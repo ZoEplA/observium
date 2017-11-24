@@ -33,7 +33,7 @@ if (!empty($agent_data['app']['nginx']))
 
   update_application($app_id, $data);
 
-  unset($nginx,$active,$reading,$writing,$req);
+  unset($nginx,$active,$reading,$writing,$waiting,$req);
 }
 
 // EOF
