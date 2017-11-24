@@ -112,6 +112,7 @@ if (!empty($argv[1]))
 
         if ($snmp_v3_seclevel != "any")
         {
+          array_pop($config['snmp']['v3']);
           array_push($config['snmp']['v3'], $snmp_v3_auth);
         }
       }
@@ -119,7 +120,7 @@ if (!empty($argv[1]))
       {
 
         $snmp_v3_auth['authlevel'] = "authNoPriv";
-        $snmp_v3_args = array_slice($argv, 4);
+        $snmp_v3_args = array_slice($add, 3);
         $snmp_v3_auth['authname'] = array_shift($snmp_v3_args);
         $snmp_v3_auth['authpass'] = array_shift($snmp_v3_args);
 
@@ -140,12 +141,13 @@ if (!empty($argv[1]))
           }
         }
 
+        array_pop($config['snmp']['v3']);
         array_push($config['snmp']['v3'], $snmp_v3_auth);
       }
       else if ($snmp_v3_seclevel == "ap" || $snmp_v3_seclevel == "authPriv")
       {
         $snmp_v3_auth['authlevel'] = "authPriv";
-        $snmp_v3_args = array_slice($argv, 4);
+        $snmp_v3_args = array_slice($add, 3);
         $snmp_v3_auth['authname'] = array_shift($snmp_v3_args);
         $snmp_v3_auth['authpass'] = array_shift($snmp_v3_args);
         $snmp_v3_auth['cryptopass'] = array_shift($snmp_v3_args);
@@ -171,11 +173,12 @@ if (!empty($argv[1]))
           }
         }
 
+        array_pop($config['snmp']['v3']);
         array_push($config['snmp']['v3'], $snmp_v3_auth);
       }
     } else {
       // v1 or v2c
-      $snmp_v2_args = array_slice($argv, 2);
+      $snmp_v2_args = array_slice($add, 2);
 
       while ($arg = array_shift($snmp_v2_args))
       {
