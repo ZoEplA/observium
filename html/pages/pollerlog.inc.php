@@ -32,8 +32,8 @@ unset($navbar);
 
 // Generate statistics
 
-$proc['avg']['poller']    = round($cache['devices']['timers']['polling']   / $devices['count'], 2);
-$proc['avg']['discovery'] = round($cache['devices']['timers']['discovery'] / $devices['count'], 2);
+$proc['avg']['poller']    = round($cache['devices']['timers']['polling']   / $cache['devices']['stat']['count'], 2);
+$proc['avg']['discovery'] = round($cache['devices']['timers']['discovery'] / $cache['devices']['stat']['count'], 2);
 $proc['avg2']['poller']    = 0;
 $proc['avg2']['discovery'] = 0;
 $proc['max']['poller']    = 0;
@@ -258,9 +258,9 @@ foreach ($poller_table as $row)
 }
 
 // Calculate root mean square
-$proc['avg2']['poller']    = sqrt($proc['avg2']['poller'] / $devices['count']);
+$proc['avg2']['poller']    = sqrt($proc['avg2']['poller'] / $cache['devices']['stat']['count']);
 $proc['avg2']['poller']    = round($proc['avg2']['poller'], 2);
-$proc['avg2']['discovery'] = sqrt($proc['avg2']['discovery'] / $devices['count']);
+$proc['avg2']['discovery'] = sqrt($proc['avg2']['discovery'] / $cache['devices']['stat']['count']);
 $proc['avg2']['discovery'] = round($proc['avg2']['discovery'], 2);
 
 echo('    <tr>
