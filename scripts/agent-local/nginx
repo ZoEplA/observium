@@ -35,4 +35,4 @@ for param in dataorder:
         Active = int(params["Reading"]) + int(params["Writing"]) + int(params["Waiting"])
         print Active
     else:
-        print params[param]
+        print params[param].strip()
