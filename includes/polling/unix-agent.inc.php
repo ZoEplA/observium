@@ -32,9 +32,31 @@ if ($device['os_group'] == "unix")
     $agent_port = $override_port;
   }
 
+  // Try SSH Connect solution by http://ispire.me/polling-observium-unix-agent-with-ssh
   $agent_start = utime();
-  $agent_socket = "tcp://".$device['hostname'].":".$agent_port;
-  $agent = @stream_socket_client($agent_socket, $errno, $errstr, 10);
+  $connection = ssh2_connect($device['hostname'], $agent_port, array('hostkey'=>'ssh-rsa'));
+  if (ssh2_auth_pubkey_file($connection, 'root',
+                          '/opt/observium/ssh/id_rsa.pub',
+                          '/opt/observium/ssh/id_rsa')) {
+
+    $stream = ssh2_exec($connection, "/usr/bin/observium_agent");
+    stream_set_blocking($stream, true);
+    $agent = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+  // This is for LibreElec
+  } elseif (ssh2_auth_pubkey_file($connection, 'root',
+                          '/opt/observium/ssh/le_rsa.pub',
+                          '/opt/observium/ssh/le_rsa')) {
+
+    $stream = ssh2_exec($connection, "/storage/observium/observium_agent");
+    stream_set_blocking($stream, true);
+    $agent = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+  // Else try official port
+  } else {
+
+    $agent_start = utime();
+    $agent_socket = "tcp://".$device['hostname'].":".$agent_port;
+    $agent = @stream_socket_client($agent_socket, $errno, $errstr, 10);
+  }
 
   if (!$agent)
   {
