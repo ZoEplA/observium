@@ -11,7 +11,9 @@
  *
  */
 
-$hrDevice_oids = array('hrDeviceType', 'hrDeviceDescr', 'hrProcessorLoad');
+//$hrDevice_oids = array('hrDeviceType', 'hrDeviceDescr', 'hrProcessorLoad');
+$hrDevice_oids = array('hrProcessorLoad');
+
 unset($hrDevice_array);
 foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmpwalk_cache_oid($device, $oid, $hrDevice_array, 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES'); }
 
