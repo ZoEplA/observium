@@ -1,0 +1,74 @@
+#!/bin/bash
+
+    #######################################################################################
+    ###
+    ##      Raspberry Pi Agent script that allows to poll health data
+    ##             (temprature, voltage, frequency)
+    ###
+    ##      Needed commands: vcgencmd
+    ###
+    ##      Version 1.0 By:
+    ##              All In One - Dennis de Houx <info@all-in-one.be>
+    ###
+    #######################################################################################
+
+    ## START SETTINGS ###
+
+        # NO SETTINGS POSSIBLE FOR THIS SCRIPT
+
+    ## END SETTINGS ###
+
+    ###
+    ## DO NOT EDIT BENEATH THIS LINE
+    ###
+    #######################################################################################
+
+        # Extract DRAM and dvfs settings from script.bin
+        bin2fex <"/boot/script.bin" 2>/dev/null | \
+                egrep "^LV._|^LV_|extrem|boot_clock|_freq|^dram_" | \
+                egrep -v "cpu_freq|dram_freq" | while read ; do
+                echo "# ${REPLY}"
+        done >/tmp/orangepi-dvfs-table
+
+        echo -e '\nGetVCore() {' >>/tmp/orangepi-dvfs-table
+
+        # parse /tmp/orangepi-dvfs-table to get dvfs entries
+        grep "^# LV._freq" /tmp/orangepi-dvfs-table | sort -r | while read ; do
+                set ${REPLY}
+                CPUFreq=$4
+                if [ ${CPUFreq} -ne 0 ]; then
+                        VCore=$(grep -A1 "^# $2" /tmp/orangepi-dvfs-table | tail -n1 | awk -F" " '{print $4}')
+                        echo -e "if [ \$1 -le $(( ${CPUFreq} / 1000 )) ]; then\n\techo -n ${VCore}\nel\c" >>/tmp/orangepi-dvfs-table
+                fi
+        done
+        echo -e "se\n\techo -n ${VCore}\nfi\n}" >>/tmp/orangepi-dvfs-table
+
+        source /tmp/orangepi-dvfs-table
+
+        read CPUFreq </sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
+        GetVCore ${CPUFreq} >/tmp/orangepi-vcore
+
+        CLOCK_CORE=`cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq`
+        VOLTS_CORE=`cat /tmp/orangepi-vcore`
+        TEMP=`cat /sys/class/thermal/thermal_zone0/temp`
+
+        if [ -z "$CLOCK_CORE" ]; then
+            echo "<<<orangepi>>>"
+            echo "clock-core: 0"
+        else
+            echo "<<<orangepi>>>"
+            echo "clock-core: $CLOCK_CORE"
+        fi
+
+        if [ -z "$VOLTS_CORE" ]; then
+            echo "volts-core: 0"
+        else
+            echo "volts-core: $VOLTS_CORE"
+        fi
+
+        if [ -z "$TEMP" ]; then
+            echo "temp-core: 0"
+        else
+            echo "temp-core: $TEMP"
+        fi
+
