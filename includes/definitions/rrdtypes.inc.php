@@ -1676,6 +1676,17 @@ $config['rrd_types']['nginx'] = array(
   ),
 );
 
+// HTTP Live Streaming (HLS)
+
+
+$config['rrd_types']['hls'] = array(
+  'file'  => 'app-hls-%index%.rrd',
+  'ds'    => array(
+    'bitrate_video'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'bitrate_audio'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+  ),
+);
+
 // CrashPlan
 
 $config['rrd_types']['crashplan'] = array(

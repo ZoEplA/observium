@@ -27,6 +27,7 @@ $config['app']['postgresql']['top']        = array('xact', 'blks', 'tuples', 'tu
 $config['app']['memcached']['top']         = array('bits', 'commands', 'data', 'items');
 $config['app']['dhcpkit']['top']           = array('packets', 'msgtypes');
 $config['app']['drbd']['top']              = array('disk_bits', 'network_bits', 'queue', 'unsynced');
+$config['app']['hls']['top']               = array('multi_video');
 $config['app']['ioping']['top']            = array('iops', 'speed', 'timing');
 $config['app']['ntpd']['top']              = array('stats', 'freq', 'stratum', 'bits');
 $config['app']['nfs']['top']               = array('nfs2','nfs3', 'nfs4');

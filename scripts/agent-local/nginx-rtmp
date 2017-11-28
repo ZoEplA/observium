@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use XML::LibXML;
+
+# create object
+my $xml = XML::LibXML->load_xml(location => 'http://127.0.0.1:8080/stats/');
+
+print "<<<app-hls>>>\n";
+
+########################
+### Bandwidth Statistics
+########################
+
+foreach my $stream ($xml->findnodes('/rtmp/server/application/live/stream')) {
+    say $stream->findvalue('./name'), ' ', $stream->findvalue('./bw_video'), ' ', $stream->findvalue('./bw_audio');
+}
+
