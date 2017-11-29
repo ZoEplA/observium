@@ -23,9 +23,7 @@
 ###
 #######################################################################################
 
-DVFS_FILE = /tmp/orangepi-dvfs-table
-
-if [ ! -e $DVFS_FILE]; then
+if [ ! -e /tmp/orangepi-dvfs-table ]; then
     # Extract DRAM and dvfs settings from script.bin
     bin2fex <"/boot/script.bin" 2>/dev/null | \
         egrep "^LV._|^LV_|extrem|boot_clock|_freq|^dram_" | \
@@ -36,15 +34,19 @@ if [ ! -e $DVFS_FILE]; then
     echo -e '\nGetVCore() {' >>/tmp/orangepi-dvfs-table
 
     # parse /tmp/orangepi-dvfs-table to get dvfs entries
-    grep "^# LV._freq" /tmp/orangepi-dvfs-table | sort -r | while read ; do
-        set ${REPLY}
-        CPUFreq=$4
-        if [ ${CPUFreq} -ne 0 ]; then
-            VCore=$(grep -A1 "^# $2" /tmp/orangepi-dvfs-table | tail -n1 | awk -F" " '{print $4}')
-            echo -e "if [ \$1 -le $(( ${CPUFreq} / 1000 )) ]; then\n\techo -n ${VCore}\nel\c" >>/tmp/orangepi-dvfs-table
-        fi
-    done
-    echo -e "se\n\techo -n ${VCore}\nfi\n}" >>/tmp/orangepi-dvfs-table
+    grep "^# LV._freq" /tmp/orangepi-dvfs-table | sort -r |
+    {
+        while read ;
+        do
+            set ${REPLY}
+            CPUFreq=$4
+            if [ ${CPUFreq} -ne 0 ]; then
+                VCore=$(grep -A1 "^# $2" /tmp/orangepi-dvfs-table | tail -n1 | awk -F" " '{print $4}')
+                echo -e "if [ \$1 -le $(( ${CPUFreq} / 1000 )) ]; then\n\techo ${VCore}\nel\c" >>/tmp/orangepi-dvfs-table
+            fi
+        done
+        echo -e "se\n\techo ${VCore}\nfi\n}" >>/tmp/orangepi-dvfs-table
+    }
 fi
 
 source /tmp/orangepi-dvfs-table
@@ -52,27 +54,13 @@ source /tmp/orangepi-dvfs-table
 read CPUFreq </sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 GetVCore ${CPUFreq} >/tmp/orangepi-vcore
 
-CLOCK_CORE=`cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq`
-VOLTS_CORE=`cat /tmp/orangepi-vcore`
-TEMP=`cat /sys/class/thermal/thermal_zone0/temp`
-
 echo "<<<orangepi>>>"
 
-if [ -z "$CLOCK_CORE" ]; then
-    echo "clock-core: 0"
-else
-    echo "clock-core: $CLOCK_CORE"
-fi
+printf "clock-core: "
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq
 
-if [ -z "$VOLTS_CORE" ]; then
-    echo "volts-core: 0"
-else
-    echo "volts-core: $VOLTS_CORE"
-fi
+printf "volts-core: "
+cat /tmp/orangepi-vcore
 
-if [ -z "$TEMP" ]; then
-    echo "temp-core: 0"
-else
-    echo "temp-core: $TEMP"
-fi
-
+printf "temp-core: "
+cat /sys/class/thermal/thermal_zone0/temp
