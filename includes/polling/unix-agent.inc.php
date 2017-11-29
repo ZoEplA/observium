@@ -34,8 +34,14 @@ if ($device['os_group'] == "unix")
 
   // Try SSH Connect solution by http://ispire.me/polling-observium-unix-agent-with-ssh
   $agent_start = utime();
-  $connection = ssh2_connect($device['hostname'], $agent_port, array('hostkey'=>'ssh-rsa'));
-  if (ssh2_auth_pubkey_file($connection, 'root',
+
+  // Change socket timeout
+  $originalConnectionTimeout = ini_get('default_socket_timeout');
+  ini_set('default_socket_timeout', 10);
+
+  $connection = ssh2_connect($device['hostname'], $device['ssh_port'], array('hostkey'=>'ssh-rsa'));
+
+  if ($connection && ssh2_auth_pubkey_file($connection, 'root',
                           '/opt/observium/ssh/id_rsa.pub',
                           '/opt/observium/ssh/id_rsa')) {
 
@@ -43,9 +49,9 @@ if ($device['os_group'] == "unix")
     stream_set_blocking($stream, true);
     $agent = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
   // This is for LibreElec
-  } elseif (ssh2_auth_pubkey_file($connection, 'root',
-                          '/opt/observium/ssh/le_rsa.pub',
-                          '/opt/observium/ssh/le_rsa')) {
+  } elseif ($connection && ssh2_auth_pubkey_file($connection, 'root',
+                               '/opt/observium/ssh/le_rsa.pub',
+                               '/opt/observium/ssh/le_rsa')) {
 
     $stream = ssh2_exec($connection, "/storage/observium/observium_agent");
     stream_set_blocking($stream, true);
@@ -57,6 +63,14 @@ if ($device['os_group'] == "unix")
     $agent_socket = "tcp://".$device['hostname'].":".$agent_port;
     $agent = @stream_socket_client($agent_socket, $errno, $errstr, 10);
   }
+
+  // Close SSH connection
+  if ($connection) {
+    ssh2_exec($connection, "exit");
+  }
+
+  // Restore the original timeout
+  ini_set('default_socket_timeout', $originalConnectionTimeout);
 
   if (!$agent)
   {
