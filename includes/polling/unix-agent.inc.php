@@ -14,6 +14,11 @@
 // FIXME. From this uses only check_valid_sensors(), maybe need move to global functions or copy to polling. --mike
 // Also uses check_valid_virtual_machines(). We (should) do a lot more discovery through the agent, IMO we should do away with the distinction. --tom
 include_once("includes/discovery/functions.inc.php");
+include_once("Net/SSH2.php");
+include_once("Crypt/RSA.php");
+
+// define("NET_SSH2_LOGGING", NET_SSH2_LOG_REALTIME_FILE);
+// define("NET_SSH2_LOG_REALTIME_FILENAME", "/opt/observium/logs/debugssh.log");
 
 global $valid, $agent_sensors;
 
@@ -32,52 +37,44 @@ if ($device['os_group'] == "unix")
     $agent_port = $override_port;
   }
 
-  // Try SSH Connect solution by http://ispire.me/polling-observium-unix-agent-with-ssh
+  // Try SSH Connect inspired by http://ispire.me/polling-observium-unix-agent-with-ssh
   $agent_start = utime();
 
-  // Change socket timeout
-  $originalConnectionTimeout = ini_get('default_socket_timeout');
-  ini_set('default_socket_timeout', 10);
+  $key1 = new Crypt_RSA();
+  if (file_exists("/opt/observium/ssh/id_rsa")) {
+    $key1->loadKey(file_get_contents("/opt/observium/ssh/id_rsa"));
+  }
 
-  $connection = ssh2_connect($device['hostname'], $device['ssh_port'], array('hostkey'=>'ssh-rsa'));
+  $key2 = new Crypt_RSA();
+  if (file_exists("/opt/observium/ssh/le_rsa")) {
+    $key2->loadKey(file_get_contents("/opt/observium/ssh/le_rsa"));
+  }
 
-  if ($connection && ssh2_auth_pubkey_file($connection, 'root',
-                          '/opt/observium/ssh/id_rsa.pub',
-                          '/opt/observium/ssh/id_rsa')) {
+  $connection = new Net_SSH2($device['hostname'], $device['ssh_port'], 10);
 
-    $stream = ssh2_exec($connection, "/usr/bin/observium_agent");
-    stream_set_blocking($stream, true);
-    $agent = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+  $connection->enableQuietMode();
+
+  if ($connection->login("root", $key1)) {
+    $agent_raw = $connection->exec("/usr/bin/observium_agent");
   // This is for LibreElec
-  } elseif ($connection && ssh2_auth_pubkey_file($connection, 'root',
-                               '/opt/observium/ssh/le_rsa.pub',
-                               '/opt/observium/ssh/le_rsa')) {
-
-    $stream = ssh2_exec($connection, "/storage/observium/observium_agent");
-    stream_set_blocking($stream, true);
-    $agent = ssh2_fetch_stream($stream, SSH2_STREAM_STDIO);
+  } elseif ($connection->login("root", $key2)) {
+    $agent_raw = $connection->exec("/storage/observium/observium_agent");
   // Else try official port
   } else {
+    print_warning("SSH connection to UNIX agent failed. Fallback to xinetd connection.");
+    logfile("UNIX-AGENT: SSH connection failed. Fallback to xinetd connection.");
 
-    $agent_start = utime();
+    // Fallback to xinetd connection
     $agent_socket = "tcp://".$device['hostname'].":".$agent_port;
     $agent = @stream_socket_client($agent_socket, $errno, $errstr, 10);
-  }
 
-  // Close SSH connection
-  if ($connection) {
-    ssh2_exec($connection, "exit");
-  }
-
-  // Restore the original timeout
-  ini_set('default_socket_timeout', $originalConnectionTimeout);
-
-  if (!$agent)
-  {
-    print_warning("Connection to UNIX agent on ".$agent_socket." failed. ERROR: ".$errno." ".$errstr);
-    logfile("UNIX-AGENT: Connection on ".$agent_socket." failed. ERROR: ".$errno." ".$errstr);
-  } else {
-    $agent_raw = stream_get_contents($agent);
+    if (!$agent)
+    {
+        print_warning("Connection to UNIX agent on ".$agent_socket." failed. ERROR: ".$errno." ".$errstr);
+        logfile("UNIX-AGENT: Connection on ".$agent_socket." failed. ERROR: ".$errno." ".$errstr);
+    } else {
+        $agent_raw = stream_get_contents($agent);
+    }
   }
 
   $agent_end = utime(); $agent_time = round(($agent_end - $agent_start) * 1000);
