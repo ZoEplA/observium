@@ -59,6 +59,7 @@ $cpu_oids = array('ssCpuRawUser' => array('colour' => 'c02020'),
                   'ssCpuRawInterrupt' => array(),
                   'ssCpuRawSoftIRQ' => array(),
                   'ssCpuRawKernel' => array(),
+                  'ssCpuRawSteal' => array(),
                   'ssCpuRawIdle' => array('colour' => 'f5f5e5'),
                   );
 $bstack = '';

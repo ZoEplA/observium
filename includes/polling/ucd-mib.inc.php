@@ -55,16 +55,17 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
        DS:user:COUNTER:600:0:U \
        DS:system:COUNTER:600:0:U \
        DS:nice:COUNTER:600:0:U \
+       DS:steal:COUNTER:600:0:U \
        DS:idle:COUNTER:600:0:U ";
 
     // This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
     // and because it is per-host and no big performance hit. See new format below
     // FIXME REMOVE
 
-    if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle']))
+    if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawSteal']) && is_numeric($ss['ssCpuRawIdle']))
     {
       rrdtool_create($device, $cpu_rrd, $cpu_rrd_create);
-      rrdtool_update($device, $cpu_rrd, array($ss['ssCpuRawUser'],$ss['ssCpuRawSystem'],$ss['ssCpuRawNice'],$ss['ssCpuRawIdle']));
+      rrdtool_update($device, $cpu_rrd, array($ss['ssCpuRawUser'],$ss['ssCpuRawSystem'],$ss['ssCpuRawNice'],$ss['ssCpuRawSteal'],$ss['ssCpuRawIdle']));
       $graphs['ucd_cpu'] = TRUE;
     }
 
@@ -85,7 +86,7 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
       }
     }
 
-    $cpu_oids = array('ssCpuRawUser','ssCpuRawNice','ssCpuRawSystem','ssCpuRawIdle','ssCpuRawInterrupt', 'ssCpuRawSoftIRQ', 'ssCpuRawKernel', 'ssCpuRawWait');
+    $cpu_oids = array('ssCpuRawUser','ssCpuRawNice','ssCpuRawSystem','ssCpuRawIdle','ssCpuRawInterrupt', 'ssCpuRawSoftIRQ', 'ssCpuRawKernel', 'ssCpuRawWait', 'ssCpuRawSteal');
 
     $ss_cpu_total = 0;
     foreach ($cpu_oids as $oid)
