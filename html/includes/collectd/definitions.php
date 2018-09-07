@@ -494,16 +494,16 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false) {
 		'GPRINT:temp_avg:LAST:%4.1lf\l');
 	$GraphDefs['humidity'] = array(
 		#'-v', 'Percent',
-		'DEF:temp_avg={file}:value:AVERAGE',
-		'DEF:temp_min={file}:value:MIN',
-		'DEF:temp_max={file}:value:MAX',
-		"AREA:temp_max#$HalfGreen",
-		"AREA:temp_min#$Canvas",
-		"LINE1:temp_avg#$FullGreen:Temperature",
-		'GPRINT:temp_min:MIN:%4.1lf%% ',
-		'GPRINT:temp_avg:AVERAGE:%4.1lf%% ',
-		'GPRINT:temp_max:MAX:%4.1lf%%',
-		'GPRINT:temp_avg:LAST:%4.1lf%%\l');
+		'DEF:humidity_avg={file}:value:AVERAGE',
+		'DEF:humidity_min={file}:value:MIN',
+		'DEF:humidity_max={file}:value:MAX',
+		"AREA:humidity_max#$HalfGreen",
+		"AREA:humidity_min#$Canvas",
+		"LINE1:humidity_avg#$FullGreen:Humidity",
+		'GPRINT:humidity_min:MIN:%4.1lf%% ',
+		'GPRINT:humidity_avg:AVERAGE:%4.1lf%% ',
+		'GPRINT:humidity_max:MAX:%4.1lf%%',
+		'GPRINT:humidity_avg:LAST:%4.1lf%%\l');
 	$GraphDefs['if_errors'] = array(
 		#'-v', 'Errors/s',
                 '--units=si',

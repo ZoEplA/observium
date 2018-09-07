@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -21,7 +21,7 @@ if (is_numeric($vars['id']))
     $device = device_by_id_cache($data['device_id']);
 
     $graph_title = $device['hostname'];
-    $graph_title .= " :: AS" . escape_html($data['bgpPeerRemoteAs']);
+    $graph_title .= " :: AS" . ($config['web_show_bgp_asdot'] ? bgp_asplain_to_asdot($data['bgpPeerRemoteAs']) : $data['bgpPeerRemoteAs']);
     $auth = TRUE;
   }
 }

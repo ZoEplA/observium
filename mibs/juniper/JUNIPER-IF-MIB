@@ -126,7 +126,7 @@ ifJnx MODULE-IDENTITY
         ifJnxOutHslFifoUnderFlows Counter64,
         ifJnxOutHslCrcErrors   Counter32,
         ifJnxCrcErrors         Counter64,
-        ifJnxFcsErrors         Counter65,
+        ifJnxFcsErrors         Counter64,
 	    ifHCIn1SecOctets	   CounterBasedGauge64,
 	    ifHCOut1SecOctets	   CounterBasedGauge64
 	}

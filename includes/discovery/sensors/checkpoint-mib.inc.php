@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -53,7 +53,7 @@ foreach ($chkpnt['volt'] as $index => $entry)
 # CHECKPOINT-MIB::haStarted.0 = STRING: yes
 # CHECKPOINT-MIB::haState.0 = STRING: standby
 # CHECKPOINT-MIB::haStatCode.0 = INTEGER: 0
-$chkpnt['ha'] = snmp_get_multi($device, 'haProdName.0 haStarted.0 haState.0 haStatCode.0', '-OQUs', 'CHECKPOINT-MIB');
+$chkpnt['ha'] = snmp_get_multi_oid($device, 'haProdName.0 haStarted.0 haState.0 haStatCode.0', array(), 'CHECKPOINT-MIB');
 
 if (isset($chkpnt['ha'][0]) && $chkpnt['ha'][0]['haStarted'] == 'yes')
 {

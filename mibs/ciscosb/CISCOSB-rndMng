@@ -485,6 +485,18 @@ rlSysNameRowStatus OBJECT-TYPE
          row installation and removal conventions."
     ::= { rlSysNameEntry 4 }
 
+-------------------------------------------------------------------------------
 
+rlErrdisableLinkFlappingCause OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable Link flapping error disable in the switch."
+    ::= { rndMng 20 }
+
+
+-------------------------------------------------------------------------------
+	
 END
 

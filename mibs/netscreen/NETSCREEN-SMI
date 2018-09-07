@@ -8,7 +8,9 @@ IMPORTS
         FROM SNMPv2-SMI
     ;
 
-netscreenSmiMibModule MODULE-IDENTITY
+-- netscreenSmiMibModule MODULE-IDENTITY
+
+ netscreen MODULE-IDENTITY
     LAST-UPDATED  "200408310000Z" -- Aug 31, 2004
     ORGANIZATION
         "Juniper Networks, Inc."
@@ -39,9 +41,10 @@ netscreenSmiMibModule MODULE-IDENTITY
     REVISION      "200008020000Z" -- August 02, 2000
     DESCRIPTION
         "Creation Date"
-    ::= { netscreen 50 }
+--    ::= { netscreen 50 }
+    ::= { enterprises 3224 }
 
-netscreen OBJECT IDENTIFIER ::= { enterprises 3224 }
+-- netscreen OBJECT IDENTIFIER ::= { enterprises 3224 }
 
 netscreenTrap OBJECT IDENTIFIER ::= { netscreen 0 }
 
@@ -81,7 +84,9 @@ netscreenIp OBJECT IDENTIFIER ::= { netscreen 17 }
 
 netscreenVR OBJECT IDENTIFIER ::= { netscreen 18 }
 
-netscreenChasis OBJECT IDENTIFIER ::= { netscreen 21 }
+netscreenChassis OBJECT IDENTIFIER ::= { netscreen 21 }
+
+netscreenUAC OBJECT IDENTIFIER ::= { netscreen 22 }
 
 netscreenSettingMibModule OBJECT IDENTIFIER ::= { netscreenSetting 0 }
 

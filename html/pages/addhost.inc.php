@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -29,7 +29,7 @@ if ($vars['hostname'])
     if ($result)
     {
       $device_url  = generate_device_url(array('device_id' => $result));
-      $device_link = '<a href="' . $device_url . '" class="entity-popup" data-eid="' . $result . '" data-etype="device">' . $hostname . '</a>';
+      $device_link = '<a href="' . $device_url . '" class="entity-popup" data-eid="' . $result . '" data-etype="device">' . escape_html($vars['hostname']) . '</a>';
       print_success("Device added (id = $result): $device_link");
     }
 
@@ -100,7 +100,7 @@ foreach ($config['snmp']['transports'] as $transport)
                                       'fieldset'    => 'edit',
                                       'name'        => 'Hostname',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['hostname']));
+                                      'value'       => $vars['hostname']);
       $form['row'][2]['ping_skip'] = array(
                                       'type'        => 'checkbox',
                                       'fieldset'    => 'edit',
@@ -127,21 +127,21 @@ foreach ($config['snmp']['transports'] as $transport)
                                       'name'        => 'Port',
                                       'placeholder' => '161',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_port']));
+                                      'value'       => $vars['snmp_port']);
       $form['row'][6]['snmp_timeout'] = array(
                                       'type'        => 'text',
                                       'fieldset'    => 'edit',
                                       'name'        => 'Timeout',
                                       'placeholder' => '1',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_timeout']));
+                                      'value'       => $vars['snmp_timeout']);
       $form['row'][7]['snmp_retries'] = array(
                                       'type'        => 'text',
                                       'fieldset'    => 'edit',
                                       'name'        => 'Retries',
                                       'placeholder' => '5',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_retries']));
+                                      'value'       => $vars['snmp_retries']);
       $form['row'][8]['ignorerrd'] = array(
                                       'type'        => 'checkbox',
                                       'fieldset'    => 'edit',
@@ -156,7 +156,7 @@ foreach ($config['snmp']['transports'] as $transport)
                                       'fieldset'    => 'snmpv2',
                                       'name'        => 'SNMP Community',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_community'])); // FIXME. For passwords we should use filter instead escape!
+                                      'value'       => $vars['snmp_community']); // FIXME. For passwords we should use filter instead escape!
 
       // Snmp v3 fieldset
       $form['row'][17]['snmp_authlevel'] = array(
@@ -173,13 +173,13 @@ foreach ($config['snmp']['transports'] as $transport)
                                       'fieldset'    => 'snmpv3',
                                       'name'        => 'Auth Username',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_authname']));
+                                      'value'       => $vars['snmp_authname']);
       $form['row'][19]['snmp_authpass'] = array(
                                       'type'        => 'text',
                                       'fieldset'    => 'snmpv3',
                                       'name'        => 'Auth Password',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_authpass'])); // FIXME. For passwords we should use filter instead escape!
+                                      'value'       => $vars['snmp_authpass']); // FIXME. For passwords we should use filter instead escape!
       $form['row'][20]['snmp_authalgo'] = array(
                                       'type'        => 'select',
                                       'fieldset'    => 'snmpv3',
@@ -192,7 +192,7 @@ foreach ($config['snmp']['transports'] as $transport)
                                       'fieldset'    => 'snmpv3',
                                       'name'        => 'Crypto Password',
                                       'width'       => '250px',
-                                      'value'       => escape_html($vars['snmp_cryptopass'])); // FIXME. For passwords we should use filter instead escape!
+                                      'value'       => $vars['snmp_cryptopass']); // FIXME. For passwords we should use filter instead escape!
       $form['row'][22]['snmp_cryptoalgo'] = array(
                                       'type'        => 'select',
                                       'fieldset'    => 'snmpv3',

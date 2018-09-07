@@ -3,7 +3,7 @@
 -- -----------------------------------------------------------------------------
 -- Version X.X, 2016/2/11
 -- This is compilation of multiple different DLINK-ID-REC-MIB files
--- by Observium Limited (Mike Stupalov)
+-- by Mike Stupalov
 -- -----------------------------------------------------------------------------
 -- Version 1.4, 2014/4/24
 -- Add dlinkPrimeCommon for DGS1100 serial product.

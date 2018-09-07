@@ -26,7 +26,7 @@ MITEL-APPCMN-MIB DEFINITIONS ::= BEGIN
            FROM MITEL-CMNALM-MIB;
 
     mitelAppCommon        MODULE-IDENTITY
-        LAST-UPDATED      "200502212134Z"
+        LAST-UPDATED      "201402111200Z"
         ORGANIZATION      "MITEL Networks Corporation"
         CONTACT-INFO      "Standards Group,
                            Postal:    MITEL Networks Corporation
@@ -35,7 +35,9 @@ MITEL-APPCMN-MIB DEFINITIONS ::= BEGIN
                            Canada  K2K 2W7
                            Tel: +1 613 592 2122
                            Fax: +1 613 592 4784
-                           E-mail: std@mitel.com"
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replaced E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
         DESCRIPTION       "The MITEL Application-Specific Common MIB module."
         REVISION          "200502212134Z"
         DESCRIPTION       "Some additional attributes added to the Applications table." 

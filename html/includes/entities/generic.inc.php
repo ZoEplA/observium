@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -40,14 +40,6 @@ function print_f5_lb_virtual_table_header($vars)
   echo(get_table_header($cols, $vars));
   echo('<tbody>' . PHP_EOL);
 }
-
-
-
-
-
-
-
-
 
 function get_customoid_by_id($oid_id)
 {
@@ -157,7 +149,7 @@ function generate_entity_popup_header($entity, $vars)
       {
         $peer_name = '<br /><span style="font-weight: bold;">' . $entity['reverse_dns'] . '</span>';
       }
-      $astext = '<span>AS'.$entity['bgpPeerRemoteAs'];
+      $astext = '<span>AS'.$entity['human_remote_as'];
       if ($entity['astext'])
       {
         $astext .= '<br />' . $entity['astext'] . '</span>';
@@ -170,7 +162,7 @@ function generate_entity_popup_header($entity, $vars)
           <td class="state-marker"></td>
           <td style="width: 10px;"></td>
           <td style="width: 10px;"><i class="'.$translate['icon'].'"></i></td>
-          <td><a class="entity-popup" style="font-size: 15px; font-weight: bold;">'.$entity['entity_shortname'].'</a>'.$peer_name.'</td>
+          <td><a class="entity-popup" style="font-size: 15px; font-weight: bold;">'.escape_html($entity['entity_shortname']).'</a>'.$peer_name.'</td>
           <td class="text-nowrap" style="width: 20%;">'.$astext.'</td>
           <td></td>
         </tr>
@@ -275,7 +267,7 @@ function generate_entity_popup_header($entity, $vars)
         <tr class="' . $entity['row_class'] . '" style="font-size: 10pt;">
           <td class="state-marker"></td>
           <td style="width: 10px;"></td>
-          <td width="400"><i class="'.$translate['icon'].'" style="margin-right: 10px;"></i> <a class="entity-popup" style="font-size: 15px; font-weight: bold;">'.$entity['entity_name'].'</a></td>
+          <td width="400"><i class="'.$translate['icon'].'" style="margin-right: 10px;"></i> <a class="entity-popup" style="font-size: 15px; font-weight: bold;">'.escape_html($entity['entity_name']).'</a></td>
           <td width="100"></td>
           <td></td>
         </tr>

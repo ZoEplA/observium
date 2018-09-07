@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-10-01-0027
+-- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-OSPF-MIB.my
  --
@@ -18,7 +18,7 @@
 
 	
  cienaCesOspfMIB MODULE-IDENTITY
-	    LAST-UPDATED "201102020000Z"
+	    LAST-UPDATED "201304180000Z"
 	    ORGANIZATION "Ciena, Inc"
 	    CONTACT-INFO
 		    "   Mib Meister
@@ -29,6 +29,11 @@
 			Email:  support@ciena.com"
 	    DESCRIPTION
 		    "This MIB module is for the Extension of the OSPF MIB for CIENA Products"
+
+	    REVISION
+	    	"201304180000Z"
+	    DESCRIPTION
+		"Fixed miscellaneous typos and descriptions."
 
 	    REVISION
 	    	"201102020000Z"
@@ -67,19 +72,19 @@
     STATUS       current
     DESCRIPTION
        "Indicates metrics used to choose among multiple
-       AS-external-LSAs.  When RFC1583Compatibility is set to
-       TRUE, only cost will be used when choosing among
+       AS-external-LSAs. When RFC1583Compatibility is set to
+       TRUE, only cost is used when choosing among
        multiple AS-external-LSAs advertising the same
-       destination.  When RFC1583Compatibility is set to
-       FALSE, preference will be driven first by type of
+       destination. When RFC1583Compatibility is set to
+       FALSE, preference is driven first by type of
        path using cost only to break ties.
 
        In order to minimize the chance of routing loops, all OSPF
        routers in an OSPF routing domain should have
-       RFC1583Compatibility set identically.  When there are routers
+       RFC1583Compatibility set identically. When there are routers
        present that have not been updated with the functionality
        specified in RFC2328 Section 16.4.1, all routers should
-       have RFC1583Compatibility set to TRUE.  Otherwise, all
+       have RFC1583Compatibility set to TRUE. Otherwise, all
        routers should have RFC1583Compatibility set to FALSE,
        preventing all routing loops."
     REFERENCE
@@ -101,7 +106,7 @@
        MAX-ACCESS   read-only
        STATUS       current
        DESCRIPTION
-          "The router's support for Opaque LSA types.  This value cannot be
+          "The router's support for Opaque LSA types. This value cannot be
            changed when OSPF is active and operStatus is up."
        REFERENCE
           "The OSPF Opaque LSA Option"
@@ -139,8 +144,7 @@
        MAX-ACCESS   read-only
        STATUS       current
        DESCRIPTION
-          "The number of updates that are pending addition to the Link State
-          Database."
+          "The number of pending updates to the Link State Database."
        ::= { cienaCesOspfGeneralGroup 7 }
 
   cienaCesOspfNumUpdMerged OBJECT-TYPE
@@ -167,12 +171,12 @@
        MAX-ACCESS   read-only
        STATUS       current
        DESCRIPTION
-          "The maximum delay before the Routing Table is
+          "The maximum delay before the routing table is
           recalculated following a change to the Link State
-          Database.  (Recalculation is delayed to reduce the
-          frequency of recalculations of the Routing Table).
+          Database. (Recalculation is delayed to reduce the
+          frequency of recalculations of the routing table).
 
-          This parameter has units of milliseconds.  A value of
+          This parameter has units of milliseconds. A value of
           0 indicates that a routing calculation will
           immediately follow an update to the database."
        DEFVAL { 5000 }
@@ -191,14 +195,15 @@
 --      virtual links are configured as part of these areas.
 --      Area 0.0.0.0, by definition, is the Backbone Area
 
+
  cienaCesOspfAreaTable OBJECT-TYPE
      SYNTAX   SEQUENCE OF CienaCesOspfAreaEntry
      MAX-ACCESS   not-accessible
      STATUS   current
      DESCRIPTION
-        "Information describing the configured  parame-
-        ters  and cumulative statistics of the router's
-        attached areas."
+        "Information describing the configured parameters 
+        and cumulative statistics of the router's attached 
+        areas."
     REFERENCE
        "OSPF Version 2, Section 6  The Area Data Struc-
        ture"
@@ -210,9 +215,9 @@
      MAX-ACCESS   not-accessible
      STATUS   current
      DESCRIPTION
-        "Information describing the configured  parame-
-        ters  and  cumulative  statistics of one of the
-        router's attached areas."
+        "Information describing the configured parameters  
+        and cumulative statistics of one of the router's 
+        attached areas."
     INDEX { cienaCesOspfAreaId }
     ::= { cienaCesOspfAreaTable 1 }
 
@@ -253,7 +258,7 @@
       DESCRIPTION
          "This parameter indicates whether the area can carry data
          traffic that neither originates nor terminates in the area
-         itself.  This parameter is calculated when the area's shortest-path
+         itself. This parameter is calculated when the area's shortest-path
          tree is built."
       DEFVAL { false }
       ::= { cienaCesOspfAreaEntry 2 }
@@ -375,8 +380,8 @@
      MAX-ACCESS   not-accessible
      STATUS   current
      DESCRIPTION
-        "The OSPF Interface Table describes the  inter-
-        faces from the viewpoint of OSPF."
+        "The OSPF interface table describes the interfaces from the viewpoint 
+        of OSPF."
     REFERENCE
        "OSPF Version 2, Appendix C.3  Router  interface
        parameters"
@@ -388,8 +393,8 @@
      MAX-ACCESS   not-accessible
      STATUS   current
      DESCRIPTION
-        "The OSPF Interface Entry describes one  inter-
-        face from the viewpoint of OSPF."
+        "The OSPF interface entry describes one interface from the viewpoint 
+        of OSPF."
     INDEX { cienaCesOspfIfIpAddress, cienaCesOspfAddressLessIf }
     ::= { cienaCesOspfIfTable 1 }
 
@@ -417,11 +422,11 @@
       MAX-ACCESS   not-accessible
       STATUS   current
       DESCRIPTION
-         "For the purpose of easing  the  instancing  of
-         addressed   and  addressless  interfaces;  This
-         variable takes the value 0 on  interfaces  with
-         IP  Addresses,  and  the corresponding value of
-         ifIndex for interfaces having no IP Address."
+         "For the purpose of easing the instancing of
+         addressed and addressless interfaces, this
+         variable takes the value 0 on interfaces with
+         IP addresses, and the corresponding value of
+         ifIndex for interfaces having no IP address."
      ::= { cienaCesOspfIfEntry 2 }
 
  cienaCesOspfIfLsaCount OBJECT-TYPE
@@ -430,7 +435,7 @@
       STATUS       current
       DESCRIPTION
          "The total number of link-local link state advertisements
-         in this interface's link-local link state database."
+         in this interface's link-local Link State Database."
       ::= { cienaCesOspfIfEntry 3 }
 
  cienaCesOspfIfLsaCksumSum OBJECT-TYPE
@@ -440,10 +445,10 @@
       DESCRIPTION
          "The 32-bit unsigned sum of the link-state
          advertisements' LS checksums contained in this
-         interface's link-local link state database.
+         interface's link-local Link State Database.
          The sum can be used to determine if there has
-         been a change in the interface's link state database,
-         and to compare the interface link-state database of
+         been a change in the interface's Link State Database,
+         and to compare the interface Link State Database of
          routers attached to the same subnet."
       ::= { cienaCesOspfIfEntry 4 }
 
@@ -460,7 +465,7 @@
       MAX-ACCESS   read-only
       STATUS       current
       DESCRIPTION
-        "The subnet mask associated with the IP address of this entry.  The
+        "The subnet mask associated with the IP address of this entry. The
         value of the mask is an IP address with all the network bits set to 1
         and all the hosts bits set to 0."
       ::= { cienaCesOspfIfEntry 6 }
@@ -471,9 +476,9 @@
        MAX-ACCESS   read-only
        STATUS       current
        DESCRIPTION
-          "The time this interface will delay a LSU packet, in order to
-          add more LSAs to the packet before sending.  Setting this
-          correctly can reduce the network traffic.  This is configurable
+          "The time this interface delays a LSU packet, in order to
+          add more LSAs to the packet before sending. Setting this
+          correctly can reduce the network traffic. This is configurable
           on a per-interface basis."
        DEFVAL { 100 }
        ::= { cienaCesOspfIfEntry 7 }

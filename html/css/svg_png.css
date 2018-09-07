@@ -167,3 +167,73 @@ only screen and (                min-resolution: 2dppx)
   }
 }
 
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+/*only screen and (     -o-min-device-pixel-ratio: 2/1),*/
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx)
+{
+  [class^="sprite-"], [class*=" sprite-"] {
+    background-size: 234px 216px;
+    background-image: url("../img/svg_png_36.png");
+  }
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+/*only screen and (     -o-min-device-pixel-ratio: 2/1),*/
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx)
+{
+  [class^="sprite-"], [class*=" sprite-"] {
+    background-size: 234px 216px;
+    background-image: url("../img/svg_png_36.png");
+  }
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+/*only screen and (     -o-min-device-pixel-ratio: 2/1),*/
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx)
+{
+  [class^="sprite-"], [class*=" sprite-"] {
+    background-size: 234px 216px;
+    background-image: url("../img/svg_png_36.png");
+  }
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+/*only screen and (     -o-min-device-pixel-ratio: 2/1),*/
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx)
+{
+  [class^="sprite-"], [class*=" sprite-"] {
+    background-size: 234px 216px;
+    background-image: url("../img/svg_png_36.png");
+  }
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+/*only screen and (     -o-min-device-pixel-ratio: 2/1),*/
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx)
+{
+  [class^="sprite-"], [class*=" sprite-"] {
+    background-size: 234px 216px;
+    background-image: url("../img/svg_png_36.png");
+  }
+}
+

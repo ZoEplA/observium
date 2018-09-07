@@ -7,11 +7,11 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-$snmpdata = snmp_get_multi($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0', '-OQUs', 'SNMPv2-MIB');
+$snmpdata = snmp_get_multi_oid($device, 'sysUpTime.0 sysLocation.0 sysContact.0 sysName.0', array(), 'SNMPv2-MIB');
 $polled   = round($GLOBALS['exec_status']['endtime']);
 if (is_array($snmpdata[0]))
 {
@@ -24,19 +24,13 @@ if (is_array($snmpdata[0]))
   }
 }
 
-$sysDescr = snmp_get($device, 'sysDescr.0', '-Oqv', 'SNMPv2-MIB');
+$sysDescr = snmp_get_oid($device, 'sysDescr.0', 'SNMPv2-MIB');
 if ($GLOBALS['snmp_status'] || $GLOBALS['snmp_error_code'] === 1) // Allow empty response for sysDescr (not timeouts)
 {
   $poll_device['sysDescr']   = $sysDescr;
 }
 
-$poll_device['sysObjectID']  = snmp_get($device, 'sysObjectID.0', '-Oqvn', 'SNMPv2-MIB');
-if (strlen($poll_device['sysObjectID']) && $poll_device['sysObjectID'][0] != '.')
-{
-  // Wrong Type (should be OBJECT IDENTIFIER): "1.3.6.1.4.1.25651.1.2"
-  //list(, $poll_device['sysObjectID']) = explode(':', $poll_device['sysObjectID']);
-  $poll_device['sysObjectID'] = '.' . $poll_device['sysObjectID'];
-}
+$poll_device['sysObjectID']  = snmp_cache_sysObjectID($device);
 $poll_device['snmpEngineID'] = snmp_cache_snmpEngineID($device);
 
 unset($snmpdata, $sysDescr);

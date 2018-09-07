@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: SSHFP.php 179 2012-11-23 05:49:01Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -89,15 +89,18 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
     /*
      * Algorithms
      */
-    const SSHFP_ALGORITHM_RES   = 0;
-    const SSHFP_ALGORITHM_RSA   = 1;
-    const SSHFP_ALGORITHM_DSS   = 2;
+    const SSHFP_ALGORITHM_RES       = 0;
+    const SSHFP_ALGORITHM_RSA       = 1;
+    const SSHFP_ALGORITHM_DSS       = 2;
+    const SSHFP_ALGORITHM_ECDSA     = 3;
+    const SSHFP_ALGORITHM_ED25519   = 4;
 
     /*
      * Fingerprint Types
      */
     const SSHFP_FPTYPE_RES      = 0;
     const SSHFP_FPTYPE_SHA1     = 1;
+    const SSHFP_FPTYPE_SHA256   = 2;
 
 
     /**
@@ -137,15 +140,18 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
         //
         if ( ($algorithm != self::SSHFP_ALGORITHM_RSA) 
             && ($algorithm != self::SSHFP_ALGORITHM_DSS) 
+            && ($algorithm != self::SSHFP_ALGORITHM_ECDSA) 
+            && ($algorithm != self::SSHFP_ALGORITHM_ED25519)
         ) {
             return false;
         }
 
         //
-        // there's only one fingerprint type currently implemented, so if it's not
-        // that, then fail.
+        // there are only two fingerprints defined
         //
-        if ($fp_type != self::SSHFP_FPTYPE_SHA1) {
+        if ( ($fp_type != self::SSHFP_FPTYPE_SHA1)
+            && ($fp_type != self::SSHFP_FPTYPE_SHA256) 
+        ) {
             return false;
         }
 
@@ -178,19 +184,22 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
             $this->fp_type      = $x['fp_type'];
 
             //
-            // There are only two algorithm's defined 
+            // There are only three algorithm's defined 
             //
             if ( ($this->algorithm != self::SSHFP_ALGORITHM_RSA) 
                 && ($this->algorithm != self::SSHFP_ALGORITHM_DSS)
+                && ($this->algorithm != self::SSHFP_ALGORITHM_ECDSA)
+                && ($this->algorithm != self::SSHFP_ALGORITHM_ED25519)
             ) {
                 return false;
             }
 
             //
-            // there's only one fingerprint type currently implemented, 
-            // so if it's not that, then fail.
+            // there are only two fingerprints defined
             //
-            if ($this->fp_type != self::SSHFP_FPTYPE_SHA1) {
+            if ( ($this->fp_type != self::SSHFP_FPTYPE_SHA1)
+                && ($this->fp_type != self::SSHFP_FPTYPE_SHA256)
+            ) {
                 return false;
             }
             

@@ -1,4 +1,4 @@
--- ArubaOS 6.5.1.3_58402
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4: 
 WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 
@@ -225,7 +225,11 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          wlanAPSwitchIpAddress      IpAddress,
          wlanAPStandbyIpAddress     IpAddress,
          wlanAPConnectedAsStandby   INTEGER,
-         wlanAPServiceTag           DisplayString
+         wlanAPServiceTag           DisplayString,
+         wlanAPConnectedAsDatazone  INTEGER,
+         wlanAPFlexRadioMode        ArubaFlexRadioMode,
+         wlanAPdot11aAntennaGain10x	Integer32,
+         wlanAPdot11gAntennaGain10x	Integer32
    }
 
    	wlanAPMacAddress OBJECT-TYPE
@@ -658,7 +662,46 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanAPEntry 42 }
 
+        wlanAPConnectedAsDatazone OBJECT-TYPE
+        SYNTAX       INTEGER(0..4)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        This object indicate this AP comes from datazone(1-4) or primary zone(0)
+            "
+        ::= { wlsxWlanAPEntry 43 }
+
+        wlanAPFlexRadioMode OBJECT-TYPE
+        SYNTAX       ArubaFlexRadioMode
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Flex Radio Operating Mode
+            "
+        ::= { wlsxWlanAPEntry 44 }
  
+   	wlanAPdot11aAntennaGain10x	OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Configured antenna  gain for 'A' Radio (antennaGain*10)
+            "
+        ::= { wlsxWlanAPEntry 45 }
+
+   	wlanAPdot11gAntennaGain10x	OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Configured antenna  gain for 'G' Radio (antennaGain*10)
+            "
+        ::= { wlsxWlanAPEntry 46 }
+
 -- Radio table is indexed by the Mac Address of the AP and the type of the
 -- radio.
 
@@ -699,7 +742,8 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 		 wlanAPRadioHTMode					ArubaHTMode,
 		 wlanAPRadioHTExtChannel			ArubaHTExtChannel,
 		 wlanAPRadioHTChannel				DisplayString,
-		 wlanAPRadioAPName  				DisplayString
+		 wlanAPRadioAPName  				DisplayString,
+		 wlanAPRadioTransmitPower10x		Integer32
 	 }
 
    	wlanAPRadioNumber OBJECT-TYPE
@@ -868,6 +912,16 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "Name of the AP the radio belongs to"
         ::= { wlsxWlanRadioEntry 16 }
+
+	wlanAPRadioTransmitPower10x OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The current power level of the radio. (Transmitted as txpwr*10)
+            "
+        ::= { wlsxWlanRadioEntry 17 }
 
 -- Local Access Point Table.
 

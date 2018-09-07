@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -29,7 +29,17 @@ $graph_return = array('status'        => FALSE,   // --> $GLOBALS['rrd_status']
 
 preg_match('/^(?P<type>[a-z0-9A-Z-]+)_(?P<subtype>[a-z0-9A-Z-_]+)/', $vars['type'], $graphtype);
 
-$graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
+if(isset($vars['format']) && $vars['format'] == 'svg')
+{
+  $extension = 'svg';
+  $mimetype  = 'image/svg+xml';
+  $img_format = 'SVG';
+} else {
+  $extension = 'png';
+  $mimetype  = 'image/png';
+}
+
+$graphfile = $config['temp_dir'] . "/"  . strgen() . "." . $extension;
 
 if (OBS_DEBUG) { print_vars($graphtype); }
 
@@ -80,6 +90,7 @@ $prev_from = $from - $period;
 $graph_include = FALSE;
 $definition_include = FALSE;
 //print_message("Graph type: $type, subtype: $subtype");
+
 if (is_file($config['html_dir'] . "/includes/graphs/$type/$subtype.inc.php"))
 {
   $graph_include = $config['html_dir'] . "/includes/graphs/$type/$subtype.inc.php";
@@ -114,7 +125,7 @@ if ($graph_include)
     include($graph_include);
   }
 } elseif(!isset($vars['command_only'])) {
-  graph_error($type.'_'.$subtype); // Graph Template Missing
+  graph_error('no '. $type.'_'.$subtype.''); // Graph Template Missing
 }
 
 if ($error_msg)
@@ -162,19 +173,19 @@ else if (!$auth)
       {
         if ($vars['image_data_uri'] == TRUE)
         {
-          $image_data_uri = data_uri($graphfile, 'image/png');
+          $image_data_uri = data_uri($graphfile, $mimetype);
         }
         else if (!OBS_DEBUG)
         {
           $fd = fopen($graphfile, 'rb');
-          header('Content-type: image/png');
+          header('Content-type: '.$mimetype);
           header('Content-Disposition: inline; filename="'.basename($graphfile).'"');
           header('Content-Length: ' . filesize($graphfile));
           fpassthru($fd);
           fclose($fd);
         } else {
           external_exec('/bin/ls -l '.$graphfile);
-          echo('<img src="'.data_uri($graphfile, 'image/png').'" alt="graph" />');
+          echo('<img src="'.data_uri($graphfile, $mimetype).'" alt="graph" />');
         }
         unlink($graphfile);
       } else {

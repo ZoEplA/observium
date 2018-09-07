@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,7 +17,7 @@
 
 <?php
 
-$form_devices = dbFetchColumn('SELECT DISTINCT `device_id` FROM `ipv6_addresses` LEFT JOIN `ports` USING(`port_id`);');
+$form_devices = dbFetchColumn('SELECT DISTINCT `device_id` FROM `ipv6_addresses`;');
 $form_items['devices'] = generate_form_values('device', $form_devices);
 
 $form = array('type'  => 'rows',
@@ -44,7 +44,7 @@ $form['row'][0]['network'] = array(
                                 'placeholder' => TRUE,
                                 'ajax'        => TRUE,
                                 'ajax_vars'   => array('field' => 'ipv6_network'),
-                                'value'       => escape_html($vars['network']));
+                                'value'       => $vars['network']);
 $form['row'][0]['address']  = array(
                                 'type'        => 'text',
                                 'name'        => 'IP Address',
@@ -52,7 +52,7 @@ $form['row'][0]['address']  = array(
                                 'grid'        => 3,
                                 //'div_class'   => 'col-lg-3 col-md-3 col-sm-3',
                                 'placeholder' => TRUE,
-                                'value'       => escape_html($vars['address']));
+                                'value'       => $vars['address']);
 // search button
 $form['row'][0]['search']   = array(
                                 'type'        => 'submit',

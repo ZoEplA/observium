@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage graphing
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -30,7 +30,8 @@ if (isset($config['allow_unauth_graphs']) && $config['allow_unauth_graphs'])
 }
 elseif (isset($config['allow_unauth_graphs_cidr']) && count($config['allow_unauth_graphs_cidr']))
 {
-  if (match_network($_SERVER['REMOTE_ADDR'], $config['allow_unauth_graphs_cidr']))
+  //if (match_network($_SERVER['REMOTE_ADDR'], $config['allow_unauth_graphs_cidr']))
+  if (match_network(get_remote_addr($config['web_session_ip_by_header']), $config['allow_unauth_graphs_cidr']))
   {
     $auth = TRUE; // hardcode authenticated for matched subnet
     print_debug("Authentication by matched CIDR.");

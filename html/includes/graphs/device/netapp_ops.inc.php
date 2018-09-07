@@ -7,15 +7,14 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 $rrd_filename = get_rrd_path($device, 'netapp_stats.rrd');
 $rrd_exists   = is_file($rrd_filename);
 
-$count = 0;
-foreach (array('iscsi', 'nfs', 'cifs', 'http','fcp') as $stat)
+foreach (array('iscsi', 'nfs', 'cifs', 'http', 'fcp') as $stat)
 {
   if (!$rrd_exists) {
     continue;
@@ -35,7 +34,6 @@ $total_units = '';
 
 $scale_min = '0';
 $scale_max = '100';
-$divider   = $count;
 $text_orig = 1;
 $nototal   = 1;
 

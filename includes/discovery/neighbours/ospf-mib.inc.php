@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,7 +16,7 @@
 if ($config['autodiscovery']['ospf'] != FALSE)
 {
 
-  $ips = snmpwalk_values($device, "ospfNbrIpAddr", array(), "OSPF-MIB");
+  $ips = snmpwalk_values($device, "ospfNbrRtrId", array(), "OSPF-MIB");
 
   foreach ($ips as $ip)
   {

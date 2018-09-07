@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -72,7 +72,14 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
     $graphs['wifi_clients'] = TRUE;
   }
 
-  unset($wificlients2, $wificlients1);
+  if (isset($wifi_ap_count) && is_numeric($wifi_ap_count))
+  {
+    rrdtool_update_ng($device, 'wifi_ap_count', array('value' => $wifi_ap_count));
+
+    $graphs['wifi_ap_count'] = TRUE;
+  }
+
+  unset($wificlients2, $wificlients1, $wifi_ap_count);
 }
 
 // EOF

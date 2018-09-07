@@ -5,7 +5,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -62,13 +62,12 @@ foreach ($netstats_poll as $type => $netstats)
   if (isset($netstats['oids_t']))
   {
     $oids_string = implode('.0 ', $netstats['oids_t']).'.0';
-    $data = snmp_get_multi($device, $oids_string, '-OQUs', $netstats['mib']); // get testing oids
+    $data = snmp_get_multi_oid($device, $oids_string, array(), $netstats['mib']); // get testing oids
     if (!count($data)) { continue; }
-    $data_array = $data[0];
 
     $oids_string = implode('.0 ', array_diff($oids, $netstats['oids_t'])).'.0';
-    $data = snmp_get_multi($device, $oids_string, '-OQUs', $netstats['mib']);
-    $data_array = array_merge($data_array, $data[0]);
+    $data = snmp_get_multi_oid($device, $oids_string, $data, $netstats['mib']);
+    $data_array = $data[0];
   } else {
     $data = snmpwalk_cache_oid($device, $type, array(), $netstats['mib']);
     if (!count($data)) { continue; }

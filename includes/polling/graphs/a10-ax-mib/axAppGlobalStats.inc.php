@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -35,7 +35,7 @@
 // .1.3.6.1.4.1.22610.2.4.3.1.3.1.0 = INTEGER: 90000
 // .1.3.6.1.4.1.22610.2.4.3.1.3.2.0 = INTEGER: 9849
 
-$table_defs['NS-ROOT-MIB']['axAppGlobalStats'] = array (
+$table_defs['A10-AX-MIB']['axAppGlobalStats'] = array (
   'table'      => 'axAppGlobals',
   'numeric'    => '.1.3.6.1.4.1.22610.2.4.3.1.2',
   'mib'        => 'A10-AX-MIB',

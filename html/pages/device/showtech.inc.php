@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -37,13 +37,15 @@ if ($_SESSION['userlevel'] < 10)
 
   echo generate_box_open($box_args);
 
-  $ptime = dbFetchRow('SELECT * FROM `devices_perftimes` WHERE `operation` = "poll" AND `device_id` = ? ORDER BY `start` DESC LIMIT 1', array($device['device_id']));
+  $ptime  = array_values($device['state']['poller_history'])[0]; // note for self: PHP 5.4+
+  $pstart = array_keys($device['state']['poller_history'])[0];
 
-  echo "Last Polled: <b>" . format_unixtime($ptime['start']) .'</b> (took '.$ptime['duration'].'s) - <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'perf')) . '">Details</a>';
+  echo "Last Polled: <b>" . format_unixtime($pstart) .'</b> (took '.$ptime.'s) - <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'perf')) . '">Details</a>';
 
-  $dtime = dbFetchRow('SELECT * FROM `devices_perftimes` WHERE `operation` = "discover" AND `device_id` = ? ORDER BY `start` DESC LIMIT 1', array($device['device_id']));
+  $dtime  = array_values($device['state']['discovery_history'])[0]; // note for self: PHP 5.4+
+  $dstart = array_keys($device['state']['discovery_history'])[0];
 
-  echo "<p>Last discovered: <b>" . format_unixtime($dtime['start']) .'</b> (took '.$dtime['duration'].'s) - <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'perf')) . '">Details</a></p>';
+  echo "<p>Last discovered: <b>" . format_unixtime($dstart) .'</b> (took '.$dtime.'s) - <a href="' . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'perf')) . '">Details</a></p>';
 
   echo generate_box_close();
 

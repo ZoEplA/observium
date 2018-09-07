@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -18,6 +18,8 @@ $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
                     'tab' => 'graphs');
 
+$graphs_sections = array();
+
 foreach ($device['graphs'] as $entry)
 {
   if (isset($entry['enabled']) && !$entry['enabled']) { continue; } // Skip disabled graphs
@@ -26,7 +28,18 @@ foreach ($device['graphs'] as $entry)
   if (in_array($section, $config['graph_sections']))
   {
     // Collect only enabled and exists graphs
-    $graphs_sections[$section][$entry['graph']] = $entry['enabled'];
+    //$graphs_sections[$section][$entry['graph']] = $entry['enabled'];
+    if (isset($config['graph_types']['device'][$entry['graph']]['order']) && is_numeric($config['graph_types']['device'][$entry['graph']]['order']))
+    {
+      $order = $config['graph_types']['device'][$entry['graph']]['order'];
+    } else {
+      $order = 999; // Set high order for unordered graphs
+    }
+    while (isset($graphs_sections[$section][$order]))
+    {
+      $order++;
+    }
+    $graphs_sections[$section][$order] = $entry['graph'];
   }
 }
 
@@ -48,7 +61,21 @@ if (OBSERVIUM_EDITION != 'community')
 $navbar['brand'] = "Graphs";
 $navbar['class'] = "navbar-narrow";
 
-foreach ($graphs_sections as $section => $text)
+// Set sections order
+$graphs_sections_sorted = array();
+foreach ($config['graph_sections'] as $section)
+{
+  if (isset($graphs_sections[$section]))
+  {
+    $graphs_sections_sorted[$section] = $graphs_sections[$section];
+    unset($graphs_sections[$section]);
+  }
+}
+$graphs_sections = array_merge($graphs_sections_sorted, $graphs_sections);
+//print_vars($graphs_sections);
+unset($graphs_sections_sorted);
+
+foreach ($graphs_sections as $section => $graph)
 {
   $type = strtolower($section);
   if (empty($config['graph_sections'][$section])) { $text = nicecase($type); } else { $text = $config['graph_sections'][$section]; }
@@ -56,11 +83,11 @@ foreach ($graphs_sections as $section => $text)
   if ($vars['group'] == $type) { $navbar['options'][$section]['class'] = "active"; }
   $navbar['options'][$section]['url'] = generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'graphs', 'group' => $type));
   $navbar['options'][$section]['text'] = $text;
+
+  //print_vars($graph);
 }
 
 print_navbar($navbar);
-
-$graph_enable = $graphs_sections[$vars['group']];
 
 echo generate_box_open();
 echo('<table class="table table-condensed table-striped table-hover ">');
@@ -86,11 +113,15 @@ if ($vars['group'] == "custom" && $graphs_sections['custom'])
 
 } else {
 
-  foreach ($graph_enable as $graph => $entry)
+  ksort($graphs_sections[$vars['group']], SORT_NUMERIC);
+  $graph_enable = $graphs_sections[$vars['group']];
+
+//  print_vars($graph_enable);
+  foreach ($graph_enable as $graph)
   {
     $graph_array = array();
-    if ($graph_enable[$graph])
-    {
+    //if ($graph_enable[$graph])
+    //{
       $graph_title = $config['graph_types']['device'][$graph]['descr'];
       $graph_array['type'] = "device_" . $graph;
       $graph_array['device'] = $device['device_id'];
@@ -102,7 +133,7 @@ if ($vars['group'] == "custom" && $graphs_sections['custom'])
       print_graph_row($graph_array);
 
       echo('</td></tr>');
-    }
+    //}
   }
 }
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -22,9 +22,10 @@ if ($handle = opendir($config['install_dir'] . '/' . $include_dir))
 {
   while (false !== ($file = readdir($handle)))
   {
-    if (filetype($config['install_dir'] . '/' . $include_dir . '/' . $file) == 'file' && preg_match($include_dir_regexp, $file))
+    if (preg_match($include_dir_regexp, $file) && is_file($config['install_dir'] . '/' . $include_dir . '/' . $file))
     {
-      print_debug('Including: ' . $config['install_dir'] . '/' . $include_dir . '/' . $file);
+      //print_debug('Including: ' . $config['install_dir'] . '/' . $include_dir . '/' . $file);
+      //if (OBS_DEBUG > 1) { echo('Including: ' . $config['install_dir'] . '/' . $include_dir . '/' . $file . PHP_EOL); } // do not use print_debug, which not included for definitions!
 
       include($config['install_dir'] . '/' . $include_dir . '/' . $file);
     }
@@ -32,6 +33,6 @@ if ($handle = opendir($config['install_dir'] . '/' . $include_dir))
   closedir($handle);
 }
 
-unset($include_dir_regexp, $include_dir);
+unset($include_dir_regexp, $include_dir, $file, $handle);
 
 // EOF

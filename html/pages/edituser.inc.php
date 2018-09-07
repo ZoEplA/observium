@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -103,11 +103,18 @@ register_html_resource('js', 'observium-entities.js');
     if (auth_usermanagement() && $vars['user_id'] !== $_SESSION['user_id'])
     {
       echo('<ul class="nav pull-right">');
-      echo('<li><a href="'.generate_url(array('page' => 'edituser',
-                                              'action' => 'deleteuser',
-                                              'user_id' => $vars['user_id'],
-                                              'requesttoken' => $_SESSION['requesttoken'])) . '"><i class="'.$config['icon']['cancel'].'"></i> Delete User</a></li>');
+      echo('<li><a href="'.generate_url(array('page'         => 'edituser',
+                                              'action'       => 'deleteuser',
+                                              'user_id'      => $vars['user_id'],
+                                              'confirm'      => 'yes',
+                                              'requesttoken' => $_SESSION['requesttoken'])) . '"
+                   data-toggle="confirmation"
+                   data-confirm-content="You have requested deletion of the user <strong>'.$user_data['username'].'</strong>.<br />This action can not be reversed."
+                   data-confirm-placement="bottom">
+                <i class="'.$config['icon']['cancel'].'"></i> Delete User</a></li>');
       echo('</ul>');
+      register_html_resource('js',     'jquery.popconfirm.js');
+      register_html_resource('script', '$("[data-toggle=\'confirmation\']").popConfirm();');
     }
   }
 
@@ -347,7 +354,7 @@ register_html_resource('js', 'observium-entities.js');
                                         'name'        => 'Real Name',
                                         'width'       => '80%',
                                         'placeholder' => TRUE,
-                                        'value'       => escape_html($user_data['realname']));
+                                        'value'       => $user_data['realname']);
       $form['row'][2]['new_level'] = array(
                                         'type'        => 'select',
                                         'fieldset'    => 'body',
@@ -362,14 +369,14 @@ register_html_resource('js', 'observium-entities.js');
                                         'name'        => 'E-mail',
                                         'width'       => '80%',
                                         'placeholder' => TRUE,
-                                        'value'       => escape_html($user_data['email']));
+                                        'value'       => $user_data['email']);
       $form['row'][4]['new_descr'] = array(
                                         'type'        => 'text',
                                         'fieldset'    => 'body',
                                         'name'        => 'Description',
                                         'width'       => '80%',
                                         'placeholder' => TRUE,
-                                        'value'       => escape_html($user_data['descr']));
+                                        'value'       => $user_data['descr']);
       $form['row'][5]['new_can_modify_passwd'] = array(
                                         'type'        => 'checkbox',
                                         'fieldset'    => 'body',

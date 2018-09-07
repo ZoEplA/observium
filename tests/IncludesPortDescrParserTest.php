@@ -1,10 +1,13 @@
 <?php
 
+$base_dir = realpath(dirname(__FILE__) . '/..');
+$config['install_dir'] = $base_dir;
+
 include(dirname(__FILE__) . '/../includes/defaults.inc.php');
 //include(dirname(__FILE__) . '/../config.php'); // Do not include user editable config here
-include(dirname(__FILE__) . '/data/test_definitions.inc.php'); // Fake definitions for testing
-include(dirname(__FILE__) . '/../includes/definitions.inc.php');
 include(dirname(__FILE__) . '/../includes/functions.inc.php');
+include(dirname(__FILE__) . '/../includes/definitions.inc.php');
+include(dirname(__FILE__) . '/data/test_definitions.inc.php'); // Fake definitions for testing
 include(dirname(__FILE__) . '/../includes/port-descr-parser.inc.php');
 
 class IncludesPortDescrParserTest extends \PHPUnit\Framework\TestCase

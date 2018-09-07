@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,8 +17,6 @@ $sql  = "SELECT *";
 $sql .= " FROM  `oids_entries`";
 $sql .= " LEFT JOIN `oids` USING(`oid_id`)";
 $sql .= " WHERE `device_id` = ?";
-
-print_vars($sql);
 
 $entries_db = dbFetchRows($sql, array($device['device_id']));
 

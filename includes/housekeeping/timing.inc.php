@@ -8,9 +8,12 @@
  * @package    observium
  * @subpackage housekeeping
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
+
+//CLEANME. Not actually since removed this tables.
+return;
 
 // Minimum allowed age for delete perfomance times is 24h
 $cutoff = age_to_unixtime($config['housekeeping']['timing']['age'], age_to_seconds('24h'));
@@ -25,7 +28,7 @@ if ($cutoff)
   {
     if ($prompt)
     {
-      $answer = print_prompt("Perfomance entries - $count_run (per-run) and $count_dev (per-device) older than " . format_unixtime($cutoff) . " will be deleted");
+      $answer = print_prompt("Performance entries - $count_run (per-run) and $count_dev (per-device) older than " . format_unixtime($cutoff) . " will be deleted");
     }
 
     if ($answer)

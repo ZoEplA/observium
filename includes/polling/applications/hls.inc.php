@@ -20,7 +20,6 @@ if (!empty($agent_data['app']['hls']))
   // Polls hls statistics from agent script
   $streams = explode("\n", $agent_data['app']['hls']);
   rsort($streams);
-  print_r($streams);
   $data = array();
 
   foreach ($streams as $item => $stream)

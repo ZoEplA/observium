@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -56,8 +56,8 @@ if ($vars['ignoreport'])
       </th>
       <th>Port</th>
       <th style="width: 200px;">ifType / Status</th>
-      <th style="width: 120px;">Polling</th>
-      <th style="width: 120px;">Alerts</th>
+      <th style="width: 120px;">Polling (Disable)</th>
+      <th style="width: 120px;">Alerts (Ignore)</th>
       <!-- <th style="width: 110px;">% Threshold</th>   -->
       <!-- <th style="width: 110px;">BPS Threshold</th> -->
       <!-- <th style="width: 110px;">PPS Threshold</th> -->
@@ -92,6 +92,7 @@ $ports_attribs = get_device_entities_attribs($device['device_id'], 'port'); // G
 foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id` = ? ORDER BY `ifIndex` ", array($device['device_id'])) as $port)
 {
   humanize_port($port);
+  //r($port);
 
   if (isset($ports_attribs['port'][$port['port_id']]))
   {
@@ -104,7 +105,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
   echo('<td style="vertical-align: top;"><span class="entity">'.generate_entity_link('port', $port).'</span><br />'.escape_html($port['ifAlias']).'</td>');
   echo("<td>".$port['human_type']."<br />");
 
-  echo(($port['admin_status'] == enabled ? : '<span class="">'.$port['admin_status'].'</span>').' / <span data-name="operstatus_'.$port['port_id'].'" class="'.$port['row_class'].'">'. escape_html($port['ifOperStatus']) .'</span></td>');
+  echo(($port['admin_status'] == 'enabled' ? '<span class="'.$port['row_class'].'">' : '<span class="">').$port['admin_status'].'</span> / <span data-name="operstatus_'.$port['port_id'].'" class="'.$port['row_class'].'">'. escape_html($port['ifOperStatus']) .'</span></td>');
 
   echo('<td>');
   $item = array('id'          => 'port[]',

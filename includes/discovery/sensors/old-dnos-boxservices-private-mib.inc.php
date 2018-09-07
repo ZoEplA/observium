@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,6 +16,7 @@ if (count($valid['sensor']['temperature']['DNOS-BOXSERVICES-PRIVATE-MIB']) ||
 {
   // Exit from discovery, since already added valid sensors by DNOS-BOXSERVICES-PRIVATE-MIB
   // Note, DNOS-BOXSERVICES-PRIVATE-MIB and OLD-DNOS-BOXSERVICES-PRIVATE-MIB are crossed
+  echo 'Skipped by DNOS-BOXSERVICES-PRIVATE-MIB';
   return;
 }
 
@@ -135,13 +136,13 @@ foreach ($oids as $index => $entry)
 
   if ($entry['boxServicesFanItemState'] != 'notpresent')
   {
-    // FIXME should be a state sensor. subtype fanspeed. (or fanspeed sensor, subtype state)
-    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, "boxServicesFanItemState.$index", 'fastpath-boxservices-private-state', $descr, 1, $value, array('entPhysicalClass' => 'fan'));
+     discover_status($device, $oid, "boxServicesFanItemState.$index", 'fastpath-boxservices-private-state', $descr, $value, array('entPhysicalClass' => 'fan'));
 
     if ($entry['boxServicesFanSpeed'] != 0)
     {
       // FIXME - could add a fan speed sensor here, but none of my devices have non-zero values.
       // duty level is most likely a percentage?
+       discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, "boxServicesFanSpeed.$index", 'fastpath-boxservices-private-mib', $descr, 1, $entry['boxServicesFanSpeed'], array('entPhysicalClass' => 'fan'));
     }
   }
 }
@@ -163,7 +164,7 @@ foreach ($oids as $index => $entry)
 
   if ($entry['boxServicesPowSupplyItemState'] != 'notpresent')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "boxServicesPowSupplyItemState.$index", 'fastpath-boxservices-private-state', $descr, 1, $value, array('entPhysicalClass' => 'power'));
+    discover_status($device, $oid, "boxServicesPowSupplyItemState.$index", 'fastpath-boxservices-private-state', $descr, $value, array('entPhysicalClass' => 'power'));
   }
 }
 

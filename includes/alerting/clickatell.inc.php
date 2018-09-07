@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage alerting
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -15,35 +15,25 @@ $message = $message_tags['TITLE'] . PHP_EOL;
 $message .= str_replace("             ", "", $message_tags['METRICS']);
 
 // Clickatell Config
-$url = 'https://api.clickatell.com/http/sendmsg';
 
-// POST Data
-$postdata = http_build_query(
-  array(
-    "to" => $endpoint['recipient'],
-    "from" => $endpoint['originator'],
-    "text" => $message,
-    "user" => $endpoint['user'],
-    "password" => $endpoint['password'],
-    "api_id" => $endpoint['apiid'])
-);
-
+$url = sprintf('https://platform.clickatell.com/messages/http/send?apiKey=%s&to=%s&content=%s',
+  trim($endpoint['apiid']), urlencode($endpoint['recipient']), urlencode($message));
+        
 $context_data = array(
-  'method'  => 'POST',
-  'content' => $postdata
+  'method'  => 'GET',
+  "Content-Type: application/json\r\n",
 );
 
 // Send out API call and parse response into an associative array
-$response = get_http_request($url, $context_data);
+$result = json_decode(get_http_request($url, $context_data), TRUE);
 
-$send = explode(":", $response);
-if ($send[0] == "ID")
+if ($result['messages'][0]['accepted'] == 1)
 {
   $notify_status['success'] = TRUE;
 } else {
   $notify_status['success'] = FALSE;
 }
 
-unset($url, $send, $message, $response, $postdata, $context_data);
+unset($url, $message, $result, $context_data);
 
 // EOF

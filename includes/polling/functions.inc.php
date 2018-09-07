@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -178,6 +178,17 @@ function poll_sensor($device, $class, $unit, &$oid_cache)
       $sensor_poll['sensor_value'] += $attribs['sensor_addition'];
     }
 
+    //For Bluecoat multiplier may change very often - poll current data
+    if ($sensor_db['sensor_type']=='bluecoat-sg-proxy-mib'){
+      //poll only once - using snmpwalk
+      if (!isset($deviceSensorScale)){
+        $deviceSensorScale = snmpwalk_cache_multi_oid($device, 'deviceSensorScale', array(), 'BLUECOAT-SG-SENSOR-MIB');
+      }
+      if (isset($deviceSensorScale[$sensor_db['sensor_index']]['deviceSensorScale'])){
+        $sensor_db['sensor_multiplier']=si_to_scale($deviceSensorScale[$sensor_db['sensor_index']]['deviceSensorScale']);
+      }
+    }
+
     if (isset($sensor_db['sensor_multiplier']) && $sensor_db['sensor_multiplier'] != 0)
     {
       //$sensor_poll['sensor_value'] *= $sensor_db['sensor_multiplier'];
@@ -225,7 +236,7 @@ function poll_sensor($device, $class, $unit, &$oid_cache)
     if ($sensor_poll['sensor_event'] != $sensor_db['sensor_event'])
     {
       // Sensor event changed, log and set sensor_last_change
-      $sensor_poll['status_last_change'] = $sensor_polled_time;
+      $sensor_poll['sensor_last_change'] = $sensor_polled_time;
 
       if ($sensor_db['sensor_event'] == 'ignore')
       {
@@ -295,9 +306,9 @@ function poll_sensor($device, $class, $unit, &$oid_cache)
   }
 }
 
-function poll_status($device)
+function poll_status($device, &$oid_cache)
 {
-  global $config, $agent_sensors, $ipmi_sensors, $graphs, $oid_cache;
+  global $config, $agent_sensors, $ipmi_sensors, $graphs, $table_rows;
 
   $sql  = "SELECT * FROM `status`";
   //$sql .= " LEFT JOIN `status-state` USING(`status_id`)";
@@ -331,7 +342,7 @@ function poll_status($device)
         } else {
           $status_value = snmp_get_oid($device, $status_db['status_oid'], 'SNMPv2-MIB');
         }
-        $status_value = snmp_fix_numeric($status_value);
+        //$status_value = snmp_fix_numeric($status_value); // Do not use fix, this broke not-enum (string) statuses
       }
     }
     else if ($status_db['poller_type'] == "agent")
@@ -361,7 +372,7 @@ function poll_status($device)
     $status_polled_time = time(); // Store polled time for current status
 
     // Write new value and humanize (for alert checks)
-    $state_array = get_state_array($status_db['status_type'], $status_value, $status_db['poller_type']);
+    $state_array = get_state_array($status_db['status_type'], $status_value, $status_db['status_map'], $status_db['poller_type']);
     $status_value                = $state_array['value']; // Override status_value by numeric for "pseudo" (string) statuses
     $status_poll['status_value'] = $state_array['value'];
     $status_poll['status_name']  = $state_array['name'];
@@ -442,7 +453,7 @@ function poll_status($device)
 
     //print_cli_data("Event (State)", $status_poll['status_event'] ." (".$status_poll['status_name'].")", 3);
 
-    $GLOBALS['table_rows'][] = array($status_db['status_descr'], $status_db['status_type'], $status_db['status_index'] ,$status_db['poller_type'],
+    $table_rows[] = array($status_db['status_descr'], $status_db['status_type'], $status_db['status_index'] ,$status_db['poller_type'],
                           $status_poll['status_name'], $status_poll['status_event'], format_unixtime($status_poll['status_last_change']));
 
     check_entity('status', $status_db, $metrics);
@@ -461,9 +472,12 @@ function poll_device($device, $options)
 {
   global $config, $device, $polled_devices, $db_stats, $exec_status, $alert_rules, $alert_table, $graphs, $attribs;
 
+  $device_start = utime();  // Start counting device poll time
+
   $alert_metrics = array();
   $oid_cache = array();
-  $old_device_state = unserialize($device['device_state']);
+  $device_state = array();
+  //$old_device_state = unserialize($device['device_state']);
   $attribs = get_entity_attribs('device', $device['device_id']);
 
   print_debug_vars($device);
@@ -479,8 +493,6 @@ function poll_device($device, $options)
   print_debug_vars($alert_table);
 
   $status = 0;
-
-  $device_start = utime();  // Start counting device poll time
 
   print_cli_heading($device['hostname'] . " [".$device['device_id']."]", 1);
 
@@ -579,10 +591,20 @@ function poll_device($device, $options)
     // Arrays for store and check enabled/disabled graphs
     $graphs    = array();
     $graphs_db = array();
+    $graphs_insert = array();
+    $graphs_delete = array();
     foreach (dbFetchRows("SELECT * FROM `device_graphs` WHERE `device_id` = ?", array($device['device_id'])) as $entry)
     {
-      $graphs_db[$entry['graph']] = (isset($entry['enabled']) ? (bool)$entry['enabled'] : TRUE);
+      // Not know how empty was here
+      if (empty($entry['graph']))
+      {
+        $graphs_delete[] = $entry['device_graph_id'];
+      }
+
+      $graphs_db[$entry['graph']] = $entry;
     }
+
+    $graphs['availability'] = TRUE; // Everything has this!
 
     if (!$attribs['ping_skip'])
     {
@@ -693,11 +715,12 @@ function poll_device($device, $options)
       $graphs['poller_perf'] = TRUE;
 
       // Delete not exists graphs from DB (only if poller run without modules option)
-      foreach ($graphs_db as $graph => $value)
+      foreach ($graphs_db as $graph => $entry)
       {
         if (!isset($graphs[$graph]))
         {
-          dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph));
+          //dbDelete('device_graphs', "`device_id` = ? AND `graph` = ?", array($device['device_id'], $graph));
+          $graphs_delete[] = $entry['device_graph_id'];
           unset($graphs_db[$graph]);
           $graphs_stat['deleted'][] = $graph;
         }
@@ -707,18 +730,29 @@ function poll_device($device, $options)
     // Add or update graphs in DB
     foreach ($graphs as $graph => $value)
     {
+      if (!$graph) { continue; } // Not know how here can empty
+
       if (!isset($graphs_db[$graph]))
       {
-        dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph, 'enabled' => $value), 'device_graphs');
+        //dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph, 'enabled' => $value), 'device_graphs');
+        $graphs_insert[] = array('device_id' => $device['device_id'], 'graph' => $graph, 'enabled' => $value);
         $graphs_stat['added'][] = $graph;
       }
-      else if ($value != $graphs_db[$graph])
+      else if ($value != $graphs_db[$graph]['enabled'])
       {
-        dbUpdate(array('enabled' => $value), 'device_graphs', '`device_id` = ? AND `graph` = ?', array($device['device_id'], $graph));
+        dbUpdate(array('enabled' => $value), 'device_graphs', '`device_graph_id` = ?', array($device['device_id'], $graph));
         $graphs_stat['updated'][] = $graph;
       } else {
         $graphs_stat['checked'][] = $graph;
       }
+    }
+    if (count($graphs_insert))
+    {
+      dbInsertMulti($graphs_insert, 'device_graphs');
+    }
+    if (count($graphs_delete))
+    {
+      dbDelete('device_graphs', generate_query_values($graphs_delete, 'device_graph_id', NULL, FALSE));
     }
 
     // Print graphs stats
@@ -727,22 +761,48 @@ function poll_device($device, $options)
       if (count($stat)) { print_cli_data('Graphs ['.$key.']', implode(', ', $stat), 1); }
     }
 
-    $device_end = utime(); $device_run = $device_end - $device_start; $device_time = round($device_run, 4);
+    $device_end  = utime();
+    $device_run  = $device_end - $device_start;
+    $device_time = round($device_run, 4);
 
     $update_array['last_polled'] = array('NOW()');
     $update_array['last_polled_timetaken'] = $device_time;
-
-    $update_array['device_state'] = serialize($device_state);
 
     #echo("$device_end - $device_start; $device_time $device_run");
 
     print_cli_data("Poller time", $device_time." seconds", 1);
     //print_message(PHP_EOL."Polled in $device_time seconds");
 
-    // Only store performance data if we're not doing a single-module poll
+    // Store device stats and history data (only) if we're not doing a single-module poll
     if (!$options['m'])
     {
-      dbInsert(array('device_id' => $device['device_id'], 'operation' => 'poll', 'start' => $device_start, 'duration' => $device_run), 'devices_perftimes');
+
+      // Fetch previous device state (do not use $device array here, for exclude update history collisions)
+      $old_device_state = dbFetchCell('SELECT `device_state` FROM `devices` WHERE `device_id` = ?;', array($device['device_id']));
+      $old_device_state = unserialize($old_device_state);
+
+      // Add first entry
+      $poller_history = array(intval($device_start) => $device_time); // start => duration
+      // Add and keep not more than 288 (24 hours with 5min interval) last entries
+      if (isset($old_device_state['poller_history']))
+      {
+        print_debug_vars($old_device_state['poller_history']);
+        $poller_history = array_slice($poller_history + $old_device_state['poller_history'], 0, 288, TRUE);
+      }
+      print_debug_vars($poller_history);
+
+      $device_state['poller_history'] = $poller_history;
+
+      // Keep discovery history too
+      if (isset($old_device_state['discovery_history']))
+      {
+        $device_state['discovery_history'] = $old_device_state['discovery_history'];
+      }
+      unset($poller_history, $old_device_state);
+
+      $update_array['device_state'] = serialize($device_state);
+
+      // Also store history in graph
       rrdtool_update_ng($device, 'perf-poller', array('val' => $device_time));
     }
 
@@ -759,8 +819,13 @@ function poll_device($device, $options)
       print_cli_data("Updated Data", implode(", ", array_keys($update_array)), 1);
     }
 
-    $alert_metrics['device_uptime']   = $device['uptime'];
-    $alert_metrics['device_rebooted'] = $rebooted; // 0 - not rebooted, 1 - rebooted
+    $alert_metrics['device_la']            = $device_state['la']['5min']; // 5 min as common LA
+    $alert_metrics['device_la_1min']       = $device_state['la']['1min'];
+    $alert_metrics['device_la_5min']       = $device_state['la']['5min'];
+    $alert_metrics['device_la_15min']      = $device_state['la']['15min'];
+
+    $alert_metrics['device_uptime']        = $device['uptime'];
+    $alert_metrics['device_rebooted']      = $rebooted; // 0 - not rebooted, 1 - rebooted
     $alert_metrics['device_duration_poll'] = $device['last_polled_timetaken'];
 
     unset($cache_storage); // Clear cache of hrStorage ** MAYBE FIXME? ** (ok, later)
@@ -838,6 +903,7 @@ function poller_module_excluded($device, $module)
  *   'graphs'        => array('one','two'),           // [OPTIONAL] List of graph_types that this table provides
  *   'table'         => 'someTable',                  // [RECOMENDED] Table name for OIDs
  *   'numeric'       => '.1.3.6.1.4.1.555.4.1.1.48',  // [OPTIONAL] Numeric table OID
+ *   'index'         => '1',                          // [OPTIONAL] Force an OID index for the entire table. If not set, equals '0'
  *   'ds_rename'     => array('http' => ''),          // [OPTIONAL] Array for renaming OIDs to DSes
  *   'oids'          => array(                        // List of OIDs you can use as key: full OID name
  *     'someOid' => array(                                 // OID name (You can use OID name, like 'cpvIKECurrSAs')
@@ -931,7 +997,7 @@ function collect_table($device, $oids_def, &$graphs)
     {
       $entry['numeric'] = $oids_def['numeric'] . '.' . $entry['numeric']; // Numeric oid, for future using
     }
-    if (!isset($entry['index']))   { $entry['index'] = '0'; }
+    if (!isset($entry['index']) && isset($oids_def['index']))   { $entry['index'] = $oids_def['index']; } elseif (!isset($entry['index'])) { $entry['index'] = '0'; }
     if (!isset($entry['ds_type'])) { $entry['ds_type'] = 'COUNTER'; }
     if (!isset($entry['ds_min']))  { $entry['ds_min']  = 'U'; }
     if (!isset($entry['ds_max']))  { $entry['ds_max']  = '100000000000'; }
@@ -980,11 +1046,11 @@ function collect_table($device, $oids_def, &$graphs)
       $data = snmpwalk_cache_bare_oid($device, $oids_def['table'], array(), $mib, $mib_dirs);
       break;
     case 'snmp_get_multi':
-      $data = snmp_get_multi($device, $oids, "-OQUs", $mib, $mib_dirs);
+    case 'snmp_get_multi_oid':
+      $data = snmp_get_multi_oid($device, $oids, array(), $mib, $mib_dirs);
       break;
   }
-
-  if (isset($GLOBALS['exec_status']['exitcode']) && $GLOBALS['exec_status']['exitcode'] !== 0)
+  if (!$GLOBALS['snmp_status'])
   {
     // Break because latest snmp walk/get return not good exitstatus (wrong mib/timeout/error/etc)
     print_debug("  WARNING, latest snmp walk/get return not good exitstatus for '$mib', RRD update skipped.");
@@ -1011,6 +1077,15 @@ function collect_table($device, $oids_def, &$graphs)
 
     if (is_numeric($data[$index][$oid]))
     {
+      // The original OID definition from the table.
+      $def = $oids_def['oids'][$oid];
+
+      // Apply multiplier value from the entry
+      if (isset($def['multiplier']) && $def['multiplier'] != 0)
+      {
+        $data[$index][$oid] = scale_value($data[$index][$oid], $def['multiplier']);
+      }
+
       $rrd['ok']           = TRUE; // We have any data for current rrd_file
       $rrd['rrd_update'][] = $data[$index][$oid];
     } else {

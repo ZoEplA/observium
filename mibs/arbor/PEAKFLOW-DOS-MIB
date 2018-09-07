@@ -33,7 +33,7 @@ IMPORTS
 -- =================================================================================
 
 peakflowDosMIB MODULE-IDENTITY
-	LAST-UPDATED "201308190000Z" -- August 19, 2013
+	LAST-UPDATED "201406240000Z" -- June 24, 2014
 	ORGANIZATION "Arbor Networks, Inc."
 	CONTACT-INFO
 		"	Arbor Networks, Inc.
@@ -51,6 +51,12 @@ peakflowDosMIB MODULE-IDENTITY
 		"Peakflow DoS MIB"
 
 	-- Revision log, reverse chrono
+	REVISION    "201511170000Z" -- November 17, 2015
+	DESCRIPTION "Add pdosAnomalyIpVersion to Anomaly notifications"
+
+	REVISION    "201406240000Z" -- June 24, 2014
+	DESCRIPTION "Add pdosAnomalyIpVersion"
+
 	REVISION    "201308190000Z" -- August 19, 2013
 	DESCRIPTION "Updated contact information"
 
@@ -252,6 +258,14 @@ pdosAnomalyClassification	OBJECT-TYPE
 		"Classification of the anomaly -- high, medium, or low."
 	::= { peakflowDosCMI 16 }
 
+pdosAnomalyIpVersion	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"IP version of the anomaly"
+	::= { peakflowDosCMI 17 }
+
 -- =================================================================================
 --  Notifications:
 --
@@ -262,6 +276,7 @@ bandwidthAnomaly NOTIFICATION-TYPE
         OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -279,6 +294,7 @@ tcpflagsAnomaly NOTIFICATION-TYPE
         OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -297,6 +313,7 @@ protocolAnomaly NOTIFICATION-TYPE
         OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -335,6 +352,7 @@ anomalyDone	NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -372,6 +390,7 @@ icmpMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -390,6 +409,7 @@ tcpNullMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -409,6 +429,7 @@ tcpSynMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -428,6 +449,7 @@ ipNullMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -445,6 +467,7 @@ ipFragMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -463,6 +486,7 @@ ipPrivateMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -489,6 +513,7 @@ tcpRstMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -508,6 +533,7 @@ totalTrafficMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -525,6 +551,7 @@ fingerprintAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -542,6 +569,7 @@ dnsMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,
@@ -560,6 +588,7 @@ udpMisuseAnomaly NOTIFICATION-TYPE
 	OBJECTS {
 		pdosAnomalyId,
 		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
 		pdosAnomalyResource,
 		pdosAnomalyLinkPercent,
 		pdosAnomalyClassification,

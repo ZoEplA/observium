@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -76,17 +76,17 @@ foreach (get_device_mibs($device) as $mib)
           $entry['oid_num'] = snmp_translate($oid . '.' . $index, $mib);
         }
 
-        $value = snmp_fix_numeric(snmp_get($device, $entry['oid_num'], '-OQUvs'));
+        $value = snmp_fix_numeric(snmp_get_oid($device, $entry['oid_num']));
         if (is_numeric($value))
         {
           // Fetch description from oid if specified
           if (isset($entry['oid_descr']))
           {
-            $descr = snmp_get($device, $entry['oid_descr'], '-OQUvs');
+            $descr = snmp_get_oid($device, $entry['oid_descr'], $mib);
             if (isset($entry['descr']) && str_contains($entry['descr'], '%oid_descr%'))
             {
               // If descr definition have this magic key, use combination of static 'descr' and named 'descr' from oid
-              $descr = str_replace('%oid_descr%', $descr, $entry['descr']);
+              $descr = array_tag_replace(array('oid_descr' => $descr), $entry['descr']);
             }
             $entry['descr'] = $descr;
           }
@@ -97,6 +97,41 @@ foreach (get_device_mibs($device) as $mib)
               (isset($entry['max']) && $value >= $entry['max'])) { continue; }
 
           $options = array();
+
+          // Unit
+          if (isset($entry['unit'])) { $options['sensor_unit'] = $entry['unit']; }
+          if (isset($entry['oid_unit']))
+          {
+            // Fetch and translate unit from specific Oid
+            $unit = snmp_get_oid($device, $entry['oid_unit'], $mib, NULL, OBS_SNMP_ALL_ENUM);
+            if (isset($entry['map_unit'][$unit]))
+            {
+              $options['sensor_unit'] = $entry['map_unit'][$unit];
+            }
+            unset($unit);
+          }
+          // Scale
+          if (isset($entry['oid_scale']))
+          {
+            // Fetch and translate scale from specific Oid
+            $scale = snmp_get_oid($device, $entry['oid_scale'], $mib, NULL, OBS_SNMP_ALL_ENUM);
+            if (isset($entry['map_scale']))
+            {
+              $entry['scale'] = $entry['map_scale'][$scale];
+            }
+            else if (is_numeric($scale))
+            {
+              $entry['scale'] = $scale;
+            }
+            unset($scale);
+          }
+          if (!isset($entry['scale'])) { $entry['scale'] = 1; }
+          if ($entry['limit_scale'] === 'scale')
+          {
+            // If limit_scale equals to 'scale' - copy main scale for limits
+            $entry['limit_scale'] = $entry['scale'];
+          }
+
           // Check limits oids if set
           foreach (array('limit_low', 'limit_low_warn', 'limit_high_warn', 'limit_high') as $limit)
           {
@@ -104,7 +139,7 @@ foreach (get_device_mibs($device) as $mib)
             if (isset($entry[$oid_limit]))
             {
               // Get limit from OID
-              $options[$limit] = snmp_fix_numeric(snmp_get($device, $entry[$oid_limit], '-OQUvs', $mib));
+              $options[$limit] = snmp_fix_numeric(snmp_get_oid($device, $entry[$oid_limit], $mib));
               // Scale limit
               if (isset($entry['limit_scale']) && is_numeric($entry['limit_scale']) && $entry['limit_scale'] != 0)
               {
@@ -118,10 +153,6 @@ foreach (get_device_mibs($device) as $mib)
             }
           }
 
-          // Unit
-          if (isset($entry['unit'])) { $options['sensor_unit'] = $entry['unit']; }
-          if (!isset($entry['scale'])) { $entry['scale'] = 1; }
-
           // Rename old (converted) RRDs to definition format
           if (isset($entry['rename_rrd']))
           {
@@ -133,7 +164,7 @@ foreach (get_device_mibs($device) as $mib)
           else if (isset($entry['rename_rrd_array']) && is_array($entry['rename_rrd_array']))
           {
             $old_rrd_array = $entry['rename_rrd_array'];
-            $old_rrd_array['class'] = $entry['class'];
+            if (!isset($old_rrd_array['class'])) { $old_rrd_array['class'] = $entry['class']; }
             if (!isset($old_rrd_array['descr'])) { $old_rrd_array['descr'] = $entry['descr']; }
             if (!isset($old_rrd_array['index'])) { $old_rrd_array['index'] = $index; }
             rename_rrd_entity($device, 'sensor', $old_rrd_array, // old
@@ -184,7 +215,7 @@ foreach (get_device_mibs($device) as $mib)
           {
             if (isset($entry[$table_oid]))
             {
-              $sensor_array = snmpwalk_cache_oid($device, $table_oid, $sensor_array, $mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
+              $sensor_array = snmpwalk_cache_oid($device, $table_oid, $sensor_array, $mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX | OBS_SNMP_DISPLAY_HINT);
             }
           }
         } else {
@@ -194,7 +225,7 @@ foreach (get_device_mibs($device) as $mib)
             print_debug("Get cached Table OID: $mib::$table");
             $sensor_array = $cache_snmp[$mib][$table];
           } else {
-            $sensor_array = snmpwalk_cache_oid($device, $table, $sensor_array, $mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
+            $sensor_array = snmpwalk_cache_oid($device, $table, $sensor_array, $mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX | OBS_SNMP_DISPLAY_HINT);
           }
           if ($cache_snmp_enable && !isset($cache_snmp[$mib][$table]))
           {
@@ -237,50 +268,55 @@ foreach (get_device_mibs($device) as $mib)
             }
           }
 
+          // FIXME - this stuff is messy. Things are rewritten silently and it's a pain to work out why.
+          // Setting descr to oid_descr should be the last resort, not the first attempt
+          // Randomly shoving index on the end is really confusing too
+
+          // Quick attempt at making the structure more logical, needs ifs restructuring
+
           $dot_index = '.' . $index;
           $oid_num   = $entry['oid_num'] . $dot_index;
-          if ($entry['oid_descr'] && $sensor[$entry['oid_descr']])
+          if (!isset($entry['descr']) && $entry['oid_descr'] && $sensor[$entry['oid_descr']])
           {
             $descr = $sensor[$entry['oid_descr']];
             if (isset($entry['descr']) && str_contains($entry['descr'], '%oid_descr%'))
             {
               // If descr definition have this magic key, use combination of static 'descr' and named 'descr' from oid
-              $descr = str_replace('%oid_descr%', $descr, $entry['descr']);
+              $descr = array_tag_replace(array('oid_descr' => $descr), $entry['descr']);
             }
-          } else {
-            $descr = '';
           }
-          if (!$descr)
+          elseif (isset($entry['descr']))
           {
-            if (isset($entry['descr']))
-            {
-              $descr = $entry['descr'];
-              if (!str_contains($entry['descr'], array('%i%', '%index')))
-              {
-                $descr .= ' ' . $index;
-              }
-            } else {
-              $descr = 'Sensor ' . $index;
-            }
+            $descr = $entry['descr'];
+          } else {
+            $descr = 'Sensor ' . $index;
           }
+
+          // echo PHP_EOL; print_vars($entry); echo PHP_EOL; print_vars($sensor); echo PHP_EOL; print_vars($descr); echo PHP_EOL;
+
 
           // %i% can be used in description, a counter is kept per sensor class
           $counters[$class]++;
 
           // Rewrite specific keys
-          if (str_contains($descr, array('%i%', '%index')))
+          if (str_contains($descr, array('%i%', '%index')) || TRUE)
           {
-            $descr = str_replace('%class%', nicecase($class), $descr); // Class in descr
-            $descr = str_replace('%index%', $index, $descr); // Index in descr
-            $descr = str_replace('%i%', $counters[$class], $descr); // i++ counter in descr (per sensor class)
+            $replace_array = array(
+              'oid_descr' => $sensor[$entry['oid_descr']],
+              'class' => nicecase($class),  // Class in descr
+              'index' => $index,            // Index in descr
+              'i'     => $counters[$class], // i++ counter in descr (per sensor class)
+            );
+            // Multipart index: Oid.0.1.2 -> %index0%, %index1%, %index2%
             if (preg_match('/%index\d+%/', $entry['descr']))
             {
               // Multipart index
               foreach (explode('.', $index) as $k => $k_index)
               {
-                $descr = str_replace('%index'.$k.'%', $k_index, $descr);
+                $replace_array['index'.$k] = $k_index; // Multipart indexes
               }
             }
+            $descr = array_tag_replace($replace_array, $descr);
           }
 
           $value = snmp_fix_numeric($sensor[$entry['oid']]);
@@ -298,7 +334,7 @@ foreach (get_device_mibs($device) as $mib)
               if (isset($entry[$oid_limit]))
               {
                 if (isset($sensor[$entry[$oid_limit]])) { $options[$limit] = $sensor[$entry[$oid_limit]]; } // Named oid, exist in table
-                else                                    { $options[$limit] = snmp_get($device, $entry[$oid_limit] . $dot_index, '-OQUvs'); } // Numeric oid
+                else                                    { $options[$limit] = snmp_get_oid($device, $entry[$oid_limit] . $dot_index, $mib); } // Numeric oid
                 $options[$limit] = snmp_fix_numeric($options[$limit]);
                 // Scale limit
                 if (isset($entry['limit_scale']) && is_numeric($entry['limit_scale']) && $entry['limit_scale'] != 0)
@@ -316,13 +352,13 @@ foreach (get_device_mibs($device) as $mib)
             {
               $oid_limit = 'oid_limit_nominal';
               if (isset($sensor[$entry[$oid_limit]])) { $limit_nominal = $sensor[$entry[$oid_limit]]; } // Named oid, exist in table
-              else                                    { $limit_nominal = snmp_get($device, $entry[$oid_limit] . $dot_index, '-OQUvs'); } // Numeric oid
+              else                                    { $limit_nominal = snmp_get_oid($device, $entry[$oid_limit] . $dot_index, $mib); } // Numeric oid
 
               if (is_numeric($limit_nominal) && isset($entry['oid_limit_delta_warn']))
               {
                 $oid_limit = 'oid_limit_delta_warn';
                 if (isset($sensor[$entry[$oid_limit]])) { $limit_delta_warn = $sensor[$entry[$oid_limit]]; } // Named oid, exist in table
-                else                                    { $limit_delta_warn = snmp_get($device, $entry[$oid_limit] . $dot_index, '-OQUvs'); } // Numeric oid
+                else                                    { $limit_delta_warn = snmp_get_oid($device, $entry[$oid_limit] . $dot_index, $mib); } // Numeric oid
                 $options['limit_low_warn']  = $limit_nominal - $limit_delta_warn; //$entry['limit_scale'];
                 $options['limit_high_warn'] = $limit_nominal + $limit_delta_warn; //$entry['limit_scale'];
                 if (isset($entry['limit_scale']) && is_numeric($entry['limit_scale']) && $entry['limit_scale'] != 0)
@@ -335,7 +371,7 @@ foreach (get_device_mibs($device) as $mib)
               {
                 $oid_limit = 'oid_limit_delta';
                 if (isset($sensor[$entry[$oid_limit]])) { $limit_delta = $sensor[$entry[$oid_limit]]; } // Named oid, exist in table
-                else                                    { $limit_delta = snmp_get($device, $entry[$oid_limit] . $dot_index, '-OQUvs'); } // Numeric oid
+                else                                    { $limit_delta = snmp_get_oid($device, $entry[$oid_limit] . $dot_index, $mib); } // Numeric oid
                 $options['limit_low']  = $limit_nominal - $limit_delta;
                 $options['limit_high'] = $limit_nominal + $limit_delta;
                 if (isset($entry['limit_scale']) && is_numeric($entry['limit_scale']) && $entry['limit_scale'] != 0)
@@ -348,11 +384,47 @@ foreach (get_device_mibs($device) as $mib)
 
             // Unit
             if (isset($entry['unit'])) { $options['sensor_unit'] = $entry['unit']; }
+            if (isset($entry['oid_unit']) && isset($sensor[$entry['oid_unit']]))
+            {
+              // Translate unit from specific Oid
+              $unit = $sensor[$entry['oid_unit']];
+              if (isset($entry['map_unit'][$unit]))
+              {
+                $options['sensor_unit'] = $entry['map_unit'][$unit];
+              }
+            }
+
+            // Measured entity
+            if (isset($entry['measured_entity_by']))
+            {
+              switch ($entry['measured'])
+              {
+                case 'port':
+                  // Example in MIKROTIK-MIB
+                  $options['measured_class']   = 'port';
+                  $options['entPhysicalIndex'] = $index;
+                  if ($entry['measured_entity_by'] == 'ifDescr')
+                  {
+                    $entity_name = array_tag_replace(array('oid_descr' => $sensor[$entry['oid_descr']]), $entry['measured_entity']);
+                    //$entity_id   = get_port_id_by_ifDescr($device['device_id'], $entity_name);
+                    if ($entity = dbFetchRow("SELECT `port_id`, `ifIndex` FROM `ports` WHERE `device_id` = ? AND (`ifDescr` = ? OR `ifName` = ?) AND `deleted` = ? LIMIT 1", array($device['device_id'], $entity_name, $entity_name, 0)))
+                    {
+                      $options['measured_entity']           = $entity['port_id'];
+                      $options['entPhysicalIndex_measured'] = $entity['ifIndex'];
+                    }
+                  }
+                  break;
+                case 'ifIndex':
+                case 'index':
+                  // FIXME need more examples
+                  break;
+              }
+            }
 
             // Rename old (converted) RRDs to definition format
             if (isset($entry['rename_rrd']))
             {
-              $entry['rename_rrd'] = str_replace('%index%', $index, $entry['rename_rrd']);
+              $entry['rename_rrd'] = array_tag_replace(array('index' => $index), $entry['rename_rrd']); // %index% >> $index
               $old_rrd = 'sensor-'.$entry['class'].'-'.$entry['rename_rrd'];
               $new_rrd = 'sensor-'.$entry['class'].'-'.$entry['type'].'-'.$index;
               rename_rrd($device, $old_rrd, $new_rrd);
@@ -361,13 +433,13 @@ foreach (get_device_mibs($device) as $mib)
             else if (isset($entry['rename_rrd_array']) && is_array($entry['rename_rrd_array']))
             {
               $old_rrd_array = $entry['rename_rrd_array'];
-              $old_rrd_array['class'] = $entry['class'];
+              if (!isset($old_rrd_array['class'])) { $old_rrd_array['class'] = $entry['class']; }
               if (!isset($old_rrd_array['descr'])) { $old_rrd_array['descr'] = $entry['descr']; }
               if (!isset($old_rrd_array['index'])) { $old_rrd_array['index'] = $index; }
               foreach (array('descr', 'index') as $param)
               {
-                $old_rrd_array[$param] = str_replace('%index%', $index, $old_rrd_array[$param]);
-                $old_rrd_array[$param] = str_replace('%descr%', $descr, $old_rrd_array[$param]);
+                $replace_array         = array('index' => $index, 'descr' => $descr);
+                $old_rrd_array[$param] = array_tag_replace($replace_array, $old_rrd_array[$param]);
               }
               rename_rrd_entity($device, 'sensor', $old_rrd_array, // old
                                                    array('descr' => $entry['descr'], 'class' => $entry['class'], 'index' => $index, 'type' => $entry['type'])); // new
@@ -428,19 +500,27 @@ foreach (get_device_mibs($device) as $mib)
           $entry['oid_num'] = snmp_translate($oid . '.' . $index, $mib);
         }
 
-        $value = snmp_get($device, $entry['oid_num'], '-OQUvsn');
+        $value = snmp_get_oid($device, $entry['oid_num'], $mib, NULL, OBS_SNMP_ALL_ENUM);
         if (is_numeric($value))
         {
           // Fetch description from oid if specified
           if (isset($entry['oid_descr']))
           {
-            $descr = snmp_get($device, $entry['oid_descr'], '-OQUvs');
+            $descr = snmp_get_oid($device, $entry['oid_descr'], $mib);
             if (isset($entry['descr']) && str_contains($entry['descr'], '%oid_descr%'))
             {
               // If descr definition have this magic key, use combination of static 'descr' and named 'descr' from oid
-              $descr = str_replace('%oid_descr%', $descr, $entry['descr']);
+              $descr = array_tag_replace(array('oid_descr' => $descr), $entry['descr']);
             }
             $entry['descr'] = $descr;
+          }
+
+          $options = array('entPhysicalClass' => $entry['measured']);
+
+          // Definition based events
+          if (isset($entry['oid_map']))
+          {
+            $options['status_map'] = snmp_get_oid($device, $entry['oid_map'], $mib);
           }
 
           // Rename old (converted) RRDs to definition format
@@ -454,6 +534,7 @@ foreach (get_device_mibs($device) as $mib)
           else if (isset($entry['rename_rrd_array']) && is_array($entry['rename_rrd_array']))
           {
             $old_rrd_array = $entry['rename_rrd_array'];
+            if (!isset($old_rrd_array['type']))  { $old_rrd_array['type']  = $entry['type']; }
             if (!isset($old_rrd_array['descr'])) { $old_rrd_array['descr'] = $entry['descr']; }
             if (!isset($old_rrd_array['index'])) { $old_rrd_array['index'] = "$oid.$index"; }
             rename_rrd_entity($device, 'status', $old_rrd_array, // old
@@ -463,7 +544,7 @@ foreach (get_device_mibs($device) as $mib)
             rename_rrd($device, "status-".$entry['type'].'-'.$index, "status-".$entry['type'].'-'."$oid.$index");
           }
 
-          discover_status($device, $entry['oid_num'], "$oid.$index", $entry['type'], $entry['descr'], $value, array('entPhysicalClass' => $entry['measured']));
+          discover_status($device, $entry['oid_num'], "$oid.$index", $entry['type'], $entry['descr'], $value, $options);
         }
       }
 
@@ -501,7 +582,7 @@ foreach (get_device_mibs($device) as $mib)
         if (isset($entry['table_walk']) && $entry['table_walk'] == FALSE)
         {
           // Walk by oids separately
-          $table_oids = array('oid', 'oid_descr');
+          $table_oids = array('oid', 'oid_descr', 'oid_map');
           foreach ($table_oids as $table_oid)
           {
             if (isset($entry[$table_oid]))
@@ -539,55 +620,72 @@ foreach (get_device_mibs($device) as $mib)
         $i = 1; // Used in descr as $i++
         foreach ($status_array as $index => $status)
         {
+          // FIXME - this stuff is messy. Things are rewritten silently and it's a pain to work out why.
+          // Setting descr to oid_descr should be the last resort, not the first attempt
+          // Randomly shoving index on the end is really confusing too
+
+          // Quick attempt at making the structure more logical, needs ifs restructuring
+
           $dot_index = '.' . $index;
           $oid_num   = $entry['oid_num'] . $dot_index;
-          if ($entry['oid_descr'] && $status[$entry['oid_descr']])
+          if (!isset($entry['descr']) && $entry['oid_descr'] && $status[$entry['oid_descr']])
           {
             $descr = $status[$entry['oid_descr']];
             if (isset($entry['descr']) && str_contains($entry['descr'], '%oid_descr%'))
             {
               // If descr definition have this magic key, use combination of static 'descr' and named 'descr' from oid
-              $descr = str_replace('%oid_descr%', $descr, $entry['descr']);
+              $descr = array_tag_replace(array('oid_descr' => $descr), $entry['descr']);
             }
+          }
+          elseif (isset($entry['descr']))
+          {
+            $descr = $entry['descr'];
           } else {
-            $descr = '';
+            $descr = 'Status ' . $index;
           }
-          if (!$descr)
-          {
-            if (isset($entry['descr']))
-            {
-              $descr = $entry['descr'];
-              if (!str_contains($entry['descr'], array('%i%', '%index')))
-              {
-                $descr .= ' ' . $index;
-              }
-            } else {
-              $descr = 'Status ' . $index;
-            }
-          }
+
+          //echo PHP_EOL; print_vars($entry); echo PHP_EOL; print_vars($status); echo PHP_EOL; print_vars($descr); echo PHP_EOL;
+
+
+          // %i% can be used in description
+          $i++;
+
           // Rewrite specific keys
-          if (str_contains($descr, array('%i%', '%index')))
+          if (str_contains($descr, array('%i%', '%index')) || TRUE)
           {
-            $descr = str_replace('%index%', $index, $descr); // Index in descr
-            $descr = str_replace('%i%', $i, $descr);                  // i++ counter in descr
+            $replace_array = array(
+              'oid_descr' => $status[$entry['oid_descr']],
+              'class' => nicecase($class),  // Class in descr
+              'index' => $index,            // Index in descr
+              'i'     => $i, // i++ counter in descr
+            );
+            // Multipart index: Oid.0.1.2 -> %index0%, %index1%, %index2%
             if (preg_match('/%index\d+%/', $entry['descr']))
             {
               // Multipart index
               foreach (explode('.', $index) as $k => $k_index)
               {
-                $descr = str_replace('%index'.$k.'%', $k_index, $descr);
+                $replace_array['index'.$k] = $k_index; // Multipart indexes
               }
             }
+            $descr = array_tag_replace($replace_array, $descr);
           }
 
           $value = $status[$entry['oid']];
           if (strlen($value))
           {
+            $options = array('entPhysicalClass' => $entry['measured']);
+
+            // Definition based events
+            if (isset($entry['oid_map']) && $status[$entry['oid_map']])
+            {
+              $options['status_map'] = $status[$entry['oid_map']];
+            }
 
             // Rename old (converted) RRDs to definition format
             if (isset($entry['rename_rrd']))
             {
-              $entry['rename_rrd'] = str_replace('%index%', $index, $entry['rename_rrd']);
+              $entry['rename_rrd'] = array_tag_replace(array('index' => $index), $entry['rename_rrd']);
               $old_rrd = 'status-'.$entry['rename_rrd'];
               $new_rrd = 'status-'.$entry['type'].'-'.$entry['oid'].$dot_index;
               rename_rrd($device, $old_rrd, $new_rrd);
@@ -596,12 +694,13 @@ foreach (get_device_mibs($device) as $mib)
             else if (isset($entry['rename_rrd_array']) && is_array($entry['rename_rrd_array']))
             {
               $old_rrd_array = $entry['rename_rrd_array'];
+              if (!isset($old_rrd_array['type']))  { $old_rrd_array['type']  = $entry['type']; }
               if (!isset($old_rrd_array['descr'])) { $old_rrd_array['descr'] = $entry['descr']; }
               if (!isset($old_rrd_array['index'])) { $old_rrd_array['index'] = $entry['oid'].$dot_index; }
               foreach (array('descr', 'index') as $param)
               {
-                $old_rrd_array[$param] = str_replace('%index%', $index, $old_rrd_array[$param]);
-                $old_rrd_array[$param] = str_replace('%descr%', $descr, $old_rrd_array[$param]);
+                $replace_array         = array('index' => $index, 'descr' => $descr);
+                $old_rrd_array[$param] = array_tag_replace($replace_array, $old_rrd_array[$param]);
               }
               rename_rrd_entity($device, 'status', $old_rrd_array, // old
                                                    array('descr' => $entry['descr'], 'index' => $entry['oid'].$dot_index, 'type' => $entry['type'])); // new
@@ -610,7 +709,7 @@ foreach (get_device_mibs($device) as $mib)
               rename_rrd($device, "status-".$entry['type'].'-'.$index, "status-".$entry['type'].'-'.$entry['oid'].$dot_index);
             }
 
-            discover_status($device, $oid_num, $entry['oid'].$dot_index, $entry['type'], $descr, $value, array('entPhysicalClass' => $entry['measured']));
+            discover_status($device, $oid_num, $entry['oid'].$dot_index, $entry['type'], $descr, $value, $options);
           }
         }
       }

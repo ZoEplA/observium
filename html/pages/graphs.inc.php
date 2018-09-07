@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -142,6 +142,59 @@ if (!$auth)
       }
   }
 
+
+  // Adding to the dashboard
+
+  if($_SESSION['userlevel'] > 7)
+  {
+
+    $dashboards = dbFetchRows("SELECT * FROM `dashboards`");
+
+    // FIXME - widget_exists() dashboard_exists(), widget_permitted(), dashboard_permitted(), etc.
+
+    // FIXME - convert this to ajax call, maybe make the code usable on other pages too
+
+    $valid = array('id', 'device');
+    $add_array = array('type' => $vars['type'],
+                       'period' => $vars['to'] - $vars['from']);
+    foreach($vars as $var => $value) { if(in_array($var, $valid))  { $add_array[$var] = $value; } }
+
+    if(isset($vars['dash_add']) && is_array($dashboards[$vars['dash_add']]))
+    {
+      $widget_id = dbInsert(array('dash_id' => $vars['dash_add'], 'widget_config' => json_encode($add_array), 'widget_type' => 'graph', 'x' => 0, 'y' => 99, 'width' => 3, 'height' => 2), 'dash_widgets');
+      print_message('Graph widget added to dashboard.', 'info');
+      unset($vars['dash_add']);
+    }
+
+    if(isset($vars['dash_add_widget']))
+    {
+      dbUpdate(array('widget_config' => json_encode($add_array)), 'dash_widgets', '`widget_id` = ?', array($vars['dash_add_widget']));
+      if(dbAffectedRows() == 1) { print_message("Widget updated.", 'info'); }
+      unset($vars['dash_add_widget']);
+    }
+
+
+    if(count($dashboards))
+    {
+      $navbar['options_right']['dash']['text'] = "Add to Dashboard";
+
+      foreach($dashboards as $dash)
+      {
+        $navbar['options_right']['dash']['suboptions'][$avail_type]['text'] = "Add to " . $dash['dash_name'];
+        $navbar['options_right']['dash']['suboptions'][$avail_type]['url'] = generate_url($vars, array('page' => "graphs", 'dash_add' => $dash['dash_id']));
+        $widgets = dbFetchRows("SELECT * FROM `dash_widgets` WHERE `dash_id` = ? AND widget_type = 'graph' AND `widget_config` = ?", array($dash['dash_id'], '[]'));
+        foreach($widgets as $widget)
+        {
+          $navbar['options_right']['dash']['suboptions'][$avail_type]['entries'][$widget['widget_id']]['text'] = "Add to Widget #".$widget['widget_id']."";
+          $navbar['options_right']['dash']['suboptions'][$avail_type]['entries'][$widget['widget_id']]['url'] = generate_url($vars, array('page' => "graphs", 'dash_add_widget' => $widget['widget_id']));
+        }
+      }
+
+    }
+  }
+
+
+
   print_navbar($navbar);
 
   // Start form for the custom range.
@@ -154,9 +207,9 @@ if (!$auth)
                        'week' => 'One Week',
                        //'twoweek' => 'Two Weeks',
                        'month' => 'One Month',
-                       //'twomonth' => 'Two Months',
+                       'threemonth' => 'Three Months',
                        'year' => 'One Year',
-                       'twoyear' => 'Two Years'
+                       'threeyear' => 'Three Years'
                       );
 
   echo('<table style="width: 100%; background: transparent;"><tr>');
@@ -275,11 +328,18 @@ $navbar['class'] = "navbar-narrow";
 
 $navbar['options']['legend']   =  array('text' => 'Show Legend', 'inverse' => TRUE);
 $navbar['options']['previous'] =  array('text' => 'Graph Previous');
+
 if(in_array('trend', $graph_return['valid_options']))
 {
   $navbar['options']['trend']    =  array('text' => 'Graph Trend');
 }
 $navbar['options']['max']      =  array('text' => 'Graph Maximum');
+
+if(in_array('inverse', $graph_return['valid_options']))
+{
+   $navbar['options']['inverse']    =  array('text' => 'Invert Graph');
+}
+
 
 $navbar['options_right']['showcommand'] =  array('text' => 'RRD Command');
 
@@ -503,6 +563,9 @@ LINE1:d95thout#aa0000';
 /// End options navbar
 
   echo generate_graph_js_state($graph_array);
+
+  //r($graph_array);
+
 
   echo generate_box_open();
   echo generate_graph_tag($graph_array);

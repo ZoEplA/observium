@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,7 +16,7 @@
 if (is_device_mib($device, 'HOST-RESOURCES-MIB'))
 {
   $oid_list = "hrSystemProcesses.0 hrSystemNumUsers.0";
-  $hrSystem  = snmp_get_multi ($device, $oid_list, "-OUQs", "HOST-RESOURCES-MIB");
+  $hrSystem  = snmp_get_multi_oid($device, $oid_list, array(), "HOST-RESOURCES-MIB");
 
   print_cli_data_field("Collecting", 2);
 

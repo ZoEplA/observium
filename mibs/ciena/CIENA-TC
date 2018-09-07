@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-10-01-0027
+-- This file was included in WWP MIB release 04-16-00-0047
 
 
 CIENA-TC DEFINITIONS ::= BEGIN
@@ -59,7 +59,7 @@ CIENA-TC DEFINITIONS ::= BEGIN
 CienaGlobalState  ::=  TEXTUAL-CONVENTION
      STATUS  current
      DESCRIPTION
-         "This textual convention enumerates the administration and operational state."
+         "This textual convention enumerates the administrative and operational state."
      SYNTAX  INTEGER {                                                 
      					enabled(1),
      					disabled(2)
@@ -86,7 +86,7 @@ CienaGlobalState  ::=  TEXTUAL-CONVENTION
   CienaStatsClear ::= TEXTUAL-CONVENTION
 	STATUS current
 	DESCRIPTION
-		"This textual convention enumerates the stats clear operation if the value is set to 1."
+		"This textual convention enumerates the statistics clear operation if the value is set to 1."
 	SYNTAX	INTEGER {		
 					none(0),
      				clear(1)
@@ -94,7 +94,7 @@ CienaGlobalState  ::=  TEXTUAL-CONVENTION
  CienaMacAddress ::= TEXTUAL-CONVENTION
  	STATUS current
  	DESCRIPTION
- 		"This textual convention denotes MAC Address"
+ 		"This textual convention denotes a MAC address."
  	SYNTAX MacAddress 
  	
 END

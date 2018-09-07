@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Packet.php 218 2013-11-28 22:34:20Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -421,21 +421,6 @@ class Net_DNS2_Packet
         $this->_compressed  = array();
     
         return true;
-    }
-
-    /**
-     * formats an IPv6 IP address in the preferred format
-     *
-     * @param string $address The IPv6 IP address to format
-     *
-     * @return string The IPv6 IP address formatted in the new format
-     * @access public
-     * @deprecated function deprecated in 1.1.3
-     *
-     */
-    public static function formatIPv6($address)
-    {
-        return Net_DNS2::expandIPv6($address);
     }
 }
 

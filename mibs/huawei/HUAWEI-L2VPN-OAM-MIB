@@ -3,11 +3,11 @@
 --
 
 --  ==================================================================
--- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI L2VPN OAM TRAP Management MIB
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.04
 -- History:
 --              V1.0 yueyongliang, 2011-04-21, publish
 -- ==================================================================
@@ -30,7 +30,7 @@
     
         -- 1.3.6.1.4.1.2011.5.25.119.9
     hwL2vpnOamTrap MODULE-IDENTITY 
-        LAST-UPDATED "201309051400Z"        -- Sep 05, 2013 at 14:00 GMT
+        LAST-UPDATED "201511271400Z"        -- Nov 27, 2015 at 14:00 GMT
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -46,6 +46,9 @@
             manage OAM TRAP."
         
         -- Revision history
+        REVISION "201511271400Z"
+    	DESCRIPTION 
+            "V2.04, add hwL2vpnOamTunnelNonSupport, hwL2vpnOamTunnelNonSupportResumed for router."
         REVISION "201309051400Z"
     	DESCRIPTION 
             "V2.03, modify import error."
@@ -220,6 +223,21 @@
                 "This object indicates the the vsi's name.
                  This object should contain a value of null if not valid."
             ::= { hwL2vpnOamTrapMIBObjects 12 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.119.9.1.13
+        hwL2vpnOamType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                mplsoam(1),
+                mplstpoam(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type (MPLS OAM or MPLS-TP OAM) of the OAM.
+                 This object should contain a value of zero if not valid."
+            ::= { hwL2vpnOamTrapMIBObjects 13 }
 
 
 --           
@@ -655,6 +673,22 @@
                 "OAM reported the FDI alarm disappearance."
             ::= { hwL2vpnOamMIBTraps 40 }
 
+        -- 1.3.6.1.4.1.2011.5.25.119.9.2.41
+        hwL2vpnOamTunnelNonSupport NOTIFICATION-TYPE
+            OBJECTS { hwL2vpnVcID, hwL2vpnVcType, hwL2vpnPeerAddr, hwL2vpnOamType}
+            STATUS current
+            DESCRIPTION 
+                "OAM for PW does not support the current public tunnel."
+            ::= { hwL2vpnOamMIBTraps 41 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.9.2.42
+        hwL2vpnOamTunnelNonSupportResumed NOTIFICATION-TYPE
+            OBJECTS { hwL2vpnVcID, hwL2vpnVcType, hwL2vpnPeerAddr, hwL2vpnOamType}
+            STATUS current
+            DESCRIPTION 
+                "The alarm that OAM for PW does not support the current public tunnel is resumed."
+            ::= { hwL2vpnOamMIBTraps 42 }
+ 
 --    Conformance information
 -- 
 		-- 1.3.6.1.4.1.2011.5.25.119.9.3
@@ -683,7 +717,7 @@
 		hwL2vpnOamGroup OBJECT-GROUP
 			OBJECTS { hwL2vpnServiceType, hwL2vpnProtocolType, hwL2vpnVcID, hwL2vpnVcType, hwL2vpnPeerAddr, 
                                   hwL2vpnIfIndex, hwL2vpnPwMaster, hwL2vpnRmtSiteID, hwL2vpnInLabel, hwL2vpnOutLabel, 
-                                  hwL2vpnIfName, hwL2vpnVsiName }
+                                  hwL2vpnIfName, hwL2vpnVsiName, hwL2vpnOamType}
 			STATUS current
 			DESCRIPTION 
 				"The L2VPN OAM group."
@@ -700,7 +734,8 @@
 			                hwL2vpnOamExcess, hwL2vpnOamExcessClear, hwL2vpnOamMismatch, hwL2vpnOamMismatchClear,
 				        hwL2vpnOamMismerge, hwL2vpnOamMismergeClear, hwL2vpnOamFail, hwL2vpnOamFailClear,
 				        hwL2vpnOamDbdi, hwL2vpnOamDbdiClear, hwL2vpnOamUnknown, hwL2vpnOamUnknownClear,
-				        hwL2vpnOamLocalLock, hwL2vpnOamLocalLockClear, hwL2vpnOamSd1Far, hwL2vpnOamSd1FarClear, hwL2vpnOamSd2Far, hwL2vpnOamSd2FarClear, hwL2vpnOamFdi, hwL2vpnOamFdiClear }
+				        hwL2vpnOamLocalLock, hwL2vpnOamLocalLockClear, hwL2vpnOamSd1Far, hwL2vpnOamSd1FarClear, hwL2vpnOamSd2Far, hwL2vpnOamSd2FarClear, hwL2vpnOamFdi, hwL2vpnOamFdiClear,
+                                                                               hwL2vpnOamTunnelNonSupport, hwL2vpnOamTunnelNonSupportResumed }
 			STATUS current
 			DESCRIPTION 
 				"The L2VPN OAM Notification group."

@@ -1886,5 +1886,15 @@ rlSntpAllServerInetKeyIdentifier OBJECT-TYPE
         ::= { rlSntpAllServerInetEntry 12 }
 
 
+rlSntpRestoreDefaultServers OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this scalar to true restores sntp default unicast servers.
+                     Meaning: all manually configured servers are deleted, and the
+                     default SNTP servers are recreated with their default values.
+                     This is an 'action' scalar."
+        ::= { rlSntpConfig 19 }
+
 
 END

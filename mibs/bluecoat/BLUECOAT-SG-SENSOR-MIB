@@ -9,12 +9,14 @@ IMPORTS
                 FROM BLUECOAT-MIB;
 
 deviceSensorMIB MODULE-IDENTITY
-        LAST-UPDATED    "201307110300Z"
+        LAST-UPDATED    "201511260300Z"
         ORGANIZATION    "Blue Coat Systems, Inc."
         CONTACT-INFO    "support.services@bluecoat.com
                          http://www.bluecoat.com"
         DESCRIPTION     "The sensor MIB is used to monitor
                          the values of sensors"
+        REVISION        "201511260300Z"
+        DESCRIPTION     "Add new value (notInstalled) to SensorStatus"
         REVISION        "201307110300Z"
         DESCRIPTION     "Access level for deviceSensorTrapEnabled changed."
         REVISION        "200711050300Z"
@@ -99,11 +101,13 @@ SensorStatus ::= TEXTUAL-CONVENTION
                          ok(1) means the agent can read the sensor value.
                          unavailable(2) means that the agent presently
                          can not report the sensor value.
-                         nonoperational(3) means that the sensor is broken."
+                         nonoperational(3) means that the sensor is broken.
+                         notInstalled(4) means that the sensor or device is not present."
         SYNTAX INTEGER {
                 ok(1),
                 unavailable(2),
-                nonoperational(3)
+                nonoperational(3),
+                notInstalled(4)
         }
 
 --

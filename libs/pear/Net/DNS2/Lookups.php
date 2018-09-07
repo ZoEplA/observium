@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Lookups.php 215 2013-10-28 04:20:36Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -130,13 +130,15 @@ class Net_DNS2_Lookups
 
     // 11-15 reserved
 
-    const RCODE_BADSIG          = 16;       // RFC 2845    
+    const RCODE_BADSIG          = 16;       // RFC 2845
+    const RCODE_BADVERS         = 16;       // RFC 6891    
     const RCODE_BADKEY          = 17;       // RFC 2845
     const RCODE_BADTIME         = 18;       // RFC 2845
     const RCODE_BADMODE         = 19;       // RFC 2930
     const RCODE_BADNAME         = 20;       // RFC 2930
     const RCODE_BADALG          = 21;       // RFC 2930
     const RCODE_BADTRUNC        = 22;       // RFC 4635
+    const RCODE_BADCOOKIE       = 23;       // RFC 7873
 
     /*
      * internal errors codes returned by the exceptions class
@@ -162,12 +164,15 @@ class Net_DNS2_Lookups
     const E_DNS_BADNAME         = self::RCODE_BADNAME;
     const E_DNS_BADALG          = self::RCODE_BADALG;
     const E_DNS_BADTRUNC        = self::RCODE_BADTRUNC;    
+    const E_DNS_BADCOOKIE       = self::RCODE_BADCOOKIE;
 
     // other error conditions
 
     const E_NS_INVALID_FILE     = 200;
     const E_NS_INVALID_ENTRY    = 201;
     const E_NS_FAILED           = 202;
+    const E_NS_SOCKET_FAILED    = 203;
+    const E_NS_INVALID_SOCKET   = 204;
 
     const E_PACKET_INVALID      = 300;
     const E_PARSE_ERROR         = 301;
@@ -185,6 +190,25 @@ class Net_DNS2_Lookups
     const E_CACHE_SHM_UNAVAIL   = 502;
 
     /*
+     * EDNS0 Option Codes (OPT)
+     */
+    // 0 - Reserved
+    const EDNS0_OPT_LLQ             = 1;
+    const EDNS0_OPT_UL              = 2;
+    const EDNS0_OPT_NSID            = 3;
+    // 4 - Reserved
+    const EDNS0_OPT_DAU             = 5;
+    const EDNS0_OPT_DHU             = 6;
+    const EDNS0_OPT_N3U             = 7;
+    const EDNS0_OPT_CLIENT_SUBNET   = 8;
+    const EDNS0_OPT_EXPIRE          = 9;
+    const EDNS0_OPT_COOKIE          = 10;
+    const EDNS0_OPT_TCP_KEEPALIVE   = 11;
+    const EDNS0_OPT_PADDING         = 12;
+    const EDNS0_OPT_CHAIN           = 13;
+    const EDNS0_OPT_KEY_TAG         = 14;
+
+    /*
      * DNSSEC Algorithms
      */
     const DNSSEC_ALGORITHM_RES                  = 0;
@@ -198,6 +222,10 @@ class Net_DNS2_Lookups
     const DNSSEC_ALGORITHM_RSASHA256	        = 8;
     const DNSSEC_ALGORITHM_RSASHA512            = 10;
     const DNSSEC_ALGORITHM_ECCGOST              = 12;
+    const DNSSEC_ALGORITHM_ECDSAP256SHA256      = 13;
+    const DNSSEC_ALGORITHM_ECDSAP384SHA384      = 14;
+    const DNSSEC_ALGORITHM_ED25519              = 15;
+    const DNSSEC_ALGORITHM_ED448                = 16;
     const DNSSEC_ALGORITHM_INDIRECT             = 252;
     const DNSSEC_ALGORITHM_PRIVATEDNS           = 253;
     const DNSSEC_ALGORITHM_PRIVATEOID           = 254;
@@ -272,16 +300,20 @@ class Net_DNS2_Lookups
         'NSEC3'         => 50,      // RFC 5155
         'NSEC3PARAM'    => 51,      // RFC 5155
         'TLSA'          => 52,      // RFC 6698
+        'SMIMEA'        => 53,      // draft-ietf-dane-smime-10
 
-                                    // 52 - 54 unassigned
+                                    // 54 unassigned
 
         'HIP'           => 55,      // RFC 5205
         'NINFO'         => 56,      // Not implemented
         'RKEY'          => 57,      // Not implemented
-        'TALINK'        => 58,      // IETF (draft-barwood-dnsop-ds-publish-02)
-        'CDS'           => 59,      // IETF (draft-barwood-dnsop-ds-publish-02)
+        'TALINK'        => 58,      // 
+        'CDS'           => 59,      // RFC 7344
+        'CDNSKEY'       => 60,      // RFC 7344
+        'OPENPGPKEY'    => 61,      // RFC 7929
+        'CSYNC'         => 62,      // RFC 7477
 
-                                    // 60 - 98 unassigned
+                                    // 63 - 98 unassigned
 
         'SPF'           => 99,      // RFC 4408
         'UINFO'         => 100,     // no RFC, Not implemented
@@ -306,11 +338,13 @@ class Net_DNS2_Lookups
         'ANY'           => 255,     // RFC 1035 - we support both 'ANY' and '*'
         'URI'           => 256,     // tools.ietf.org/html/draft-faltstrom-uri-06
         'CAA'           => 257,     // tools.ietf.org/html/draft-ietf-pkix-caa-03
+        'AVC'           => 258,     // Application Visibility and Control
 
-                                    // 258 - 32767 unassigned
+                                    // 259 - 32767 unassigned
 
         'TA'            => 32768,   // same as DS
-        'DLV'           => 32769    // RFC 4431
+        'DLV'           => 32769,   // RFC 4431
+        'TYPE65534'     => 65534    // Private Bind record
     );
 
     /*
@@ -380,9 +414,13 @@ class Net_DNS2_Lookups
         50          => 'Net_DNS2_RR_NSEC3',
         51          => 'Net_DNS2_RR_NSEC3PARAM',
         52          => 'Net_DNS2_RR_TLSA',
+        53          => 'Net_DNS2_RR_SMIMEA',
         55          => 'Net_DNS2_RR_HIP',
         58          => 'Net_DNS2_RR_TALINK',
         59          => 'Net_DNS2_RR_CDS',
+        60          => 'Net_DNS2_RR_CDNSKEY',
+        61          => 'Net_DNS2_RR_OPENPGPKEY',
+        62          => 'Net_DNS2_RR_CSYNC',
         99          => 'Net_DNS2_RR_SPF',
         104         => 'Net_DNS2_RR_NID',
         105         => 'Net_DNS2_RR_L32',
@@ -400,8 +438,10 @@ class Net_DNS2_Lookups
         255         => 'Net_DNS2_RR_ANY',
         256         => 'Net_DNS2_RR_URI',
         257         => 'Net_DNS2_RR_CAA',
+        258         => 'Net_DNS2_RR_AVC',
         32768       => 'Net_DNS2_RR_TA',
-        32769       => 'Net_DNS2_RR_DLV'
+        32769       => 'Net_DNS2_RR_DLV',
+        65534       => 'Net_DNS2_RR_TYPE65534'
     );
 
     /*
@@ -460,6 +500,10 @@ class Net_DNS2_Lookups
         self::DNSSEC_ALGORITHM_RSASHA256            => 'RSASHA256',
         self::DNSSEC_ALGORITHM_RSASHA512            => 'RSASHA512',
         self::DNSSEC_ALGORITHM_ECCGOST              => 'ECC-GOST',
+        self::DNSSEC_ALGORITHM_ECDSAP256SHA256      => 'ECDSAP256SHA256',
+        self::DNSSEC_ALGORITHM_ECDSAP384SHA384      => 'ECDSAP384SHA384',
+        self::DNSSEC_ALGORITHM_ED25519              => 'ED25519',
+        self::DNSSEC_ALGORITHM_ED448                => 'ED448',
         self::DNSSEC_ALGORITHM_INDIRECT             => 'INDIRECT',
         self::DNSSEC_ALGORITHM_PRIVATEDNS           => 'PRIVATEDNS',
         self::DNSSEC_ALGORITHM_PRIVATEOID           => 'PRIVATEOID'

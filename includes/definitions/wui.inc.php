@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -30,17 +30,29 @@ define('OBS_CLASS_TABLE_STRIPED_MORE', OBS_CLASS_TABLE . ' table-condensed-more 
 /* After this line keep only WUI specific definitions, not required in cli! */
 //if (is_cli()) { return; }
 
+// List of allowed (un-escaped) tags in escape_html(): <tag>..</tag>
+$config['escape_html']['tags']            = array('sup', 'sub');
+// List of allowed (un-escaped) entities in escape_html(): &entity;
+$config['escape_html']['entities']        = array('deg', 'omega');
+
+
+$config['pages']['gridstack']['no_panel'] = TRUE;
+$config['pages']['dashboard']['no_panel'] = TRUE;
+
 // Refresh pages definitions
 $config['wui']['refresh_times']       = array(0, 60, 120, 300, 900, 1800); // Allowed refresh times in seconds
 // $vars array combination where auto-refresh page disabled by default
+$config['wui']['refresh_disabled'][]  = array('page' => 'dashboard');
 $config['wui']['refresh_disabled'][]  = array('page' => 'add_alert_check');
 $config['wui']['refresh_disabled'][]  = array('page' => 'alert_check');
 $config['wui']['refresh_disabled'][]  = array('page' => 'alert_regenerate');
 $config['wui']['refresh_disabled'][]  = array('page' => 'alert_maintenance_add');
 $config['wui']['refresh_disabled'][]  = array('page' => 'group_add');
 $config['wui']['refresh_disabled'][]  = array('page' => 'groups_regenerate');
+$config['wui']['refresh_disabled'][]  = array('page' => 'group', 'view' => 'edit');
 $config['wui']['refresh_disabled'][]  = array('page' => 'add_alertlog_rule');
 $config['wui']['refresh_disabled'][]  = array('page' => 'syslog_rules');
+$config['wui']['refresh_disabled'][]  = array('page' => 'add_syslog_rule');
 $config['wui']['refresh_disabled'][]  = array('page' => 'contact');
 $config['wui']['refresh_disabled'][]  = array('page' => 'contacts');
 $config['wui']['refresh_disabled'][]  = array('page' => 'bills', 'view' => 'add');
@@ -64,7 +76,7 @@ $config['wui']['refresh_disabled'][]  = array('page' => 'customoids');
 $config['wui']['refresh_disabled'][]  = array('page' => 'log');
 
 // Search modules used by the ajax search, in order.
-$config['wui']['search_modules'] = array('devices', 'ports', 'sensors', 'status', 'accesspoints', 'ip-addresses', 'inventory');
+$config['wui']['search_modules'] = array('devices', 'ports', 'slas', 'sensors', 'status', 'accesspoints', 'ip-addresses', 'inventory');
 
 // Default groups list (on status page and default panel)
 //$config['wui']['groups_list'] = array('device', 'port', 'processor', 'mempool', 'sensor', 'bgp_peer');
@@ -188,7 +200,7 @@ $config['icon']['counter']           = "sprite-counter";
 $config['icon']['fanspeed']          = "sprite-fanspeed";
 $config['icon']['current']           = "sprite-amps";
 $config['icon']['power']             = "sprite-watts";
-$config['icon']['illuminance']       = "sprite-lightbulb";
+$config['icon']['illuminance']       = "sprite-light-bulb";
 $config['icon']['load']              = "sprite-asterisk";
 $config['icon']['temperature']       = "sprite-temperature";
 $config['icon']['humidity']          = "sprite-humidity";
@@ -203,7 +215,8 @@ $config['icon']['resistance']        = "sprite-ohms";
 $config['icon']['velocity']          = "sprite-performance";
 $config['icon']['waterflow']         = "sprite-flowrate";
 $config['icon']['volume']            = "sprite-volume";
-$config['icon']['lflux']             = "sprite-lightbulb";
+$config['icon']['lflux']             = "sprite-light-bulb";
+$config['icon']['wavelength']        = "sprite-laser"; // FIXME need other icon
 
 $config['icon']['service']           = "sprite-service";
 $config['icon']['servicegroup']      = $config['icon']['service'];
@@ -222,6 +235,8 @@ $config['icon']['routing']           = "sprite-routing";
 $config['icon']['vrf']               = "sprite-vrf";
 $config['icon']['cef']               = "sprite-cef";
 $config['icon']['ospf']              = "sprite-ospf";
+$config['icon']['eigrp']              = "sprite-ospf";
+$config['icon']['ipsec_tunnel']      = "sprite-tunnel";
 $config['icon']['vlan']              = "sprite-vlan";
 $config['icon']['switching']         = "sprite-switching";
 $config['icon']['crossbar']          = $config['icon']['switching'];
@@ -251,6 +266,7 @@ $config['icon']['bgp']               = "sprite-bgp";
 $config['icon']['bgp-internal']      = "sprite-bgp-internal";
 $config['icon']['bgp-external']      = "sprite-bgp-external";
 $config['icon']['bgp-alert']         = "sprite-bgp-alerts";
+$config['icon']['bgp-afi']            = "sprite-bgp-afi";
 
 $config['icon']['users']             = "sprite-users";
 $config['icon']['user-self']         = "sprite-user-self";

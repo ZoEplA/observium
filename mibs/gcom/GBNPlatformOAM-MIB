@@ -17,12 +17,17 @@
         PortList, dot1qStaticMulticastEntry     FROM Q-BRIDGE-MIB;
 
     gbnPlatformOAM MODULE-IDENTITY
-        LAST-UPDATED    "0011020000Z"  -- November 2, 2000
+        LAST-UPDATED    "201802140000Z"  -- February 14, 2018
         ORGANIZATION    "Greentech"
         CONTACT-INFO    "Adam Armstrong
                          E-mail: adama@observium.org"
 
         DESCRIPTION     "Gbn Common Enterprise MIB definition."
+
+        REVISION        "201802140000Z"  -- February 14, 2018
+        DESCRIPTION     "Fix a few ASN.1 syntax errors (replace underscores
+                         with hyphens in descriptors) so that Net-SNMP tools
+                         can now load the MIB."
 
         REVISION        "0011020000Z"  -- November 2, 2000
         DESCRIPTION     "Initial MIB creation."
@@ -39,7 +44,7 @@ VctRunResultStatusType ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
        "normal¡¢short¡¢open¡¢impedance mismatch"
-    SYNTAX      INTEGER { normal(0), short (1), open(2),  impedance_mismatch(3) }
+    SYNTAX      INTEGER { normal(0), short (1), open(2),  impedance-mismatch(3) }
 
 ------------------------------------------------------------------------------
 --  define groups in GBN-COMMON-MIB

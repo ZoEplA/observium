@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Exception.php 197 2013-04-22 00:28:00Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  */
@@ -92,7 +92,17 @@ class Net_DNS2_Exception extends Exception
         //
         // call the parent constructor
         //
-        parent::__construct($message, $code, $previous);
+        // the "previous" argument was added in PHP 5.3.0
+        //
+        //      https://code.google.com/p/netdns2/issues/detail?id=25
+        //
+        if (version_compare(PHP_VERSION, '5.3.0', '>=') == true) {
+
+            parent::__construct($message, $code, $previous);
+        } else {
+
+            parent::__construct($message, $code);
+        }
     }
 
     /**

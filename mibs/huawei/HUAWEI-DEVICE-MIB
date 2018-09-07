@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:	The MIB module defines MIB objects which provide device
 --              management NMS interfaces.
 -- Reference:   
--- Version:     V4.56            
+-- Version:     V4.64
 -- ============================================================================
 	HUAWEI-DEVICE-MIB DEFINITIONS ::= BEGIN 
 	
@@ -27,7 +27,7 @@
                     FROM INET-ADDRESS-MIB;
 
     hwDev MODULE-IDENTITY
-        LAST-UPDATED "201506040000Z"
+        LAST-UPDATED "201702090000Z"
             ORGANIZATION
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -44,6 +44,59 @@
                     management NMS interfaces.
                     "
 --  Revision history
+                REVISION "201702090000Z"  
+                DESCRIPTION "V4.64, 
+                             1. Modify the following nodes:
+                             hwbandwidthmode
+                            "
+
+                REVISION "201701200000Z"
+                DESCRIPTION "V4.63, Added the following node: 
+                             hwDeviceCurrentTemp
+                             hwDevTempMinorAlmThreshold 
+                             hwDevTempMajorAlmThreshold
+                             hwDevTempCriticalAlmThreshold
+                             hwDeviceHighTemperatureMinorFaultTrap
+                             hwDeviceHighTemperatureMinorRestoreTrap
+                             hwDeviceHighTemperatureMajorFaultTrap
+                             hwDeviceHighTemperatureMajorRestoreTrap
+                             hwDeviceHighTemperatureCriticalFaultTrap
+                             hwDeviceHighTemperatureCriticalRestoreTrap.
+                             "
+
+                REVISION "201701100000Z"
+                DESCRIPTION "V4.62, Added the following node: 
+                             hwSysSsdSwitch.
+                             "
+                                                          
+                REVISION "201610260000Z"
+                DESCRIPTION "V4.61, Added the following nodes: 
+                             hwDevLongitude
+                             hwDevLatitude
+                             hwDevElevation
+                             hwDevHorizontalErr
+                             hwDevAltitudeErr
+                             hwDevAreaCode
+                             hwDevGisTimeStamp
+                             hwDevGisDigest
+                             hwDevGisCheckCode.
+                             "
+                REVISION "201607260000Z"
+                DESCRIPTION "V4.60, Added hwVsPortTable."
+
+                REVISION "201607070000Z"
+                DESCRIPTION "V4.59, Modify the SYNTAX of the node hwTrapPowerPortIndex" 
+			     
+		REVISION "201606230000Z"
+                DESCRIPTION "V4.58, Add one node hwPortVsIDMask on hwPortEntry."
+
+                REVISION "201606030000Z"
+                DESCRIPTION "V4.57, Added the following nodes: 
+                             hwTrapPowerPortIndex
+                             hwDevPowerPortInputFaultTrap
+                             hwDevPowerPortInputRecoverTrap.
+                             " 
+
                 REVISION "201506040000Z"
                 DESCRIPTION "V4.56, Added the following nodes: 
                              hwMemOccupancy
@@ -1263,7 +1316,135 @@
                 The system software version used in update scene for HUAWEI product.For example, MA5600V800R008C00.
                 "
             ::= { hwSystemPara 31 }
-
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.32
+        hwDevLongitude OBJECT-TYPE
+            SYNTAX Integer32 (-18000000..18000000 | 2147483647)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The longitude of the device.
+                The value expands 100000 times and the value 2147483647 indicates invalid longitude.
+                "
+            ::= { hwSystemPara 32 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.33
+        hwDevLatitude OBJECT-TYPE
+            SYNTAX Integer32 (-9000000..9000000 | 2147483647)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The latitude of the device.
+                The value expands 100000 times and the value 2147483647 indicates invalid latitude.
+                "
+            ::= { hwSystemPara 33 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.34
+        hwDevElevation OBJECT-TYPE
+            SYNTAX Integer32 (-32768..32767)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The elevation of the device, in unit of meters.
+                The value 32767 indicates invalid elevation.
+                "
+            ::= { hwSystemPara 34 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.35
+        hwDevHorizontalErr OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535 | 4294967295)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The horizontal error of the device, in unit of meters.
+                The value 4294967295 indicates invalid horizontal error.
+                "
+            ::= { hwSystemPara 35 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.36
+        hwDevAltitudeErr OBJECT-TYPE
+            SYNTAX Unsigned32 (0..65535 | 4294967295)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The altitude error of the device, in unit of meters.
+                The value 4294967295 indicates invalid altitude error.
+                "
+            ::= { hwSystemPara 36 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.37
+        hwDevAreaCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0 | 12))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The area code of the device.
+                The length of area code is 12. The characters can be 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9.
+                The zero-length string indicates invalid area code.
+                "
+            ::= { hwSystemPara 37 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.38
+        hwDevGisTimeStamp OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The time stamp of the measurement signature, which is the number of seconds from 00:00 on January 1, 1970 to the current time.
+                The value 4294967295 indicates invalid time stamp.
+                "
+            ::= { hwSystemPara 38 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.39
+        hwDevGisDigest OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0 | 16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The check value of the measurement signature.
+                The length of check value is 16. The characters can be 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E and F.
+                The zero-length string indicates invalid check value.
+                "
+            ::= { hwSystemPara 39 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.1.40
+        hwDevGisCheckCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0 | 4))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The check code of the device GPS information.
+                The length of check code is 4. The characters can be 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E and F.
+                The zero-length string indicates invalid area check code.
+                "
+            ::= { hwSystemPara 40 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.1.41
+        hwSysSsdSwitch OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The secure software downloading status.
+                Options:
+                1. enable(1)     -The secure software downloading is enable
+                2. disable(2)    -The secure software downloading is disable
+                "
+            ::= { hwSystemPara 41 }
 
         -- 1.3.6.1.4.1.2011.6.3.1.999
         hwSysVersionVrcb OBJECT-TYPE
@@ -2987,7 +3168,9 @@
                 hwPortPrimaryStatus
                     INTEGER,
                 hwPortSecondaryStatus
-                    BITS
+                    BITS,
+                hwPortVsIDMask
+                    Integer32    
              }
 
         -- 1.3.6.1.4.1.2011.6.3.3.4.1.1
@@ -3280,7 +3463,21 @@
                 "
             ::= { hwPortEntry 10 }
 
-
+                      
+        -- 1.3.6.1.4.1.2011.6.3.3.4.1.11
+        hwPortVsIDMask OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The virtual system mask of the port, each bit indicates the VAN to which the board
+                belongs. For example, the first bit maps vs0, the second bit maps vs1, and the rest 
+                can be deducted by analog.
+                 "
+            ::= { hwPortEntry 11 }
+                                
+                                
         -- 1.3.6.1.4.1.2011.6.3.3.5
         hwFrameLinks OBJECT IDENTIFIER ::= { hwSlotConf 5 }
 
@@ -3727,6 +3924,70 @@
                                    the returned value is powerSaving(2)
                 "
             ::= { hwBoardAttrEntry 7 }
+        
+	-- 1.3.6.1.4.1.2011.6.3.3.7
+	hwVsPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVsPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port query table that describes the detailed
+                information of physical ports in the board, including the type,
+                the virtual system mask of the port. 
+                The indexes of this table are hwFrameIndex, hwSlotIndex, hwSubslotIndex and hwPortIndex.
+                hwFrameIndex refer to hwFrameTable, hwSlotIndex refer to hwSlotTable,
+                hwSubslotIndex refer to hwSubslotTable, hwPortIndex refer to hwPortTable.
+                "
+            ::= { hwSlotConf 7 }
+			
+	--1.3.6.1.4.1.2011.6.3.3.7.1
+	hwVsPortEntry OBJECT-TYPE
+            SYNTAX HwVsPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Port query table that describes the detailed
+                information of physical ports in the board, including the type,
+                the virtual system mask of the port. 
+                The indexes of this entry are hwFrameIndex, hwSlotIndex, hwSubslotIndex and hwPortIndex.
+                hwFrameIndex refer to hwFrameTable, hwSlotIndex refer to hwSlotTable,
+                hwSubslotIndex refer to hwSubslotTable, hwPortIndex refer to hwPortTable.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex, hwSubslotIndex, hwPortIndex }
+            ::= { hwVsPortTable 1 }
+			
+	HwVsPortEntry ::=
+            SEQUENCE {
+                hwVsPortType
+                    HWPortType,
+                hwVsPortVsMask
+                    Integer32    
+             }
+			 
+	-- 1.3.6.1.4.1.2011.6.3.3.7.1.1
+        hwVsPortType OBJECT-TYPE
+            SYNTAX HWPortType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Port type, which is defined in HUAWEI-TC-MIB.mib.
+                "
+            ::= { hwVsPortEntry 1 }
+			
+	-- 1.3.6.1.4.1.2011.6.3.3.7.1.2
+        hwVsPortVsMask OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The virtual system mask of the port, each bit indicates the VAN to which the port
+                belongs. For example, the first bit maps vs0, the second bit maps vs1, and the rest 
+                can be deducted by analog.
+                 "
+            ::= { hwVsPortEntry 2 }
+            
         -- 1.3.6.1.4.1.2011.6.3.4
         hwCpuDevTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwCpuDevEntry
@@ -4961,8 +5222,61 @@
             	"
             ::= { hwDevTrapVbOids 36 }
 
+        -- 1.3.6.1.4.1.2011.6.3.8.1.37
+        hwTrapPowerPortIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The index of power port.
+            	"
+            ::= { hwDevTrapVbOids 37 }  
+            
+        -- 1.3.6.1.4.1.2011.6.3.8.1.38
+        hwDevTempMinorAlmThreshold OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The level-1 high temperature alarm threshold.
+            	"
+            ::= { hwDevTrapVbOids 38 }
 
-
+        -- 1.3.6.1.4.1.2011.6.3.8.1.39
+        hwDevTempMajorAlmThreshold OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The level-2 high temperature alarm threshold.
+            	"
+            ::= { hwDevTrapVbOids 39 } 
+            
+        -- 1.3.6.1.4.1.2011.6.3.8.1.40
+        hwDevTempCriticalAlmThreshold OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The level-3 high temperature alarm threshold.
+            	"
+            ::= { hwDevTrapVbOids 40 }
+                                        
+        -- 1.3.6.1.4.1.2011.6.3.8.1.41
+        hwDeviceCurrentTemp OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The current temperature of the device.
+            	"
+            ::= { hwDevTrapVbOids 41 }                                
+                                        
         -- 1.3.6.1.4.1.2011.6.3.8.2
         hwDevCommonTraps OBJECT IDENTIFIER ::= { hwDevTraps 2 }
 
@@ -5349,7 +5663,65 @@
 		"
 	    ::= { hwDevFrameTrapsPrefix 13 }
 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.14
+        hwDeviceHighTemperatureMinorFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempMinorAlmThreshold }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the device temperature exceeds the level-1 high temperature alarm threshold.
+		"
+	    ::= { hwDevFrameTrapsPrefix 14 }
 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.15
+        hwDeviceHighTemperatureMinorRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempMinorAlmThreshold }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the device temperature exceeds the threshold for level-1 high temperature alarm recovery.
+		"
+	    ::= { hwDevFrameTrapsPrefix 15 } 
+	    
+-- 1.3.6.1.4.1.2011.6.3.8.3.2.0.16
+        hwDeviceHighTemperatureMajorFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempMajorAlmThreshold }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the device temperature exceeds the level-2 high temperature alarm threshold.
+		"
+	    ::= { hwDevFrameTrapsPrefix 16 }
+        
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.17
+        hwDeviceHighTemperatureMajorRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempMajorAlmThreshold }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the device temperature exceeds the threshold for level-2 high temperature alarm recovery.
+		"
+	    ::= { hwDevFrameTrapsPrefix 17 } 
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.18
+        hwDeviceHighTemperatureCriticalFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempCriticalAlmThreshold }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the device temperature exceeds the level-3 high temperature alarm threshold.
+		"
+	    ::= { hwDevFrameTrapsPrefix 18 }
+        
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.19
+        hwDeviceHighTemperatureCriticalRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempCriticalAlmThreshold }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the device temperature exceeds the threshold for level-3 high temperature alarm recovery.
+		"
+	    ::= { hwDevFrameTrapsPrefix 19 } 
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3
         hwDevBoardTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 3 }
@@ -5629,6 +6001,26 @@
                 This trap message is reported when the original board failed to replace with a new board.
                 "
             ::= { hwDevBoardTrapsPrefix 30 }
+      
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.31
+        hwDevPowerPortInputFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwTrapPowerPortIndex }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the power input of the local shelf fails.
+                "
+            ::= { hwDevBoardTrapsPrefix 31 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.32
+        hwDevPowerPortInputRecoverTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwTrapPowerPortIndex }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the power input of the local shelf Recovers.
+                "
+            ::= { hwDevBoardTrapsPrefix 32 }
             
         -- 1.3.6.1.4.1.2011.6.3.8.3.4
         hwDevSubBoardTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 4 }
@@ -7810,7 +8202,10 @@
                  {
                  bandwidth40G(1),
                  bandwidth80G(2),
-                 bandwidth160G(3)
+                 bandwidth160G(3),
+                 bandwidth50G(4),
+                 bandwidth100G(5),
+                 bandwidth200G(6)
                  }
             MAX-ACCESS read-write
             STATUS current
@@ -7821,6 +8216,9 @@
                 1.bandwidth40G(1)   - 40G
                 2.bandwidth80G(2)   - 80G
                 3.bandwidth160G(3)  - 160G
+                4.bandwidth50G(4)   - 50G
+                5.bandwidth100G(5)  - 100G
+                6.bandwidth200G(6)  - 200G
                 "
             ::= { hwBandwidth 1 }
 

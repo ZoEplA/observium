@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -40,9 +40,9 @@ function custom_port_parser($port)
   $descr = trim($matches[2]);
   if ($descr == '') { return array(); }
 
-  if (preg_match('/\{(.*)\}/', $port['ifAlias'], $matches)) { $circuit = $matches[1]; }
-  if (preg_match('/\[(.*)\]/', $port['ifAlias'], $matches)) { $speed   = $matches[1]; }
-  if (preg_match('/\((.*)\)/', $port['ifAlias'], $matches)) { $notes   = $matches[1]; }
+  if (preg_match('/\{(.*?)\}/', $port['ifAlias'], $matches)) { $circuit = $matches[1]; }
+  if (preg_match('/\[(.*?)\]/', $port['ifAlias'], $matches)) { $speed   = $matches[1]; }
+  if (preg_match('/\((.*?)\)/', $port['ifAlias'], $matches)) { $notes   = $matches[1]; }
 
   $port_ifAlias = array();
   $port_ifAlias['type']    = $type;

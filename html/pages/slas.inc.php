@@ -7,11 +7,88 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 $link_array = array('page'    => 'slas');
+
+$form_items = array();
+$form_limit = 250; // Limit count for multiselect (use input instead)
+
+$form_devices = dbFetchColumn('SELECT DISTINCT `device_id` FROM `slas`;');
+$form_items['devices'] = generate_form_values('device', $form_devices);
+
+$form_params = array('rtt_sense' => 'rtt_sense',
+                     'rtt_type'  => 'rtt_type');
+
+foreach ($form_params as $param => $column)
+{
+  $query = 'SELECT COUNT(DISTINCT `' . $column . '`) FROM `slas` WHERE 1 ' . $cache['where']['devices_permitted'];
+  $count = dbFetchCell($query);
+  if ($count < $form_limit)
+  {
+    $query = 'SELECT DISTINCT `' . $column . '` FROM `slas` WHERE 1 ' . $cache['where']['devices_permitted'] . ' ORDER BY `' . $column . '`';
+    foreach (dbFetchColumn($query) as $entry)
+    {
+      if (empty($entry)) { continue; }
+      $form_items[$param][$entry]['name']  = $entry;
+    }
+  }
+}
+
+$form = array('type'  => 'rows',
+              'space' => '5px',
+              'submit_by_key' => TRUE,
+              'url'   => generate_url($vars));
+$form['row'][0]['device']   = array(
+  'type'        => 'multiselect',
+  'name'        => 'Local Device',
+  'width'       => '100%',
+  'value'       => $vars['device'],
+  'values'      => $form_items['devices']);
+
+$form['row'][0]['sla_target'] = array(
+  'type'        => 'text',
+  'name'        => 'SLA Target',
+  'value'       => $vars['sla_target'],
+  'width'       => '100%', //'180px',
+  'placeholder' => TRUE);
+
+$form['row'][0]['rtt_type']     = array(
+  'type'        => 'multiselect',
+  'name'        => 'Select RTT Type',
+  'width'       => '100%',
+  'value'       => $vars['rtt_type'],
+  'values'      => $form_items['rtt_type']);
+
+$form['row'][0]['event']     = array(
+  'type'        => 'multiselect',
+  'name'        => 'Select Status',
+  'width'       => '100%',
+  'value'       => $vars['event'],
+  'values'      => array('ok' => 'Ok', 'warning' => 'Warning', 'alert' => 'Alert', 'ignore' => 'Ignore'));
+
+$form['row'][0]['rtt_sense']     = array(
+  'type'        => 'multiselect',
+  'name'        => 'Select RTT Sense',
+  'width'       => '100%',
+  'value'       => $vars['rtt_sense'],
+  'values'      => $form_items['rtt_sense']);
+
+
+// search button
+$form['row'][0]['search']   = array(
+  'type'        => 'submit',
+  //'name'        => 'Search',
+  //'icon'        => 'icon-search',
+  'right'       => TRUE);
+
+echo '<div class="hidden-xl">';
+print_form($form);
+echo '</div>';
+
+unset($form, $panel_form, $form_items);
 
 $navbar['brand'] = 'SLAs';
 $navbar['class'] = 'navbar-narrow';

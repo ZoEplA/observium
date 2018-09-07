@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -70,9 +70,9 @@ $where = 'WHERE 1';
 $order = '';
 if ($vars['deleted'] != 1)
 {
-  $where .= ' AND `deleted` = 0';
+  $where .= ' AND `tunnel_deleted` = 0';
 } else {
-  $order .= '`deleted`,';
+  $order .= '`tunnel_deleted`,';
 }
 $where .= ' AND `device_id` = ? AND `peer_addr` != ?';
 $query = "SELECT * FROM `ipsec_tunnels` $where ORDER BY $order `tunnel_added` DESC, `peer_addr`";

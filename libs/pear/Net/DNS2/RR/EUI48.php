@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2013 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: EUI48.php 215 2013-10-28 04:20:36Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.3.2
  *

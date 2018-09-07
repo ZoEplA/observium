@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2015 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -56,11 +56,25 @@ if (count($supplies))
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . " - " . $supply['supply_descr']);
 
     $graph_array['width'] = 80; $graph_array['height'] = 20; $graph_array['bg'] = 'ffffff00';
-    $graph_array['style'][] = 'margin-top: -6px';
+    //$graph_array['style'][] = 'margin-top: -6px';
 
     $minigraph =  generate_graph_tag($graph_array);
 
-    $percent_text = ($percent < 0 ? "Unknown" : $percent . "%");
+    if ($percent < 0)
+    {
+      $percent_text = 'Unknown';
+    }
+    else if ($percent == 1 && $supply['supply_capacity'] < 0)
+    {
+      $percent_text = 'Some space';
+    }
+    else if ($percent <= 0 && $supply['supply_capacity'] <= 0)
+    {
+      $percent_text = 'Unknown';
+    } else {
+      $percent_text = $percent.'%';
+    }
+
     echo('<tr class="'.$background_percent['class'].'">
            <td class="state-marker"></td>
            <td class="entity">'.overlib_link($link, $supply['supply_descr'], $overlib_content)."</td>

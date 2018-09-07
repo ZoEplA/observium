@@ -1,10 +1,10 @@
 DELL-SNMP-UPS-MIB DEFINITIONS ::= BEGIN
 
 -- Title:       UPS MIB
--- Date:        July 28th, 2011
+-- Date:        August 8th, 2013
 -- Author:      Eaton - R&D Communication
--- Release:     01.04.0001
--- NMC Firmware compatibility:     01.10.000x
+-- Release:     01.04.0002
+-- NMC Firmware compatibility:     01.18.000x
 
 IMPORTS
         enterprises
@@ -39,6 +39,7 @@ physicalRectifier   OBJECT IDENTIFIER ::= { physical 3 }
 physicalUPS         OBJECT IDENTIFIER ::= { physical 4 }
 physicalBattery     OBJECT IDENTIFIER ::= { physical 5 }
 physicalLoadSegment OBJECT IDENTIFIER ::= { physical 6 }
+physicalEnvironment OBJECT IDENTIFIER ::= { physical 7 }
 
 ----
 -- Definition of object types
@@ -395,9 +396,9 @@ physicalBatteryTestStatus OBJECT-TYPE
                 doneWarning(2),
                 doneError(3),
                 aborted(4),
-                InProgress(5),
-                NoTestIniated(6),
-                TestScheduled(7)
+                inProgress(5),
+                noTestIniated(6),
+                testScheduled(7)
         }
         ACCESS read-only
         STATUS mandatory
@@ -469,6 +470,171 @@ physicalLoadSegment2RuntimeToShutdown OBJECT-TYPE
                 "Number of seconds remaining until load segment 2 will receive a 
                 ShutdownAfterDelay command. 2147483647 if no countdown is in effect."
         ::= { physicalLoadSegment 6 }        
+
+-- physicalEnvironment group
+
+physicalEnvironmentSensorPresent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Informations, if there is Environment Measurement Probe connected."
+        ::= { physicalEnvironment 1 }
+
+physicalEnvironmentSensorName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..59))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "User name of EMP."
+        ::= { physicalEnvironment 2 }
+
+physicalEnvironmentValues OBJECT IDENTIFIER ::= { physicalEnvironment 3 }
+
+physicalEnvironmentValuesTemperatureUnit OBJECT-TYPE
+        SYNTAX INTEGER {
+                celsius(1),
+                fahrenheit(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature unit setting."
+        ::= { physicalEnvironmentValues 1 }
+
+physicalEnvironmentValuesTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current temperature value in 0.1 degree Celsius."
+        ::= { physicalEnvironmentValues 2 }
+
+physicalEnvironmentValuesHumidity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current humidity value in 0.1 percents."
+        ::= { physicalEnvironmentValues 3 }
+
+physicalEnvironmentValuesTemperatureLow OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature low threshhold in units of degree Celsius."
+        ::= { physicalEnvironmentValues 4 }
+
+physicalEnvironmentValuesTemperatureHigh OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature high threshhold in units of degree Celsius."
+        ::= { physicalEnvironmentValues 5 }
+
+physicalEnvironmentValuesTemperatureHysteresis OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature hysteresis in units of degree Celsius."
+        ::= { physicalEnvironmentValues 6 }
+
+physicalEnvironmentValueshHumidityLow OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Humidity low threshhold in percents."
+        ::= { physicalEnvironmentValues 7 }
+
+physicalEnvironmentValuesHumidityHigh OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Humidity high threshhold in percents."
+        ::= { physicalEnvironmentValues 8 }
+
+physicalEnvironmentValuesHumidityHysteresis OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Humidity hysteresis in percents."
+        ::= { physicalEnvironmentValues 9 }
+
+physicalEnvironmentInputTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PhysicalEnvironmentInputEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table containins dry contact inputs information."
+        ::= { physicalEnvironment 4 }
+        
+physicalEnvironmentInputEntry OBJECT-TYPE
+        SYNTAX PhysicalEnvironmentInputEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The description of an entry in the table."
+        INDEX   { physicalEnvironmentInputIndex }
+        ::= { physicalEnvironmentInputTable 1 }
+
+
+PhysicalEnvironmentInputEntry ::= SEQUENCE { -- ASN.1 type definition
+        physicalEnvironmentInputIndex INTEGER,
+        physicalEnvironmentInputName DisplayString,
+        physicalEnvironmentInputState INTEGER,
+        physicalEnvironmentInputOpenedState DisplayString,
+        physicalEnvironmentInputClosedState DisplayString
+        }
+
+physicalEnvironmentInputIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..1)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input index, ranging from 1 to 2."
+        ::= { physicalEnvironmentInputEntry 1 }
+                        
+physicalEnvironmentInputName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..27))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input user-friendly name."
+        ::= { physicalEnvironmentInputEntry 2 }
+
+physicalEnvironmentInputState OBJECT-TYPE
+        SYNTAX INTEGER {
+                opened(1),
+                closed(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current state of input."
+        ::= { physicalEnvironmentInputEntry 3 }
+                        
+physicalEnvironmentInputOpenedState OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..21))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input opened state user-friendly name."
+        ::= { physicalEnvironmentInputEntry 4 }
+
+physicalEnvironmentInputClosedState OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..21))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input closed state user-friendly name."
+        ::= { physicalEnvironmentInputEntry 5 }
+
                                                                                                                                         
 --------------------------
 -- the Logical group --

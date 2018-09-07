@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -19,7 +19,7 @@
 //ExaltComProducts::remTempAlarm.0 = INTEGER: almNORMAL(0)
 //ExaltComProducts::remCurrentTemp.0 = INTEGER: 29 C
 //ExaltComProducts::remCurrentTempS.0 = STRING: 29 dec C.
-$discover['temp'] = snmp_get_multi($device, 'locCurrentTemp.0 remCurrentTemp.0', '-OQUs', 'ExaltComProducts');
+$discover['temp'] = snmp_get_multi_oid($device, 'locCurrentTemp.0 remCurrentTemp.0', array(), 'ExaltComProducts');
 
 if (is_numeric($discover['temp'][0]['locCurrentTemp']) && $discover['temp'][0]['locCurrentTemp'] > 0)
 {
@@ -44,7 +44,7 @@ if (is_numeric($discover['temp'][0]['remCurrentTemp']) && $discover['temp'][0]['
 //ExaltComProducts::remMinRSLstr.0 = STRING: -82 (dBm).
 //ExaltComProducts::remMaxRSL.0 = INTEGER: -62 dBm
 //ExaltComProducts::remMaxRSLstr.0 = STRING: -62 (dBm). dBm
-$discover['dbm'] = snmp_get_multi($device, 'locCurrentRSL.0 locMinRSL.0 locMaxRSL.0 remCurrentRSL.0 remMinRSL.0 remMaxRSL.0', '-OQUs', 'ExaltComProducts');
+$discover['dbm'] = snmp_get_multi_oid($device, 'locCurrentRSL.0 locMinRSL.0 locMaxRSL.0 remCurrentRSL.0 remMinRSL.0 remMaxRSL.0', array(), 'ExaltComProducts');
 
 if (is_numeric($discover['dbm'][0]['locCurrentRSL']))
 {
@@ -71,7 +71,7 @@ if (is_numeric($discover['dbm'][0]['remCurrentRSL']))
 //ExaltComProducts::remErrorDurationStr.0 = STRING: 3 seconds.
 //ExaltComProducts::remUnavailDuration.0 = INTEGER: 0 Seconds
 //ExaltComProducts::remUnavailDurationStr.0 = STRING: 0 seconds.
-$discover['state'] = snmp_get_multi($device, 'locLinkState.0 locErrorDuration.0 locUnavailDuration.0 remLinkState.0 remErrorDuration.0 remUnavailDuration.0', '-OQUs', 'ExaltComProducts');
+$discover['state'] = snmp_get_multi_oid($device, 'locLinkState.0 locErrorDuration.0 locUnavailDuration.0 remLinkState.0 remErrorDuration.0 remUnavailDuration.0', array(), 'ExaltComProducts');
 
 $sensor_state_type = 'exaltcomproducts-state';
 $options           = array('entPhysicalClass' => 'linkstate');

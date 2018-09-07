@@ -332,7 +332,7 @@ PolicerType ::= TEXTUAL-CONVENTION
     SYNTAX  INTEGER {
         single(1),
         aggregate(2),
-        cascade(3)
+        cascade(3) -- Obsolete
         }
 
 
@@ -350,7 +350,7 @@ PolicerAction ::= TEXTUAL-CONVENTION
         drop(2),
         remark(3),
         explicit-remark(4),
-        cascadePointer(5)
+        cascadePointer(5) -- Obsolete
         }
 
 QosGlobalMode ::= TEXTUAL-CONVENTION
@@ -1204,10 +1204,13 @@ RlQosPolicerEntry ::= SEQUENCE {
     rlQosPolicerName             DisplayString,
     rlQosPolicerType             PolicerType,
     rlQosPolicerCir              Unsigned32,
-    rlQosPolicerCbs              Unsigned32,
+    rlQosPolicerCbs              Unsigned32,   
     rlQosPolicerAction           PolicerAction,
     rlQosPolicerCasPointerRemVal INTEGER,
-    rlQosPolicerStatus           RowStatus
+    rlQosPolicerStatus           RowStatus,
+    rlQosPolicerPir              Unsigned32,
+    rlQosPolicerPbs              Unsigned32,
+    rlQosPolicerPeakAction       PolicerAction
     }
 
 rlQosPolicerIndex OBJECT-TYPE
@@ -1250,7 +1253,7 @@ rlQosPolicerCbs OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Committed rate Value."
+        "Committed burst Value."
     ::= { rlQosPolicerEntry 5 }
 
 rlQosPolicerAction OBJECT-TYPE
@@ -1266,9 +1269,8 @@ rlQosPolicerCasPointerRemVal OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Pointer to use whan the type is
-         cascade policer. 0-means no cascade policer. It can also be
-         Remark value in case of explicit remark"
+        "Remark value in case of explicit remark.
+         The functionality as cascade pointer is obsolete."
     ::= { rlQosPolicerEntry 7 }
 
 rlQosPolicerStatus OBJECT-TYPE
@@ -1280,9 +1282,35 @@ rlQosPolicerStatus OBJECT-TYPE
         It is used to delete/Add an entry from this table."
     ::= { rlQosPolicerEntry 8 }
 
+rlQosPolicerPir OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Peak rate value.
+         When both this and rlQosPolicerPbs are 0 this means the mode is Single Rate
+         and when they are both non 0 this means the mode is Two Rate."
+    ::= { rlQosPolicerEntry 9 }
+    
+rlQosPolicerPbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS      "bytes"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Peak burst Value.
+         When both this and rlQosPolicerPir are 0 this means the mode is Single Rate
+         and when they are both non 0 this means the mode is Two Rate."
+    ::= { rlQosPolicerEntry 10 }
 
-
-
+rlQosPolicerPeakAction OBJECT-TYPE
+    SYNTAX PolicerAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Out of profile peak action."
+    ::= { rlQosPolicerEntry 11 }
 
 -- QoS Police-Map table
 
@@ -1447,7 +1475,8 @@ RlQosIfPolicyEntry ::= SEQUENCE {
         rlQosCirPortRateLimit          INTEGER,
         rlQosCbsPortRateLimit          INTEGER,
         rlQosIfIpv6AclIn               INTEGER,
-        rlQosIfIpv6AclOut              INTEGER
+        rlQosIfIpv6AclOut              INTEGER,
+        rlQosAclDefaultActionOut       AclDefaultAction
     }
 
 rlIfIndex OBJECT-TYPE
@@ -1550,7 +1579,7 @@ rlQosAclDefaultAction OBJECT-TYPE
     STATUS current
     DESCRIPTION
         " When one ACL is enterd then what to do for the last rull."
-    ::= { rlQosIfPolicyEntry 12 }
+    ::= { rlQosIfPolicyEntry 12 } 
 
 rlQosIfPolicyMapStatus OBJECT-TYPE
     SYNTAX  RowStatus
@@ -1646,6 +1675,14 @@ rlQosIfIpv6AclOut OBJECT-TYPE
          0 - means no ACL applied."
     DEFVAL {0}
     ::= { rlQosIfPolicyEntry 21 }
+    
+rlQosAclDefaultActionOut OBJECT-TYPE
+    SYNTAX AclDefaultAction
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        " When one egress ACL is enterd then what to do for the last rull."
+    ::= { rlQosIfPolicyEntry 22 }       
 
 -- QoS Interface Profile table
 
@@ -1896,7 +1933,8 @@ rlQosDscpRemarkEntry OBJECT-TYPE
 
 RlQosDscpRemarkEntry ::= SEQUENCE {
         rlQosRmOldDscp                INTEGER,
-        rlQosRmNewDscp                INTEGER
+        rlQosRmNewDscp                INTEGER,
+        rlQosRmNewExceedDscp          INTEGER
     }
 
 rlQosRmOldDscp OBJECT-TYPE
@@ -1912,9 +1950,16 @@ rlQosRmNewDscp OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "New DSCP."
+        "Specifies new DSCP in the violation action."
     ::= { rlQosDscpRemarkEntry 2 }
-
+    
+rlQosRmNewExceedDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies new DSCP in the exceed action."
+    ::= { rlQosDscpRemarkEntry 3 }
 
 
 --  QoS CoS (VPT) to Queue map
@@ -4188,6 +4233,130 @@ rlQosLogInputInterfacesAceMatchedVlanList3073to4094 OBJECT-TYPE
      "the matched log-input ACEs vlan list from 3073 to 4094."
 
    ::= { rlQosLogInputInterfacesAceMatchedEntry 6}
+
+-- rlQosCosProfileTable
+rlQosCosProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosCosProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "This table specifies the Cos to queue map per-profile table"
+    ::= { rlQosCliMib 51 }
+
+rlQosCosProfileEntry OBJECT-TYPE
+    SYNTAX RlQosCosProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "Each entry in this table describes a QoS profile. The indices are 
+         Application index, represented by rlQosCosProfileAppIndex
+	 Profile index, represent by rlQosCosProfileIndex 
+	 and CoS represent by rlQosCosProfileCosIndex"
+    INDEX { rlQosCosProfileAppIndex, rlQosCosProfileIndex , rlQosCosProfileCosIndex }
+    ::= { rlQosCosProfileTable 1 }
+
+RlQosCosProfileEntry::= SEQUENCE {
+	rlQosCosProfileAppIndex     INTEGER,	
+        rlQosCosProfileIndex        INTEGER,
+        rlQosCosProfileCosIndex     INTEGER,
+	rlQosCosProfileEgressCos    INTEGER,
+        rlQosCosProfileEgressQueue  INTEGER
+--        rlQosCosProfileEgressDSCP      INTEGER,
+--        rlQosCosProfileEgressDP        INTEGER,
+    }
+
+rlQosCosProfileAppIndex OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "Application index."
+    ::= { rlQosCosProfileEntry 1 }
+
+rlQosCosProfileIndex    OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "Profile index per-application."
+    ::= { rlQosCosProfileEntry 2 }
+
+rlQosCosProfileCosIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..7)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "CoS value of an incoming packet."
+    ::= { rlQosCosProfileEntry 3 }
+
+rlQosCosProfileEgressCos OBJECT-TYPE
+    SYNTAX INTEGER (0..7)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION        "CoS value to (optionally) set in 802.1p User Priority field of matching packets."
+    ::= { rlQosCosProfileEntry 4 }
+
+rlQosCosProfileEgressQueue OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION        
+        "Traffic class queue assigned to matching packets."
+    ::= { rlQosCosProfileEntry 5 }
+
+-- rlQosCosProfileEgressDSCP OBJECT-TYPE
+--    SYNTAX INTEGER (0..63)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "DSCP value to (optionally) set in IP header of matching packets."
+--    ::= { rlQosCosProfileEntry 6 }
+
+-- rlQosCosProfileEgressDP OBJECT-TYPE
+--    SYNTAX INTEGER (0..2)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Drop precedence assigned to matching packets."
+--    ::= { rlQosCosProfileEntry 7 }
+
+-- rlQosCosProfileInterfaceTable
+rlQosCosProfileInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlQosCosProfileInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "This table specifies the Cos profile per-interface"
+    ::= { rlQosCliMib 52 }
+
+rlQosCosProfileInterfaceEntry OBJECT-TYPE
+    SYNTAX RlQosCosProfileInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "Each entry in this table describes a CoS profile for an interface"
+    INDEX { rlQosCosProfileInterfaceIfIndex }
+    ::= { rlQosCosProfileInterfaceTable 1 }
+
+RlQosCosProfileInterfaceEntry::= SEQUENCE {
+	rlQosCosProfileInterfaceIfIndex             InterfaceIndex,
+	rlQosCosProfileInterfaceAppIndex            INTEGER,	
+        rlQosCosProfileInterfaceCosProfileIndex     INTEGER
+    }
+
+rlQosCosProfileInterfaceIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex 
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION        "Interface index."
+    ::= { rlQosCosProfileInterfaceEntry 1 }
+
+rlQosCosProfileInterfaceAppIndex OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION        "Application index."
+    ::= { rlQosCosProfileInterfaceEntry 2 }
+
+rlQosCosProfileInterfaceCosProfileIndex    OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION        "CoS-Profile index per-application."
+    ::= { rlQosCosProfileInterfaceEntry 3 }
 
 
 

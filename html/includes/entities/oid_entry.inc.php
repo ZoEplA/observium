@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -76,7 +76,7 @@ function build_oid_query($vars)
 
 }
 
-function print_oid_table_header($vars)
+function print_oid_table_header($vars, $entries)
 {
 
     echo('<table class="' . ($vars['graphs'] == 'yes' ? OBS_CLASS_TABLE_STRIPED_TWO : OBS_CLASS_TABLE_STRIPED) . '">');
@@ -90,12 +90,9 @@ function print_oid_table_header($vars)
     $cols[] = array('Thresholds', 'style="width: 100px;"');
     $cols['value']  = array('Value', 'style="width: 80px;"');
     $cols['event']  = array('Event', 'style="width: 60px;"');
-    if ($entries[0]['oid_autodiscover'] == '0' && $vars['page'] == "customoid") {
-        $cols['actions'] = array('', 'style="width: 40px;"');
-    }
 
     if ($entries[0]['oid_autodiscover'] == '0' && $vars['page'] == "customoid") {
-        $cols['actions'] = array('', 'style="width: 40px;"');
+        $cols['actions'] = array('', 'style="width: 40px;"'); echo "derp";
     }
 
     echo get_table_header($cols, $vars);
@@ -115,7 +112,7 @@ function print_oid_table($vars)
 
     echo generate_box_open();
 
-    print_oid_table_header($vars);
+    print_oid_table_header($vars, $entries);
 
     foreach ($entries as $device_id => $entry) {
       //$device = device_by_id_cache($device_id);
@@ -186,7 +183,7 @@ function print_oid_table($vars)
                 <td><span class="label label-' . $entry['event_class'] . '">' . $entry['human_value'] . '</span></td>
                 <td>' . $event . '</td>
                 ';
-      if (isset($cols['actions'])) {
+      if ($entries[0]['oid_autodiscover'] == '0' && $vars['page'] == "customoid") {
 
         $form = array('type'  => 'simple',
           //'userlevel'  => 10,          // Minimum user level for display form

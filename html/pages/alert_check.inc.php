@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -246,7 +246,7 @@ humanize_alert_check($check);
   $navbar = array('brand' => escape_html($check['alert_name']), 'class' => "navbar-narrow");
 
   $navbar['options']['entries']     = array('text' => 'Alert Entries');
-  $navbar['options']['details']     = array('text' => 'Alert Details');
+  $navbar['options']['assoc']      = array('text' => 'Associations',    'icon' => $config['icon']['bgp'], 'right' => TRUE);
 
 
   if (!$readonly)
@@ -525,9 +525,9 @@ humanize_alert_check($check);
     /* End delete alert */
   }
 
-if ($vars['view'] == "details")
+if ($vars['view'] == "assoc")
 {
-  register_html_title('Alert Details');
+  register_html_title('Alert Associations');
 
   $assocs = dbFetchRows("SELECT * FROM `alert_assoc` WHERE `alert_test_id` = ?", array($vars['alert_test_id']));
 
@@ -537,262 +537,344 @@ if ($vars['view'] == "details")
 
 <?php
 
-  $box_args = array('title' => 'Associations',
-                    'header-border' => TRUE,
-                   );
-
-  if ($_SESSION['userlevel'] == '10')
+  if(!is_null($check['alert_assoc']))
   {
-    $box_args['header-controls'] = array('controls' => array('edit'   => array('text' => 'Add',
+
+    register_html_resource('css', 'query-builder.default.css');
+    register_html_resource('js', 'jQuery.extendext.min.js');
+    register_html_resource('js', 'doT.min.js');
+    register_html_resource('js', 'query-builder.js');
+    register_html_resource('js', 'bootbox.min.js');
+    register_html_resource('js', 'bootstrap-select.min.js');
+    register_html_resource('js', 'interact.min.js');
+
+    //r($check);
+
+      echo generate_box_open(array('title' => 'Entity Association Ruleset', 'padding' => FALSE, 'header-border' => TRUE));
+
+            $form_id = 'rules-' . generate_random_string(8);
+
+            echo '<div id="' . $form_id . '"></div>';
+            //echo '<div id="output"></div>';
+
+            generate_querybuilder_form($check['entity_type'], 'attribs', $form_id, $check['alert_assoc']);
+
+// FIXME. Duplicated scripts for #btn-save, #btn-reset
+$script = "<script>
+  $('#btn-save').on('click', function() {
+    var result = $('#" . $form_id . "').queryBuilder('getRules');
+    var div = $('#output');
+
+    if (!$.isEmptyObject(result)) {
+
+      var formData = JSON.stringify({
+                                action: 'alert_assoc_edit',
+                                alert_assoc: JSON.stringify(result),
+                                alert_test_id: '" . $check['alert_test_id'] . "'
+      });
+      
+      var request = $.ajax({
+        type: 'POST',
+        url: 'ajax/actions.php',
+        data: formData,
+        dataType: 'json',
+        contentType : 'application/json',
+      });
+      
+      request.success(  function(json) {
+      
+        if(json.status === 'ok') 
+        {
+            div.html('<div class=\"alert alert-error\">Update Succeeded. Redirecting!</div>')
+            window.setTimeout(window.location.href = json.redirect,5000);
+        } else {
+            div.html('<div class=\"alert alert-error\">Update Failed: ' + json.message + '</div>')
+        }  
+      });
+    }
+  });
+  
+  $('#btn-reset').on('click', function() {
+    $('#".$form_id."').queryBuilder('reset');
+  });
+  
+  
+  </script>
+  ";
+
+$footer_content
+    = '
+<div class="btn-group pull-right">
+    <button class="btn btn-danger" id="btn-reset" data-target="' . $form_id . '"><i class="icon-trash"></i> Clear Rules</button>
+    <button class="btn btn-primary" id="btn-set" data-target="' . $form_id . '"><i class="icon-refresh"></i> Restore Rules</button>
+    <button class="btn btn-success" id="btn-save" data-target="' . $form_id . '"><i class="icon-ok"></i> Save Changes</button>
+</div>' . $script;
+
+echo generate_box_close(array('footer_content' => $footer_content));
+
+  } else {
+
+    $box_args = array('title'         => 'Associations',
+                      'header-border' => TRUE,
+    );
+
+    if ($_SESSION['userlevel'] == '10')
+    {
+      $box_args['header-controls'] = array('controls' => array('edit' => array('text' => 'Add',
                                                                                'icon' => $config['icon']['plus'],
                                                                                'url'  => '#modal-add_assoc',
                                                                                'data' => 'data-toggle="modal"')));
-  }
-
-  echo generate_box_open($box_args);
-
-  echo '<table class="' . OBS_CLASS_TABLE_STRIPED . '">';
-
-?>
-  <thead><tr>
-    <th style="width: 2%;">ID</th>
-    <th style="width: 30%;">Device Match</th>
-    <th style="">Entity Match</th>
-    <th style="width: 10%;"></th>
-  </tr></thead>
-
-<?php
-
-  foreach ($assocs as $assoc_id => $assoc)
-  {
-    echo('<tr>' . PHP_EOL);
-    echo('<td>' . $assoc['alert_assoc_id'] . '</td>' . PHP_EOL);
-    echo('<td>');
-    echo('<code>');
-    $assoc['device_attribs'] = json_decode($assoc['device_attribs'], TRUE);
-    $assoc_dev_text = array();
-    if (is_array($assoc['device_attribs']))
-    {
-      foreach ($assoc['device_attribs'] as $attribute)
-      {
-        echo(escape_html($attribute['attrib']).' ');
-        echo(escape_html($attribute['condition']).' ');
-        echo(escape_html($attribute['value']));
-        echo('<br />');
-        $assoc_dev_text[] = $attribute['attrib'].' '.$attribute['condition'].' '.$attribute['value'];
-      }
-    } else {
-      echo("*");
     }
 
-    echo("</code>");
-    echo('</td>');
-    echo('<td><code style="white-space: pre-wrap;">');
-    $assoc['entity_attribs'] = json_decode($assoc['entity_attribs'], TRUE);
-    $assoc_entity_text = array();
-    if (is_array($assoc['entity_attribs']))
+    echo generate_box_open($box_args);
+
+    echo '<table class="' . OBS_CLASS_TABLE_STRIPED . '">';
+
+    ?>
+      <thead>
+      <tr>
+          <th style="width: 2%;">ID</th>
+          <th style="width: 30%;">Device Match</th>
+          <th style="">Entity Match</th>
+          <th style="width: 10%;"></th>
+      </tr>
+      </thead>
+
+    <?php
+
+    foreach ($assocs as $assoc_id => $assoc)
     {
-      foreach ($assoc['entity_attribs'] as $attribute)
+      echo('<tr>' . PHP_EOL);
+      echo('<td>' . $assoc['alert_assoc_id'] . '</td>' . PHP_EOL);
+      echo('<td>');
+      echo('<code>');
+      $assoc['device_attribs'] = json_decode($assoc['device_attribs'], TRUE);
+      $assoc_dev_text = array();
+      if (is_array($assoc['device_attribs']))
       {
-        echo(escape_html($attribute['attrib']).' ');
-        echo(escape_html($attribute['condition']).' ');
-        echo(str_replace(',', ',&#x200B;', escape_html($attribute['value']))); // add empty whitespace to commas for wrap 
-        echo('<br />');
-        $assoc_entity_text[] = $attribute['attrib'].' '.$attribute['condition'].' '.$attribute['value'];
+        foreach ($assoc['device_attribs'] as $attribute)
+        {
+          echo(escape_html($attribute['attrib']) . ' ');
+          echo(escape_html($attribute['condition']) . ' ');
+          echo(escape_html($attribute['value']));
+          echo('<br />');
+          $assoc_dev_text[] = $attribute['attrib'] . ' ' . $attribute['condition'] . ' ' . $attribute['value'];
+        }
+      } else
+      {
+        echo("*");
       }
-    } else {
-      echo("*");
-    }
-    echo '</code></td>';
-    echo '<td style="text-align: right;">';
 
-    if ($_SESSION['userlevel'] >= 10)
-    {
-      echo('<a href="#modal-assoc_edit_' . $assoc['alert_assoc_id'] . '" data-toggle="modal"><i class="'.$config['icon']['tools'].'"></i></a>&nbsp;');
+      echo("</code>");
+      echo('</td>');
+      echo('<td><code style="white-space: pre-wrap;">');
+      $assoc['entity_attribs'] = json_decode($assoc['entity_attribs'], TRUE);
+      $assoc_entity_text = array();
+      if (is_array($assoc['entity_attribs']))
+      {
+        foreach ($assoc['entity_attribs'] as $attribute)
+        {
+          echo(escape_html($attribute['attrib']) . ' ');
+          echo(escape_html($attribute['condition']) . ' ');
+          echo(str_replace(',', ',&#x200B;',
+                           escape_html($attribute['value']))); // add empty whitespace to commas for wrap
+          echo('<br />');
+          $assoc_entity_text[] = $attribute['attrib'] . ' ' . $attribute['condition'] . ' ' . $attribute['value'];
+        }
+      } else
+      {
+        echo("*");
+      }
+      echo '</code></td>';
+      echo '<td style="text-align: right;">';
 
-      $form = array('type'       => 'simple',
+      if ($_SESSION['userlevel'] >= 10)
+      {
+        echo('<a href="#modal-assoc_edit_' . $assoc['alert_assoc_id'] . '" data-toggle="modal"><i class="' . $config['icon']['tools'] . '"></i></a>&nbsp;');
+
+        $form = array('type'      => 'simple',
+                      'userlevel' => 10,          // Minimum user level for display form
+                      'id'        => 'assoc_del_' . $assoc['alert_assoc_id'],
+          //'title'      => 'Delete Association Rule (Id: '. $assoc['alert_assoc_id'] . ')',
+                      'style'     => 'display:inline;',
+        );
+        $form['row'][0]['assoc_id'] = array(
+          'type'  => 'hidden',
+          'value' => $assoc['alert_assoc_id']);
+        $form['row'][0]['confirm_' . $assoc['alert_assoc_id']] = array(
+          'type'  => 'hidden',
+          'value' => 1);
+
+        $form['row'][99]['action'] = array(
+          //$form['row'][99]['submit'] = array(
+          'type'      => 'submit',
+          'icon_only' => TRUE, // hide button styles
+          'name'      => '',
+          'icon'      => $config['icon']['cancel'],
+          //'right'       => TRUE,
+          //'class'       => 'btn-small',
+          // confirmation dialog
+          'attribs'   => array('data-toggle'            => 'confirmation', // Enable confirmation dialog
+                               'data-confirm-placement' => 'left',
+                               'data-confirm-content'   => '<div class="alert alert-warning"><h4 class="alert-heading"><i class="icon-warning-sign"></i> Warning!</h4>
+                                                                                        This association will be deleted!</div>'),
+          'value'     => 'delete_assoc');
+
+        print_form($form);
+        unset($form);
+      }
+
+      echo('</td>');
+      echo('</tr>');
+
+      /* Begin Edit association */
+      /*
+      $modal_args = array(
+        'id'    => 'modal-edit_alert',
+        'title' => 'Edit Checker Details',
+        //'icon'  => 'oicon-target',
+        //'hide'  => TRUE,
+        //'fade'  => TRUE,
+        //'role'  => 'dialog',
+        'class' => 'modal-md',
+      );
+      */
+
+      $form = array('type'      => 'horizontal',
+                    'userlevel' => 10,          // Minimum user level for display form
+                    'id'        => 'modal-assoc_edit_' . $assoc['alert_assoc_id'],
+                    'title'     => 'Edit Association Conditions (Id: ' . $assoc['alert_assoc_id'] . ')',
+        //'modal_args' => $modal_args, // !!! This generate modal specific form
+        //'class'      => '',          // Clean default box class!
+        //'help'       => 'Please exercise care when editing here.',
+        //'url'        => generate_url(array('page' => 'alert_check')),
+      );
+      //$form['fieldset']['body']   = array(//'class' => 'modal-body');   // Required this class for modal body!
+      //                                    'offset'=> FALSE);          // Do not add 'controls' class, disable 180px margin for form element
+      //$form['fieldset']['footer'] = array('class' => 'modal-footer'); // Required this class for modal footer!
+
+      $form['row'][0]['assoc_id'] = array(
+        'type'     => 'hidden',
+        'fieldset' => 'body',
+        'value'    => $assoc['alert_assoc_id']);
+      $form['row'][6]['assoc_device_conditions_' . $assoc['alert_assoc_id']] = array(
+        'type'        => 'textarea',
+        'fieldset'    => 'body',
+        'name'        => 'Device match',
+        //'class'       => 'input-xlarge',
+        'width'       => '320px',
+        'rows'        => 3,
+        'placeholder' => TRUE,
+        'value'       => escape_html(implode("\n", $assoc_dev_text)));
+      $form['row'][7]['assoc_entity_conditions_' . $assoc['alert_assoc_id']] = array(
+        'type'        => 'textarea',
+        'fieldset'    => 'body',
+        'name'        => 'Entity match',
+        //'class'       => 'input-xlarge',
+        'width'       => '320px',
+        'rows'        => 3,
+        'placeholder' => TRUE,
+        'value'       => escape_html(implode("\n", $assoc_entity_text)));
+
+      $form['row'][99]['close'] = array(
+        'type'      => 'submit',
+        'fieldset'  => 'footer',
+        'div_class' => '', // Clean default form-action class!
+        'name'      => 'Close',
+        'icon'      => '',
+        'attribs'   => array('data-dismiss' => 'modal',
+                             'aria-hidden'  => 'true'));
+      $form['row'][99]['action'] = array(
+        'type'      => 'submit',
+        'fieldset'  => 'footer',
+        'div_class' => '', // Clean default form-action class!
+        'name'      => 'Save Changes',
+        'icon'      => 'icon-ok icon-white',
+        //'right'       => TRUE,
+        'class'     => 'btn-primary',
+        'value'     => 'assoc_conditions');
+
+      $modals .= generate_form_modal($form);
+      unset($form, $form_params);
+      /* End Edit association */
+
+      /* Begin delete association */
+      /*
+      $modal_args = array(
+        //'hide'  => TRUE,
+        //'fade'  => TRUE,
+        //'role'  => 'dialog',
+        //'class' => 'modal-md',
+      );
+      */
+
+      /* switched to confirm dialog
+      $form = array('type'       => 'horizontal',
                     'userlevel'  => 10,          // Minimum user level for display form
-                    'id'         => 'assoc_del_'.$assoc['alert_assoc_id'],
-                    //'title'      => 'Delete Association Rule (Id: '. $assoc['alert_assoc_id'] . ')',
-                    'style'      => 'display:inline;',
-                   );
+                    'id'         => 'modal-assoc_del_'.$assoc['alert_assoc_id'],
+                    'title'      => 'Delete Association Rule (Id: '. $assoc['alert_assoc_id'] . ')',
+                    //'modal_args' => $modal_args,
+                    //'help'     => 'This will delete the selected association rule.',
+                    //'class'      => '', // Clean default box class!
+                    //'url'       => ''
+                    );
+      //$form['fieldset']['body']   = array('class' => 'modal-body');   // Required this class for modal body!
+      //$form['fieldset']['footer'] = array('class' => 'modal-footer'); // Required this class for modal footer!
+
       $form['row'][0]['assoc_id'] = array(
                                       'type'        => 'hidden',
+                                      'fieldset'    => 'body',
                                       'value'       => $assoc['alert_assoc_id']);
-      $form['row'][0]['confirm_'.$assoc['alert_assoc_id']] = array(
-                                      'type'        => 'hidden',
-                                      'value'       => 1);
+      $form['row'][0]['action']     = array(
+                                        'type'        => 'hidden',
+                                        'fieldset'    => 'body',
+                                        'value'       => 'delete_assoc');
 
-      $form['row'][99]['action'] = array(
-      //$form['row'][99]['submit'] = array(
+      $form['row'][6]['confirm_'.$assoc['alert_assoc_id']] = array(
+                                      'type'        => 'checkbox',
+                                      'fieldset'    => 'body',
+                                      'name'        => 'Confirm',
+                                      //'offset'      => FALSE,
+                                      'placeholder' => 'Yes, please delete this association rule!',
+                                      'onchange'    => "javascript: toggleAttrib('disabled', 'delete_assoc_".$assoc['alert_assoc_id']."'); showDiv(!this.checked, 'warning_assoc_".$assoc['alert_assoc_id']."_div');",
+                                      'value'       => 'confirm');
+      $form['row'][7]['warning_assoc_'.$assoc['alert_assoc_id']] = array(
+                                      'type'        => 'html',
+                                      'fieldset'    => 'body',
+                                      'html'        => '<h4 class="alert-heading"><i class="icon-warning-sign"></i> Warning!</h4>' .
+                                                       ' This association will be deleted!',
+                                      'div_style'   => 'display: none', // hide initially
+                                      'div_class'   => 'alert alert-warning');
+
+      $form['row'][99]['close'] = array(
                                       'type'        => 'submit',
-                                      'icon_only'   => TRUE, // hide button styles
-                                      'name'        => '',
-                                      'icon'        => $config['icon']['cancel'],
+                                      'fieldset'    => 'footer',
+                                      'div_class'   => '', // Clean default form-action class!
+                                      'name'        => 'Close',
+                                      'icon'        => '',
+                                      'attribs'     => array('data-dismiss' => 'modal',  // dismiss modal
+                                                             'aria-hidden'  => 'true')); // do not sent any value
+      $form['row'][99]['delete_assoc_'.$assoc['alert_assoc_id']] = array(
+                                      'type'        => 'submit',
+                                      'fieldset'    => 'footer',
+                                      'div_class'   => '', // Clean default form-action class!
+                                      'name'        => 'Delete Association',
+                                      'icon'        => 'icon-trash icon-white',
                                       //'right'       => TRUE,
-                                      //'class'       => 'btn-small',
-                                      // confirmation dialog
-                                      'attribs'     => array('data-toggle' => 'confirmation', // Enable confirmation dialog
-                                                             'data-confirm-placement' => 'left',
-                                                             'data-confirm-content' => '<div class="alert alert-warning"><h4 class="alert-heading"><i class="icon-warning-sign"></i> Warning!</h4>
-                                                                                        This association will be deleted!</div>'),
+                                      'class'       => 'btn-danger',
+                                      'disabled'    => TRUE,
                                       'value'       => 'delete_assoc');
 
-      print_form($form);
+      $modals .= generate_form_modal($form);
       unset($form);
-    }
+      */
+      /* End delete association */
 
-    echo('</td>');
-    echo('</tr>');
+    } // End assocation loop
 
-    /* Begin Edit association */
-    /*
-    $modal_args = array(
-      'id'    => 'modal-edit_alert',
-      'title' => 'Edit Checker Details',
-      //'icon'  => 'oicon-target',
-      //'hide'  => TRUE,
-      //'fade'  => TRUE,
-      //'role'  => 'dialog',
-      'class' => 'modal-md',
-    );
-    */
+    echo('</table>');
 
-    $form = array('type'       => 'horizontal',
-                  'userlevel'  => 10,          // Minimum user level for display form
-                  'id'         => 'modal-assoc_edit_'.$assoc['alert_assoc_id'],
-                  'title'      => 'Edit Association Conditions (Id: '.$assoc['alert_assoc_id'].')',
-                  //'modal_args' => $modal_args, // !!! This generate modal specific form
-                  //'class'      => '',          // Clean default box class!
-                  //'help'       => 'Please exercise care when editing here.',
-                  //'url'        => generate_url(array('page' => 'alert_check')),
-                  );
-    //$form['fieldset']['body']   = array(//'class' => 'modal-body');   // Required this class for modal body!
-    //                                    'offset'=> FALSE);          // Do not add 'controls' class, disable 180px margin for form element
-    //$form['fieldset']['footer'] = array('class' => 'modal-footer'); // Required this class for modal footer!
-
-    $form['row'][0]['assoc_id'] = array(
-                                    'type'        => 'hidden',
-                                    'fieldset'    => 'body',
-                                    'value'       => $assoc['alert_assoc_id']);
-    $form['row'][6]['assoc_device_conditions_'.$assoc['alert_assoc_id']] = array(
-                                      'type'        => 'textarea',
-                                      'fieldset'    => 'body',
-                                      'name'        => 'Device match',
-                                      //'class'       => 'input-xlarge',
-                                      'width'       => '320px',
-                                      'rows'        => 3,
-                                      'placeholder' => TRUE,
-                                      'value'       => escape_html(implode("\n", $assoc_dev_text)));
-    $form['row'][7]['assoc_entity_conditions_'.$assoc['alert_assoc_id']] = array(
-                                      'type'        => 'textarea',
-                                      'fieldset'    => 'body',
-                                      'name'        => 'Entity match',
-                                      //'class'       => 'input-xlarge',
-                                      'width'       => '320px',
-                                      'rows'        => 3,
-                                      'placeholder' => TRUE,
-                                      'value'       => escape_html(implode("\n", $assoc_entity_text)));
-
-    $form['row'][99]['close'] = array(
-                                    'type'        => 'submit',
-                                    'fieldset'    => 'footer',
-                                    'div_class'   => '', // Clean default form-action class!
-                                    'name'        => 'Close',
-                                    'icon'        => '',
-                                    'attribs'     => array('data-dismiss' => 'modal',
-                                                           'aria-hidden'  => 'true'));
-    $form['row'][99]['action'] = array(
-                                    'type'        => 'submit',
-                                    'fieldset'    => 'footer',
-                                    'div_class'   => '', // Clean default form-action class!
-                                    'name'        => 'Save Changes',
-                                    'icon'        => 'icon-ok icon-white',
-                                    //'right'       => TRUE,
-                                    'class'       => 'btn-primary',
-                                    'value'       => 'assoc_conditions');
-
-    $modals .= generate_form_modal($form);
-    unset($form, $form_params);
-    /* End Edit association */
-
-    /* Begin delete association */
-    /*
-    $modal_args = array(
-      //'hide'  => TRUE,
-      //'fade'  => TRUE,
-      //'role'  => 'dialog',
-      //'class' => 'modal-md',
-    );
-    */
-
-    /* switched to confirm dialog
-    $form = array('type'       => 'horizontal',
-                  'userlevel'  => 10,          // Minimum user level for display form
-                  'id'         => 'modal-assoc_del_'.$assoc['alert_assoc_id'],
-                  'title'      => 'Delete Association Rule (Id: '. $assoc['alert_assoc_id'] . ')',
-                  //'modal_args' => $modal_args,
-                  //'help'     => 'This will delete the selected association rule.',
-                  //'class'      => '', // Clean default box class!
-                  //'url'       => ''
-                  );
-    //$form['fieldset']['body']   = array('class' => 'modal-body');   // Required this class for modal body!
-    //$form['fieldset']['footer'] = array('class' => 'modal-footer'); // Required this class for modal footer!
-
-    $form['row'][0]['assoc_id'] = array(
-                                    'type'        => 'hidden',
-                                    'fieldset'    => 'body',
-                                    'value'       => $assoc['alert_assoc_id']);
-    $form['row'][0]['action']     = array(
-                                      'type'        => 'hidden',
-                                      'fieldset'    => 'body',
-                                      'value'       => 'delete_assoc');
-
-    $form['row'][6]['confirm_'.$assoc['alert_assoc_id']] = array(
-                                    'type'        => 'checkbox',
-                                    'fieldset'    => 'body',
-                                    'name'        => 'Confirm',
-                                    //'offset'      => FALSE,
-                                    'placeholder' => 'Yes, please delete this association rule!',
-                                    'onchange'    => "javascript: toggleAttrib('disabled', 'delete_assoc_".$assoc['alert_assoc_id']."'); showDiv(!this.checked, 'warning_assoc_".$assoc['alert_assoc_id']."_div');",
-                                    'value'       => 'confirm');
-    $form['row'][7]['warning_assoc_'.$assoc['alert_assoc_id']] = array(
-                                    'type'        => 'html',
-                                    'fieldset'    => 'body',
-                                    'html'        => '<h4 class="alert-heading"><i class="icon-warning-sign"></i> Warning!</h4>' .
-                                                     ' This association will be deleted!',
-                                    'div_style'   => 'display: none', // hide initially
-                                    'div_class'   => 'alert alert-warning');
-
-    $form['row'][99]['close'] = array(
-                                    'type'        => 'submit',
-                                    'fieldset'    => 'footer',
-                                    'div_class'   => '', // Clean default form-action class!
-                                    'name'        => 'Close',
-                                    'icon'        => '',
-                                    'attribs'     => array('data-dismiss' => 'modal',  // dismiss modal
-                                                           'aria-hidden'  => 'true')); // do not sent any value
-    $form['row'][99]['delete_assoc_'.$assoc['alert_assoc_id']] = array(
-                                    'type'        => 'submit',
-                                    'fieldset'    => 'footer',
-                                    'div_class'   => '', // Clean default form-action class!
-                                    'name'        => 'Delete Association',
-                                    'icon'        => 'icon-trash icon-white',
-                                    //'right'       => TRUE,
-                                    'class'       => 'btn-danger',
-                                    'disabled'    => TRUE,
-                                    'value'       => 'delete_assoc');
-
-    $modals .= generate_form_modal($form);
-    unset($form);
-    */
-    /* End delete association */
-
-  } // End assocation loop
-
-  echo('</table>');
-
-  echo generate_box_close();
+    echo generate_box_close();
 
     /* Begin Add association */
     /*
@@ -807,59 +889,61 @@ if ($vars['view'] == "details")
     );
     */
 
-    $form = array('type'       => 'horizontal',
-                  'userlevel'  => 10,          // Minimum user level for display form
-                  'id'         => 'modal-add_assoc',
-                  'title'      => 'Add Association Conditions',
-                  //'modal_args' => $modal_args, // !!! This generate modal specific form
-                  //'class'      => '',          // Clean default box class!
-                  //'help'       => 'Please exercise care when editing here.',
-                  //'url'        => generate_url(array('page' => 'alert_check')),
-                  );
+    $form = array('type'      => 'horizontal',
+                  'userlevel' => 10,          // Minimum user level for display form
+                  'id'        => 'modal-add_assoc',
+                  'title'     => 'Add Association Conditions',
+      //'modal_args' => $modal_args, // !!! This generate modal specific form
+      //'class'      => '',          // Clean default box class!
+      //'help'       => 'Please exercise care when editing here.',
+      //'url'        => generate_url(array('page' => 'alert_check')),
+    );
     //$form['fieldset']['body']   = array(//'class' => 'modal-body');   // Required this class for modal body!
     //                                    'offset'=> FALSE);          // Do not add 'controls' class, disable 180px margin for form element
     //$form['fieldset']['footer'] = array('class' => 'modal-footer'); // Required this class for modal footer!
 
     $form['row'][6]['assoc_device_conditions'] = array(
-                                      'type'        => 'textarea',
-                                      'fieldset'    => 'body',
-                                      'name'        => 'Device match',
-                                      //'class'       => 'input-xlarge',
-                                      'width'       => '320px',
-                                      'rows'        => 3,
-                                      'placeholder' => TRUE,
-                                      'value'       => '');
+      'type'        => 'textarea',
+      'fieldset'    => 'body',
+      'name'        => 'Device match',
+      //'class'       => 'input-xlarge',
+      'width'       => '320px',
+      'rows'        => 3,
+      'placeholder' => TRUE,
+      'value'       => '');
     $form['row'][7]['assoc_entity_conditions'] = array(
-                                      'type'        => 'textarea',
-                                      'fieldset'    => 'body',
-                                      'name'        => 'Entity match',
-                                      //'class'       => 'input-xlarge',
-                                      'width'       => '320px',
-                                      'rows'        => 3,
-                                      'placeholder' => TRUE,
-                                      'value'       => '');
+      'type'        => 'textarea',
+      'fieldset'    => 'body',
+      'name'        => 'Entity match',
+      //'class'       => 'input-xlarge',
+      'width'       => '320px',
+      'rows'        => 3,
+      'placeholder' => TRUE,
+      'value'       => '');
 
     $form['row'][99]['close'] = array(
-                                    'type'        => 'submit',
-                                    'fieldset'    => 'footer',
-                                    'div_class'   => '', // Clean default form-action class!
-                                    'name'        => 'Close',
-                                    'icon'        => '',
-                                    'attribs'     => array('data-dismiss' => 'modal',
-                                                           'aria-hidden'  => 'true'));
+      'type'      => 'submit',
+      'fieldset'  => 'footer',
+      'div_class' => '', // Clean default form-action class!
+      'name'      => 'Close',
+      'icon'      => '',
+      'attribs'   => array('data-dismiss' => 'modal',
+                           'aria-hidden'  => 'true'));
     $form['row'][99]['action'] = array(
-                                    'type'        => 'submit',
-                                    'fieldset'    => 'footer',
-                                    'div_class'   => '', // Clean default form-action class!
-                                    'name'        => 'Add Assocation',
-                                    'icon'        => 'icon-ok icon-white',
-                                    //'right'       => TRUE,
-                                    'class'       => 'btn-primary',
-                                    'value'       => 'assoc_add');
+      'type'      => 'submit',
+      'fieldset'  => 'footer',
+      'div_class' => '', // Clean default form-action class!
+      'name'      => 'Add Assocation',
+      'icon'      => 'icon-ok icon-white',
+      //'right'       => TRUE,
+      'class'     => 'btn-primary',
+      'value'     => 'assoc_add');
 
     $modals .= generate_form_modal($form);
     unset($form, $form_params);
     /* End Add association */
+
+  }
 
 ?>
 

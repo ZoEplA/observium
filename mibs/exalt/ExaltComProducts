@@ -17,10 +17,9 @@ ExaltComProducts DEFINITIONS ::= BEGIN
     productsMIB MODULE-IDENTITY
         LAST-UPDATED        "201304291021Z"
         ORGANIZATION        "Exalt"
-        CONTACT-INFO        "Exalt Communication Inc.
-
-                            254 E Hacienda Ave.,
-                            Campbell, CA 95008
+        CONTACT-INFO        "Exalt Wireless Inc.
+                            250 E Hacienda Ave.,
+                            Campbell, CA, 95008
                             USA"
 
         DESCRIPTION         "Exalt devices"
@@ -141,6 +140,13 @@ ExaltComProducts DEFINITIONS ::= BEGIN
         STATUS              current
         DESCRIPTION         "The Model Number of the Radio. See Web, Radio Information, Model Number"
         ::= { radioInfo 16 }
+
+    licenseFeatures OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(0..128))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The list of the features enabled by License Key"
+        ::= { radioInfo 17 }
 
     radioAdmin OBJECT-IDENTITY
         STATUS		current
@@ -311,13 +317,65 @@ ExaltComProducts DEFINITIONS ::= BEGIN
 
     snmpConfig OBJECT IDENTIFIER ::= { radioAdmin 17 }
 
-    trapIpaddr OBJECT-TYPE
+    trapIpaddr1 OBJECT-TYPE
         SYNTAX              IpAddress
         MAX-ACCESS          read-write
         STATUS              current
         DESCRIPTION         "The IP address to which the SNMP traps are directed.
                             See Web, Administration, SNMP, Traps, Trap Destination IP Address."
         ::= { snmpConfig 1 }
+
+    trapIpaddrEnable1 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 2 }
+
+    trapIpaddr2 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 3 }
+
+    trapIpaddrEnable2 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 4 }
+
+    trapIpaddr3 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 5 }
+
+    trapIpaddrEnable3 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 6 }
+
+    trapIpaddr4 OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The IP address to which the SNMP traps are directed.
+                            See Web, Administration, SNMP, Traps, Trap Destination IP Address."
+        ::= { snmpConfig 7 }
+
+    trapIpaddrEnable4 OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable/Disable trap ip address."
+        ::= { snmpConfig 8 }
 
     trapAuth OBJECT-TYPE
         SYNTAX              EnableStatusT
@@ -326,7 +384,7 @@ ExaltComProducts DEFINITIONS ::= BEGIN
         DESCRIPTION         "Authentication trap enable(1)/disable(0).
                             This is an SNMP standard trap when password information for SNMP is incorrect.
                             See Web, Administration, SNMP, Traps, Authentication Trap."
-        ::= { snmpConfig 2 }
+        ::= { snmpConfig 9 }
 
     trapReboot OBJECT-TYPE
         SYNTAX              EnableStatusT
@@ -335,7 +393,7 @@ ExaltComProducts DEFINITIONS ::= BEGIN
         DESCRIPTION         "Reboot trap enable(0)/disable(1).
                             This trap is sent after any radio reboot to inform the manager of the reboot status.
                             See Web, Administration, SNMP, Traps, Radio Reboot Trap."
-        ::= { snmpConfig 3 }
+        ::= { snmpConfig 10 }
 
     trapLocLinkStat OBJECT-TYPE
         SYNTAX              EnableStatusT
@@ -344,7 +402,7 @@ ExaltComProducts DEFINITIONS ::= BEGIN
         DESCRIPTION         "Local Link Status trap enable(0)/disable(1).
                             This trap is sent when Link is in errored state (equivalent to the Link LED).
                             See Web, Administration, SNMP, Traps, Local Link Status Trap."
-        ::= { snmpConfig 4 }
+        ::= { snmpConfig 11 }
 
     trapLocAlarmStat OBJECT-TYPE
         SYNTAX              EnableStatusT
@@ -354,7 +412,7 @@ ExaltComProducts DEFINITIONS ::= BEGIN
                             This trap is sent when local radio Status is in errored state 
                             (equivalent to the Status LED).
                             See Web, Administration, SNMP, Traps, Local Radio Status Trap."
-        ::= { snmpConfig 5 }
+        ::= { snmpConfig 12 }
 
     trapRemAlarmStat OBJECT-TYPE
         SYNTAX              EnableStatusT
@@ -364,7 +422,43 @@ ExaltComProducts DEFINITIONS ::= BEGIN
                             This trap is sent when remote radio Status is in errored state 
                             (equivalent to the Status LED).
                             See Web, Administration, SNMP, Traps, Remote Radio Status Trap."
-        ::= { snmpConfig 6 }
+        ::= { snmpConfig 13 }
+
+    trapLocTempStat OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Local Temperature Status trap enable(0)/disable(1).
+                            This trap is sent when the internal temperature reaches the warning point.
+                            See Web, Administration, SNMP, Traps, Temperature Status Trap."
+        ::= { snmpConfig 14 }
+
+    trapv1Enable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SNMPv1 Traps enable(0)/disable(1).
+                            Enables traps for SNMP protocol version 1.
+                            See Web, Administration, SNMP, Traps, Enable SNMPv1 Traps."
+        ::= { snmpConfig 15 }
+
+    trapv2cEnable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SNMPv2c Traps enable(0)/disable(1).
+                            Enables traps for SNMP protocol version 2c.
+                            See Web, Administration, SNMP, Traps, Enable SNMPv2c Traps."
+        ::= { snmpConfig 16 }
+
+    trapv3Enable OBJECT-TYPE
+        SYNTAX              EnableStatusT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SNMPv3 Traps enable(0)/disable(1).
+                            Enables traps for SNMP protocol version 3.
+                            See Web, Administration, SNMP, Traps, Enable SNMPv3 Traps."
+        ::= { snmpConfig 17 }
 
     trapLocRslStat OBJECT-TYPE
         SYNTAX              EnableStatusT
@@ -374,16 +468,7 @@ ExaltComProducts DEFINITIONS ::= BEGIN
                             This trap is sent when the local RSL drops below the value set in the
                             RSL Threshold Value (dBm) field.
                             See Web, Administration, SNMP, Traps, Local RSL Status Trap."
-        ::= { snmpConfig 7 }
-
-    trapLocTempStat OBJECT-TYPE
-        SYNTAX              EnableStatusT
-        MAX-ACCESS          read-write
-        STATUS              current
-        DESCRIPTION         "Local Temperature Status trap enable(0)/disable(1).
-                            This trap is sent when the internal temperature reaches the warning point.
-                            See Web, Administration, SNMP, Traps, Temperature Status Trap."
-        ::= { snmpConfig 8 }
+        ::= { snmpConfig 18 }
 
     trapLocRslThreshold OBJECT-TYPE
         SYNTAX              INTEGER
@@ -393,34 +478,16 @@ ExaltComProducts DEFINITIONS ::= BEGIN
                             Exalt recommends that this trap be set to a value 5dBm or 10dBm above 
                             the threshold as a warning that the system has faded and may be approaching an outage.
                             See Web, Administration, SNMP, Traps, Threshold Value."
-        ::= { snmpConfig 9 }
+        ::= { snmpConfig 19 }
 
-    trapv1Enable OBJECT-TYPE
-        SYNTAX              EnableStatusT
+    commitSnmpSettings OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(4..200))
         MAX-ACCESS          read-write
         STATUS              current
-        DESCRIPTION         "SNMPv1 Traps enable(0)/disable(1).
-                            Enables traps for SNMP protocol version 1.
-                            See Web, Administration, SNMP, Traps, Enable SNMPv1 Traps."
-        ::= { snmpConfig 10 }
+        DESCRIPTION         "Option strings to be written are: save, clear, correspondingly saving changes to
+                            configuration to the persistent storage or clearing unsaved changes."
+        ::= { snmpConfig 1000 }
 
-    trapv2cEnable OBJECT-TYPE
-        SYNTAX              EnableStatusT
-        MAX-ACCESS          read-write
-        STATUS              current
-        DESCRIPTION         "SNMPv2c Traps enable(0)/disable(1).
-                            Enables traps for SNMP protocol version 2c.
-                            See Web, Administration, SNMP, Traps, Enable SNMPv2c Traps."
-        ::= { snmpConfig 11 }
-
-    trapv3Enable OBJECT-TYPE
-        SYNTAX              EnableStatusT
-        MAX-ACCESS          read-write
-        STATUS              current
-        DESCRIPTION         "SNMPv3 Traps enable(0)/disable(1).
-                            Enables traps for SNMP protocol version 3.
-                            See Web, Administration, SNMP, Traps, Enable SNMPv3 Traps."
-        ::= { snmpConfig 12 }
 
     ntp OBJECT-IDENTITY
         STATUS              current
@@ -1183,13 +1250,15 @@ ExaltComProducts DEFINITIONS ::= BEGIN
         DESCRIPTION         "An entry in the Performance characteristics of local Ethernet interfaces table"
         INDEX               {
                                 locEthUtilizationIn,
-                                locEthUtilizationOut
+                                locEthUtilizationOut,
+                                locEthSpeed
                             }
         ::= { locEthPerfInterfaces 1 }
 
     LocEthPerfInterfacesEntry ::= SEQUENCE {
         locEthUtilizationIn   Integer32,
-        locEthUtilizationOut  Integer32
+        locEthUtilizationOut  Integer32,
+        locEthSpeed           DisplayString
     }
 
     locEthUtilizationIn     OBJECT-TYPE
@@ -1207,6 +1276,14 @@ ExaltComProducts DEFINITIONS ::= BEGIN
         DESCRIPTION         "Outbound ethernet utilization (%).
                             See Web, Analysis, Ethernet Utilization."
         ::= { locEthPerfInterfacesEntry 2 }
+
+    locEthSpeed    OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current Ethernet Speed.
+                            See Web, Monitor, Ethernet Performance."
+        ::= { locEthPerfInterfacesEntry 3 }
  
     locEthUtilizationWatermarkEnabled OBJECT-TYPE
         SYNTAX              ExaltEnableT

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -20,6 +20,13 @@
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitCodeVersionInFlash.1 = STRING:
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitSerialNumber.1 = STRING: DL2E9250002
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitUpTime.1 = Timeticks: (262804700) 30 days, 10:00:47.00
+
+#chStackUnitCodeVersion.1 = 8.4.2.7
+#chStackUnitProductOrder.1 = .........................
+#chStackUnitProductOrder.1 = <FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF><FF>
+#chStackUnitModelID.1 = S25-01-GE-24T
+#chStackUnitSerialNumber.1 = DL2D8430012
+#chStackUnitServiceTag.1 =
 
 // Stats for C-Series
 
@@ -114,7 +121,8 @@ if ($is_dell)
 else if (strstr($poll_device['sysObjectID'], '.1.3.6.1.4.1.6027.1.3.'))
 {
   $data     = snmp_get_multi_oid($device, 'chStackUnitCodeVersion.1 chStackUnitProductOrder.1 chStackUnitModelID.1 chStackUnitSerialNumber.1 chStackUnitServiceTag.1', array(), 'F10-S-SERIES-CHASSIS-MIB');
-  if ($data[1]['chStackUnitProductOrder'] && $data[1]['chStackUnitProductOrder'] != 'NA')
+  if ($data[1]['chStackUnitProductOrder'] && !str_starts($data[1]['chStackUnitProductOrder'], array('NA', '.')) &&
+      preg_match('/^[A-Z]/', $data[1]['chStackUnitProductOrder'])) // This Oid can return unprintable chars
   {
     $hardware = $data[1]['chStackUnitProductOrder'];
   }

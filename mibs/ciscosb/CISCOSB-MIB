@@ -174,6 +174,7 @@ CISCOSB-MIB DEFINITIONS ::= BEGIN
 -- 25-Mar-2009 added rlDeleteImg
 -- 02-Apr-2009 added rlCustom1BonjourService
 -- 18-Apr-2010 added rlPfcMib
+-- 30-Jan-2015 added rlLan1
 
 
 -- Title:                CISCOSB ROS
@@ -695,8 +696,6 @@ rlDebugCapabilities OBJECT IDENTIFIER ::= { switch001 206 }
 
 rlIpStdAcl  OBJECT IDENTIFIER ::= { switch001 207 }
 
-rlWBA  OBJECT IDENTIFIER ::= { switch001 208 }
-
 rlSecSd  OBJECT IDENTIFIER ::= { switch001 209 }
 
 rlOspf  OBJECT IDENTIFIER ::= { switch001 210 }
@@ -714,6 +713,30 @@ rlIpv6Fhs  OBJECT IDENTIFIER ::= { switch001 215}
 rlInventoryEnt  OBJECT IDENTIFIER ::= { switch001 217}
 
 rlUdld OBJECT IDENTIFIER ::= { switch001 218 }
+
+rlSpan OBJECT IDENTIFIER ::= { switch001 219 }
+
+rlPortStat OBJECT IDENTIFIER ::= { switch001 223 }
+
+rlLan1 OBJECT IDENTIFIER ::= { switch001 224 }    
+
+rlIgmp OBJECT IDENTIFIER ::= { switch001 225 }
+
+rlRadiusServ OBJECT IDENTIFIER ::= { switch001 226 }
+
+rlRouteMap OBJECT IDENTIFIER ::= { switch001 227 }
+
+rlPolicyBasedRouting OBJECT IDENTIFIER ::= { switch001 228 }
+
+rlSna  OBJECT IDENTIFIER ::= { switch001 229 }
+
+rlWBA  OBJECT IDENTIFIER ::= { switch001 230 }
+
+rlSLA  OBJECT IDENTIFIER ::= { switch001 231 }
+
+rlQosApps OBJECT IDENTIFIER ::= { switch001 232 }
+
+rlQueueStatistics OBJECT IDENTIFIER ::= { switch001 233 }
 
 rndEndOfMibGroup   OBJECT IDENTIFIER ::= { switch001 1000  }
 

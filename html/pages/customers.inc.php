@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -39,7 +39,6 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
 
     unset($class);
 
-    $ifname = rewrite_ifname($device['ifDescr']);
     $ifclass = port_html_class($port['ifOperStatus'], $port['ifAdminStatus'], $port['encrypted']);
 
     if ($device['os'] == "ios")
@@ -53,7 +52,7 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GRO
            <tr>
              <td style="width: 250px;"><span style="font-weight: bold;" class="interface">'.$customer_name.'</span></td>
              <td style="width: 150px;">' . generate_device_link($device) . '</td>
-             <td style="width: 100px;">' . generate_port_link($port, short_ifname($port['ifDescr'])) . '</td>
+             <td style="width: 100px;">' . generate_port_link($port, $port['port_label_short']) . '</td>
              <td style="width: 100px;">'.$port['port_descr_speed'].'</td>
              <td style="width: 100px;">'.$port['port_descr_circuit'].'</td>
              <td>'.$port['port_descr_notes'].'</td>

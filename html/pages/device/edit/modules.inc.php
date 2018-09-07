@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ * Observium
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage webui
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -88,6 +88,7 @@ if ($vars['submit'])
   <thead>
     <tr>
       <th>Module</th>
+      <th style="width: 60px;">Last Poll</th>
       <th style="width: 60px;">Global</th>
       <th style="width: 60px;">Device</th>
       <th style="width: 80px;"></th>
@@ -100,7 +101,30 @@ foreach (array_merge(array('os' => 1, 'system' => 1), $config['poller_modules'])
 {
   $attrib_set = isset($attribs['poll_'.$module]);
 
-  echo('<tr><td><strong>'.$module.'</strong></td><td>');
+  // Last module poll time and row class
+  $module_row_class = '';
+  if (!isset($device_state['poller_mod_perf'][$module]))
+  {
+    $module_time = '--';
+  }
+  else if ($device_state['poller_mod_perf'][$module] < 0.01)
+  {
+    $module_time = $device_state['poller_mod_perf'][$module] . 's';
+  } else {
+    $module_time = format_value($device_state['poller_mod_perf'][$module]) . 's';
+
+    if ($device_state['poller_mod_perf'][$module] > 10)
+    {
+      $module_row_class = 'error';
+    }
+    else if ($device_state['poller_mod_perf'][$module] > 3)
+    {
+      $module_row_class = 'warning';
+    }
+  }
+
+  echo('<tr class="'.$module_row_class.'"><td><strong>'.$module.'</strong></td>');
+  echo('<td>'.$module_time.'</td><td>');
   echo(($module_status ? '<span class="label label-success">enabled</span>' : '<span class="label label-important">disabled</span>'));
   echo('</td><td>');
 
@@ -163,6 +187,7 @@ foreach (array_merge(array('os' => 1, 'system' => 1), $config['poller_modules'])
   <thead>
     <tr>
       <th>Module</th>
+      <th style="width: 60px;">Last Poll</th>
       <th style="width: 60px;">Global</th>
       <th style="width: 60px;">Device</th>
       <th style="width: 80px;"></th>
@@ -177,8 +202,38 @@ foreach (array_keys($config) as $module)
 
   $module_status = $config[$module];
   $attrib_set = isset($attribs[$module]);
+  $module_name = str_replace('enable_ports_', '', $module);
 
-  echo('<tr><td><strong>'.str_replace('enable_ports_', '', $module).'</strong></td><td>');
+  // Last ports module poll time and row class
+  $module_row_class = '';
+  if ($module_name == 'separate_walk')
+  {
+    $module_time = ''; // nothing to show for this pseudo-module
+  }
+  else if (!isset($device_state['poller_ports_perf'][$module_name]))
+  {
+    $module_time = '--';
+  }
+  else if ($device_state['poller_ports_perf'][$module_name] < 0.01)
+  {
+    $module_time = $device_state['poller_ports_perf'][$module_name] . 's';
+  }
+  else
+  {
+    $module_time = format_value($device_state['poller_ports_perf'][$module_name]) . 's';
+
+    if ($device_state['poller_ports_perf'][$module_name] > 10)
+    {
+      $module_row_class = 'error';
+    }
+    else if ($device_state['poller_ports_perf'][$module_name] > 3)
+    {
+      $module_row_class = 'warning';
+    }
+  }
+
+  echo('<tr class="'.$module_row_class.'"><td><strong>'.$module_name.'</strong></td>');
+  echo('<td>'.$module_time.'</td><td>');
   echo(($module_status ? '<span class="label label-success">enabled</span>' : '<span class="label label-important">disabled</span>'));
   echo('</td><td>');
 

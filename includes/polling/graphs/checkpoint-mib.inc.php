@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -28,7 +28,7 @@ $table_defs['CHECKPOINT-MIB']['fw'] = array(
   'call_function' => 'snmp_get_multi',
   'mib'           => 'CHECKPOINT-MIB',
   'mib_dir'       => 'checkpoint',
-  'table'         => 'fw', // Table fw super-global, use snmp_get_multi()
+  'table'         => 'fw', // Table fw super-global, use snmp_get_multi_oid()
   'ds_rename'     => array('fw' => '', 'Total' => ''),
   'graphs'        => array('checkpoint_connections', 'checkpoint_packets'),
   'oids'          => array(

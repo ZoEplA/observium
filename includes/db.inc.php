@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage db
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -134,13 +134,13 @@ function dbShowIndexes($table, $index_name = NULL)
  * Performs a query using the given string.
  * Used by the other _query functions.
  * */
-function dbQuery($sql, $parameters = array())
+function dbQuery($sql, $parameters = array(), $print_query = FALSE)
 {
   global $fullSql;
 
   $fullSql = dbMakeQuery($sql, $parameters);
 
-  if (OBS_DEBUG > 0)
+  if (OBS_DEBUG > 0 || $print_query)
   {
     // Pre query debug output
     if (is_cli())
@@ -204,20 +204,20 @@ function dbQuery($sql, $parameters = array())
  * This is intended to be the method used for large result sets.
  * It is intended to return an iterator, and act upon buffered data.
  * */
-function dbFetch($sql, $parameters = array())
+function dbFetch($sql, $parameters = array(), $print_query = FALSE)
 {
-  return dbFetchRows($sql, $parameters);
+  return dbFetchRows($sql, $parameters, $print_query);
 }
 
 /*
  * This method is quite different from fetchCell(), actually
  * It fetches one cell from each row and places all the values in 1 array
  * */
-function dbFetchColumn($sql, $parameters = array())
+function dbFetchColumn($sql, $parameters = array(), $print_query = FALSE)
 {
   $time_start = microtime(true);
   $cells = array();
-  foreach (dbFetchRows($sql, $parameters) as $row)
+  foreach (dbFetchRows($sql, $parameters, $print_query) as $row)
   {
     $cells[] = array_shift($row);
   }
@@ -234,10 +234,10 @@ function dbFetchColumn($sql, $parameters = array())
  * The first will become the array key
  * The second the key's value
  */
-function dbFetchKeyValue($sql, $parameters = array())
+function dbFetchKeyValue($sql, $parameters = array(), $print_query)
 {
   $data = array();
-  foreach (dbFetchRows($sql, $parameters) as $row)
+  foreach (dbFetchRows($sql, $parameters, $print_query) as $row)
   {
     $key = array_shift($row);
     if (sizeof($row) == 1)
@@ -257,7 +257,7 @@ function dbFetchKeyValue($sql, $parameters = array())
  * Passed an array and a table name, it attempts to insert the data into the table.
  * Check for boolean false to determine whether insert failed
  * */
-function dbInsert($data, $table)
+function dbInsert($data, $table, $print_query = FALSE)
 {
   global $fullSql;
 
@@ -278,7 +278,80 @@ function dbInsert($data, $table)
 
   $time_start = microtime(true);
   //dbBeginTransaction();
-  $result = dbQuery($sql, $data);
+  $result = dbQuery($sql, $data, $print_query);
+  if ($result)
+  {
+    // This should return true if insert succeeded, but no ID was generated
+    $id = dbLastID();
+    //dbCommitTransaction();
+  } else {
+    //dbRollbackTransaction();
+    $id = FALSE;
+  }
+
+  $time_end = microtime(true);
+  $GLOBALS['db_stats']['insert_sec'] += number_format($time_end - $time_start, 8);
+  $GLOBALS['db_stats']['insert']++;
+
+  return $id;
+}
+
+/*
+ * Passed an array and a table name, it attempts to insert the data into the table.
+ * Check for boolean false to determine whether insert failed
+ * */
+function dbInsertMulti($data, $table, $columns = NULL, $print_query = FALSE)
+{
+  global $fullSql;
+
+  // the following block swaps the parameters if they were given in the wrong order.
+  // it allows the method to work for those that would rather it (or expect it to)
+  // follow closer with SQL convention:
+  // insert into the TABLE this DATA
+  if (is_string($data) && is_array($table))
+  {
+    $tmp = $data;
+    $data = $table;
+    $table = $tmp;
+
+    print_debug('Parameters passed to dbInsertMulti() were in reverse order.');
+  }
+
+  // Detect if data is multiarray
+  $first_data = reset($data);
+  if (!is_array($first_data))
+  {
+    $first_data = $data;
+    $data = array($data);
+  }
+
+  // Columns, if not passed use keys from first element
+  if (empty($columns))
+  {
+    $columns = array_keys($first_data);
+  }
+
+  $values = array();
+  // Multiarray data
+  foreach ($data as $entry)
+  {
+    $entry = dbPrepareData($entry); // Escape data
+
+    // Keep same columns order as in first entry
+    $entries = array();
+    foreach ($columns as $column)
+    {
+      $entries[$column] = $entry[$column];
+    }
+
+    $values[] = '(' . implode(',', $entries) . ')';
+  }
+
+  $sql = 'INSERT INTO `' . $table . '` (`' . implode('`,`', $columns) . '`)  VALUES ' . implode(',', $values);
+
+  $time_start = microtime(true);
+  //dbBeginTransaction();
+  $result = dbQuery($sql, NULL, $print_query);
   if ($result)
   {
     // This should return true if insert succeeded, but no ID was generated
@@ -300,7 +373,7 @@ function dbInsert($data, $table)
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
  * */
-function dbUpdate($data, $table, $where = NULL, $parameters = array())
+function dbUpdate($data, $table, $where = NULL, $parameters = array(), $print_query = FALSE)
 {
   global $fullSql;
 
@@ -332,7 +405,7 @@ function dbUpdate($data, $table, $where = NULL, $parameters = array())
   }
 
   $time_start = microtime(true);
-  if (dbQuery($sql, $data))
+  if (dbQuery($sql, $data, $print_query))
   {
     $return = dbAffectedRows();
   } else {
@@ -345,7 +418,7 @@ function dbUpdate($data, $table, $where = NULL, $parameters = array())
   return $return;
 }
 
-function dbDelete($table, $where = NULL, $parameters = array())
+function dbDelete($table, $where = NULL, $parameters = array(), $print_query = FALSE)
 {
   $sql = 'DELETE FROM `' . $table.'`';
   if ($where)
@@ -354,7 +427,7 @@ function dbDelete($table, $where = NULL, $parameters = array())
   }
 
   $time_start = microtime(true);
-  if (dbQuery($sql, $parameters))
+  if (dbQuery($sql, $parameters, $print_query))
   {
     $return = dbAffectedRows();
   } else {
@@ -504,7 +577,7 @@ function dbPlaceHolders($values)
  * @param string $condition
  * @return string
  */
-function generate_query_values($value, $column, $condition = NULL)
+function generate_query_values($value, $column, $condition = NULL, $leading_and = TRUE)
 {
   //if (!is_array($value)) { $value = explode(',', $value); }
   if (!is_array($value)) { $value = array((string)$value); }
@@ -525,9 +598,11 @@ function generate_query_values($value, $column, $condition = NULL)
   {
     // Use LIKE condition
     case 'LIKE':
-      // Replace stars by % only for LIKE condition
-      $search[]  = '*';
+      // Replace (* by %) and (? by _) only for LIKE condition
+      $search[]  = '*'; // any string
       $replace[] = '%';
+      $search[]  = '?'; // any single char
+      $replace[] = '_';
     case '%LIKE%':
     case '%LIKE':
     case 'LIKE%':
@@ -601,6 +676,7 @@ function generate_query_values($value, $column, $condition = NULL)
       }
       break;
   }
+  if(!$leading_and) { $where = preg_replace('/^(\ )+AND/', '', $where); }
 
   return $where;
 }

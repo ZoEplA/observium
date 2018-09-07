@@ -2,7 +2,7 @@
 -- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference:
--- Version: V1.01
+-- Version: V1.02
 -- ===================================================================
 
        HUAWEI-USC-MIB DEFINITIONS ::= BEGIN
@@ -20,7 +20,7 @@
     
     
         hwUSC MODULE-IDENTITY 
-            LAST-UPDATED "201407111600Z"        
+            LAST-UPDATED "201408111600Z"        
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -33,11 +33,15 @@
             DESCRIPTION 
                 "Please provide the descritpion."
 
+            REVISION    "201408111600Z"   
+            DESCRIPTION "V1.02, initial version."
+
            REVISION    "201407111600Z"   
             DESCRIPTION "V1.01, initial version."
 
             REVISION    "201008111600Z"   
             DESCRIPTION "V1.00, initial version."
+
     
             ::= { hwBRASMib 19 }
 
@@ -90,7 +94,7 @@
             
         hwUSCInterfaceName OBJECT-TYPE
             SYNTAX DisplayString (SIZE(1..64))
-            MAX-ACCESS read-write
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "The name of USC interface."

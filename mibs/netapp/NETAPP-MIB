@@ -6,9 +6,9 @@
 	-- not included in this file.                               --
 	-- =======================================================  --
 
-	-- Version 2.4.2, June 2015 (See NOTE below)
+	-- Version 2.6, October 2016 (See NOTE below)
 
-	-- Copyright (c) 1995-2015 NetApp, Inc.
+	-- Copyright (c) 1995-2016 NetApp, Inc.
 	-- All rights reserved.
 
 	-- This NetApp SNMP Management Information Base
@@ -88,10 +88,12 @@
 		MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
 		        FROM SNMPv2-CONF
 		CounterBasedGauge64, ZeroBasedCounter64
-			FROM HCNUM-TC;
+		        FROM HCNUM-TC
+		SnmpAdminString
+		        FROM SNMP-FRAMEWORK-MIB;
 
         netappModuleId  MODULE-IDENTITY
-	LAST-UPDATED      "201504240000Z"
+	LAST-UPDATED      "201610200000Z"
         ORGANIZATION      "NetApp"
         CONTACT-INFO      "www.netapp.com"
         DESCRIPTION       "The mib module for NetApp SNMPv2 entities"
@@ -118,6 +120,35 @@
 	    DESCRIPTION
 		"Represents time in hundredths (1/100) of a second since an epoch."
 	    SYNTAX   Counter64
+
+	FileOrDirectoryString ::= TEXTUAL-CONVENTION
+	    DISPLAY-HINT "1023t"
+	    STATUS       current
+	    DESCRIPTION
+		"An octet string containing a file or directory
+		 name.
+
+                 UTF-8 encoding is used to represent Unicode
+		 characters. See [RFC2279].
+
+		 Essentially, this is a longer variant of
+		 SnmpAdminString.
+		"
+	    SYNTAX       OCTET STRING (SIZE (0..1023))
+
+	FilesystemPathString ::= TEXTUAL-CONVENTION
+	    DISPLAY-HINT "4095t"
+	    STATUS       current
+	    DESCRIPTION
+		"An octet string containing a filesystem path.
+
+                 UTF-8 encoding is used to represent Unicode
+		 characters. See [RFC2279].
+
+		 Essentially, this is a longer variant of
+		 SnmpAdminString.
+		"
+	    SYNTAX       OCTET STRING (SIZE (0..4095))
 
 	--  MIB-II (same prefix as MIB-I)
 
@@ -167,13 +198,6 @@
 	netappOnCommand OBJECT IDENTIFIER ::= { netapp 5 }
 
 	--
-	-- This is the tree under which values for the NetApp MetroCluster
-	-- are allocated.
-	--
-
-	netappMcc OBJECT IDENTIFIER ::= { netapp 6 }
-
-	--
 	-- We distinguish between filers and NetCaches.
 	--
 
@@ -184,14 +208,6 @@
 	netappCluster	OBJECT IDENTIFIER ::= { netappProducts 5 }
 	netappVserver	OBJECT IDENTIFIER ::= { netappProducts 6 }
 
-	--
-	-- This is the tree under which values for the NetApp MetroCluster
-	-- Tiebreaker software are allocated.
-	-- Those values are defined in separate MCCTB MIB file, distributed
-	-- with MCCTB product.
-	--
-
-	netappMcctb	OBJECT IDENTIFIER ::= { netappMcc 1 }
 
 	-- top-level netapp groups
 
@@ -558,7 +574,7 @@
         clusterLicenseTable 		OBJECT-TYPE
 	SYNTAX      			SEQUENCE OF ClusterLicenseEntry
 	MAX-ACCESS  			not-accessible
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster Licenses"
 	::= { cluster 3 }
@@ -566,7 +582,7 @@
 	clusterLicenseEntry 		OBJECT-TYPE
 	SYNTAX      			ClusterLicenseEntry
 	MAX-ACCESS  			not-accessible
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Details about each installed cluster license."
 	INDEX { clusterLicenseFeature }
@@ -585,7 +601,7 @@
 	clusterLicenseFeature 		OBJECT-TYPE
 	SYNTAX      			Integer32 (1..2147483647)
 	MAX-ACCESS  			read-only
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster license feature ID, see clusterLicenseDescription
 	         for the name/description of this feature"
@@ -594,7 +610,7 @@
 	clusterLicenseCode 		OBJECT-TYPE
 	SYNTAX      			DisplayString
 	MAX-ACCESS  			read-only
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster License Code"
 	::= { clusterLicenseEntry 2 }
@@ -602,7 +618,7 @@
 	clusterLicenseDescription 	OBJECT-TYPE
 	SYNTAX      			DisplayString
 	MAX-ACCESS  			read-only
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster License Feature Description"
 	::= { clusterLicenseEntry 3 }
@@ -610,7 +626,7 @@
 	clusterLicenseSerialNumber 	OBJECT-TYPE
 	SYNTAX      			DisplayString
 	MAX-ACCESS  			read-only
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster Serial Number"
 	::= { clusterLicenseEntry 4 }
@@ -618,7 +634,7 @@
 	clusterLicenseLimit 		OBJECT-TYPE
 	SYNTAX      			Integer32
 	MAX-ACCESS  			read-only
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster feature limit value. The units of this value
 		are feature specific, for example number of nodes, capacity in TB, 
@@ -629,7 +645,7 @@
 	clusterLicenseExpirationDate 	OBJECT-TYPE
 	SYNTAX      			DisplayString
 	MAX-ACCESS  			read-only
-	STATUS      			deprecated
+	STATUS      			obsolete
 	DESCRIPTION
 		"Cluster License Expiration Date if it exists"
 	::= { clusterLicenseEntry 6 }
@@ -996,7 +1012,8 @@
        MAX-ACCESS                   read-only
        STATUS                       current
        DESCRIPTION
-       "This parameter defines if this is a Vserver with Infinite Volume. A Vserver with Infinite Volume contains a single Infinite Volume."
+           "This parameter defines if this is a Vserver with Infinite Volume.
+	    A Vserver with Infinite Volume contains a single Infinite Volume."
        ::= { vserverEntry 23 }
 
        vserverOperationalState    OBJECT-TYPE
@@ -10302,7 +10319,7 @@
 			"A number that identifies the volume for which
 			this quota is in effect on.  The volume that this
 			value represents can be determined by checking
-			the value of qvStateName (above) with 
+			the value of qvStateName (above) with
 			qvStateVolume set to the value found here."
 	::= { qrVEntry 9 }
 
@@ -10370,7 +10387,7 @@
         ::= { qrVEntry 15 }
 
 	--
-	-- multi-volume-aware quota table with 64 bit values
+	-- multi-volume-aware quota table with 64 bit values (V2)
 	--
 
 	qrV2Table                       OBJECT-TYPE
@@ -10422,11 +10439,11 @@
 		qrV2FileLimit
 		    Integer32,
 		qrV2PathName
-		    DisplayString,
+		    FilesystemPathString,
 		qrV2Volume
 		    Integer32,
 		qrV2Tree
-		    DisplayString,
+		    FileOrDirectoryString,
 		qrV2IdType
 		    INTEGER,
                 qrV2Sid
@@ -10592,7 +10609,7 @@
 	::= { qrV2Entry 11 }
 
 	qrV2PathName                    OBJECT-TYPE
-	SYNTAX                          DisplayString
+	SYNTAX                          FilesystemPathString
         MAX-ACCESS                      read-only
         STATUS                          current
 	DESCRIPTION
@@ -10613,7 +10630,7 @@
 	::= { qrV2Entry 13 }
 
         qrV2Tree                        OBJECT-TYPE
-	SYNTAX                          DisplayString
+	SYNTAX                          FileOrDirectoryString
         MAX-ACCESS                      read-only
         STATUS                          current
         DESCRIPTION
@@ -10816,6 +10833,390 @@
 			 Name from the cluster interfaces.
 			 Only applicable to cluster-mode volume."
 	::= { qrV2Entry 30 }
+
+	--
+	-- quota table with 64 bit index (index-high,index-low) (V3)
+	--
+
+	qrV3Table                       OBJECT-TYPE
+	SYNTAX                          SEQUENCE OF QrV3Entry
+        MAX-ACCESS                      not-accessible
+        STATUS                          current
+	DESCRIPTION
+			"Provide a report of the current file and
+			 space consumption for each user, group,
+                         or qtree, as well as configured limits."
+	::= { quota 7 }
+
+
+	qrV3Entry                       OBJECT-TYPE
+	SYNTAX                          QrV3Entry
+        MAX-ACCESS                      not-accessible
+        STATUS                          current
+	DESCRIPTION
+			"Provide a report of the current file and
+			 space consumption for the referenced user,
+			 group, or qtree.  Field qrV3Volume identifies
+                         the volume, and the combination of
+                         qrV3IndexHigh and qrV3IndexLow indentify
+                         a particular record within that volume."
+	INDEX	{ qrV3Volume, qrV3IndexHigh, qrV3IndexLow }
+	::= { qrV3Table 1 }
+
+	QrV3Entry ::=
+	    SEQUENCE {
+		qrV3Volume
+		    Unsigned32,
+		qrV3IndexHigh
+		    Unsigned32,
+		qrV3IndexLow
+		    Unsigned32,
+		qrV3Vserver
+		    DisplayString,
+		qrV3VolumeName
+		    DisplayString,
+		qrV3Type
+		    INTEGER,
+		qrV3IdType
+		    INTEGER,
+		qrV3Id
+		    Unsigned32,
+                qrV3Sid
+                    DisplayString,
+		qrV3PathName
+		    FilesystemPathString,
+		qrV3Tree
+		    FileOrDirectoryString,
+		qrV3KBytesUsed
+		    Counter64,
+                qrV3QuotaUnlimited
+		    INTEGER,
+		qrV3KBytesLimit
+		    Counter64,
+		qrV3FilesUsed
+		    Unsigned32,
+                qrV3FileQuotaUnlimited
+		    INTEGER,
+		qrV3FileLimit
+		    Unsigned32,
+                qrV3SoftQuotaUnlimited
+		    INTEGER,
+		qrV3KBytesSoftLimit
+		    Counter64,
+		qrV3SoftFileQuotaUnlimited
+		    INTEGER,
+		qrV3SoftFileLimit
+		    Unsigned32,
+                qrV3ThresholdUnlimited
+		    INTEGER,
+	        qrV3KBytesThreshold
+                    Counter64,
+		qrV364FilesUsed
+                    Counter64,
+		qrV364FileLimit
+                    Counter64,
+		qrV364SoftFileLimit
+                    Counter64
+	    }
+
+	qrV3Volume                      OBJECT-TYPE
+	SYNTAX                          Unsigned32 (1..4294967295)
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"A number that identifies the volume for which
+			this quota applies. The volume that this
+			value represents can be determined by checking
+			the value of qvStateName (above) with
+			qvStateVolume set to the value found here."
+	::= { qrV3Entry 1 }
+
+	qrV3IndexHigh                   OBJECT-TYPE
+	SYNTAX                          Unsigned32 (1..4294967295)
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"A number that identifies this entry
+			 within the volume. This is the most
+                         significant 32 bits of a 64 bit record
+                         identifier."
+	::= { qrV3Entry 2 }
+
+	qrV3IndexLow                    OBJECT-TYPE
+	SYNTAX                          Unsigned32 (1..4294967295)
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"A number that identifies this entry
+			 within the volume. This is the least
+                         significant 32 bits of a 64 bit record
+                         identifier."
+	::= { qrV3Entry 3 }
+
+	qrV3Vserver                     OBJECT-TYPE
+	SYNTAX                          DisplayString
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"Indicates the vserver to which the volume belongs.
+			 Name from the cluster interfaces."
+	::= { qrV3Entry 4 }
+
+	qrV3VolumeName                  OBJECT-TYPE
+	SYNTAX                          DisplayString
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"Indicates the name of the volume to which this
+                         quota belongs."
+	::= { qrV3Entry 5 }
+
+	qrV3Type                        OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             qrV3TypeUser(1),
+                                             qrV3TypeGroup(2),
+					     qrV3TypeTree(3),
+					     qrV3TypeUserDefault(4),
+					     qrV3TypeGroupDefault(5),
+                                             qrV3TypeUnknown(6),
+					     qrV3TypeTreeDefault(7)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"Identifies the kind of quota for this qrV3Entry."
+	::= { qrV3Entry 6 }
+
+        qrV3IdType                      OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             qrV3IdValid(1),
+                                             qrV3SidValid(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+                        "A value that indicates which ID field is valid."
+        ::= { qrV3Entry 7 }
+
+	qrV3Id                          OBJECT-TYPE
+	SYNTAX                          Unsigned32
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"Depending on qrV3Type, this is either the UID
+			 (user's numerical ID), the GID (numerical ID
+			 of  the  group  that a user belongs to), or the
+			 TID (numerical qtree id) associated with this
+			 qrV3Entry. For qrV3TypeUser records, check the
+			 qrV3IdType field to see if this field is valid."
+	::= { qrV3Entry 8 }
+
+	qrV3Sid                         OBJECT-TYPE
+	SYNTAX                          DisplayString
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"The one or more IDs associated with this qrV3Entry.
+                         If the qrV3entry is associated with a Windows ID, the
+			 text form of the Windows ID (the SID) is here. If
+			 the qrV3Entry is associated with more than one id,
+			 this contains a blank separated list of those IDs.
+                         Check the qrV3IdType field to see if this field is
+                         valid."
+	::= { qrV3Entry 9 }
+
+	qrV3PathName                    OBJECT-TYPE
+	SYNTAX                          FilesystemPathString
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"A textual string that contains the path
+			 corresponding to this qrV3Entry."
+	::= { qrV3Entry 10 }
+
+        qrV3Tree                        OBJECT-TYPE
+	SYNTAX                          FileOrDirectoryString
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+			"A string that indicates which qtree this quota
+			belongs to."
+	::= { qrV3Entry 11 }
+
+	qrV3KBytesUsed                  OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"The current number of KBytes used for this
+			 qrV3Entry."
+
+	::= { qrV3Entry 12 }
+
+	qrV3QuotaUnlimited              OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             false(1),
+                                             true(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"This flag designates whether or not the
+			size based quota limit for this qrV3Entry is unlimited.
+			If false(1) then qrV3KBytesLimit OID's are valid,
+			if true(2) then qrV3KBytesLimit OID's are unused
+			and will return 0."
+	::= { qrV3Entry 13 }
+
+	qrV3KBytesLimit                 OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"The limit of KBytes that can be used for this
+			 qrV3Entry. This will return 0 if
+			 qrV3QuotaUnlimited is true."
+	::= { qrV3Entry 14 }
+
+	qrV3FilesUsed                   OBJECT-TYPE
+	SYNTAX                          Unsigned32
+        MAX-ACCESS                      read-only
+        STATUS                          deprecated
+	DESCRIPTION
+			"The current number of files used for this
+			 qrV3Entry. This object is deprecated in
+                         favor of qrV364FilesUsed."
+	::= { qrV3Entry 15 }
+
+	qrV3FileQuotaUnlimited          OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             false(1),
+                                             true(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"This flag designates whether or not the
+			file based quota limit for this qrV3Entry is unlimited.
+			If false(1) then qrV3FileLimit is valid, if true(2)
+			qrV3FileLimit will return 0."
+	::= { qrV3Entry 16 }
+
+	qrV3FileLimit                   OBJECT-TYPE
+	SYNTAX                          Unsigned32
+        MAX-ACCESS                      read-only
+        STATUS                          deprecated
+	DESCRIPTION
+			"The limit of files that can be used for this
+			 qrV3Entry. This object is deprecated in
+                         favor of qrV364FileLimit."
+	::= { qrV3Entry 17 }
+
+	qrV3SoftQuotaUnlimited          OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             false(1),
+                                             true(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"This flag designates whether or not the
+			size based soft quota limit for this qrV3Entry is
+			unlimited. If false(1) then qrV3KBytesSoftLimit OID's
+			are valid, if true(2) the qrV3KBytesSoftLimit OID's
+			are unused and will return 0."
+	::= { qrV3Entry 18 }
+
+        qrV3KBytesSoftLimit             OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+			"The limit of KBytes that can be used for this
+			 qrV3Entry before a warning message and SNMP
+			 trap is produced."
+        ::= { qrV3Entry 19 }
+
+	qrV3SoftFileQuotaUnlimited      OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             false(1),
+                                             true(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"This flag designates whether or not the
+			file based soft quota limit for this qrV3Entry is
+			unlimited. If false(1) then qrV3SoftFileLimit is valid,
+			if true(2) qrV3SoftFileLimit is unused and will
+			return 0."
+	::= { qrV3Entry 20 }
+
+        qrV3SoftFileLimit               OBJECT-TYPE
+	SYNTAX                          Unsigned32
+        MAX-ACCESS                      read-only
+        STATUS                          deprecated
+        DESCRIPTION
+			"The limit of files that can be used for this
+			 qrV3Entry before a warning message and SNMP
+			 trap is produced. This will return 0 if
+			 qrV3SoftFileQuotaUnlimited is true. This object
+			 is deprecated in favor of qrV364SoftFileLimit."
+        ::= { qrV3Entry 21 }
+
+	qrV3ThresholdUnlimited          OBJECT-TYPE
+	SYNTAX                          INTEGER {
+                                             false(1),
+                                             true(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"This flag designates whether or not the
+			size based threshold limit for this qrV3Entry is
+			unlimited. If false(1) then qrV3KBytesThreshold OID's
+			are valid, if true(2) then qrV3KBytesThreshold OID's
+			are unused and will return 0."
+	::= { qrV3Entry 22 }
+
+        qrV3KBytesThreshold             OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+                        "A number of KBytes that when used by this entry
+			 produces a warning message. This will return
+			 0 if qrV3ThresholdUnlimited is true."
+        ::= { qrV3Entry 23 }
+
+	qrV364FilesUsed                 OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"The current number of files used for this
+			 qrV3Entry."
+	::= { qrV3Entry 24 }
+
+	qrV364FileLimit                 OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"The limit of files that can be used for this
+			 qrV3Entry."
+	::= { qrV3Entry 25 }
+
+        qrV364SoftFileLimit             OBJECT-TYPE
+	SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+			"The limit of files that can be used for this
+			 qrV3Entry before a warning message and SNMP
+			 trap is produced. This will return 0 if
+			 qrV3SoftFileQuotaUnlimited is true."
+        ::= { qrV3Entry 26 }
 
 	-- -- -- -- -- -- -- --  --
 	-- the file system group --
@@ -11227,8 +11628,7 @@
 
         dfType                          OBJECT-TYPE
 	SYNTAX                          INTEGER {
-                                             traditionalVolume(1),
-                                             flexibleVolume(2),		
+                                             flexibleVolume(2),
                                              aggregate(3),
                                              stripedAggregate(4),
                                              stripedVolume(5)
@@ -11729,9 +12129,8 @@
 
 	slVType                         OBJECT-TYPE
 	SYNTAX                          INTEGER {
-                                             traditionalVolume(1),
                                              flexibleVolume(2),
-                                             aggregate(3)	
+                                             aggregate(3)
                                         }
         MAX-ACCESS                      read-only
         STATUS                          current
@@ -11779,7 +12178,7 @@
     	        slQSnapshotTime
 		    Integer32,
 		slQQtreeName
-		    DisplayString,
+		    FileOrDirectoryString,
   	        slQQtreeContent
 		    INTEGER,
 		slQSource	
@@ -11835,7 +12234,7 @@
 	::= { slQEntry 5 }
 
 	slQQtreeName                    OBJECT-TYPE
-	SYNTAX                          DisplayString
+	SYNTAX                          FileOrDirectoryString
         MAX-ACCESS                      read-only
         STATUS                          current
 	DESCRIPTION
@@ -12098,7 +12497,6 @@
 
 	volType                         OBJECT-TYPE
 	SYNTAX                          INTEGER {
-                                             traditional(1),
                                              flexible(2),
                                              striped(3),
                                              asis(4),
@@ -12107,9 +12505,7 @@
         MAX-ACCESS                      read-only
         STATUS                          current
 	DESCRIPTION
-			"Type of this volume, older volumes are
-			traditional while newer volumes contained in
-			aggregates are flexible."
+			"Type of this volume."
 	::= { volEntry 10 }
 
 	volClone                        OBJECT-TYPE
@@ -12334,13 +12730,14 @@
 			"Indicates whether dr-force-nvfail option is enabled
 			 on this volume. If true, volume would be put in a
 			 special state called 'in-nvfailed-state' by switchover
-			 operation. The protocol access on the volume in
-			 'in-nvfailed-state' is blocked. This will cause the
-			 client applications to crash and thus prevent access
-			 to data on the volume. To get out of this situation,
-			 admin needs to manually clear the 'in-nvfailed-state'
-			 on the volume. By default, dr-force-nvfail option
-			 value is false."
+			 operation. The option has no effect for negotiated or
+			 an automatic switchover operation. The protocol
+			 access on the volume in 'in-nvfailed-state' is
+			 blocked. This will cause the client applications to
+			 crash and thus prevent access to data on the volume.
+			 To get out of this situation, admin needs to manually
+			 clear the 'in-nvfailed-state' on the volume. By
+			 default, dr-force-nvfail option value is false."
 
         ::= { volEntry 30 }
 
@@ -12378,7 +12775,7 @@
 		qtreeVolume		     Integer32,
 		qtreeVolumeName		     DisplayString,
 		qtreeId			     Integer32,
-		qtreeName		     DisplayString,
+		qtreeName		     FileOrDirectoryString,
 		qtreeStyle		     INTEGER,
 		qtreeStatus		     INTEGER,
 		qtreeOplock		     INTEGER,
@@ -12427,7 +12824,7 @@
 	::= { qtreeEntry 4 }
 
 	qtreeName                       OBJECT-TYPE
-	SYNTAX                          DisplayString
+	SYNTAX                          FileOrDirectoryString
         MAX-ACCESS                      read-only
         STATUS                          current
 	DESCRIPTION
@@ -12652,7 +13049,6 @@
         aggrType                        OBJECT-TYPE
 	SYNTAX                          INTEGER {
                                              unknown(0),
-                                             traditional(1),
                                              aggregate(2),
                                              striped(3)
                                         }
@@ -13576,7 +13972,13 @@
 		spare64TotalBlocks
 		    Counter64,
 		spareCarrierID
-		    DisplayString
+		    DisplayString,
+		spareOwnerNode
+		    DisplayString,
+		spareDrawer
+		    Integer32,
+		spareDrawerSlot
+		    Integer32
 	    }
 
 	spareIndex                      OBJECT-TYPE
@@ -13827,6 +14229,33 @@
 		"Unique identifier of the disk carrier."
 	::= { spareEntry 24 }
 
+	spareOwnerNode			OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION
+	        "Owner node of the spare disk."
+	::= { spareEntry 25 }
+
+    spareDrawer                     OBJECT-TYPE
+	SYNTAX                          Integer32
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION
+			"Used for shelves with drawers. Number
+			identifying the physical drawer where
+			the disk is located."
+        ::= { spareEntry 26 }
+
+    spareDrawerSlot                 OBJECT-TYPE
+	SYNTAX                          Integer32
+    MAX-ACCESS                      read-only
+    STATUS                          current
+    DESCRIPTION
+			"Used for shelves with drawers. Identifies which
+			slot in the drawer this disk is located."
+        ::= { spareEntry 27 }
+
 	-- Disk summaries
 
 	diskSummary	OBJECT IDENTIFIER ::= { raid 4 }
@@ -14052,7 +14481,11 @@
 		otherDisk64TotalBlocks
 		    Counter64,
 		otherDiskCarrierID
-		    DisplayString
+		    DisplayString,
+		otherDiskDrawer
+		    Integer32,
+		otherDiskDrawerSlot
+		    Integer32
 	    }
 
 	otherDiskIndex                  OBJECT-TYPE
@@ -14294,6 +14727,26 @@
 	DESCRIPTION
 		"Unique identifier of the disk carrier."
 	::= { otherDiskEntry 23 }
+
+
+	otherDiskDrawer                  OBJECT-TYPE
+	SYNTAX                          Integer32
+	MAX-ACCESS                      read-only
+	STATUS                          current
+	DESCRIPTION
+			"Used for shelves with drawers. Number
+			identifying the physical drawer where
+			the disk is located."
+	::= { otherDiskEntry 24 }
+
+	otherDiskDrawerSlot                  OBJECT-TYPE
+	SYNTAX                          Integer32
+	MAX-ACCESS                      read-only
+	STATUS                          current
+	DESCRIPTION
+			"Used for shelves with drawers. Identifies which
+			slot in the drawer this disk is located."
+	::= { otherDiskEntry 25 }
 
 	-- Multivolume and multiplex raidTable.
 
@@ -14903,7 +15356,11 @@
 		outOfDateDisk64TotalBlocks
 		    Counter64,
 		outOfDateDiskCarrierID
-		    DisplayString
+		    DisplayString,
+		outOfDateDiskDrawer
+		    Integer32,
+		outOfDateDiskDrawerSlot
+		    Integer32
 	    }
 
 	outOfDateDiskIndex              OBJECT-TYPE
@@ -15132,6 +15589,25 @@
 	DESCRIPTION
 		"Unique identifier of the disk carrier."
 	::= { outOfDateDiskEntry 22 }
+
+	outOfDateDiskDrawer             OBJECT-TYPE
+	SYNTAX                          Integer32
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"Used for shelves with drawers. Number
+			identifying the physical drawer where
+			the disk is located."
+	::= { outOfDateDiskEntry 23 }
+
+	outOfDateDiskDrawerSlot         OBJECT-TYPE
+	SYNTAX                          Integer32
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+			"Used for shelves with drawers. Identifies which
+			slot in the drawer this disk is located."
+	::= { outOfDateDiskEntry 24 }
 
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -25428,15 +25904,15 @@
         MAX-ACCESS                      read-only
         STATUS                          current
         DESCRIPTION
-                      "Number of LUNs in the Filer in 7-mode. Unsupported in C-mode."
+                      "Number of LUNs in the Filer in 7-mode. Unsupported in Clustered Data ONTAP."
         ::= { lun 1 }
 
 	lunTable                        OBJECT-TYPE
 	SYNTAX                          SEQUENCE OF LunEntry
         MAX-ACCESS                      not-accessible
-        STATUS                          current
+        STATUS                          obsolete
 	DESCRIPTION
-			"Provide a report of per-LUN general information "
+			"Provide a report of per-LUN general information."
 	::= {lun 2}
 
 	lunEntry                        OBJECT-TYPE
@@ -25457,7 +25933,7 @@
 		lunSizeHigh Integer32,
 		lunMapped INTEGER,
 		lunSerialNumber DisplayString,
-		lunQtreeName DisplayString,
+		lunQtreeName FileOrDirectoryString,
 		lunHighOps Counter32,
 		lunLowOps Counter32,
 		lunHighReadBytes Counter32,
@@ -25556,7 +26032,7 @@
 
 
 	lunQtreeName                    OBJECT-TYPE
-	SYNTAX                          DisplayString
+	SYNTAX                          FileOrDirectoryString
         MAX-ACCESS                      read-only
         STATUS                          current
 	DESCRIPTION
@@ -25903,7 +26379,7 @@
 	lunMapTable                     OBJECT-TYPE
 	SYNTAX                          SEQUENCE OF LunMapEntry
         MAX-ACCESS                      not-accessible
-        STATUS                          current
+        STATUS                          obsolete
 	DESCRIPTION
 			"Provide a table listing the initiator group to 
 			Logical Unit Number mapping for each LUN."
@@ -25989,7 +26465,7 @@
 	initiatorGroupTable             OBJECT-TYPE
 	SYNTAX                          SEQUENCE OF InitiatorGroupEntry
         MAX-ACCESS                      not-accessible
-        STATUS                          current
+        STATUS                          obsolete
 	DESCRIPTION
 			"Provide a report of per-initiator group general 
 			information "
@@ -26133,7 +26609,7 @@
 	initiatorGroupMemberTable       OBJECT-TYPE
 	SYNTAX                          SEQUENCE OF InitiatorGroupMemberEntry
         MAX-ACCESS                      not-accessible
-        STATUS                          current
+        STATUS                          obsolete
 	DESCRIPTION
 			"Table of individual Initiator names in each Initiator 
 			group"
@@ -26448,7 +26924,7 @@
 	psetTable                       OBJECT-TYPE
 	SYNTAX                          SEQUENCE OF PsetEntry
         MAX-ACCESS                      not-accessible
-        STATUS                          current
+        STATUS                          obsolete
 	DESCRIPTION
 			"Provide a report of portset general 
 			information "
@@ -26514,7 +26990,7 @@
 	psetMemberTable                 OBJECT-TYPE
 	SYNTAX                          SEQUENCE OF PsetMemberEntry
         MAX-ACCESS                      not-accessible
-        STATUS                          current
+        STATUS                          obsolete
 	DESCRIPTION
 			"Table of individual Port names in each Port
 			set"
@@ -26653,11 +27129,11 @@
    fcpTargetPortTable              OBJECT-TYPE
    SYNTAX                          SEQUENCE OF FcpTargetPortEntry
        MAX-ACCESS                      not-accessible
-       STATUS                          current
+       STATUS                          obsolete
    DESCRIPTION
        "Provide a report of fcp target port general
-       information
-       This table is available from c-mode management interfaces only."
+       information. This table is available from Clustered
+       Data ONTAP management interfaces only."
    ::= {fcpTargetPort 1}
    
    fcpTargetPortEntry         OBJECT-TYPE
@@ -26739,11 +27215,11 @@
    fcpTargetLifTable               OBJECT-TYPE
    SYNTAX                          SEQUENCE OF FcpTargetLifEntry
        MAX-ACCESS                      not-accessible
-       STATUS                          current
+       STATUS                          obsolete
    DESCRIPTION
        "Provide a report of FCP target LIFs general
-       information.
-       This table is available from c-mode management interfaces only."
+       information. This table is available from Clustered
+       Data ONTAP management interfaces only."
    ::= {fcpTargetLif 1}
    
    fcpTargetLifEntry          OBJECT-TYPE
@@ -28810,7 +29286,10 @@
          netportRemoteDeviceId	          DisplayString,
 	 netportIPspace                   DisplayString,
 	 netportBroadcastDomain           DisplayString,
-	 netportMtuAdmin		  INTEGER
+	 netportMtuAdmin		  INTEGER,
+         netportHealthStatus              INTEGER,
+         netportIgnoreHealthStatus        Boolean,
+         netportDegradedReason            DisplayString
 	}
 
 	netportNode				OBJECT-TYPE
@@ -29146,6 +29625,34 @@
 		 (in bytes) of the largest packet that is supported by the
 		 port."
         ::= { netportEntry 29 }
+
+
+	netportHealthStatus			OBJECT-TYPE
+	SYNTAX					INTEGER {
+                                                        healthy(0),
+                                                        degraded(1)
+                                                }
+	MAX-ACCESS				read-only
+	STATUS					current
+	DESCRIPTION
+		"The health status of the port."
+        ::= { netportEntry 30 }
+
+	netportIgnoreHealthStatus	 OBJECT-TYPE
+	SYNTAX			        Boolean
+	MAX-ACCESS				read-only
+	STATUS					current
+	DESCRIPTION
+		"The health overrided status of the port."
+        ::= { netportEntry 31 }
+
+	netportDegradedReason			OBJECT-TYPE
+	SYNTAX					DisplayString
+	MAX-ACCESS				read-only
+	STATUS					current
+	DESCRIPTION
+		"The list of reasons why the port is marked as degraded"
+        ::= { netportEntry 32 }
 
 	-- netportIfGrpTable
 
@@ -30220,6 +30727,10 @@
 		sisIsConstituent
 		    Boolean,
 		sisIsInlineDedupeEnabled
+		    Boolean,
+		sisIsDataCompactionEnabled
+		    Boolean,
+		sisIsCrossVolumeInlineDedupeEnabled
 		    Boolean
 	    }
 
@@ -30550,6 +31061,26 @@
 		the volume or not"
 
 	::= { sisEntry 32 }
+
+	sisIsCrossVolumeInlineDedupeEnabled    OBJECT-TYPE
+	SYNTAX                                 Boolean
+	MAX-ACCESS                             read-only
+	STATUS                                 current
+	DESCRIPTION
+		"Indicates whether cross volume inline deduplication is enabled
+		 on the volume or not"
+
+	::= { sisEntry 33 }
+
+	sisIsDataCompactionEnabled      OBJECT-TYPE
+	SYNTAX                          Boolean
+	MAX-ACCESS                      read-only
+	STATUS                          current
+	DESCRIPTION
+		"Indicates whether data compaction is enabled on
+		the volume or not"
+
+	::= { sisEntry 34 }
 
 	-- -- -- -- -- -- -- -- --
 	-- the compression group
@@ -30920,7 +31451,7 @@
             qosWorkloadVolume            DisplayString,
             qosWorkloadLun               DisplayString,
             qosWorkloadFile              DisplayString,
-            qosWorkloadQtree             DisplayString,
+            qosWorkloadQtree             FileOrDirectoryString,
             qosWorkloadReadAhead         DisplayString,
             qosWorkloadCache          	 DisplayString
         }
@@ -31012,7 +31543,7 @@
 
 
         qosWorkloadQtree                 OBJECT-TYPE
-        SYNTAX                           DisplayString
+        SYNTAX                           FileOrDirectoryString
         MAX-ACCESS                       read-only
         STATUS                           current
         DESCRIPTION
@@ -31061,7 +31592,8 @@
             qosPolicyGroupPgid                  Counter32,
             qosPolicyGroupClass                 INTEGER,
             qosPolicyGroupMaxThroughput         DisplayString,
-            qosPolicyGroupVserver               DisplayString
+            qosPolicyGroupVserver               DisplayString,
+	    qosPolicyGroupMinThroughput         DisplayString
         }
 
         qosPolicyGroupUuid               OBJECT-TYPE
@@ -31121,7 +31653,13 @@
                       "Vserver that the QoS Policy Group belongs to"
         ::= { qosPolicyGroupEntry  6 }
 
-
+        qosPolicyGroupMinThroughput      OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Minimum Throughput"
+        ::= { qosPolicyGroupEntry  7 }
 
     --qos  Read Ahead
     qosReadaheadSettingsTable OBJECT-TYPE
@@ -32870,9 +33408,9 @@
 	STATUS                          current
 	DESCRIPTION 
 		"This trap is issued when one plex of a mirrored 
-		traditional volume or aggregate is failed. The string 
-		sent with this trap specifies name of affected plex or
-		mirrored traditional volume or aggregate."
+		aggregate is failed. The string sent with
+		this trap specifies name of affected plex or
+		mirrored aggregate."
 	::= { netapp 0 444 }
 
 	plexOffline                     NOTIFICATION-TYPE
@@ -32881,7 +33419,7 @@
 	DESCRIPTION 
 		"This trap is issued when a plex becomes offline. 
 		The string sent with this trap specifies name of 
-		affected plex or mirrored traditional volume or aggregate."
+		affected plex or mirrored aggregate."
 	::= { netapp 0 454 }
 
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -33050,6 +33588,25 @@
 
 	::= { netapp 0 521 }
 
+	ioCardFailed			NOTIFICATION-TYPE
+	OBJECTS				{productTrapData, productSerialNum}
+	STATUS				current
+	DESCRIPTION
+		"An IO card is degraded.
+		The trap includes a string describing
+		the degraded IO card."
+
+	::= { netapp 0 525 }
+
+	ioCardOk			 NOTIFICATION-TYPE
+	OBJECTS				{productTrapData, productSerialNum}
+	STATUS				current
+	DESCRIPTION
+		"The IO card is functioning properly.
+		The trap includes a string containing the slot number
+		of the IO card."
+
+	::= { netapp 0 526 }
 
         -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
         -- New Remote Management Subsystem Traps 
@@ -33536,7 +34093,7 @@
             "A volume move has reached the cutover phase and is waiting
             for the user to trigger cutover because the user specified 
             wait for cutover-action"
-        
+
         ::= { netapp 0 737 }
 
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
@@ -33893,6 +34450,15 @@
                 "Lun relocation completed successfully"
      ::= { netapp 0 896 }
 
+     smSyncOutOfSyncWarn           NOTIFICATION-TYPE
+     OBJECTS                         {productTrapData, productSerialNum}
+     STATUS                          current
+     DESCRIPTION
+		"A synchronous granular CG relationship has
+		transitioned from in-sync to out-of-sync and
+		remained out-of-sync for longer than expected."
+     ::= { netapp 0 905 }
+
      clusterLinkDown         NOTIFICATION-TYPE
      OBJECTS                 {productTrapData, productSerialNum}
      STATUS                  current
@@ -33984,6 +34550,7 @@
 		involving a shelf power supply has been corrected."
 	::= { netapp 0 1057 }
 
+
         -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
         -- Volume Rehost traps
         -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -33996,6 +34563,27 @@
 	    under source Vserver."
 
         ::= { netapp 0 1064 }
+
+
+        -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- -- -- -- -- -
+	--
+	-- This section contains traps related to shelf voltage issues
+	--
+        -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+	sesShelfVoltageWarning	        NOTIFICATION-TYPE
+	OBJECTS				{productTrapData, productSerialNum}
+	STATUS				current
+	DESCRIPTION
+		"This message occurs when a warning condition is
+		 detected in the indicated disk shelf voltage sensor.
+		 The shelf might be able to continue operation."
+	::= { netapp 0 1065 }
+
+
+        -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+        -- Volume Rehost traps
+        -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
         volRehostSucceeded                  NOTIFICATION-TYPE
         OBJECTS                             {productTrapData, productSerialNum}
@@ -34018,12 +34606,127 @@
 
     ::= { netapp 0 1072 }
 
+
+	snmpTestTraphost                    NOTIFICATION-TYPE
+        OBJECTS                             {productTrapData, productSerialNum}
+        STATUS                              current
+        DESCRIPTION
+        "SNMP test trap  is generated."
+
+        ::= { netapp 0 1103 }
+
+
+        snmpFipsSupport                     NOTIFICATION-TYPE
+        OBJECTS                             {productTrapData, productSerialNum}
+        STATUS                              current
+        DESCRIPTION
+            "Data ONTAP is operating in FIPS compliant mode but
+            SNMPv3 is configured with non-compliant ciphers or hash algorithms.
+            Hence SNMPv3 is disabled."
+
+        ::= { netapp 0 1114 }
+
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+     --
+     -- This section contains traps when no servers are available (LDAP, NIS, AD)
+     -- Reserve trap from 112x to 115x for loss of connection related events.
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+     noNisServersAvailable   NOTIFICATION-TYPE
+     OBJECTS                 {productTrapData, productSerialNum}
+     STATUS                  current
+     DESCRIPTION
+             "None of the configured NIS servers are
+             reachable at this point of time. The string
+             sent with the trap gives the name of the
+             affected Storage Virtual Machine."
+
+     ::= { netapp 0 1121 }
+
+     noLdapServersAvailable   NOTIFICATION-TYPE
+     OBJECTS                  {productTrapData, productSerialNum}
+     STATUS                   current
+     DESCRIPTION
+             "None of the configured LDAP servers are
+             reachable at this point of time. The string
+             sent with the trap gives the name of the
+             affected Storage Virtual Machine."
+
+     ::= { netapp 0 1131 }
+
+     noLsaServersAvailable    NOTIFICATION-TYPE
+     OBJECTS                  {productTrapData, productSerialNum}
+     STATUS                   current
+     DESCRIPTION
+             "None of the configured LSA servers are
+             reachable at this point of time. The string
+             sent with the trap gives the name of the
+             affected Storage Virtual Machine."
+
+     ::= { netapp 0 1141 }
+
+     noNetlogonServersAvailable    NOTIFICATION-TYPE
+     OBJECTS                       {productTrapData, productSerialNum}
+     STATUS                        current
+     DESCRIPTION
+             "None of the configured Netlogon servers are
+             reachable at this point of time. The string
+             sent with the trap gives the name of the
+             affected Storage Virtual Machine."
+
+     ::= { netapp 0 1151 }
+
+        -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+	--
+	-- This section contains traps related to shelf dcm issues
+	--
+        -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+
+	sesShelfDcmError	NOTIFICATION-TYPE
+	OBJECTS				{productTrapData, productSerialNum}
+	STATUS				current
+	DESCRIPTION
+		"A shelf dcm is not installed or not supported."
+	::= { netapp 0 1164 }
+
+	sesShelfDcmWarn		NOTIFICATION-TYPE
+	OBJECTS				{productTrapData, productSerialNum}
+	STATUS				current
+	DESCRIPTION
+		"A shelf dcm has indicated a warning condition."
+	::= { netapp 0 1165 }
+
+
+	sesShelfDcmInfo		NOTIFICATION-TYPE
+	OBJECTS				{productTrapData, productSerialNum}
+	STATUS				current
+	DESCRIPTION
+		"A previously reported error or warning condition
+		involving a shelf dcm has been corrected."
+	::= { netapp 0 1167 }
+
+     snmpSnmpv3Enable                    NOTIFICATION-TYPE
+     OBJECTS                             {productTrapData, productSerialNum}
+     STATUS                              current
+     DESCRIPTION
+             "This message occurs when SNMPv3 is disabled due to a cluster in FIPS
+             mode being upgraded to a version of ONTAP(R) software supporting the
+             SNMPv3 FIPS feature. FIPS compliance adds more stringent limitations
+             on SNMP users and SNMP traphosts, so SNMPv3 access has been disabled
+             to allow the current SNMP users and SNMP traphosts to be reevaluated.
+             If SNMPv3 functionality is required, you can reenable it; if cluster
+             is still in FIPS mode at that time, any existing SNMP users and SNMP
+             traphosts that are noncompliant to FIPS will be deleted. Until SNMPv3
+             is reenabled, SNMPv3 users cannot be created, SNMPv3 traphosts cannot
+             be added and SNMPv3 packets will not be processed."
+     ::= { netapp 0 1194 }
+
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 	-- End of NetApp trap definitions
 	--
 	-- Note: Please update this comment when adding a new NOTIFICATION-TYPE.
-	--       The next trap set range should be: 112x
-	-- 
+	--       The next trap set range should be: 117x
+	--
         --       The 10xxx trap range is used by DataFabric Manager
         --           (netappDataFabricManager) see the DFM MIB for further
         --           information.

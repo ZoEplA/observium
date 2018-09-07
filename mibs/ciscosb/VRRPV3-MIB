@@ -19,15 +19,15 @@ VRRPV3-MIB DEFINITIONS ::= BEGIN
 
    vrrpv3MIB  MODULE-IDENTITY
         LAST-UPDATED "201006090000Z"         -- June 9, 2010
-        ORGANIZATION "Cisco Small Business"
+        ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
         "Postal: 170 West Tasman Drive
         San Jose , CA 95134-1706
         USA
 
-        Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-        Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
         DESCRIPTION
             "This MIB describes objects used for managing Virtual

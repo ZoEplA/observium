@@ -8,17 +8,17 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 include_once($config['html_dir']."/includes/graphs/common.inc.php");
 
-$colours      = "mixed";
+$colours      = "mixed-q12";
 $nototal      = (($width<224) ? 1 : 0);
-$unit_text    = "nano second";
+$unit_text    = "IOPs";
 $nototal      = "true";
-$multiplier   = "1000000";
+//$multiplier   = "1000000";
 $rrd_filename = get_rrd_path($device, "app-ioping-".$app['app_instance'].".rrd");
 $array        = array(
                       'reqps' => array('descr' => 'I/O Requests per second'),

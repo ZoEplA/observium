@@ -9,7 +9,7 @@
  * @package    observium
  * @subpackage syslog
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -26,6 +26,9 @@ $config['profile_sql'] = FALSE;
 $rules = cache_syslog_rules();
 $device_rules = cache_syslog_rules_assoc();
 $maint = cache_alert_maintenance();
+$cur_config = $config['time']['now'];
+
+$_SESSION['userlevel'] = 10; // Hardcode this to max to ensure links and the like are created
 
 $i = 1;
 
@@ -60,23 +63,51 @@ while ($line = fgets($s))
       exit(1);
     }
   }
-  if ($new_rules > $cur_rules)
+  else if ($new_rules > $cur_rules)
   {
     $cur_rules = $new_rules;
     $rules = cache_syslog_rules();
     $device_rules = cache_syslog_rules_assoc();
     $maint = cache_alert_maintenance();
 
-    // logfile('debug.log', "Rules updated: ".$new_rules);
+    if ($config['syslog']['debug'])
+    {
+      logfile('debug.log', "Rules updated: ".$new_rules);
+    }
   }
 
 
   // host || facility || priority || level || tag || timestamp || msg || program
-  $entry = array(); // Init!!!
-  list($entry['host'], $entry['facility'], $entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']) = explode("||", trim($line));
-  process_syslog($entry, 1);
-  unset($entry, $line);
+  process_syslog($line, 1);
+  unset($line);
 
+  // Check if syslog config changed
+  $new_config = get_obs_attrib('syslog_config_changed');
+
+  if (empty($new_config))
+  {
+    // Never changed
+  }
+  else if ($new_config > $cur_config)
+  {
+    $cur_config = $new_config;
+
+    // Reload config changed
+    load_sqlconfig($config);
+
+    if ($config['syslog']['debug'])
+    {
+      logfile('debug.log', "Syslog config changed: ".$new_config);
+      //logfile('debug.log', var_export($config['syslog']['filter'], TRUE));
+    }
+    if (!$config['enable_syslog'])
+    {
+      // Disabled during update
+      exit(0);
+    }
+  }
+
+  // What is do this? :O
   $i++;
 
   if($i > 10)

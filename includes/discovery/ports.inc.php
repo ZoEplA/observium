@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -54,11 +54,19 @@ print_cli(count($ports_db)." ports".PHP_EOL);
 print_cli_data_field("Discovering ports", 3);
 
 $table_rows = array();
+$ports_insert = array();
 
 // New interface detection
 foreach ($port_stats as $ifIndex => $port)
 {
   $port['ifIndex'] = $ifIndex;
+
+  // Fix ord (UTF-8) chars, ie:
+  // ifAlias.3 = Conexi<F3>n de <E1>rea local* 3
+  foreach (array('ifAlias', 'ifDescr', 'ifName') as $oid_fix)
+  {
+    if (isset($port[$oid_fix])) { $port[$oid_fix] = snmp_fix_string($port[$oid_fix]); }
+  }
 
   $table_row = array($ifIndex, truncate($port['ifDescr'], 30), $port['ifName'], truncate($port['ifAlias'], 20), $port['ifType'], $port['ifOperStatus']);
   // Check the port against our filters.
@@ -71,9 +79,18 @@ foreach ($port_stats as $ifIndex => $port)
       process_port_label($port, $device); // Process ifDescr if needed
       $table_row[1] = truncate($port['ifDescr'], 30);
 
-      $port_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifAlias' => $port['ifAlias'], 'ifDescr' => $port['ifDescr'], 'ifName' => $port['ifName'], 'ifType' => $port['ifType']), 'ports');
-      $ports_db[$ifIndex] = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ifIndex));
-      echo(" ".$port['ifName']."(".$ifIndex.")[".$ports_db[$ifIndex]['port_id']."]");
+      $ports_insert[] = array('device_id' => $device['device_id'],
+                              'ifIndex'  => $ifIndex,
+                              'ifAlias'  => $port['ifAlias'],
+                              'ifDescr'  => $port['ifDescr'],
+                              'ifName'   => $port['ifName'],
+                              'ifType'   => $port['ifType'],
+                              'ignore'   => isset($port['ignore']) ? $port['ignore'] : '0',
+                              'disabled' => isset($port['disabled']) ? $port['disabled'] : '0',
+      );
+      //$port_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex, 'ifAlias' => $port['ifAlias'], 'ifDescr' => $port['ifDescr'], 'ifName' => $port['ifName'], 'ifType' => $port['ifType']), 'ports');
+      //$ports_db[$ifIndex] = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device['device_id'], $ifIndex));
+      echo(" ".$port['ifDescr']."(".$ifIndex.")");
     }
     else if ($ports_db[$ifIndex]['deleted'] == "1")
     {
@@ -85,7 +102,7 @@ foreach ($port_stats as $ifIndex => $port)
       echo(".");
     }
     // We've seen it. Remove it from the cache.
-    unset($ports_l[$ifIndex]);
+    unset($ports_db_l[$ifIndex]);
   } else {
     $table_row[] = '%ryes%n';
     if (is_array($ports_db[$port['ifIndex']])) {
@@ -101,11 +118,16 @@ foreach ($port_stats as $ifIndex => $port)
   }
   $table_rows[] = $table_row;
 }
+
+if (count($ports_insert))
+{
+  dbInsertMulti($ports_insert, 'ports');
+}
 // End New interface detection
 
 // Interface Deletion
 // If it's in our $ports_l list, that means it's not been seen. Mark it deleted.
-foreach ($ports_l as $ifIndex => $port_id)
+foreach ($ports_db_l as $ifIndex => $port_id)
 {
   if ($ports_db[$ifIndex]['deleted'] == "0")
   {
@@ -121,10 +143,6 @@ $table_headers = array('%WifIndex%n', '%WifDescr%n', '%WifName%n', '%WifAlias%n'
 print_cli_table($table_rows, $table_headers);
 
 // Clear Variables Here
-unset($port_stats);
-unset($ports_db);
-unset($ports_db_db);
-unset($table_rows);
-unset($table_headers);
+unset($port_stats, $ports_db, $ports_db_l, $ports_insert, $table_rows, $table_headers);
 
 // EOF

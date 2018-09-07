@@ -7,14 +7,14 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 // EtherLike-MIB functions
 
 // Process in main ports loop
-function process_port_etherlike(&$this_port, $device)
+function process_port_etherlike(&$this_port, $device, $port)
 {
   // Used to loop below for StatsD
   $etherlike_oids = array(
@@ -37,18 +37,18 @@ function process_port_etherlike(&$this_port, $device)
     rrdtool_update_ng($device, 'port-dot3', array(
       'AlignmentErrors'           => $this_port['dot3StatsAlignmentErrors'],
       'FCSErrors'                 => $this_port['dot3StatsFCSErrors'],
-      'SingleCollisionFram'     => $this_port['dot3StatsSingleCollisionFrames'],
-      'MultipleCollisionFr'   => $this_port['dot3StatsMultipleCollisionFrames'],
+      'SingleCollisionFram'       => $this_port['dot3StatsSingleCollisionFrames'],
+      'MultipleCollisionFr'       => $this_port['dot3StatsMultipleCollisionFrames'],
       'SQETestErrors'             => $this_port['dot3StatsSQETestErrors'],
-      'DeferredTransmissio'     => $this_port['dot3StatsDeferredTransmissions'],
+      'DeferredTransmissio'       => $this_port['dot3StatsDeferredTransmissions'],
       'LateCollisions'            => $this_port['dot3StatsLateCollisions'],
       'ExcessiveCollisions'       => $this_port['dot3StatsExcessiveCollisions'],
-      'InternalMacTransmit' => $this_port['dot3StatsInternalMacTransmitErrors'],
+      'InternalMacTransmit'       => $this_port['dot3StatsInternalMacTransmitErrors'],
       'CarrierSenseErrors'        => $this_port['dot3StatsCarrierSenseErrors'],
       'FrameTooLongs'             => $this_port['dot3StatsFrameTooLongs'],
-      'InternalMacReceiveE'  => $this_port['dot3StatsInternalMacReceiveErrors'],
+      'InternalMacReceiveE'       => $this_port['dot3StatsInternalMacReceiveErrors'],
       'SymbolErrors'              => $this_port['dot3StatsSymbolErrors'],
-    ), get_port_rrdindex($this_port));
+    ), get_port_rrdindex($port));
 
     if ($GLOBALS['config']['statsd']['enable'] == TRUE)
     {

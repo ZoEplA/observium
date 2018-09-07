@@ -34,8 +34,10 @@ IMPORTS
         FROM SNMPv2-TC
     mwConfiguration
         FROM MERU-SMI
+    MwlProfileOwner,
     MwlEnableDisableOption,
     MwlDataplaneMode,
+    MwlBridgedVlanType,
     MwlOnOffSwitch,
     MwlIfAdministrativeState,
     MwlOperationalState
@@ -74,9 +76,19 @@ IMPORTS
        mwPortProfileName                                           DisplayString(SIZE (1..32)),
        mwPortProfileState                                          MwlEnableDisableOption,
        mwPortProfileVlanName                                       DisplayString(SIZE (0..32)),
-       mwPortProfileApVlanTag                                      Unsigned32,
+       mwPortProfileVlanTrunk                                      MwlEnableDisableOption,
+       mwPortProfileIPv6Bridging                                   MwlOnOffSwitch,
        mwPortProfileDataplaneMode                                  MwlDataplaneMode,
+       mwPortProfilePortApVlanTag                                  Unsigned32,
        mwPortProfileAllowMulticast                                 MwlOnOffSwitch,
+       mwPortProfileIpPrefixLookup                                 MwlOnOffSwitch,
+       mwPortProfilePortApVlanPolicy                               MwlBridgedVlanType,
+       mwPortProfileSecurityProfileName                            DisplayString(SIZE (0..32)),
+       mwPortProfileReconnectPrimaryServer                         Integer32(5..60),
+       mwPortProfileAccountingInterimInterval                      Unsigned32,
+       mwPortProfilePrimaryAccountingRadiusName                    DisplayString,
+       mwPortProfileSecondaryAccountingRadiusName                  DisplayString,
+       mwPortProfileOwner                                          MwlProfileOwner,
        mwPortProfileRowStatus                                      RowStatus 
   }
    
@@ -113,14 +125,6 @@ IMPORTS
          "This object describes Dataplane Mode"
     ::= { mwPortProfileEntry    4 }
 
-  mwPortProfileApVlanTag  OBJECT-TYPE
-    SYNTAX Unsigned32
-    MAX-ACCESS read-create
-    STATUS     current
-    DESCRIPTION
-         "This object describes AP VLAN Tag"
-    ::= { mwPortProfileEntry    5 }
-
   mwPortProfileVlanName  OBJECT-TYPE
     SYNTAX DisplayString(SIZE (0..32))
     MAX-ACCESS read-create
@@ -137,13 +141,101 @@ IMPORTS
          "This object describes Allow Multicast Flag"
     ::= { mwPortProfileEntry    7 }
 
+  mwPortProfileIPv6Bridging  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Bridging"
+    ::= { mwPortProfileEntry    8 }
+
+  mwPortProfileSecurityProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Security Profile Name"
+    ::= { mwPortProfileEntry   10 }
+
+  mwPortProfilePrimaryAccountingRadiusName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary RADIUS Accounting Server"
+    ::= { mwPortProfileEntry   11 }
+
+  mwPortProfileSecondaryAccountingRadiusName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary RADIUS Accounting Server"
+    ::= { mwPortProfileEntry   12 }
+
+  mwPortProfileAccountingInterimInterval  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Accounting Interim Interval (seconds)"
+    ::= { mwPortProfileEntry   13 }
+
+  mwPortProfileIpPrefixLookup  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Prefix Validation"
+    ::= { mwPortProfileEntry   14 }
+
+  mwPortProfilePortApVlanPolicy  OBJECT-TYPE
+    SYNTAX MwlBridgedVlanType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Policy"
+    ::= { mwPortProfileEntry   15 }
+
+  mwPortProfilePortApVlanTag  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Tag"
+    ::= { mwPortProfileEntry   16 }
+
+  mwPortProfileVlanTrunk  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VlanTrunk"
+    ::= { mwPortProfileEntry   17 }
+
+  mwPortProfileOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwPortProfileEntry   18 }
+
+  mwPortProfileReconnectPrimaryServer  OBJECT-TYPE
+    SYNTAX Integer32(5..60)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Reconnect Primary Server (minutes)"
+    ::= { mwPortProfileEntry   19 }
+
   mwPortProfileRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwPortProfileEntry 10 }
+    ::= { mwPortProfileEntry 27 }
 
   mwPortApTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwPortApEntry

@@ -10,7 +10,7 @@ IMPORTS
         FROM NETSCREEN-SMI
     Counter32, Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
         FROM SNMPv2-SMI
-    DisplayString
+    DisplayString,PhysAddress
         FROM SNMPv2-TC
     ;
 
@@ -101,7 +101,7 @@ NsRpVsdInterfaceEntry ::= SEQUENCE
     nsrpVsdIfGateway       IpAddress,
     nsrpVsdIfName          DisplayString,
     nsrpVsdIfVLAN          Integer32,
-    nsrpVsdIfMAC           DisplayString,
+    nsrpVsdIfMAC           PhysAddress,
     nsrpVsdIfVSys          DisplayString,
     nsrpVsdIfMngTelnet     INTEGER,
     nsrpVsdIfMngSCS        INTEGER,
@@ -118,8 +118,8 @@ NsrpClusterEntry ::= SEQUENCE
 {
     nsrpClusterTblIndex    Integer32,
     nsrpClusterUnitId      Integer32,
-    nsrpClusterUnitCtrlMac DisplayString,
-    nsrpClusterUnitDataMac DisplayString
+    nsrpClusterUnitCtrlMac PhysAddress,
+    nsrpClusterUnitDataMac PhysAddress
 }
 
 NsrpLinkInfoEntry ::= SEQUENCE
@@ -127,7 +127,7 @@ NsrpLinkInfoEntry ::= SEQUENCE
     nsrpLinkInfoIndex    Integer32,
     nsrpLinkInfoLinkType INTEGER,
     nsrpLinkInfoChannel  DisplayString,
-    nsrpLinkInfoMac      DisplayString,
+    nsrpLinkInfoMac      PhysAddress,
     nsrpLinkInfoState    INTEGER
 }
 
@@ -526,7 +526,7 @@ nsrpVsdIfVLAN OBJECT-TYPE
     ::= { nsrpVsdInterfaceEntry 8 }
 
 nsrpVsdIfMAC OBJECT-TYPE
-    SYNTAX        DisplayString (SIZE(0..32))
+    SYNTAX        PhysAddress
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
@@ -1094,7 +1094,7 @@ nsrpClusterUnitId OBJECT-TYPE
     ::= { nsrpClusterEntry 2 }
 
 nsrpClusterUnitCtrlMac OBJECT-TYPE
-    SYNTAX        DisplayString (SIZE(0..16))
+    SYNTAX        PhysAddress
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
@@ -1102,7 +1102,7 @@ nsrpClusterUnitCtrlMac OBJECT-TYPE
     ::= { nsrpClusterEntry 3 }
 
 nsrpClusterUnitDataMac OBJECT-TYPE
-    SYNTAX        DisplayString (SIZE(0..16))
+    SYNTAX        PhysAddress
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
@@ -1159,7 +1159,7 @@ nsrpLinkInfoChannel OBJECT-TYPE
     ::= { nsrpLinkInfoEntry 3 }
 
 nsrpLinkInfoMac OBJECT-TYPE
-    SYNTAX        DisplayString (SIZE(0..16))
+    SYNTAX        PhysAddress
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION

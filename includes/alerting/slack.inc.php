@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage alerting
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -34,37 +34,47 @@ $data = array("username" => $endpoint['username'],
               //"text"     => $title,
         );
 
-$data['attachments'][] = array('fallback'   => $message_tags['TITLE'],
-                               //'pretext'    => "Observium Alert Notification",
-                               'title'      => $message_tags['TITLE'],
-                               'title_link' => $message_tags['ALERT_URL'],
-                               //'text'       => simple_template('slack_text.tpl', $message_tags, array('is_file' => TRUE)),
-                               'fields' => array(array('title' => 'Device/Location',
-                                                       'value' => $message_tags['DEVICE_HOSTNAME'] . " (" . $message_tags['DEVICE_OS'] . ")" . PHP_EOL . $message_tags['DEVICE_LOCATION'],
-                                                       'short' => TRUE),
-                                                 array('title' => 'Entity',
-                                                       'value' => $message_tags['ENTITY_TYPE'] . " / " . $message_tags['ENTITY_NAME'] .
-                                                                  (isset($message_tags['ENTITY_DESCRIPTION']) ? PHP_EOL . $message_tags['ENTITY_DESCRIPTION'] : ''),
-                                                       'short' => TRUE),
-                                                 array('title' => 'Alert Message/Duration',
-                                                       'value' => $message_tags['ALERT_MESSAGE'] . PHP_EOL . $message_tags['DURATION'],
-                                                       'short' => TRUE),
-                                                 array('title' => 'Metrics',
-                                                       'value' => str_replace("             ", "", $message_tags['METRICS']),
-                                                       'short' => TRUE),
-                                                ),
-                               'color' => $color);
-
-/*
-foreach ($graphs as $graph)
+if($endpoint['short'] == 'true')
 {
-    $data['attachments'][] = array('fallback' => "Graph Image",
-      'title' => $graph['label'],
-      'image_url' => $graph['url'],
-      'color' => 'danger');
+  $data['attachments'][] = array('fallback'   => $message_tags['TITLE'],
+    //'pretext'    => "Observium Alert Notification",
+                                 'title'      => $message_tags['TITLE'],
+                                 'title_link' => $message_tags['ALERT_URL'],
+                                 'color'      => $color);
+} else {
+  $data['attachments'][] = array('fallback'   => $message_tags['TITLE'],
+    //'pretext'    => "Observium Alert Notification",
+                                 'title'      => $message_tags['TITLE'],
+                                 'title_link' => $message_tags['ALERT_URL'],
+    //'text'       => simple_template('slack_text.tpl', $message_tags, array('is_file' => TRUE)),
+                                 'fields'     => array(array('title' => 'Device/Location',
+                                                             'value' => $message_tags['DEVICE_HOSTNAME'] . " (" . $message_tags['DEVICE_OS'] . ")" . PHP_EOL . $message_tags['DEVICE_LOCATION'],
+                                                             'short' => TRUE),
+                                   array('title' => 'Entity',
+                                         'value' => $message_tags['ENTITY_TYPE'] . " / " . $message_tags['ENTITY_NAME'] .
+                                           (isset($message_tags['ENTITY_DESCRIPTION']) ? PHP_EOL . $message_tags['ENTITY_DESCRIPTION'] : ''),
+                                         'short' => TRUE),
+                                   array('title' => 'Alert Message/Duration',
+                                         'value' => $message_tags['ALERT_MESSAGE'] . PHP_EOL . $message_tags['DURATION'],
+                                         'short' => TRUE),
+                                   array('title' => 'Metrics',
+                                         'value' => str_replace("             ", "", $message_tags['METRICS']),
+                                         'short' => TRUE),
+                                 ),
+                                 'color'      => $color);
+
+  /*
+  foreach ($graphs as $graph)
+  {
+      $data['attachments'][] = array('fallback' => "Graph Image",
+        'title' => $graph['label'],
+        'image_url' => $graph['url'],
+        'color' => 'danger');
+
+  }
+  */
 
 }
-*/
 
 $data_string = json_encode($data);
 

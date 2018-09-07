@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- DESCRIPTION:  HUAWEI-AAA-MIB
 -- Reference:  
--- Version: V2.52
+-- Version: V2.77
 -- History:
 --         v3.02
 --         modified by huangjun 2009-12-08
@@ -45,6 +45,31 @@
 --         modified by s00292246 2015-08-08
 --         modified by z00242837 2015-08-26
 --         modified by t00305052 2015-09-11
+--         modified by w00196787 2015-12-01
+--         modified by w00280908 2015-12-31
+--         modified by j00333366 2016-01-26
+--         modified by d00309882 2016-02-16
+--         modified by g00324876 2016-03-14
+--         modified by l00347324  2016-03-15
+--         modified by l00347174  2016-03-21
+--         modified by c00350813 2016-03-28
+--         modified by  l00351244 2016-04-05
+--         modified by  l00347324 2016-04-08
+--         modified by  d00289266 2016-04-19
+--         modified by  h00357305 2016-05-14
+--         modified by  h00350813 2016-05-18
+--         modified by  t00298981 2016-06-17
+--         modified by  l00368985 2016-06-22
+--         modified by  z00356298 2016-08-04
+--         modified by  z00347321 2016-08-12
+--         modified by  zwx349005 2016-08-26
+--         modified by  l00368985 2016-09-19
+--         modified by  zwx349005 2016-09-27
+--         modified by  d00289266 2016-09-27
+--         modified by  x00342537 2017-01-12
+--         modified by  y00377742 2017-01-16
+--         modified by  h00317426 2017-02-13
+
 -- =================================================================
 
     HUAWEI-AAA-MIB DEFINITIONS ::= BEGIN
@@ -63,7 +88,7 @@
                 FROM IPV6-TC;
 
         hwAaa MODULE-IDENTITY 
-            LAST-UPDATED "201506101250Z"
+            LAST-UPDATED "201702131843Z"
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
                 "Huawei Industrial Base
@@ -72,6 +97,95 @@
                  People's Republic of China
                  Website: http://www.huawei.com
                  Email: support@huawei.com"
+	    
+            DESCRIPTION 
+            "Modify the size of hwOfflineReason"
+                       REVISION    "201702131843Z"
+
+	    DESCRIPTION 
+            "Add hwOnlineFailNum,hwOnlineSuccessPercentage,hwUserOnlineFailAlarm"
+                       REVISION    "201701121705Z"
+
+           
+            DESCRIPTION 
+            "Add hwhttpdirectory"
+	    REVISION    "201609271140Z"    
+
+	    DESCRIPTION 
+            "Add hwLocalUserIsExpired"
+	    REVISION    "201609270940Z" 
+	    			
+           DESCRIPTION 
+                "hwOfflineRecordIPv6PDPrefixLength" 
+           REVISION    "201609191716Z"
+
+           DESCRIPTION 
+                "hwAAAAdminUserAuthenWithoutDomainName" 
+           REVISION    "201607141152Z"
+
+        DESCRIPTION 
+                "hwAAAAdminUserAuthenWithoutDomainName" 
+           REVISION    "201607061741Z"
+
+        DESCRIPTION 
+                "Add hwTotalFamilyUserByUsernameOnlineNum hwOfflineRecordStackTypeFlag hwOfflineRecordAccessPVC hwOfflineRecordIPv6NDRAPrefix hwOfflineRecordIPv6Address hwOfflineRecordIPv6PDPrefix hwOfflineRecordUserAuthenState hwOfflineRecordUserAcctState hwOfflineRecordUserAuthorState" 
+           REVISION    "201606221704Z"
+
+
+        DESCRIPTION 
+                "Add hwPortalAccessProfileLocalServerAnonymousUrl" 
+           REVISION    "201605181050Z"
+  
+        DESCRIPTION 
+                "Add hwAAAUserPwdWillExpire  hwAAAUserPwdExpired" 
+           REVISION    "201605142145Z"
+			   
+         DESCRIPTION 
+                "Add hwAccessBakeState" 
+           REVISION    "201604192145Z"
+
+         DESCRIPTION 
+                "Add hwAccessAuthorizetype" 
+           REVISION    "201604081442Z"
+
+         DESCRIPTION 
+                "Modify hwAccessIndex" 
+           REVISION    "201604051650Z"
+         DESCRIPTION 
+                "Modify hwMACAuthenAccessProfileMACAddressFormat" 
+           REVISION    "201603280950Z"
+          DESCRIPTION 
+                "Add hwReAuthenUserTable" 
+           REVISION    "201603211539Z"
+ 
+         DESCRIPTION 
+                "Modify hwAccessAuthtype" 
+           REVISION    "201603170259Z"
+
+          DESCRIPTION 
+                "Modify hwAccessIndex"              
+           REVISION    "201603151018Z"
+
+          DESCRIPTION 
+                "Modify hwAccessIPv6OtherFlag hwAccessIPv6ManagedAddressFlag "           
+           REVISION    "201603141018Z"
+
+           DESCRIPTION 
+                "Modify hwSlotConnectNumSlot hwSlotCardConnectNumSlot hwSlotAccessUserStatSlot to be compatible with device X1X2"           
+           REVISION    "201602161018Z"
+
+           DESCRIPTION 
+                "Add hwAAAPwifSlotConnectNumTable,hwAAAPwifSlotCardConnectNumTable,hwAAAPwifSlotAccessUserStatTable,hwAAAPwifAccessTable"           
+           REVISION    "201601261630Z"
+
+
+           DESCRIPTION 
+                "Add hwAAAAdminUserAuthenWithoutDomainName" 
+           REVISION    "201512310950Z"
+
+           DESCRIPTION 
+                "Modify  ServiceSchemeName,UserGroupName,PortalServerName,PortalBackupServerName in hwPortalAccessProfileTable" 
+           REVISION    "201512011418Z"
 
            DESCRIPTION 
                 "Modify  hwAccessSSID hwAccessDomain hwAccessUserName hwPortalAccessProfileDetectPeriod" 
@@ -246,6 +360,26 @@
             DESCRIPTION
             "Add hwAAASessionGroupUpperLimitThreshold, hwAAASessionGroupUpperLimitResume, hwAAASessionGroupLowerLimitThreshold, hwAAASessionGroupLowerLimitAlarm, hwAAASessionGroupLowerLimitResume, hwAAASessionUpperLimitThreshold, hwAAAOnlineSessoinUpperLimitAlarm, hwAAAOnlineSessoinUpperLimitResume, hwAAASessionLowerLimitThreshold, hwAAAOnlineSessoinLowerLimitAlarm, hwAAAOnlineSessoinLowerLimitResume, hwAAASlotOnlineUserNumAlarm,hwAAASlotOnlineUserNumResume"            
             
+            REVISION    "201606171051Z"
+            DESCRIPTION
+            "Add hwUserMaxNumResume, hwUserSlotMaxNumResume"            
+        
+            REVISION    "201607141152Z"
+            DESCRIPTION
+            "Add hwTotalAuthReqNumPortal, hwTotalAuthReqNumMac, hwTotalAuthReqNumDot1x" 
+	    
+	    REVISION    "201608121705Z" 
+	    DESCRIPTION 
+            "Add hwServiceSchemeRedirectACL"
+			
+             REVISION    "201608261030Z" 
+	    DESCRIPTION 
+            "Add hwAccessQinQVLANID,hwAccessOption82CircuitID,hwAccessOption82RemoteID,hwAccessSessionTimeout,hwAccessISPVLAN,hwAccessISPInterface,hwAccessUserNumberTable,hwAccessUserNumberEntry,hwAccessUserNumberDot1x,hwAccessUserNumberMAC,hwAccessUserNumberPortal,hwAccessUserNumberPPP,hwAccessUserNumberNone,hwAccessUserNumberStatic,hwAccessUserNumberAdmin"
+           
+           	    REVISION    "201701161705Z" 
+	    DESCRIPTION 
+            "Add hwPortalAccessProfileWebProxyEnable, hwPortalAccessProfileWebProxyPort"
+    
             ::= { huaweiMgmt 2 }
 
         hwAAAMibObjects OBJECT IDENTIFIER ::= { hwAaa 1 }
@@ -2126,7 +2260,9 @@
                 hwLocalUserPasswordIsExpired
                     INTEGER,
               hwLocalUserPasswordIsOrginal
-                    INTEGER
+                    INTEGER,
+		 hwhttpdirectory
+                    DisplayString  		
 
              }
 
@@ -2291,6 +2427,14 @@
                  DESCRIPTION
                    "Local user password is orginal."
                  ::= {  hwLocalUserEntry 22 }
+				 
+		hwhttpdirectory OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "http directory"
+            ::= { hwLocalUserEntry 23 }   		 
                         
         hwLocalUserExtTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwLocalUserExtEntry
@@ -2339,7 +2483,9 @@
                 hwLocalUserIdleTimeoutSecond
                     Integer32,
                 hwLocalUserTimeRange
-                    DisplayString                    
+                    DisplayString,
+                hwLocalUserIsExpired
+                    INTEGER
              }
 
         hwLocalUserState OBJECT-TYPE
@@ -2427,6 +2573,19 @@
             DESCRIPTION
                 "The time-range of user"
             ::= { hwLocalUserExtEntry 11 } 
+            
+        hwLocalUserIsExpired OBJECT-TYPE   
+            SYNTAX INTEGER
+            {
+                notExpired(0),
+                expired(1)               
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Local user  is expired."
+            ::= {  hwLocalUserExtEntry 12 }
+
                                                   
         hwAAASetting OBJECT IDENTIFIER ::= { hwAAAMibObjects 13 }
 
@@ -3003,7 +3162,30 @@
                  localremoteuser(2)
                 "
             ::= { hwAAASettingEntry 54 }
-            
+       
+      hwTotalAuthReqNumPortal OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "the number of AUTH num portal"
+            ::= { hwAAASettingEntry 55} 
+
+      hwTotalAuthReqNumMac OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "the number of AUTH num mac"
+            ::= { hwAAASettingEntry 56 } 
+
+      hwTotalAuthReqNumDot1x OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "the number of AUTH num Dot1x"
+            ::= { hwAAASettingEntry 57} 	   
              
         hwAAAStat OBJECT IDENTIFIER ::= { hwAAAMibObjects 14 }
 
@@ -3287,7 +3469,18 @@
             STATUS current
             DESCRIPTION
                 "the number of dhcp online fail users"
-            ::= { hwAAAStatEntry 34 }                   
+            ::= { hwAAAStatEntry 34 }    
+
+      hwTotalFamilyUserByUsernameOnlineNum OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of family users by username, counted only when the user domain has the user-max-session configuration or the RADIUS server has delivered the Port-Limit attribute, and the same username is counted only once. "
+            ::= { hwAAAStatEntry 35 }                 
+
+
+			
 
         hwAccessTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwAccessEntry
@@ -3368,17 +3561,17 @@
                 hwAccessDnPacket64
                     Counter64,
                 hwAccessCARUpCIR
-                    Integer32,
+                    Unsigned32,
                 hwAccessCARUpPIR
-                    Integer32,
+                    Unsigned32,
                 hwAccessCARUpCBS
                     Unsigned32,
                 hwAccessCARUpPBS
                     Unsigned32,
                 hwAccessCARDnCIR
-                    Integer32,
+                    Unsigned32,
                 hwAccessCARDnPIR
-                    Integer32,
+                    Unsigned32,
                 hwAccessCARDnCBS
                     Unsigned32,
                 hwAccessCARDnPBS
@@ -3432,11 +3625,23 @@
                 hwAccessDevicePortName
                     OCTET STRING,
                 hwAccessAPID     
-                    Unsigned32
+                    Unsigned32,
+                hwAccessQinQVLANID
+                    Integer32,
+                hwAccessOption82CircuitID
+                    OCTET STRING,
+                hwAccessOption82RemoteID
+                    OCTET STRING,
+                hwAccessSessionTimeout
+                    Integer32, 
+                hwAccessISPVLAN
+                    Integer32, 
+                hwAccessISPInterface
+                    OCTET STRING
              }
 
         hwAccessIndex OBJECT-TYPE
-            SYNTAX Integer32 (0..1000000)
+            SYNTAX Integer32 (0..3145727)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3688,7 +3893,7 @@
             ::= { hwAccessEntry 39 }
 
         hwAccessCARUpCIR OBJECT-TYPE
-            SYNTAX Integer32 (16..10000000)
+            SYNTAX Unsigned32 (0|16..10000000)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3696,7 +3901,7 @@
             ::= { hwAccessEntry 45 }
 
         hwAccessCARUpPIR OBJECT-TYPE
-            SYNTAX Integer32 (16..10000000)
+            SYNTAX Unsigned32 (0|16..10000000)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3704,7 +3909,7 @@
             ::= { hwAccessEntry 46 }
 
          hwAccessCARUpCBS OBJECT-TYPE
-            SYNTAX Unsigned32 (100..4294967295)
+            SYNTAX Unsigned32 (0|100..4294967295)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3713,7 +3918,7 @@
 
             
          hwAccessCARUpPBS OBJECT-TYPE
-            SYNTAX Unsigned32 (0..4294967295)
+            SYNTAX Unsigned32 (0|0..4294967295)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3721,7 +3926,7 @@
             ::= { hwAccessEntry 48 }
             
           hwAccessCARDnCIR OBJECT-TYPE
-            SYNTAX Integer32 (16..10000000)
+            SYNTAX Unsigned32 (0|16..10000000)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3729,7 +3934,7 @@
             ::= { hwAccessEntry 49 }
 
         hwAccessCARDnPIR OBJECT-TYPE
-            SYNTAX Integer32 (16..10000000)
+            SYNTAX Unsigned32 (0|16..10000000)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3737,7 +3942,7 @@
             ::= { hwAccessEntry 50 }
 
         hwAccessCARDnCBS OBJECT-TYPE
-            SYNTAX Unsigned32 (100..4294967295)
+            SYNTAX Unsigned32 (0|100..4294967295)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3746,12 +3951,13 @@
 
             
        hwAccessCARDnPBS OBJECT-TYPE
-            SYNTAX Unsigned32 (0..4294967295)
+            SYNTAX Unsigned32 (0|0..4294967295)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "down peak burst size(byte)"
             ::= { hwAccessEntry 52 }
+
 
       hwAccessDownPriority OBJECT-TYPE
             SYNTAX Integer32 (0..15|255)
@@ -3853,7 +4059,8 @@
             SYNTAX INTEGER
             {
                 ndra(1),
-                dhcpv6(2)
+                dhcpv6(2),
+                invalid(255)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -3873,7 +4080,8 @@
             SYNTAX INTEGER
             {
                 ndra(1),
-                dhcpv6(2)
+                dhcpv6(2),
+                invalid(255)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -3961,6 +4169,54 @@
                 "Access wiless device AP Id"
             ::= { hwAccessEntry 77 }
 
+       hwAccessQinQVLANID OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access QINQ VLAN ID"
+            ::= { hwAccessEntry 78 }
+			
+		hwAccessOption82CircuitID OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..256))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access Option82 CircuitID"
+            ::= { hwAccessEntry 79 }
+		
+		hwAccessOption82RemoteID OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..256))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access Option82 RemoteID"
+            ::= { hwAccessEntry 80 }
+		
+		hwAccessSessionTimeout OBJECT-TYPE
+            SYNTAX Integer32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access Session Timeout"
+            ::= { hwAccessEntry 81 }
+		
+		hwAccessISPVLAN OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access ISP VLAN"
+            ::= { hwAccessEntry 82 }
+		
+		hwAccessISPInterface OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access ISP Interface"
+            ::= { hwAccessEntry 83 }
+		
         hwAccessExtTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwAccessExtEntry
             MAX-ACCESS not-accessible
@@ -4029,7 +4285,11 @@
                     hwAccessResourceInsufficientInbound
                         Integer32,
                     hwAccessResourceInsufficientOutbound
-                        Integer32
+                        Integer32,
+                    hwAccessAuthorizetype
+                        INTEGER,
+                    hwAccessBakeState
+                        INTEGER
                  }
     
             hwAccessUCLGroup OBJECT-TYPE
@@ -4189,7 +4449,8 @@
                     fast(5),
                     wlan(6),
                     admin(7),
-                    tunnel(8)
+                    tunnel(8),
+                    mac(9)
                     }
                 MAX-ACCESS read-only
                 STATUS current
@@ -4321,7 +4582,7 @@
                 DESCRIPTION
                     "The user group"
                 ::= { hwAccessExtEntry 25 }  
-
+                                      
             hwAccessResourceInsufficientInbound OBJECT-TYPE
                 SYNTAX Integer32  (0..1)
                 MAX-ACCESS read-only
@@ -4337,7 +4598,39 @@
                 DESCRIPTION
                     "Outbound result of insufficient resource"
                 ::= { hwAccessExtEntry 27 }
-					 
+	
+            hwAccessAuthorizetype OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    running(0),
+                    preAuthen(1),
+                    clientNoResp(2),
+                    failAuthorized(3),
+                    webServerDown(4),
+                    aaaServerDown(5),
+                    sussess(6),
+                    open(7)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The user status."
+                ::= { hwAccessExtEntry 28 }
+
+            hwAccessBakeState OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                    independent(0),
+                    master(1),
+                    slave(2),
+                    switching(3)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "The user bake status."
+                ::= { hwAccessExtEntry 29 }
+				 
 					 
         hwAcctSchemeExtTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwAcctSchemeExtEntry
@@ -4906,6 +5199,30 @@
           DESCRIPTION
                 "The number of IPv6 addresses on the slot reached the threshold."
           ::= { hwAAATrapOid 37 }
+				 
+	    hwPwdVdtyLeftDays OBJECT-TYPE
+                    SYNTAX Integer32 (0..365) 
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Password validity left days"
+            ::= { hwAAATrapOid 38 }
+
+           hwOnlineFailNum OBJECT-TYPE
+                    SYNTAX Unsigned32 
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Online fail number"
+            ::= { hwAAATrapOid 39 }
+            
+        hwOnlineSuccessPercentage OBJECT-TYPE
+                    SYNTAX Unsigned32 
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Online success percentage"
+            ::= { hwAAATrapOid 40 }
 
             hwAAATrapsDefine OBJECT IDENTIFIER ::= { hwAAAMibTrap 2 }
 
@@ -5464,9 +5781,8 @@
                 2 Notice/Trap generation cause:   The number of users fell below the upper limit of the board.
                 3 Repair suggestions: NA
                 "
-            ::= { hwAAATraps 48 }  
-            
-
+            ::= { hwAAATraps 48 }  						
+				           
           hwAAATimerExpireMajorLevelAlarm NOTIFICATION-TYPE
           OBJECTS { hwAAATimerExpireMajorLevelThreshold }
           STATUS current
@@ -5579,6 +5895,50 @@
             "
          ::= { hwAAATraps 58 }  
 
+        hwAAAAdminUserAuthenWithoutDomainName NOTIFICATION-TYPE
+          STATUS current
+         DESCRIPTION
+             "
+             1 Notice/Trap name:  Performing remote authentication on administrators whose user names do not contain domain names brings security risks.
+             2 Notice/Trap generation cause:  Performing remote authentication on administrators whose user names do not contain domain names brings security risks.
+             3 Repair suggestions: Configuring the device in the admin domain to send user names with domain names to the remote authen server. 
+             "
+          ::= { hwAAATraps 59 }  
+		  		  		  		  
+        hwUserMaxNumResume NOTIFICATION-TYPE
+         OBJECTS {hwMaxUserThresholdType,hwUserSlot,hwUserSlotMaxNumThreshold}
+         STATUS current
+         DESCRIPTION
+             "
+             1 Notice/Trap name:  The number of user resources on the board or the device fell below the threshold.
+             2 Notice/Trap generation cause:  the number of the online user in this machine fell below the threshold 
+             3 Repair suggestions: NA.
+             "
+          ::= { hwAAATraps 60 } 
+          
+        hwUserSlotMaxNumResume NOTIFICATION-TYPE
+         OBJECTS { hwUserSlot,hwUserSlotMaxNumThreshold }
+         STATUS current
+         DESCRIPTION
+             "
+             1 Notice/Trap name:  The number of user resources on the board fell below the threshold.
+             2 Notice/Trap generation cause:  the number of the online user in this slot fell below the threshold 
+             3 Repair suggestions:
+                 please change to another board which can support more users.
+             "
+          ::= { hwAAATraps 61 }
+
+        hwUserOnlineFailAlarm NOTIFICATION-TYPE
+         OBJECTS { hwUserSlot, hwOnlineFailNum, hwOnlineSuccessPercentage }
+         STATUS current
+         DESCRIPTION
+             "
+             1 Notice/Trap name:  User Login Failure.
+             2 Notice/Trap generation cause:  The number of user login failures reached the number that can trigger detection and debugging. 
+             3 Repair suggestions: Collect alarm, log, and configuration information, and contact Huawei technical support personnel.
+             "
+          ::= { hwAAATraps 62 }
+          			
         hwLAMTrapsDefine OBJECT IDENTIFIER ::= { hwAAAMibTrap 3 }
 
         hwLAMTraps OBJECT IDENTIFIER ::= { hwLAMTrapsDefine 0 }
@@ -5647,7 +6007,31 @@
                     Add new IP pool to this domain .
 
                 "
-            ::= { hwLAMTraps 5 }    
+            ::= { hwLAMTraps 5 } 
+			
+	 hwAAAUserPwdWillExpire NOTIFICATION-TYPE
+            OBJECTS { hwLocalUserName,hwPwdVdtyLeftDays }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Local user password will expire
+                2 Notice/Trap generation cause:  Local user doesnot change password 
+                3 Repair suggestions:
+                    NA
+                "
+            ::= { hwLAMTraps 6 }
+			
+	 hwAAAUserPwdExpired NOTIFICATION-TYPE
+            OBJECTS { hwLocalUserName }
+            STATUS current
+            DESCRIPTION
+                "
+                1 Notice/Trap name:  Local user password had expired
+                2 Notice/Trap generation cause:  Local user doesnot change password always
+                3 Repair suggestions:
+                    NA
+                "
+            ::= { hwLAMTraps 7 }			
             
         hwCutAccessUserTable OBJECT IDENTIFIER  ::= { hwAAAMibObjects 28 }
         
@@ -6130,7 +6514,7 @@
                         }
 
                     hwSlotConnectNumSlot OBJECT-TYPE
-                        SYNTAX Integer32 (1..16)
+                        SYNTAX Integer32 (0..16)
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -6218,7 +6602,7 @@
                         }
 
                     hwSlotCardConnectNumSlot OBJECT-TYPE
-                        SYNTAX Integer32 (1..16)
+                        SYNTAX Integer32 (0..16)
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -6378,7 +6762,7 @@
                         }
 
                     hwOfflineReason OBJECT-TYPE
-                        SYNTAX Integer32 (1..600)
+                        SYNTAX Integer32 (1..65535)
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION
@@ -6686,8 +7070,9 @@
                             hwLocalAuthorize
                             	DisplayString,
                             hwRemoteAuthorize
-                            	DisplayString
-                            
+				DisplayString,
+                            hwServiceSchemeRedirectACL
+                            	DisplayString  
                         }
                         
                     hwServiceSchemeName OBJECT-TYPE
@@ -6826,7 +7211,15 @@
              	"RemoteAuthorize type:ucl-group car acl priority."
             	::= { hwServiceSchemeEntry 55 }              
                          
-        
+     
+      hwServiceSchemeRedirectACL OBJECT-TYPE 
+                SYNTAX DisplayString (SIZE (1..32))		
+        	MAX-ACCESS read-write
+        	STATUS current
+        	DESCRIPTION
+        	"RedirectAcl : HW Redirect Acl Value."
+       		::= { hwServiceSchemeEntry 56 }    
+       	     	 
         hwDhcpOpt121RouteTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwDhcpOpt121RouteEntry
             MAX-ACCESS not-accessible
@@ -7119,7 +7512,7 @@
              }
                       
         hwSlotAccessUserStatSlot OBJECT-TYPE
-            SYNTAX Integer32 (1..16)
+            SYNTAX Integer32 (0..16)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -7935,7 +8328,25 @@
                 hwOfflineRecordUserLogoutTime
                     DateAndTime,                    
                 hwOfflineRecordOfflineReason
-                    DisplayString
+                    DisplayString,
+	hwOfflineRecordStackTypeFlag
+                    DisplayString,
+	hwOfflineRecordAccessPVC
+                    DisplayString,
+	hwOfflineRecordIPv6NDRAPrefix
+                    Ipv6AddressPrefix,
+	hwOfflineRecordIPv6Address
+                    Ipv6Address,
+	hwOfflineRecordIPv6PDPrefix
+                    Ipv6AddressPrefix,
+	hwOfflineRecordUserAuthenState
+                    INTEGER,
+	hwOfflineRecordUserAcctState
+                    INTEGER,
+	hwOfflineRecordUserAuthorState
+                    INTEGER,
+                   hwOfflineRecordIPv6PDPrefixLength
+                    Integer32
                 }
 
         hwAAAOfflineIndex OBJECT-TYPE
@@ -8035,12 +8446,106 @@
                  ::= { hwAAAOfflineRecordEntry 12 }                
                  
         hwOfflineRecordOfflineReason OBJECT-TYPE
-                 SYNTAX DisplayString (SIZE(1..63))
+                 SYNTAX DisplayString (SIZE(1..80))
                  MAX-ACCESS read-only
                  STATUS current
                  DESCRIPTION
                    "The offline reason."
                  ::= { hwAAAOfflineRecordEntry 13 }	
+
+        hwOfflineRecordStackTypeFlag OBJECT-TYPE
+                 SYNTAX DisplayString (SIZE(0..32))
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user Stack type."
+                 ::= { hwAAAOfflineRecordEntry 14 }
+		 
+         hwOfflineRecordAccessPVC OBJECT-TYPE
+                 SYNTAX DisplayString (SIZE(1..63))
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user PVC."
+                 ::= { hwAAAOfflineRecordEntry 15 }   
+		 
+        hwOfflineRecordIPv6NDRAPrefix OBJECT-TYPE
+                 SYNTAX Ipv6AddressPrefix
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user ipv6 NDRA prefix."
+                 ::= { hwAAAOfflineRecordEntry 16 }
+
+        hwOfflineRecordIPv6Address OBJECT-TYPE
+                 SYNTAX Ipv6Address
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user ipv6 address."
+                 ::= { hwAAAOfflineRecordEntry 17 }
+        
+        hwOfflineRecordIPv6PDPrefix OBJECT-TYPE
+                 SYNTAX Ipv6AddressPrefix
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user ipv6 PD prefix."
+                 ::= { hwAAAOfflineRecordEntry 18 }
+	
+       hwOfflineRecordUserAuthenState OBJECT-TYPE
+                 SYNTAX INTEGER
+                 {
+                     authIdle(0),
+                     authWait(1),
+                     authed(2),
+                     unknown(255)
+                 }
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user authentication state."
+                 ::= { hwAAAOfflineRecordEntry 19 }
+                 
+        hwOfflineRecordUserAcctState OBJECT-TYPE
+                 SYNTAX INTEGER
+                 {
+                     acctIdle(3),
+                     acctReady(4),
+                     acctStartWait(5),
+                     acctAccting(6),
+                     acctLeavingFlowQuery(7),
+                     acctStopWait(8),
+                     acctSendForceStopWait(12),
+                     unknown(255)
+                 }
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user accounting state."
+                 ::= { hwAAAOfflineRecordEntry 20 }
+                 
+        hwOfflineRecordUserAuthorState OBJECT-TYPE
+                 SYNTAX INTEGER
+                 {
+                     authorIdle(9),
+                     authorUserAckWait(10),
+                     authorServerAckWait(11),
+                     unknown(255)
+                 }
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                   "The user authorizatoin state."
+                 ::= { hwAAAOfflineRecordEntry 21 }	
+
+        hwOfflineRecordIPv6PDPrefixLength OBJECT-TYPE
+                 SYNTAX Integer32 (0..128)
+                 MAX-ACCESS read-only
+                 STATUS current
+                 DESCRIPTION
+                 "The user ipv6 PD prefix length."
+                 ::= { hwAAAOfflineRecordEntry 22}
 
         hwGlobalDhcpOpt64SepAndSeg OBJECT-TYPE
             SYNTAX DisplayString (SIZE (1..5))
@@ -9132,7 +9637,7 @@
             ::= { userAuthenProfileEntry 48 }
 		
 		userAuthenProfileAuthenticationMaxUser OBJECT-TYPE    
-        	SYNTAX Integer32 (1..128)
+        	SYNTAX Integer32 (1..512)
         	MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -9587,7 +10092,12 @@
         		macAddressWithoutHyphen(1),
         		macAddressWithHyphen(2),
         		fixed(3),
-        		option(4)
+        		option(4),
+        		macAddressWithHyphenNormal(5),
+        		macAddressWithoutHyphenUpper(6),
+        		macAddressWithHyphenUpper(7),
+                                      macAddressWithHyphenNormalUpper(8)
+
         	}
             MAX-ACCESS read-create
             STATUS current
@@ -9742,7 +10252,13 @@
 				hwPortalAccessProfileRowStatus         
 					RowStatus,
 			        hwPortalAccessProfilePortalBackupServerName      
-					DisplayString
+					DisplayString,
+                                                                 hwPortalAccessProfileLocalServerAnonymousUrl
+                                                                                                OCTET STRING,
+                                                                                hwPortalAccessProfileWebProxyEnable
+                                                                                                      TruthValue,
+                                                                                hwPortalAccessProfileWebProxyPort
+                                                                                                       Integer32 
 			}
 			
         hwPortalAccessProfileName OBJECT-TYPE
@@ -9762,7 +10278,7 @@
             ::= { hwPortalAccessProfileEntry 2 }  
                         
 		hwPortalAccessProfilePortalServerDownServiceSchemeName OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (1..32))
+			SYNTAX OCTET STRING (SIZE (0..32))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -9770,7 +10286,7 @@
             ::= { hwPortalAccessProfileEntry 3 }
               
 		hwPortalAccessProfilePortalServerDownUserGroupName OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (1..64))
+			SYNTAX OCTET STRING (SIZE (0..64))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -9818,7 +10334,7 @@
             ::= { hwPortalAccessProfileEntry 9 }
              
             hwPortalAccessProfilePortalServerName OBJECT-TYPE
-            SYNTAX DisplayString (SIZE(1..31))
+            SYNTAX DisplayString (SIZE(0..31))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -9863,12 +10379,36 @@
             ::= { hwPortalAccessProfileEntry 14 } 
         
 	    hwPortalAccessProfilePortalBackupServerName OBJECT-TYPE
-            SYNTAX DisplayString (SIZE(1..31))
+            SYNTAX DisplayString (SIZE(0..31))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "The portal backup server name."
             ::= { hwPortalAccessProfileEntry 15 }
+
+	    hwPortalAccessProfileLocalServerAnonymousUrl OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..200))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The portal local-server anonymouse url."
+            ::= { hwPortalAccessProfileEntry 16 }
+
+        hwPortalAccessProfileWebProxyEnable OBJECT-TYPE
+			SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The portal server web proxy."
+            ::= { hwPortalAccessProfileEntry 17 }  
+                        
+        hwPortalAccessProfileWebProxyPort OBJECT-TYPE
+			SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The portal server web proxy port."
+            ::= { hwPortalAccessProfileEntry 18 }
 
 		--  ============== hwAAAInboundVPNAccessUserStatTable ============== 
         hwAAAInboundVPNAccessUserStatTable OBJECT-TYPE
@@ -10109,7 +10649,1060 @@
                 "The row administration status, only supporting add or delete."
             ::= { userAuthenticationFreeRuleExtEntry 14 } 
 	    -- =============== FreeRule Extend End =================
-                                                           
+                 
+--===pwif begin===
+       
+        hwAAAPwifSlotConnectNumTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAAAPwifSlotConnectNumEntry
+            MAX-ACCESS not-accessible
+            STATUS current 
+            DESCRIPTION
+                "slot connect number table"
+            ::= { hwAAAMibObjects 69 }
+        
+            hwAAAPwifSlotConnectNumEntry OBJECT-TYPE
+                  SYNTAX HwAAAPwifSlotConnectNumEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "Slot Query Online Number Entry
+                            "
+                        INDEX { hwAAAPwifSlotConnectNumSlot }
+                        ::= { hwAAAPwifSlotConnectNumTable 1 }
+        
+                    HwAAAPwifSlotConnectNumEntry ::=
+                        SEQUENCE { 
+                            hwAAAPwifSlotConnectNumSlot
+                                OCTET STRING,
+                            hwAAAPwifSlotConnectNumOnlineNum
+                                Integer32,
+                            hwAAAPwifSlotConnectNumMaxOnlineNum
+                                Integer32,
+                            hwAAAPwifSlotConnectNumMaxOnlineAcctReadyNum
+                                Integer32                  
+                        }
+
+                    hwAAAPwifSlotConnectNumSlot OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (1..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Slot"
+                        ::= { hwAAAPwifSlotConnectNumEntry 1 }
+
+
+                    hwAAAPwifSlotConnectNumOnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online number"
+                        ::= { hwAAAPwifSlotConnectNumEntry 2 }
+                        
+                    hwAAAPwifSlotConnectNumMaxOnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Max Online number"
+                        ::= { hwAAAPwifSlotConnectNumEntry 3 }   
+                    hwAAAPwifSlotConnectNumMaxOnlineAcctReadyNum OBJECT-TYPE
+                       SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Max slot acct ready online number"
+                        ::= { hwAAAPwifSlotConnectNumEntry 4 }                             
+            
+         hwAAAPwifSlotCardConnectNumTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAAAPwifSlotCardConnectNumEntry
+            MAX-ACCESS not-accessible
+            STATUS current 
+            DESCRIPTION
+                "slot card connect number table"
+            ::= { hwAAAMibObjects 70 }
+        
+            hwAAAPwifSlotCardConnectNumEntry OBJECT-TYPE
+                  SYNTAX HwAAAPwifSlotCardConnectNumEntry
+                  MAX-ACCESS not-accessible
+                  STATUS current
+                  DESCRIPTION
+                            "Slot Card Query Online Number Entry
+                            "
+                        INDEX { hwAAAPwifSlotCardConnectNumSlot, hwAAAPwifSlotCardConnectNumCard }
+                        ::= { hwAAAPwifSlotCardConnectNumTable 1 }
+        
+                    HwAAAPwifSlotCardConnectNumEntry ::=
+                        SEQUENCE { 
+                            hwAAAPwifSlotCardConnectNumSlot
+                                OCTET STRING,
+                            hwAAAPwifSlotCardConnectNumCard
+                                Integer32,                              
+                            hwAAAPwifSlotCardConnectNumOnlineNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumIPv4OnlineNum
+                                Integer32,                  
+                            hwAAAPwifSlotCardConnectNumIPv6OnlineNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumDualOnlineNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumNoAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumPPPAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNum8021xAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumWebAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumBindAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumFastAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumWlanAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumAdminAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumTunnelAuthNum
+                                Integer32,
+                            hwAAAPwifSlotCardConnectNumMIPAuthNum
+                                Integer32
+                                                                              
+                        }
+
+                    hwAAAPwifSlotCardConnectNumSlot OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (1..16))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Slot"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 1 }
+                    
+                    hwAAAPwifSlotCardConnectNumCard OBJECT-TYPE
+                        SYNTAX Integer32 
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "User Card"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 2 }
+
+                    hwAAAPwifSlotCardConnectNumOnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 3 }    
+                        
+                    hwAAAPwifSlotCardConnectNumIPv4OnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online Ipv4 user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 4 }    
+                    
+                    hwAAAPwifSlotCardConnectNumIPv6OnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online Ipv6 user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 5 }    
+                    
+                    hwAAAPwifSlotCardConnectNumDualOnlineNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online Dual-stack user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 6 }    
+                    
+                    hwAAAPwifSlotCardConnectNumNoAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online no authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 7 }
+                        
+                    hwAAAPwifSlotCardConnectNumPPPAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online PPP authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 8 }
+                        
+                    hwAAAPwifSlotCardConnectNum8021xAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online 802.1x authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 9 }
+                    
+                    hwAAAPwifSlotCardConnectNumWebAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online web authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 10 }
+                    
+                    hwAAAPwifSlotCardConnectNumBindAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online bind authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 11 }
+                    
+                    hwAAAPwifSlotCardConnectNumFastAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online fast authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 12 }    
+                    
+                    hwAAAPwifSlotCardConnectNumWlanAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online wlan authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 13 }    
+                    
+                    hwAAAPwifSlotCardConnectNumAdminAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online admin authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 14 }    
+                    
+                    hwAAAPwifSlotCardConnectNumTunnelAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online tunnel authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 15 }    
+                    
+                    hwAAAPwifSlotCardConnectNumMIPAuthNum OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                            "Online MIP authentication user number"
+                        ::= { hwAAAPwifSlotCardConnectNumEntry 16 }    
+                                       
+            
+ hwAAAPwifSlotAccessUserStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAAAPwifSlotAccessUserStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwAAAPwifInterfaceAccessUserStatTable"
+            ::= { hwAAAMibObjects 71 }     
+            
+        hwAAAPwifSlotAccessUserStatEntry OBJECT-TYPE
+            SYNTAX HwAAAPwifSlotAccessUserStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "HwAAAPwifSlotAccessUserStatEntry"
+            INDEX { hwUserType, hwAAAPwifSlotAccessUserStatSlot }
+            ::= { hwAAAPwifSlotAccessUserStatTable 1 }
+                                                 
+        HwAAAPwifSlotAccessUserStatEntry ::=
+            SEQUENCE {
+                hwAAAPwifSlotAccessUserStatSlot                   OCTET STRING,
+                hwAAAPwifSlotAccessUserStatUserStat               Integer32
+             }
+                      
+        hwAAAPwifSlotAccessUserStatSlot OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "hwAAAPwifSlotAccessUserStatSlot"
+            ::= { hwAAAPwifSlotAccessUserStatEntry 1 }
+                                                          
+        hwAAAPwifSlotAccessUserStatUserStat OBJECT-TYPE
+            SYNTAX Integer32 (0..256000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "hwAAAPwifSlotAccessUserStatUserStat"
+            ::= { hwAAAPwifSlotAccessUserStatEntry 2 }
+
+      hwAAAPwifAccessTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAAAPwifAccessEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "access table"
+            ::= { hwAAAMibObjects 72 }
+
+        hwAAAPwifAccessEntry OBJECT-TYPE
+            SYNTAX HwAAAPwifAccessEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "access entry
+
+                The access table is used to query the property of online users. The index item node is hwAccessIndex.
+                Notice: Read operation is not allowed for all the items in this table.
+                1. The index of hwAAAPwifAccessTable also uses hwAccessIndex, get operation only 
+                    supports the standard get operation with hwAccessIndex as its index.
+                2. To prevent too much interaction, get next operation does use the standard operation that uses hwAccessIndex as its index.
+                "
+            INDEX { hwAAAPwifAccessIndex }
+            ::= { hwAAAPwifAccessTable 1 }
+
+        HwAAAPwifAccessEntry ::=
+            SEQUENCE {
+                hwAAAPwifAccessIndex
+                    Integer32,
+                hwAAAPwifAccessUserName
+                    DisplayString,
+                hwAAAPwifAccessPortType
+                    INTEGER,
+                hwAAAPwifAccessPriority
+                    Integer32,
+                hwAAAPwifAccessSlotNo
+                    OCTET STRING,
+                hwAAAPwifAccessSubSlotNo
+                    Integer32,
+                hwAAAPwifAccessPortNo
+                    Integer32,
+                hwAAAPwifAccessVLANID
+                    Integer32,
+                hwAAAPwifAccessPVC
+                    Integer32,
+                hwAAAPwifAccessAuthenMethod
+                    INTEGER,
+                hwAAAPwifAccessAcctMethod
+                    INTEGER,
+                hwAAAPwifAccessIPAddress
+                    IpAddress,                    
+                hwAAAPwifAccessVRF
+                    DisplayString,
+                hwAAAPwifAccessMACAddress
+                    MacAddress,
+                hwAAAPwifAccessIfIdleCut
+                    TruthValue,
+                hwAAAPwifAccessIdleCutTime
+                    Integer32,
+                hwAAAPwifAccessIdleCutFlow
+                    Integer32,
+                hwAAAPwifAccessTimeLimit
+                    Integer32,
+                hwAAAPwifAccessTotalFlow64Limit
+                    Counter64,
+                hwAAAPwifAccessStartTime
+                    DateAndTime,
+                hwAAAPwifAccessCARIfUpActive
+                    TruthValue,
+                hwAAAPwifAccessCARIfDnActive
+                    TruthValue,
+                hwAAAPwifAccessUpFlow64
+                    Counter64,
+                hwAAAPwifAccessDnFlow64
+                    Counter64,
+                hwAAAPwifAccessUpPacket64
+                    Counter64,
+                hwAAAPwifAccessDnPacket64
+                    Counter64,
+                hwAAAPwifAccessCARUpCIR
+                    Integer32,
+                hwAAAPwifAccessCARUpPIR
+                    Integer32,
+                hwAAAPwifAccessCARUpCBS
+                    Unsigned32,
+                hwAAAPwifAccessCARUpPBS
+                    Unsigned32,
+                hwAAAPwifAccessCARDnCIR
+                    Integer32,
+                hwAAAPwifAccessCARDnPIR
+                    Integer32,
+                hwAAAPwifAccessCARDnCBS
+                    Unsigned32,
+                hwAAAPwifAccessCARDnPBS
+                    Unsigned32,            
+                hwAAAPwifAccessDownPriority
+                    Integer32,    
+--                hwAAAPwifAccessQinqVlanID
+--                    Integer32,
+--                hwAAAPwifAccessUserVlanID
+--                    Integer32                    
+                hwAAAPwifAccessQosProfile
+                    DisplayString,
+                hwAAAPwifAccessInterface
+                    DisplayString,
+                hwAAAPwifAccessIPv6IFID
+                    Ipv6AddressIfIdentifier,
+                hwAAAPwifAccessIPv6WanAddress
+                    Ipv6Address,
+                hwAAAPwifAccessIPv6WanPrefix
+                    Ipv6AddressPrefix,
+                hwAAAPwifAccessIPv6LanPrefix
+                    Ipv6AddressPrefix,
+                hwAAAPwifAccessIPv6LanPrefixLen
+                    Integer32,
+                hwAAAPwifAccessBasicIPType
+                    DisplayString,
+                hwAAAPwifAccessIPv6WaitDelay
+                    Integer32,
+                hwAAAPwifAccessIPv6ManagedAddressFlag
+                    INTEGER,
+                hwAAAPwifAccessIPv6CPIFIDAvailable
+                    TruthValue,
+                hwAAAPwifAccessIPv6OtherFlag
+                    INTEGER,
+                hwAAAPwifAccessIPv6CPAssignIFID
+                    TruthValue,
+                hwAAAPwifAccessLineID
+                    DisplayString,
+                hwAAAPwifAccessIPv6UpFlow64
+                    Counter64,
+                hwAAAPwifAccessIPv6DnFlow64
+                    Counter64,
+                hwAAAPwifAccessIPv6UpPacket64
+                    Counter64,
+                hwAAAPwifAccessIPv6DnPacket64
+                    Counter64,               
+                hwAAAPwifAccessDeviceName
+                    DisplayString,
+                hwAAAPwifAccessDeviceMACAddress
+                    MacAddress,
+                hwAAAPwifAccessDevicePortName
+                    OCTET STRING,
+                hwAAAPwifAccessAPID     
+                    Unsigned32
+             }
+
+        hwAAAPwifAccessIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..1000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "unqualified index"
+            ::= { hwAAAPwifAccessEntry 1 }
+
+        hwAAAPwifAccessUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..253))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access user name"
+            ::= { hwAAAPwifAccessEntry 3 }
+
+        hwAAAPwifAccessPortType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                all(1),
+                ppp(2),
+                vlan(3),
+                vlanweb(4),
+                vlanportal(5),
+                vlan8021x(6),
+                telnet(7),
+                ftp(8),
+                ssh(9),
+                igmp(10)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access port type
+                1:all
+                2:PPP
+                3:VLAN
+                4:WEB of VLAN
+                5:Portal of VLAN
+                6:802.1X
+                7:telnet
+                8:ftp
+                9:SSH
+                10:igmp"
+            ::= { hwAAAPwifAccessEntry 5 }
+
+        hwAAAPwifAccessPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..15|255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access up priority"
+            ::= { hwAAAPwifAccessEntry 6 } 
+            
+        hwAAAPwifAccessSlotNo OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "slot No."
+            ::= { hwAAAPwifAccessEntry 8 }
+
+        hwAAAPwifAccessSubSlotNo OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "subslot No."
+            ::= { hwAAAPwifAccessEntry 9 }
+
+        hwAAAPwifAccessPortNo OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "port No."
+            ::= { hwAAAPwifAccessEntry 10 }
+
+        hwAAAPwifAccessVLANID OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VLAN id"
+            ::= { hwAAAPwifAccessEntry 11 }
+
+        hwAAAPwifAccessPVC OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VPI VPC"
+            ::= { hwAAAPwifAccessEntry 12 }
+
+        hwAAAPwifAccessAuthenMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    local(1),
+                    noauth(2),
+                    radius(3),
+                    localRadius(4),
+                    radiusLocal(5),
+                    radiusNoauth(6),
+                    tacacs(7),
+                    localTacacs(8),
+                    tacacsLocal(9),
+                    tacacsNone(10)         
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "authentication method"
+            ::= { hwAAAPwifAccessEntry 13 }
+
+        hwAAAPwifAccessAcctMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                local(1),
+                radius(2),               
+                noacct(3),
+                localradiusboth(4),
+                hwtacacs(5),
+                localhwtacacsboth(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "account method"
+            ::= { hwAAAPwifAccessEntry 14 }
+
+        hwAAAPwifAccessIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "IP address"
+            ::= { hwAAAPwifAccessEntry 15 } 
+            
+      hwAAAPwifAccessVRF OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "VRF name"
+            ::= { hwAAAPwifAccessEntry 16 }
+
+         hwAAAPwifAccessMACAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Mac address"
+            ::= { hwAAAPwifAccessEntry 17 }
+        
+
+        hwAAAPwifAccessIfIdleCut OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "if idle cut"
+            ::= { hwAAAPwifAccessEntry 18 }
+
+        hwAAAPwifAccessIdleCutTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "idle cut time"
+            ::= { hwAAAPwifAccessEntry 19 }
+
+        hwAAAPwifAccessIdleCutFlow OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "idle cut flow"
+            ::= { hwAAAPwifAccessEntry 20 }
+
+        hwAAAPwifAccessTimeLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "session time"
+            ::= { hwAAAPwifAccessEntry 21 }
+
+        hwAAAPwifAccessTotalFlow64Limit OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "remain flow(64bit)"
+            ::= { hwAAAPwifAccessEntry 22 }
+
+        hwAAAPwifAccessStartTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "start time"
+            ::= { hwAAAPwifAccessEntry 25 }
+
+        hwAAAPwifAccessCARIfUpActive OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up car control"
+            ::= { hwAAAPwifAccessEntry 27 }
+
+
+        hwAAAPwifAccessCARIfDnActive OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down car control"
+            ::= { hwAAAPwifAccessEntry 31 }
+
+        hwAAAPwifAccessUpFlow64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up flow(64Byte)"
+            ::= { hwAAAPwifAccessEntry 36 }
+
+        hwAAAPwifAccessDnFlow64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down flow(64Byte)"
+            ::= { hwAAAPwifAccessEntry 37 }
+
+        hwAAAPwifAccessUpPacket64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up packet"
+            ::= { hwAAAPwifAccessEntry 38 }
+
+        hwAAAPwifAccessDnPacket64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down packet"
+            ::= { hwAAAPwifAccessEntry 39 }
+
+        hwAAAPwifAccessCARUpCIR OBJECT-TYPE
+            SYNTAX Integer32 (16..10000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up committed information rate(Kbps)"
+            ::= { hwAAAPwifAccessEntry 45 }
+
+        hwAAAPwifAccessCARUpPIR OBJECT-TYPE
+            SYNTAX Integer32 (16..10000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up peak information rate(Kbps)"
+            ::= { hwAAAPwifAccessEntry 46 }
+
+         hwAAAPwifAccessCARUpCBS OBJECT-TYPE
+            SYNTAX Unsigned32 (100..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up committed burst size(byte)"
+            ::= { hwAAAPwifAccessEntry 47 }
+
+            
+         hwAAAPwifAccessCARUpPBS OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "up peak burst size(byte)"
+            ::= { hwAAAPwifAccessEntry 48 }
+            
+          hwAAAPwifAccessCARDnCIR OBJECT-TYPE
+            SYNTAX Integer32 (16..10000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down committed information rate(Kbps)"
+            ::= { hwAAAPwifAccessEntry 49 }
+
+        hwAAAPwifAccessCARDnPIR OBJECT-TYPE
+            SYNTAX Integer32 (16..10000000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down peak information rate(Kbps)"
+            ::= { hwAAAPwifAccessEntry 50 }
+
+        hwAAAPwifAccessCARDnCBS OBJECT-TYPE
+            SYNTAX Unsigned32 (100..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down committed burst size(byte)"
+            ::= { hwAAAPwifAccessEntry 51 }
+
+            
+       hwAAAPwifAccessCARDnPBS OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "down peak burst size(byte)"
+            ::= { hwAAAPwifAccessEntry 52 }
+
+      hwAAAPwifAccessDownPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..15|255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access down priority"
+            ::= { hwAAAPwifAccessEntry 53 }
+
+--        hwAAAPwifAccessQinqVlanID OBJECT-TYPE
+--            SYNTAX Integer32 (0..4094)
+--            MAX-ACCESS read-only
+--            STATUS current
+--            DESCRIPTION
+--                "qinq vlan"
+--            ::= { hwAAAPwifAccessEntry 54 }
+
+--        hwAAAPwifAccessUserVlanID OBJECT-TYPE
+--            SYNTAX Integer32 (0..4094)
+--            MAX-ACCESS read-only
+--            STATUS current
+--            DESCRIPTION
+--                "user VLAN"
+--            ::= { hwAAAPwifAccessEntry 55 }
+
+        hwAAAPwifAccessQosProfile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..63))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "QOS profile"
+            ::= { hwAAAPwifAccessEntry 56 }
+
+        hwAAAPwifAccessInterface OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..63))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "user access interface"
+            ::= { hwAAAPwifAccessEntry 57 }
+
+        hwAAAPwifAccessIPv6IFID OBJECT-TYPE
+            SYNTAX Ipv6AddressIfIdentifier
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's interface ID when IPv6CP negotiation."
+            ::= { hwAAAPwifAccessEntry 58 }
+
+        hwAAAPwifAccessIPv6WanAddress OBJECT-TYPE
+            SYNTAX Ipv6Address
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's WAN address."
+            ::= { hwAAAPwifAccessEntry 59 }
+
+        hwAAAPwifAccessIPv6WanPrefix OBJECT-TYPE
+            SYNTAX Ipv6AddressPrefix
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's WAN prefix."
+            ::= { hwAAAPwifAccessEntry 60 }
+
+        hwAAAPwifAccessIPv6LanPrefix OBJECT-TYPE
+            SYNTAX Ipv6AddressPrefix
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's LAN prefix."
+            ::= { hwAAAPwifAccessEntry 61 }
+
+        hwAAAPwifAccessIPv6LanPrefixLen OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's LAN prefix length."
+            ::= { hwAAAPwifAccessEntry 62 }
+
+        hwAAAPwifAccessBasicIPType OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..3))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The basic service type. UCHAR[0]-IPv4, UCHAR[1]-IPv6, UCHAR[2]-IPv6-PD. '0'-without such basic service, '1'-with such basic service."
+            ::= { hwAAAPwifAccessEntry 63 }
+
+        hwAAAPwifAccessIPv6WaitDelay OBJECT-TYPE
+            SYNTAX Integer32 (30..120)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time of waiting for DHCPv6 packet after IPv6CP negotiation."
+            ::= { hwAAAPwifAccessEntry 64 }
+
+        hwAAAPwifAccessIPv6ManagedAddressFlag OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ndra(1),
+                dhcpv6(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The address configuration method for PPP and L2TP user."
+            ::= { hwAAAPwifAccessEntry 65 }
+
+        hwAAAPwifAccessIPv6CPIFIDAvailable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flag indicating whether PPP and L2TP user will use the interface-id of ipv6cp negotiation in DHCPv6 address allocation."
+            ::= { hwAAAPwifAccessEntry 66 }
+
+        hwAAAPwifAccessIPv6OtherFlag OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ndra(1),
+                dhcpv6(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The method PPP and L2TP user get configuration parameters."
+            ::= { hwAAAPwifAccessEntry 67 }
+
+        hwAAAPwifAccessIPv6CPAssignIFID OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flag indicating whether to accept user's interface-id when ipv6cp negotiation."
+            ::= { hwAAAPwifAccessEntry 68 }
+
+        hwAAAPwifAccessLineID OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The access-line-id information."
+            ::= { hwAAAPwifAccessEntry 69 }
+
+        hwAAAPwifAccessIPv6UpFlow64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's up flow."
+            ::= { hwAAAPwifAccessEntry 70 }
+
+        hwAAAPwifAccessIPv6DnFlow64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's down flow."
+            ::= { hwAAAPwifAccessEntry 71 }
+
+        hwAAAPwifAccessIPv6UpPacket64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's up flow packet."
+            ::= { hwAAAPwifAccessEntry 72 }
+
+        hwAAAPwifAccessIPv6DnPacket64 OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The user's down flow packet."
+            ::= { hwAAAPwifAccessEntry 73 }  
+            
+        hwAAAPwifAccessDeviceName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "access device name"
+            ::= { hwAAAPwifAccessEntry 74 }
+            
+        hwAAAPwifAccessDeviceMACAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access device Mac address"
+            ::= { hwAAAPwifAccessEntry 75 }
+            
+        hwAAAPwifAccessDevicePortName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface Name of Access device."
+            ::= { hwAAAPwifAccessEntry 76 }
+            
+       hwAAAPwifAccessAPID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294836225)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Access wiless device AP Id"
+            ::= { hwAAAPwifAccessEntry 77 }
+            
+      --===pwif end===
+     
+      --===ReAuthenUser begin===
+
+        hwReAuthenUserTable OBJECT IDENTIFIER ::= { hwAAAMibObjects 73 }
+		
+        hwReAuthenMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                 "User Mac Address"
+            ::= { hwReAuthenUserTable 1 }
+        
+       --===ReAuthenUser end===     
+       
+  
+        hwAccessUserNumberTable OBJECT IDENTIFIER ::= { hwAAAMibObjects 74 }
+
+        hwAccessUserNumberEntry OBJECT IDENTIFIER ::= { hwAccessUserNumberTable 1 }
+                              
+                        
+		             hwAccessUserNumberDot1x OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This Dot1x access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 1 } 
+                        
+		             hwAccessUserNumberMAC OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This MAC access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 2 } 
+
+		             hwAccessUserNumberPortal OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This Portal access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 3 } 
+
+		             hwAccessUserNumberPPP OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This PPP access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 4 } 
+
+		             hwAccessUserNumberNone OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This None access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 5 } 
+
+		             hwAccessUserNumberStatic OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This Static access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 6 } 
+	     
+		             hwAccessUserNumberAdmin OBJECT-TYPE
+		                SYNTAX Integer32 (0..65535)
+		                MAX-ACCESS read-only
+		                STATUS current
+		                DESCRIPTION
+		                    "
+		                    This Admin access user number.
+		                    "
+		                ::= { hwAccessUserNumberEntry 7 }				 
+	
+       
+                                       
             --  ============== conformance information ==============
         hwAaaConformance OBJECT IDENTIFIER ::= { hwAaa 5 }
         
@@ -10134,7 +11727,7 @@
                                   hwMulticastProfileGroup, hwMulticastProfileExtGroup, hwAaaTrapOidGroup,
                                   hwAaaTrapsNotificationsGroup, hwLamTrapsNotificationsGroup,hwObsoleteGroup,
                                   hwServiceSchemeGroup, hwDhcpOpt121RouteGroup, hwAccessDelayPerSlotGroup, hwVpnAccessUserStatGroup,
-                                  hwInterfaceAccessUserStatGroup,hwDomainAccessUserStatGroup,hwSlotAccessUserStatGroup,hwReauthorizeGroup,  
+                                  hwInterfaceAccessUserStatGroup,hwDomainAccessUserStatGroup,hwSlotAccessUserStatGroup,hwReAuthenUserGroup,hwReauthorizeGroup,  
                                   hwUserLogGroup,hwGlobalDhcpOpt64SepAndSegGroup,hwGlobalDhcpServerAckGroup, hwWlanInterfaceGroup, hwAuthorCmdGroup,hwAAARateGroup,
                                   hwLocalUserPwPolicyAdminGroup    , hwLocalUserPwPolicyAccGroup
 
@@ -10241,7 +11834,7 @@
         hwLocalUserExtGroup OBJECT-GROUP
             OBJECTS { hwLocalUserState, hwLocalUserNoCallBackVerify, hwLocalUserCallBackDialStr, hwLocalUserBlockFailTimes,
                       hwLocalUserBlockInterval, hwLocalUserUserGroup, hwLocalUserDeviceType, hwLocalUserExpireDate, 
-                      hwLocalUserIdleTimeoutSecond, hwLocalUserTimeRange }
+                      hwLocalUserIdleTimeoutSecond, hwLocalUserTimeRange, hwLocalUserIsExpired }
             STATUS current
             DESCRIPTION 
                 "The local user extent group configuration." 
@@ -10265,7 +11858,7 @@
                       hwGlobalAuthEventAuthenServerDownUserGroup,hwGlobalAuthEventClientNoResponseUserGroup,
                       hwGlobalAuthEventPreAuthUserGroup,hwTriggerLoose,hwOfflineSpeedNumber, hwAuthorModifyMode, 
                       hwLocalRetryInterval, hwLocalRetryTime, hwLocalBlockTime, hwRemoteRetryInterval, hwRemoteRetryTime, 
-                      hwRemoteBlockTime, hwBlockDisable }
+                      hwRemoteBlockTime, hwBlockDisable, hwTotalAuthReqNumPortal, hwTotalAuthReqNumMac, hwTotalAuthReqNumDot1x}
             STATUS current
             DESCRIPTION 
                 "The AAA setting group configuration."
@@ -10282,7 +11875,8 @@
                       hwTotalIPv4FlowUpPkt, hwTotalIPv6FlowDnByte, hwTotalIPv6FlowDnPkt, 
                       hwTotalIPv6FlowUpByte, hwTotalIPv6FlowUpPkt, hwHistoricMaxOnlineAcctReadyNum,
                       hwPubicLacUserNum, hwHistoricMaxOnlineLocalNum, hwHistoricMaxOnlineRemoteNum,
-                      hwTotalLacOnlineNum,hwTotalLnsOnlineNum,hwTotalWlsOnlineNum,hwTotalWrdOnlineNum }                   
+                      hwTotalLacOnlineNum,hwTotalLnsOnlineNum,hwTotalWlsOnlineNum,hwTotalWrdOnlineNum, hwDhcpUserOnlineFailCount,
+					  hwTotalFamilyUserByUsernameOnlineNum }                   
             STATUS current
             DESCRIPTION                                          
                 "The AAA statistics group configuration."
@@ -10305,7 +11899,8 @@
                       hwAccessIPv6LanPrefixLen, hwAccessBasicIPType, hwAccessIPv6WaitDelay, hwAccessIPv6ManagedAddressFlag,
                       hwAccessIPv6CPIFIDAvailable, hwAccessIPv6OtherFlag, hwAccessIPv6CPAssignIFID, hwAccessLineID,
                       hwAccessIPv6UpFlow64, hwAccessIPv6DnFlow64, hwAccessIPv6UpPacket64, hwAccessIPv6DnPacket64,
-                      hwAccessDeviceName,hwAccessDeviceMACAddress,hwAccessDevicePortName,hwAccessAPID }
+                      hwAccessDeviceName,hwAccessDeviceMACAddress,hwAccessDevicePortName,hwAccessAPID, hwAccessQinQVLANID,
+					  hwAccessOption82CircuitID, hwAccessOption82RemoteID, hwAccessSessionTimeout, hwAccessISPVLAN, hwAccessISPInterface }
             STATUS current
             DESCRIPTION 
                 "The access group configuration."
@@ -10318,7 +11913,8 @@
                       hwAccessNormalServerGroup, hwAccessDomainAcctCopySeverGroup, hwAccessPVlanAcctCopyServerGroup,
                       hwAccessCurAuthenPlace, hwAccessActionFlag, hwAccessAuthtype, hwAccessType, hwAccessOnlineTime,
                       hwAccessGateway, hwAccessSSID, hwAccessAPMAC, hwAccessDomain, hwAccessCurAccountingPlace,
-                      hwAccessCurAuthorPlace, hwAccessUserGroup, hwAccessResourceInsufficientInbound, hwAccessResourceInsufficientOutbound }
+                      hwAccessCurAuthorPlace, hwAccessUserGroup, hwAccessResourceInsufficientInbound, hwAccessResourceInsufficientOutbound,
+                      hwAccessAuthorizetype, hwAccessBakeState}
               STATUS current
              DESCRIPTION 
                 "The access extent group configuration."
@@ -10475,8 +12071,7 @@
                             hwIPv6NDRAPrefixLowerlimitWarningResume, hwIPv6PDPrefixLowerlimitWarningAlarm,hwIPv6PDPrefixLowerlimitWarningResume,hwPolicyRouteSlotMaxNum,
                             hwRemoteDownloadAclThresholdAlarm,hwRemoteDownloadAclThresholdResume,
                             hwAdminLoginFailed, hwAdminLoginFailedClear, hwUserGroupThresholdAlarm, hwUserGroupThresholdResume,hwEDSGLicenseExpireAlarm,hwEDSGLicenseExpireResume,
-                            hwAAAAccessUserResourceOrCpuAlarm, hwAAAAccessUserResourceOrCpuResume
-                    }
+                            hwAAAAccessUserResourceOrCpuAlarm, hwAAAAccessUserResourceOrCpuResume}
             STATUS current
             DESCRIPTION 
                 "The AAA traps."
@@ -10484,7 +12079,7 @@
 
         hwLamTrapsNotificationsGroup NOTIFICATION-GROUP
             NOTIFICATIONS { hwHarddiskoverflow, hwHarddiskReachThreshold, hwHarddiskOK,
-                            hwCachetoFTPFail, hwHDtoFTPFail }
+                            hwCachetoFTPFail, hwHDtoFTPFail, hwAAAUserPwdWillExpire, hwAAAUserPwdExpired }
             STATUS current
             DESCRIPTION 
                 "The lam traps."
@@ -10504,7 +12099,7 @@
                      hwSrvSchemeAdminUserPriority,  hwSrvSchemeIpPoolOneName,
                      hwSrvSchemeIpPoolTwoName, hwSrvSchemeIpPoolThreeName, 
                      hwServiceSchemeRowStatus,hwServiceSchemeIdleCutType,
-                     hwServiceSchemeIdleCutFlowValue  }
+                     hwServiceSchemeIdleCutFlowValue,hwServiceSchemeRedirectACL }
        STATUS current
        DESCRIPTION 
             "The service scheme group configuration."
@@ -10694,13 +12289,26 @@
   		OBJECTS {hwPortalAccessProfileName, hwPortalAccessProfileDetectPeriod, hwPortalAccessProfilePortalServerDownServiceSchemeName, hwPortalAccessProfilePortalServerDownUserGroupName,
   					hwPortalAccessProfilePortalServerUpReAuthen, hwPortalAccessProfileAlarmUserLowNum, hwPortalAccessProfileAlarmUserHighNum, hwPortalAccessProfileAuthenNetWork,
   					hwPortalAccessProfileAuthenNetWorkMask, hwPortalAccessProfilePortalServerName, hwPortalAccessProfilePortalAccessDirect, hwPortalAccessProfileLocalServerEnable,
-  					hwPortalAccessProfileRowStatus, hwPortalAccessProfilePortalBackupServerName} 
+  					hwPortalAccessProfileRowStatus, hwPortalAccessProfilePortalBackupServerName, hwPortalAccessProfileLocalServerAnonymousUrl} 
   		STATUS current
   		DESCRIPTION
   			"The portal access profile." 
   			::= { hwAaaObjectGroups 66 }    
 
-
+  hwReAuthenUserGroup OBJECT-GROUP
+		OBJECTS { hwReAuthenMacAddress }
+		STATUS current
+		DESCRIPTION 
+			"ReAuthen User"
+			::= { hwAaaObjectGroups 67 }            
+			
+  hwAccessUserNumberGroup OBJECT-GROUP  
+  		OBJECTS {hwAccessUserNumberDot1x,hwAccessUserNumberMAC,hwAccessUserNumberPortal,hwAccessUserNumberPPP,
+  		hwAccessUserNumberNone,hwAccessUserNumberStatic,hwAccessUserNumberAdmin} 
+  		STATUS current
+  		DESCRIPTION
+  			"The access users profile." 
+  			::= { hwAaaObjectGroups 68 }  
 
         --  ============== conformance information define end ==============  
 

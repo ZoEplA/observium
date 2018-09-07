@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2013 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: ITU-T G.8032 huawei mib define
 -- Reference: ITU-T G.8032/Y.1344
--- Version: V1.00
+-- Version: V2.13
 -- History:
 --    <fenghaisheng 61958>,<2011.07.05>,<create>
 -- =================================================================
@@ -29,7 +29,7 @@ HUAWEI-ERPS-MIB DEFINITIONS ::= BEGIN
 
     -- 1.3.6.1.4.1.2011.5.25.256
     hwErpsMIB MODULE-IDENTITY 
-        LAST-UPDATED "201308310000Z"
+        LAST-UPDATED "201610280000Z"
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -44,6 +44,9 @@ HUAWEI-ERPS-MIB DEFINITIONS ::= BEGIN
             "The private mib file includes the general extent 
             information of the device.hwDatacomm(25).hwErpsMIB.
             "
+        REVISION "201610280000Z"
+            DESCRIPTION
+            	"fix the errors points of hwErpsNotifications."
         REVISION "201308310000Z"
             DESCRIPTION
             	"fix the errors checked by a tool."
@@ -893,7 +896,7 @@ HUAWEI-ERPS-MIB DEFINITIONS ::= BEGIN
         {
         cfm(1)   
         }
-        MAX-ACCESS not-accessible
+        MAX-ACCESS accessible-for-notify
         STATUS current
         DESCRIPTION
             "The protocol type that ERPS port tracks. Currently ERPS port just supports tracking CFM."
@@ -1070,7 +1073,8 @@ HUAWEI-ERPS-MIB DEFINITIONS ::= BEGIN
 		hwErpsRingStatusInfoGroup,
 		hwErpsPortConfigInfoGroup, 
 		hwErpsPortStatusInfoGroup,
-		hwErpsPortStatisticsInfoGroup  		            		            		            
+		hwErpsPortStatisticsInfoGroup,
+                                        hwErpsNotificationGroup  		            		            		            
 	    }
 	    ::= { hwErpsCompliances 1 } 
 	    

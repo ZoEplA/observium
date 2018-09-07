@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -163,21 +163,21 @@ $form['row'][3]['snmp_port'] = array(
                                 'name'        => 'Port',
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
-                                'value'       => escape_html($device['snmp_port']));
+                                'value'       => $device['snmp_port']);
 $form['row'][4]['snmp_timeout'] = array(
                                 'type'        => 'text',
                                 'fieldset'    => 'edit',
                                 'name'        => 'Timeout',
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
-                                'value'       => escape_html($device['snmp_timeout']));
+                                'value'       => $device['snmp_timeout']);
 $form['row'][5]['snmp_retries'] = array(
                                 'type'        => 'text',
                                 'fieldset'    => 'edit',
                                 'name'        => 'Retries',
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
-                                'value'       => escape_html($device['snmp_retries']));
+                                'value'       => $device['snmp_retries']);
 
 $form['row'][6]['snmp_maxrep'] = array(
                                 'type'        => 'text',
@@ -185,7 +185,7 @@ $form['row'][6]['snmp_maxrep'] = array(
                                 'name'        => 'Max Repetitions',
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
-                                'value'       => escape_html($device['snmp_maxrep']));
+                                'value'       => $device['snmp_maxrep']);
 // Snmp v1/2c fieldset
 $form['row'][7]['snmp_community'] = array(
                                 'type'        => 'password',
@@ -194,7 +194,7 @@ $form['row'][7]['snmp_community'] = array(
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
                                 'show_password' => !$readonly,
-                                'value'       => escape_html($device['snmp_community'])); // FIXME. For passwords we should use filter instead escape!
+                                'value'       => $device['snmp_community']); // FIXME. For passwords we should use filter instead escape!
 
 // Snmp v3 fieldset
 $form['row'][8]['snmp_authlevel'] = array(
@@ -214,7 +214,7 @@ $form['row'][9]['snmp_authname'] = array(
                                 'name'        => 'Auth Username',
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
-                                'value'       => escape_html($device['snmp_authname']));
+                                'value'       => $device['snmp_authname']);
 
 $form['row'][10]['snmp_authpass'] = array(
                                 'type'        => 'password',
@@ -223,7 +223,7 @@ $form['row'][10]['snmp_authpass'] = array(
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
                                 'show_password' => !$readonly,
-                                'value'       => escape_html($device['snmp_authpass'])); // FIXME. For passwords we should use filter instead escape!
+                                'value'       => $device['snmp_authpass']); // FIXME. For passwords we should use filter instead escape!
 
 $form['row'][11]['snmp_authalgo'] = array(
                                 'type'        => 'select',
@@ -241,7 +241,7 @@ $form['row'][12]['snmp_cryptopass'] = array(
                                 'width'       => '250px',
                                 'readonly'    => $readonly,
                                 'show_password' => !$readonly,
-                                'value'       => escape_html($device['snmp_cryptopass'])); // FIXME. For passwords we should use filter instead escape!
+                                'value'       => $device['snmp_cryptopass']); // FIXME. For passwords we should use filter instead escape!
 $form['row'][13]['snmp_cryptoalgo'] = array(
                                 'type'        => 'select',
                                 'fieldset'    => 'snmpv3',

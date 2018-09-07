@@ -40,14 +40,17 @@ IMPORTS
     MwlCaptivePortalAuthMethod,
     MwlTunnelTerminationModeBits,
     MwlKDDI,
+    MwlAclEnvState,
     MwlFirewallCapability,
-    MwlOnOffSwitch,
-    MwlSslUsrAuthProtocolType,
-    MwlCaptivePortalAuthenticationType,
+    MwlManagementFrameProtection,
     MwlRadiusMacDelimiter,
     MwlRadiusPasswordType,
-    MwlProfileOwner,
-    MwlAuthenticationType
+    MwlRadiusCalledStationIdType,
+    MwlAuthenticationType,
+    MwlOnOffSwitch,
+    MwlCaptivePortalAuthenticationType,
+    MwlCaptivePortalExternalServerType,
+    MwlProfileOwner
         FROM MERU-TC;
 
   mwConfigSecurity  MODULE-IDENTITY
@@ -83,9 +86,11 @@ IMPORTS
        mwSecurityProfileTableIndex                                 Integer32, 
        mwSecurityProfileName                                       DisplayString(SIZE (1..32)),
        mwSecurityProfileKDDI                                       MwlKDDI,
+       mwSecurityProfileEnvState                                   MwlAclEnvState,
        mwSecurityProfileReKeyPeriod                                Unsigned32,
        mwSecurityProfileCypherSuites                               MwlCypherSuiteBits,
        mwSecurityProfileReAuthEnable                               MwlOnOffSwitch,
+       mwSecurityProfileMFP11wSupport                              MwlManagementFrameProtection,
        mwSecurityProfileL2ModesAllowed                             MwlL2SecurityModeBits,
        mwSecurityProfileStaticWepKeyPos                            Integer32(1..4),
        mwSecurityProfileSecurityLogging                            MwlOnOffSwitch,
@@ -97,13 +102,18 @@ IMPORTS
        mwSecurityProfileSharedAuthEnabled                          MwlOnOffSwitch,
        mwSecurityProfileEnableMacFiltering                         MwlOnOffSwitch,
        mwSecurityProfileFirewallCapability                         MwlFirewallCapability,
-       mwSecurityProfileBeAuthServerTimeout                        Integer32(1..65535),
        mwSecurityProfileCaptivePortalEnabled                       MwlCaptivePortalMode,
+       mwSecurityProfileCaptivePortalProfile                       DisplayString(SIZE (0..32)),
        mwSecurityProfileNetworkInitiation8021x                     MwlOnOffSwitch,
        mwSecurityProfilePrimaryRadiusProfileName                   DisplayString(SIZE (0..16)),
+       mwSecurityProfileCaptivePortalBypassForMAC                  MwlOnOffSwitch,
        mwSecurityProfileSecondaryRadiusProfileName                 DisplayString(SIZE (0..16)),
        mwSecurityProfilePassthroughFirewallFilterId                DisplayString(SIZE (0..16)),
+       mwSecurityProfileMACAuthPrimaryRadiusProfileName            DisplayString,
        mwSecurityProfileCaptivePortalAuthenticationMethod          MwlCaptivePortalAuthMethod,
+       mwSecurityProfileMACAuthSecondaryRadiusProfileName          DisplayString,
+       mwSecurityProfileMACAccountingPrimaryRadiusProfileName      DisplayString,
+       mwSecurityProfileMACAccountingSecondaryRadiusProfileName    DisplayString,
        mwSecurityProfileOwner                                      MwlProfileOwner,
        mwSecurityProfilePskKey                                     DisplayString(SIZE (0..66)),
        mwSecurityProfileStaticWepKey                               DisplayString(SIZE (0..28)),
@@ -287,14 +297,6 @@ IMPORTS
          "This object describes Owner"
     ::= { mwSecurityProfileEntry   25 }
 
-  mwSecurityProfileBeAuthServerTimeout  OBJECT-TYPE
-    SYNTAX Integer32(1..65535)
-    MAX-ACCESS read-create
-    STATUS     current
-    DESCRIPTION
-         "This object describes Backend Auth Server Timeout"
-    ::= { mwSecurityProfileEntry   26 }
-
   mwSecurityProfileCaptivePortalAuthenticationMethod  OBJECT-TYPE
     SYNTAX MwlCaptivePortalAuthMethod
     MAX-ACCESS read-create
@@ -327,13 +329,77 @@ IMPORTS
          "This object describes PMK Caching"
     ::= { mwSecurityProfileEntry   33 }
 
+  mwSecurityProfileEnvState  OBJECT-TYPE
+    SYNTAX MwlAclEnvState
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACL Environment State"
+    ::= { mwSecurityProfileEntry   47 }
+
+  mwSecurityProfileMACAuthPrimaryRadiusProfileName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Auth Primary RADIUS Profile Name"
+    ::= { mwSecurityProfileEntry   48 }
+
+  mwSecurityProfileMACAuthSecondaryRadiusProfileName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Auth Secondary RADIUS Profile Name"
+    ::= { mwSecurityProfileEntry   49 }
+
+  mwSecurityProfileCaptivePortalProfile  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal profile"
+    ::= { mwSecurityProfileEntry   50 }
+
+  mwSecurityProfileMFP11wSupport  OBJECT-TYPE
+    SYNTAX MwlManagementFrameProtection
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11W - Management Frame Protection"
+    ::= { mwSecurityProfileEntry   51 }
+
+  mwSecurityProfileMACAccountingPrimaryRadiusProfileName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Accounting Primary RADIUS Profile Name"
+    ::= { mwSecurityProfileEntry   52 }
+
+  mwSecurityProfileMACAccountingSecondaryRadiusProfileName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Accounting Secondary RADIUS Profile Name"
+    ::= { mwSecurityProfileEntry   53 }
+
+  mwSecurityProfileCaptivePortalBypassForMAC  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal Bypass For MAC Authentication"
+    ::= { mwSecurityProfileEntry   54 }
+
   mwSecurityProfileRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwSecurityProfileEntry 52 }
+    ::= { mwSecurityProfileEntry 61 }
 
   mwSslVarsTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwSslVarsEntry
@@ -354,21 +420,8 @@ IMPORTS
 
   MwSslVarsEntry  ::=  SEQUENCE { 
        mwSslVarsTableIndex                                         Integer32, 
-       mwSslVarsSslServerPort                                      Integer32(1024..65535),
-       mwSslVarsExternalCPURL                                      DisplayString(SIZE (0..255)),
-       mwSslVarsOverrideRadius                                     MwlCaptivePortalAuthenticationType,
-       mwSslVarsRadiusProfileName                                  DisplayString(SIZE (0..32)),
-       mwSslVarsL3UserSessionTimeout                               Integer32(1..1440),
-       mwSslVarsAccountingInterimInterval                          Unsigned32,
-       mwSslVarsSecondaryRadiusProfileName                         DisplayString(SIZE (0..32)),
-       mwSslVarsCaptivePortalSessionTimeout                        Integer32(0..1440),
-       mwSslVarsCaptivePortalActivityTimeout                       Integer32(0..60),
-       mwSslVarsPrimaryAccountingRadiusServer                      DisplayString(SIZE (0..32)),
-       mwSslVarsSecondaryAccountingRadiusServer                    DisplayString(SIZE (0..32)),
-       mwSslVarsWncIpAddr                                          IpAddress,
        mwSslVarsSslLifeTime                                        Unsigned32,
-       mwSslVarsSslServerName                                      DisplayString,
-       mwSslVarsSslUserAuthProtocol                                MwlSslUsrAuthProtocolType,
+       mwSslVarsCPCertificate                                      DisplayString(SIZE (0..255)),
        mwSslVarsCertificateFileName                                DisplayString(SIZE (0..128)) 
   }
    
@@ -381,86 +434,6 @@ IMPORTS
          "The index value of the  table "
     ::= { mwSslVarsEntry 1 }
 
-  mwSslVarsSslServerPort  OBJECT-TYPE
-    SYNTAX Integer32(1024..65535)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Server Port"
-    ::= { mwSslVarsEntry    2 }
-
-  mwSslVarsOverrideRadius  OBJECT-TYPE
-    SYNTAX MwlCaptivePortalAuthenticationType
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes CaptivePortal Authentication Type"
-    ::= { mwSslVarsEntry    3 }
-
-  mwSslVarsRadiusProfileName  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (0..32))
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Primary RADIUS Profile Name"
-    ::= { mwSslVarsEntry    4 }
-
-  mwSslVarsAccountingInterimInterval  OBJECT-TYPE
-    SYNTAX Unsigned32
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Accounting Interim Interval (seconds)"
-    ::= { mwSslVarsEntry    5 }
-
-  mwSslVarsSecondaryRadiusProfileName  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (0..32))
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Secondary RADIUS Profile Name"
-    ::= { mwSslVarsEntry    6 }
-
-  mwSslVarsCaptivePortalSessionTimeout  OBJECT-TYPE
-    SYNTAX Integer32(0..1440)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes CaptivePortalSessionTimeout"
-    ::= { mwSslVarsEntry    7 }
-
-  mwSslVarsCaptivePortalActivityTimeout  OBJECT-TYPE
-    SYNTAX Integer32(0..60)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes CaptivePortalActivityTimeout"
-    ::= { mwSslVarsEntry    8 }
-
-  mwSslVarsPrimaryAccountingRadiusServer  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (0..32))
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Primary Accounting Radius Server Profile Name"
-    ::= { mwSslVarsEntry    9 }
-
-  mwSslVarsSecondaryAccountingRadiusServer  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (0..32))
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Secondary Accounting Radius Server Profile Name"
-    ::= { mwSslVarsEntry   10 }
-
-  mwSslVarsWncIpAddr  OBJECT-TYPE
-    SYNTAX IpAddress
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-         "This object describes Server IP"
-    ::= { mwSslVarsEntry   11 }
-
   mwSslVarsSslLifeTime  OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS read-only
@@ -469,45 +442,21 @@ IMPORTS
          "This object describes Server Lifetime"
     ::= { mwSslVarsEntry   12 }
 
-  mwSslVarsSslServerName  OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-         "This object describes Name"
-    ::= { mwSslVarsEntry   13 }
-
-  mwSslVarsSslUserAuthProtocol  OBJECT-TYPE
-    SYNTAX MwlSslUsrAuthProtocolType
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-         "This object describes User Authentication Protocol"
-    ::= { mwSslVarsEntry   14 }
-
   mwSslVarsCertificateFileName  OBJECT-TYPE
     SYNTAX DisplayString(SIZE (0..128))
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-         "This object describes Certificate"
+         "This object describes Certificate File Name"
     ::= { mwSslVarsEntry   15 }
 
-  mwSslVarsExternalCPURL  OBJECT-TYPE
+  mwSslVarsCPCertificate  OBJECT-TYPE
     SYNTAX DisplayString(SIZE (0..255))
-    MAX-ACCESS read-write
+    MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-         "This object describes CaptivePortal External URL"
-    ::= { mwSslVarsEntry   16 }
-
-  mwSslVarsL3UserSessionTimeout  OBJECT-TYPE
-    SYNTAX Integer32(1..1440)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes L3 User Session Timeout(mins)"
-    ::= { mwSslVarsEntry   21 }
+         "This object describes CP Certificate"
+    ::= { mwSslVarsEntry   26 }
 
   mwRadiusProfileTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwRadiusProfileEntry
@@ -530,10 +479,16 @@ IMPORTS
        mwRadiusProfileTableIndex                                   Integer32, 
        mwRadiusProfileName                                         DisplayString(SIZE (1..16)),
        mwRadiusProfileDescr                                        DisplayString(SIZE (0..128)),
+       mwRadiusProfileCoaFlag                                      MwlOnOffSwitch,
        mwRadiusProfileRadiusIp                                     IpAddress,
        mwRadiusProfileRadiusPort                                   Unsigned32,
+       mwRadiusProfileRadiusRelayApId                              Unsigned32,
        mwRadiusProfileRadiusMacDelimiter                           MwlRadiusMacDelimiter,
        mwRadiusProfileRadiusPasswordType                           MwlRadiusPasswordType,
+       mwRadiusProfileCalledStationIdType                          MwlRadiusCalledStationIdType,
+       mwRadiusProfileRadiusServerTimeout                          Integer32(1..20),
+       mwRadiusProfileRadiusServerRetries                          Integer32(1..10),
+       mwRadiusProfileRemoteRadiusServerFlag                       MwlOnOffSwitch,
        mwRadiusProfileOwner                                        MwlProfileOwner,
        mwRadiusProfileRadiusSecret                                 DisplayString(SIZE (1..64)),
        mwRadiusProfileRowStatus                                    RowStatus 
@@ -612,13 +567,61 @@ IMPORTS
          "This object describes Owner"
     ::= { mwRadiusProfileEntry    9 }
 
+  mwRadiusProfileCalledStationIdType  OBJECT-TYPE
+    SYNTAX MwlRadiusCalledStationIdType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Called-Station-ID Type"
+    ::= { mwRadiusProfileEntry   10 }
+
+  mwRadiusProfileCoaFlag  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes COA"
+    ::= { mwRadiusProfileEntry   11 }
+
+  mwRadiusProfileRadiusRelayApId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes RADIUS Relay AP-ID"
+    ::= { mwRadiusProfileEntry   12 }
+
+  mwRadiusProfileRemoteRadiusServerFlag  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Remote RADIUS Server"
+    ::= { mwRadiusProfileEntry   13 }
+
+  mwRadiusProfileRadiusServerTimeout  OBJECT-TYPE
+    SYNTAX Integer32(1..20)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes RADIUS Server Timeout"
+    ::= { mwRadiusProfileEntry   14 }
+
+  mwRadiusProfileRadiusServerRetries  OBJECT-TYPE
+    SYNTAX Integer32(1..10)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes RADIUS Server Retries"
+    ::= { mwRadiusProfileEntry   15 }
+
   mwRadiusProfileRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwRadiusProfileEntry 13 }
+    ::= { mwRadiusProfileEntry 19 }
 
   mwGuestUserTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwGuestUserEntry
@@ -723,10 +726,10 @@ IMPORTS
        mwAuthModeSecondaryTacacsIp                                 IpAddress,
        mwAuthModeSecondaryRadiusPort                               Unsigned32,
        mwAuthModeSecondaryTacacsPort                               Unsigned32,
-       mwAuthModePrimaryRadiusSecret                               DisplayString(SIZE (1..64)),
-       mwAuthModePrimaryTacacsSecret                               DisplayString(SIZE (1..64)),
-       mwAuthModeSecondaryRadiusSecret                             DisplayString(SIZE (1..64)),
-       mwAuthModeSecondaryTacacsSecret                             DisplayString(SIZE (1..64)) 
+       mwAuthModePrimaryRadiusSecret                               DisplayString(SIZE (0..64)),
+       mwAuthModePrimaryTacacsSecret                               DisplayString(SIZE (0..64)),
+       mwAuthModeSecondaryRadiusSecret                             DisplayString(SIZE (0..64)),
+       mwAuthModeSecondaryTacacsSecret                             DisplayString(SIZE (0..64)) 
   }
    
    
@@ -763,7 +766,7 @@ IMPORTS
     ::= { mwAuthModeEntry    6 }
 
   mwAuthModePrimaryRadiusSecret  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (1..64))
+    SYNTAX DisplayString(SIZE (0..64))
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -787,7 +790,7 @@ IMPORTS
     ::= { mwAuthModeEntry    9 }
 
   mwAuthModeSecondaryRadiusSecret  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (1..64))
+    SYNTAX DisplayString(SIZE (0..64))
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -811,7 +814,7 @@ IMPORTS
     ::= { mwAuthModeEntry   12 }
 
   mwAuthModePrimaryTacacsSecret  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (1..64))
+    SYNTAX DisplayString(SIZE (0..64))
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -835,7 +838,7 @@ IMPORTS
     ::= { mwAuthModeEntry   15 }
 
   mwAuthModeSecondaryTacacsSecret  OBJECT-TYPE
-    SYNTAX DisplayString(SIZE (1..64))
+    SYNTAX DisplayString(SIZE (0..64))
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -857,6 +860,264 @@ IMPORTS
     DESCRIPTION
          "This object describes WAPI Server Port"
     ::= { mwWapiServer    2 }
+
+  mwCaptivePortalProfileTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwCaptivePortalProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal "
+    ::= { mwConfigSecurity 7 }
+
+  mwCaptivePortalProfileEntry  OBJECT-TYPE
+    SYNTAX MwCaptivePortalProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal "
+    INDEX {  mwCaptivePortalProfileTableIndex  }
+    ::= { mwCaptivePortalProfileTable 1 }
+
+  MwCaptivePortalProfileEntry  ::=  SEQUENCE { 
+       mwCaptivePortalProfileTableIndex                            Integer32, 
+       mwCaptivePortalProfileName                                  DisplayString(SIZE (1..32)),
+       mwCaptivePortalProfileAutoLogin                             MwlOnOffSwitch,
+       mwCaptivePortalProfileExternalCPIP                          IpAddress,
+       mwCaptivePortalProfileExternalCPURL                         DisplayString(SIZE (0..255)),
+       mwCaptivePortalProfileOverrideRadius                        MwlCaptivePortalAuthenticationType,
+       mwCaptivePortalProfileExternalServer                        MwlCaptivePortalExternalServerType,
+       mwCaptivePortalProfileRadiusProfileName                     DisplayString(SIZE (0..32)),
+       mwCaptivePortalProfileCpExemptionProfile                    DisplayString(SIZE (0..32)),
+       mwCaptivePortalProfileL3UserSessionTimeout                  Integer32(1..1440),
+       mwCaptivePortalProfileAccountingInterimInterval             Unsigned32,
+       mwCaptivePortalProfileSecondaryRadiusProfileName            DisplayString(SIZE (0..32)),
+       mwCaptivePortalProfileCaptivePortalSessionTimeout           Integer32(0..1440),
+       mwCaptivePortalProfileCaptivePortalActivityTimeout          Integer32(0..60),
+       mwCaptivePortalProfilePrimaryAccountingRadiusServer         DisplayString(SIZE (0..32)),
+       mwCaptivePortalProfileSecondaryAccountingRadiusServer       DisplayString(SIZE (0..32)),
+       mwCaptivePortalProfileOwner                                 MwlProfileOwner,
+       mwCaptivePortalProfileRowStatus                             RowStatus 
+  }
+   
+   
+  mwCaptivePortalProfileTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwCaptivePortalProfileEntry 1 }
+
+  mwCaptivePortalProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes CP Name"
+    ::= { mwCaptivePortalProfileEntry    2 }
+
+  mwCaptivePortalProfileRadiusProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary Profile"
+    ::= { mwCaptivePortalProfileEntry    3 }
+
+  mwCaptivePortalProfileSecondaryRadiusProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary Profile"
+    ::= { mwCaptivePortalProfileEntry    4 }
+
+  mwCaptivePortalProfilePrimaryAccountingRadiusServer  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary Accounting"
+    ::= { mwCaptivePortalProfileEntry    5 }
+
+  mwCaptivePortalProfileSecondaryAccountingRadiusServer  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary Accounting"
+    ::= { mwCaptivePortalProfileEntry    6 }
+
+  mwCaptivePortalProfileAccountingInterimInterval  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Accounting Interim Interval (seconds)"
+    ::= { mwCaptivePortalProfileEntry    7 }
+
+  mwCaptivePortalProfileOverrideRadius  OBJECT-TYPE
+    SYNTAX MwlCaptivePortalAuthenticationType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Authentication Type"
+    ::= { mwCaptivePortalProfileEntry    8 }
+
+  mwCaptivePortalProfileExternalCPURL  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..255))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes CaptivePortal External URL"
+    ::= { mwCaptivePortalProfileEntry    9 }
+
+  mwCaptivePortalProfileExternalCPIP  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Public IP of Controller"
+    ::= { mwCaptivePortalProfileEntry   10 }
+
+  mwCaptivePortalProfileCaptivePortalSessionTimeout  OBJECT-TYPE
+    SYNTAX Integer32(0..1440)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Session Timeout"
+    ::= { mwCaptivePortalProfileEntry   15 }
+
+  mwCaptivePortalProfileCaptivePortalActivityTimeout  OBJECT-TYPE
+    SYNTAX Integer32(0..60)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Activity Timeout"
+    ::= { mwCaptivePortalProfileEntry   16 }
+
+  mwCaptivePortalProfileL3UserSessionTimeout  OBJECT-TYPE
+    SYNTAX Integer32(1..1440)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes L3 User Session Timeout(mins)"
+    ::= { mwCaptivePortalProfileEntry   17 }
+
+  mwCaptivePortalProfileAutoLogin  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes CNA bypass"
+    ::= { mwCaptivePortalProfileEntry   18 }
+
+  mwCaptivePortalProfileOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwCaptivePortalProfileEntry   19 }
+
+  mwCaptivePortalProfileExternalServer  OBJECT-TYPE
+    SYNTAX MwlCaptivePortalExternalServerType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal External Server Type"
+    ::= { mwCaptivePortalProfileEntry   20 }
+
+  mwCaptivePortalProfileCpExemptionProfile  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal Exemption"
+    ::= { mwCaptivePortalProfileEntry   21 }
+
+  mwCaptivePortalProfileRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwCaptivePortalProfileEntry 58 }
+
+  mwCaptivePortalExemptionTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwCaptivePortalExemptionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal Exemptions "
+    ::= { mwConfigSecurity 8 }
+
+  mwCaptivePortalExemptionEntry  OBJECT-TYPE
+    SYNTAX MwCaptivePortalExemptionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal Exemptions "
+    INDEX {  mwCaptivePortalExemptionTableIndex  }
+    ::= { mwCaptivePortalExemptionTable 1 }
+
+  MwCaptivePortalExemptionEntry  ::=  SEQUENCE { 
+       mwCaptivePortalExemptionTableIndex                          Integer32, 
+       mwCaptivePortalExemptionName                                DisplayString(SIZE (1..32)),
+       mwCaptivePortalExemptionFqdn                                DisplayString,
+       mwCaptivePortalExemptionDescr                               DisplayString(SIZE (0..128)),
+       mwCaptivePortalExemptionOwner                               MwlProfileOwner,
+       mwCaptivePortalExemptionRowStatus                           RowStatus 
+  }
+   
+   
+  mwCaptivePortalExemptionTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwCaptivePortalExemptionEntry 1 }
+
+  mwCaptivePortalExemptionName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Profile Name"
+    ::= { mwCaptivePortalExemptionEntry    2 }
+
+  mwCaptivePortalExemptionDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..128))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Description"
+    ::= { mwCaptivePortalExemptionEntry    3 }
+
+  mwCaptivePortalExemptionFqdn  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes FQDN"
+    ::= { mwCaptivePortalExemptionEntry    4 }
+
+  mwCaptivePortalExemptionOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwCaptivePortalExemptionEntry    5 }
+
+  mwCaptivePortalExemptionRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwCaptivePortalExemptionEntry 7 }
 
   
 END

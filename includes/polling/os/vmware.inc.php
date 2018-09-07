@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -23,7 +23,7 @@
  *  features:  build-348481
  */
 
-$data     = snmp_get_multi($device, 'vmwProdName.0 vmwProdVersion.0 vmwProdBuild.0 vmwProdUpdate.0', '-OQUs', 'VMWARE-SYSTEM-MIB');
+$data     = snmp_get_multi_oid($device, 'vmwProdName.0 vmwProdVersion.0 vmwProdBuild.0 vmwProdUpdate.0', array(), 'VMWARE-SYSTEM-MIB');
 $update   = ($data[0]['vmwProdUpdate'] ? ' U' . $data[0]['vmwProdUpdate'] : ''); // Only add update info if update > 0
 $version  = preg_replace('/^VMware /', '', $data[0]['vmwProdName']) . ' ' . $data[0]['vmwProdVersion'] . $update;
 $features = 'build-' . $data[0]['vmwProdBuild'];

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ * Observium
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage webui
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -30,11 +30,11 @@ $navbar = array('brand' => "Ports", 'class' => "navbar-narrow");
 $navbar['options']['basic']['text']   = 'Basic';
 $navbar['options']['details']['text'] = 'Details';
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` LEFT JOIN `ports` USING(`port_id`) WHERE `device_id` = ?", array($device['device_id'])))
+if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `device_id` = ?", array($device['device_id'])))
 {
   $navbar['options']['ipv4']['text'] = 'IPv4 addresses';
 }
-if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses` LEFT JOIN `ports` USING(`port_id`) WHERE `device_id` = ?", array($device['device_id'])))
+if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `device_id` = ?", array($device['device_id'])))
 {
   $navbar['options']['ipv6']['text'] = 'IPv6 addresses';
 }
@@ -74,10 +74,15 @@ foreach ($navbar['options'] as $option => $array)
   $navbar['options'][$option]['url'] = generate_url($link_array,array('view' => $option));
 }
 
+//r($config['graph_types']['port']);
+//r($device['graphs']);
 foreach (array('graphs', 'minigraphs') as $type)
 {
   foreach ($config['graph_types']['port'] as $option => $data)
   {
+    // Skip unavialable port graphs
+    //if (!isset($device['graphs']['port_'.$option])) { continue; } // device grapha array is not the place for this
+
     if ($vars['view'] == $type && $vars['graph'] == $option)
     {
       $navbar['options'][$type]['suboptions'][$option]['class'] = 'active';
@@ -151,13 +156,13 @@ if ($vars['view'] == 'minigraphs')
   unset ($seperator);
 
   // FIXME - FIX THIS. UGLY.
-  foreach (dbFetchRows("SELECT * FROM ports WHERE device_id = ? ORDER BY ifIndex", array($device['device_id'])) as $port)
+  foreach (dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? ORDER BY `ifIndex`", array($device['device_id'])) as $port)
   {
     if (is_filtered()) { continue; }
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
-    <div style='font-weight: bold;'>".short_ifname($port['ifDescr'])."</div>
+    <div style='font-weight: bold;'>".escape_html($port['port_label_short'])."</div>
     <a href=\"" . generate_port_url($port) . "\" onmouseover=\"return overlib('\
-    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
+    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".escape_html($port['port_label'])."</div>\
     ".$port['ifAlias']." \
     <img src=\'graph.php?type=".$graph_type."&amp;id=".$port['port_id']."&amp;from=".$from."&amp;to=".$config['time']['now']."&amp;width=450&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
@@ -204,7 +209,7 @@ else if (is_file($config['html_dir'] . '/pages/device/ports/' . $vars['view'] . 
   {
     $ext_tables = array_merge($ext_tables, array('ipv4_addresses', 'ipv6_addresses', 'pseudowires'));
     // Here stored ifIndex!
-    $cache['ports_option']['ports_pagp']       = dbFetchColumn("SELECT `pagpGroupIfIndex` FROM `ports`   WHERE `device_id` = ? GROUP BY `pagpGroupIfIndex`", array($device['device_id']));
+    //$cache['ports_option']['ports_pagp']       = dbFetchColumn("SELECT `pagpGroupIfIndex` FROM `ports`   WHERE `device_id` = ? GROUP BY `pagpGroupIfIndex`", array($device['device_id'])); // PAGP removed
     $cache['ports_option']['ports_stack_low']  = dbFetchColumn("SELECT `port_id_low`  FROM `ports_stack` WHERE `device_id` = ? AND `port_id_high` != 0 GROUP BY `port_id_low`",  array($device['device_id']));
     $cache['ports_option']['ports_stack_high'] = dbFetchColumn("SELECT `port_id_high` FROM `ports_stack` WHERE `device_id` = ? AND `port_id_low`  != 0 GROUP BY `port_id_high`", array($device['device_id']));
   }

@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: MIB interface of BFD protocol configuration.
 --              The Bidirectional Forwarding Detection (BFD) protocol
 --              is standardized by the IETF. BFD detects the
@@ -7,7 +7,7 @@
 --              quickly sending BFD control packets (the UDP packets in
 --              a specified format) at intervals between two nodes.
 -- Reference:
--- Version:     V1.51
+-- Version:     V1.55
 --
 -- =================================================================
 
@@ -32,7 +32,7 @@
 
 
         hwBFDMIB MODULE-IDENTITY
-            LAST-UPDATED "201508040000Z"
+            LAST-UPDATED "201601080000Z"
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
                 "Huawei Industrial Base
@@ -52,6 +52,18 @@
                 "
 
             -- Revision history
+              REVISION    "201601080000Z"
+            DESCRIPTION "V1.55, add hwBfdSessConfbImpactFlag and hwBfdSessConfbImpactFlag."
+
+            REVISION    "201601080000Z"
+            DESCRIPTION "V1.54, add hwBfdSessFsmDiscordant and hwBfdSessFsmAccordant."
+
+            REVISION    "201511080000Z"
+            DESCRIPTION "V1.53, add hwBfdPWSessDownTrap and hwBfdPWSessUpTrap for Pw Bfd session."
+
+            REVISION    "201510230000Z"
+            DESCRIPTION "V1.52, add hwBfdSessApOperFailed for virtual access."
+			
             REVISION    "201508040000Z"
             DESCRIPTION "V1.51, add hwBfdSessFaultDown and hwBfdSessResume."
 
@@ -387,7 +399,7 @@
                 "
             ::= { hwBfdScalarsObjects 18 }
 
-            hwBfdSessCfgRemoteFailType OBJECT-TYPE
+        hwBfdSessCfgRemoteFailType OBJECT-TYPE
             SYNTAX INTEGER
                 {
                 localDiscriminatorNonsupport(101),
@@ -401,7 +413,7 @@
                  1. localDiscriminatorNonsupport(101)
                  2. localDiscriminatorConflict(102)
                 "
-            ::= { hwBfdScalarsObjects 19 }
+            ::= { hwBfdScalarsObjects 19 }	
 
         hwBfdObjects OBJECT IDENTIFIER ::= { hwBFDMIB 2 }
 
@@ -655,7 +667,9 @@
                 hwBfdSessConfCEVid
                     Unsigned32,
                 hwBfdSessConfTOSEx
-                    Integer32
+                    Integer32,
+                hwBfdSessConfbImpactFlag
+                    INTEGER
              }
 
         hwBfdSessConfName OBJECT-TYPE
@@ -1314,6 +1328,23 @@
             DEFVAL { 7 }
             ::= { hwBfdSessionConfEntry 53 }
 
+        hwBfdSessConfbImpactFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                no(1),
+                yes(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "BFD session impact interface when the device reboot
+                 Options:
+                 1. no(1)  -do not impact interface when the device reboot
+                 2. yes(2) -impact interface when the device reboot
+                "
+            DEFVAL { 1 }
+            ::= { hwBfdSessionConfEntry 54 }
+
         hwBfdSessionTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwBfdSessionEntry
             MAX-ACCESS not-accessible
@@ -1458,7 +1489,9 @@
                 hwBfdSessBindAppTypeMask
                     OCTET STRING,
                 hwBfdSessDscp
-                    Integer32
+                    Integer32,
+                hwBfdSessPWId
+                    Unsigned32
              }
 
         hwBfdSessIndex OBJECT-TYPE
@@ -2633,6 +2666,14 @@
                 "
             ::= { hwBfdSessionEntry 60 }
 
+        hwBfdSessPWId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "It is the ID of PW."
+            ::= { hwBfdSessionEntry 61 }
+
         hwBfdSessionPerTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwBfdSessionPerEntry
             MAX-ACCESS not-accessible
@@ -3191,6 +3232,40 @@
                 "
             ::= { hwBfdNotifications 9 }
 
+        hwBfdSessApOperFailed NOTIFICATION-TYPE
+            OBJECTS {
+                hwBfdCfgApUserName,
+                hwBfdCfgApIPAddress,
+                hwBfdCfgApID,
+                hwBfdCfgApOperation,
+                hwBfdCfgApReason }
+            STATUS current
+            DESCRIPTION
+                "The operation failed to config access point."
+            ::= { hwBfdNotifications 10 }
+
+        hwBfdSessFsmDiscordant NOTIFICATION-TYPE
+            OBJECTS { hwBfdSessCfgName, hwBfdSessLocalDiscr, hwBfdSessDiag, hwBfdSessBindIfName }
+            STATUS current
+            DESCRIPTION
+                "This trap occurred when the state of the BFD session
+                 FSM's board is different from the monitored link's board.
+                 The BFD session is characterized by the objects in this node.
+                "
+            ::= { hwBfdNotifications 11 }  
+            
+
+        hwBfdSessFsmAccordant NOTIFICATION-TYPE
+            OBJECTS { hwBfdSessCfgName, hwBfdSessLocalDiscr, hwBfdSessDiag, hwBfdSessBindIfName }
+            STATUS current
+            DESCRIPTION
+                "This trap occurred when the state of the BFD session
+                 FSM's board is the same as the monitored link's board.
+                 The BFD session is characterized by the objects in this node.
+                "
+            ::= { hwBfdNotifications 12 }
+
+
         hwBfdConformance OBJECT IDENTIFIER ::= { hwBFDMIB 4 }
 
 
@@ -3233,7 +3308,7 @@
                 hwBfdSessConfPWSecondaryFlag, hwBfdSessConfTunnelDetectType, hwBfdSessConfVcId, hwBfdSessConfVsiName, hwBfdSessConfVsiPeerAddr, hwBfdSessConfDiscrAuto, hwBfdSessConfPeerIpv6Addr, hwBfdSessConfSourceIpv6Addr, hwBfdSessConfIpv6NextHop, hwBfdSessConfIsIpv6Addr,
                 hwBfdSessConfKeychainName, hwBfdSessConfMeticulous, hwBfdSessConfLooseAuthentication, hwBfdSessConfPWTtlMode,
                 hwBfdSessConfPWTtl, hwBfdSessConfRemotePeerIp, hwBfdSessConfRemotePeerIpType, hwBfdSessConfPWSPE, hwBfdSessConfPWTrackIfName, hwBfdSessConfIsPWTrackIf, hwBfdSessConfEncapsulationType,
-                hwBfdSessConfPEVid, hwBfdSessConfCEVid, hwBfdSessConfTOSEx, hwBfdSessMIndex, hwBfdSessBindVRRP,
+                hwBfdSessConfPEVid, hwBfdSessConfCEVid, hwBfdSessConfTOSEx, hwBfdSessConfbImpactFlag, hwBfdSessMIndex, hwBfdSessBindVRRP,
                 hwBfdSessCfgName, hwBfdSessPeerAddr, hwBfdSessBindIfIndex, hwBfdSessBindIfName, hwBfdSessLocalDiscr,
                 hwBfdSessRemoteDiscr, hwBfdSessOperMode, hwBfdSessDetectMult, hwBfdSessDemandTimerInterval, hwBfdSessActualRxInterval,
                 hwBfdSessActualTxInterval, hwBfdSessWTRInterval, hwBfdSessTOS, hwBfdSessState, hwBfdSessDiag,
@@ -3245,7 +3320,7 @@
                 hwBfdSessPerfPktInHC, hwBfdSessPerfPktOut, hwBfdSessPerfPktOutHC, hwBfdSessPerfBadIn, hwBfdSessPerfBadInHC,
                 hwBfdSessPerfBadOut, hwBfdSessPerfBadOutHC, hwBfdSessPerfLastSessDownTime, hwBfdSessPerfSessDownCount, hwBfdSessPerfSessShortBreakCount,
                 hwBfdSessionPerStartTime, hwBfdTtlConfValue, hwBfdTtlConfRowStatus,
-                hwBfdPassiveAuthPeerAddr, hwBfdPassiveAuthProtocol, hwBfdPassiveAuthKeychainName, hwBfdPassiveAuthMeticulous, hwBfdPassiveAuthLoose, hwBfdPassiveAuthRowStatus}
+                hwBfdPassiveAuthPeerAddr, hwBfdPassiveAuthProtocol, hwBfdPassiveAuthKeychainName, hwBfdPassiveAuthMeticulous, hwBfdPassiveAuthLoose, hwBfdPassiveAuthRowStatus, hwBfdSessPWId}
             STATUS current
             DESCRIPTION
                 "A collection of objects providing BFD session information."
@@ -3276,7 +3351,47 @@
             DESCRIPTION
                 "The VLANID binding to BFD session.
                 "  
-            ::= { hwBfdTrapsVbOids 1 }     
+            ::= { hwBfdTrapsVbOids 1 }  
+
+        hwBfdCfgApUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The name of user failed to configure access point."
+            ::= { hwBfdTrapsVbOids 2 }
+
+        hwBfdCfgApIPAddress OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The IP-address of user failed to configure access point."
+            ::= { hwBfdTrapsVbOids 3 }
+
+        hwBfdCfgApID OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8191)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ID of access point failed to be configured."
+            ::= { hwBfdTrapsVbOids 4 }
+
+        hwBfdCfgApOperation OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The operation of confiuration to access point."
+            ::= { hwBfdTrapsVbOids 5 }
+
+        hwBfdCfgApReason OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason of failed to configure access point."
+            ::= { hwBfdTrapsVbOids 6 }			
             
         hwBfdTraps OBJECT IDENTIFIER ::= { hwBFDMIB 6 }
     
@@ -3392,6 +3507,47 @@
                  other state.
                 "
             ::= { hwBfdAlarmTraps 0 6 }
+        hwBfdPWSessUp NOTIFICATION-TYPE
+            OBJECTS 
+            {
+                hwBfdSessIndex,
+                hwBfdSessCfgName,
+                hwBfdSessLocalDiscr,
+                hwBfdSessDiag,
+                hwBfdSessBindType,
+                hwBfdSessPWSecondaryFlag,
+                hwBfdSessPWId,
+                hwBfdSessVsiName,
+                hwBfdSessVsiPeerAddr
+            }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the bfdSessState
+                 object for one entry in bfdSessionTable is about to 
+                 enter the up(3) state from some other state.
+                "
+            ::= { hwBfdAlarmTraps 0 7 }
+        hwBfdPWSessDown NOTIFICATION-TYPE
+            OBJECTS 
+            {
+                hwBfdSessIndex,
+                hwBfdSessCfgName,
+                hwBfdSessLocalDiscr,
+                hwBfdSessDiag,
+                hwBfdSessBindType,
+                hwBfdSessPWSecondaryFlag,
+                hwBfdSessPWId,
+                hwBfdSessVsiName,
+                hwBfdSessVsiPeerAddr
+            }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the bfdSessState
+                 object for one entry in bfdSessionTable is about to 
+                 enter the down(1) or adminDown(0) states from some 
+                 other state.
+                "
+            ::= { hwBfdAlarmTraps 0 8 }
             
     END  
          

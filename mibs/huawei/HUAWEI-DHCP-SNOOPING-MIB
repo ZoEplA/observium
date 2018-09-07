@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI DHCP SNOOPING MIB
 -- Reference:
--- Version: V2.03
+-- Version: V2.05
 -- History:
 --    wangcheng 60005987 initial    16/02/2006
 --  hexiaoqin 60020960 modified   25/12/2006
@@ -12,6 +12,8 @@
 --      modified by xiazhaolin 2013-06-19
 --      modified by huangxiaomin 221241 2014/01/27
 --      modified by caojingyun 00273809 2014/07/18
+--      modified by liangyun 00353956 2016/10/11
+--      modified by liangyun 00353956 2016/10/28 
 -- =================================================================
     
     HUAWEI-DHCP-SNOOPING-MIB DEFINITIONS ::= BEGIN
@@ -80,11 +82,19 @@
 -- Module Identifier                
 --
     hwDhcpSnpMib MODULE-IDENTITY 
-        LAST-UPDATED "201407180000Z"            -- july 18th, 2014 at 16:00 GMT
+        LAST-UPDATED "201610280000Z"            -- Oct 28th, 2016 at 21:00 GMT
         ORGANIZATION 
              "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
 "Huawei Industrial Base  Bantian, Longgang   Shenzhen 518129   People's Republic of China   Website: http://www.huawei.com   Email: support@huawei.com "
+
+       DESCRIPTION
+            "Change the DHCP Snooping Conformance."
+       REVISION "201610280000Z" 
+	
+       DESCRIPTION
+            "Change the DHCP Snooping Conformance."
+       REVISION "201610110000Z" 
        DESCRIPTION
             "This MIB describes objects used for DHCP Snooping."
        REVISION "201407180000Z"      
@@ -1619,20 +1629,11 @@
             
     
     hwDhcpSnpCompliance OBJECT IDENTIFIER ::= { hwDhcpSnpMib 3 }
-        
-        hwDhcpSnpMibGroups MODULE-COMPLIANCE
-               STATUS      current
-               DESCRIPTION
-                   "The compliance statement for systems supporting 
-                this module."
-
-               MODULE    
-               MANDATORY-GROUPS    { hwDhcpSnpCfgGroup,hwDhcpSnpBindGroup, hwDhcpSnpStatisticGroup,hwDhcpSnpTrapGroup }  
-                                               
-              ::= { hwDhcpSnpCompliance 1 }
-              
-              
-              
+    
+    
+	
+    hwDhcpSnpMibGroups OBJECT IDENTIFIER ::= { hwDhcpSnpCompliance 1 }
+             
     hwDhcpSnpCfgGroup OBJECT-GROUP
             OBJECTS { hwDhcpSnpGlobal, hwDhcpPktRateCheck, hwDhcpPktRate, hwDhcpPktRateAlarmThreshold, 
             hwDhcpPktRateAlarmEnable, hwDhcpSnpBindTblNomatchedArpGlobalAction, hwDhcpSnpBindTblNomatchedIpGlobalAction,
@@ -1690,8 +1691,8 @@
                 "The DHCPSNP's Notification group."
             ::= { hwDhcpSnpMibGroups 4 } 
 
-         hwDhcpSnpBdStatisticGroup OBJECT-GROUP
-            OBJECTS { hwDhcpSnpBdIndex ,hwBdNomatchSnpBindTblDhcpPktNum,hwBdChaddrNomatchSrcMacDhcpPktNum,
+    hwDhcpSnpBdStatisticGroup OBJECT-GROUP
+            OBJECTS { hwBdNomatchSnpBindTblDhcpPktNum,hwBdChaddrNomatchSrcMacDhcpPktNum,
                 hwBdArpNomatchSnpBindTblPktNum,hwBdIpNomatchSnpBindTblPktNum,hwBdUntrustedReplyPktNum,hwBdSnpBindingItemNum, 
                 hwBdSnpCfgMaxUserNum }
             STATUS current
@@ -1699,6 +1700,17 @@
                 "The DHCPSNP's Statistic group on the bridge domain ."
             ::= { hwDhcpSnpMibGroups 5 }
 
-                                                                               
+    hwDhcpSnpCompliances OBJECT IDENTIFIER ::= { hwDhcpSnpCompliance 2 }
+	
+        hwDhcpSnpMibCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                this module."
+
+               MODULE    
+               MANDATORY-GROUPS    { hwDhcpSnpCfgGroup, hwDhcpSnpBindGroup, hwDhcpSnpStatisticGroup, hwDhcpSnpTrapGroup}  
+                                               
+              ::= { hwDhcpSnpCompliances 1 }                                                                           
 
         END

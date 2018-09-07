@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -19,16 +19,29 @@ $scale_max = "100";
 
 if ($width > 500)
 {
-  $descr_len = 22;
+   $descr_len = 22;
 } else {
-  $descr_len = 12;
+   $descr_len = 12;
 }
 $descr_len += round(($width - 250) / 8);
+
+if ($width > "1000")
+{
+   $descr_len = 36;
+}
+else if ($width > "500")
+{
+   $descr_len = 24;
+} else {
+   $descr_len = 12;
+   $descr_len += round(($width - 200) / 8);
+}
+
 
 $iter = 0;
 $colours = 'mixed';
 
-$rrd_options .= " COMMENT:'".str_pad('Size      Used    %used', $descr_len+31, ' ', STR_PAD_LEFT)."\\\l'";
+$rrd_options .= " COMMENT:'".str_pad('Size      Used    %used', $descr_len+31, ' ', STR_PAD_LEFT)."\\l'";
 
 
 foreach ($vars['id'] as $mempool_id)
@@ -36,14 +49,13 @@ foreach ($vars['id'] as $mempool_id)
 
   $mempool = dbFetchRow("SELECT * FROM `mempools` WHERE `mempool_id` = ?", array($mempool_id));
   $device = device_by_id_cache($mempool['device_id']);
-
   if (!$config['graph_colours'][$colours][$iter]) { $iter = 0; }
   $colour=$config['graph_colours'][$colours][$iter];
 
   $descr = rrdtool_escape(rewrite_hrDevice($mempool['mempool_descr']), $descr_len);
   if (isset($mempool['mempool_type'])) { $mempool['mempool_mib'] = $mempool['mempool_type']; }
 
-  $rrd_filename = get_rrd_path($device, "mempool-".$mempool['mempool_mib']."-".$mempool['mempool_index'].".rrd");
+  $rrd_filename = get_rrd_path($device, "mempool-".strtolower($mempool['mempool_mib'])."-".$mempool['mempool_index'].".rrd");
 
   if (is_file($rrd_filename))
   {
@@ -55,10 +67,11 @@ foreach ($vars['id'] as $mempool_id)
     $rrd_options .= " LINE1.25:".$mempool['mempool_id']."perc#" . $colour . ":'$descr'";
     $rrd_options .= " GPRINT:".$mempool['mempool_id']."size:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:".$mempool['mempool_id']."used:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:".$mempool['mempool_id']."perc:LAST:%5.2lf%%\\\l";
+    $rrd_options .= " GPRINT:".$mempool['mempool_id']."perc:LAST:%5.2lf%%\\l";
     $iter++;
   }
 }
+
 
 // EOF
 

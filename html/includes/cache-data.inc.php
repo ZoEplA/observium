@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -492,11 +492,14 @@ while ($i <= $ports_count)
   if (isset($config['enable_bgp']) && $config['enable_bgp'])
   {
     // Init variables to 0
-    $cache['routing']['bgp']['internal'] = 0; $cache['routing']['bgp']['external'] = 0; $cache['routing']['bgp']['count'] = 0;
-    $cache['routing']['bgp']['up'] = 0; $cache['routing']['bgp']['down'] = 0;
+    $cache['routing']['bgp']['internal'] = 0;
+    $cache['routing']['bgp']['external'] = 0;
+    $cache['routing']['bgp']['count'] = 0;
+    $cache['routing']['bgp']['up'] = 0;
+    $cache['routing']['bgp']['down'] = 0;
 
     $cache['routing']['bgp']['last_seen'] = $config['time']['now'];
-    foreach (dbFetchRows('SELECT `device_id`,`bgpPeer_id`,`bgpPeerState`,`bgpPeerAdminStatus`,`bgpPeerRemoteAs` FROM `bgpPeers`;') as $bgp)
+    foreach (dbFetchRows('SELECT `device_id`,`bgpPeer_id`,`local_as`,`bgpPeerState`,`bgpPeerAdminStatus`,`bgpPeerRemoteAs` FROM `bgpPeers`;') as $bgp)
     {
       if (!$config['web_show_disabled'])
       {
@@ -519,7 +522,7 @@ while ($i <= $ports_count)
         } else {
           $cache['routing']['bgp']['down']++;
         }
-        if ($cache['devices']['id'][$bgp['device_id']]['bgpLocalAs'] == $bgp['bgpPeerRemoteAs'])
+        if ($bgp['local_as'] == $bgp['bgpPeerRemoteAs'])
         {
           $cache['routing']['bgp']['internal']++;
           $cache['bgp']['internal'][] = (int)$bgp['bgpPeer_id']; // Collect iBGP peers
@@ -557,6 +560,24 @@ while ($i <= $ports_count)
       }
     }
   }
+
+//  if (isset($config['enable_eigrp']) && $config['enable_eigrp']) {
+    $cache['routing']['eigrp']['last_seen'] = $config['time']['now'];
+    foreach (dbFetchRows("SELECT `device_id` FROM `eigrp_vpns`") as $eigrp)
+    {
+      if (!$config['web_show_disabled'])
+      {
+        if ($cache['devices']['id'][$eigrp['device_id']]['disabled'])
+        {
+          continue;
+        }
+      }
+      if (device_permitted($ospf))
+      {
+        $cache['routing']['eigrp']['count']++;
+      }
+    }
+ // }
 
   // Common permission sql query
   //r(range_to_list($cache['devices']['permitted']));

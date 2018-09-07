@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI VPLS Management Extended MIB
 -- Reference:
--- Version:     V2.37
+-- Version:     V2.43
 -- History:
 --              V1.0 PanJun, 2006-05-08, publish
 -- ==================================================================
@@ -34,7 +34,7 @@
 
 
         hwL2VpnVplsExt MODULE-IDENTITY 
-            LAST-UPDATED "201501071000Z"            --Jan 7, 2015 at 10:00 GMT 
+            LAST-UPDATED "201611281000Z"            --Nov 28, 2016 at 10:00 GMT 
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -48,6 +48,34 @@
             DESCRIPTION 
                 "The HUAWEI-VPLS-EXT-MIB contains objects to
                 manage VPLS."
+
+             REVISION "201611281000Z"           --Nov 28, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add OBJECTS(hwVplsBLabelNotEnough, hwVplsBLabelNotEnoughClear)." 
+
+             REVISION "201611181000Z"           --Nov 18, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add hwVplsNotificationGroup(hwVplsBLabelNotEnough, hwVplsBLabelNotEnoughClear)." 
+
+              REVISION "201610311000Z"           --Oct 31, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add VPLS MIB Trap(hwVplsBLabelNotEnough)." 
+
+              REVISION "201610311000Z"           --Oct 31, 2016 at 10:00 GMT 
+             DESCRIPTION               
+             "Add VPLS MIB Trap(hwVplsBLabelNotEnoughClear)."
+
+             REVISION "201609271000Z"           --Sep 27, 2016 at 10:00 GMT 
+             DESCRIPTION "modify hwVplsDiffServMode range"  
+
+             REVISION "201607111000Z"           --July 11, 2016 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                Add Leaf Node to hwVplsLdpStatisticsEntry"  
+
+             REVISION "201511171000Z"           --Nov 17, 2015 at 10:00 GMT 
+             DESCRIPTION "add change reason
+                TDM Bit Rate Matched(93),
+                TDM Bit Rate Unmatched(94)"  
 
               REVISION "201501071000Z"           --Jan 7, 2015 at 10:00 GMT 
              DESCRIPTION "add change reason
@@ -278,6 +306,8 @@
                 Route Reachable(90)
                 Aging(91)
                 Verification(92)
+                TDM Bit Rate Matched(93)
+                TDM Bit Rate Unmatched(94)
                 "
             SYNTAX INTEGER
                 {
@@ -372,7 +402,9 @@
                 routeUnreachable(89),
                 routeReachable(90),
                 aging(91),
-                verification(92)
+                verification(92),
+                tdmBitRateMatched(93),
+                tdmBitRateUnmatched(94)
                 }
 
     
@@ -502,7 +534,7 @@
 
         hwVplsVsiName OBJECT-TYPE
             SYNTAX DisplayString (SIZE (1..31))
-            MAX-ACCESS not-accessible
+            MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
                 "This object indicates the VSI's name."
@@ -713,7 +745,11 @@
                 {
                 pipe(1),
                 shortpipe(2),
-                uniform(3)
+                uniform(3),
+                egressPipe(4),
+                egressShortpipe(5),
+                egressShortpipeTrustInnerVlan8021p(6),
+                egressShortpipeTrustIpDscp(7) 
                 }
             MAX-ACCESS read-create
             STATUS current
@@ -1556,7 +1592,19 @@
                 hwVplsLdpStatResetTime
                     DateAndTime,
                 hwVplsLdpStatResetStatistic
-                    INTEGER
+                    INTEGER,
+                hwVplsLdpStatInUnicastBytes
+                    Counter64,
+                hwVplsLdpStatOutUnicastBytes
+                    Counter64,
+                hwVplsLdpStatInMulticastBytes
+                    Counter64,
+                hwVplsLdpStatOutMulticastBytes
+                    Counter64,
+                hwVplsLdpStatInBroadcastBytes
+                    Counter64,
+                hwVplsLdpStatOutBroadcastBytes
+                    Counter64	
              }
 
         hwVplsLdpStatPwID OBJECT-TYPE
@@ -1776,6 +1824,59 @@
                 "Reset traffic statistics of VSI's LDP peer."
             ::= { hwVplsLdpStatisticsEntry 24 }
 
+
+        hwVplsLdpStatInUnicastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 25 }
+
+        
+        hwVplsLdpStatOutUnicastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 26 }
+
+        
+        hwVplsLdpStatInMulticastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 27 }
+
+        
+        hwVplsLdpStatOutMulticastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 28 }
+
+        
+        hwVplsLdpStatInBroadcastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast bytes received on the PW."
+            ::= { hwVplsLdpStatisticsEntry 29 }
+
+        
+        hwVplsLdpStatOutBroadcastBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast bytes transmitted out of the PW."
+            ::= { hwVplsLdpStatisticsEntry 30 }
 
 --          
 -- The VPLS BGP's Statistic Table
@@ -2874,7 +2975,21 @@
             STATUS current
             DESCRIPTION 
                 "VPLS PW redundancy reported the clearing of the protect degraded alarm."
-            ::= { hwVplsMIBTraps 14 }           
+            ::= { hwVplsMIBTraps 14 }
+
+        hwVplsBLabelNotEnough NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiName }
+            STATUS current
+            DESCRIPTION 
+                "The block labels of VPLS are not enough."
+            ::= { hwVplsMIBTraps 15 }
+            
+        hwVplsBLabelNotEnoughClear NOTIFICATION-TYPE
+            OBJECTS { hwVplsVsiName }
+            STATUS current
+            DESCRIPTION 
+                "The block labels of VPLS are enough."
+            ::= { hwVplsMIBTraps 16 }            
                                             
 --    Conformance information
 -- 
@@ -2980,7 +3095,7 @@
         hwVplsNotificationGroup NOTIFICATION-GROUP
             NOTIFICATIONS { hwVplsVcDown, hwVplsVcUp, hwVplsVsiDown, hwVplsVsiUp, hwVplsVcBackup, hwVplsVsiDeleted, hwVplsVcDeleted, hwVplsVcStatusChange,
                  hwVplsVcNumberThresholdExceed, hwVplsVcNumberThresholdClear, hwVplsVcNumberMaxExceed, hwVplsVcNumberMaxClear, hwVplsPwRedundancyDegraded,
-                 hwVplsPwRedundancyDegradedClear }
+                 hwVplsPwRedundancyDegradedClear, hwVplsBLabelNotEnough, hwVplsBLabelNotEnoughClear }
             STATUS current
             DESCRIPTION 
                 "The VPLS Notification group."

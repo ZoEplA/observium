@@ -4,11 +4,11 @@
 --
 
 --    ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI PERFMGMT MIB
 -- Reference:
--- Version: V4.09
+-- Version: V4.11
 -- History:  V4.08  huqing, 2015-09-21,Modify nodes 
 -- created 2014-05-05
 -- ==================================================================
@@ -31,7 +31,7 @@
 -- February 27, 2009 at 11:41 GMT
         -- 1.3.6.1.4.1.2011.5.25.190
         hwPerfMgmt MODULE-IDENTITY 
-            LAST-UPDATED "201510161434Z"      --Oct 16, 2015 at 14:34GMT
+            LAST-UPDATED "201601291434Z"      --Jur 29, 2016 at 14:34GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -42,6 +42,16 @@
                      Website: http://www.huawei.com
                      Email: support@huawei.com
                    "
+            DESCRIPTION 
+                "V4.11  delete MIB nodes ." 
+                
+            REVISION "201601291434Z"        --Jur 19, 2016 at 14:34GMT
+            
+            DESCRIPTION 
+                "V4.10  add MIB nodes ." 
+                
+            REVISION "201601191434Z"        --Jur 19, 2016 at 14:34GMT
+                        
             DESCRIPTION 
                 "V4.09  modify MIB nodes hwPMMeasureExceed ." 
                 
@@ -182,7 +192,9 @@
                 hwPMStatisticsTaskType
                 	INTEGER,
                 hwPMStatisticsHighPrecisionPeriod
-                	Unsigned32
+                	Unsigned32,
+                hwPMStatisticsSampleLevel
+                	INTEGER
              }
 
         hwPMStatisticsTaskName OBJECT-TYPE
@@ -329,7 +341,20 @@
                 "The interval of statistics task, in seconds. if taskType is sdhShort , It must be multiple of 5 seconds and less or equal to 900 seconds, else It must be multiple of 30 seconds."
             DEFVAL { 900 }
             ::= { hwPMStatisticsTaskEntry 20 }
-        
+ 
+       hwPMStatisticsSampleLevel OBJECT-TYPE  
+           SYNTAX INTEGER
+                {
+                default(0),
+                second(1)              
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The sample level of statistics task."
+            DEFVAL { minute }
+            ::= { hwPMStatisticsTaskEntry 21 }    
+                 
         hwPMStatisticsTaskInstanceTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwPMStatisticsTaskInstanceEntry
             MAX-ACCESS not-accessible

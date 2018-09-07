@@ -8,12 +8,16 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-// Pre-cache the existing state of VLANs for this device from the database
-unset($vlans_db, $ports_vlans_db, $ports_vlans);
+// Init collecting vars
+$discovery_vlans       = array();
+$discovery_ports_vlans = array();
+$vlans_db        = array();
+$ports_vlans_db  = array();
+$ports_vlans     = array();
 
 $vlans_db_raw = dbFetchRows("SELECT * FROM `vlans` WHERE `device_id` = ?;", array($device['device_id']));
 foreach ($vlans_db_raw as $vlan_db)
@@ -26,111 +30,135 @@ foreach ($ports_vlans_db_raw as $vlan_db)
 {
   $ports_vlans_db[$vlan_db['port_id']][$vlan_db['vlan']] = $vlan_db;
 }
-#if (OBS_DEBUG > 1 && count($ports_vlans_db)) { var_dump($ports_vlans_db); }
-
-// Create an empty array to record what VLANs we discover this session.
-$device['vlans'] = array();
+print_debug_vars($ports_vlans_db);
 
 // Include all discovery modules
 $include_dir = "includes/discovery/vlans";
 include("includes/include-dir-mib.inc.php");
 
-foreach ($device['vlans'] as $domain_id => $vlans)
+
+/* Process discovered Vlans */
+$table_rows = array();
+$vlan_params = array('vlan_name', 'vlan_mtu', 'vlan_type', 'vlan_status', 'ifIndex');
+foreach ($discovery_vlans as $domain_index => $vlans)
 {
   foreach ($vlans as $vlan_id => $vlan)
   {
-    // Pull Tables for this VLAN
+    echo(" $vlan_id");
+    $vlan_update = array();
 
-    // /usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dStpPortEntry
-    // /usr/bin/snmpbulkwalk -v2c -c kglk5g3l454@988  -OQUs  -m BRIDGE-MIB -M /opt/observium/mibs/ udp:sw2.ahf:161 dot1dBasePortEntry
-
-    // FIXME - do this only when vlan type == ethernet?
-    if (is_numeric($vlan_id) && ($vlan_id <1002 || $vlan_id > 1105)) // Ignore reserved VLAN IDs
+    if (isset($vlans_db[$domain_index][$vlan_id]))
     {
-      if ($device['os_group'] == "cisco" && $device['os'] != 'ciscosb') // This shit only seems to work on Cisco
+      // Vlan already in db, compare
+      foreach ($vlan_params as $param)
       {
-        list($ios_version) = explode('(', $device['version']);
-
-        // vlan context not worked on Cisco IOS <= 12.1 (SNMPv3)
-        if ($device['snmp_version'] == 'v3' && $device['os'] == "ios" && ($ios_version * 10) <= 121)
+        if ($vlans_db[$domain_index][$vlan_id][$param] != $vlan[$param])
         {
-          print_error("ERROR: For VLAN context to work on this device please use SNMP v2/v1 for this device (or upgrade IOS).");
-          break;
-        }
-        $device_context = $device;
-        $device_context['snmp_context'] = $vlan_id;  // Add vlan context
-        $device_context['snmp_retries'] = 0;         // Set retries to 0 for speedup walking
-        $vlan_data = snmpwalk_cache_oid($device_context, "dot1dStpPortEntry", array(), "BRIDGE-MIB:Q-BRIDGE-MIB");
-
-        // Detection shit snmpv3 authorization errors for contexts
-        if ($exec_status['exitcode'] != 0)
-        {
-          unset($device_context);
-          if ($device['snmp_version'] == 'v3')
-          {
-            print_error("ERROR: For VLAN context to work on Cisco devices with SNMPv3, it is necessary to add 'match prefix' in snmp-server config.");
-          } else {
-            print_error("ERROR: Device does not support per-VLAN community.");
-          }
-          break;
-        }
-        $vlan_data = snmpwalk_cache_oid($device_context, "dot1dBasePortEntry", $vlan_data, "BRIDGE-MIB:Q-BRIDGE-MIB");
-        unset($device_context);
-      }
-
-      if ($vlan_data)
-      {
-        print_debug(str_pad("dot1d id", 10).str_pad("ifIndex", 10).str_pad("Port Name", 25).
-                    str_pad("Priority", 10).str_pad("State", 15).str_pad("Cost", 10));
-      }
-
-      foreach ($vlan_data as $vlan_port_id => $vlan_port)
-      {
-        $port = get_port_by_index_cache($device, $vlan_port['dot1dBasePortIfIndex']);
-        if (!is_array($port)) { continue; } // Port not founded, skip
-
-        print_debug(str_pad($vlan_port_id, 10).str_pad($vlan_port['dot1dBasePortIfIndex'], 10).
-                    str_pad($port['ifDescr'],25).str_pad($vlan_port['dot1dStpPortPriority'], 10).
-                    str_pad($vlan_port['dot1dStpPortState'], 15).str_pad($vlan_port['dot1dStpPortPathCost'], 10));
-
-        $db_w = array('device_id' => $device['device_id'],
-                      'port_id'   => $port['port_id'],
-                      'vlan'      => $vlan_id);
-
-        $db_a = array('baseport'  => $vlan_port_id,
-                      'priority'  => $vlan_port['dot1dStpPortPriority'],
-                      'state'     => $vlan_port['dot1dStpPortState'],
-                      'cost'      => $vlan_port['dot1dStpPortPathCost']);
-
-        if (isset($ports_vlans_db[$port['port_id']][$vlan_id]))
-        {
-          $id = $ports_vlans_db[$port['port_id']][$vlan_id]['port_vlan_id'];
-          foreach ($db_a as $key => $value)
-          {
-            $db_a_changed = $ports_vlans_db[$port['port_id']][$vlan_id][$key] != $value;
-            if ($db_a_changed) { break; }
-          }
-          if ($db_a_changed)
-          {
-            dbUpdate($db_a, 'ports_vlans', "`port_vlan_id` = ?", array($id));
-            $module_stats[$vlan_id]['S'] = 'U';
-          } else {
-            $module_stats[$vlan_id]['S'] = '.';
-          }
-          $ports_vlans[$port['port_id']][$vlan_id] = $id;
-        } else {
-          $id = dbInsert(array_merge($db_w, $db_a), 'ports_vlans');
-          $module_stats[$vlan_id]['P'] = '+';
-          $module_stats[$vlan_id]['S'] = '+';
-          $ports_vlans[$port['port_id']][$vlan_id] = $id;
+          $vlan_update[$param] = $vlan[$param];
         }
       }
+
+      if (count($vlan_update))
+      {
+        dbUpdate($vlan_update, 'vlans', 'vlan_id = ?', array($vlans_db[$domain_index][$vlan_id]['vlan_id']));
+        $module_stats[$vlan_id]['V'] = 'U';
+        $GLOBALS['module_stats'][$module]['updated']++;
+      } else {
+        $module_stats[$vlan_id]['V'] = '.';
+        $GLOBALS['module_stats'][$module]['unchanged']++;
+      }
+
     } else {
-      unset($module_stats[$vlan_id]);
+      // New vlan discovered
+      $vlan_update = $vlan;
+      $vlan_update['device_id'] = $device['device_id'];
+      dbInsert($vlan_update, 'vlans');
+      $module_stats[$vlan_id]['V'] = '+';
+      $GLOBALS['module_stats'][$module]['added']++;
+    }
+
+    $table_rows[] = array($domain_index, $vlan_id, $vlan['vlan_name'], $vlan['vlan_type'], $vlan['vlan_status']);
+  }
+}
+$table_headers = array('%WDomain%n', '%WVlan: ID%n', '%WName%n', '%WType%n', '%WStatus%n');
+print_cli_table($table_rows, $table_headers);
+/* End process vlans */
+
+// Clean removed vlans
+foreach ($vlans_db as $domain_index => $vlans)
+{
+  foreach ($vlans as $vlan_id => $vlan)
+  {
+    if (empty($discovery_vlans[$domain_index][$vlan_id]))
+    {
+      dbDelete('vlans', "`device_id` = ? AND vlan_domain = ? AND vlan_vlan = ?", array($device['device_id'], $domain_index, $vlan_id));
+      $module_stats[$vlan_id]['V'] = '-';
+      $GLOBALS['module_stats'][$module]['deleted']++;
+
+      $table_rows[] = array($domain_index, $vlan_id, $vlan['vlan_name'], $vlan['vlan_type'], $vlan['vlan_status'], '');
     }
   }
 }
 
+$valid['vlans'] = $discovery_vlans;
+$GLOBALS['module_stats'][$module]['status'] = count($valid[$module]);
+//if (OBS_DEBUG && $GLOBALS['module_stats'][$module]['status']) { print_vars($valid[$module]); }
+
+/* Process discovered ports vlans */
+$table_rows = array();
+$vlan_params = array('vlan', 'baseport', 'priority', 'state', 'cost'); // FIXME. move STP to separate table
+foreach ($discovery_ports_vlans as $ifIndex => $vlans)
+{
+  foreach ($vlans as $vlan_id => $vlan)
+  {
+    $port = get_port_by_index_cache($device, $ifIndex);
+    if (!is_array($port)) { continue; } // Port not founded, skip
+
+    $table_rows[] = array($ifIndex, $port['port_label_short'], $vlan['vlan'], $vlan['priority'], $vlan['state'], $vlan['cost']);
+
+    $vlan_update = array();
+    if (isset($ports_vlans_db[$port['port_id']][$vlan_id]))
+    {
+      // Port vlan already in db, compare
+      foreach ($vlan_params as $param)
+      {
+        if ($ports_vlans_db[$port['port_id']][$vlan_id] != $vlan[$param])
+        {
+          $vlan_update[$param] = $vlan[$param];
+        }
+      }
+
+      $id = $ports_vlans_db[$port['port_id']][$vlan_id]['port_vlan_id'];
+      if (count($vlan_update))
+      {
+        dbUpdate($vlan_update, 'ports_vlans', '`port_vlan_id` = ?', array($id));
+        $module_stats[$vlan_id]['P'] = 'U';
+        $GLOBALS['module_stats']['ports_vlans']['updated']++;
+      } else {
+        $module_stats[$vlan_id]['P'] = '.';
+        $GLOBALS['module_stats']['ports_vlans']['unchanged']++;
+      }
+    } else {
+      // New port vlan discovered
+      $vlan_update = $vlan;
+      $vlan_update['device_id'] = $device['device_id'];
+      $vlan_update['port_id']   = $port['port_id'];
+
+      $id = dbInsert($vlan_update, 'ports_vlans');
+      $module_stats[$vlan_id]['P'] = '+';
+      $GLOBALS['module_stats']['ports_vlans']['added']++;
+    }
+
+    // Store processed IDs
+    $ports_vlans[$port['port_id']][$vlan_id] = $id;
+
+  }
+}
+$table_headers = array('%WifIndex%n', '%WifDescr%n', '%WVlan%n', '%WSTP: Priority%n', '%WState%n', '%WCost%n');
+print_cli_table($table_rows, $table_headers);
+/* End process ports vlans */
+
+// Clean removed per port vlans
 foreach ($ports_vlans_db as $port_id => $vlans)
 {
   foreach ($vlans as $vlan_id => $vlan)
@@ -139,23 +167,18 @@ foreach ($ports_vlans_db as $port_id => $vlans)
     {
       dbDelete('ports_vlans', "`port_vlan_id` = ?", array($ports_vlans_db[$port_id][$vlan_id]['port_vlan_id']));
       $module_stats[$vlan_id]['P'] = '-';
+      $GLOBALS['module_stats']['ports_vlans']['deleted']++;
     }
   }
 }
 
-foreach ($vlans_db as $domain_id => $vlans)
-{
-  foreach ($vlans as $vlan_id => $vlan)
-  {
-    if (empty($device['vlans'][$domain_id][$vlan_id]))
-    {
-      dbDelete('vlans', "`device_id` = ? AND vlan_domain = ? AND vlan_vlan = ?", array($device['device_id'], $domain_id, $vlan_id));
-      $module_stats[$vlan_id]['V'] = '-';
-    }
-  }
-}
+$valid['ports_vlans'] = $ports_vlans;
+$GLOBALS['module_stats']['ports_vlans']['status'] = count($valid['ports_vlans']);
+//if (OBS_DEBUG && $GLOBALS['module_stats']['ports_vlans']['status']) { print_vars($valid['ports_vlans']); }
 
-// Print module stats (P - ports, V - vlans, S - spannigtree)
+
+// Print vlan specific module stats (P - ports, V - vlans, S - spannigtree)
+
 if ($module_stats)
 {
   $msg = "Module [ $module ] stats:";
@@ -171,7 +194,7 @@ if ($module_stats)
   echo($msg);
 }
 
-unset($device['vlans']);
+unset($vlans_db, $ports_vlans_db, $ports_vlans, $discovery_vlans, $discovery_ports_vlans);
 
 echo(PHP_EOL);
 

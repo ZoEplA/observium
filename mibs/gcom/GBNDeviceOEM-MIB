@@ -15,13 +15,18 @@
         PortList                                FROM Q-BRIDGE-MIB;      
 
     bcm5600 MODULE-IDENTITY
-        LAST-UPDATED    "0105030000Z"  -- May 03,2001  
+        LAST-UPDATED    "201802140000Z"  -- February 14, 2018
         ORGANIZATION    "Greentech"
         CONTACT-INFO    "Adam Armstrong
                          E-mail: adama@observium.org"
 
         DESCRIPTION     "GBN Broadcom BCM5600 StrataSwitch OEM-Product
                          Enterprise MIB definition."
+
+        REVISION        "201802140000Z"  -- February 14, 2018
+        DESCRIPTION     "Fix a few ASN.1 syntax errors (replace underscores
+                         with hyphens in descriptors) so that Net-SNMP tools
+                         can now load the MIB."
 
         REVISION        "0105030000Z"  -- May 03,2001
         DESCRIPTION     "Initial MIB creation."
@@ -212,9 +217,9 @@
              full-100(5),
              half-1000(6),
              full-1000(7),
-             auto_10(8),
-             auto_100(9),
-             auto_1000(10),
+             auto-10(8),
+             auto-100(9),
+             auto-1000(10),
              illegal(99)
         }
         MAX-ACCESS read-only

@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring the information of the VLAN, including
 --               VLAN management, VLAN interface, VLAN aggregation and so on.
 -- Reference:
--- Version:      V3.83
+-- Version:      V3.86
 --
 -- ============================================================================
 
@@ -23,7 +23,7 @@
                FROM SNMPv2-TC;
 
        hwVlan MODULE-IDENTITY
-           LAST-UPDATED "201508071000Z"
+           LAST-UPDATED "201608301000Z"
            ORGANIZATION
                "Huawei Technologies Co.,Ltd."
            CONTACT-INFO
@@ -38,7 +38,16 @@
                "The mib is used for configuring the information of the VLAN, including
                 VLAN management,VLAN interface,VLAN aggregation and so on."
 
-           -- Revision history    
+           -- Revision history
+           REVISION    "201608301000Z"
+           DESCRIPTION "V3.86, modified the value range and description of hwIPv6MTU and hwIPv4MTU."
+
+           REVISION    "201605281000Z"
+           DESCRIPTION "V3.85, Added hwAntiMacDuplicateSwitch in hwVlanSrvProfTable."
+
+           REVISION    "201511101000Z"
+           DESCRIPTION "V3.84, Added hwPortVlanOuterEthernetTypeTable in hwVlanMngObject."
+
            REVISION    "201508071000Z"
            DESCRIPTION "V3.83, modified the value range and description of hwIPv6MTU."
 
@@ -2182,27 +2191,27 @@
             ::= { hwVlanInterfaceEntry 13 }
 
        hwIPv6MTU OBJECT-TYPE
-           SYNTAX Integer32 (-1|1280..1499|1501..1560)
+           SYNTAX Integer32 (-1|1280..1499|1501..9600)
            MAX-ACCESS read-write
            STATUS current
            DESCRIPTION
                "Used to configure the maximum transmission unit of vlanif.If you set it on one vlanif,all the vlanif will
                 be configured. For P300 device, the node can take effect on IPV4 and IPV6. For Saturn device, it only takes 
                 effect on IPV6.
-                Range: -1,1280-1499,1501-1560. For P300 device, the range is -1,1501-1560. For Saturn device, the range is
-                -1,1280-1499,1501-1560. 
+                Range: -1,1280-1499,1501-9600. For P300 device, the range is -1,1501-1560. For Saturn device, the range is
+                -1,1280-1499,1501-9600. 
                 Deafult:-1,this value means the MTU of vlanif is the default value(for example: 1500).
                "
            ::= { hwVlanInterfaceEntry 14 }
 
        hwIPv4MTU OBJECT-TYPE
-           SYNTAX Integer32 (-1|1501..1560)
+           SYNTAX Integer32 (-1|1501..9600)
            MAX-ACCESS read-write
            STATUS current
            DESCRIPTION
                "Used to configure the maximum transmission unit of vlanif. The node is only supported on Saturn device. It
                only takes effect on IPV4.
-                Range: -1,1501-1560
+                Range: -1,1501-9600
                 Deafult:-1,this value means the MTU of vlanif is the default value(for example: 1500).
                "
            ::= { hwVlanInterfaceEntry 15 }
@@ -2767,6 +2776,8 @@
                INTEGER,
              hwCableIPv6SourceVerify
                INTEGER,
+             hwAntiMacDuplicateSwitch
+               INTEGER,  
              hwProfileRowStatus
                RowStatus
             }
@@ -3817,6 +3828,33 @@
                "
            ::= { hwVlanSrvProfEntry 46 }
 
+       hwAntiMacDuplicateSwitch OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               enable(1),
+               disable(2),
+               notConfig(3)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the VLAN-based mac-duplicate function.
+                Options:
+                1. enable(1)     -indicates that the mac-duplicate function is enabled.
+                2. disable(2)    -indicates that the mac-duplicate function is disabled.
+                3. notConfig(3)  -indicates by VLAN single switch.
+                This leaf is optional for creating a VLAN service profile.
+                The VLAN-based mac-duplicate function can be configured in
+                hwIpDslamL2pVlanCtrlAntiMacDuplicate of HUAWEI-IPDSLAML2PPORTCONFIG-MIB.
+                The status of the mac-duplicate function is determined by its
+                VLAN-level switch. The mac-duplicate function of a VLAN is enabled
+                only when the VLAN-level switch is enabled.
+                If a VLAN service profile is bound to the VLAN,
+                the configuration of the VLAN-based mac-duplicate function
+                in the VLAN service profile takes effect.
+               "
+           ::= { hwVlanSrvProfEntry 47 }
+
        hwProfileRowStatus   OBJECT-TYPE
            SYNTAX RowStatus
            MAX-ACCESS read-create
@@ -4810,7 +4848,86 @@
                 Default: -1
                "
            ::= { hwVlanMngObject 65010 }
-           
+
+        --hwPortVlanOuterEthernetTypeTable 
+        hwPortVlanOuterEthernetTypeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortVlanOuterEthernetTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the TPID table based on port and VLAN.
+                The indexes of this table are ifIndex and hwPortVlanOuterEthernetTypeVlanid.
+                "
+            ::= { hwVlanMngObject 65011 }
+
+        hwPortVlanOuterEthernetTypeEntry OBJECT-TYPE
+            SYNTAX HwPortVlanOuterEthernetTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Describes the Ethernet protocol type of the outer VLAN tag of a port and VLAN.
+                The indexes of this entry are ifIndex and hwPortVlanOuterEthernetTypeVlanid.
+                "
+            INDEX { ifIndex, hwPortVlanOuterEthernetTypeVlanid }
+            ::= { hwPortVlanOuterEthernetTypeTable 1 }
+
+        HwPortVlanOuterEthernetTypeEntry ::=
+            SEQUENCE {
+                hwPortVlanOuterEthernetTypeVlanid
+                    Integer32,
+                hwPortVlanOuterEthernetType
+                    INTEGER,
+                hwPortVlanOuterEthernetTypeRowStatus
+                    RowStatus
+             }
+
+        hwPortVlanOuterEthernetTypeVlanid OBJECT-TYPE
+            SYNTAX Integer32 (1..4095)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the VLAN ID input in TPID configuration.
+                Range: 1-4095.
+                "
+            ::= { hwPortVlanOuterEthernetTypeEntry 1 }
+
+        hwPortVlanOuterEthernetType OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               dot1adTpid(2)
+             }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the TPID based on port and VLAN.
+                Options:
+                1. dot1adTpid(2) -indicates that hwPortVlanOuterEthernetType is dot1adTpid
+                "
+            ::= { hwPortVlanOuterEthernetTypeEntry 2 }
+
+        hwPortVlanOuterEthernetTypeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the row status, used for setting, querying or deleting a hwPortVlanOuterEthernetType.
+                Options:
+                1. active(1)
+                2. createAndGo(4)
+                3. destroy(6)
+                To set a hwPortVlanOuterEthernetType, you must specify hwPortVlanOuterEthernetTypeVlanid and set
+                hwPortVlanOuterEthernetTypeRowStatus to createAndGo(4) to perform the set operation.
+                To delete a hwPortVlanOuterEthernetType, set hwPortVlanOuterEthernetTypeRowStatus to destroy(6) to perform the set operation.
+                During query, the value of this leaf is the fixed active(1).
+                "
+            ::= { hwPortVlanOuterEthernetTypeEntry 3 }
+        --hwPortVlanOuterEthernetTypeTable
+
        hwVlanInterfaceTrapsVbOids OBJECT IDENTIFIER ::= { hwVlanMngObject 30 }
 
        hwL3InterfaceType

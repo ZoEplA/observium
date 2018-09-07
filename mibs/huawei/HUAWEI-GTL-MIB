@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI GTL MIB
 -- Reference:
--- Version: V2.09
+-- Version: V2.13
 -- History:
 -- <author>,  <date>,  <contents>
 -- WangHaiwei   2007-1-16
@@ -27,7 +27,7 @@
                 FROM SNMPv2-SMI;
 
         hwGtl MODULE-IDENTITY 
-            LAST-UPDATED "201508101714Z"        -- Aug 10, 2015 at 17:14 GMT
+            LAST-UPDATED "201607271037Z"        -- JUL 27, 2016 at 10:37 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -41,7 +41,19 @@
             DESCRIPTION 
                 "The private mib file includes the general extent 
                 information of the device.hwDatacomm(25).htGtl(142)"
-                
+				
+            REVISION     "201607271037Z"                                                                                    
+            DESCRIPTION  "V2.13, Modify description of hwGtlFunctionInactive, hwGtlFunctionInactiveCleared, hwGtlResourceLack, hwGtlResourceLackCleared "  
+
+            REVISION     "201606282020Z"                                                                                    
+            DESCRIPTION  "V2.12, Add hwGtlAbnormal, hwGtlAbnormalCleared, hwGtlAbnormalReason "     				
+				
+            REVISION     "201605191118Z"                                                                                    
+            DESCRIPTION  "V2.11, Add hwGtlFunctionInactive, hwGtlFunctionInactiveCleared, hwGtlResourceLack, hwGtlResourceLackCleared "     				
+				
+            REVISION     "201512311501Z"                                                                                    
+            DESCRIPTION  "V2.10, Add hwGtlInitial, hwGtlInitialCleared, hwGtlBoardID  "     
+               
             REVISION     "201508101714Z"                                                                                    
             DESCRIPTION  "V2.09, Add hwGtlItemInactive, hwGtlItemInactiveCleared  "     
  
@@ -217,6 +229,37 @@
             "Show chassis description."
         ::= { hwGtlMibObjects 9 }
 
+        hwGtlBoardID OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE (1..32))
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "Show board description."
+        ::= { hwGtlMibObjects 10 }
+
+        hwGtlAbnormalReason OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            startLibrary(10),
+            requestRespond(11),
+            processMessage(12),
+            sendRequest(13),
+            processRequest(14),
+            licenseAbnormal(15)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "Show abnormal reason of license:
+            startLibrary(10): Failed to start the license library
+            requestRespond(11): The backup request was not responded
+            processMessage(12): Failed to process the backup message
+            sendRequest(13): Failed to send a backup request
+            processRequest(14): Failed to process the backup request
+            licenseAbnormal(15): The license may be abnormal
+            "
+        ::= { hwGtlMibObjects 11 }
+
         hwGtlNotifications OBJECT IDENTIFIER ::= { hwGtl 2 }
 
         hwGtlDefaultValue NOTIFICATION-TYPE
@@ -380,6 +423,63 @@
             DESCRIPTION 
                 "The notification represents the item is inactive is cleared."
             ::= { hwGtlNotifications 23 }
+
+        hwGtlInitial NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents current license had been initialized."
+            ::= { hwGtlNotifications 24 }
+            
+        hwGtlInitialCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents current license had been initialized is cleared."
+            ::= { hwGtlNotifications 25 }
+			
+			
+        hwGtlFunctionInactive NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicates that the control item is not activated."
+            ::= { hwGtlNotifications 26 }
+            
+        hwGtlFunctionInactiveCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicating that the control item is not activated is cleared."
+            ::= { hwGtlNotifications 27 }
+
+        hwGtlResourceLack NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicates that the current resources are insufficient."
+            ::= { hwGtlNotifications 28 }
+            
+        hwGtlResourceLackCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicating that the current resources are insufficient is cleared."
+            ::= { hwGtlNotifications 29 }			
+
+        hwGtlAbnormal NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID, hwGtlAbnormalReason }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents license function is abnormal."
+            ::= { hwGtlNotifications 30 }
+            
+        hwGtlAbnormalCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID, hwGtlAbnormalReason }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents license function is abnormal is cleared."
+            ::= { hwGtlNotifications 31 }			
             
 --    Conformance information            
         hwGtlConformance OBJECT IDENTIFIER ::= { hwGtl 3 }
@@ -399,14 +499,14 @@
 
         hwGtlObjectGroup OBJECT-GROUP
             OBJECTS { hwGtlDefaultValueReason, hwGtlResourceItem, hwGtlFeatureName, hwGtlRemainTime, hwGtlVerifyCode, 
-                      hwGtlActive, hwGtlShowActLCSName, hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue, hwGtlItemDescription, hwGtlChassisID }
+                      hwGtlActive, hwGtlShowActLCSName, hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue, hwGtlItemDescription, hwGtlChassisID, hwGtlBoardID, hwGtlAbnormalReason }
             STATUS current
             DESCRIPTION 
                 "The GTL attribute group."
             ::= { hwGtlGroups 1 }
 
         hwGtlNotificationGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwGtlDefaultValue, hwGtlResourceUsedUp, hwGtlNearDeadline, hwGtlLicenseVerifyFailed, hwGtlExpired, hwGtlItemMismatch, hwGtlDefaultValueCleared, hwGtlNearDeadlineCleared, hwGtlItemMismatchCleared, hwGtlResourceUsedUpCleared, hwGtlLicenseNotCommeral, hwGtlEmergencyStart, hwGtlEmergencyStop, hwGtlTrialFeatureEnable, hwGtlTrialFeatureDisable, hwGtlTrialFeatureNearDeadline, hwGtlTrialFeatureNearDeadlineCleared, hwGtlResourceOverload, hwGtlResourceOverloadCleared, hwGtlEsnMismatch, hwGtlEsnMismatchCleared, hwGtlItemInactive, hwGtlItemInactiveCleared }
+            NOTIFICATIONS { hwGtlDefaultValue, hwGtlResourceUsedUp, hwGtlNearDeadline, hwGtlLicenseVerifyFailed, hwGtlExpired, hwGtlItemMismatch, hwGtlDefaultValueCleared, hwGtlNearDeadlineCleared, hwGtlItemMismatchCleared, hwGtlResourceUsedUpCleared, hwGtlLicenseNotCommeral, hwGtlEmergencyStart, hwGtlEmergencyStop, hwGtlTrialFeatureEnable, hwGtlTrialFeatureDisable, hwGtlTrialFeatureNearDeadline, hwGtlTrialFeatureNearDeadlineCleared, hwGtlResourceOverload, hwGtlResourceOverloadCleared, hwGtlEsnMismatch, hwGtlEsnMismatchCleared, hwGtlItemInactive, hwGtlItemInactiveCleared, hwGtlInitial, hwGtlInitialCleared, hwGtlFunctionInactive, hwGtlFunctionInactiveCleared, hwGtlResourceLack, hwGtlResourceLackCleared, hwGtlAbnormal, hwGtlAbnormalCleared }
             STATUS current
             DESCRIPTION 
                 "The notification group."

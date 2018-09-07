@@ -1,11 +1,11 @@
 -- =================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-TUNNEL-MIB provides information about 
 --        Tunnel configuration
 --              
 -- Reference:
--- Version:     V2.05
+-- Version:     V2.06
 -- History:
 -- V1.0 2009-06-19, publish
 -- =================================================================
@@ -33,7 +33,7 @@ HUAWEI-TUNNEL-MIB DEFINITIONS ::= BEGIN
 
 
     hwTunnelMib MODULE-IDENTITY
-        LAST-UPDATED "201410240000Z"
+        LAST-UPDATED "201601050000Z"
         ORGANIZATION "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
             "Huawei Industrial Base
@@ -45,6 +45,10 @@ HUAWEI-TUNNEL-MIB DEFINITIONS ::= BEGIN
              "
         DESCRIPTION
             "V2.05 Update hwHybridDynBwPunish and hwHybridDynBwResume, modify their description."
+        
+        REVISION "201601050000Z"  
+        DESCRIPTION
+            "Switch name of hwTunnelInDataFlow and hwTunnelOutDataFlow"
         REVISION "201410240000Z"  
         DESCRIPTION
             "The MIB module for entities implementing the Tunnel protocol configuration."
@@ -339,8 +343,8 @@ HUAWEI-TUNNEL-MIB DEFINITIONS ::= BEGIN
         hwTunnelAuthNotAllowedCnt      Counter64,
         hwTunnelAuthFailOthersCnt      Counter64,
         hwTunnelCreateFailCnt      Counter64,
-        hwTunnelInDataFlow      Counter64,
-        hwTunnelOutDataFlow      Counter64
+        hwTunnelOutDataFlow      Counter64,
+        hwTunnelInDataFlow      Counter64
         }            
 
     hwTunnelType  OBJECT-TYPE
@@ -348,7 +352,7 @@ HUAWEI-TUNNEL-MIB DEFINITIONS ::= BEGIN
             overflow(1),
             priority(2)
             }
-        MAX-ACCESS not-accessible
+        MAX-ACCESS accessible-for-notify
         STATUS current
         DESCRIPTION "This object indicates the tunnel type."
         ::= { hwHybridAccessTunnelGlobalStatEntry 1 } 
@@ -430,14 +434,14 @@ HUAWEI-TUNNEL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION "The value of this object identifies the total number of GRE tunnel creation failures on each device."
         ::= { hwHybridAccessTunnelGlobalStatEntry 12 }   
         
-    hwTunnelInDataFlow  OBJECT-TYPE
+    hwTunnelOutDataFlow OBJECT-TYPE 
         SYNTAX  Counter64
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION "This object indicates the uplink data volume using the tunnel connection."
         ::= { hwHybridAccessTunnelGlobalStatEntry 13 }      
         
-    hwTunnelOutDataFlow  OBJECT-TYPE
+    hwTunnelInDataFlow  OBJECT-TYPE
         SYNTAX  Counter64
         MAX-ACCESS read-only
         STATUS current
@@ -539,8 +543,8 @@ HUAWEI-TUNNEL-MIB DEFINITIONS ::= BEGIN
         hwTunnelAuthNotAllowedCnt,
         hwTunnelAuthFailOthersCnt,
         hwTunnelCreateFailCnt,
-        hwTunnelInDataFlow,
         hwTunnelOutDataFlow,
+        hwTunnelInDataFlow,
         hwHybridRttThreshold,
         hwHybridRttCheckTimes,
         hwHybridCreateFailValue,

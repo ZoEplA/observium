@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -98,14 +98,26 @@ function print_events($vars)
         $string .= format_timestamp($entry['timestamp']) . '</td>' . PHP_EOL;
       }
 
+      if ($entry['device_id'] == 0 && $entry['entity_type'] == '')
+      {
+        // Compatability for global events
+        $entry['entity_type'] = 'global';
+      }
+
       if ($list['device'])
       {
-        $dev = device_by_id_cache($entry['device_id']);
-        $device_vars = array('page'    => 'device',
-                             'device'  => $entry['device_id'],
-                             'tab'     => 'logs',
-                             'section' => 'eventlog');
-        $string .= '    <td class="entity">' . generate_device_link($dev, short_hostname($dev['hostname']), $device_vars) . '</td>' . PHP_EOL;
+        if ($entry['entity_type'] == 'global')
+        {
+          // Global events
+          $string .= '    <td class="entity"><span class="label">GLOBAL</span></td>' . PHP_EOL;
+        } else {
+          $dev = device_by_id_cache($entry['device_id']);
+          $device_vars = array('page'    => 'device',
+                               'device'  => $entry['device_id'],
+                               'tab'     => 'logs',
+                               'section' => 'eventlog');
+          $string .= '    <td class="entity">' . generate_device_link($dev, short_hostname($dev['hostname']), $device_vars) . '</td>' . PHP_EOL;
+        }
       }
       if ($list['entity'])
       {
@@ -114,6 +126,10 @@ function print_events($vars)
         {
           $this_if = get_port_by_id_cache($entry['entity_id']);
           $entry['link'] = '<span class="entity"><i class="' . $config['entities']['port']['icon'] . '"></i> ' . generate_port_link($this_if, $this_if['port_label_short']) . '</span>';
+        }
+        else if ($entry['entity_type'] == 'global')
+        {
+          $entry['link'] = '<i class="' . $config['icon']['info'] . '"></i>';
         } else {
           if (!empty($config['entities'][$entry['entity_type']]['icon']))
           {
@@ -136,6 +152,7 @@ function print_events($vars)
         $string .= '    <td>';
       }
       $string .= escape_html($entry['message']) . '</td>' . PHP_EOL;
+      //$string .= $entry['message'] . '</td>' . PHP_EOL;
       $string .= '  </tr>' . PHP_EOL;
     }
 
@@ -283,17 +300,29 @@ function generate_eventlog_form_values($form_filter = FALSE, $column = NULL)
     case 'type':
     case 'types':
       // Use filter as items
-      if ($filter && in_array('device', $form_filter))
+      if ($filter)
       {
-        // Device always first
-        $form_filter = array_unique(array_merge(array('device'), $form_filter));
+        if (in_array('device', $form_filter))
+        {
+          // Device always first
+          $form_filter = array_unique(array_merge(array('device'), $form_filter));
+        }
+        if (in_array('global', $form_filter))
+        {
+          // Global always first
+          $form_filter = array_unique(array_merge(array('global'), $form_filter));
+        }
       }
       foreach ($form_filter as $type)
       {
-        $name = ($type != '' ? $type : OBS_VAR_UNSET);
-        $form_items[$type]['name'] = nicecase($name);
+        if (strlen($type) == 0) { continue; }
+        $form_items[$type]['name'] = nicecase($type);
 
-        if (!isset($config['entities'][$type]['icon']))
+        if ($type == 'global')
+        {
+          $form_items[$type]['icon'] = $config['icon']['info'];
+        }
+        else if (!isset($config['entities'][$type]['icon']))
         {
           $form_items[$type]['icon'] = $config['entity_default']['icon'];
         } else {

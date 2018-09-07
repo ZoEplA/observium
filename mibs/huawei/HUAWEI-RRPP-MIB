@@ -1,10 +1,13 @@
 -- ==================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:  HUAWEI LAN Switch RRPP MIB
 -- Reference:
--- Version: V2.13
+-- Version: V2.14
 -- Revision history: 
+--     REVISION     "201612080000Z"        
+--     DESCRIPTION  "V2.4,  add hwRrppDomainProtectedInstance leaf node for the rrpp Protected Instance function"
+
 --     REVISION     "201503230000Z"        
 --     DESCRIPTION  "V2.3,  add hwRrppRingSingleDirectionFail leaf node for the rrpp single direction fail trap function"
 
@@ -40,7 +43,7 @@
     
     
         hwRrpp MODULE-IDENTITY 
-            LAST-UPDATED "201503230000Z"        
+            LAST-UPDATED "201612080000Z"        
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -62,6 +65,9 @@
                 than a second after link failure.
                 This MIB defines management information used on 
                 products which support RRPP."
+            REVISION "201612080000Z"
+            DESCRIPTION
+            	"Add new node hwRrppDomainProtectedInstance "
             REVISION "201503230000Z"
             DESCRIPTION
             	"Add new node hwRrppRingSingleDirectionFail"
@@ -137,6 +143,8 @@
                 hwRrppDomainControlVlanID
                     Integer32,
                    hwRrppDomainProtectedVlan
+                        OCTET STRING,
+                   hwRrppDomainProtectedInstance
                         OCTET STRING,
                 hwRrppDomainHelloTime
                     Integer32,
@@ -252,6 +260,14 @@
                    "A textual description of the RRPP domain.  
  	      	    It is mandatory that this only contain no more than 255 printable ASCII characters."
                 ::= { hwRrppDomainEntry 9 }
+
+        hwRrppDomainProtectedInstance OBJECT-TYPE
+              SYNTAX OCTET STRING (SIZE (0..512))
+              MAX-ACCESS read-create
+              STATUS current
+              DESCRIPTION
+                 "Information of instance index protected by a domain."
+             ::= { hwRrppDomainEntry 10 }
 
         hwRrppRingTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwRrppRingEntry
@@ -1131,7 +1147,7 @@
 
         hwRrppDomainGroup OBJECT-GROUP
             OBJECTS { hwRrppDomainControlVlanID,hwRrppDomainHelloTime, hwRrppDomainFailTime, hwRrppDomainRowStatus,
-            		hwRrppDomainResetStatistics, hwRrppMulSubRingProtection, hwRrppDomainProtectedVlan, hwRrppDomainDescription }
+            		hwRrppDomainResetStatistics, hwRrppMulSubRingProtection, hwRrppDomainProtectedVlan, hwRrppDomainDescription, hwRrppDomainProtectedInstance }
             STATUS current
             DESCRIPTION 
                 "The RRPP domain group."

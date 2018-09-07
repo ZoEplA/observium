@@ -7,35 +7,14 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 echo("ENTITY-MIB ");
 
-$mibs = 'ENTITY-MIB';
-$mib_dirs = mib_dirs();
-
-// Vendor specific MIBs
-$vendor_mibs = array('ACMEPACKET-ENTITY-VENDORTYPE-OID-MIB',
-                     'HUAWEI-TC-MIB',
-                     'HPN-ICF-ENTITY-VENDORTYPE-OID-MIB',
-                     'H3C-ENTITY-VENDORTYPE-OID-MIB',
-                     'HH3C-ENTITY-VENDORTYPE-OID-MIB',
-                     'CISCO-STACK-MIB',
-                     'CISCO-ENTITY-VENDORTYPE-OID-MIB'); // Leave this mib always last
-foreach ($vendor_mibs as $vendor_mib)
-{
-  if (is_device_mib($device, $vendor_mib, FALSE))
-  {
-    $mibs .= ':'.$vendor_mib;
-    $mib_dirs = mib_dirs($config['mibs'][$vendor_mib]['mib_dir']);
-    break;
-  }
-}
-
-$entity_array = snmpwalk_cache_oid($device, "entPhysicalEntry", array(), $mibs, $mib_dirs);
-if ($GLOBALS['snmp_status'])
+$entity_array = snmpwalk_cache_oid($device, "entPhysicalEntry", array(), snmp_mib_entity_vendortype($device, 'ENTITY-MIB'));
+if (snmp_status())
 {
   $entity_array = snmpwalk_cache_twopart_oid($device, "entAliasMappingIdentifier", $entity_array, 'ENTITY-MIB:IF-MIB');
 

@@ -2346,4 +2346,22 @@ upsLowBatteryShutdown TRAP-TYPE
                 "The UPS Low Battery Shutdown"
  ::= 67
  
+buckOn TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has enabled Buck."
+ ::= 68
+ 
+returnFromBuck TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has return from Buck."
+ ::= 69
+ 
+returnFromBoost TRAP-TYPE
+        ENTERPRISE ppc
+        DESCRIPTION 
+                "WARNING: The UPS has return from Boost."
+ ::= 70
+ 
 END

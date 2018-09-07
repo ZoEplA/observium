@@ -5,25 +5,15 @@
  * @package    observium
  * @subpackage updater
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 if (!defined('OBS_DEBUG'))
 {
-  // Direct call not allowed, use
+  // Direct call not allowed.
   echo("WARNING. Direct call to this script is no longer supported, please use './discovery.php -u' from main observium directory.\n");
   exit(2);
-
-  /*
-  include_once("includes/defaults.inc.php");
-  include_once("config.php");
-
-  $options = getopt("d");
-
-  include_once("includes/definitions.inc.php");
-  include("includes/functions.inc.php");
-  */
 }
 
 /**
@@ -147,7 +137,8 @@ foreach ($filelist as $file)
 
     if ($extension == "php")
     {
-      echo(sprintf("%03d",$db_rev) . " -> " . sprintf("%03d", $filename) . " # (php) ");
+      $log_msg = sprintf("%03d",$db_rev) . " -> " . sprintf("%03d", $filename) . " # (php) ";
+      echo($log_msg);
 
       $start = time();
       if (include_wrapper($filepath))
@@ -161,16 +152,19 @@ foreach ($filelist as $file)
         }
         $update_time = formatUptime(time() - $start);
         echo(" Done ($update_time)." . PHP_EOL);
+        log_event("Observium schema updated: " . $log_msg . "($update_time).", NULL, NULL, NULL, 5);
       } else {
         // Critical errors, stop update
         logfile('update-errors.log', "====== Schema update " . sprintf("%03d", $db_rev) . " -> " . sprintf("%03d", $filename) . " ==============");
         logfile('update-errors.log', "Error: Could not load file $filepath!");
+        log_event("Observium schema not updated: " . $log_msg . ".", NULL, NULL, NULL, 3);
         exit(1);
       }
     }
     else if ($extension == "sql")
     {
-      echo(sprintf("%03d",$db_rev) . " -> " . sprintf("%03d",$filename) . " # (db) ");
+      $log_msg = sprintf("%03d",$db_rev) . " -> " . sprintf("%03d", $filename) . " # (db) ";
+      echo($log_msg);
 
       $err   = 0;
       $start = time();
@@ -211,9 +205,10 @@ foreach ($filelist as $file)
             {
               $error_no  = dbErrorNo();
               $error_msg = "($error_no) " . dbError();
-              if ($error_no >= 2000) // || !$error_ignore)
+              if ($error_no >= 2000 || in_array($error_no, array(3, 1114))) // additional critical errors list
               {
                 // Critical errors, stop update
+                log_event("Observium schema not updated: " . $log_msg . ".", NULL, NULL, NULL, 3);
                 echo(" stopped. Critical error: " . $error_msg . PHP_EOL);
                 // http://dev.mysql.com/doc/refman/5.6/en/error-messages-client.html
                 logfile('update-errors.log', "====== Schema update " . sprintf("%03d", $db_rev) . " -> " . sprintf("%03d", $filename) . " ==============");
@@ -222,7 +217,12 @@ foreach ($filelist as $file)
                 del_process_info(-1); // Remove process info
                 exit(1);
               } else {
-                echo('F');
+                if ($error_ignore)
+                {
+                  echo('.');
+                } else {
+                  echo('F');
+                }
                 $err++;
                 $errors[] = array('query' => $line, 'error' => $error_msg);
                 print_debug($error_msg);
@@ -237,11 +237,19 @@ foreach ($filelist as $file)
         $update_time = formatUptime(time() - $start);
         if ($db_rev < 1)
         {
+          log_event("Observium schema updated: " . $log_msg . "($update_time).", NULL, NULL, NULL, 5);
           echo(" Done ($update_time)." . PHP_EOL);
         }
         else if ($err)
         {
-          echo(" Done ($update_time, $err errors)." . PHP_EOL);
+          if ($error_ignore)
+          {
+            log_event("Observium schema updated: " . $log_msg . "($update_time).", NULL, NULL, NULL, 5);
+            echo(" Done ($update_time)." . PHP_EOL);
+          } else {
+            log_event("Observium schema updated: " . $log_msg . "($update_time, $err errors).", NULL, NULL, NULL, 4);
+            echo(" Done ($update_time, $err errors)." . PHP_EOL);
+          }
           logfile('update-errors.log', "====== Schema update " . sprintf("%03d", $db_rev) . " -> " . sprintf("%03d", $filename) . " ==============");
           foreach ($errors as $error)
           {
@@ -250,6 +258,7 @@ foreach ($filelist as $file)
           }
           unset($errors);
         } else {
+          log_event("Observium schema updated: " . $log_msg . "($update_time).", NULL, NULL, NULL, 5);
           echo(" Done ($update_time)." . PHP_EOL);
         }
 
@@ -261,6 +270,7 @@ foreach ($filelist as $file)
           $schema_insert = FALSE;
         }
       } else {
+        log_event("Observium schema not updated: " . $log_msg . ".", NULL, NULL, NULL, 3);
         echo(' Could not open file!' . PHP_EOL);
         // Critical errors, stop update
         logfile('update-errors.log', "====== Schema update " . sprintf("%03d", $db_rev) . " -> " . sprintf("%03d", $filename) . " ==============");

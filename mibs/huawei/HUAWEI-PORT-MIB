@@ -1,8 +1,8 @@
 -- ===================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:
 -- Reference:
--- Version: V2.54
+-- Version: V2.71
 -- ===================================================================
 HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -21,10 +21,12 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
         NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
             FROM SNMPv2-CONF     
         DateAndTime            
-                FROM SNMPv2-TC;
+                FROM SNMPv2-TC
+        entPhysicalName            
+                FROM ENTITY-MIB; 
 
     hwPortMIB MODULE-IDENTITY
-        LAST-UPDATED "201510191105Z"
+        LAST-UPDATED "201701241430Z"
         ORGANIZATION "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
             "Huawei Industrial Base
@@ -36,8 +38,82 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "The private mib file includes the general extent
             information of the device.hwDatacomm(157).hwPortMIB"
+        -- Add revision info here!
+		REVISION "201701241430Z"
+        DESCRIPTION
+        "add hwNbAcBlock hwNbRealTimeDelay."
 
-	-- Add revision info here! 
+		-- Add revision info here!
+		REVISION "201701041730Z"
+        DESCRIPTION
+        "add hwPortProtectGroupId,hwPortProtectGroupAvailable,hwPortProtectGroupDelete."
+		
+		-- Add revision info here!
+		REVISION "201612161730Z"
+        DESCRIPTION
+        "add hwBoardNotSupportAssignTrunk."
+		
+		-- Add revision info here!
+        REVISION "201610122026Z"
+        DESCRIPTION
+        "modify hwEthernetJumboframeMaxLength."
+
+	REVISION "201609252334Z"
+        DESCRIPTION
+        "modify hwEthernetSpeedSet."
+	
+	REVISION "201608151106Z"
+        DESCRIPTION
+        "Add hwPhysicalPortInBroadcastRapidChange, hwInputBroadcastChangeThreshold, hwCurrentStatisticalInputBroadcast, hwBaseStatisticalInputBroadcast."
+		
+        REVISION "201608022211Z"
+        DESCRIPTION
+        "modify hwImpedanceMismatch."
+
+
+        REVISION "201607251508Z"
+        DESCRIPTION
+        "Add hwPicLcdAlarm ,hwPicLcdAlarmResume."
+		
+		
+        REVISION "201607211145Z"
+        DESCRIPTION
+        "Add hwImpedenceMismatch."
+
+
+		 REVISION "201606161054Z"
+        DESCRIPTION 
+		"Add hwPhysicalPortName of this mib nodes:hwPtimAlarm,hwB3TcaAlarm,hwPplmAlarm,hwPrdiAlarm,hwLomAlarm,hwPuneqAlarm,hwPaisAlarm."
+		-- Add revision info here!
+        REVISION "201605111850Z"
+        DESCRIPTION
+        "Add hwPortGroupTransModeDiff,hwPortGroupTransModeDiffResume,hwPhysicalPortGroupID,hwPortTransModeReasonDescr."
+		
+        -- Add revision info here!
+        REVISION "201605041850Z"
+        DESCRIPTION
+        "Add hwPortErrorRateExceed."
+
+        REVISION "201604251526Z"
+        DESCRIPTION
+         "Add hwIPIfStatTable."
+            
+        REVISION "201604180926Z"
+        DESCRIPTION
+        "Add hwPortSpeedChangeTrap,hwPhysicalPortCurSpeed,hwPhysicalPortLastSpeed."
+        
+		REVISION "201603291516Z"		-- March 29, 2016 at 15:16 GMT
+		DESCRIPTION 
+		"Add hwSubIfNumExceededSpecTrapObject,hwSubIfSpecNum,hwSubIfNumExceededSpecAlarm,hwSubIfNumExceededSpecAlarmResume."				
+
+        REVISION "201602171634Z"
+        DESCRIPTION
+        "Add hwPortCrcRateExceed."
+         
+        REVISION "201512011108Z"
+        DESCRIPTION
+        "Add hwNbPortType."
+
         REVISION "201510191105Z"
         DESCRIPTION
         "Modify hwCollisionAlarm,hwCollisionAlarmResume."
@@ -369,13 +445,13 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
 
 
     hwEthernetSpeedSet OBJECT-TYPE
-        SYNTAX INTEGER {other(1),speed10(2),speed100(3),speed1000(4),speed10000(5),speed40000(6),speed20000(7),speed2500(8),speed5000(9),speed100000(10)}
+        SYNTAX INTEGER {other(1),speed10(2),speed100(3),speed1000(4),speed10000(5),speed40000(6),speed20000(7),speed2500(8),speed5000(9),speed100000(10),speed12000(11)}
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "Indicates the speed of the Ethernet interface. This parameter takes effect only on some Ethernet
                 electrical interfaces rather than optical interfaces. The parameter can be 10 M, 100 M, 1000 M,
-                10000 M,40000 M,20000 M,2500 M,5000 M,100000M."
+                10000 M,40000 M,20000 M,2500 M,5000 M,100000 M,12000 M."
         ::= { hwEthernetEntry 13 }
 
 
@@ -552,7 +628,7 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
 
 
     hwEthernetJumboframeMaxLength OBJECT-TYPE
-        SYNTAX Integer32 (1536..13296)
+        SYNTAX Integer32 (1536..16000)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -2119,7 +2195,11 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
 	hwPhysicalPortMode
 	    INTEGER,
 	hwScadaGroupId
-	    Integer32
+	    Integer32,
+    hwPhysicalPortGroupID
+             OCTET STRING,
+        hwPortTransModeReasonDescr 			
+            OCTET STRING
         }
 
 
@@ -2381,6 +2461,24 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
 			DESCRIPTION
 				"Indicates the scada group ID."
 			::= { hwPhysicalPortEntry 29 }
+
+    -- 1.3.6.1.4.1.2011.5.25.157.1.8.1.1.30
+    hwPhysicalPortGroupID OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the physical port group ID."
+        ::= { hwPhysicalPortEntry 30 } 	
+		
+    -- 1.3.6.1.4.1.2011.5.25.157.1.8.1.1.31
+    hwPortTransModeReasonDescr OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the physical port transmission mode different reason."
+        ::= { hwPhysicalPortEntry 31 } 	
 
     hwSDHRsMsPerfCurrentTable OBJECT-TYPE
         SYNTAX  SEQUENCE OF HwSDHRsMsPerfCurrentEntry
@@ -5026,7 +5124,17 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
         hwPhysicalPortPreFecCoefficientStatistics
             Unsigned32,
         hwPhysicalPortPreFecPowerStatistics 
-            Unsigned32
+            Unsigned32,
+        hwPhysicalPortErrorPerCurrentValueString
+            OCTET STRING,
+        hwPhysicalPortErrorPerAlarmThresholdString
+            OCTET STRING,
+		hwInputBroadcastChangeThreshold
+            Unsigned32,
+		hwCurrentStatisticalInputBroadcast
+			Counter64,
+		hwBaseStatisticalInputBroadcast
+			Counter64		
              }
 
     hwPhysicalPortThrIfIndex OBJECT-TYPE
@@ -5452,8 +5560,7 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The power value of CRC-PER(Packet Error Ratio) alarm statistics."
         ::= { hwPortAlarmThresholdEntry 47 }
-
-		
+	
     -- 1.3.6.1.4.1.2011.5.25.157.1.14.1.1.48
     hwPhysicalPortCrcSdAlarmTriggerLsp OBJECT-TYPE
 	SYNTAX INTEGER
@@ -5559,6 +5666,45 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
 		"The power value of PRE-FEC bit-error-ratio statistics."
 	::= { hwPortAlarmThresholdEntry 57 }
 
+    hwPhysicalPortErrorPerCurrentValueString OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The current value of error packets per second(Packet Error Ratio)."
+        ::= { hwPortAlarmThresholdEntry 58 }
+
+    hwPhysicalPortErrorPerAlarmThresholdString OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The warning threshold of error packets per second(Packet Error Ratio)."
+        ::= { hwPortAlarmThresholdEntry 59 }
+	
+	hwInputBroadcastChangeThreshold OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "input broadcast rate Threshold."
+        ::= { hwPortAlarmThresholdEntry 60 }
+	
+	hwCurrentStatisticalInputBroadcast OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "current statistics of input broadcast."
+        ::= { hwPortAlarmThresholdEntry 61 }
+		
+	hwBaseStatisticalInputBroadcast OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "base statistics of input broadcast."
+        ::= { hwPortAlarmThresholdEntry 62 }
     -- 1.3.6.1.4.1.2011.5.25.157.1.15
     hwPortAlarmDownEnable OBJECT IDENTIFIER ::= { hwPortMIBObjects 15 }
 
@@ -5926,7 +6072,128 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
 	    "Indicates the number of packets which the CRC operates."
 			::= { hwPortIfStatEntry 2 } 
 			
-			
+	hwIPIfStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwIPIfStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table lists the number of ip packets of the interface."
+	::= { hwPortIfStatistics 2 }
+		
+    hwIPIfStatEntry OBJECT-TYPE
+	SYNTAX HwIPIfStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+    	        "This table lists the number of ip packets of the interface."
+	INDEX { hwIpIfStatsIfIndex,hwIpIfStatsIPVersion }
+	::= { hwIPIfStatTable 1 }
+		
+    HwIPIfStatEntry ::=
+	SEQUENCE { 
+		hwIpIfStatsIPVersion
+	   	    INTEGER,
+		hwIpIfStatsIfIndex
+	   	    Integer32,				
+		hwIpIfInOctetRate
+	   	    Counter64,	   	    	   	    
+		hwIpIfInPktRate
+		    Counter64,
+        hwIpIfOutOctetRate
+	   	    Counter64,	   	    	   	    
+		hwIpIfOutPktRate
+		    Counter64,		    
+		hwIpIfInOctets
+		    Counter64,
+		hwIpIfInPkts
+		    Counter64,
+		hwIpIfOutOctets
+		    Counter64,
+        hwIpIfOutPkts
+		    Counter64		    		    		    
+	         }   
+
+    hwIpIfStatsIPVersion OBJECT-TYPE
+	SYNTAX INTEGER {ipv4(1),ipv6(2)}	
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The version of packets protocol."
+			::= { hwIPIfStatEntry 1 } 
+
+
+    hwIpIfStatsIfIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+  	    "Interface index(es) of port(s) present on the device ."
+			::= { hwIPIfStatEntry 2 }
+
+
+    hwIpIfInOctetRate OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip rate of octets received on the interface ."
+			::= { hwIPIfStatEntry 3 } 
+
+    hwIpIfInPktRate OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip rate of packets received on the interface ."
+			::= { hwIPIfStatEntry 4 } 
+
+    hwIpIfOutOctetRate OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip rate of octets transmitted out of the interface ."
+			::= { hwIPIfStatEntry 5 } 
+
+    hwIpIfOutPktRate OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip rate of packets transmitted out of the interface ."
+			::= { hwIPIfStatEntry 6 }
+
+	hwIpIfInOctets OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip octets received on the interface ."
+			::= { hwIPIfStatEntry 7 } 
+
+    hwIpIfInPkts OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip packets received on the interface ."
+			::= { hwIPIfStatEntry 8 } 
+
+    hwIpIfOutOctets OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip octets transmitted out of the interface ."
+			::= { hwIPIfStatEntry 9 } 
+
+    hwIpIfOutPkts OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The ip packets transmitted out of the interface ."
+			::= { hwIPIfStatEntry 10 }		
 	    
     hwPortDescription OBJECT IDENTIFIER ::= { hwPortMIBObjects 19 }
       
@@ -7847,7 +8114,17 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
 				hwNbIfIndex
 					InterfaceIndex,
 				hwNbLoopback
-					INTEGER
+					INTEGER,
+				hwNbPortType
+					INTEGER,
+				hwNbAcBlock
+					INTEGER,
+				hwNbTimeDelayMaster
+					Integer32,
+				hwNbTimeDelaySlave
+					Integer32,
+				hwNbRealTimeDelay
+					Integer32
 			 }
 
 		-- 1.3.6.1.4.1.2011.5.25.157.1.23.5.1.1
@@ -7875,7 +8152,75 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
 				"The local loopback of an narrowband interface is used to test the interface itself.
 				By default, stopLoopback is used."
 			::= { hwNbCommonEntry 2 }
-	
+
+		-- 1.3.6.1.4.1.2011.5.25.157.1.23.5.1.3
+		hwNbPortType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				rs232(1),
+				rs485(2),
+				rs422(3),
+				v24(4),
+				x21(5),
+				v35(6),
+				fxs(7),
+				fxo(8),
+				em(9),
+				c3794(10),
+				c64k(11)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of a serial interface."
+			::= { hwNbCommonEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.23.5.1.4
+		hwNbAcBlock OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				block(1),
+				active(2),
+				unsupport(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AC state of a serial interface."
+			::= { hwNbCommonEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.23.5.1.5
+		hwNbTimeDelayMaster OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the delay configured for the primary link of a serial interface."
+			::= { hwNbCommonEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.23.5.1.6
+		hwNbTimeDelaySlave OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the delay configured for the secondary link of a serial interface."
+			::= { hwNbCommonEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.23.5.1.7
+		hwNbRealTimeDelay OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the real-time delay of a serial interface."
+			::= { hwNbCommonEntry 7 }
+
+		
 		-- 1.3.6.1.4.1.2011.5.25.157.1.24
 		hwLinkHeartbeat OBJECT IDENTIFIER ::= { hwPortMIBObjects 24 }
 		
@@ -8456,7 +8801,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8467,7 +8813,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -8478,7 +8825,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8489,7 +8837,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -8500,7 +8849,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8511,7 +8861,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -8522,7 +8873,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8533,7 +8885,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -8544,7 +8897,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8555,7 +8909,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -8566,7 +8921,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8577,7 +8933,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -8638,7 +8995,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is detected."
@@ -8649,7 +9007,8 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
             hwPhysicalPortInSlot,
             hwPhysicalPortInCard,
             hwPhysicalPortInPort,
-            hwPortPhysicalHpIndex}
+            hwPortPhysicalHpIndex,
+			hwPhysicalPortName}
         STATUS current
         DESCRIPTION
             "Indicates the alarm is cleared."
@@ -9812,7 +10171,41 @@ hwPhysicalPortPreFecPowerStatistics OBJECT-TYPE
         DESCRIPTION
             "Output broadcast surge resumed."
         ::= { hwPhysicalPortFlowSurge 4 }
+        
+    hwPortCrcRateExceed NOTIFICATION-TYPE
+        OBJECTS {
+            hwPhysicalPortThrIfIndex,
+            hwPhysicalPortThrName,
+            hwPhysicalPortCrcPerCurrentValueString,
+            hwPhysicalPortCrcPerAlarmThresholdString}
+        STATUS current
+        DESCRIPTION
+            "Indicates that the rate of the incoming traffic packets with CRC error exceeds the alarm threshold."
+        ::= { hwPortAlarmTraps 18 }
 
+    hwPortErrorRateExceed NOTIFICATION-TYPE
+        OBJECTS {
+            hwPhysicalPortThrIfIndex,
+            hwPhysicalPortThrName,
+            hwPhysicalPortErrorPerCurrentValueString,
+            hwPhysicalPortErrorPerAlarmThresholdString}
+        STATUS current
+        DESCRIPTION
+            "Indicates that the rate of the incoming traffic error packets exceeds the alarm threshold."
+        ::= { hwPortAlarmTraps 19 }
+	
+	hwPhysicalPortInBroadcastRapidChange NOTIFICATION-TYPE
+	OBJECTS {
+		hwPhysicalPortThrIfIndex,
+		hwPhysicalPortThrName,
+		hwInputBroadcastChangeThreshold,
+		hwCurrentStatisticalInputBroadcast,
+		hwBaseStatisticalInputBroadcast}
+	STATUS current
+	DESCRIPTION
+		"Indicates that the rate of the input broadcast exceeds the threshold."
+	::= { hwPortAlarmTraps 20 }
+	
     hwLoopBackAutoClearNotice NOTIFICATION-TYPE
         OBJECTS {
             hwPhysicalPortIfIndex,
@@ -10875,7 +11268,121 @@ local and the remote."
         DESCRIPTION
             "The link recovered from a collision."
         ::= { hwPortNotifications 238 }	
-					
+        
+		-- 1.3.6.1.4.1.2011.5.25.157.2.239
+		hwSubIfNumExceededSpecAlarm NOTIFICATION-TYPE
+			OBJECTS { hwSubIfSpecNum }
+			STATUS current
+			DESCRIPTION 
+				"The nunber of sub interface exceeded spec alarm."
+			::= { hwPortNotifications 239 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.2.240
+		hwSubIfNumExceededSpecAlarmResume NOTIFICATION-TYPE
+			OBJECTS { hwSubIfSpecNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of sub interface exceeded spec alarm resume."
+			::= { hwPortNotifications 240 }
+
+		hwPortSpeedChangeTrap NOTIFICATION-TYPE
+			OBJECTS { hwPhysicalPortIfIndex,hwPhysicalPortName, hwPhysicalPortLastSpeed, hwPhysicalPortCurSpeed }
+			STATUS current
+			DESCRIPTION 
+				"The speed of port is changed."
+			::= { hwPortNotifications 241 }
+
+    -- 1.3.6.1.4.1.2011.5.25.157.2.242
+    hwPortGroupTransModeDiff NOTIFICATION-TYPE
+        OBJECTS { hwPhysicalPortInSlot, hwPhysicalPortInCard, hwPhysicalPortGroupID, hwPortTransModeReasonDescr }
+	STATUS current
+	DESCRIPTION 
+	        "This group of interfaces do not work in the same transmission mode."
+	::= { hwPortNotifications 242 }
+			
+     -- 1.3.6.1.4.1.2011.5.25.157.2.243	
+    hwPortGroupTransModeDiffResume NOTIFICATION-TYPE
+        OBJECTS { hwPhysicalPortInSlot, hwPhysicalPortInCard, hwPhysicalPortGroupID, hwPortTransModeReasonDescr }
+	STATUS current
+	DESCRIPTION 
+	         "This group of interfaces work in the same transmission mode now."
+	::= { hwPortNotifications 243 }	
+
+    -- 1.3.6.1.4.1.2011.5.25.157.2.244
+    hwImpedanceMismatch NOTIFICATION-TYPE
+    OBJECTS { hwPhysicalPortIfIndex, hwPhysicalPortName }
+			STATUS current
+			DESCRIPTION 
+				"The configured interface impedance value did not match that of the cable."
+			::= { hwPortNotifications 244 }
+    -- 1.3.6.1.4.1.2011.5.25.157.2.245
+    hwPicLcdAlarm NOTIFICATION-TYPE
+        OBJECTS { hwPhysicalPortInSlot,
+            hwPhysicalPortInCard,
+            hwPhysicalPortInPort,
+            hwPhysicalPortName}
+        STATUS current
+        DESCRIPTION
+            "Loss of code group synchronization alarm is detected."
+        ::= { hwPortNotifications 245 }
+    -- 1.3.6.1.4.1.2011.5.25.157.2.246
+    hwPicLcdAlarmResume NOTIFICATION-TYPE
+        OBJECTS {hwPhysicalPortInSlot,
+            hwPhysicalPortInCard,
+            hwPhysicalPortInPort,
+            hwPhysicalPortName}
+        STATUS current
+        DESCRIPTION
+            "Loss of code group synchronization alarm  is cleared."
+        ::= { hwPortNotifications 246 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.2.247
+		hwBoardNotSupportAssignTrunk NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"The card does not support extensions of Eth-Trunk specifications."
+			::= { hwPortNotifications 247 }
+     -- 1.3.6.1.4.1.2011.5.25.157.2.248	
+    hwPortProtectGroupUnavailable NOTIFICATION-TYPE
+        OBJECTS { hwPortProtectGroupId }
+	STATUS current
+	DESCRIPTION 
+	        "The port protection group is unavailable."
+	::= { hwPortNotifications 248 }
+			
+     -- 1.3.6.1.4.1.2011.5.25.157.2.249
+    hwPortProtectGroupAvailable NOTIFICATION-TYPE          
+        OBJECTS { hwPortProtectGroupId }
+	STATUS current
+	DESCRIPTION 
+	         "The port protection group is available."
+	::= { hwPortNotifications 249 }	
+	
+	 -- 1.3.6.1.4.1.2011.5.25.157.2.250
+	hwPortProtectGroupDelete NOTIFICATION-TYPE          
+        OBJECTS { hwPortProtectGroupId }
+	STATUS current
+	DESCRIPTION 
+	         "The port protection group was deleted."
+	::= { hwPortNotifications 250 }	
+	-- 1.3.6.1.4.1.2011.5.25.157.2.251
+		hwDelayOverConfig NOTIFICATION-TYPE
+			OBJECTS { hwPhysicalPortIfIndex, hwPhysicalPortName, hwNbRealTimeDelay }
+			STATUS current
+			DESCRIPTION 
+				"Real-time E2E Delay Exceeded the Configured Delay."
+			::= { hwPortNotifications 251 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.2.252
+		hwDelayOverConfigResume NOTIFICATION-TYPE
+			OBJECTS { hwPhysicalPortIfIndex, hwPhysicalPortName, hwNbRealTimeDelay }
+			STATUS current
+			DESCRIPTION 
+				"Alarm Indicating the Real-time E2E Delay Exceeded the Configured Delay Was Cleared."
+			::= { hwPortNotifications 252 }
     hwPortTotalStatistics OBJECT IDENTIFIER ::= { hwPortMIBObjects 25 }
 
 		-- 1.3.6.1.4.1.2011.5.25.157.1.25.1
@@ -10988,7 +11495,41 @@ local and the remote."
 			DESCRIPTION
 				"Send total error Pkts stat of this interface."
 			::= { hwPortTotalStatEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.5.25.157.1.26
+		hwSubIfNumExceededSpecTrapObject OBJECT IDENTIFIER ::= { hwPortMIBObjects 26 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.26.1
+		hwSubIfSpecNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The number of sub interface spec."
+			::= { hwSubIfNumExceededSpecTrapObject 1 }
 			
+		-- 1.3.6.1.4.1.2011.5.25.157.1.27
+		hwPortSpeedTrapObjects OBJECT IDENTIFIER ::= { hwPortMIBObjects 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.27.1
+		hwPhysicalPortCurSpeed OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The speed of port after change."
+			::= { hwPortSpeedTrapObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.157.1.27.2
+		hwPhysicalPortLastSpeed OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The speed of port before change."
+			::= { hwPortSpeedTrapObjects 2 }
+
     hwPortConformance OBJECT IDENTIFIER ::= { hwPortMIB 11 }
 
     hwPortCompliances OBJECT IDENTIFIER ::= { hwPortConformance 1 }
@@ -10999,7 +11540,7 @@ local and the remote."
             "The compliance statement for systems supporting
                 the HUAWEI-PORT-MIB."
         MODULE 
-            MANDATORY-GROUPS {hwEthernetObjectGroup,hwPosObjectGroup,hwCposObjectGroup,hwBundleSerialObjectGroup,hwDs0ChannelBundleObjectGroup,hwDs1ObjectGroup,hwDs3ObjectGroup,hwPortNotificationsGroup,hwPortAlarmThresholdObjectGroup,hwPortAlarmDownEnableObjectGroup,hwLogicalPortObjectGroup}
+            MANDATORY-GROUPS {hwEthernetObjectGroup,hwPosObjectGroup,hwCposObjectGroup,hwBundleSerialObjectGroup,hwDs0ChannelBundleObjectGroup,hwDs1ObjectGroup,hwDs3ObjectGroup,hwPortNotificationsGroup,hwPortAlarmThresholdObjectGroup,hwPortAlarmDownEnableObjectGroup,hwLogicalPortObjectGroup,hwPortSpeedTrapObjectsGroup}
 
         ::= { hwPortCompliances 1 }
 
@@ -11352,7 +11893,16 @@ local and the remote."
             hwAisAlarm,
             hwAisAlarmResume,
             hwCollisionAlarm,
-            hwCollisionAlarmResume   
+            hwCollisionAlarmResume,
+            hwPortSpeedChangeTrap,
+      hwPortGroupTransModeDiff,
+           hwPortGroupTransModeDiffResume,
+		   hwPicLcdAlarm,
+		    hwPicLcdAlarmResume,  
+			hwBoardNotSupportAssignTrunk,
+			hwPortProtectGroupUnavailable,  
+			hwPortProtectGroupAvailable, 
+			hwPortProtectGroupDelete
          }
         STATUS current
         DESCRIPTION
@@ -11526,6 +12076,9 @@ local and the remote."
             hwPhysicalPortCrcExcResume, 
             hwPhysicalPortCrcPerWarning,
             hwPhysicalPortCrcPerWarningResume,
+            hwPortCrcRateExceed,
+            hwPortErrorRateExceed,
+			hwPhysicalPortInBroadcastRapidChange,
             hwInputErrorAlarm,
             hwInputErrorAlarmResume,
             hwOutputErrorAlarm,
@@ -11619,6 +12172,17 @@ local and the remote."
 			DESCRIPTION 
 				"The port total stat object group."
 			::= { hwPortGroups 31 }
+
+     hwPortSpeedTrapObjectsGroup OBJECT-GROUP
+
+        OBJECTS {
+            hwPhysicalPortCurSpeed,
+            hwPhysicalPortLastSpeed
+        }
+        STATUS current
+        DESCRIPTION
+            "The port speed change trap object group"
+        ::= { hwPortGroups 32 }
 END
 --
 -- HUAWEI-PORT-MIB

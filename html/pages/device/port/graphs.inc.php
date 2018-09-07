@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -28,6 +28,16 @@ if (is_file($rrdfile))
   $graph_array['type'] = "port_bits";
   print_graph_row_port($graph_array, $port);
   echo('</td></tr>');
+
+  if (is_file(get_port_rrdfilename($port, "ipv6-octets", TRUE)))
+  {
+    echo('<tr><td>');
+    echo("<h3>IPv6 Traffic</h3>");
+    $graph_array['type'] = "port_ipv6_bits";
+
+    print_graph_row_port($graph_array, $port);
+    echo('</td></tr>');
+  }
 
   echo('<tr><td>');
   echo("<h3>Unicast Packets</h3>");
@@ -71,8 +81,7 @@ if (is_file($rrdfile))
   print_graph_row_port($graph_array, $port);
   echo('</td></tr>');
 
-
-  if (is_file($device, get_port_rrdfilename($port, "dot3", TRUE)))
+  if (is_file(get_port_rrdfilename($port, "dot3", TRUE)))
   {
     echo('<tr><td>');
     echo("<h3>Ethernet Errors</h3>");

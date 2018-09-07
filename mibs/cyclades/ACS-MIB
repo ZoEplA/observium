@@ -1,11 +1,11 @@
+ACS-MIB DEFINITIONS ::= BEGIN
+
 --------------------------------------------------------------------------------
 --  Avocent ACS MIB
 --  Copyright 2009 Avocent Corporation
 --  Revision: 2.0.1
 --  Last Modified: October 10, 2010
 --------------------------------------------------------------------------------
-
-ACS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
    Gauge,TimeTicks,IpAddress,Counter,NetworkAddress

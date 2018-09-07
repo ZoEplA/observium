@@ -1,4 +1,4 @@
--- ArubaOS 6.5.1.3_58402
+--- ArubaOS 6.5.2.0_59123
 -- vim:set ts=4 sw=4:
 ARUBA-TC DEFINITIONS ::= BEGIN
 
@@ -826,7 +826,7 @@ ArubaARMChangeReason ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
 		"
-		The reason for ARM based change.
+		The reason for ARM or AirMatch based change.
 		"
 	SYNTAX       INTEGER {
                        radarDetected(1),
@@ -846,7 +846,18 @@ ArubaARMChangeReason ::= TEXTUAL-CONVENTION
                        armIncreasePower(15),
                        armTurnOffRadio(16),
                        armTurnOnRadio(17),
-                       armChannelQualityThresh(18)
+                       armChannelQualityThresh(18),
+                       armDynamicBW(19),
+                       armInterferenceCCA(20),
+                       airmatchNoise(21),
+                       airmatchSolver(22),
+                       airmatchFreeze(23),
+                       airmatchUnfreeze(24),
+                       random(25),
+                       airmatchInit(26),
+                       unknown(27),
+                       airmatchNoiseCleared(28),
+                       airmatchRogueCont(29)
    }
 
 ArubaAPMasterStatus ::= TEXTUAL-CONVENTION
@@ -1065,4 +1076,19 @@ ArubaHaConnectivityStatus ::= TEXTUAL-CONVENTION
                             haInvalidHelloResponse(6),
                             haStandbyTunnelDown(7)
 					    }
+
+ArubaFlexRadioMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  Flex Radio Operating Mode
+		"
+	SYNTAX		INTEGER {
+                            single2GHzBand(0),
+                            single5GHzBand(1),
+                            dual2GHzplus5GHzBand(2), 
+                            unknown(3),
+                            notApplicable(4)
+                       }
+
 END

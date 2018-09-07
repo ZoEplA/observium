@@ -10,7 +10,7 @@ IMPORTS
 		FROM INET-ADDRESS-MIB;
 
 netScaler MODULE-IDENTITY
-	LAST-UPDATED "201512220000Z"
+	LAST-UPDATED "201609250000Z"
 	ORGANIZATION "Citrix Systems, Inc."
 	CONTACT-INFO  "Citrix Technical Assistance Center
 			Postal: Citrix Systems, Inc.
@@ -19,7 +19,7 @@ netScaler MODULE-IDENTITY
 				United States
 			Tel: +1-800-4-CITRIX (+1-800-424-8749)
 			E-mail: customercare@citrix.com"
-	DESCRIPTION "The enterprise specific MIB for Netscaler NS11.0."
+	DESCRIPTION "The enterprise specific MIB for Netscaler NS11.1."
 	::= { enterprises 5951 }
 
 nsRoot OBJECT IDENTIFIER
@@ -4441,7 +4441,7 @@ cpeeNetmask OBJECT-TYPE
     ::= { cpeExprConfigStatsEntry 9 }
 
 EntityProtocolType ::=
-	INTEGER{ http(0), ftp(1), tcp(2), udp(3), sslBridge(4), monitor(5), monitorUdp(6), nntp(7), httpserver(8), httpclient(9), rpcserver(10), rpcclient(11), nat(12), any(13), ssl(14), dns(16), adns(17), snmp(18), ha(19), monitorPing(20), sslOtherTcp(21), aaa(22), secureMonitor(23), sslvpnUdp(24), rip(25), dnsClient(26), rpcServer(27), rpcClient(28), dhcrpa(36), sipudp(39), siptcp(40), siptls(41), dnstcp(48), adnstcp(49), rtsp(50), push(52), sslPush(53), dhcpClient(54), radius(55), rdp(61), mysql(62), mssql(63), diameter(73), sslDiameter(74), tftp(75), tftp(90), pptp(91), gre(92), serviceUnknown(95) }
+	INTEGER{ http(0), ftp(1), tcp(2), udp(3), sslBridge(4), monitor(5), monitorUdp(6), nntp(7), httpserver(8), httpclient(9), rpcserver(10), rpcclient(11), nat(12), any(13), ssl(14), dns(16), adns(17), snmp(18), ha(19), monitorPing(20), sslOtherTcp(21), aaa(22), secureMonitor(23), sslvpnUdp(24), rip(25), dnsClient(26), rpcServer(27), rpcClient(28), dhcrpa(36), sipudp(39), siptcp(40), siptls(41), dnstcp(48), adnstcp(49), rtsp(50), push(52), sslPush(53), dhcpClient(54), radius(55), rdp(61), mysql(62), mssql(63), diameter(73), sslDiameter(74), tftp(75), tftp(90), pptp(91), gre(92), fix(95), sslFix(96), serviceUnknown(99) }
 
 EntityState ::=
 	INTEGER{ down(1), unknown(2), busy(3), outOfService(4), transitionToOutOfService(5), up(7), transitionToOutOfServiceDown(8) }
@@ -4492,10 +4492,10 @@ ModeStatus ::=
 	INTEGER{ disabled(0), enabled(1) }
 
 LbPolicy ::=
-	INTEGER{ weightedRoundRobin(1), leastConnections(2), leastResponse(3), asynchronousMAC(4), urlHashed(5), domainHashed(6), destinationIPHashed(7), sourceIPHashed(8), leastBandwidth(9), leastPackets(10), customLoad(11), token(12), staticProximity(13), rtt(14), sourceIPDestinationIPHashed(15), sourceIPSourcePort(16), lrtm(17), callIDHashed(18) }
+	INTEGER{ weightedRoundRobin(1), leastConnections(2), leastResponse(3), asynchronousMAC(4), urlHashed(5), domainHashed(6), destinationIPHashed(7), sourceIPHashed(8), leastBandwidth(9), leastPackets(10), customLoad(11), token(12), staticProximity(13), rdp(14), leastreq(15), rtt(16), sourceIPDestinationIPHashed(17), sourceIPSourcePort(18), lrtm(19), callIDHashed(20) }
 
 PersistanceType ::=
-	INTEGER{ none(0), sourceIp(1), cookieInsert(2), cookieDelete(3), cookieRead(4), cookieHash(5), sessionId(6), server(7), rule(8), urlPassive(9), customServerID(10), groupSourceID(11), groupCookieInsert(12), groupRule(13), destinationIP(14), spillOver(15), sourceIPdestinationIP(16), callerID(17), gslbBackup(18), rtspSessionID(19), diameter(20) }
+	INTEGER{ none(0), sourceIp(1), cookieInsert(2), cookieDelete(3), cookieRead(4), cookieHash(5), sessionId(6), server(7), rule(8), urlPassive(9), customServerID(10), groupSourceID(11), groupCookieInsert(12), groupRule(13), destinationIP(14), spillOver(15), sourceIPdestinationIP(16), callerID(17), gslbBackup(18), rtspSessionID(19), diameter(20), fixSession(21) }
 
 ActionType ::=
 	INTEGER{ ns(1), acs(2), noAction(3) }
@@ -5572,6 +5572,14 @@ pbrTotMisses  OBJECT-TYPE
 		"Total packets that did not match any PBR"
 	::= { pbrStatsGroup 24 }
 
+pbrTotNullDrop  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that are dropped due to null nexthop"
+	::= { pbrStatsGroup 25 }
+
 sacl6StatsGroup OBJECT IDENTIFIER
 	::= { nsFiltersGroup 6 }
 
@@ -5713,6 +5721,14 @@ pbr6TotMisses  OBJECT-TYPE
 	DESCRIPTION
 		"Total packets that did not match any PBR6"
 	::= { pbr6StatsGroup 24 }
+
+pbr6TotNullDrop  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total packets that are dropped due to null next hop"
+	::= { pbr6StatsGroup 25 }
 
 nsHighAvailabilityGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 23 }
@@ -8568,6 +8584,22 @@ mptcpCurSessWithoutSFs  OBJECT-TYPE
 		"Current Multipath TCP sessions without any subflows"
 	::= { nsTcpStatsGroup 130 }
 
+tcpOptimizationEnabled  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of connections with TCP optimzation."
+	::= { nsTcpStatsGroup 131 }
+
+tcpOptimizationBypassed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of connections that bypassed TCP optimzation."
+	::= { nsTcpStatsGroup 132 }
+
 nsSslStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 47 }
 
@@ -11211,6 +11243,14 @@ sslCryptoUtilization  OBJECT-TYPE
 		"Utilization of the hardware crypto resource. Only valid values are 0-100%. Only works for platform with N3 chips A value of 4294967295 is displayed for a platform without a N3 chip"
 	::= { nsSslStatsGroup 365 }
 
+sslTotECDSAAuthorizations  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of times ECDSA authorization is used on the NetScaler appliance."
+	::= { nsSslStatsGroup 366 }
+
 nsHttpStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 48 }
 
@@ -11828,7 +11868,7 @@ httpTotRequestsRate  OBJECT-TYPE
 		"Rate at which HTTP Requests are received in the system per second."
 	::= { nsHttpStatsGroup 76 }
 
-httpTotResponsesRate  OBJECT-TYPE
+httpTotResposesRate  OBJECT-TYPE
 	SYNTAX  Gauge32
 	MAX-ACCESS  read-only
 	STATUS  current
@@ -12495,7 +12535,7 @@ compTotalRequests  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of HTTP compression requests the NetScaler receives for which the response is successfully compressed. For example, after you enable compression and configure services, if you send requests to the NetScaler with the following header information: “Accept-Encoding: gzip, deflate”, and NetScaler compresses the corresponding response, this counter is incremented."
+		"Number of HTTP compression requests the NetScaler receives for which the response is successfully compressed. For example, after you enable compression and configure services, if you send HTTP requests to the NetScaler using a HTTP client that supports compression, and NetScaler compresses the corresponding response, this counter is incremented."
 	::= { nsCompressionStatsGroup 1 }
 
 compTotalTxBytes  OBJECT-TYPE
@@ -14111,33 +14151,33 @@ ifRxAlignmentErrors  OBJECT-TYPE
 ifTxCollisions  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of collisions detected during transmission, on the specified interface, since the NetScaler appliance was started or the interface statistics were cleared. This statistic is applicable only to half-duplex transmissions and is available only on the data ports of the NetScaler 12000 platform and the management port of the NetScaler MPX 15000 and 17000 platforms."
+		"This object is now obsolete"
 	::= { nsIfStatsEntry 14 }
 
 ifTxExcessCollisions  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of excess collisions detected during transmission, on the specified interface, since the NetScaler appliance was started or the interface statistics were cleared. This statistic is only applicable to half-duplex transmissions and is supported only on the NetScaler Classic edition."
+		"This object is now obsolete"
 	::= { nsIfStatsEntry 15 }
 
 ifTxLateCollisions  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of late collisions detected during transmission, on the specified interface, since the NetScaler appliance was started or the interface statistics were cleared. This statistic is only applicable to half-duplex transmissions. Currently this is supported only on Classic builds."
+		"This object is now obsolete"
 	::= { nsIfStatsEntry 16 }
 
 ifTxMultiCollisionErrors  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of multiple collisions during transmission on the specified interface. This counter is deprecated now. (Includes only half-duplex transmissions.)"
+		"This object is now obsolete"
 	::= { nsIfStatsEntry 17 }
 
 ifTxCarrierError  OBJECT-TYPE
@@ -14315,9 +14355,9 @@ ifErrTxOverflow  OBJECT-TYPE
 ifErrTxDeferred  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of times packet transmission was deferred on the specified interface. This statistic is only available on data ports of the NetScaler 12000 platform and management ports of the NetScaler MPX 15000 and 17000 platforms. This statistic is only applicable to half-duplex transmissions."
+		"This object is now obsolete"
 	::= { nsIfStatsEntry 37 }
 
 ifErrDroppedTxPkts  OBJECT-TYPE
@@ -15988,7 +16028,7 @@ iipDisabledMIPdisabled  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Both IIP and MIP is disabled."
+		"Both IIP and SNIP is disabled."
 	::= { nsSslVpnStatsGroup 11 }
 
 iipFailedMIPdisabled  OBJECT-TYPE
@@ -15996,7 +16036,7 @@ iipFailedMIPdisabled  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times IIP assignment failed and MIP is disabled."
+		"Number of times IIP assignment failed and SNIP is disabled."
 	::= { nsSslVpnStatsGroup 12 }
 
 iipDisabledMIPused  OBJECT-TYPE
@@ -16004,7 +16044,7 @@ iipDisabledMIPused  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times MIP is used as IIP is disabled."
+		"Number of times SNIP is used as IIP is disabled."
 	::= { nsSslVpnStatsGroup 13 }
 
 iipFailedMIPused  OBJECT-TYPE
@@ -16012,7 +16052,7 @@ iipFailedMIPused  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times MIP is used as IIP assignment failed."
+		"Number of times SNIP is used as IIP assignment failed."
 	::= { nsSslVpnStatsGroup 14 }
 
 socksMethReqRcvd  OBJECT-TYPE
@@ -16244,7 +16284,7 @@ iipSpilloverMIPused  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of times MIP is used on IIP Spillover."
+		"Number of times SNIP is used on IIP Spillover."
 	::= { nsSslVpnStatsGroup 43 }
 
 iPv6tov4FindIPv6MapErr  OBJECT-TYPE
@@ -18571,7 +18611,7 @@ lldpRemTimeMark  OBJECT-TYPE
 
 lldpRemLocalPortNum  OBJECT-TYPE
 	SYNTAX  OCTET STRING
-	MAX-ACCESS  accessible-for-notify
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"local nic no"
@@ -18587,7 +18627,7 @@ lldpRemChassisIdSubtype  OBJECT-TYPE
 
 lldpRemChassisId  OBJECT-TYPE
 	SYNTAX  OCTET STRING
-	MAX-ACCESS  accessible-for-notify
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"Chassiss id of remote system"
@@ -18603,7 +18643,7 @@ lldpRemPortIdSubtype  OBJECT-TYPE
 
 lldpRemPortId  OBJECT-TYPE
 	SYNTAX  OCTET STRING
-	MAX-ACCESS  accessible-for-notify
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
 		"port id of remote system"
@@ -19855,6 +19895,233 @@ lsnLogTotWrongProtocols  OBJECT-TYPE
 	DESCRIPTION
 		"Wrong protocol popped up in logentry."
 	::= { nsLsnLogStatsGroup 13 }
+
+nsLsnNAT64GlobalStatsGroup OBJECT IDENTIFIER
+	::= { nsLsnStatsGroup 6 }
+
+lsnTotNAT64RxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of LSN NAT64 rx pkts."
+	::= { nsLsnNAT64GlobalStatsGroup 1 }
+
+lsnTotNAT64RxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of LSN NAT64 rx bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 2 }
+
+lsnTotNAT64TxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of LSN NAT64 tx pkts."
+	::= { nsLsnNAT64GlobalStatsGroup 3 }
+
+lsnTotNAT64TxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of LSN NAT64 tx bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 4 }
+
+lsnCurNAT64sessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current number of LSN NAT64 sessions."
+	::= { nsLsnNAT64GlobalStatsGroup 5 }
+
+lsnNAT64CurSubscribers  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current number of LSN NAT64 subscribers."
+	::= { nsLsnNAT64GlobalStatsGroup 6 }
+
+lsnTotNAT64TcpRxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 TCP Received packets."
+	::= { nsLsnNAT64GlobalStatsGroup 7 }
+
+lsnTotNAT64TcpTxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 TCP Transmitted packets."
+	::= { nsLsnNAT64GlobalStatsGroup 8 }
+
+lsnTotNAT64UdpRxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 UDP Received packets."
+	::= { nsLsnNAT64GlobalStatsGroup 9 }
+
+lsnTotNAT64UdpTxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 UDP Transmitted packets."
+	::= { nsLsnNAT64GlobalStatsGroup 10 }
+
+lsnTotNAT64IcmpRxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 ICMP Received packets."
+	::= { nsLsnNAT64GlobalStatsGroup 11 }
+
+lsnTotNAT64IcmpTxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 ICMP Transmitted packets."
+	::= { nsLsnNAT64GlobalStatsGroup 12 }
+
+lsnTotNAT64TcpRxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 TCP Received bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 13 }
+
+lsnTotNAT64TcpTxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 TCP Transmitted bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 14 }
+
+lsnTotNAT64UdpRxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 UDP Received bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 15 }
+
+lsnTotNAT64UdpTxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 UDP Transmitted bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 16 }
+
+lsnTotNAT64IcmpRxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 ICMP Received bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 17 }
+
+lsnTotNAT64IcmpTxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 ICMP Transmitted bytes."
+	::= { nsLsnNAT64GlobalStatsGroup 18 }
+
+lsnTotNAT64TcpDrpPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 TCP Dropped packets."
+	::= { nsLsnNAT64GlobalStatsGroup 19 }
+
+lsnTotNAT64UdpDrpPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 UDP Dropped packets."
+	::= { nsLsnNAT64GlobalStatsGroup 20 }
+
+lsnTotnat64IcmpDrpPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 ICMP Dropped packets."
+	::= { nsLsnNAT64GlobalStatsGroup 21 }
+
+lsnCurNAT64TcpSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 TCP Current Sessions."
+	::= { nsLsnNAT64GlobalStatsGroup 22 }
+
+lsnCurNAT64UdpSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 UDP Current Sessions."
+	::= { nsLsnNAT64GlobalStatsGroup 23 }
+
+lsnCurNAT64IcmpSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of LSN NAT64 ICMP Current Sessions."
+	::= { nsLsnNAT64GlobalStatsGroup 24 }
+
+lsnNAT64SessionsRate  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Rate at which total LSN NAT64 sessions are opened per second."
+	::= { nsLsnNAT64GlobalStatsGroup 25 }
+
+lsnNAT64TcpSessionsRate  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Rate at which total LSN NAT64 sessions are opened per second."
+	::= { nsLsnNAT64GlobalStatsGroup 26 }
+
+lsnNAT64UdpSessionsRate  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Rate at which total LSN NAT64 sessions are opened per second."
+	::= { nsLsnNAT64GlobalStatsGroup 27 }
+
+lsnNAT64IcmpSessionsRate  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Rate at which total LSN sessions are opened per second."
+	::= { nsLsnNAT64GlobalStatsGroup 28 }
 
 nsmcStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 84 }
@@ -24313,6 +24580,38 @@ lsnDSLiteB4Address  OBJECT-TYPE
 		"This represents the IPv6 address of the B4 device in DS-Lite environment."
 	::= { snmpTrapVarBindOidsGroup 65 }
 
+ipConflictMacAddr  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The MAC address of the machine having the conflicting IP configured in the network."
+	::= { snmpTrapVarBindOidsGroup 66 }
+
+gslbSite  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the GSLB site name."
+	::= { snmpTrapVarBindOidsGroup 67 }
+
+siteIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the GSLB site IP Address."
+	::= { snmpTrapVarBindOidsGroup 68 }
+
+lsnNAT64SubscrIPV6  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the LSN Subscriber IPV6 address."
+	::= { snmpTrapVarBindOidsGroup 69 }
+
 netScalerEventsV2 OBJECT-IDENTITY
 	STATUS  current
 	DESCRIPTION
@@ -24905,7 +25204,7 @@ haPropFailure  NOTIFICATION-TYPE
 	::= { netScalerEventsV2 85 }
 
 ipConflict  NOTIFICATION-TYPE
-	OBJECTS  { ipConflictAddr , sysIpAddress }
+	OBJECTS  { ipConflictAddr , ipConflictMacAddr , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap indicates that ip conflict is present with another device in the network. "
@@ -25324,21 +25623,21 @@ ipv6AddressDuplicated  NOTIFICATION-TYPE
 	::= { netScalerEventsV2 145 }
 
 lsnPortAllocFailed  NOTIFICATION-TYPE
-	OBJECTS  { lsnGrpName , lsnSubscrIP , lsnSubscrTD , protocol , sysIpAddress }
+	OBJECTS  { lsnGrpName , lsnSubscrTD , protocol , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap is sent when a LSN Subscriber is unable to allocate port"
 	::= { netScalerEventsV2 146 }
 
 lsnPortQuotaExceed  NOTIFICATION-TYPE
-	OBJECTS  { lsnGrpName , lsnSubscrIP , lsnSubscrTD , protocol , sysIpAddress }
+	OBJECTS  { lsnGrpName , lsnSubscrTD , protocol , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap is sent when a LSN Subscriber exceeds its Port Quota"
 	::= { netScalerEventsV2 147 }
 
 lsnSessionQuotaExceed  NOTIFICATION-TYPE
-	OBJECTS  { lsnGrpName , lsnSubscrIP , lsnSubscrTD , protocol , lsnSessLimitExceededBy , sysIpAddress }
+	OBJECTS  { lsnGrpName , lsnSubscrTD , protocol , lsnSessLimitExceededBy , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap is sent when a LSN Subscriber exceeds its Session Quota"
@@ -25427,5 +25726,47 @@ clusterBackplaneHBMissing  NOTIFICATION-TYPE
 	DESCRIPTION
 		"This trap is sent when heartbeat is missing on backplane of cluster node"
 	::= { netScalerEventsV2 160 }
+
+pooledLicenseGraceStarted  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when pooled license is running on grace"
+	::= { netScalerEventsV2 161 }
+
+pooledLicenseGraceNormal  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when pooled license was running on grace and now it's normal"
+	::= { netScalerEventsV2 162 }
+
+pooledLicenseGracePeriodOver  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when pooled license was running on grace and it's time period is over"
+	::= { netScalerEventsV2 163 }
+
+pooledLicenseCapacityPartial  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when system is running on partial capacity"
+	::= { netScalerEventsV2 164 }
+
+pooledLicenseCapacityNormal  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when system was running on partial capacity and now it has returned to normal"
+	::= { netScalerEventsV2 165 }
+
+gslbSiteMEPflap  NOTIFICATION-TYPE
+	OBJECTS  { gslbSite , siteIP , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when the GSLB site MEP flaps."
+	::= { netScalerEventsV2 166 }
 
 END -- end of module NS-ROOT-MIB.

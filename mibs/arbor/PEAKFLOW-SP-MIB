@@ -26,6 +26,10 @@ IMPORTS
                 FROM SNMPv2-SMI
 	Counter32
                 FROM SNMPv2-SMI
+	Counter64
+                FROM SNMPv2-SMI
+	CounterBasedGauge64
+                FROM HCNUM-TC
         DisplayString
                 FROM SNMPv2-TC
 	arbornetworksProducts
@@ -44,7 +48,7 @@ IMPORTS
 -- =================================================================================
 
 peakflowSPMIB MODULE-IDENTITY
-	LAST-UPDATED "201308190000Z" -- August 19, 2013
+	LAST-UPDATED "201612060000Z" -- December 6, 2016
 	ORGANIZATION "Arbor Networks, Inc."
 	CONTACT-INFO
 		"	Arbor Networks, Inc.
@@ -62,6 +66,32 @@ peakflowSPMIB MODULE-IDENTITY
 		"Peakflow SP MIB"
 
 	-- Revision log, reverse chrono
+	REVISION    "201612060000Z" -- December 6, 2016
+	DESCRIPTION "Added spTMSMultiDiversionPrefix.
+		     Deprecated mitigationTMSStart trap and created a new trap
+		     mitigationTMSStartV2 which includes a new
+		     spTMSMultiDiversionPrefix object."
+
+	REVISION    "201601110000Z" -- January 11, 2015
+	DESCRIPTION "Increase SIZE of spLicenseErrDescription"
+
+	REVISION    "201511200000Z" -- November 20, 2015
+	DESCRIPTION "Add trap for Cloud Signaling Fault"
+
+	REVISION	"201404040000Z" -- April 4, 2014
+	DESCRIPTION "Add spGreTunnelName to greDown and greDownDone"
+
+	REVISION    "201312040000Z" -- December 4, 2013
+	DESCRIPTION "Add spInterfaceSpeedHC, a 64-bit version
+				 of spInterfaceSpeed.
+				 Add spInterfaceUsageHC, a 64-bit version
+				 of spInterfaceUsage."
+
+	REVISION    "201310030000Z" -- October 3, 2013
+	DESCRIPTION "Add deviceTotalFlowsHC, a 64-bit version
+				 of deviceTotalFlows.
+				 Deprecate deviceTotalFlows."
+
 	REVISION    "201308190000Z" -- August 19, 2013
 	DESCRIPTION "Updated contact information"
 
@@ -543,7 +573,7 @@ spTMSPrefix OBJECT-TYPE
 	MAX-ACCESS  accessible-for-notify
 	STATUS  current
 	DESCRIPTION
-		"The offramp prefix associated with the TMS mitigation"
+		"The offramp protection prefix associated with the TMS mitigation"
 	::= { peakflowSPCMI 46 }
 
 spTMSCommunity OBJECT-TYPE
@@ -799,9 +829,9 @@ spTMSMultiPrefix OBJECT-TYPE
 	MAX-ACCESS  accessible-for-notify
 	STATUS  current
 	DESCRIPTION
-		"A comma seperated list of the offramp prefixes associated with
+		"A comma seperated list of the offramp protection prefixes associated with
 		 the TMS multi-prefix mitigation. This field does not include
-		 the first prefix which is included in spTMSPrefix."
+		 the first protection prefix which is included in spTMSPrefix."
 	::= { peakflowSPCMI 76 }
 
 spLicenseErrType OBJECT-TYPE
@@ -829,12 +859,55 @@ spLicenseErrLimit	OBJECT-TYPE
 	::= { peakflowSPCMI 79 }
 
 spLicenseErrDescription OBJECT-TYPE
-	SYNTAX  DisplayString (SIZE (1..256))
+	SYNTAX  DisplayString (SIZE (1..1023))
 	MAX-ACCESS  accessible-for-notify
 	STATUS  current
 	DESCRIPTION
 		"Description of the License alert"
 	::= { peakflowSPCMI 80 }
+
+spInterfaceSpeedHC	OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Configured Interface Speed (bps)
+		 The 64-bit version of spInterfaceSpeed"
+	::= { peakflowSPCMI 81 }
+
+spInterfaceUsageHC	OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Actual interface usage (bps)
+		 The 64-bit version of spInterfaceUsage"
+	::= { peakflowSPCMI 82 }
+
+spGreTunnelName	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"GRE Tunnel name"
+	::= { peakflowSPCMI 83 }
+
+spCloudSignalFaultDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..256))
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Description of cloud signaling fault"
+	::= { peakflowSPCMI 84 }
+
+spTMSMultiDiversionPrefix OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..255))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"A comma seperated list of the offramp diversion prefixes associated with
+		 the TMS multi-prefix mitigation."
+	::= { peakflowSPCMI 85 }
 
 -- =================================================================================
 --  Pollable SP device management types:
@@ -937,10 +1010,22 @@ deviceSwapSpaceUsage OBJECT-TYPE
 deviceTotalFlows OBJECT-TYPE
 	SYNTAX  Counter32
 	MAX-ACCESS  read-only
+	STATUS  deprecated
+	DESCRIPTION
+		"Accumulative flow count per SP device.
+
+		 This object is deprecated in favor of deviceTotalFlowsHC."
+	::= { deviceHealth 11 }
+
+deviceTotalFlowsHC OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Accumulative flow count per SP device."
-	::= { deviceHealth 11 }
+		"Accumulative flow count per SP device.
+
+		 The 64-bit version of deviceTotalFlows."
+	::= { deviceHealth 12 }
 
 
 -- =================================================================================
@@ -1085,7 +1170,9 @@ interfaceUsage NOTIFICATION-TYPE
 		spInterfaceIndex,
 		spInterfaceSpeed,
 		spUsageType,
-		spInterfaceUsage
+		spInterfaceUsage,
+		spInterfaceSpeedHC,
+		spInterfaceUsageHC
 	}
 	STATUS  current
 	DESCRIPTION
@@ -1305,7 +1392,7 @@ mitigationTMSStart NOTIFICATION-TYPE
 		spMitigationStart,
 		spTMSMultiPrefix
 	}
-	STATUS  current
+	STATUS  deprecated
 	DESCRIPTION
 		"TMS Mitigation has started"
 	::= { peakflowSPTrapsEnumerate 30 }
@@ -1382,7 +1469,8 @@ spcommFailureDone NOTIFICATION-TYPE
 greDown NOTIFICATION-TYPE
 	OBJECTS {
 		spAlertID,
-		spGreTunnelDestination
+		spGreTunnelDestination,
+		spGreTunnelName
 	}
 	STATUS  current
 	DESCRIPTION
@@ -1392,7 +1480,8 @@ greDown NOTIFICATION-TYPE
 greDownDone NOTIFICATION-TYPE
 	OBJECTS {
 		spAlertID,
-		spGreTunnelDestination
+		spGreTunnelDestination,
+		spGreTunnelName
 	}
 	STATUS  current
 	DESCRIPTION
@@ -1641,7 +1730,45 @@ licenseErrorDone NOTIFICATION-TYPE
 		"An SP Deployment License error alert has ended."
 	::= { peakflowSPTrapsEnumerate 54 }
 
+cloudSignalingFault NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertId,
+		spPravail,
+		spCloudSignalFaultDescription
+	}
+	STATUS current
+	DESCRIPTION
+		"A cloud signaling fault was detected."
+	::= { peakflowSPTrapsEnumerate 55 }
 
+cloudSignalingFaultDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertId,
+		spPravail,
+		spCloudSignalFaultDescription
+	}
+	STATUS current
+	DESCRIPTION
+		"A cloud signaling fault is no longer detected."
+	::= { peakflowSPTrapsEnumerate 56 }
+
+mitigationTMSStartV2 NOTIFICATION-TYPE
+	OBJECTS {
+		spMitigationID,
+		spMitigationName,
+		spAlertID,
+		spManagedObject,
+		spTMSPrefix,
+		spTMSCommunity,
+		spTMSTimeout,
+		spMitigationStart,
+		spTMSMultiPrefix,
+		spTMSMultiDiversionPrefix
+	}
+	STATUS  current
+	DESCRIPTION
+		"TMS Mitigation has started"
+	::= { peakflowSPTrapsEnumerate 57 }
 -- =================================================================================
 
 END

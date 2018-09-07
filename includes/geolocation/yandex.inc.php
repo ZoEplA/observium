@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage geolocation
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -61,9 +61,14 @@
     {
       $location['location_county']  = $data['Country']['AdministrativeArea']['SubAdministrativeArea']['SubAdministrativeAreaName'];
       $location['location_city']    = $data['Country']['AdministrativeArea']['SubAdministrativeArea']['Locality']['LocalityName'];
-    } else {
+    }
+    else if (isset($data['Country']['AdministrativeArea']['Locality']['DependentLocality']))
+    {
       $location['location_county']  = $data['Country']['AdministrativeArea']['Locality']['DependentLocality']['DependentLocalityName'];
       $location['location_city']    = $data['Country']['AdministrativeArea']['Locality']['DependentLocality']['DependentLocality']['DependentLocalityName'];
+    } else {
+      $location['location_county']  = $data['Country']['AdministrativeArea']['AdministrativeAreaName'];
+      $location['location_city']    = $data['Country']['AdministrativeArea']['Locality']['LocalityName'];
     }
   } else {
     $data = FALSE;

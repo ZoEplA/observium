@@ -4,10 +4,10 @@
 -- Wednesday, March 19, 2014 at 14:06:58 
 
 --  ===================================================================
--- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:
 -- Reference:
--- Version: V1.04
+-- Version: V1.07
 -- ===================================================================
 
 	HUAWEI-SWITCH-L2MAM-EXT-MIB DEFINITIONS ::= BEGIN
@@ -31,7 +31,7 @@
 	
 		-- 1.3.6.1.4.1.2011.5.25.315
 		hwSWITCH-L2MAM-EXT MODULE-IDENTITY 
-			LAST-UPDATED "201403261600Z"		-- March 26, 2014 at 16:00 GMT
+			LAST-UPDATED "201508041600Z"		--  August 4, 2015 at 16:00 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -43,6 +43,18 @@
 				 Email: support@huawei.com"
 			DESCRIPTION 
 				"THIS IS THE LAYER 2 MAC-ADDRESS MANAGEMENT MIB."
+
+                                                                REVISION "201508041600Z"		-- August 4, 2015 at 16:00 GMT
+		                      DESCRIPTION 
+				"Add code hwTrunkMemSpeedDifferentAlarm and hwTrunkMemSpeedDifferentResume"
+
+                                                    REVISION "201508041600Z" 
+                                                    DESCRIPTION 
+                                                    "Modify MODULE HwSWITCH-L2MAM-EXT" 
+
+                                                    REVISION "201508041600Z" 
+                                                    DESCRIPTION 
+                                                    "Modify code hwPortsecStaticFlpAlarm " 
 
                                                     REVISION "201403261600Z" 
                                                     DESCRIPTION 
@@ -137,7 +149,8 @@
 			REVISION "201402141600Z"		-- February 14, 2014 at 16:00 GMT
 			DESCRIPTION 
 				"Add code hwMacTrapPortCfgAlarm"
-			::= { hwDatacomm 315 }
+
+                                                               	::= { hwDatacomm 315 }
 
 		
 	
@@ -305,6 +318,30 @@
 				"This notification indicates that MAC address hash conflict occurred."
 			::= { hwSwitchL2MamExtTraps 6 }
 
+
+		-- 1.3.6.1.4.1.2011.5.25.315.3.7
+		hwTrunkMemSpeedDifferentAlarm NOTIFICATION-TYPE
+			OBJECTS { ifDescr}
+			STATUS current
+			DESCRIPTION 
+				"The active member ports in trunk have inconsistent bandwidth."
+			::= { hwSwitchL2MamExtTraps 7 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.315.3.8
+		hwTrunkMemSpeedDifferentResume NOTIFICATION-TYPE
+			OBJECTS { ifDescr}
+			STATUS current
+			DESCRIPTION 
+				"The active member ports in trunk have consistent bandwidth."
+			::= { hwSwitchL2MamExtTraps 8 }
+
+                                   -- 1.3.6.1.4.1.2011.5.25.315.3.9
+		hwPortsecStaticFlpAlarm NOTIFICATION-TYPE
+			OBJECTS { hwCfgFdbMac, hwCfgFdbVlanId, ifDescr }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwSwitchL2MamExtTraps 9 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.315.4
 		hwSwitchL2MamExtConformance OBJECT IDENTIFIER ::= { hwSWITCH-L2MAM-EXT 4 }
@@ -319,7 +356,7 @@
 			STATUS current
 			DESCRIPTION 
 				"hwSwitchL2MamExtFullCompliance"
-			MODULE HwSWITCH-L2MAM-EXT
+			MODULE 
 				MANDATORY-GROUPS { hwMacTrapGroups, hwL2MAMExtGeneralGrops, hwL2MAMExtTrapGroup }
 			::= { hwSwitchL2MamExtCompliances 1 }
 
@@ -348,8 +385,8 @@
 		
 		-- 1.3.6.1.4.1.2011.5.25.315.4.2.3
 		hwL2MAMExtTrapGroup NOTIFICATION-GROUP
-			NOTIFICATIONS { hwMacTrapAlarm, hwMacTrapPortCfgAlarm, hwPortVlanSecureMacAlarm, hwSlotMacUsageFallingThreshold, hwSlotMacUsageRaisingThreshold, hwMacTrapHashConflictAlarm 
-				 }
+			NOTIFICATIONS { hwMacTrapAlarm, hwMacTrapPortCfgAlarm, hwPortVlanSecureMacAlarm, hwPortsecStaticFlpAlarm, hwSlotMacUsageFallingThreshold, 
+				hwSlotMacUsageRaisingThreshold, hwMacTrapHashConflictAlarm, hwTrunkMemSpeedDifferentAlarm, hwTrunkMemSpeedDifferentResume }
 			STATUS current
 			DESCRIPTION 
 				"The trap enable group."

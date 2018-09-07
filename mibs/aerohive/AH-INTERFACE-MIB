@@ -19,11 +19,10 @@ IMPORTS
 		FROM IF-MIB;
 
 ahInterface MODULE-IDENTITY
-         LAST-UPDATED  "200806160000Z"  --  June 16, 2008
+         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
          ORGANIZATION  "Aerohive Networks, Inc"
          CONTACT-INFO  "info@aerohive.com
-                        330 Gibraltar Drive
-                        Sunnyvale CA, 94089"
+                        1011 McCarthy Boulevard                                                Milpitas, CA 95035"
          DESCRIPTION   "This module contains the MIB definition of 
 			interface related information."
 	 

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -40,7 +40,7 @@ print_navbar($navbar);
 
 $hostname = $device['hostname'];
 $hostid   = $device['port_id'];
-$ifname   = $port['ifDescr'];
+$ifname   = $port['port_label'];
 $ifIndex   = $port['ifIndex'];
 $speed = humanspeed($port['ifSpeed']);
 
@@ -57,7 +57,6 @@ else if ($port['ifAdminStatus'] == "up")
 }
 
 $i = 1;
-$inf = rewrite_ifname($ifname);
 
 echo("<div style='clear: both;'>");
 
@@ -73,7 +72,7 @@ else
   $query = "SELECT *, `mac_accounting`.`ma_id` as `ma_id` FROM `mac_accounting` WHERE port_id = ?";
   $param = array($port['port_id']);
 
- if ($vars['subview'] != minigraphs) {
+ if ($vars['subview'] != 'minigraphs') {
 
   if ($vars['subview'] == "graphs") { $table_class = "table-striped-two"; } else { $table_class = "table-striped"; }
 

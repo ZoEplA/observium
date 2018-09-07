@@ -18,11 +18,12 @@ IMPORTS MODULE-IDENTITY, OBJECT-TYPE, enterprises
 --        
 
 aerohive MODULE-IDENTITY
-         LAST-UPDATED  "200612140000Z"  --  Dec 14, 2006
+         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
          ORGANIZATION  "Aerohive Networks, Inc"
          CONTACT-INFO  "info@aerohive.com
-                        330 Gibraltar Drive
-                        Sunnyvale CA, 94089"
+                        1011 McCarthy Boulevard
+                        
+                        Milpitas, CA 95035"
          DESCRIPTION
            "This is the MIB module for object type definitions
 	    that are used throughout the Aerohive Networks enterprise MIBs."

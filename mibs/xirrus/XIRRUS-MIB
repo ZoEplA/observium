@@ -7,11 +7,11 @@ IMPORTS
     DisplayString, MacAddress, RowStatus FROM SNMPv2-TC;
 
     xirrus      MODULE-IDENTITY
-        LAST-UPDATED    "201602231200Z"
+        LAST-UPDATED    "201605231200Z"
         ORGANIZATION    "Xirrus"
         CONTACT-INFO    "support@xirrus.com"
         DESCRIPTION     "Xirrus enterprise MIB tree"
-        REVISION        "201602231200Z"
+        REVISION        "201605231200Z"
         DESCRIPTION     "xirrus mib"
         ::=  { enterprises 21013 }
 
@@ -142,6 +142,36 @@ IMPORTS
     xr6847Array         OBJECT IDENTIFIER ::= { products 220 }
     xr7247Array         OBJECT IDENTIFIER ::= { products 221 }
     xr7647Array         OBJECT IDENTIFIER ::= { products 222 }
+    xa1-120Array        OBJECT IDENTIFIER ::= { products 223 }
+    xa2-120Array        OBJECT IDENTIFIER ::= { products 224 }
+    xa4-120Array        OBJECT IDENTIFIER ::= { products 225 }
+    xa8-120Array        OBJECT IDENTIFIER ::= { products 226 }
+    xa1-130Array        OBJECT IDENTIFIER ::= { products 227 }
+    xa2-130Array        OBJECT IDENTIFIER ::= { products 228 }
+    xa4-130Array        OBJECT IDENTIFIER ::= { products 229 }
+    xa8-130Array        OBJECT IDENTIFIER ::= { products 230 }
+    xa1-240Array        OBJECT IDENTIFIER ::= { products 231 }
+    xa2-240Array        OBJECT IDENTIFIER ::= { products 232 }
+    xa4-240Array        OBJECT IDENTIFIER ::= { products 233 }
+    xa8-240Array        OBJECT IDENTIFIER ::= { products 234 }
+    xd1-230Array        OBJECT IDENTIFIER ::= { products 235 }
+    xd2-230Array        OBJECT IDENTIFIER ::= { products 236 }
+    xd3-230Array        OBJECT IDENTIFIER ::= { products 237 }
+    xd4-230Array        OBJECT IDENTIFIER ::= { products 238 }
+    xd8-230Array        OBJECT IDENTIFIER ::= { products 239 }
+    xh1-230Array        OBJECT IDENTIFIER ::= { products 240 }
+    xh2-230Array        OBJECT IDENTIFIER ::= { products 241 }
+    xh3-230Array        OBJECT IDENTIFIER ::= { products 242 }
+    xh4-230Array        OBJECT IDENTIFIER ::= { products 243 }
+    xh8-230Array        OBJECT IDENTIFIER ::= { products 244 }
+    xa1-230Array        OBJECT IDENTIFIER ::= { products 245 }
+    xa2-230Array        OBJECT IDENTIFIER ::= { products 246 }
+    xa3-230Array        OBJECT IDENTIFIER ::= { products 247 }
+    xa4-230Array        OBJECT IDENTIFIER ::= { products 248 }
+    xa8-230Array        OBJECT IDENTIFIER ::= { products 249 }
+    xa3-240Array        OBJECT IDENTIFIER ::= { products 250 }
+    xh3-240Array        OBJECT IDENTIFIER ::= { products 251 }
+    xd3-240Array        OBJECT IDENTIFIER ::= { products 252 }
 
 -- xsArray
 
@@ -1217,7 +1247,9 @@ IMPORTS
         filterTrafficLimitType      INTEGER,
         filterTimeOn                Integer32,
         filterTimeOff               Integer32,
-        filterDays                  DisplayString
+        filterDays                  DisplayString,
+	    filterSetIP		            DisplayString	
+
     }
 
     filterIndex OBJECT-TYPE
@@ -1572,6 +1604,14 @@ IMPORTS
             "Days of the week the filter is active"
         ::= { filterEntry 43 }
 
+    filterSetIP OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..16))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Modify IP setting for this filter"
+        ::= { filterEntry 44 }
+
     filterListTable OBJECT-TYPE
         SYNTAX          SEQUENCE OF FilterListEntry
         MAX-ACCESS      not-accessible
@@ -1841,10 +1881,10 @@ IMPORTS
         ::= { appListMemberTable 1 }
 
     AppListMemberEntry ::= SEQUENCE {
-        AppListMemberIndex         Integer32,
-        AppListMemberGuid          DisplayString,
-        AppListMemberApp           DisplayString,
-        AppListMemberRowStatus     RowStatus
+        appListMemberIndex         Integer32,
+        appListMemberGuid          DisplayString,
+        appListMemberApp           DisplayString,
+        appListMemberRowStatus     RowStatus
         }
 
     appListMemberIndex OBJECT-TYPE 
@@ -1943,7 +1983,8 @@ IMPORTS
         iapSpatialStreams    INTEGER,
         iapChannelBond80Mhz  INTEGER,
         iapBondedChannelList DisplayString,
-        iapType              INTEGER
+        iapType              INTEGER,
+        iapChannelBond160Mhz INTEGER
     }
 
     iapIndex OBJECT-TYPE
@@ -2064,7 +2105,7 @@ IMPORTS
         MAX-ACCESS      read-write
         STATUS          current
         DESCRIPTION
-            "Channel bonding setting (802.11n)"
+            "Channel bonding 40Mhz setting (802.11n)"
         ::= { iapEntry 15 }
 
     iapBondedChannel OBJECT-TYPE
@@ -2217,12 +2258,21 @@ IMPORTS
         ::= { iapEntry 33 }
 
     iapType OBJECT-TYPE
-        SYNTAX          INTEGER { not-present(0), unknown(1), dot11abgn(2), dot11abgnac(3), dot11an(4) }
+        SYNTAX          INTEGER { not-present(0), unknown(1), dot11abgn(2), dot11abgnac(3), dot11an(4), dot11anac(5) }
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
             "IAP type"
         ::= { iapEntry 34 }
+
+    iapChannelBond160Mhz OBJECT-TYPE
+        SYNTAX          INTEGER { off(0), on(1) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Channel bonding 160Mhz setting"
+        ::= { iapEntry 35 }
+
 
     global      OBJECT IDENTIFIER ::= { iap 2 }
     global11a   OBJECT IDENTIFIER ::= { iap 3 }
@@ -4852,7 +4902,7 @@ IMPORTS
         ::= { global11n 1 }
 
     global11nTxChains OBJECT-TYPE
-        SYNTAX          Integer32(1..3)
+        SYNTAX          Integer32(1..4)
         MAX-ACCESS      read-write
         STATUS          current
         DESCRIPTION
@@ -4860,7 +4910,7 @@ IMPORTS
         ::= { global11n 2 }
 
     global11nRxChains OBJECT-TYPE
-        SYNTAX          Integer32(1..3)
+        SYNTAX          Integer32(1..4)
         MAX-ACCESS      read-write
         STATUS          current
         DESCRIPTION
@@ -5082,6 +5132,15 @@ IMPORTS
         DESCRIPTION
             "Status of 802.11ac Wave 2 Capability"
         ::= { global11ac 9 }    
+
+    global11acAutoBond OBJECT-TYPE
+        SYNTAX          INTEGER { disable(0), enable(1) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Enable or disable 802.11ac 5GHz automatic channel bonding"
+        ::= { global11ac 10 }
+
 
 --
 -- INTERFACE ETHERNET
@@ -5754,6 +5813,14 @@ IMPORTS
             "Specify station MAC address format used in a User-Name attribute during RADIUS MAC authentication"
         ::= { radiusServerExternal 29 }
 
+    radiusFailoverTimeout OBJECT-TYPE
+        SYNTAX          Integer32(10..600)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Timeout before failover to another server after current server failed"
+        ::= { radiusServerExternal 30 }
+
 --
 -- RADIUS SERVER INTERNAL
 --
@@ -6421,7 +6488,8 @@ IMPORTS
         ssidVlanPool                        DisplayString,
         ssidExpiration                      Integer32,
         ssidDateOn                          Integer32,
-        ssidDateOff                         Integer32
+        ssidDateOff                         Integer32,
+        ssidRadiusFailoverTimeout           Integer32
     }
 
     ssidIndex OBJECT-TYPE
@@ -6968,6 +7036,14 @@ IMPORTS
             "SSID Scheduling Date Off"
         ::= { ssidEntry 68 }
 
+    ssidRadiusFailoverTimeout OBJECT-TYPE
+        SYNTAX          Integer32(10..600)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Timeout before failover to another server after current server failed"
+        ::= { ssidEntry 69 }
+
     ssidTableReset OBJECT-TYPE
         SYNTAX          INTEGER { reset(1) }
         MAX-ACCESS      read-write
@@ -7200,7 +7276,8 @@ IMPORTS
         ssidWprLogoImage            DisplayString,
         ssidWprHeaderText           DisplayString,
         ssidWprFooterText           DisplayString,
-        ssidWprAuthTimeout          Integer32
+        ssidWprAuthTimeout          Integer32,
+        ssidWprHttpsPassthru        INTEGER
     }
 
     ssidWprIndex OBJECT-TYPE
@@ -7338,6 +7415,14 @@ IMPORTS
         DESCRIPTION
             "WPR station authentication timeout in minutes (0 - no timeout)"
         ::= { ssidWprEntry 19 }
+
+    ssidWprHttpsPassthru OBJECT-TYPE
+        SYNTAX          INTEGER { disable(0), enable(1) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Enable or disable WPR HTTPS Passthru"
+        ::= { ssidWprEntry 20 }
 
     ssidHoneypotWhitelistTable OBJECT-TYPE
         SYNTAX          SEQUENCE OF SsidHoneypotWhitelistEntry

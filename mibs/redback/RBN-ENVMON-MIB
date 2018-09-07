@@ -1,8 +1,7 @@
 -- *****************************************************************
 -- RBN-ENVMON-MIB	Environmental Monitor MIB
 --
--- Copyright (c) 1999-2007 RedBack Networks, Inc.
--- Copyright (c) 2012 Ericsson AB.
+-- Copyright (c) 1999-2007, 2010-2011 Ericsson AB
 -- All rights reserved.
 -- 
 -- *****************************************************************
@@ -31,25 +30,29 @@ IMPORTS
 
 rbnEnvMonMIB MODULE-IDENTITY
         LAST-UPDATED    "201210030000Z" -- October 3, 2012
-	ORGANIZATION	"RedBack Networks, Inc."
+	ORGANIZATION	"Ericsson AB."
 	CONTACT-INFO
-		"	RedBack Networks, Inc.
+		"	Ericsson AB.
 
-		Postal:	300 Holger Way
+		Postal:	100 Headquarters Dr.
 			San Jose, CA  95134
 			USA
 
 		 Phone:	+1 408 750 5000
 		   Fax: +1 408 750 5599
 
-		E-mail:	mib-info@redback.com"
+		"
 	DESCRIPTION
 		"The MIB used to genericially manage Environmental
-		Monitor functionality on RedBack Networks devices."
-
+		Monitor functionality on network devices."
+               
         REVISION        "201210030000Z" -- October 3, 2012
         DESCRIPTION
                 "Removed DISPLAY-HINT from RbnVoltage and RbnFanSpeed."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
 
         REVISION        "201011110000Z" -- Nov 11, 2010
         DESCRIPTION

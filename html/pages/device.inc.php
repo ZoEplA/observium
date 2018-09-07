@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -340,28 +340,50 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
     // $routing_tabs is used in device/routing/ to build the tabs menu. we build it here to save some queries
 
     $device_routing_count['ipsec_tunnels'] = dbFetchCell("SELECT COUNT(*) FROM `ipsec_tunnels` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['ipsec_tunnels']) { $routing_tabs[] = 'ipsec_tunnels'; }
+    if ($device_routing_count['ipsec_tunnels']) { $routing_tabs[] = 'ipsec_tunnels';
+      $routing_options[] = array('url'  => generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'routing', 'proto' => 'ipsec_tunnels')),
+                                 'text' => 'IPSEC Tunnels',
+                                 'icon' => $config['icon']['ipsec_tunnel']);
+    }
 
     $device_routing_count['bgp'] = dbFetchCell("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['bgp']) { $routing_tabs[] = 'bgp'; }
+    if ($device_routing_count['bgp']) {
+      $routing_tabs[] = 'bgp';
+      $routing_options[] = array('url'  => generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'routing', 'proto' => 'bgp')),
+                                 'text' => 'BGP',
+                                 'icon' => $config['icon']['bgp']);
+    }
 
     //$device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_instances` WHERE `ospfAdminStat` = 'enabled' AND `device_id` = ?", array($device['device_id']));
     $device_routing_count['ospf'] = dbFetchCell("SELECT COUNT(*) FROM `ospf_instances` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['ospf']) { $routing_tabs[] = 'ospf'; }
+    if ($device_routing_count['ospf']) { $routing_tabs[] = 'ospf';
+      $routing_options[] = array('url'  => generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'routing', 'proto' => 'ospf')),
+                                 'text' => 'OSPF',
+                                 'icon' => $config['icon']['ospf']);
+    }
 
     $device_routing_count['eigrp'] = dbFetchCell("SELECT COUNT(*) FROM `eigrp_ports` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['eigrp']) { $routing_tabs[] = 'eigrp'; }
+    if ($device_routing_count['eigrp']) { $routing_tabs[] = 'eigrp';
+      $routing_options[] = array('url'  => generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'routing', 'proto' => 'eigrp')),
+                                 'text' => 'EIGRP',
+                                 'icon' => $config['icon']['eigrp']);}
 
     $device_routing_count['cef'] = dbFetchCell("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['cef']) { $routing_tabs[] = 'cef'; }
+    if ($device_routing_count['cef']) { $routing_tabs[] = 'cef';
+      $routing_options[] = array('url'  => generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'routing', 'proto' => 'cef')),
+                                 'text' => 'CEF',
+                                 'icon' => $config['icon']['cef']);}
 
     $device_routing_count['vrf'] = dbFetchCell("SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ?", array($device['device_id']));
-    if ($device_routing_count['vrf']) { $routing_tabs[] = 'vrf'; }
+    if ($device_routing_count['vrf']) { $routing_tabs[] = 'vrf';
+      $routing_options[] = array('url'  => generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'routing', 'proto' => 'vrf')),
+                                 'text' => 'VRF',
+                                 'icon' => $config['icon']['vrf']);}
 
     // Print routing tab if any of the routing tables contain matching entries
     if (is_array($routing_tabs))
     {
-      $navbar['options']['routing'] = array('text' => 'Routing', 'icon' => $config['icon']['routing']);
+      $navbar['options']['routing'] = array('text' => 'Routing', 'icon' => $config['icon']['routing'], 'suboptions' => $routing_options);
     }
 
     // Print the pseudowire tab if any of the routing tables contain matching entries
@@ -446,6 +468,9 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
     {
       $navbar['options']['nfsen'] = array('text' => 'Netflow', 'icon' => $config['icon']['nfsen']);
     }
+
+    $navbar['options']['notes']                             = array('text' => '', 'icon' => $config['icon']['eventlog'], 'right' => TRUE, 'class' => "dropdown-toggle");
+
 
     // If the user has global write permissions, show them the edit tab
     if ($_SESSION['userlevel'] >= "10")
@@ -563,12 +588,10 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
   // Delete device modal
 
       $form = array('type'      => 'horizontal',
-                    'id'        => 'delete_device',
+                    'userlevel'  => 10,          // Minimum user level for display form
+                    'id'        => 'modal-delete_device',
                     'title'      => 'Delete Device "' . $device['hostname'] . '"',
-                    //'space'     => '20px',
-                    //'title'     => 'Delete device',
                     'icon'      => $config['icon']['device-delete'],
-                    //'class'     => '',
                     'url'       => 'delhost/'
                     );
 
@@ -630,6 +653,18 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
       print_warning('<h4>Device not yet polled</h4>
 This device has not yet been successfully polled. System information and statistics will not be populated and graphs will not draw.
 Please wait 5-10 minutes for graphs to draw correctly.');
+
+      // Poller info displayed only if device never polled
+      if ($_SESSION['userlevel'] >= 7)
+      {
+        $poller_start = dbFetchCell("SELECT `process_start` FROM `observium_processes` WHERE `device_id` = ? AND `process_name` = ?", array($device['device_id'], 'poller.php'));
+        //r($poller_start);
+        if ($poller_start)
+        {
+          print_success('<h4>Device poller in progress</h4>
+  This device is polling now. Poller started '.format_unixtime($poller_start).' ('.formatUptime(time() - $poller_start).' ago).');
+        }
+      }
     }
 
     // If this device has never been discovered, print a warning here
@@ -638,6 +673,16 @@ Please wait 5-10 minutes for graphs to draw correctly.');
       print_warning('<h4>Device not yet discovered</h4>
 This device has not yet been successfully discovered. System information and statistics will not be populated and graphs will not draw.
 This device should be automatically discovered within 10 minutes.');
+    }
+    if ($_SESSION['userlevel'] >= 7)
+    {
+      $discovery_start = dbFetchCell("SELECT `process_start` FROM `observium_processes` WHERE `device_id` = ? AND `process_name` = ?", array($device['device_id'], 'discovery.php'));
+      //r($discovery_start);
+      if ($discovery_start)
+      {
+        print_success('<h4>Device discovery in progress</h4>
+This device is discover now. Discovery started '.format_unixtime($discovery_start).' ('.formatUptime(time() - $discovery_start).' ago).');
+      }
     }
 
     if (is_file($config['html_dir']."/pages/device/".basename($tab).".inc.php"))

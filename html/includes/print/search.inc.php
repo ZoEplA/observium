@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -603,6 +603,11 @@ function print_form($data, $return = FALSE)
     $used_vars[] = 'requesttoken';
   }
 
+  // Always clean pagination from form action url
+  $used_vars[] = 'pageno';
+  $used_vars[] = 'pagination';
+  $used_vars[] = 'pagesize';
+
   // Remove old vars from url
   if ($data['url'])
   {
@@ -747,7 +752,7 @@ function print_form_box($data, $return = FALSE)
             }
             if ($i < 1)
             {
-              // Add laber for first element in row
+              // Add label for first element in row
               if ($element['name'])
               {
                 $row_label = '    <label';
@@ -1014,6 +1019,14 @@ function generate_form_element($item, $type = '')
 {
   $value_isset = isset($item['value']);
   if (!$value_isset) { $item['value'] = ''; }
+  if (is_array($item['value']))
+  {
+    // Passed from URI comma values always converted to array, re-implode it
+    $item['value_escaped'] = escape_html(implode(',', $item['value']));
+  } else {
+    $item['value_escaped'] = escape_html($item['value']);
+  }
+
   if (!isset($item['type']))  { $item['type'] = $type; }
   $string          = '';
   $element_tooltip = '';
@@ -1066,7 +1079,7 @@ function generate_form_element($item, $type = '')
     case 'hidden':
       if (!$item['readonly'] && !$item['disabled']) // If item readonly or disabled, just skip item
       {
-        $string .= '    <input type="'.$item['type'].'" name="'.$item['id'] . '" id="' .$item['id'] . '" value="'.$item['value'].'"'.$element_data.' />' . PHP_EOL;
+        $string .= '    <input type="'.$item['type'].'" name="'.$item['id'] . '" id="' .$item['id'] . '" value="'.$item['value_escaped'].'"'.$element_data.' />' . PHP_EOL;
       }
       break;
 
@@ -1092,7 +1105,7 @@ function generate_form_element($item, $type = '')
           {
             if (!($item['show_password'] && $_SESSION['userlevel'] > 7)) // For admin, do not replace, required for show password
             {
-              $item['value'] = '&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;';
+              $item['value_escaped'] = '&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;';
             }
           }
           // add icon for show/hide password
@@ -1103,7 +1116,7 @@ function generate_form_element($item, $type = '')
             $GLOBALS['cache_html']['javascript'][] = "$('[data-toggle=\"password\"]').password();";
           }
         }
-        $item_end   = ' value="'.$item['value'].'" />';
+        $item_end   = ' value="'.$item['value_escaped'].'" />';
         $item_class = 'input';
       } else {
         $item_begin = '    <textarea ';
@@ -1116,7 +1129,7 @@ function generate_form_element($item, $type = '')
         {
           $item_begin .= 'cols="' . $item['cols'] . '" ';
         }
-        $item_end   = '>' . $item['value'] . '</textarea>';
+        $item_end   = '>' . $item['value_escaped'] . '</textarea>';
         $item_class = 'form-control';
       }
       $item_begin .= $element_data; // Add custom data- attribs
@@ -1296,12 +1309,15 @@ SCRIPT;
 
     case 'datetime':
       register_html_resource('js', 'bootstrap-datetimepicker.min.js'); // Enable DateTime JS
+      // Additionally register qTip (if not already enabled by $config['web_mouseover'])
+      register_html_resource('js', 'jquery.qtip.min.js');
+      register_html_resource('css', 'jquery.qtip.min.css');
       $id_from = $item['id'].'_from';
       $id_to = $item['id'].'_to';
       if ($value_isset && !$item['from'] && !$item['to'])
       {
         // Single datetime input
-        $item['from']    = $item['value'];
+        $item['from']    = $item['value_escaped'];
         $item['to']      = FALSE;
         $item['presets'] = FALSE;
         $id_from      = $item['id'];
@@ -1624,7 +1640,7 @@ SCRIPT;
       foreach ($item['values'] as $k => $entry)
       {
         $k = (string)$k;
-        $value   = ($item['encode'] ? var_encode($k) : $k); // Use base64+serialize encoding
+        $value   = ($item['encode'] ? var_encode($k) : escape_html($k)); // Use base64+serialize encoding
         // Default group is '' (empty string), for allow to use 0 as group name!
         $group = '';
         if (!is_array($entry))
@@ -1674,10 +1690,10 @@ SCRIPT;
         $optgroup[$group] = '';
         foreach ($entries as $value => $entry)
         {
-          $optgroup[$group] .= '<option value="'.$value.'"';
+          $optgroup[$group] .= '<option value="'.$value.'"'; // already escaped
           if (isset($entry['subtext']) && strlen($entry['subtext']))
           {
-            $optgroup[$group] .= ' data-subtext="' . $entry['subtext'] . '"';
+            $optgroup[$group] .= ' data-subtext="' . escape_html($entry['subtext']) . '"';
           }
           if ($entry['name'] == '[there is no data]')
           {
@@ -1686,7 +1702,7 @@ SCRIPT;
 
           if (isset($entry['class']) && $entry['class'])
           {
-            $optgroup[$group] .= ' class="' . $entry['class'] . '"';
+            $optgroup[$group] .= ' class="' . escape_html($entry['class']) . '"';
           }
           else if (isset($entry['style']) && $entry['style'])
           {
@@ -1807,7 +1823,7 @@ SCRIPT;
 
       if ($item['value'])
       {
-        $string .= ' value="' . $item['value'] . '"';
+        $string .= ' value="' . $item['value_escaped'] . '"';
       }
       $string .= $element_data; // Add custom data- attribs
       $string .= '>';

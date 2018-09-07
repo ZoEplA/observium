@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -32,7 +32,7 @@ $ignore = 0;
   {
     foreach ($config['device_traffic_descr'] as $ifdescr)
     {
-      if (preg_match($ifdescr."i", $port['ifDescr']) || preg_match($ifdescr."i", $port['ifName']) || preg_match($ifdescr."i", $port['portName']))
+      if (preg_match($ifdescr."i", $port['ifDescr']) || preg_match($ifdescr."i", $port['ifName']))
       {
         $ignore = 1;
       }

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -77,7 +77,7 @@ foreach (array_keys($pseudowires_db) as $mib)
       $pw_uptime = timeticks_to_sec($pw_poll[$oids['Uptime']['oid']]); // Convert uptime to sec
       rrdtool_create($device, $rrd_uptime, "DS:Uptime:GAUGE:600:0:U ");
       rrdtool_update($device, $rrd_uptime, "N:".$pw_uptime);
-      $graphs['pseudowire_uptime'] = TRUE;
+      //$graphs['pseudowire_uptime'] = TRUE; // not a device graph
 
       // Bits & Packets graphs
       $pw_values = array();
@@ -92,8 +92,8 @@ foreach (array_keys($pseudowires_db) as $mib)
       {
         rrdtool_create($device, $rrd_filename, $rrd_ds);
         rrdtool_update($device, $rrd_filename, $pw_values);
-        $graphs['pseudowire_bits'] = TRUE;
-        $graphs['pseudowire_pkts'] = TRUE;
+        //$graphs['pseudowire_bits'] = TRUE; // not a device graph
+        //$graphs['pseudowire_pkts'] = TRUE; // not a device graph
       }
 
       // Event

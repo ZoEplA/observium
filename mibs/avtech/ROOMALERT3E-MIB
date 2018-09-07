@@ -2,7 +2,7 @@
 --defines ROOMALERT3E-MIB for SNMP agent extension of Room Alert 3E
 --Contents:	Global Registration Module
 --		Room Alert OIDs - Enterprise 20916
---Version:	1.0.0 
+--Version:	1.0.1
 --Date:		1 October 2012
 --Developed By: AVTECH Software, Inc.
 
@@ -52,7 +52,7 @@ digital-sen1-2 OBJECT-TYPE
 ::= { digital-sen1 2 }
 
 digital-sen1-label OBJECT-TYPE
-	SYNTAX		OCTECT STRING
+	SYNTAX		OCTET STRING
 	ACCESS		read-only
 	STATUS		mandatory
 	DESCRIPTION "The label of this sensor"
@@ -94,7 +94,7 @@ digital-sen2-5 OBJECT-TYPE
 ::= { digital-sen2 5 }
 
 digital-sen2-label OBJECT-TYPE
-	SYNTAX		OCTECT STRING
+	SYNTAX		OCTET STRING
 	ACCESS		read-only
 	STATUS		mandatory
 	DESCRIPTION "The label of this sensor"

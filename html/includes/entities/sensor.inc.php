@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -101,14 +101,21 @@ function humanize_sensor(&$sensor)
   $sensor['humanized'] = TRUE;
 }
 
-function build_sensor_query($vars)
+function build_sensor_query($vars, $query_count = FALSE)
 {
 
-  $sql  = "SELECT * FROM `sensors`";
-  if($vars['sort'] == 'hostname' || $vars['sort'] == 'device' || $vars['sort'] == 'device_id')
+  if ($query_count)
   {
-    $sql .= ' LEFT JOIN `devices` USING(`device_id`)';
+    $sql = "SELECT COUNT(*) FROM `sensors`";
+  } else {
+    $sql  = "SELECT * FROM `sensors`";
+
+    if ($vars['sort'] == 'hostname' || $vars['sort'] == 'device' || $vars['sort'] == 'device_id')
+    {
+      $sql .= ' LEFT JOIN `devices` USING(`device_id`)';
+    }
   }
+
   $sql .= " WHERE `sensor_deleted` = 0";
 
   // Build query
@@ -151,6 +158,12 @@ function build_sensor_query($vars)
   // $sql .= $GLOBALS['cache']['where']['devices_permitted'];
 
   $sql .= generate_query_permitted(array('device', 'sensor'));
+
+  // If need count, just return sql without sorting
+  if ($query_count)
+  {
+    return $sql;
+  }
 
   switch ($vars['sort_order'])
   {
@@ -196,13 +209,15 @@ function build_sensor_query($vars)
 function print_sensor_table($vars)
 {
 
+  pagination($vars, 0, TRUE); // Get default pagesize/pageno
+
   $sql = build_sensor_query($vars);
 
-//r($vars);
-//r($sql);
-
+  //r($vars);
+  //r($sql);
 
   $sensors = array();
+  //foreach(dbFetchRows($sql, NULL, TRUE) as $sensor)
   foreach(dbFetchRows($sql) as $sensor)
   {
     //if (isset($GLOBALS['cache']['devices']['id'][$sensor['device_id']]))
@@ -212,7 +227,9 @@ function print_sensor_table($vars)
     //}
   }
 
-  $sensors_count = count($sensors);
+  //$sensors_count = count($sensors); // This is count incorrect, when pagination used!
+  //$sensors_count = dbFetchCell(build_sensor_query($vars, TRUE), NULL, TRUE);
+  $sensors_count = dbFetchCell(build_sensor_query($vars, TRUE));
 
   // Pagination
   $pagination_html = pagination($vars, $sensors_count);
@@ -325,7 +342,7 @@ function generate_sensor_row($sensor, $vars)
 
   if ($vars['tab'] != 'overview')
   {
-    $row .= '        <td style="white-space: nowrap">' . generate_tooltip_link(NULL, formatUptime(($config['time']['now'] - $sensor['sensor_last_change']), 'short-2') . ' ago', format_unixtime($sensor['sensor_last_change'])) . '</td>';
+    $row .= '        <td style="white-space: nowrap">' . ($sensor['sensor_last_change'] == '0' ? 'Never' : generate_tooltip_link(NULL, formatUptime(($config['time']['now'] - $sensor['sensor_last_change']), 'short-2') . ' ago', format_unixtime($sensor['sensor_last_change']))) . '</td>';
     $table_cols++;
     $row .= '        <td style="text-align: right;"><strong>' . generate_tooltip_link('', $sensor['sensor_event'], $sensor['event_descr'], $sensor['event_class']) . '</strong></td>';
     $table_cols++;

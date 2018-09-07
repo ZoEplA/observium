@@ -7,16 +7,18 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 $i = "1";
 
-$aps = dbFetchRows("SELECT * FROM `accesspoints`  LEFT JOIN `accesspoints-state` ON  `accesspoints`.`accesspoint_id` = `accesspoints-state`.`accesspoint_id` WHERE `device_id` = ? AND `deleted` = '0'  ORDER BY `name`,`radio_number` ASC", array($device['device_id']));
+$aps = dbFetchRows("SELECT * FROM `accesspoints` LEFT JOIN `accesspoints-state` USING (`accesspoint_id`) WHERE `device_id` = ? AND `deleted` = '0'  ORDER BY `name`,`radio_number` ASC", array($device['device_id']));
 
 if(count($aps))
 {
+
+  echo generate_box_open();
 
   echo('<table class="table   table-striped table-hover">');
 
@@ -27,6 +29,8 @@ if(count($aps))
     $i++;
   }
   echo('</table>');
+
+  echo generate_box_close();
 
 } else {
 

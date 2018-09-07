@@ -15,7 +15,7 @@ AVAYA-RTP-MIB DEFINITIONS ::= BEGIN
 
 
      avRtpMib MODULE-IDENTITY
-       LAST-UPDATED "201006081712Z"   
+       LAST-UPDATED "201501091031Z"   
      ORGANIZATION
                        "Avaya"
      CONTACT-INFO
@@ -57,6 +57,10 @@ AVAYA-RTP-MIB DEFINITIONS ::= BEGIN
 
            ::= { mibs 7  }  
 
+-- Version 201501091031Z
+-- 1. Add Opus to avRtpSessionType
+-- 2. Add AES256 to avRtpSessionTxEncryp
+           
 -- Version 201006081712Z
 -- 1. Add avRtpQoSInetTrap.
            
@@ -898,6 +902,7 @@ avRtpThresholdTable OBJECT-TYPE
         	g729ab(137),  
         	g729b(138),
         	g726a32(139),
+        	opus(140),
         	unspecified(255)
         }
         MAX-ACCESS read-only
@@ -927,7 +932,10 @@ avRtpThresholdTable OBJECT-TYPE
           srtpF8128HmacSha180(7),
           srtpHmacSha180(8),
           srtpHmacSha132(9),
-          srtp(10)
+          srtp(10),
+          srtpAesCm256(11),
+          srtpAesCm256HmacSha180(12),
+          srtpAesCm256HmacSha132(13)
 		}
         MAX-ACCESS read-only
         STATUS current            

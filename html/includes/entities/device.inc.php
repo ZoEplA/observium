@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -40,6 +40,10 @@ function build_devices_where_array($vars)
           break;
         case 'hostname':
         case 'sysname':
+        case 'sysContact':
+        case 'sysDescr':
+        case 'serial':
+        case 'purpose':
           $where_array[$var] = generate_query_values($value, $var, '%LIKE%');
           break;
         case 'location_text':
@@ -65,6 +69,7 @@ function build_devices_where_array($vars)
         case 'features':
         case 'type':
         case 'status':
+        case 'distro':
         case 'ignore':
         case 'disabled':
           $where_array[$var] = generate_query_values($value, $var);

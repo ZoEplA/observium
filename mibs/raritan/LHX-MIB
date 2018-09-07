@@ -9,7 +9,7 @@ IMPORTS
     sysContact, sysName, sysLocation                    FROM RFC1213-MIB;
 
 raritan MODULE-IDENTITY
-    LAST-UPDATED "201501050000Z"      -- January 5, 2015
+    LAST-UPDATED "201701270000Z"      -- January 27, 2017
     ORGANIZATION "Raritan"
     CONTACT-INFO "
                   Author:       Raritan Americas, Inc.
@@ -22,6 +22,13 @@ raritan MODULE-IDENTITY
     DESCRIPTION  "This MIB describes the SNMP functions of the
                   Schroff Varistar LHX heat exchanger
 		  supported by Raritan devices."
+
+    REVISION	 "201701270000Z"      -- January 27, 2017
+    
+    DESCRIPTION  "1) Added deviceSerialNumber under trapInformation
+                  2) Added deviceSerialNumber to the OBJECTS clause of all traps
+                 "
+
 
 
     REVISION	 "201501050000Z"      -- January 5, 2015
@@ -164,7 +171,8 @@ lhxSensorFailure
            agentInetPortNumber,
 	    	lhxErrorCode,
     	    	portId,
-    	    	probeId
+    	    	probeId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -183,7 +191,8 @@ lhxFanFailure
            agentInetPortNumber,
 	    	lhxErrorCode,
     	    	portId,
-    	    	fanId
+    	    	fanId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -202,7 +211,8 @@ lhxPowerSupplyFailure
            agentInetPortNumber,
 	    	lhxErrorCode,
     	    	portId,
-    	    	powerSupplyId
+    	    	powerSupplyId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -220,7 +230,8 @@ lhxThresholdAirOutlet
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -238,7 +249,8 @@ lhxThresholdAirInlet
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -256,7 +268,8 @@ lhxThresholdWaterInlet
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -274,7 +287,8 @@ lhxDoorOpened
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -292,7 +306,8 @@ lhxMaximumCoolingRequest
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -310,7 +325,8 @@ lhxEmergencyCooling
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -328,7 +344,8 @@ lhxWaterLeak
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -346,7 +363,8 @@ lhxThresholdHumidity
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -364,7 +382,8 @@ lhxExternalWaterCoolingFailure
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -382,7 +401,8 @@ lhxThresholdWaterOutlet
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -400,7 +420,8 @@ lhxParameterDataLoss
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -418,7 +439,8 @@ lhxStBusError
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -436,7 +458,8 @@ lhxCollectiveFault
     	    	deviceInetIPAddress,
            agentInetPortNumber,
 	    	lhxErrorCode,
-    	    	portId
+    	    	portId,
+           deviceSerialNumber
     	}
     	STATUS	    	current
     	DESCRIPTION
@@ -460,7 +483,8 @@ gwSensorStateChange
                 measurementsSensorTimeStamp,
                 measurementsSensorValue,
                 measurementsSensorState,
-                oldSensorState
+                oldSensorState,
+                deviceSerialNumber
 	}
         STATUS	    	current
         DESCRIPTION
@@ -479,7 +503,8 @@ gwLhxOperationalStateChange
                 agentInetPortNumber,
 		portId,
 		operationalState,
-                oldOperationalState
+                oldOperationalState,
+           deviceSerialNumber
 	}
         STATUS	    	current
         DESCRIPTION
@@ -497,7 +522,8 @@ lhxVoltageLow
 		deviceInetIPAddress,
            agentInetPortNumber,
 		lhxErrorCode,
-		portId
+		portId,
+           deviceSerialNumber
 	}
 	STATUS		current
 	DESCRIPTION
@@ -515,7 +541,8 @@ lhxBaseElectronicsFailure
 		deviceInetIPAddress,
            agentInetPortNumber,
 		lhxErrorCode,
-		portId
+		portId,
+           deviceSerialNumber
 	}
 	STATUS		current
 	DESCRIPTION
@@ -533,7 +560,8 @@ lhxCondenserPumpFailure
 		deviceInetIPAddress,
 		lhxErrorCode,
            agentInetPortNumber,
-		portId
+		portId,
+           deviceSerialNumber
 	}
 	STATUS		current
 	DESCRIPTION
@@ -673,6 +701,17 @@ agentInetPortNumber   OBJECT-TYPE
                                                        
                             "
          ::= { trapInformation 13  }  
+
+
+deviceSerialNumber
+    	OBJECT-TYPE
+    	SYNTAX	    	DisplayString
+    	MAX-ACCESS  	accessible-for-notify
+    	STATUS	    	current
+    	DESCRIPTION
+    	    "The serial number of the Device."
+    	::= { trapInformation 14 }
+
 	
 -- the LHX configuration
 
@@ -1243,7 +1282,8 @@ trapInformationGroup
 		sensorTypeId,
 		sensorId,
 		oldOperationalState,
-           agentInetPortNumber
+           agentInetPortNumber,
+           deviceSerialNumber
     	}
         STATUS	    	current
         DESCRIPTION

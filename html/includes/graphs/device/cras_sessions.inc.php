@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -23,7 +23,7 @@ $rrd_options .= " DEF:l2l=$rrd_filename:l2l:AVERAGE";
 $rrd_options .= " DEF:lb=$rrd_filename:lb:AVERAGE";
 $rrd_options .= " DEF:svc=$rrd_filename:svc:AVERAGE";
 $rrd_options .= " DEF:webvpn=$rrd_filename:webvpn:AVERAGE";
-$rrd_options .= " CDEF:webvpn_only=webvpn,svc,-";
+//$rrd_options .= " CDEF:webvpn_only=webvpn,svc,-";
 
 $rrd_options .= " COMMENT:'Sessions         Current    Average   Maximum\\n'";
 
@@ -32,10 +32,10 @@ $rrd_options .= " GPRINT:svc:LAST:'%6.2lf%s'";
 $rrd_options .= " GPRINT:svc:AVERAGE:' %6.2lf%s'";
 $rrd_options .= " GPRINT:svc:MAX:' %6.2lf%s\\n'";
 
-$rrd_options .= " AREA:webvpn_only#999999:'Clientless VPN':STACK";
-$rrd_options .= " GPRINT:webvpn_only:LAST:'%6.2lf%s'";
-$rrd_options .= " GPRINT:webvpn_only:AVERAGE:' %6.2lf%s'";
-$rrd_options .= " GPRINT:webvpn_only:MAX:' %6.2lf%s\\n'";
+$rrd_options .= " AREA:webvpn#999999:'Clientless VPN':STACK";
+$rrd_options .= " GPRINT:webvpn:LAST:'%6.2lf%s'";
+$rrd_options .= " GPRINT:webvpn:AVERAGE:' %6.2lf%s'";
+$rrd_options .= " GPRINT:webvpn:MAX:' %6.2lf%s\\n'";
 
 $rrd_options .= " AREA:ipsec#00aa00:'IPSEC         ':STACK";
 $rrd_options .= " GPRINT:ipsec:LAST:'%6.2lf%s'";

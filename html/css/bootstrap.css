@@ -11475,3 +11475,13 @@ button [class*=" sprite-"],
   max-width: 609px;
   width: 609px;
 }
+
+.col-md-4 .form-horizontal .controls,
+.form-horizontal .col-md-4 .controls {
+  margin-left: 120px;
+}
+
+.col-md-4 .form-horizontal .control-label,
+.form-horizontal .col-md-4 .control-label {
+  width: 120px;
+}

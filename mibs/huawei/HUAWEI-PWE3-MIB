@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI PWE3 Management MIB
 -- Reference:
--- Version: V2.09
+-- Version: V2.12
 -- History:
 --              V1.0 PanJun, 2006-05-10, publish
 -- ==================================================================
@@ -36,7 +36,7 @@
     
     
         hwL2VpnPwe3 MODULE-IDENTITY 
-            LAST-UPDATED  "201507181600Z"           --July 18, 2015 at 13:58 GMT 
+            LAST-UPDATED  "201601121800Z"           --Dec 28, 2015 at 17:00 GMT 
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -50,6 +50,18 @@
             DESCRIPTION 
                 "The HUAWEI-PWE3-MIB contains objects to
                 manage PWE3."
+
+           REVISION "201601121800Z"           --Jan 12, 2016 at 18:00 GMT 
+             DESCRIPTION               
+             "Modify the description of hwSvcExtPWType" 
+
+           REVISION "201512281700Z"           --Dec 28, 2015 at 17:00 GMT 
+             DESCRIPTION               
+             "Add OBJECT(hwSvcExtCir, hwSvcExtPir,hwSvcExtQosProfile) to SVC MIB Extend Table(hwSvcExtTable)" 
+
+           REVISION "201511281600Z"           --Nov 28, 2015 at 10:55 GMT 
+             DESCRIPTION               
+             "Support query the secondary static VCs" 
          
            REVISION "201507181600Z"           --July 18, 2015 at 13:58 GMT 
              DESCRIPTION               
@@ -121,6 +133,17 @@
                 paraUnMatched(5),
                 notifiNotForward(6)
                 }    
+
+       HWL2VpnVcType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+               "The type indicates the type of the LDP PW VC."
+            SYNTAX INTEGER
+                {
+                main(1),
+                secondary(2),
+                bypass(3)
+                }
     
 --
 -- Node definitions
@@ -2627,6 +2650,504 @@
                 "The total number of bytes sent on the SVC."
             ::= { hwSvcStatisticsEntry 4 }
 
+--          
+-- The L2VPN's SVC Extend Table
+-- 
+        hwSvcExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWSvcExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the SVC configuration extend table. Users
+                can query a SVC by it."
+            ::= { hwSvcObjects 8 }
+
+        
+        hwSvcExtEntry OBJECT-TYPE
+            SYNTAX HWSvcExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a SVC entry."
+            INDEX { hwSvcExtIfIndex, hwSvcExtPWType }
+            ::= { hwSvcExtTable 1 }
+
+             HWSvcExtEntry ::=
+            SEQUENCE { 
+                hwSvcExtIfIndex
+                    InterfaceIndexOrZero,
+                hwSvcExtPWType
+                    HWL2VpnVcType,
+                hwSvcExtID
+                    Unsigned32,
+                hwSvcExtType
+                    HWL2VpnVcEncapsType,
+                hwSvcExtPeerAddrType
+                    InetAddressType,
+                hwSvcExtPeerAddr
+                    IpAddress,
+                hwSvcExtStatus
+                    INTEGER,
+                hwSvcExtInboundLabel
+                    Unsigned32,
+                hwSvcExtOutboundLabel
+                    Unsigned32,
+                hwSvcExtAcStatus
+                    INTEGER,
+                hwSvcExtACOAMStatus
+                    INTEGER,
+                 hwSvcExtCtrlWord
+                    HWEnableValue,
+                hwSvcExtVCCV
+                    BITS,
+                hwSvcExtMaxAtmCells
+                    Unsigned32,
+                hwSvcExtTnlPolicyName
+                    OCTET STRING,
+                hwSvcExtPWTemplateName
+                    OCTET STRING,
+                hwSvcExtUpTime
+                    Unsigned32,
+                hwSvcExtOAMSync
+                    TruthValue,
+                hwSvcExtForBfdIndex
+                    Unsigned32,
+                hwSvcExtSecondary
+                    TruthValue,
+                hwSvcExtDelayTime
+                    Unsigned32,
+                hwSvcExtReroutePolicy
+                    INTEGER,
+                hwSvcExtRerouteReason
+                    HWL2VpnStateChangeReason,
+                hwSvcExtLastRerouteTime
+                    Unsigned32,
+                hwSvcExtManualSetFault
+                    TruthValue,
+                hwSvcExtActive
+                    TruthValue,
+                hwSvcExtUpStartTime
+                    DisplayString,
+                hwSvcExtUpSumTime
+                    Unsigned32,                
+                hwSvcExtAtmPackOvertime
+                    Unsigned32,
+                hwSvcExtPwJitterBufferDepth
+                    Unsigned32,    
+                hwSvcExtPwTdmEncapsulationNum
+                    Unsigned32,      
+                hwSvcExtPwIdleCode
+                    Unsigned32,    
+                hwSvcExtPwRtpHeader
+                    Unsigned32,
+                hwSvcExtRawOrTagged
+                    INTEGER,
+                hwSvcExtInterworkingType
+                    INTEGER, 
+                hwSvcExtRowStatus
+                    RowStatus,
+                hwSvcExtCir
+                    Unsigned32, 
+                hwSvcExtPir
+                    Unsigned32, 
+                hwSvcExtQosProfile
+                    DisplayString
+             }
+
+        hwSvcExtIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of the interface (or the virtual interface) 
+                associated with the PW."
+            ::= { hwSvcExtEntry 1 }
+        
+        hwSvcExtPWType OBJECT-TYPE
+            SYNTAX HWL2VpnVcType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index for the conceptual row identifying a PW within  
+                this PW Emulation table.This value indicate the type of the LDP PW VC."
+            ::= { hwSvcExtEntry 2 }
+            
+		hwSvcExtID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Index for the conceptual row identifying a PW within  
+                this PW Emulation table.Used in the outgoing PW ID field within the 'Virtual 
+                Circuit FEC Element'."
+            ::= { hwSvcExtEntry 3 }
+        
+        hwSvcExtType OBJECT-TYPE
+            SYNTAX HWL2VpnVcEncapsType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Index for the conceptual row identifying a PW within  
+                this PW Emulation table.This value indicate the service to be carried over 
+                this PW."
+            ::= { hwSvcExtEntry 4 }
+            
+        hwSvcExtPeerAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Denotes the address type of the peer node. It should be  
+                set to 'unknown' if PE/PW maintenance protocol is not used 
+                and the address is unknown.
+                Currently, support 'ipv4' only."
+            DEFVAL { ipv4 }
+           ::= { hwSvcExtEntry 5 }
+
+        
+        hwSvcExtPeerAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object contain the value of the peer node address 
+                of the PW/PE maintenance protocol entity. This object  
+                SHOULD contain a value of all zeroes if not applicable  
+                (hwSvcExtPeerAddrType is 'unknown')."
+            ::= { hwSvcExtEntry 6 }
+        
+        			hwSvcExtStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                plugout(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the status of the PW in the local node.
+                Currently, can't support 'plugout'."
+            ::= { hwSvcExtEntry 7 }
+
+        
+        hwSvcExtInboundLabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the inbound label."
+            ::= { hwSvcExtEntry 8 }
+
+        
+        hwSvcExtOutboundLabel OBJECT-TYPE
+            SYNTAX Unsigned32 
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outbound label."
+            ::= { hwSvcExtEntry 9 }
+        
+        hwSvcExtAcStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2),
+                plugout(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Local AC status.
+                Currently, can't support 'plugout'."
+            ::= { hwSvcExtEntry 10 }
+
+        
+        hwSvcExtACOAMStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the AC's protocol is operational or not."
+            ::= { hwSvcExtEntry 11 }
+        
+        hwSvcExtCtrlWord OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If signaling is used for PW establishment, this object  
+                indicates the status of the control word negotiation,  
+                and in both signaling or manual configuration indicates  
+                if CW is to be present or not for this PW."
+            ::= { hwSvcExtEntry 12 }
+
+        
+        hwSvcExtVCCV OBJECT-TYPE
+            SYNTAX BITS
+                {
+                ccCw(0),
+                ccAlert(1),
+                ccLabel(2),
+                cvIcmpping(3),
+                cvLspping(4),
+                cvBfd(5)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the optional VCCV capabilities of the SVC.
+                According to whether the control word is enabled, 
+                the value can be ccCw(0)|ccAlert(1)|cvLspping(4)|cvBfd(5) 
+                or ccAlert(1)|cvLspping(4)|cvBfd(5). The default 
+                value is ccAlert(1)|cvLspping(4)|cvBfd(5)."
+            ::= { hwSvcExtEntry 13 }
+
+        hwSvcExtMaxAtmCells OBJECT-TYPE
+            SYNTAX Unsigned32 (0..28)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the max cell supported when vc type is atm."
+            ::= { hwSvcExtEntry 14 }
+
+        
+        hwSvcExtTnlPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..39))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the tunnel policy name used."
+            ::= { hwSvcExtEntry 15 }
+        
+        hwSvcExtPWTemplateName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..19))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the PW template index referenced."
+            ::= { hwSvcExtEntry 16 }
+
+        
+        hwSvcExtUpTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the duration when the SVC keeps Up 
+                for the last time, in seconds."
+            ::= { hwSvcExtEntry 17 }
+
+        
+        hwSvcExtOAMSync OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the AC and PSN are enable or not."
+            ::= { hwSvcExtEntry 18 }
+
+        
+        hwSvcExtForBfdIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of PW for BFD.Currently, can't support.Return the default value is '0'."
+            ::= { hwSvcExtEntry 19 }
+
+        
+        hwSvcExtSecondary OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates whether or not the secondary PW is used.Currently, can't support.Return the default value is 'false'."
+            ::= { hwSvcExtEntry 20 }
+
+        
+        hwSvcExtDelayTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reroute delay time.Currently, can't support.Return the default value is '0'."
+            ::= { hwSvcExtEntry 21 }
+
+        
+        hwSvcExtReroutePolicy OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                delay(1),
+                immediately(2),
+                never(3),
+                none(4),
+                err(5),
+                invalid(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Reroute policy.Currently, can't support.Return the default value is 'invalid(6)'."
+            ::= { hwSvcExtEntry 22 }
+
+        hwSvcExtRerouteReason OBJECT-TYPE
+            SYNTAX HWL2VpnStateChangeReason
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last reroute reason.Currently, can't support.Return the default value is 'invalidReason(1)'."
+            ::= { hwSvcExtEntry 23 }
+
+        
+        hwSvcExtLastRerouteTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last  reroute time.Currently, can't support.Return the default value is '0'."
+            ::= { hwSvcExtEntry 24 }
+
+        
+        hwSvcExtManualSetFault OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the manual has been set fault or not.Currently, can't support.Return the default value is 'false'."
+            ::= { hwSvcExtEntry 25 }
+
+        
+        hwSvcExtActive OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Denotes the current vc is active or not.Currently, can't support.Return the default value is 'false'."
+            ::= { hwSvcExtEntry 26 }
+
+        hwSvcExtUpStartTime OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the time this PW status was Up(1)."
+            ::= { hwSvcExtEntry 27 }
+            
+        hwSvcExtUpSumTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the accumulated time when the SVC is Up, 
+                in seconds."
+            ::= { hwSvcExtEntry 28 }          
+            
+        hwSvcExtAtmPackOvertime OBJECT-TYPE
+            SYNTAX Unsigned32 (0 | 100..50000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the AtmPackOvertime."
+            ::= { hwSvcExtEntry 29 }
+              
+        hwSvcExtPwJitterBufferDepth OBJECT-TYPE
+            SYNTAX Unsigned32 (0..64)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwJitterBufferDepth."
+            ::= { hwSvcExtEntry 30 }   
+                    
+        hwSvcExtPwTdmEncapsulationNum OBJECT-TYPE
+            SYNTAX Unsigned32 (0..40)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwTdmEncapsulationNum."
+            ::= { hwSvcExtEntry 31 }
+            
+        hwSvcExtPwIdleCode OBJECT-TYPE
+            SYNTAX Unsigned32 (0..255 | 65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwIdleCode."
+            ::= { hwSvcExtEntry 32 }
+              
+        hwSvcExtPwRtpHeader OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwRtpHeader."
+            ::= { hwSvcExtEntry 33 } 
+            
+        hwSvcExtRawOrTagged OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            raw(1),
+            tagged(2),
+            rawTagNotConfiged(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies whether the VLAN tag of the SVC entry is attached or stripped."
+            ::= { hwSvcExtEntry 34 }
+            
+        hwSvcExtInterworkingType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            ipInterWorking(1),
+            ipLayer2(2),
+            ipUnknown(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the interworking type of the SVC entry."
+            ::= { hwSvcExtEntry 35 }
+            
+        hwSvcExtRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table.
+                Restriction:
+                  The row must be created by 'createAndGo' handle only.
+                  Handle 'createAndWait' is forbidden.
+                  Not support modifying configuration."
+            ::= { hwSvcExtEntry 36 }
+            
+        hwSvcExtCir  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the committed information rate, based on the SVC entry."
+            ::= { hwSvcExtEntry 37 }
+                        
+        hwSvcExtPir  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the peak information rate, based on the SVC entry."
+            ::= { hwSvcExtEntry 38 }
+                        
+        hwSvcExtQosProfile  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-create
+            STATUS current
+                DESCRIPTION
+                    "Specifies the QoS profile's name, based on the SVC entry."
+            ::= { hwSvcExtEntry 39 } 
         
 --          
 -- The Leaf Nodes of hwSvcMIBObjects

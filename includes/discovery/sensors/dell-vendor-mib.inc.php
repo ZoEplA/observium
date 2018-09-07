@@ -7,14 +7,22 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-if (count($valid['status']['dnos-boxservices-state']))
+if (count($valid['status']['dnos-boxservices-state']) || count($valid['status']['fastpath-boxservices-private-temp-state']))
 {
   // Exit from discovery, since already added valid statuses by DNOS-BOXSERVICES-PRIVATE-MIB
-  return;
+   echo 'Skipped by DNOS-BOXSERVICES-PRIVATE-MIB';
+   return;
+}
+
+if (count($valid['status']['fastpath-boxservices-private-temp-state']))
+{
+   // Exit from discovery, since already added valid statuses by OLD-DNOS-BOXSERVICES-PRIVATE-MIB
+   echo 'Skipped by OLD-DNOS-BOXSERVICES-PRIVATE-MIB';
+   return;
 }
 
 // Dell-Vendor-MIB::envMonFanStatusDescr.67109249 = STRING: fan1

@@ -9,11 +9,11 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 dhcp MODULE-IDENTITY
-	LAST-UPDATED "201209261248Z"
+	LAST-UPDATED "201212131322Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for dhcp snoopers"
-	REVISION "201209261248Z"
+	REVISION "201212131322Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={snoopers 1}

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -87,7 +87,11 @@ if ($GLOBALS['snmp_status'])
       $options = array('entPhysicalIndex' => $index);
 
       $descr = rewrite_entity_name($entry['entPhysicalDescr']);
-      if ($entry['entPhysicalDescr'] && $entry['entPhysicalName'])
+      if($device['os'] == 'cisco-firepower')
+      {
+        $descr = $entry['entPhysicalName'];
+      }
+      else if ($entry['entPhysicalDescr'] && $entry['entPhysicalName'])
       {
         // Check if entPhysicalDescr equals entPhysicalName,
         // Also compare like this: 'TenGigabitEthernet2/1 Bias Current' and 'Te2/1 Bias Current'
@@ -104,12 +108,20 @@ if ($GLOBALS['snmp_status'])
       // Set description based on measured entity if it exists
       if (is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity'])
       {
-        $measured_descr = rewrite_entity_name($entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr']);
-        if (!$measured_descr)
+        if($device['os'] == 'cisco-firepower')
         {
-          $measured_descr = rewrite_entity_name($entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName']);
+          // FirePOWER has next to useless layout of ENTITY-SENSOR-MIB. Sensors don't have an ENTITY-MIB entry, so there is no way to tell apart individual sensors on the same entity.
+          // We just use the index to make them look less identical. It sucks, though.
+          $descr = rewrite_entity_name($entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName']) . ' ('.$index.')';
+        } else {
+          $measured_descr = rewrite_entity_name($entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr']);
+          if (!$measured_descr) {
+            $measured_descr = rewrite_entity_name($entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName']);
+          }
+          if ($measured_descr) {
+            $descr = $measured_descr . " - " . $descr;
+          }
         }
-        if ($measured_descr) { $descr = $measured_descr . " - " . $descr; }
       }
 
       $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.$index";
@@ -146,44 +158,6 @@ if ($GLOBALS['snmp_status'])
           $options['entPhysicalIndex_measured'] = $port['ifIndex'];
         }
 
-        // FIXME, remove at r8500 if errors not found, this code moved to get_port_by_ent_index()
-        /*
-        $sensor_index = $index; // Initial ifIndex
-        do
-        {
-          //print_debug("DEBUG");
-          //print_vars($entity_array[$sensor_index]);
-          $sensor_port = $entity_array[$sensor_index];
-          if ($sensor_port['entPhysicalClass'] === 'port')
-          {
-            // Port found, get mapped ifIndex
-            if (isset($sensor_port['0']['entAliasMappingIdentifier']) &&
-                strpos($sensor_port['0']['entAliasMappingIdentifier'], "fIndex"))
-            {
-              list(, $ifIndex) = explode(".", $sensor_port['0']['entAliasMappingIdentifier']);
-
-              $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-              if (is_array($port))
-              {
-                // Hola, port really found
-                $options['entPhysicalIndex_measured'] = $ifIndex;
-                $options['measured_class']  = 'port';
-                $options['measured_entity'] = $port['port_id'];
-                print_debug("Port is found: ifIndex = $ifIndex, port_id = " . $port['port_id']);
-              }
-            }
-
-            break; // Exit while
-          }
-          else if ($sensor_index == $sensor_port['entPhysicalContainedIn'])
-          {
-            break; // Break if current index same as next to avoid loop
-          } else {
-            $sensor_index = $sensor_port['entPhysicalContainedIn']; // Next ifIndex
-          }
-        } while ($sensor_port['entPhysicalClass'] !== 'port' && $sensor_port['entPhysicalContainedIn'] > 0 && $sensor_port['entPhysicalParentRelPos'] >= 0);
-        */
-
       }
 
       // Set thresholds for numeric sensors
@@ -198,23 +172,88 @@ if ($GLOBALS['snmp_status'])
         {
           if ($t_entry['entSensorThresholdValue'] == "-32768") { continue; }
 
-          if ($t_entry['entSensorThresholdSeverity'] == "major" && $t_entry['entSensorThresholdRelation'] == "greaterOrEqual")
+          /* Sometime thresholds have duplicate limits
+            entSensorType.1019 = celsius
+            entSensorScale.1019 = units
+            entSensorPrecision.1019 = 0
+            entSensorValue.1019 = 24
+            entSensorStatus.1019 = ok
+            entSensorThresholdSeverity.1019.1 = minor
+            entSensorThresholdSeverity.1019.2 = major
+            entSensorThresholdSeverity.1019.3 = critical
+            entSensorThresholdSeverity.1019.4 = critical
+            entSensorThresholdRelation.1019.1 = greaterOrEqual
+            entSensorThresholdRelation.1019.2 = greaterOrEqual
+            entSensorThresholdRelation.1019.3 = greaterOrEqual
+            entSensorThresholdRelation.1019.4 = greaterOrEqual
+            entSensorThresholdValue.1019.1 = 55
+            entSensorThresholdValue.1019.2 = 65
+            entSensorThresholdValue.1019.3 = 75
+            entSensorThresholdValue.1019.4 = 100
+           */
+          switch ($t_entry['entSensorThresholdSeverity'])
           {
-            $limits['limit_high']      = $t_entry['entSensorThresholdValue'] * $scale;
-          }
-          if ($t_entry['entSensorThresholdSeverity'] == "major" && $t_entry['entSensorThresholdRelation'] == "lessOrEqual")
-          {
-            $limits['limit_low']       = $t_entry['entSensorThresholdValue'] * $scale;
-          }
-          if ($t_entry['entSensorThresholdSeverity'] == "minor" && $t_entry['entSensorThresholdRelation'] == "greaterOrEqual")
-          {
-            $limits['limit_high_warn'] = $t_entry['entSensorThresholdValue'] * $scale;
-          }
-          if ($t_entry['entSensorThresholdSeverity'] == "minor" && $t_entry['entSensorThresholdRelation'] == "lessOrEqual")
-          {
-            $limits['limit_low_warn']  = $t_entry['entSensorThresholdValue'] * $scale;
+
+            case 'critical':
+              // Prefer critical over major
+              if      (in_array($t_entry['entSensorThresholdRelation'], array('greaterOrEqual', 'greaterThan')))
+              {
+                if (isset($limits['limit_high'])) { continue; } // Use first threshold entry
+                $limits['limit_high']      = $t_entry['entSensorThresholdValue'] * $scale;
+              }
+              else if (in_array($t_entry['entSensorThresholdRelation'], array('lessOrEqual', 'lessThan')))
+              {
+                if (isset($limits['limit_low'])) { continue; } // Use first threshold entry
+                $limits['limit_low']       = $t_entry['entSensorThresholdValue'] * $scale;
+              }
+              // FIXME. Not used: equalTo, notEqualTo
+              break;
+
+            case 'major':
+              // Prefer critical over major,
+              if      (in_array($t_entry['entSensorThresholdRelation'], array('greaterOrEqual', 'greaterThan')))
+              {
+                if (isset($limits['limit_high_major'])) { continue; } // Use first threshold entry
+                $limits['limit_high_major'] = $t_entry['entSensorThresholdValue'] * $scale;
+              }
+              else if (in_array($t_entry['entSensorThresholdRelation'], array('lessOrEqual', 'lessThan')))
+              {
+                if (isset($limits['limit_low_major'])) { continue; } // Use first threshold entry
+                $limits['limit_low_major'] = $t_entry['entSensorThresholdValue'] * $scale;
+              }
+              break;
+
+            case 'minor':
+              if      (in_array($t_entry['entSensorThresholdRelation'], array('greaterOrEqual', 'greaterThan')))
+              {
+                if (isset($limits['limit_high_warn'])) { continue; } // Use first threshold entry
+                $limits['limit_high_warn'] = $t_entry['entSensorThresholdValue'] * $scale;
+              }
+              else if (in_array($t_entry['entSensorThresholdRelation'], array('lessOrEqual', 'lessThan')))
+              {
+                if (isset($limits['limit_low_warn'])) { continue; } // Use first threshold entry
+                $limits['limit_low_warn']  = $t_entry['entSensorThresholdValue'] * $scale;
+              }
+              // FIXME. Not used: equalTo, notEqualTo
+              break;
+
+            case 'other':
+              // Probably here should be equalTo, notEqualTo.. never saw
+              break;
           }
         }
+
+        // Use major thresholds if critical not set
+        if (!isset($limits['limit_high']) && isset($limits['limit_high_major']))
+        {
+          $limits['limit_high'] = $limits['limit_high_major'];
+        }
+        if (!isset($limits['limit_low']) && isset($limits['limit_low_major']))
+        {
+          $limits['limit_low'] = $limits['limit_low_major'];
+        }
+        unset($limits['limit_high_major'], $limits['limit_low_major']);
+
         if ((float_cmp($limits['limit_high'],      $limits['limit_low'])       === 0) &&
             (float_cmp($limits['limit_high_warn'], $limits['limit_low_warn'])  === 0) &&
             (float_cmp($limits['limit_high'],      $limits['limit_high_warn']) === 0))

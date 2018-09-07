@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -36,8 +36,5 @@ if ($ports_modules[$port_module] && $port_stats_count)
     //print_vars($port_stats);
   }
 }
-
-// Additional db fields for update
-//$process_port_db[$port_module][] = 'ifDuplex'; // this field used in main data fields
 
 // EOF

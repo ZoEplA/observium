@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -21,6 +21,7 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
 {
   $p_list          = array(); // Init founded peers list
   $force_discovery = FALSE;   // Flag for force or not rediscover bgp peers
+  $snmp_incomplete = FALSE;   // Flag for detect if snmpwalk fetch complete data (required for force_discovery)
 
   // Get Local ASN
   $bgpLocalAs = snmp_get_oid($device, 'bgpLocalAs.0', 'BGP4-MIB');
@@ -142,18 +143,21 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
       if ($v_mib === 'BGP4-V2-MIB-JUNIPER' && $bgpLocalAs === '0')
       {
         // On JunOS BGP4-MIB::bgpLocalAs.0 is always '0'.
-        $v_bgpLocalAs = trim(snmp_walk($device, 'jnxBgpM2PeerLocalAs', '-OUQvn', 'BGP4-V2-MIB-JUNIPER'));
-        list($bgpLocalAs) = explode("\n", $v_bgpLocalAs);
+        $v_bgpLocalAs = snmpwalk_values($device, 'jnxBgpM2PeerLocalAs', array(), 'BGP4-V2-MIB-JUNIPER');
+        $bgpLocalAs   = array_shift($v_bgpLocalAs);
       }
       break;
     }
   }
 
   // Some Old IOS-XR (ie 4.3.2) also return BGP4-MIB::bgpLocalAs.0 as '0'.
-  if ($vendor_mib === FALSE && $bgpLocalAs === '0' && is_device_mib($device, 'CISCO-BGP4-MIB'))
+  //if ($vendor_mib === FALSE && $bgpLocalAs === '0' && is_device_mib($device, 'CISCO-BGP4-MIB'))
+
+  // Use cbgpLocalAs on Cisco devices since bgpLocalAs doesn't handle 32bit ASNs
+  if (is_device_mib($device, 'CISCO-BGP4-MIB'))
   {
     $v_bgpLocalAs = snmp_get_oid($device, 'cbgpLocalAs.0', 'CISCO-BGP4-MIB');
-    if (is_numeric($v_bgpLocalAs))
+    if (is_numeric($v_bgpLocalAs) && $v_bgpLocalAs > 0)
     {
       $bgpLocalAs = $v_bgpLocalAs;
     }
@@ -173,6 +177,13 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
       if (count($cisco_peers) > 0)
       {
         $cisco_version = 2;
+
+        // #2 - Request not completed
+        // #1002 - Request timeout
+        if (snmp_error_code() === 2 || snmp_error_code() === 1002)
+        {
+          $snmp_incomplete = TRUE;
+        }
       }
     }
 
@@ -210,6 +221,14 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
     } else {
       echo("BGP4-MIB ");
       $bgp_peers = snmpwalk_cache_multi_oid($device, 'bgpPeerRemoteAs', array(), 'BGP4-MIB');
+
+      // #2 - Request not completed
+      // #1002 - Request timeout
+      if (snmp_error_code() === 2 || snmp_error_code() === 1002)
+      {
+        $snmp_incomplete = TRUE;
+      }
+
       foreach ($bgp_oids as $bgp_oid)
       {
         $bgp_peers = snmpwalk_cache_multi_oid($device, $bgp_oid, $bgp_peers, 'BGP4-MIB');
@@ -246,6 +265,13 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
       $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerRemoteAs,           array(), $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
       if (count($vendor_bgp) > 0)
       {
+        // #2 - Request not completed
+        // #1002 - Request timeout
+        if (snmp_error_code() === 2 || snmp_error_code() === 1002)
+        {
+          $snmp_incomplete = TRUE;
+        }
+
         if (!isset($vendor_use_index[$vendor_PeerRemoteAddr]))
         {
           $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerRemoteAddr, $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
@@ -266,17 +292,6 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
           }
         }
         unset($vendor_oid);
-        /*
-        //$vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerLocalAddr,           $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerState,               $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerAdminStatus,         $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerInUpdates,           $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerOutUpdates,          $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerInTotalMessages,     $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerOutTotalMessages,    $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerFsmEstablishedTime,  $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        $vendor_bgp = snmpwalk_cache_oid($device, $vendor_PeerInUpdateElapsedTime, $vendor_bgp, $vendor_mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-        */
 
         // Collect founded peers and rewrite to pretty array.
         foreach ($vendor_bgp as $idx => $entry)
@@ -445,8 +460,6 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
       }
     }
 
-    check_entity('bgp_peer', $peer, array('bgpPeerState' => $bgpPeerState, 'bgpPeerAdminStatus' => $bgpPeerAdminStatus, 'bgpPeerFsmEstablishedTime' => $bgpPeerFsmEstablishedTime));
-
     $polled = time();
     $polled_period = $polled - $peer['bgpPeer_polled'];
 
@@ -460,7 +473,7 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
       'bgpPeerEstablished' => $bgpPeerFsmEstablishedTime,
       ), $peer_ip);
 
-    $graphs['bgp_updates'] = TRUE;
+    //$graphs['bgp_updates'] = TRUE; // not a device graph
 
     // Update states
     $peer['update'] = array();
@@ -475,6 +488,10 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
     //  dbUpdate($peer['update'], 'bgpPeers', '`bgpPeer_id` = ?', array($peer['bgpPeer_id']));
     //}
 
+    $check_metrics = array('bgpPeerState'              => $bgpPeerState,
+                           'bgpPeerAdminStatus'        => $bgpPeerAdminStatus,
+                           'bgpPeerFsmEstablishedTime' => $bgpPeerFsmEstablishedTime);
+
     // Update metrics
     $metrics = array('bgpPeerInUpdates', 'bgpPeerOutUpdates','bgpPeerInTotalMessages','bgpPeerOutTotalMessages');
     foreach ($metrics as $oid)
@@ -483,12 +500,15 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
       if (isset($peer[$oid]) && $peer[$oid] != "0")
       {
         $peer['update'][$oid.'_delta'] = $peer['update'][$oid] - $peer[$oid];
-        $peer['update'][$oid.'_rate']  = $oid_diff / $polled_period;
+        $peer['update'][$oid.'_rate']  = $peer['update'][$oid.'_delta'] / $polled_period;
         if ($peer['update'][$oid.'_rate'] < 0)
         {
           $peer['update'][$oid.'_rate'] = '0';
           echo($oid." went backwards.");
         }
+
+        $check_metrics[$oid.'_delta'] = $peer['update'][$oid.'_delta'];
+        $check_metrics[$oid.'_rate'] = $peer['update'][$oid.'_rate'];
 
         if ($config['statsd']['enable'] == TRUE)
         {
@@ -497,6 +517,8 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
         }
       }
     }
+
+    check_entity('bgp_peer', $peer, $check_metrics);
 
     //if (!is_numeric($peer['bgpPeer_polled']))
     //{
@@ -523,7 +545,7 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
     if ($cisco_version || $vendor_mib)
     {
       // Poll each AFI/SAFI for this peer
-      $peer_afis = dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND `bgpPeerRemoteAddr` = ?', array($device['device_id'], $peer_ip));
+      $peer_afis = dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND `bgpPeer_id` = ?', array($device['device_id'], $peer['bgpPeer_id']));
       foreach ($peer_afis as $peer_afi)
       {
         $afi = $peer_afi['afi'];
@@ -610,7 +632,15 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
           'WithdrawnPrefixes'  => $cbgpPeerWithdrawnPrefixes,
         ), $peer_ip.".$afi.$safi");
 
-        $graphs['bgp_prefixes_'.$afi.$safi] = TRUE;
+        //$graphs['bgp_prefixes_'.$afi.$safi] = TRUE; // Not a device graph
+
+        $check_metrics = array('AcceptedPrefixes'   => $cbgpPeerAcceptedPrefixes,
+                               'DeniedPrefixes'     => $cbgpPeerDeniedPrefixes,
+                               'AdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                               'SuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                               'WithdrawnPrefixes'  => $cbgpPeerWithdrawnPrefixes);
+
+        check_entity('bgp_peer_af', $peer_afi, $check_metrics);
 
         $c_table_row = array();
         $c_table_row[] = $peer_ip;
@@ -643,12 +673,18 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
     // Check if new peers found
     $force_discovery = $force_discovery || !empty($entry);
   }
-  if ($force_discovery)
+
+  if ($snmp_incomplete)
   {
-    // Force rediscover bgp peers
- 	 	print_debug("BGP peers list for this device changed, force rediscover BGP.");
-    print_debug_vars($p_list, 1);
- 	 	force_discovery($device, 'bgp-peers');
+    print_debug("WARNING! BGP snmpwalk did not complete.");
+    log_event("WARNING! BGP snmpwalk did not complete. Try to increase SNMP timeout on the device properties page.", $device, 'device', $device['device_id'], 7);
+  }
+  else if ($force_discovery)
+  {
+      // Force rediscover bgp peers
+      print_debug("BGP peers list for this device changed, force rediscover BGP.");
+      print_debug_vars($p_list, 1);
+      force_discovery($device, 'bgp-peers');
   }
 
 } // End check for BGP support

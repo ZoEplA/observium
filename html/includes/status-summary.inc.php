@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -149,36 +149,42 @@ if ($cache['ports']['stat']['down']) { $ports_class = "error"; } else { $ports_c
 <?php
 
 
-$navbar = array();
-$navbar['class'] = 'navbar-narrow';
-$navbar['brand'] = 'Groups';
-$navbar['style'] = 'margin-top: 10px';
-$navbar['community'] = FALSE;
-
-$groups = get_groups_by_type($config['wui']['groups_list']);
-
-foreach ($config['wui']['groups_list'] as $entity_type)
+if($_SESSION['userlevel'] >= 5)
 {
-  if (!isset($config['entities'][$entity_type])) { continue; } // Skip unknown types
 
-  $navbar['options'][$entity_type]['icon'] = $config['entities'][$entity_type]['icon'];
-  $navbar['options'][$entity_type]['text'] = nicecase($entity_type);
-  foreach ($groups[$entity_type] as $group)
-  {
-    $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['text'] = escape_html($group['group_name']);
-    $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['icon'] = $config['entities'][$entity_type]['icon'];
-    $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['url']  = generate_url(array('page' => 'group', 'group_id' => $group['group_id']));
-    if ($vars['group_id'] == $group['group_id'])
-    {
-      $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['class'] = "active";
-      $navbar['options'][$entity_type]['class'] = "active";
-    }
-  }
+   $navbar              = array();
+   $navbar['class']     = 'navbar-narrow';
+   $navbar['brand']     = 'Groups';
+   $navbar['style']     = 'margin-top: 10px';
+   $navbar['community'] = FALSE;
+
+   $groups = get_groups_by_type($config['wui']['groups_list']);
+
+   foreach ($config['wui']['groups_list'] as $entity_type)
+   {
+      if (!isset($config['entities'][$entity_type]))
+      {
+         continue;
+      } // Skip unknown types
+
+      $navbar['options'][$entity_type]['icon'] = $config['entities'][$entity_type]['icon'];
+      $navbar['options'][$entity_type]['text'] = nicecase($entity_type);
+      foreach ($groups[$entity_type] as $group)
+      {
+         $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['text'] = escape_html($group['group_name']);
+         $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['icon'] = $config['entities'][$entity_type]['icon'];
+         $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['url']  = generate_url(array('page' => 'group', 'group_id' => $group['group_id']));
+         if ($vars['group_id'] == $group['group_id'])
+         {
+            $navbar['options'][$entity_type]['suboptions'][$group['group_id']]['class'] = "active";
+            $navbar['options'][$entity_type]['class']                                   = "active";
+         }
+      }
+   }
+
+   print_navbar($navbar);
+   unset($navbar);
 }
-
-print_navbar($navbar);
-unset($navbar);
-
 ?>
 
 </div>

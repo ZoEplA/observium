@@ -14,11 +14,9 @@
 // FIXME. From this uses only check_valid_sensors(), maybe need move to global functions or copy to polling. --mike
 // Also uses check_valid_virtual_machines(). We (should) do a lot more discovery through the agent, IMO we should do away with the distinction. --tom
 include_once("includes/discovery/functions.inc.php");
-include_once("Net/SSH2.php");
-include_once("Crypt/RSA.php");
 
-// define("NET_SSH2_LOGGING", NET_SSH2_LOG_REALTIME_FILE);
-// define("NET_SSH2_LOG_REALTIME_FILENAME", "/opt/observium/logs/debugssh.log");
+//define("NET_SSH2_LOGGING", 4);
+//define("LOG_REALTIME_FILENAME", "/opt/observium/logs/debugssh.".$device['hostname'].".log");
 
 global $valid, $agent_sensors;
 
@@ -40,17 +38,17 @@ if ($device['os_group'] == "unix")
   // Try SSH Connect inspired by http://ispire.me/polling-observium-unix-agent-with-ssh
   $agent_start = utime();
 
-  $key1 = new Crypt_RSA();
+  $key1 = new phpseclib\Crypt\RSA();
   if (file_exists("/opt/observium/ssh/id_rsa")) {
     $key1->loadKey(file_get_contents("/opt/observium/ssh/id_rsa"));
   }
 
-  $key2 = new Crypt_RSA();
+  $key2 = new phpseclib\Crypt\RSA();
   if (file_exists("/opt/observium/ssh/le_rsa")) {
     $key2->loadKey(file_get_contents("/opt/observium/ssh/le_rsa"));
   }
 
-  $connection = new Net_SSH2($device['hostname'], $device['ssh_port'], 10);
+  $connection = new phpseclib\Net\SSH2($device['hostname'], $device['ssh_port'], 10);
 
   $connection->enableQuietMode();
 
@@ -61,8 +59,14 @@ if ($device['os_group'] == "unix")
     $agent_raw = $connection->exec("/storage/observium/observium_agent");
   // Else try official port
   } else {
-    print_warning("SSH connection to UNIX agent failed. Fallback to xinetd connection.");
-    logfile("UNIX-AGENT: SSH connection failed. Fallback to xinetd connection.");
+    if ($connection->isConnected())
+    {
+        print_warning("SSH connection to UNIX agent failed: Bad username or password. Fallback to xinetd connection.");
+        logfile("UNIX-AGENT: SSH connection failed: Bad username or password. Fallback to xinetd connection.");
+    } else {
+        print_warning("SSH connection to UNIX agent failed: Unable to establish a connection. Fallback to xinetd connection.");
+        logfile("UNIX-AGENT: SSH connection failed: Unable to establish a connection. Fallback to xinetd connection.");
+    }
 
     // Fallback to xinetd connection
     $agent_socket = "tcp://".$device['hostname'].":".$agent_port;

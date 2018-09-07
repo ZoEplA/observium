@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: SIG.php 179 2012-11-23 05:49:01Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -362,18 +362,44 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
 
                 $algorithm = OPENSSL_ALGO_SHA1;
                 break;
+
+            //
+            // SHA256 (PHP 5.4.8 or higher)
+            //
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
+
+                if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
+
+                    throw new Net_DNS2_Exception(
+                        'SHA256 support is only available in PHP >= 5.4.8',
+                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
+                    );
+                }
+
+                $algorithm = OPENSSL_ALGO_SHA256;
+                break;
+
+            //
+            // SHA512 (PHP 5.4.8 or higher)
+            //
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
+
+                if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
+
+                    throw new Net_DNS2_Exception(
+                        'SHA512 support is only available in PHP >= 5.4.8',
+                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
+                    );
+                }
+
+                $algorithm = OPENSSL_ALGO_SHA512;
+                break;
         
             //
-            // un-supported
+            // unsupported at the moment
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
-                //
-                // DSA won't work in PHP until the OpenSSL extension has 
-                // better DSA support
-                //
             case Net_DNS2_Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSANSEC3SHA1:            
             default:
                 throw new Net_DNS2_Exception(
@@ -386,9 +412,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // sign the data
             //
-            if (openssl_sign(
-                $sigdata, $this->signature, $this->private_key->instance, $algorithm
-            ) == false) {
+            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
 
                 throw new Net_DNS2_Exception(
                     openssl_error_string(), 
@@ -397,9 +421,21 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             }
 
             //
-            // add it locally encoded
+            // build the signature value based
             //
-            $this->signature = base64_encode($this->signature);
+            switch($this->algorithm) {
+
+            //
+            // RSA- add it directly
+            //
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
+
+                $this->signature = base64_encode($this->signature);
+                break;
+            }
         }
 
         //

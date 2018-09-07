@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -52,24 +52,25 @@ foreach ($oids as $index => $entry)
   list($unit, $iter) = explode('.', $index);
 
   // Temperature
-  $descr = "Unit $unit Temperature Sensor ". ($iter+1);
   $value = $entry['boxServicesTempSensorTemperature'];
+  $descr = "Unit $unit Sensor ". ($iter+1);
 
   $sensor_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.5.$index";
   $options    = array(
     'limit_low'        => $boxServicesNormalTempRangeMin,
     'limit_high'       => $boxServicesNormalTempRangeMax,
-    'entPhysicalClass' => 'temperature',
-  );
+    'entPhysicalClass' => 'temperature');
 
   discover_sensor($valid['sensor'], 'temperature', $device, $sensor_oid, "boxServicesTempSensorTemperature.$index", $mib, $descr, 1, $value, $options);
 
   // State
+  $descr = "Unit $unit Temperature Sensor ". ($iter+1);
   $value = $entry['boxServicesTempSensorState'];
-  $sensor_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.$index";
+  $status_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.$index";
   $options    = array('entPhysicalClass' => 'temperature');
 
-  discover_sensor($valid['sensor'], 'state', $device, $sensor_oid, "boxServicesTempSensorState.$index", 'dnos-boxservices-temp-state', $descr, NULL, $value, $options);
+  discover_status($device, $status_oid, "boxServicesFanItemState.$index", 'dnos-boxservices-temp-state', $descr, $value, $options);
+
 }
 
 // Unit / Stack Member Temperature State
@@ -86,13 +87,15 @@ $oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
 
 foreach ($oids as $index => $entry)
 {
-  $descr = "Unit $index Temperature State";
+  $descr = "Unit $index Temperature";
+
   $value = $entry['boxServicesTempUnitState'];
 
-  $sensor_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.15.1.2.$index";
+  $status_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.15.1.2.$index";
   $options    = array('entPhysicalClass' => 'temperature');
 
-  discover_sensor($valid['sensor'], 'state', $device, $sensor_oid, "boxServicesTempUnitState.$index", 'dnos-boxservices-temp-state', $descr, NULL, $value, $options);
+  discover_status($device, $status_oid, "boxServicesTempUnitState.$index", 'dnos-boxservices-temp-state', $descr, $value, $options);
+
 }
 
 // Fans
@@ -118,14 +121,43 @@ foreach ($oids as $index => $entry)
 
   // State Sensor
   $value = $entry['boxServicesFanItemState'];
-  $descr = nicecase(rewrite_entity_name($entry['boxServicesFanItemType'])) .' Fan';
+  //$descr = nicecase(rewrite_entity_name($entry['boxServicesFanItemType'])) .' Fan';
+  //if ($show_numbers) { $descr .= ' '. ($index+1); }
 
-  $sensor_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.6.1.3.$index";
+  list($unit, $iter) = explode('.', $index);
+  $descr = "Unit $unit Fan ". ($iter+1) .' ('.nicecase(rewrite_entity_name($entry['boxServicesFanItemType'])).')' ;
+
+  $status_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.6.1.3.$index";
   $options    = array('entPhysicalClass' => 'fan');
 
-  if ($show_numbers) { $descr .= ' '. ($index+1); }
+  discover_status($device, $status_oid, "boxServicesFanItemState.$index", 'fastpath-boxservices-private-state', $descr, $value, $options);
 
-  discover_sensor($valid['sensor'], 'state', $device, $sensor_oid, "boxServicesFanItemState.$index", 'dnos-boxservices-state', $descr, NULL, $value, $options);
+  if ($entry['boxServicesFanSpeed'] != 0)
+  {
+     discover_sensor($valid['sensor'],
+        'fanspeed',
+        $device,
+        ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.6.1.4.$index",
+        "boxServicesFanSpeed.$index",
+        'fastpath-boxservices-private-mib', $descr,
+        1,
+        $entry['boxServicesFanSpeed'],
+        $options);
+  }
+
+  if ($entry['boxServicesFanDutyLevel'] != 0)
+  {
+     discover_sensor($valid['sensor'],
+        'load',
+        $device,
+        ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.6.1.5.$index",
+        "boxServicesFanDutyLevel.$index",
+        'fastpath-boxservices-private-mib', $descr,
+        1,
+        $entry['boxServicesFanDutyLevel'],
+        $options);
+  }
+
 }
 
 // Power Supplies
@@ -150,10 +182,14 @@ foreach ($oids as $index => $entry)
   $descr = nicecase(rewrite_entity_name($entry['boxServicesPowSupplyItemType'])) .' PSU';
   if ($show_numbers) { $descr .= ' '. ($index+1); }
 
+  list($unit, $iter) = explode('.', $index);
+  $descr = "Unit $unit PSU ". ($iter+1) .' ('.nicecase(rewrite_entity_name($entry['boxServicesPowSupplyItemType'])).')' ;
+
   $sensor_oid = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.7.1.3.$index";
   $options    = array('entPhysicalClass' => 'power');
 
-  discover_sensor($valid['sensor'], 'state', $device, $sensor_oid, "boxServicesPowSupplyState.$index", 'dnos-boxservices-state', $descr, NULL, $value, $options);
+  discover_status($device, $sensor_oid, "boxServicesPowSupplyItemState.$index", 'dnos-boxservices-state', $descr, $value, $options);
+
 }
 
 // Power Usage
@@ -186,7 +222,9 @@ foreach ($oids as $index => $entry)
 // ...
 // DNOS-BOXSERVICES-PRIVATE-MIB::boxsPwrUsageHistoryStackPowerConsumption.3.60 = INTEGER: 94224
 
-$oid  = 'boxsUnitPwrUsageHistoryTable';
+//$oid  = 'boxsUnitPwrUsageHistoryTable';
+$oid  = 'boxsPwrUsageHistoryUnitPowerConsumption';
+
 $oids = snmpwalk_cache_multi_oid($device, $oid, array(), $mib);
 
 // This may not hold up in the long run, but...

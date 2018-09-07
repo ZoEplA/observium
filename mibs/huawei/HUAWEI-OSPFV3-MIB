@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-OSPFV3-MIB.mib, The HUAWEI-OSPFV3-MIB provides information about OSPFv3
 -- Reference: draft-ietf-ospf-ospfv3-mib-11
--- Version:    V2.12
+-- Version:    V2.18
 -- History:
 -- ==================================================================
 
@@ -29,7 +29,7 @@
                     FROM OSPF-MIB; 
     
     hwOspfv3 MODULE-IDENTITY 
-            LAST-UPDATED "201505031110Z" 
+            LAST-UPDATED "201608041521Z" 
         ORGANIZATION 
                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -47,6 +47,55 @@
                   RFC draft-ietf-ospf-ospfv3-mib-11;  
                   see the RFC itself for full legal 
                   notices." 
+
+            REVISION "201608041521Z"
+            DESCRIPTION "Added 		            
+	                hwOspfv3DeleteRouteByPurge,
+		            hwOspfv3DeleteRouteByPurgeClear,
+		            hwOspfv3RouteBeDeletedByPurgeExact,
+		            hwOspfv3RouteBeDeletedByPurgeExactClear,
+		            hwOspfv3RouteBeDeletedByPurgeInexact,
+		            hwOspfv3RouteBeDeletedByPurgeInexactClear,
+		            hwOspfv3RouteBeDeletedByPurge,
+		            hwOspfv3RouteBeDeletedByPurgeClear,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeExact,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeExactClear,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurge,
+		            hwOspfv3ThirdPartRouteBeDeletedByPurgeClear " 
+
+            REVISION "201605251110Z"
+            DESCRIPTION "Added a trap hwOspfv3GreaterAgeLsaRecived"
+            
+            REVISION "201605251110Z"
+            DESCRIPTION "Added hwOspfv3LsaId to indicates the link-id of recived lsa"
+            
+            REVISION "201605251110Z"
+            DESCRIPTION "Added hwOspfv3LsaAge to indicates the age of recived lsa"                  
+                  
+	    REVISION "201603231750Z"
+            DESCRIPTION "Changed the type of hwOspfv3ProcessId from Integer32 to Unsigned32" 
+			    
+	    REVISION "201603181750Z"
+            DESCRIPTION "Added 
+	                    hwOspfv3ImportAseRouteThreshold,
+                            hwOspfv3ImportAseRouteThresholdClear,
+                            hwOspfv3ImportAseRouteExceed,
+                            hwOspfv3ImportAseRouteExceedClear,
+                            hwOspfv3ImportNssaRouteThreshold,
+                            hwOspfv3ImportNssaRouteThresholdClear,
+                            hwOspfv3ImportNssaRouteExceed,
+                            hwOspfv3ImportNssaRouteExceedClear" 
+
+            REVISION "201603011750Z"
+            DESCRIPTION "Deleted hwOspfv3PeerFlappingSuppressInterval, Added hwOspfv3PeerFlappingSuppressReason to indicates the suppress status change reason, change hwOspfv3PeerFlappingSuppressInterval of hwOspfv3PeerFlappingSuppressStatusChange to hwOspfv3PeerFlappingSuppressReason" 
+
+            REVISION "201603011750Z"
+            DESCRIPTION "Modified hwOspfv2PeerFlappingSuppressStatusChange status currentdescription"                   
+                  
+ 						 REVISION "201507081110Z"
+             DESCRIPTION "Added hwOspfv3PeerFlappingSuppressStatus to indicates the suppress status of peer flapping" 
  
              REVISION "201505031110Z"
              DESCRIPTION "Added hwOspfv3IntraAreaRouterIdConflictRecovered to indicates process id" 
@@ -2467,11 +2516,11 @@
         ::= { hwOspfv3NotificationEntry 6 }           
     
     hwOspfv3ProcessId OBJECT-TYPE
-            SYNTAX Integer32 (1..65535)
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The process ID indicates the OSPFv3 process number. The value ranges from 1 to 65535."
+                "The process ID indicates the OSPFv3 process number. The value ranges from 1 to 4294967295."
             ::= { hwOspfv3NotificationEntry 7 }
             
     hwOspfv3AreaIdIndex OBJECT-TYPE
@@ -2494,7 +2543,189 @@
                 one of the router's IPv4 host addresses, 
                 represented as a 32-bit unsigned integer, 
                 if IPv4 is configured on the router." 
-            ::= { hwOspfv3NotificationEntry 9 }                           
+            ::= { hwOspfv3NotificationEntry 9 }
+    
+     hwOspfv3PeerFlappingSuppressStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                holddown(2),
+                holdmaxcost(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The suppress status of peer flapping."
+            ::= { hwOspfv3NotificationEntry 10 }
+
+     hwOspfv3PeerFlappingSuppressReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                resumeTimerExpired(1),
+                configureChange(2),
+                resetSuppressFlapping(3),
+                neighbourFlapping(4),
+                holddownToHoldmaxcost(5)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason of peer flapping suppress status change."
+            ::= { hwOspfv3NotificationEntry 11 }
+
+        hwOspfv3LsaId OBJECT-TYPE
+            SYNTAX HWOspfv3RouterIdTc
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                  "A 32-bit integer uniquely identifies an area.
+                LSA-ID 0.0.0.0 is used for the OSPF LSA."
+            ::= { hwOspfv3NotificationEntry 12 } 
+
+        hwOspfv3LsaAge OBJECT-TYPE
+            SYNTAX Integer32 (0..3600)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This age of the ospf lsa."
+            ::= { hwOspfv3NotificationEntry 13 } 
+            
+     hwOspfv3PurgeHostName OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 14 }
+             
+     hwOspfv3PurgeIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 15 }
+             
+     hwOspfv3PurgeRouterId OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 16 }
+             
+     hwOspfv3FlushLsaNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the number of LSAs deleted by the local device or another device."
+            ::= { hwOspfv3NotificationEntry 17 }
+             
+     hwOspfv3AffectedNodeNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the number of affected node when OSPFv3 routes were deleted."
+            ::= { hwOspfv3NotificationEntry 18 }
+             
+     hwOspfv3TotalNodeNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the total number of node in the System."
+            ::= { hwOspfv3NotificationEntry 19 }
+             
+     hwOspfv3PurgeStatPeriod OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the period interval for purge statistic."
+            ::= { hwOspfv3NotificationEntry 20 }
+             
+     hwOspfv3RuledOutDeviceNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the number of node ruled out when checking faulty device."
+            ::= { hwOspfv3NotificationEntry 21 }
+             
+     hwOspfv3PurgeHostName1 OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 22 }
+             
+     hwOspfv3PurgeHostName2 OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 23 }
+             
+     hwOspfv3PurgeHostName3 OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (1..64)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the name of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 24 }
+             
+     hwOspfv3PurgeIpAddress1 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 25 }
+             
+     hwOspfv3PurgeIpAddress2 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 26 }
+             
+     hwOspfv3PurgeIpAddress3 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the IP address of an OSPFv3 router which maybe purge OSPFv3 routes."
+            ::= { hwOspfv3NotificationEntry 27 }
+             
+     hwOspfv3PurgeRouterId1 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 28 }
+             
+     hwOspfv3PurgeRouterId2 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 29 }
+             
+     hwOspfv3PurgeRouterId3 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
+            ::= { hwOspfv3NotificationEntry 30 }
+
     -- Notification definitions  
  
    hwOspfv3VirtIfStateChange NOTIFICATION-TYPE 
@@ -2722,7 +2953,199 @@
         DESCRIPTION 
            "The object is used to monitor router ID conflict recovery in an intra area." 
         ::= { hwOspfv3Notifications 15 } 
-            
+
+   hwOspfv3PeerFlappingSuppressStatusChange NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3RouterId, hwOspfv3AreaIdIndex, hwOspfv3IfName, hwOspfv3PeerFlappingSuppressStatus, hwOspfv3PeerFlappingSuppressReason }  
+        STATUS       current 
+        DESCRIPTION 
+           "These objects are used to monitor changed OSPFv3 peer flapping suppress status." 
+        ::= { hwOspfv3Notifications 16 } 
+        
+   hwOspfv3ImportAseRouteThreshold NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes exceeds the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 17 } 
+        
+   hwOspfv3ImportAseRouteThresholdClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes has been less than the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 18 } 
+        
+   hwOspfv3ImportAseRouteExceed NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes exceeds the configured maximum number." 
+        ::= { hwOspfv3Notifications 19 } 
+        
+   hwOspfv3ImportAseRouteExceedClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of AS-external LSAs generated when an OSPFv3 process imports external routes has been less than the configured maximum number." 
+        ::= { hwOspfv3Notifications 20 }        
+                
+   hwOspfv3ImportNssaRouteThreshold NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes exceeds the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 21 } 
+        
+   hwOspfv3ImportNssaRouteThresholdClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes has been less than the configured alarm threshold." 
+        ::= { hwOspfv3Notifications 22 } 
+        
+   hwOspfv3ImportNssaRouteExceed NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes exceeds the configured maximum number." 
+        ::= { hwOspfv3Notifications 23 } 
+        
+   hwOspfv3ImportNssaRouteExceedClear NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object indicates that the number of NSSA LSAs generated when an OSPFv3 process imports external routes has been less than the configured maximum number." 
+        ::= { hwOspfv3Notifications 24 }
+
+   hwOspfv3GreaterAgeLsaRecived NOTIFICATION-TYPE 
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3RouterId, hwOspfv3AreaIdIndex, hwOspfv3IfName, hwOspfv3LsaId, hwOspfv3LsaAge }  
+        STATUS       current 
+        DESCRIPTION 
+           "This object is used to monitor the router recive a greater age lsa in ospfv3." 
+        ::= { hwOspfv3Notifications 25 }
+        
+   hwOspfv3DeleteRouteByPurge NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the local device deleted OSPFv3 routes advertised by other devices. 
+            Reset or isolate the device from the network."
+        ::= { hwOspfv3Notifications 26 }
+        
+   hwOspfv3DeleteRouteByPurgeClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the local device did not delete OSPFv3 routes advertised by other devices."
+        ::= { hwOspfv3Notifications 27 }
+        
+   hwOspfv3RouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were deleted by another device. 
+            Reset or isolate the faulty device from the network."
+        ::= { hwOspfv3Notifications 28 }
+        
+   hwOspfv3RouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were not deleted by another device."
+        ::= { hwOspfv3Notifications 29 }
+        
+   hwOspfv3RouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3RuledOutDeviceNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were deleted by another device, 
+            and the possibly faulty device did not support OSPFv3 flush LSA source trace. Log in to the possibly faulty device. 
+            If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices. 
+            Neither of the devices displayed in the display ospfv3 purge-source-trace analysis-info  command output is the faulty device."
+        ::= { hwOspfv3Notifications 30 }
+        
+   hwOspfv3RouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were not deleted by another device."
+        ::= { hwOspfv3Notifications 31 }
+        
+   hwOspfv3RouteBeDeletedByPurge NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, hwOspfv3TotalNodeNum, 
+                hwOspfv3PurgeHostName1, hwOspfv3PurgeIpAddress1, hwOspfv3PurgeRouterId1, 
+                hwOspfv3PurgeHostName2, hwOspfv3PurgeIpAddress2, hwOspfv3PurgeRouterId2, 
+                hwOspfv3PurgeHostName3, hwOspfv3PurgeIpAddress3, hwOspfv3PurgeRouterId3 }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were deleted by another device. 
+            Log in to the possibly faulty device. If the device is deleting routes, reset or isolate it from the network. 
+            Otherwise, check other devices."
+        ::= { hwOspfv3Notifications 32 }
+        
+   hwOspfv3RouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by the local device were not deleted by another device."
+        ::= { hwOspfv3Notifications 33 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were deleted. 
+            Reset or isolate the faulty device from the network."
+        ::= { hwOspfv3Notifications 34 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were not deleted."
+        ::= { hwOspfv3Notifications 35 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, 
+                hwOspfv3FlushLsaNum, hwOspfv3AffectedNodeNum, hwOspfv3TotalNodeNum, hwOspfv3RuledOutDeviceNum, hwOspfv3PurgeStatPeriod }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were deleted, 
+            and the possibly faulty device did not support OSPFv3 flush LSA source trace. 
+            Log in to the possibly faulty device. If the device is deleting routes, reset or isolate it from the network. 
+            Otherwise, check other devices. Neither of the devices displayed in the display ospfv3 purge-source-trace analysis-info 
+            command output is the faulty device."
+        ::= { hwOspfv3Notifications 36 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were not deleted."
+        ::= { hwOspfv3Notifications 37 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurge NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex, hwOspfv3TotalNodeNum, 
+                hwOspfv3PurgeHostName1, hwOspfv3PurgeIpAddress1, hwOspfv3PurgeRouterId1, 
+                hwOspfv3PurgeHostName2, hwOspfv3PurgeIpAddress2, hwOspfv3PurgeRouterId2, 
+                hwOspfv3PurgeHostName3, hwOspfv3PurgeIpAddress3, hwOspfv3PurgeRouterId3 }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were deleted. Log in to the possibly faulty device. 
+            If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices."
+        ::= { hwOspfv3Notifications 38 }
+        
+   hwOspfv3ThirdPartRouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+        OBJECTS { hwOspfv3ProcessId, hwOspfv3PurgeHostName, hwOspfv3PurgeIpAddress, hwOspfv3PurgeRouterId, hwOspfv3AreaIdIndex }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that OSPFv3 routes advertised by another device were not deleted."
+        ::= { hwOspfv3Notifications 39 }
+
     -- conformance information 
  
     hwOspfv3Groups      OBJECT IDENTIFIER ::= { hwOspfv3Conformance 1 } 
@@ -3253,7 +3676,31 @@
                             hwOspfv3NssaTranslatorStatusChange,
                             hwOspfv3LastAuthKeyExpiry,
                             hwOspfv3AuthSequenceNumWrap,
-                            hwOspfv3IntraAreaRouterIdConflictRecovered
+                            hwOspfv3IntraAreaRouterIdConflictRecovered,
+                            hwOspfv3PeerFlappingSuppressStatusChange,
+                            hwOspfv3ImportAseRouteThreshold,
+                            hwOspfv3ImportAseRouteThresholdClear,
+                            hwOspfv3ImportAseRouteExceed,
+                            hwOspfv3ImportAseRouteExceedClear,
+                            hwOspfv3ImportNssaRouteThreshold,
+                            hwOspfv3ImportNssaRouteThresholdClear,
+                            hwOspfv3ImportNssaRouteExceed,
+                            hwOspfv3ImportNssaRouteExceedClear,
+                            hwOspfv3GreaterAgeLsaRecived,
+                            hwOspfv3DeleteRouteByPurge,
+                            hwOspfv3DeleteRouteByPurgeClear,
+                            hwOspfv3RouteBeDeletedByPurgeExact,
+                            hwOspfv3RouteBeDeletedByPurgeExactClear,
+                            hwOspfv3RouteBeDeletedByPurgeInexact,
+                            hwOspfv3RouteBeDeletedByPurgeInexactClear,
+                            hwOspfv3RouteBeDeletedByPurge,
+                            hwOspfv3RouteBeDeletedByPurgeClear,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeExact,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeExactClear,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurge,
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeClear
                             } 
             STATUS          current 
             DESCRIPTION 

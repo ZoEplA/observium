@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -237,7 +237,7 @@ function generate_graph_row($graph_array, $state_marker = FALSE)
 
   if ($graph_array['shrink']) { $graph_array['width'] = $graph_array['width'] - $graph_array['shrink']; }
 
-  // If we're priting the row inside a table cell with "state-marker", we need to make the graphs a tiny bit smaller to fit
+  // If we're printing the row inside a table cell with "state-marker", we need to make the graphs a tiny bit smaller to fit
   if($state_marker) { $graph_array['width'] -= 2; }
 
   $graph_array['to']     = $config['time']['now'];

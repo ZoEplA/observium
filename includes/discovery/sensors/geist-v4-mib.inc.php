@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -33,9 +33,17 @@ $scale = 0.1;
 // GEIST-V4-MIB::internalIO4.1 = INTEGER: 100
 // GEIST-V4-MIB::internalRelayState.1 = Gauge32: 0
 
-$cache['geist']['internalTable'] = snmpwalk_cache_multi_oid($device, 'internalTable', array(), 'GEIST-V4-MIB');
+if (snmp_get_oid($device, 'temperatureUnits.0', $mib) === '0') // 0 - fahrenheit, 1 - celsius
+{
+  $temp_options = array('sensor_unit' => 'F');
+} else {
+  $temp_options = array('sensor_unit' => 'C');
+}
 
-foreach ($cache['geist']['internalTable'] as $index => $entry)
+$oids = snmpwalk_cache_multi_oid($device, 'internalTable', array(), 'GEIST-V4-MIB');
+print_debug_vars($oids);
+
+foreach ($oids as $index => $entry)
 {
   if ($entry['internalAvail'])
   {
@@ -46,7 +54,7 @@ foreach ($cache['geist']['internalTable'] as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'internalTemp.'.$index, 'geist-v4-mib', $descr, $scale, $value);
+      discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'internalTemp.'.$index, 'geist-v4-mib', $descr, $scale, $value, $temp_options);
     }
 
     $descr = $entry['internalName'] . ' Dew Point';
@@ -55,7 +63,12 @@ foreach ($cache['geist']['internalTable'] as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'internalDewPoint.'.$index, 'geist-v4-mib', $descr, $scale, $value);
+      // CLEANME not before 08/2018
+      $old_rrd_array = array('descr' => $descr, 'class' => 'temperature', 'type' => 'geist-v4-mib', 'index' => 'internalDewPoint.'.$index);
+      rename_rrd_entity($device, 'sensor', $old_rrd_array, array('class' => 'dewpoint'));
+      unset($old_rrd_array);
+
+      discover_sensor($valid['sensor'], 'dewpoint', $device, $oid, 'internalDewPoint.'.$index, 'geist-v4-mib', $descr, $scale, $value, $temp_options);
     }
 
     $descr = $entry['internalName'] . ' Humidity';
@@ -105,8 +118,26 @@ foreach ($cache['geist']['internalTable'] as $index => $entry)
   }
 }
 
+$oids = snmpwalk_cache_multi_oid($device, 'tempSensorEntry', array(), 'GEIST-V4-MIB');
+print_debug_vars($oids);
+
+foreach ($oids as $index => $entry)
+{
+  if ($entry['tempSensorAvail'])
+  {
+    $descr    = $entry['tempSensorName'] . ' ' . $index;
+
+    $oid_name = 'tempSensorTemp';
+    $oid_num  = ".1.3.6.1.4.1.21239.5.1.4.1.5.{$index}";
+    $type     = $mib . '-' . $oid_name;
+    $scale    = 0.1;
+    $value    = $entry[$oid_name];
+
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, $temp_options);
+  }
+}
+
 // Not supported yet (no test device available):
-// - tempSensorTable
 // - airFlowSensorTable
 // - dewPointSensorTable
 // - ccatSensorTable

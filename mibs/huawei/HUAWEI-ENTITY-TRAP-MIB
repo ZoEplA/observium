@@ -1,14 +1,14 @@
 -- ============================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:   V2.48
+-- Version:   V2.71
 -- ============================================================================
 
 	HUAWEI-ENTITY-TRAP-MIB DEFINITIONS ::= BEGIN
  
 		IMPORTS
-			hwEntityOperStatus
+			hwEntityOperStatus, hwStorageEntName, hwStorageEntSpaceFree 
 				FROM HUAWEI-ENTITY-EXTENT-MIB
 			ifOperStatus,ifAdminStatus
 				FROM RFC1213-MIB	
@@ -24,7 +24,7 @@
 				FROM IANA-ITU-ALARM-TC-MIB			
 			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
 				FROM SNMPv2-CONF		
-			TEXTUAL-CONVENTION, MacAddress
+             			TEXTUAL-CONVENTION, MacAddress
                                                                                      FROM SNMPv2-TC			
 			Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
 				FROM SNMPv2-SMI;
@@ -35,7 +35,7 @@
 -- January 17, 2007 at 00:00 GMT
 		-- 1.3.6.1.4.1.2011.5.25.219
 		hwEntityTrapMIB MODULE-IDENTITY 
-			LAST-UPDATED "201510100000Z"		-- Oct 10, 2015 at 11:06 GMT
+			LAST-UPDATED "201702100000Z"
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."		
 			CONTACT-INFO 
@@ -48,6 +48,76 @@
 				 "
 DESCRIPTION 
 				"This is the base trap definition for DataCom."
+         REVISION "201702100000Z"		
+         DESCRIPTION  "V2.71, add hwBoardWarning and hwBoardWarningResume " 
+
+         REVISION "201612232100Z"		
+         DESCRIPTION  "V2.70, modify the content of hwEntityBandwidthMode " 
+
+
+        REVISION "201611282100Z"		-- November 28, 2016 at 21:00 GMT
+         DESCRIPTION  "V2.69, add hwPortOpticalPositionInvalid ,hwPortOpticalPositionValid " 
+		 
+		 REVISION "201611232100Z"		-- November 23, 2016 at 21:00 GMT
+         DESCRIPTION  "V2.68, add hwEntityTrapReasonDescr as VB binder under 'hwOpticalUnAuthorized' "
+
+         REVISION     "201610252100Z"
+         DESCRIPTION  "V2.67,add object  'hwGpsModuleRemove,hwGpsModuleInsert ' of hwOpticalTrap "
+		
+         REVISION     "201610211400Z"
+         DESCRIPTION  "V2.66,add object  'hwNeedModifyCfgTrap' of hwBoardTrap "
+		 
+         REVISION     "201608171400Z"
+         DESCRIPTION  "V2.65,add object  'hwEntityTrapReasonDescr' of hwPmuFail "
+
+         REVISION     "201608031400Z"
+         DESCRIPTION  "V2.64,hwEntitySplitChange, hwCardSplitChange"
+			
+         REVISION     "201607221000Z"
+         DESCRIPTION  "V2.63, add hwEntityBandwidthMode, hwCardBandwidthModeChange" 
+         
+         REVISION     "201607151000Z"
+         DESCRIPTION  "V2.62, modify the parament of hwVPortDown"      
+
+         REVISION     "201607121000Z"
+         DESCRIPTION  "V2.61, modify 2 error code description of 135184 and 144130 for compile warnings"         
+
+         REVISION     "201607041000Z"
+         DESCRIPTION  "V2.60, add hwFanMinorAlarm, hwFanMinorAlarmResume"
+
+         REVISION     "201604151000Z"
+         DESCRIPTION  "V2.59, add hwDiskPartitionInValid, hwDiskPartitionInValidResume, hwDiskPartitionSpacinsufficient, hwDiskPartitionSpacinsufficientResume, hwDiskPartitionUtilizationRising, hwDiskPartitionUtilizationResume"
+         
+        REVISION     "201604141000Z"
+         DESCRIPTION  "V2.58, modify the Name of hwVMResourceInconsist and hwVMResourceInconsistResume to hwVMResInconsist and hwVMResInconsistResume, add the Object vmName to hwVMResInconsist and hwVMResInconsistResume"
+
+         REVISION     "201604111000Z"
+         DESCRIPTION  "V2.57, add hwVBoardInvalid modify the objects of hwVPortDown."
+         
+         REVISION     "201603031000Z"
+         DESCRIPTION  "V2.56, add hwDiskTrap."
+
+         REVISION     "201603010000Z"
+         DESCRIPTION  "V2.55, modify the Description of  hwPinchCardResetResume."
+
+         REVISION     "201602290000Z"
+         DESCRIPTION  "V2.54, add hwVMResourceInconsist,hwVMResourceInconsistResume"
+
+         REVISION     "201602180000Z"
+         DESCRIPTION  "V2.53, add hwPinchCardReset,hwPinchCardResetResume. " 
+
+         REVISION     "201601040000Z"
+         DESCRIPTION  "V2.52, add hwVportDown,hwVPortUp and a parameter vNetID. " 
+
+         REVISION     "201512290000Z"
+         DESCRIPTION  "V2.51, modify the Description of  hwChassisFailResume. " 
+
+         REVISION     "201512160000Z"
+         DESCRIPTION  "V2.50, add hwThreadTrap, hwThreadFaultIsolate. " 
+
+         REVISION     "201511030000Z"
+         DESCRIPTION  "V2.47, modify the Description of hwBandwidthOfAllCardsExceedsThresholdResume, add hwBandwidthOfAllCardsExceedsThresholdFatalAlarm, hwBandwidthOfAllCardsExceedsThresholdFatalResume" 
+
 		 REVISION     "201510100000Z"
          DESCRIPTION  "V2.48, add hwVirtualAccessDrvConfigError" 
 		 
@@ -499,7 +569,7 @@ DESCRIPTION
 			-- 135182:  ASIC On The Sub-board Malfunctions
 			aSICOnTheSubBoardMalfunctions	(135182),
 			-- 135184:  The Interface Numbered 1 On The Subcard Is Reserved But Does Not Forward Traffic. If An Optical Module Is Installed On The Interface Numbered 1, The Alarm Is Generated
-			theInterfaceNumbered1OnTheSubcardIsReservedButDoesNotForwardTrafficIfAnOpticalModuleIsInstalledOnTheInterfaceNumbered1TheAlarmIsGenerated	(135184),
+			theInterfaceNumbered1OnTheSubcardIsReservedButDoesNotForwardTraffic	(135184),
 			-- 135185:  Optical Card CDR Fault
 			opticalCardCDRFault	(135185),
 			-- 135190:  Battery Power Of The Physical Interface Card Is Lower Than 20%
@@ -847,7 +917,7 @@ DESCRIPTION
 			-- 144129:  Board Dismatch SubSlot
 			boardDismatchSubSlot	(144129),
 			-- 144130:  The Software Package For Startup On The Slave MPU Was Inconsistent With That On The Master MPU Or The Software Package For Startup On The Master MPU Was Incomplete
-			theSoftwarePackageForStartupOnTheSlaveMPUWasInconsistentWithThatOnTheMasterMPUOrTheSoftwarePackageForStartupOnTheMasterMPUWasIncomplete	(144130),
+			theSoftwarePackageForStartupOnTheSlaveMPUWasInconsistentWithTheMasterMPU	(144130),
 			-- 144131:  The Slot For The Slave MPU Was Installed With An Unmatched Board
 			theSlotForTheSlaveMPUWasInstalledWithAnUnmatchedBoard	(144131),
 			-- 144132:  The Software Package For Startup In Really Mismatched That Been Set From Command Before Device Reboot
@@ -1247,7 +1317,34 @@ DESCRIPTION
 			DESCRIPTION
 				"The failure reason of virtual-access configuration."
 			::= { hwEntityTrapObject 21 }
-									
+--  1.3.6.1.4.1.2011.5.25.219.1.22
+       -- 1.3.6.1.4.1.2011.5.25.219.1.22
+		vNetID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The virtual network ID."
+			::= { hwEntityTrapObject 22 }
+-- 1.3.6.1.4.1.2011.5.25.219.1.23
+        -- 1.3.6.1.4.1.2011.5.25.219.1.23
+		vmName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of VM."
+			::= { hwEntityTrapObject 23 }
+-- 1.3.6.1.4.1.2011.5.25.219.1.24
+        -- 1.3.6.1.4.1.2011.5.25.219.1.24
+		hwEntityBandwidthMode OBJECT-TYPE
+                                                                  SYNTAX INTEGER {eth28x10gf(1),eth26x10gf18xgf(2),eth20x10gf24xgf(3)}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" The bandwidth mode of card."
+			::= { hwEntityTrapObject 24 }
+																   
 -- 1.3.6.1.4.1.2011.5.25.219.2
 		-- 1.3.6.1.4.1.2011.5.25.219.2			
 		hwEntityTraps OBJECT IDENTIFIER ::= { hwEntityTrapMIB 2 }	
@@ -1294,7 +1391,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Board resume from failure."
+				"Chassis resume from failure."
 			::= { hwChassisTrap 4 }
 
 		
@@ -1509,9 +1606,85 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityThresholdValue, hwEntityThresholdCurrent}
 			STATUS current
 			DESCRIPTION 
-				"The total bandwidth of all cards is lower than the forwarding capacity of system control board."
+				"The total bandwidth of all cards recovered from exceeding the forwarding capacity of system control board."
 			::= { hwBoardTrap 20 } 	
+--  1.3.6.1.4.1.2011.5.25.219.2.2.21
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.21
+ 		hwBandwidthOfAllCardsExceedsThresholdFatalAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityThresholdCritical, hwEntityThresholdCurrent}
+			STATUS current
+			DESCRIPTION 
+				"The total bandwidth of all cards exceeds the fatal forwarding capacity of system control board."
+			::= { hwBoardTrap 21 } 	
+--  1.3.6.1.4.1.2011.5.25.219.2.2.22
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.22
+ 		hwBandwidthOfAllCardsExceedsThresholdFatalResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityThresholdCritical, hwEntityThresholdCurrent}
+			STATUS current
+			DESCRIPTION 
+				"The total bandwidth of all cards recovered from exceeding the fatal forwarding capacity of system control board."
+			::= { hwBoardTrap 22 }
+--  1.3.6.1.4.1.2011.5.25.219.2.2.23
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.23
+ 		hwPinchCardReset NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapReasonDescr, hwEntityOperStatus}
+			STATUS current
+			DESCRIPTION 
+				"The pinch card reset."
+			::= { hwBoardTrap 23 } 	
+--  1.3.6.1.4.1.2011.5.25.219.2.2.24
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.24
+ 		hwPinchCardResetResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapReasonDescr, hwEntityOperStatus}
+			STATUS current
+			DESCRIPTION 
+				"The pinch card recovered from reset."
+			::= { hwBoardTrap 24 }
+			
+--  1.3.6.1.4.1.2011.5.25.219.2.2.27
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.27
+		hwVBoardInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, vmName }
+			STATUS current
+			DESCRIPTION 
+				"Board is invalid for some reason."
+			::= { hwBoardTrap 27 }
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.2.28
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.28
+		hwVBoardInvalidResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, vmName }
+			STATUS current
+			DESCRIPTION 
+				"Board resume from invalid situation."
+			::= { hwBoardTrap 28 }
 
+--  1.3.6.1.4.1.2011.5.25.219.2.2.29
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.29
+		hwNeedModifyCfgTrap NOTIFICATION-TYPE 
+		    OBJECTS { hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"Before a version upgrade, the system checks the configuration files. If there is any problem, the system informs the user of the problem. After the upgrade, the system informs the user that the device needs to be restarted and configured again."
+			::= { hwBoardTrap 29 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.30
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.30
+		hwBoardWarning NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"The board experienced a minor fault."
+			::= { hwBoardTrap 30 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.31
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.31
+		hwBoardWarningResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"The board resumed from the minor fault."
+			::= { hwBoardTrap 31 }
 
 --  1.3.6.1.4.1.2011.5.25.219.2.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.3
@@ -1611,7 +1784,24 @@ DESCRIPTION
 			DESCRIPTION 
 				"This object indicates that the card recovers from resource exceeding the maximum limit."
 			::= { hwCardTrap 10 }
-		
+
+--  1.3.6.1.4.1.2011.5.25.219.2.3.11
+		-- 1.3.6.1.4.1.2011.5.25.219.2.3.11
+		hwCardBandwidthModeChange NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityBandwidthMode}
+			STATUS current
+			DESCRIPTION 
+				"The bandwidth mode of physical entity is changed."
+			::= { hwCardTrap 11 }
+
+        -- 1.3.6.1.4.1.2011.5.25.219.2.3.12
+		hwCardSplitChange NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"Port split configuration has changed on the card."
+			::= { hwCardTrap 12 }
+			
 --  1.3.6.1.4.1.2011.5.25.219.2.4
 		-- 1.3.6.1.4.1.2011.5.25.219.2.4
 		hwOpticalTrap OBJECT IDENTIFIER ::= { hwEntityTraps 4 }
@@ -1702,7 +1892,7 @@ DESCRIPTION
 --  1.3.6.1.4.1.2011.5.25.219.2.4.9
 		-- 1.3.6.1.4.1.2011.5.25.219.2.4.9
 		hwOpticalUnAuthorized NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
 			STATUS current
 			DESCRIPTION 
 				"The optical module authentication alarm occured."
@@ -1755,7 +1945,26 @@ DESCRIPTION
 			DESCRIPTION 
 				"Configuration collision removed between wavelength setting and untunable optical module."
 			::= { hwOpticalTrap 14 }
-			
+--  1.3.6.1.4.1.2011.5.25.219.2.4.15
+		-- 1.3.6.1.4.1.2011.5.25.219.2.4.15
+		hwGpsModuleRemove NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName }
+			STATUS current
+			DESCRIPTION 
+				"The gps module was removed."
+			::= { hwOpticalTrap 15 }
+
+
+--  1.3.6.1.4.1.2011.5.25.219.2.4.16
+                                     -- 1.3.6.1.4.1.2011.5.25.219.2.4.16
+                                    hwGpsModuleInsert NOTIFICATION-TYPE
+                                                    OBJECTS { hwEntityPhysicalIndex, entPhysicalName }
+                                                    STATUS current
+                                                    DESCRIPTION 
+                                                             "The gps module was inserted."
+                                                   ::= { hwOpticalTrap 16 }
+
+												   
 --  1.3.6.1.4.1.2011.5.25.219.2.5
 		-- 1.3.6.1.4.1.2011.5.25.219.2.5
 		hwPowerTrap OBJECT IDENTIFIER ::= { hwEntityTraps 5 }
@@ -1924,6 +2133,25 @@ DESCRIPTION
 			DESCRIPTION 
 				"Fan change to usable status."
 			::= { hwFanTrap 8 }
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.6.9
+		-- 1.3.6.1.4.1.2011.5.25.219.2.6.9
+		hwFanMinorAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a minor fault occurred on the fan."
+			::= { hwFanTrap 9 }
+
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.6.10
+		-- 1.3.6.1.4.1.2011.5.25.219.2.6.10
+		hwFanMinorAlarmResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the fan module recovered from the minor fault."
+			::= { hwFanTrap 10 }
 
 		
 --  1.3.6.1.4.1.2011.5.25.219.2.7
@@ -2441,6 +2669,40 @@ DESCRIPTION
 			DESCRIPTION 
 				"One new port is inserted."
 			::= { hwPortTrap 5 }
+--  1.3.6.1.4.1.2011.5.25.219.2.12.6
+                                             -- 1.3.6.1.4.1.2011.5.25.219.2.12.6
+                                             hwVPortDown NOTIFICATION-TYPE
+                                                                  OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, vNetID }
+                                                                  STATUS current
+                                                                  DESCRIPTION 
+                                                                                       "One of the port connect down."
+                                                                  ::= { hwPortTrap 6 }
+--  1.3.6.1.4.1.2011.5.25.219.2.12.7
+                                            -- 1.3.6.1.4.1.2011.5.25.219.2.12.7
+                                            hwVPortUp NOTIFICATION-TYPE
+                                                                OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, vNetID}
+                                                                STATUS current
+                                                                DESCRIPTION 
+                                                                                      "One of the port connect up."
+                                                                ::= { hwPortTrap 7 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.2.12.8 
+                hwPortOpticalPositionInvalid NOTIFICATION-TYPE 
+                        OBJECTS { hwEntityPhysicalIndex, entPhysicalName } 
+                        STATUS current 
+                        DESCRIPTION 
+                                " The current port is invalid." 
+                        ::= { hwPortTrap 8 } 
+
+                
+--  1.3.6.1.4.1.2011.5.25.219.2.12.9 
+                -- 1.3.6.1.4.1.2011.5.25.219.2.12.9 
+                hwPortOpticalPositionValid NOTIFICATION-TYPE 
+                        OBJECTS { hwEntityPhysicalIndex, entPhysicalName } 
+                        STATUS current 
+                        DESCRIPTION 
+                                " The current port is valid." 
+                        ::= { hwPortTrap 9}
 
 --  1.3.6.1.4.1.2011.5.25.219.2.13
 		-- 1.3.6.1.4.1.2011.5.25.219.2.13
@@ -2675,7 +2937,7 @@ DESCRIPTION
 --  1.3.6.1.4.1.2011.5.25.219.2.20.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.20.3
 		hwPmuFail NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID,hwEntityTrapReasonDescr }
 			STATUS current
 			DESCRIPTION 
 				"Pmu become failure for some reason."
@@ -2744,6 +3006,121 @@ DESCRIPTION
 			DESCRIPTION 
 				"battery percent is full ."
 			::= { hwBatteryTrap 1 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.23
+		-- 1.3.6.1.4.1.2011.5.25.219.2.23
+		hwThreadTrap OBJECT IDENTIFIER ::= { hwEntityTraps 23 }
+		
+--   1.3.6.1.4.1.2011.5.25.219.2.23.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.23.1
+		hwThreadFaultIsolate NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName, entPhysicalName, hwEntityPhysicalIndex, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION
+				"The faulty thread has been isolated."
+			::= { hwThreadTrap 1 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24
+		hwDiskTrap OBJECT IDENTIFIER ::= { hwEntityTraps 24 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.1
+		hwDiskUtilizationRising NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+				hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Disk utilization overrun."
+			::= { hwDiskTrap 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.2
+		hwDiskUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityThresholdType, hwEntityThresholdWarning, hwEntityThresholdCurrent, 
+				hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Disk utilization back to normal level"
+			::= { hwDiskTrap 2 }
+-- 1.3.6.1.4.1.2011.5.25.219.2.24.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.3
+		hwDiskPartitionInValid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition was unavailable."
+			::= { hwDiskTrap 3 }
+			
+			
+-- 1.3.6.1.4.1.2011.5.25.219.2.24.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.4
+		hwDiskPartitionInValidResume  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName }
+			STATUS current
+			DESCRIPTION 
+				"The fault where the VM's disk partition was unavailable was rectified."
+			::= { hwDiskTrap 4 }
+			
+			
+-- 1.3.6.1.4.1.2011.5.25.219.2.24.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.5
+		hwDiskPartitionSpacinsufficient  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName,  hwStorageEntSpaceFree,  hwEntityThresholdWarning  }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition's available space was less than the threshold."
+			::= { hwDiskTrap 5 }
+			
+			
+-- 1.3.6.1.4.1.2011.5.25.219.2.24.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.6
+		hwDiskPartitionSpacinsufficientResume  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName,  hwStorageEntSpaceFree,  hwEntityThresholdWarning }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition's available space was more than the threshold."
+			::= { hwDiskTrap 6 }
+			
+-- 1.3.6.1.4.1.2011.5.25.219.2.24.7
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.7
+		hwDiskPartitionUtilizationRising  NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName, hwEntityThresholdCurrent, hwEntityThresholdWarning }
+			STATUS current
+			DESCRIPTION 
+				"The disk usage exceeded the pre-set overload threshold."
+			::= { hwDiskTrap 7 }
+
+		
+-- 1.3.6.1.4.1.2011.5.25.219.2.24.8
+		-- 1.3.6.1.4.1.2011.5.25.219.2.24.8
+		hwDiskPartitionUtilizationResume   NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName, hwEntityThresholdCurrent, hwEntityThresholdWarning }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition usage of the slot was 10% lower than the preset threshold."
+			::= { hwDiskTrap 8 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.219.2.25
+		hwVMTrap OBJECT IDENTIFIER ::= { hwEntityTraps 25 }
+
+		-- 1.3.6.1.4.1.2011.5.25.219.2.25.1
+		hwVMResInconsist NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, vmName }
+			STATUS current
+			DESCRIPTION 
+				"Local VM resources are inconsistent with those on the MANO."
+			::= { hwVMTrap 1 }
+
+		--  1.3.6.1.4.1.2011.5.25.219.2.25.2
+		hwVMResInconsistResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, vmName }
+			STATUS current
+			DESCRIPTION 
+				"Local VM resources are consistent with those on the MANO."
+			::= { hwVMTrap 2 }
+		                                          
 --  1.3.6.1.4.1.2011.5.25.219.3
 		-- 1.3.6.1.4.1.2011.5.25.219.3
 		hwEntityTrapConformance OBJECT IDENTIFIER ::= { hwEntityTrapMIB 3 }
@@ -2794,9 +3171,9 @@ DESCRIPTION
 				hwBoardInvalid, hwBoardInvalidResume, hwBoardLeaveMaster, hwBoardBecomeMaster, hwCardRemove, 
 				hwCardInsert, hwCardFail, hwCardFailResume, hwCardInvalid, hwCardInvalidResume, hwCardResExceed, hwCardResExceedResume,
 				hwOpticalRemove, hwOpticalInsert, hwOpticalFail, hwOpticalFailResume, hwOpticalInvalid, 
-				hwOpticalInvalidResume, hwPowerRemove, hwPowerInsert, hwPowerFail, hwPowerFailResume, 
+				hwOpticalInvalidResume, hwGpsModuleRemove,hwGpsModuleInsert,hwPowerRemove, hwPowerInsert, hwPowerFail, hwPowerFailResume, 
 				hwPowerInvalid, hwPowerInvalidResume, hwPowerUnusable, hwPowerUnusableResume, hwFanRemove, 
-				hwFanInsert, hwFanFail, hwFanFailResume, hwFanInvalid, hwFanInvalidResume, 
+				hwFanInsert, hwFanFail, hwFanFailResume, hwFanInvalid, hwFanInvalidResume, hwFanMinorAlarm, hwFanMinorAlarmResume,
 				hwFanUnusable, hwFanUnusableResume, hwLcdRemove, hwLcdInsert, hwLcdInvalid, 
 				hwLcdInvalidResume, hwLcdUnusable, hwLcdUnusableResume, hwCmuRemove, hwCmuInsert, 
 				hwCmuInvalid, hwCmuInvalidResume, hwCmuUnusable, hwCmuUnusableResume, hwCommunicateError, 
@@ -2806,16 +3183,18 @@ DESCRIPTION
 				hwBrdTempFatalAlarm, hwBrdTempFatalResume, hwPowerFailureAlarm, hwPowerFailureResume, hwIOSwitchOneAlarm, 
 				hwIOSwitchOneAlarmResume, hwIOSwitchTwoAlarm, hwIOSwitchTwoAlarmResume, hwIOSwitchThreeAlarm, hwIOSwitchThreeAlarmResume, 
 				hwEntityDyingGaspEvent, hwSystemConfigError, hwSystemConfigResume, hwPortDown, 
-				hwPortUp, hwPortNoSupportOETrap, hwPortRemove, hwPortInsert, hwUserDefAlarm, hwUserDefResume, hwCPUUtilizationRising, hwCPUUtilizationResume,      
+				hwPortUp, hwPortNoSupportOETrap, hwPortRemove, hwPortInsert,hwPortOpticalPositionInvalid,hwPortOpticalPositionValid, hwUserDefAlarm, hwUserDefResume, hwCPUUtilizationRising, hwCPUUtilizationResume,      
 				hwUSBUnidentifiedResume, hwUSBUnidentified,
 				hwMemUtilizationRising, hwMemUtilizationResume, hwStorageDevRemove, hwStorageDevInsert, hwSystemRollback, hwVirtualAccessDrvConfigError,
 				hwUpMicroSwitchOpen, hwUpMicroSwitchClose, hwDownMicroSwitchOpen, hwDownMicroSwitchClose, hwBoardPowerOff, hwOpticalPowerAlarm, 
 				hwOpticalPowerAlarmResume,hwUSBInsert,hwPppLoopbackDetect,hwUSBRemove,hwPppLoopbackDetResume,hwFileErrorResume,hwFileError,
 				hwPmuRemove,hwPmuInsert,hwPmuFail,hwPmuFailResume,hwPmuInvalid,hwPmuInvalidResume,hwRATEOFTRAFFICRising,hwBatteryFull,hwRATEOFTRAFFICResume,
-				hwOpticalUnAuthorized, hwOpticalUnAuthorizedResume, hwLaserNoFited, hwLaserNoFitedResume,
+				hwThreadFaultIsolate, hwOpticalUnAuthorized, hwOpticalUnAuthorizedResume, hwLaserNoFited, hwLaserNoFitedResume,
 				hwOpticalTunableNotMatch, hwOpticalTunableNotMatchResume ,hwBandwidthOfAllCardsExceedsThreshold ,hwUsbStatusChg,
-				hwBoardResetByCmd, hwBoardResetByCmdResume, hwCardResetByCmd, hwCardResetByCmdResume, hwBoardHeartbeatTimeout, 
-                                                                                     hwBoardHeartbeatResume, hwBandwidthOfAllCardsExceedsThresholdAlarm,hwBandwidthOfAllCardsExceedsThresholdResume}
+				hwBoardResetByCmd, hwBoardResetByCmdResume, hwCardResetByCmd, hwDiskUtilizationResume, hwDiskUtilizationRising, hwCardResetByCmdResume, hwBoardHeartbeatTimeout, 
+                                                                                     hwBoardHeartbeatResume, hwBandwidthOfAllCardsExceedsThresholdAlarm,hwBandwidthOfAllCardsExceedsThresholdResume,
+                                                                          hwBandwidthOfAllCardsExceedsThresholdFatalAlarm, hwBandwidthOfAllCardsExceedsThresholdFatalResume,hwPinchCardReset,hwPinchCardResetResume,hwVMResInconsist,hwVMResInconsistResume, hwNeedModifyCfgTrap, hwCardBandwidthModeChange, hwCardSplitChange,
+                hwBoardWarning, hwBoardWarningResume}
 			STATUS current
 			DESCRIPTION 
 				"Group for all base traps."

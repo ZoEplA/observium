@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -37,7 +37,7 @@ foreach ($config['device_types'] as $entry)
 
 // Generate array with form elements
 $form_items = array();
-foreach (array('os', 'hardware', 'version', 'features', 'type') as $entry)
+foreach (array('os', 'hardware', 'version', 'features', 'type', 'distro') as $entry)
 {
   $query  = "SELECT `$entry` FROM `devices`";
   if (isset($where_array[$entry]))
@@ -168,10 +168,49 @@ $form['row'][1]['type']     = array(
                                 'width'       => '100%', //'180px',
                                 'value'       => $vars['type'],
                                 'values'      => $form_items['type']);
+
+// Third row
+$form['row'][2]['sysDescr']  = array(
+                                'type'        => 'text',
+                                'name'        => 'sysDescr',
+                                'value'       => $vars['sysDescr'],
+                                'width'       => '100%', //'180px',
+                                'placeholder' => TRUE);
+
+
+$form['row'][2]['purpose']  = array(
+                                'type'        => 'text',
+                                'name'        => 'Description / Purpose',
+                                'value'       => $vars['purpose'],
+                                'width'       => '100%', //'180px',
+                                'placeholder' => TRUE);
+
+$form['row'][2]['sysContact']  = array(
+  'type'        => 'text',
+  'name'        => 'sysContact',
+  'value'       => $vars['sysContact'],
+  'width'       => '100%', //'180px',
+  'placeholder' => TRUE);
+
+$form['row'][2]['distro'] = array(
+  'type'        => 'multiselect',
+  'name'        => 'Select Distro',
+  'width'       => '100%', //'180px',
+  'value'       => $vars['distro'],
+  'values'      => $form_items['distro']);
+
+$form['row'][2]['serial']  = array(
+  'type'        => 'text',
+  'name'        => 'Serial Number',
+  'value'       => $vars['serial'],
+  'width'       => '100%', //'180px',
+  'placeholder' => TRUE);
+
 // search button
-$form['row'][1]['search']   = array(
+$form['row'][2]['search']   = array(
                                 'type'        => 'submit',
                                 //'name'        => 'Search',
+  //'class' => 'btn-primary',
                                 //'icon'        => 'icon-search',
                                 'right'       => TRUE,
                                 );
@@ -182,23 +221,31 @@ $panel_form = array('type'          => 'rows',
                     'submit_by_key' => TRUE,
                     'url'           => generate_url($vars));
 
-$panel_form['row'][0]['hostname']      = $form['row'][0]['hostname'];
-$panel_form['row'][0]['sysname']       = $form['row'][1]['sysname'];
+$panel_form['row'][] = array('hostname'      => $form['row'][0]['hostname'],
+                             'sysname'       => $form['row'][1]['sysname']);
 
-$panel_form['row'][1]['location']      = $form['row'][0]['location'];
-$panel_form['row'][1]['location_text'] = $form['row'][1]['location_text'];
+$panel_form['row'][] = array('sysDescr'      => $form['row'][2]['sysDescr'],
+                             'purpose'       => $form['row'][2]['purpose']);
 
-$panel_form['row'][2]['os']            = $form['row'][0]['os'];
-$panel_form['row'][2]['version']       = $form['row'][1]['version'];
+$panel_form['row'][] = array('sysContact'    => $form['row'][2]['sysContact'],
+                             'serial'        => $form['row'][2]['serial']);
 
-$panel_form['row'][3]['hardware']      = $form['row'][0]['hardware'];
-$panel_form['row'][3]['features']      = $form['row'][1]['features'];
+$panel_form['row'][] = array('location'      => $form['row'][0]['location'],
+                             'location_text' => $form['row'][1]['location_text']);
 
-$panel_form['row'][4]['group']         = $form['row'][0]['group'];
-$panel_form['row'][4]['type']          = $form['row'][1]['type'];
 
-$panel_form['row'][5]['sort']          = $form['row'][0]['sort'];
-$panel_form['row'][5]['search']        = $form['row'][1]['search'];
+$panel_form['row'][4]['os']            = $form['row'][0]['os'];
+$panel_form['row'][4]['version']       = $form['row'][1]['version'];
+$panel_form['row'][4]['distro']      = $form['row'][2]['distro'];
+
+$panel_form['row'][5]['hardware']      = $form['row'][0]['hardware'];
+$panel_form['row'][5]['features']      = $form['row'][1]['features'];
+
+$panel_form['row'][6]['group']         = $form['row'][0]['group'];
+$panel_form['row'][6]['type']          = $form['row'][1]['type'];
+
+$panel_form['row'][7]['sort']          = $form['row'][0]['sort'];
+$panel_form['row'][7]['search']        = $form['row'][2]['search'];
 
 // Register custom panel
 register_html_panel(generate_form($panel_form));

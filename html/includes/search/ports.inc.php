@@ -7,14 +7,14 @@
  *
  * @package    observium
  * @subpackage search
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 /// SEARCH PORTS
 $results = dbFetchRows("SELECT * FROM `ports`
                         LEFT JOIN `devices` USING (`device_id`)
-                        WHERE (`ifAlias` LIKE ? OR `ifDescr` LIKE ?) $query_permitted_port
+                        WHERE (`ifAlias` LIKE ? OR `port_label` LIKE ?) $query_permitted_port
                         ORDER BY `ifDescr` LIMIT $query_limit", array($query_param, $query_param));
 
 if (count($results))

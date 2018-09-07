@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -21,7 +21,7 @@ $eqlgrpmembers = snmpwalk_cache_multi_oid($device, 'eqlMemberName', array(), 'EQ
 foreach ($eqlgrpmembers as $index => $entry)
 {
   // Find member id and name in results
-  if (!empty($entry['eqlMemberName']) && strtolower($entry['eqlMemberName']) == $poll_device['sysName'])
+  if (!empty($entry['eqlMemberName']) && strtolower($entry['eqlMemberName']) == strtolower($poll_device['sysName']))
   {
     list(,$eqlgrpmemid) = explode('.', $index);
     break;

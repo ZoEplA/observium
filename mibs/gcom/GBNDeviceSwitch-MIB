@@ -19,12 +19,17 @@
         PortList, dot1qStaticMulticastEntry     FROM Q-BRIDGE-MIB;
 
     gbnDeviceSwitch MODULE-IDENTITY
-        LAST-UPDATED    "0011020000Z"  -- November 2, 2000
+        LAST-UPDATED    "201802140000Z"  -- February 14, 2018
         ORGANIZATION    "Greentech"
         CONTACT-INFO    "Adam Armstrong
                          E-mail: adama@observium.org"
 
         DESCRIPTION     "Gbn Common Enterprise MIB definition."
+
+        REVISION        "201802140000Z"  -- February 14, 2018
+        DESCRIPTION     "Fix a few ASN.1 syntax errors (replace underscores
+                         with hyphens in descriptors) so that Net-SNMP tools
+                         can now load the MIB."
 
         REVISION        "0011020000Z"  -- November 2, 2000
         DESCRIPTION     "Initial MIB creation."
@@ -122,11 +127,11 @@
              single1000FX(5),
              double1000FX(6),
              fE1000(7),
-             SM_2SC_1310_25(9),
-             MM_2SC_1310_2(10),
-             MM_2SC_850_2(11),
-             SM_1SC_1550_20(12),
-             SM_1SC_1310_20(13)
+             SM-2SC-1310-25(9),
+             MM-2SC-1310-2(10),
+             MM-2SC-850-2(11),
+             SM-1SC-1550-20(12),
+             SM-1SC-1310-20(13)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -828,11 +833,11 @@
                         none (0),
                         broadcast (1),
                         ipmulticast (2),
-                        broadcast_ipmulticast (3),
+                        broadcast-ipmulticast (3),
                         dlf (4),
-                        broadcast_dlf (5),
-                        ipmulticast_dlf (6),
-                        broadcast_ipmulticast_dlf (7)
+                        broadcast-dlf (5),
+                        ipmulticast-dlf (6),
+                        broadcast-ipmulticast-dlf (7)
                        }
        ACCESS  read-write
        STATUS  current
@@ -842,10 +847,10 @@
 
    newStormControlTargetRate OBJECT-TYPE
        SYNTAX  INTEGER {
-                        rate_one_sixteenth (6),
-                        rate_one_eighth (12),
-                        rate_one_fourth (25),
-                        rate_one_half (50)}
+                        rate-one-sixteenth (6),
+                        rate-one-eighth (12),
+                        rate-one-fourth (25),
+                        rate-one-half (50)}
        ACCESS  read-write
        STATUS  current
        DESCRIPTION

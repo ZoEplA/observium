@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -37,6 +37,7 @@ $pws = snmpwalk_cache_oid($device, "cpwVcMplsLocalLdpID", $pws, "CISCO-IETF-PW-M
 $pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID",  $pws, "CISCO-IETF-PW-MPLS-MIB", mib_dirs('cisco'));
 //echo("PWS_WALK: ".count($pws)."\n"); var_dump($pws);
 
+  $peer_where = generate_query_values($device['device_id'], 'device_id', '!='); // Additional filter for exclude self IPs
   foreach ($pws as $pw_id => $pw)
   {
     $peer_addr         = hex2ip($pw['cpwVcPeerAddr']);
@@ -54,15 +55,26 @@ $pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID",  $pws, "CISCO-IETF-PW-M
     {
       $peer_addr_type = 'ipv' . $peer_addr_version; // Override address type, because snmp sometime return incorrect
       $peer_rdns = gethostbyaddr6($peer_addr); // PTR name
-      if ($peer_addr_type == 'ipv6')
+
+      // Fetch all devices with peer IP and filter by UP
+      if ($ids = get_entity_ids_ip_by_network('device', $peer_addr, $peer_where))
       {
-        $peer_addr = Net_IPv6::uncompress($peer_addr, TRUE);
+        $remote_device = $ids[0];
+        if (count($ids) > 1)
+        {
+          // If multiple same IPs found, get first NOT disabled or down
+          foreach ($ids as $id)
+          {
+            $tmp_device = device_by_id_cache($id);
+            if (!$tmp_device['disabled'] && $tmp_device['status'])
+            {
+              $remote_device = $id;
+              break;
+            }
+          }
+        }
       }
 
-      // FIXME. Retarded way
-      $remote_device = dbFetchCell('SELECT `device_id` FROM `'.$peer_addr_type.'_addresses`
-                                     LEFT JOIN `ports` USING(`port_id`)
-                                     WHERE `'.$peer_addr_type.'_address` = ? LIMIT 1;', array($peer_addr));
     } else {
       $peer_addr = ''; // Unset peer address
       print_debug("Not found correct peer address. See snmpwalk for 'cpwVcPeerAddr' and 'cpwVcMplsPeerLdpID'.");
@@ -84,11 +96,11 @@ $pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID",  $pws, "CISCO-IETF-PW-M
       // cpwVcName.3221225473 = STRING: 82.209.169.153,3055
       // cpwVcMplsLocalLdpID.3221225473 = STRING: 82.209.169.129:0
       list($local_addr) = explode(':', $pw['cpwVcMplsLocalLdpID']);
-      if ($peer_addr_type == 'ipv6')
+      $local_where = generate_query_values($device['device_id'], 'device_id'); // Filter by self IPs
+      if ($ids = get_entity_ids_ip_by_network('port', $local_addr, $local_where))
       {
-        $local_addr = Net_IPv6::uncompress($local_addr, TRUE);
+        $if_id = $ids[0];
       }
-      $if_id = dbFetchCell('SELECT `port_id` FROM `'.$peer_addr_type.'_addresses` LEFT JOIN `ports` USING (`port_id`) WHERE `'.$peer_addr_type.'_address` = ? AND `device_id` = ? LIMIT 1;', array($local_addr, $device['device_id']));
     }
 
     // Note, Cisco experimental 'cpwVc' oid prefix converted to 'pw' prefix as in rfc PW-STD-MIB

@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- DESCRIPTION:  HUAWEI-IPPOOL-MIB
 -- Reference:  
--- Version: V2.13
+-- Version: V2.17
 -- History:
 --         v3.01
 --         modified by huangjun 2009-12-08
@@ -23,7 +23,7 @@
                 FROM IPV6-TC;
 
         hwIppool MODULE-IDENTITY
-            LAST-UPDATED "201508120000Z"
+            LAST-UPDATED "201611170000Z"
             ORGANIZATION 
 			"Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -37,6 +37,26 @@
            
             DESCRIPTION 
                 "The MIB contains objects of module IPPOOL."
+
+            REVISION
+            "201611170000Z" --nov 17, 2016
+            DESCRIPTION
+             "Modify V2.16-V2.17 add isolate pool warning"
+
+            REVISION
+            "201609270000Z" --September 27, 2016
+            DESCRIPTION
+             "Modify V2.15-V2.16 mod pool and pool-group subnet warning"
+             
+            REVISION
+            "201603101109Z" --March 10, 2016
+            DESCRIPTION
+             "Modify V2.14-V2.15 mod hwIPSectionIndex<0-7> for  hwIPSectionIndex<0-255>."
+
+            REVISION
+            "201512240000Z" --Dec 24, 2015
+            DESCRIPTION
+             "Modify V2.13-V2.14 mod hwUserIPAddress for  hwUserIPConflictAlarm."
                 
             REVISION  "201508120000Z" --August 12, 2015
             DESCRIPTION
@@ -494,7 +514,7 @@
              }
 
         hwIPSectionIndex OBJECT-TYPE
-            SYNTAX Integer32 (0..7)
+            SYNTAX Integer32 (0..255)
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -3347,7 +3367,7 @@
 
         hwIPPoolTrapOid OBJECT IDENTIFIER ::= { hwIPPoolMibTrap 1 }
 
-        hwUserIPAddress OBJECT-TYPE
+        hwUserIPAddr OBJECT-TYPE
             SYNTAX IpAddress
             MAX-ACCESS accessible-for-notify
             STATUS current
@@ -3402,13 +3422,21 @@
             DESCRIPTION
                 "Failure Cause of Address Segment Application."
             ::= { hwIPPoolTrapOid 8 }
+
+        hwIPPoolAutoBlockedResumeReason OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(1..255))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The Automatically Locked Address Pool Unlock Reason."
+            ::= { hwIPPoolTrapOid 9 }
                                                   
         hwIPPoolTrapsDefine OBJECT IDENTIFIER ::= { hwIPPoolMibTrap 2 }
 
         hwIPPoolTraps OBJECT IDENTIFIER ::= { hwIPPoolTrapsDefine 0 }
 
         hwUserIPConflictAlarm NOTIFICATION-TYPE
-            OBJECTS { hwUserIPAddress,hwIPPoolName}
+            OBJECTS { hwUserIPAddr,hwIPPoolName}
             STATUS current
             DESCRIPTION
                 "
@@ -3420,7 +3448,7 @@
             ::= { hwIPPoolTraps 1 }
 
         hwUserIPLeaseAlarm NOTIFICATION-TYPE
-            OBJECTS { hwUserIPAddress }
+            OBJECTS { hwUserIPAddr }
             STATUS current
             DESCRIPTION
                 "
@@ -3635,8 +3663,96 @@
                 The number of address segments dynamically allocated to the device reached the maximum number allowed. 
                 "
            ::= { hwIPPoolTraps 25 }  
-      
+
+  hwUsedSubnetReachThreshold NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolIndex, hwIPPoolName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets  in the IP pool exceeds the threshold.
+                "
+           ::= { hwIPPoolTraps 26 }     
+ hwUsedSubnetThresholdResume NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolIndex, hwIPPoolName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets  in the IP pool is under the threshold.
+                "
+           ::= { hwIPPoolTraps 27 }    
+    
+ hwPoolGroupUsedSubnetReachThreshold  NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolGroupIndex, hwIPPoolGroupName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets in the IP pool group exceeds the threshold.
+                "
+           ::= { hwIPPoolTraps 28 } 
+
+  hwPoolGroupUsedSubnetReachThresholdResume NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolGroupIndex, hwIPPoolGroupName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets  in the IP pool group is under the threshold.
+                "
+           ::= { hwIPPoolTraps 29 }       
+
+ hwUsedSubnetExhaust NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolIndex, hwIPPoolName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets in the IP pool is exhausted. 
+                "
+           ::= { hwIPPoolTraps 30 }  
+
+ hwUsedSubnetExhaustResume  NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolIndex, hwIPPoolName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets  in the IP pool  is under the exhaust. 
+                "
+           ::= { hwIPPoolTraps 31 }        
+
+ hwPoolGroupUsedSubnetExhaust NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolGroupIndex, hwIPPoolGroupName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets in the IP pool group is exhausted.  
+                "
+           ::= { hwIPPoolTraps 32 }  
+
+ hwPoolGroupUsedSubnetExhaustResume  NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolGroupIndex, hwIPPoolGroupName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The number of Subnets  in the IP pool group is under the exhaust.
+                "
+           ::= { hwIPPoolTraps 33 }
         
+        hwIPPoolAutoBlocked NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolName }
+           STATUS current
+           DESCRIPTION 
+                "
+                The address pool was automatically locked due to address allocation failures.
+                "
+           ::= { hwIPPoolTraps 34 }
+		   
+      hwIPPoolAutoBlockedResume NOTIFICATION-TYPE 
+           OBJECTS { hwIPPoolName, hwIPPoolAutoBlockedResumeReason }
+           STATUS current
+           DESCRIPTION 
+                "
+                The automatically locked address pool was unlocked.
+                "
+           ::= { hwIPPoolTraps 35 } 
+
     --  ============== conformance information ==============
 
         hwIpPoolMIBConformance OBJECT IDENTIFIER ::= { hwIppool 3 }
@@ -3799,7 +3915,7 @@
         ::= { hwIpPoolObjectGroups 7 }
 
         hwIpPoolTrapOidGroup OBJECT-GROUP            
-            OBJECTS {hwUserIPAddress,
+            OBJECTS {hwUserIPAddr,
                     hwDHCPServerAddr,
                     hwDhcpSvrVrfName,
                     hwIPPoolGroupIndex,
@@ -3815,6 +3931,10 @@
                             hwDhcpServerDown, hwLocalIPPoolDifferWithServer, 
                             hwUsedIPReachThreshold, hwUsedIPReachThresholdResume, hwUsedDeleteUnnumberedRouter, 
                             hwPoolGroupUsedIPReachThreshold, hwPoolGroupUsedIPReachThresholdResume,
+                            hwUsedSubnetReachThreshold, hwUsedSubnetThresholdResume,
+                            hwPoolGroupUsedSubnetReachThreshold, hwPoolGroupUsedSubnetReachThresholdResume,
+	        hwUsedSubnetExhaust,hwUsedSubnetExhaustResume,
+	        hwPoolGroupUsedSubnetExhaust,hwPoolGroupUsedSubnetExhaustResume,
                             hwIPPoolConstantIndexFail, hwIPv6PrefixConstantIndexFail,
                             hwIPv6PoolConstantIndexFail, 
                             hwUsedIPExhaust,hwUsedIPExhaustResume,

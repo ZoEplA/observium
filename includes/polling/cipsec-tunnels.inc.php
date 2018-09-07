@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -249,7 +249,7 @@ if (!is_device_mib($device, 'CISCO-IPSEC-FLOW-MONITOR-MIB'))
                        'tunnel_endhash'      => $tunnel_endpt_hash,
                        'tunnel_name'         => $tunnel['cikeTunLocalName'],
                        'mib'                 => $mib,
-                       'deleted'             => 0);
+                       'tunnel_deleted'             => 0);
 
     $rrd_change_hash = FALSE;
     $tunnel_insert = !is_array($tunnels_db[$db_index][$tunnel_endpt_hash]);
@@ -385,7 +385,7 @@ if (!is_device_mib($device, 'CISCO-IPSEC-FLOW-MONITOR-MIB'))
         // old data
         dbDelete('ipsec_tunnels', '`tunnel_id` =  ?', array($tunnel['tunnel_id']));
       } else {
-        $updated = dbUpdate(array('deleted' => 1), 'ipsec_tunnels', '`tunnel_id` = ?', array($tunnel['tunnel_id']));
+        $updated = dbUpdate(array('tunnel_deleted' => 1), 'ipsec_tunnels', '`tunnel_id` = ?', array($tunnel['tunnel_id']));
       }
     }
   }

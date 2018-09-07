@@ -7,9 +7,41 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
+
+
+function build_table($array)
+{
+
+   // start table
+   $html = '<table class="table table-condensed table-striped">';
+   // header row
+   $html .= '<thead><tr>';
+   foreach($array[0] as $key => $value)
+   {
+      $html .= '<th>' . $key . '</th>';
+   }
+   $html .= '</tr></thead>';
+
+   // data rows
+   foreach($array as $key => $value)
+   {
+      $html .= '<tr>';
+      foreach($value as $key2 => $value2)
+      {
+         $html .= '<td>' . $value2 . '</td>';
+      }
+      $html .= '</tr>';
+   }
+
+   // finish table and return it
+
+   $html .= '</table>';
+   return $html;
+}
+
 
 /**
  * Print refresh meta header
@@ -131,7 +163,7 @@ function get_table_header($cols, &$vars = array())
     {
       $string .= $name;      // Column without Sort
     }
-    else if (isset($vars) || $sort)
+    else if (!empty($vars) || $sort)
     {
       // Sort order cycle: asc -> desc -> reset
       if ($sort == $id)

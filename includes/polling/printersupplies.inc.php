@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,100 +17,106 @@ foreach ($supply_data as $supply)
 {
   echo("Checking " . $supply['supply_descr'] . " (" . nicecase($supply['supply_type']) . ")... ");
 
-  $level = snmp_get($device, $supply['supply_oid'], "-OUqnv");
-  if ($level == '-1')
+  // Fetch level and capacity
+  $data = snmp_get_multi_oid($device, $supply['supply_oid'] . ' ' . $supply['supply_capacity_oid'], array(), NULL, NULL, OBS_SNMP_ALL_NUMERIC);
+  print_debug_vars($data);
+
+  // Level
+  $level = $data[$supply['supply_oid']];
+
+  if ($supply['supply_mib'] == 'RicohPrivateMIB')
   {
-    // Unlimited
-    $level = 100;
+    if ($level == '-100')
+    {
+      // Toner near empty
+      $level = '5'; // ~ 1-20%
+    }
+    else if ($level == '-3')
+    {
+      $level = '80'; // ~ 10-100%
+    }
+
+  } else {
+
+    /**
+     * .1.3.6.1.2.1.43.11.1.1.9 prtMarkerSuppliesLevel
+     *  The value (-1) means other and specifically indicates that the sub-unit places
+     *  no restrictions on this parameter. The value (-2) means unknown.
+     *  A value of (-3) means that the printer knows that there is some supply/remaining space,
+     *  respectively.
+     */
+    switch ($level)
+    {
+      case '-1':
+        $level = 100; // Unlimit
+        break;
+      case '-2':
+        $level = 0;   // Unknown
+        break;
+      case '-3':
+        $level = 1;   // This is wrong SuppliesLevel (1%), but better than nothing
+        break;
+    }
   }
-  //else if ($level == '-3')
-  //{
-  //  $level = 1; // This is wrong SuppliesLevel (1%), but better than nothing
-  //}
-  if ($level >= 0)
+
+  // Capacity
+  if (strlen($supply['supply_capacity_oid']))
   {
-    $supplyperc = round($level / $supply['supply_capacity'] * 100);
+    $capacity = $data[$supply['supply_capacity_oid']];
+  }
+  else if ($supply['supply_capacity'])
+  {
+    $capacity = $supply['supply_capacity'];
+  } else {
+    $capacity = 100;
+  }
+
+  /**
+   * .1.3.6.1.2.1.43.11.1.1.8 prtMarkerSuppliesMaxCapacity
+   *  The value (-1) means other and specifically indicates that the sub-unit places
+   *  no restrictions on this parameter. The value (-2) means unknown.
+   */
+  switch ($capacity)
+  {
+    case '-1':
+      $capacity = 100; // Unlimit
+      break;
+    //case '-2':
+    //  $capacity = 0;   // Unknown
+    //  break;
+  }
+
+  // Supply percent
+  if ($level >= 0 && $capacity > 0)
+  {
+    //$supplyperc = round($level / $supply['supply_capacity'] * 100);
+    $supplyperc = round($level / $capacity * 100);
   } else {
     $supplyperc = $level;
   }
-
-  // CLEANME remove after r8500 but not before CE 2016/10
-  // Compatibility with old filenames
-  $supply_rrd = "toner-" . $supply['supply_index'] . ".rrd";
-  switch ($supply['supply_type'])
-  {
-    case 'toner':
-      $old_rrd = "toner-" . implode('.',array_splice(explode('.',$supply['supply_index']),1)) . ".rrd"; // toner-1.5.rrd (new) -> toner-5.rrd (old)
-      if (rename_rrd($device, $old_rrd, $supply_rrd))
-      {
-        rrdtool_rename_ds($device, $supply_rrd, 'toner', 'level');
-      }
-      break;
-    case 'opc':
-    case 'transferunit':
-      if (stristr($supply['supply_descr'], 'drum') !== FALSE)
-      {
-        if (stristr($supply['supply_descr'], 'cyan') !== FALSE)
-        {
-          $old_rrd = "drum-c.rrd";
-        } else if (stristr($supply['supply_descr'], 'magenta') !== FALSE) {
-          $old_rrd = "drum-m.rrd";
-        } else if (stristr($supply['supply_descr'], 'magenta') !== FALSE) {
-          $old_rrd = "drum-y.rrd";
-        } else if (stristr($supply['supply_descr'], 'black') !== FALSE) {
-          $old_rrd = "drum-k.rrd";
-        } else {
-          $old_rrd = "drum.rrd";
-        }
-
-        if (rename_rrd($device, $old_rrd, $supply_rrd))
-        {
-          rrdtool_rename_ds($device, $supply_rrd, 'drum', 'level');
-        }
-      } else if (stristr($supply['supply_descr'], 'transfer') !== FALSE) {
-        $old_rrd = 'transferroller.rrd';
-        rename_rrd($device, $old_rrd, $supply_rrd);
-      }
-      break;
-    case 'wastetoner':
-      $old_rrd = 'wastebox.rrd';
-      rename_rrd($device, $old_rrd, $supply_rrd);
-      break;
-    case 'fuser':
-      $old_rrd = 'fuser.rrd';
-      rename_rrd($device, $old_rrd, $supply_rrd);
-      break;
-  }
-  // END CLEANME
 
   echo($supplyperc . " %\n");
 
   rrdtool_update_ng($device, 'toner', array('level' => $supplyperc),  $supply['supply_index']);
 
-  if ($supplyperc > $supply['supply_value'])
+  if ($supplyperc > $supply['supply_value'] && $capacity >= 0)
   {
     log_event('Printer supply ' . $supply['supply_descr'] . ' (type ' . nicecase($supply['supply_type']) . ') was replaced (new level: ' . $supplyperc . '%)', $device, 'toner', $supply['supply_id']);
   }
 
-  dbUpdate(array('supply_value' => $supplyperc, 'supply_capacity' => $supply['supply_capacity']), 'printersupplies', '`supply_id` = ?', array($supply['supply_id']));
+  // Update DB
+  $supply_update = array();
+  if ($supply['supply_value']    != $supplyperc) { $supply_update['supply_value']    = $supplyperc; }
+  if ($supply['supply_capacity'] != $capacity)   { $supply_update['supply_capacity'] = $capacity; }
+  if ($supply_update)
+  {
+    dbUpdate($supply_update, 'printersupplies', '`supply_id` = ?', array($supply['supply_id']));
+  }
 
+  // Check metrics
   check_entity('printersupply', $supply, array('supply_value' => $supplyperc));
 
   $graphs['printersupplies'] = TRUE;
-}
-
-// Old stuff, to replace?
-$oid = get_dev_attrib($device, 'pagecount_oid');
-
-if ($oid)
-{
-  echo("Checking page count... ");
-  $pages = snmp_get($device, $oid, "-OUqnv");
-
-  set_dev_attrib($device, "pagecounter", $pages);
-  rrdtool_update_ng($device, 'pagecount', array('pagecount' => $pages));
-
-  echo("$pages\n");
 }
 
 // EOF

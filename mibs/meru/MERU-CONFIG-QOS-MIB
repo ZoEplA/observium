@@ -40,10 +40,10 @@ IMPORTS
     MwlQosRulesMatchClassBits,
     MwlQosProtocol,
     MwlQosAction,
-    MwlDscpType,
     MwlOnOffSwitch,
     MwlQosCodec,
-    MwlQosCodecProtocol
+    MwlQosCodecProtocol,
+    MwlDscpType
         FROM MERU-TC;
 
   mwConfigQoS  MODULE-IDENTITY
@@ -56,6 +56,7 @@ IMPORTS
     ::= { mwConfiguration 8 } 
   
     mwQosVars                                OBJECT IDENTIFIER ::= { mwConfigQoS 1 }
+    mwDscpMarkingMgmtPkts                    OBJECT IDENTIFIER ::= { mwConfigQoS 4 }
     
   
   mwQosVarsQosOnOff  OBJECT-TYPE
@@ -151,7 +152,7 @@ IMPORTS
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-         "This object describes Load Balance Overflow"
+         "This object describes Native Load Balance Overflow"
     ::= { mwQosVars   12 }
 
   mwQosVarsQosMaxCallsPerBssid  OBJECT-TYPE
@@ -538,7 +539,7 @@ IMPORTS
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwQosRuleEntry 40 }
+    ::= { mwQosRuleEntry 48 }
 
   mwQosCodecTranslRuleTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwQosCodecTranslRuleEntry
@@ -677,6 +678,30 @@ IMPORTS
     DESCRIPTION
          "This object is used to create and delete rows in the table"
     ::= { mwQosCodecTranslRuleEntry 14 }
+
+  mwDscpMarkingMgmtPktsDscpControllerToEzRF  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller To EzRF"
+    ::= { mwDscpMarkingMgmtPkts    2 }
+
+  mwDscpMarkingMgmtPktsDscpControllerToAp  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller to AP"
+    ::= { mwDscpMarkingMgmtPkts    3 }
+
+  mwDscpMarkingMgmtPktsDscpApToController  OBJECT-TYPE
+    SYNTAX MwlDscpType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP to Controller"
+    ::= { mwDscpMarkingMgmtPkts    4 }
 
   
 END

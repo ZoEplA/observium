@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,7 +17,7 @@
 $table_defs['SONICWALL-FIREWALL-IP-STATISTICS-MIB']['sonicwallFwStats'] = array(
   'call_function' => 'snmp_get_multi',
   'mib'           => 'SONICWALL-FIREWALL-IP-STATISTICS-MIB',
-  'table'         => 'sonicwallFwStats', // Table sonicwallFwStats have already polled RAM and CPU oids, use snmp_get_multi()
+  'table'         => 'sonicwallFwStats', // Table sonicwallFwStats have already polled RAM and CPU oids, use snmp_get_multi_oid()
   'ds_rename'     => array('sonic' => '', 'Entries' => ''),
   'graphs'        => array('sonicwall_sessions'),
   'oids'          => array(

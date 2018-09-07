@@ -7,8 +7,7 @@
  *
  * @package    observium
  * @subpackage functions
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -73,19 +72,12 @@ function get_entity_attribs($entity_type, $entity_id)
   if (!isset($GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id]))
   {
     $attribs = array();
-    if ($entity_type == 'device' && get_db_version() < 240)
+
+    foreach (dbFetchRows("SELECT * FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ?", array($entity_type, $entity_id)) as $entry)
     {
-      // CLEANME. Compatibility, remove in r8000, but not before CE 0.16.1 (Oct 7, 2015)
-      foreach (dbFetchRows("SELECT * FROM `devices_attribs` WHERE `device_id` = ?", array($entity_id)) as $entry)
-      {
-        $attribs[$entry['attrib_type']] = $entry['attrib_value'];
-      }
-    } else {
-      foreach (dbFetchRows("SELECT * FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ?", array($entity_type, $entity_id)) as $entry)
-      {
-        $attribs[$entry['attrib_type']] = $entry['attrib_value'];
-      }
+      $attribs[$entry['attrib_type']] = $entry['attrib_value'];
     }
+
     $GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id] = $attribs;
   }
   return $GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id];
@@ -99,17 +91,37 @@ function get_entity_attribs($entity_type, $entity_id)
  * @param mixed $entity_id
  * @param string $attrib_type
  * @param string $attrib_value
+ * @param string $device_id
  * @return boolean
  */
-function set_entity_attrib($entity_type, $entity_id, $attrib_type, $attrib_value)
+function set_entity_attrib($entity_type, $entity_id, $attrib_type, $attrib_value, $device_id = NULL)
 {
   if (is_array($entity_id))
   {
     // Passed entity array, instead id
     $translate = entity_type_translate_array($entity_type);
-    $entity_id = $entity_id[$translate['id_field']];
+    $entity = $entity_id;
+    $entity_id = $entity[$translate['id_field']];
   }
+
   if (!$entity_id) { return NULL; }
+
+  // If we're setting a device attribute, use the entity_id as the device_id
+  if($entity_type == "device") { $device_id = $entity_id; }
+
+
+  // If we don't have a device_id, try to work out what it should be
+  if(!$device_id)
+  {
+    if(isset($entity) && isset($entity['device_id']))
+    {
+      $device_id = $entity['device_id'];
+    } else {
+      $entity = get_entity_by_id_cache($entity_type, $entity_id);
+      $device_id = $entity['device_id'];
+    }
+  }
+  if (!$device_id) { print_error("Enable to set attrib data : $entity_type, $entity_id, $attrib_type, $attrib_value, $device_id");  return NULL; }
 
   if (isset($GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id]))
   {
@@ -117,25 +129,14 @@ function set_entity_attrib($entity_type, $entity_id, $attrib_type, $attrib_value
     unset($GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id]);
   }
 
-  if ($entity_type == 'device' && get_db_version() < 240)
+  if (dbFetchCell("SELECT COUNT(*) FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?", array($entity_type, $entity_id, $attrib_type)))
   {
-    // // CLEANME. Compatibility, remove in r8000, but not before CE 0.16.1 (Oct 7, 2015)
-    if (dbFetchCell("SELECT COUNT(*) FROM `devices_attribs` WHERE `device_id` = ? AND `attrib_type` = ?", array($entity_id, $attrib_type)))
-    {
-      $return = dbUpdate(array('attrib_value' => $attrib_value), 'devices_attribs', '`device_id` = ? AND `attrib_type` = ?', array($entity_id, $attrib_type));
-    } else {
-      $return = dbInsert(array('device_id' => $entity_id, 'attrib_type' => $attrib_type, 'attrib_value' => $attrib_value), 'devices_attribs');
-      if ($return !== FALSE) { $return = TRUE; } // Note dbInsert return IDs if exist or 0 for not indexed tables
-    }
+    $return = dbUpdate(array('attrib_value' => $attrib_value), 'entity_attribs', '`entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?', array($entity_type, $entity_id, $attrib_type));
   } else {
-    if (dbFetchCell("SELECT COUNT(*) FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?", array($entity_type, $entity_id, $attrib_type)))
-    {
-      $return = dbUpdate(array('attrib_value' => $attrib_value), 'entity_attribs', '`entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?', array($entity_type, $entity_id, $attrib_type));
-    } else {
-      $return = dbInsert(array('entity_type' => $entity_type, 'entity_id' => $entity_id, 'attrib_type' => $attrib_type, 'attrib_value' => $attrib_value), 'entity_attribs');
-      if ($return !== FALSE) { $return = TRUE; } // Note dbInsert return IDs if exist or 0 for not indexed tables
-    }
+    $return = dbInsert(array('device_id' => $device_id, 'entity_type' => $entity_type, 'entity_id' => $entity_id, 'attrib_type' => $attrib_type, 'attrib_value' => $attrib_value), 'entity_attribs');
+    if ($return !== FALSE) { $return = TRUE; } // Note dbInsert return IDs if exist or 0 for not indexed tables
   }
+
   return $return;
 }
 
@@ -225,17 +226,20 @@ function get_device_entities($device_id, $entity_types = NULL)
 function get_device_entities_attribs($device_id, $entity_types = NULL)
 {
   $attribs = array();
-  foreach (get_device_entities($device_id, $entity_types) as $entity_type => $entities)
-  {
-    $where = generate_query_values($entities, 'entity_id');
-    foreach (dbFetchRows("SELECT * FROM `entity_attribs` WHERE `entity_type` = ?" . $where, array($entity_type)) as $entry)
-    {
-      $attribs[$entry['entity_type']][$entry['entity_id']][$entry['attrib_type']] = $entry['attrib_value'];
-    }
-  }
-  $GLOBALS['cache']['entity_attribs'] = $attribs;
 
-  return $GLOBALS['cache']['entity_attribs'];
+  $query = "SELECT * FROM `entity_attribs` WHERE `device_id` = ?";
+  if($entity_types)
+  {
+    if(!is_array($entity_types)) { $entity_types = array($entity_types); }
+    $query .= " AND `entity_type` IN ('".implode("', '", $entity_types)."')";
+  }
+
+  foreach (dbFetchRows($query, array($device_id)) as $entry)
+  {
+    $attribs[$entry['entity_type']][$entry['entity_id']][$entry['attrib_type']] = $entry['attrib_value'];
+  }
+
+  return $attribs;
 }
 
 // DOCME needs phpdoc block
@@ -296,6 +300,140 @@ function get_entity_by_id_cache($entity_type, $entity_id)
   }
 
   return FALSE;
+}
+
+/* Network/ARP/MAC specific entity functions */
+
+/**
+ * Fetch entity IDs by network. Currently supported entities: device, port, ip (ipv4, ipv6 for force specific IP version)
+ *
+ * See parse_network() for possible valid network queries.
+ *
+ * @param string       $entity_type  Entity type (device, port)
+ * @param string|array $network      Valid network string (or array)
+ * @param boolean      $ignore       Exclude deleted/disabled/ignored entities (default FALSE)
+ *
+ * @return array       Array with entity specific IDs
+ */
+function get_entity_ids_ip_by_network($entity_type, $network, $add_where = '')
+{
+
+  // Recursive query for array of networks
+  if (is_array($network))
+  {
+    $ids = array();
+    foreach ($network as $entry)
+    {
+      if ($entry_ids = get_entity_ids_ip_by_network($entity_type, $entry, $add_where))
+      {
+        $ids = array_merge($ids, $entry_ids);
+      }
+    }
+
+    return $ids;
+  }
+
+  // Parse for valid network string
+  $network_array = parse_network($network);
+  //print_vars($network_array);
+  if (!$network_array)
+  {
+    // Incorrect network/address string passed
+    return FALSE;
+  }
+
+  $query = 'SELECT ';
+  $join  = '';
+  $where = ' WHERE 1 ';
+  switch ($entity_type)
+  {
+    case 'ipv4':
+      // Force request IPv6 address
+      $network_array['ip_type'] = 'ipv4';
+      $query .= ' `ipv4_address_id`';
+      break;
+    case 'ipv6':
+      // Force request IPv6 address
+      $network_array['ip_type'] = 'ipv6';
+      $query .= ' `ipv6_address_id`';
+      break;
+    case 'ip':
+      $query .= ($network_array['ip_version'] == 4) ? ' `ipv4_address_id`' : ' `ipv6_address_id`';
+      break;
+
+    case 'device':
+    case 'devices':
+      $query .= ' DISTINCT `device_id`';
+      break;
+
+    case 'port':
+    case 'ports':
+      $query .= ' DISTINCT `port_id`';
+      break;
+  }
+
+  switch ($network_array['ip_type'])
+  {
+    case 'ipv4':
+      $query .= ' FROM `ipv4_addresses`';
+      if ($network_array['query_type'] == 'single')
+      {
+        // Exactly IP match
+        $where .= ' AND `ipv4_binary` = ?';
+        $param[] = $network_array['address_binary'];
+      }
+      else if ($network_array['query_type'] == 'network')
+      {
+        // Match IP in network
+        $where .= ' AND `ipv4_binary` >= ? AND `ipv4_binary` <= ?';
+        $param[] = $network_array['network_start_binary'];
+        $param[] = $network_array['network_end_binary'];
+      } else {
+        // Match IP addresses by part of string
+        $where .=  generate_query_values($network_array['address'], 'ipv4_address', $network_array['query_type']);
+      }
+      break;
+    case 'ipv6':
+      $query .= ' FROM `ipv6_addresses`';
+      if ($network_array['query_type'] == 'single')
+      {
+        // Exactly IP match
+        $where .= ' AND `ipv6_binary` = ?';
+        $param[] = $network_array['address_binary'];
+      }
+      else if ($network_array['query_type'] == 'network')
+      {
+        // Match IP in network
+        $where .= ' AND `ipv6_binary` >= ? AND `ipv6_binary` <= ?';
+        $param[] = $network_array['network_start_binary'];
+        $param[] = $network_array['network_end_binary'];
+      } else {
+        // Match IP addresses by part of string
+        $where .= ' AND (' . generate_query_values($network_array['address'], 'ipv6_address',    $network_array['query_type'], FALSE) .
+                  ' OR '   . generate_query_values($network_array['address'], 'ipv6_compressed', $network_array['query_type'], FALSE) . ')';
+      }
+      break;
+  }
+
+  if (FALSE)
+  {
+    // Ignore disabled/deleted/ignored
+    $where .= ' AND `device_id` NOT IN (SELECT `device_id` FROM `devices` WHERE `disabled` = "1" OR `ignore` = "1")';
+    $where .= ' AND `port_id` NOT IN (SELECT `port_id` FROM `ports` WHERE `deleted` = "1" OR `ignore` = "1")';
+  } else {
+    // Always ignore deleted ports
+    $join = ' LEFT JOIN `ports` USING (`device_id`, `port_id`) ';
+    // IS NULL allow to search addresses without associated port
+    $where .= ' AND (`ports`.`deleted` != "1" OR `ports`.`deleted` IS NULL)';
+  }
+  $query .= $join;
+  $where .= $add_where; // Additional query, ie limit by device_id or port_id
+
+  $ids = dbFetchColumn($query . $where, $param);
+  //$ids = dbFetchColumn($query . $where, $param);
+  //print_vars($ids);
+
+  return $ids;
 }
 
 // DOCME needs phpdoc block
@@ -571,7 +709,7 @@ function generate_entity_link($entity_type, $entity, $text = NULL, $graph_type =
   switch($entity_type)
   {
     case "device":
-      $link = generate_device_link($entity);
+      $link = generate_device_link($entity, short_hostname($entity['hostname'], 16));
       break;
     case "mempool":
       $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'mempool'));
@@ -763,7 +901,7 @@ function get_port_by_ent_index($device, $entPhysicalIndex, $allow_snmp = FALSE)
     }
     foreach ($oids as $oid)
     {
-      $entity_array = snmpwalk_cache_multi_oid($device, $oid, $entity_array, 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB');
+      $entity_array = snmpwalk_cache_multi_oid($device, $oid, $entity_array, snmp_mib_entity_vendortype($device, 'ENTITY-MIB'));
       if (!$GLOBALS['snmp_status']) { break; }
     }
     $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
@@ -777,7 +915,7 @@ function get_port_by_ent_index($device, $entPhysicalIndex, $allow_snmp = FALSE)
     // Or try to use DB
   }
 
-  //print_vars($entity_array);
+  //print_debug_vars($entity_array);
   $sensor_index = $entPhysicalIndex; // Initial ifIndex  
   do
   {
@@ -789,8 +927,8 @@ function get_port_by_ent_index($device, $entPhysicalIndex, $allow_snmp = FALSE)
       // DB (web)
       $sensor_port = dbFetchRow('SELECT * FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $sensor_index));
     }
-    //print_vars($sensor_index);
-    //print_vars($sensor_port);
+    print_debug_vars($sensor_index);
+    print_debug_vars($sensor_port);
     if ($sensor_port['entPhysicalClass'] === 'port')
     {
       // Port found, get mapped ifIndex
@@ -850,6 +988,20 @@ function get_port_by_ent_index($device, $entPhysicalIndex, $allow_snmp = FALSE)
       break; // Break if current index same as next to avoid loop
     } else {
       $sensor_index = $sensor_port['entPhysicalContainedIn']; // Next ifIndex
+
+      // See: http://jira.observium.org/browse/OBS-2295
+      // IOS-XE and IOS-XR can store in module index both: sensors and port
+      if ($sensor_port['entPhysicalClass'] == 'sensor' &&
+          str_icontains($sensor_port['entPhysicalName'] . $sensor_port['entPhysicalDescr'] . $sensor_port['entPhysicalVendorType'], array('transceiver', '-PORT-')))
+          //'module' == dbFetchCell('SELECT `entPhysicalClass` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $sensor_port['entPhysicalContainedIn']))) // high level, should be module
+      {
+        $tmp_index = dbFetchCell('SELECT `entPhysicalIndex` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalContainedIn` = ? AND `entPhysicalClass` = ?', array($device['device_id'], $sensor_index, 'port'));
+        if (is_numeric($tmp_index) && $tmp_index > 0)
+        {
+          // If port index found, try this entPhysicalIndex in next round
+          $sensor_index = $tmp_index;
+        }
+      }
     }
     // NOTE for self: entPhysicalParentRelPos >= 0 because on iosxr trouble
   } while ($sensor_port['entPhysicalClass'] !== 'port' && $sensor_port['entPhysicalContainedIn'] > 0 && ($sensor_port['entPhysicalParentRelPos'] >= 0 || $device['os'] == 'arista_eos'));

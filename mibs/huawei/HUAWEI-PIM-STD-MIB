@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-PIM-STD-MIB.my , this MIB module for management of 
 --              the Protocol Independent Multicast (PIM) protocols for PIM routers.
 -- Reference:  
--- Version: V2.04
+-- Version: V2.06
 -- History:
 --    created by wangyanwei 63315 2007-04-24
 --    
@@ -34,7 +34,7 @@ IMPORTS
 hwMcast      OBJECT IDENTIFIER      ::= { hwDatacomm 149 }
 
 hwPimStdMib MODULE-IDENTITY
-    LAST-UPDATED  "201407010000Z" -- 1 July 2014
+    LAST-UPDATED  "201611090000Z" -- 9 Nov 2016
     ORGANIZATION
             "Huawei Technologies Co.,Ltd."
     CONTACT-INFO
@@ -51,6 +51,17 @@ hwPimStdMib MODULE-IDENTITY
             Huawei Technologies co.,Ltd . Supplementary information may
             be available at:
             http://www.huawei.com"
+
+    REVISION     "201611090000Z" -- 9 Nov 2016
+    DESCRIPTION  "Modify the description of hwPimNotificationLimitType."
+    
+    REVISION     "201605260000Z" -- 26 May 2016
+    DESCRIPTION  "1.Add hwPimGlobalTypeSGThresholdExceed.
+                                   2.Add hwPimGlobalTypeSGThresholdExceedClear.
+                                   3.Add hwPimGlobalTypeSGExceed.
+                                   4.Add hwPimGlobalTypeSGExceedClear.
+                                  "
+
     REVISION     "201407010000Z" -- 1 July 2014
     DESCRIPTION  "1.Modify the description of  hwPimStarGThresholdExceed.
                                    2.Modify the description of  hwPimStarGThresholdExceedClear.
@@ -868,6 +879,7 @@ hwPimNotificationSrcAddr OBJECT-TYPE
     DESCRIPTION
             "The source address of the entry."
     ::= { hwPim 69 }
+    
 hwPimNotificationGrpAddr OBJECT-TYPE
     SYNTAX     InetAddress (SIZE (0|4|8|16|20))
     MAX-ACCESS accessible-for-notify
@@ -875,7 +887,110 @@ hwPimNotificationGrpAddr OBJECT-TYPE
     DESCRIPTION
             "The group address of the entry."
     ::= { hwPim 70 }	
+    
+hwPimNotificationTypeCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of PIM specified type entries of all instances." 
+    ::= { hwPim 71 }
 
+hwPimNotificationTypeTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of PIM specified type entries of all instances." 
+    ::= { hwPim 72 }
+
+hwPimNotificationTypeLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of PIM specified type uppper limit(%)." 
+    ::= { hwPim 73 }    
+     
+hwPimNotificationLimitType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         sMStarG(1),
+                         sMSG(2),
+	   dMStarG(3),
+	   dMSG(4),
+	   bidirPimStarG(5)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The limit type:
+             1:SM star-group;
+             2:SM source-group;
+             3:DM star-group;
+             4:DM source-group;
+             5:bidirPim star-group"
+    ::= { hwPim 74 }   
+   
+ 
+hwPimNotificationLimitUpperThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The upper threshold value of PIM specified type alarm(%)." 
+    ::= { hwPim 75 }    
+      
+hwPimNotificationLimitLowerThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The lower threshold value of PIM specified type alarm(%)." 
+    ::= { hwPim 76 }  
+ 
+hwPimNotificationLimitReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryDeleted(1),
+                         configurationChanged(2),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is deleted;
+             2:configuration is changed;
+             100:Alarm Clear"  
+    ::= { hwPim 77 }    
+    
+hwPimNotificationThresholdReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryCreated(1),
+                         configurationChanged(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is created;
+             100:configuration is changed"  
+    ::= { hwPim 78 }
+
+hwPimNotificationThresholdClearReasonType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         entryDeleted(1),
+                         configurationChanged(2),
+                         alarmClear(100)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+             "The reason for trap sending:
+             1:entry is deleted;
+             2:configuration is changed;
+             100:Alarm Clear"  
+    ::= { hwPim 79 }
+          
 hwPimInterfaceTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HwPimInterfaceEntry
     MAX-ACCESS not-accessible
@@ -3370,6 +3485,60 @@ hwPimSGExceedClear NOTIFICATION-TYPE
     DESCRIPTION
             "A hwPimSGExceedClear notification signifies that the number of PIM(S, G) entries count of all instances fell below the limit."
       ::= { hwPimNotifications 20 }
+      
+hwPimGlobalTypeSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationLimitUpperThreshold,
+              hwPimNotificationThresholdReasonType
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGThresholdExceed notification signifies that PIM specified type entries count of all instances reached the upper threshold."
+      ::= { hwPimNotifications 21 }
+
+hwPimGlobalTypeSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationLimitLowerThreshold,
+              hwPimNotificationThresholdClearReasonType
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGThresholdExceedClear notification signifies that PIM specified type entries count of all instances fell below the lower threshold."
+      ::= { hwPimNotifications 22 }
+
+hwPimGlobalTypeSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationTypeLimit,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGExceed notification signifies that PIM specified type entries count of all instances reached the limit."
+      ::= { hwPimNotifications 23 }
+
+hwPimGlobalTypeSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationLimitType,
+              hwPimNotificationAddressType,
+              hwPimNotificationTypeTotalCount,
+              hwPimNotificationTypeLimit,
+              hwPimNotificationSrcAddr,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceName,
+              hwPimNotificationLimitReasonType
+                       }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimGlobalTypeSGExceedClear notification signifies that the number of PIM specified type entries count of all instances fell below the limit."
+      ::= { hwPimNotifications 24 }  
+     
   
 hwPimMibConformance OBJECT IDENTIFIER ::= { hwPimStdMib 2 }
 hwPimMibCompliances OBJECT IDENTIFIER ::= { hwPimMibConformance 1 }
@@ -3779,7 +3948,11 @@ hwPimNetMgmtNotificationGroup NOTIFICATION-GROUP
                     hwPimSGThresholdExceed,
                     hwPimSGThresholdExceedClear,
                     hwPimSGExceed,
-                    hwPimSGExceedClear
+                    hwPimSGExceedClear,
+                    hwPimGlobalTypeSGThresholdExceed,
+                    hwPimGlobalTypeSGThresholdExceedClear,
+                    hwPimGlobalTypeSGExceed,
+                    hwPimGlobalTypeSGExceedClear                    
                   }
     STATUS  current
     DESCRIPTION

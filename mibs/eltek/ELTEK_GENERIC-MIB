@@ -1,3 +1,4 @@
+
 -- Eltek OEM MIB for Nextel Digital Power plant designs
 
 ELTEK_GENERIC-MIB DEFINITIONS ::= BEGIN

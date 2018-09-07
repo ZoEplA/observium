@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage webui
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,9 +16,9 @@ if (dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ?", array
 if (dbFetchCell("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = ?", array($device['device_id']))) { $datas['mempool'] = array('icon' => $config['entities']['mempool']['icon']); }
 if (dbFetchCell("SELECT COUNT(*) FROM `storage` WHERE `device_id` = ?", array($device['device_id']))) { $datas['storage'] = array('icon' => $config['entities']['storage']['icon']); }
 if (dbFetchCell("SELECT COUNT(*) FROM `ucd_diskio` WHERE `device_id` = ?", array($device['device_id']))) { $datas['diskio'] = array('icon' => $config['icon']['diskio']); }
-if (dbFetchCell("SELECT COUNT(*) FROM `status` WHERE `device_id` = ?", array($device['device_id']))) { $datas['status'] = array('icon' => $config['entities']['status']['icon']); }
+if (dbFetchCell("SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_deleted` = ?", array($device['device_id'], 0))) { $datas['status'] = array('icon' => $config['entities']['status']['icon']); }
 
-$sensors_device = dbFetchRows("SELECT `sensor_class` FROM `sensors` WHERE device_id = ? GROUP BY `sensor_class`", array($device['device_id']));
+$sensors_device = dbFetchRows("SELECT DISTINCT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = ?", array($device['device_id'], 0));
 foreach ($sensors_device as $sensor) { $datas[$sensor['sensor_class']] = array('icon' => $config['sensor_types'][$sensor['sensor_class']]['icon']); }
 
 $link_array = array('page'    => 'device',

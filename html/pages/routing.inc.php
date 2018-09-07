@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -39,6 +39,7 @@ switch ($vars['protocol'])
   case 'bgp':
   case 'vrf':
   case 'cef':
+  case 'eigrp':
   case 'ospf':
     include($config['html_dir'].'/pages/routing/'.$vars['protocol'].'.inc.php');
     break;

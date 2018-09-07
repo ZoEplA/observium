@@ -8,96 +8,166 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-$vtpdomain_id = '1';
-//$q_bridge_index = snmpwalk_cache_oid($device, 'dot1qPortVlanTable', array(), 'Q-BRIDGE-MIB');
-$vlans = snmpwalk_cache_oid($device, 'dot1qVlanStaticTable', array(), 'Q-BRIDGE-MIB', NULL, OBS_SNMP_ALL | OBS_QUOTES_STRIP | OBS_SNMP_CONCAT);
-if ($vlans)
+if (is_device_mib($device, 'CISCO-VTP-MIB'))
 {
-  $vlan_ifindex_map = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', array(), 'Q-BRIDGE-MIB');
-  $vlan_ifindex_min = $vlan_ifindex_map[key($vlan_ifindex_map)]['dot1dBasePortIfIndex'];
+  // Q-BRIDGE-MIB is default mib, need excludes Cisco
+  return;
 }
+
+$domain_index = '1';
+
+// Simplify dot1qVlanStaticTable walk
+$dot1q_ports = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', array(), 'Q-BRIDGE-MIB');
+//$dot1q_ports = snmpwalk_cache_oid($device, 'dot1qVlanStaticTable', array(), 'Q-BRIDGE-MIB', NULL, OBS_SNMP_ALL_MULTILINE | OBS_SNMP_HEX);
+if (!snmp_status())
+{
+  return;
+}
+
+$dot1q_ports = snmpwalk_cache_oid($device, 'dot1qVlanStaticRowStatus',   $dot1q_ports, 'Q-BRIDGE-MIB');
+$dot1q_ports = snmpwalk_cache_oid($device, 'dot1qVlanStaticEgressPorts', $dot1q_ports, 'Q-BRIDGE-MIB', NULL, OBS_SNMP_ALL_MULTILINE | OBS_SNMP_HEX);
 
 if (is_device_mib($device, 'JUNIPER-VLAN-MIB')) // Unsure if other Juniper platforms "affected"
 {
   // Fetch Juniper VLAN table for correct tag
-  $vlans = snmpwalk_cache_oid($device, 'jnxExVlanTable', $vlans, 'JUNIPER-VLAN-MIB');
+  $dot1q_ports = snmpwalk_cache_oid($device, 'jnxExVlanTable', $dot1q_ports, 'JUNIPER-VLAN-MIB');
 }
 
-foreach ($vlans as $vlan_id => $vlan)
+/* Base port ifIndex association */
+$dot1d_baseports = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
+
+// Detect min ifIndex for vlan base ports
+// Why, see here: http://jira.observium.org/browse/OBS-963
+$use_baseports = count($dot1d_baseports) > 0;
+/*
+if ($use_baseports)
 {
+  $vlan_ifindex_min = $dot1d_baseports[key($dot1d_baseports)]['dot1dBasePortIfIndex']; // First element
+  foreach ($dot1d_baseports as $entry)
+  {
+    // But min ifIndex can be in any entry
+    $vlan_ifindex_min = min($vlan_ifindex_min, $entry['dot1dBasePortIfIndex']);
+  }
+
+} else {
+  $vlan_ifindex_min = 0;
+}*/
+/* End base port ifIndex association */
+
+$binary_debug = array(); // DEBUG
+foreach ($dot1q_ports as $vlan_num => $vlan)
+{
+  $vlan['ifIndex'] = $vlan_num;
+  // FTOS vlan fix
   if ($device['os'] == 'ftos')
   {
-    $vlan_id = rewrite_ftos_vlanid($device, $vlan_id);
+    // Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts.1107787777, where 1107787777 is ifIndex for Vlan interface
+    //IF-MIB::ifDescr.1107787777 = STRING: Vlan 1
+    //IF-MIB::ifDescr.1107787998 = STRING: Vlan 222
+    $vlan_num = rewrite_ftos_vlanid($device, $vlan_num);
+    if (!is_numeric($vlan_num)) { continue; } // Skip unknown
   }
 
+  // JunOS Vlan fix
   if (isset($vlan['jnxExVlanTag']))
   {
-    $vlan_id = $vlan['jnxExVlanTag'];
+    $vlan_num = $vlan['jnxExVlanTag'];
   }
 
-  unset ($vlan_update);
+  $vlan_array = array('ifIndex'     => $vlan['ifIndex'],
+                      'vlan_domain' => $domain_index,
+                      'vlan_vlan'   => $vlan_num,
+                      'vlan_name'   => $vlan['dot1qVlanStaticName'],
+                      //'vlan_mtu'    => '',
+                      'vlan_type'   => 'ethernet',
+                      'vlan_status' => 'operational');
+  $discovery_vlans[$domain_index][$vlan_num] = $vlan_array;
+  /* End vlans discovery */
 
-  if (is_array($vlans_db[$vtpdomain_id][$vlan_id]) && $vlans_db[$vtpdomain_id][$vlan_id]['vlan_name'] != $vlan['dot1qVlanStaticName'])
-  {
-    $vlan_update['vlan_name'] = $vlan['dot1qVlanStaticName'];
-  }
+  /* Per port vlans */
 
-  if (is_array($vlans_db[$vtpdomain_id][$vlan_id]) && $vlans_db[$vtpdomain_id][$vlan_id]['vlan_status'] != $vlan['dot1qVlanStaticRowStatus'])
-  {
-    $vlan_update['vlan_status'] = $vlan['dot1qVlanStaticRowStatus'];
-  }
+  // Convert hex to binary map
+  $binary = hex2binmap($vlan['dot1qVlanStaticEgressPorts']);
 
-  echo(" $vlan_id");
-  if (is_array($vlan_update))
-  {
-    dbUpdate($vlan_update, 'vlans', 'vlan_id = ?', array($vlans_db[$vtpdomain_id][$vlan_id]['vlan_id']));
-    $module_stats[$vlan_id]['V'] = 'U';
-  }
-  elseif (is_array($vlans_db[$vtpdomain_id][$vlan_id]))
-  {
-    $module_stats[$vlan_id]['V'] = '.';
-    //echo('.');
-  } else {
-    dbInsert(array('device_id' => $device['device_id'], 'vlan_domain' => $vtpdomain_id, 'vlan_vlan' => $vlan_id, 'vlan_name' => $vlan['dot1qVlanStaticName'], 'vlan_type' => array('NULL')), 'vlans');
-    $module_stats[$vlan_id]['V'] = '+';
-  }
-  $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
 
-  //Set Q-BRIDGE ports Vlan table (not work on FTOS for now)
-  if ($device['os'] != 'ftos')
+  if ($device['os'] == 'ftos') // FTOS specific
   {
-    $parts = explode(' ', $vlan['dot1qVlanStaticEgressPorts']);
-    $binary = '';
-    foreach ($parts as $part)
+    // FTOS devices use harder way for detect VLANs and associate ports
+    // See: https://www.force10networks.com/CSPortal20/TechTips/0041B_displaying_vlan_ports.aspx
+    // Port associations based on slot/port, each 12 hex pair (96 bin) is slot
+
+    foreach (str_split($binary, 96) as $slot => $binary_map)
     {
-      $binary .= zeropad(base_convert($part, 16, 2), 8);
+      $length = strlen($binary_map);
+      for ($i = 0; $i < $length; $i++)
+      {
+        if ($binary_map[$i])
+        {
+          // Now find slot/port from ifDescr
+          $port_map = '% '.$slot.'/'.($i + 1);
+          $ifIndex = dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `device_id` = ? AND `ifDescr` LIKE ? AND `deleted` = ? LIMIT 1", array($device['device_id'], $port_map, 0));
+
+          $discovery_ports_vlans[$ifIndex][$vlan_num] = array('vlan'     => $vlan_num,
+                                                             // FIXME. move STP to separate table
+                                                             //'baseport' => $vlan_port_id,
+                                                             //'priority' => $vlan_port['dot1dStpPortPriority'],
+                                                             //'state'    => $vlan_port['dot1dStpPortState'],
+                                                             //'cost'     => $vlan_port['dot1dStpPortPathCost']
+                                                             );
+        }
+      }
     }
+
+  } else {
+    // All others
+
+    // Assign binary vlans map to ports
     $length = strlen($binary);
     for ($i = 0; $i < $length; $i++)
     {
       if ($binary[$i])
       {
-        $port = get_port_by_index_cache($device, $i + $vlan_ifindex_min);
-        if (!is_array($port)) { continue; } // Port not founded, skip
-
-        if (isset($ports_vlans_db[$port['port_id']][$vlan_id]))
+        //$ifIndex = $i + $vlan_ifindex_min; // This is incorrect ifIndex association!
+        if ($use_baseports)
         {
-          $ports_vlans[$port['port_id']][$vlan_id] = $ports_vlans_db[$port['port_id']][$vlan_id]['port_vlan_id'];
-          $module_stats[$vlan_id]['P'] = '.';
+          $ifIndex = $dot1d_baseports[$i + 1]['dot1dBasePortIfIndex'];
         } else {
-          $db_w = array('device_id' => $device['device_id'],
-                        'port_id'   => $port['port_id'],
-                        'vlan'      => $vlan_id);
-          $id = dbInsert($db_w, 'ports_vlans');
-          $module_stats[$vlan_id]['P'] = '+';
-          $ports_vlans[$port['port_id']][$vlan_id] = $id;
+          $ifIndex = $i;
         }
+        $binary_debug[$vlan_num][$i] = $ifIndex; // DEBUG
+
+        $discovery_ports_vlans[$ifIndex][$vlan_num] = array('vlan'     => $vlan_num,
+                                                           // FIXME. move STP to separate table
+                                                           //'baseport' => $vlan_port_id,
+                                                           //'priority' => $vlan_port['dot1dStpPortPriority'],
+                                                           //'state'    => $vlan_port['dot1dStpPortState'],
+                                                           //'cost'     => $vlan_port['dot1dStpPortPathCost']
+                                                           );
       }
     }
+
+  }
+}
+print_debug_vars($binary_debug); // DEBUG
+
+// As last point validate access ports that vlan is added (some devices not report it in dot1qVlanStaticTable)
+$dot1q_ports = snmpwalk_cache_oid($device, 'dot1qPvid', array(), 'Q-BRIDGE-MIB');
+foreach ($dot1q_ports as $entry)
+{
+  $vlan_num = $entry['dot1qPvid'];
+  if (!isset($discovery_vlans[$domain_index][$vlan_num]))
+  {
+    $vlan_array = array('vlan_domain' => $domain_index,
+                        'vlan_vlan'   => $vlan_num,
+                        'vlan_name'   => 'VLAN '.$vlan_num,
+                        //'vlan_mtu'    => '',
+                        'vlan_type'   => 'ethernet',
+                        'vlan_status' => 'operational');
+    $discovery_vlans[$domain_index][$vlan_num] = $vlan_array;
   }
 }
 

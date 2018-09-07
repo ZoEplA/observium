@@ -7,8 +7,7 @@
  *
  * @package    observium
  * @subpackage rrdtool
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -341,16 +340,18 @@ function rrdtool($command, $filename, $options)
   global $config, $rrd_pipes;
 
   // We now require rrdcached 1.5.5
-  if($config['rrdcached'] && ($config['rrd']['no_local'] == TRUE || $command != 'create'))
+  if ($config['rrdcached'] && (OBS_RRD_NOLOCAL || $command != 'create'))
   {
     $filename = str_replace($config['rrd_dir'].'/', '', $filename);
+    if (OBS_RRD_NOLOCAL && $command == 'create')
+    {
+      // No overwrite for remote rrdtool, since no way for check if rrdfile exist
+      $options  .= ' --no-overwrite';
+    }
+    $options  .= ' --daemon ' . $config['rrdcached'];
   }
 
   $cmd = "$command $filename $options";
-  if ($config['rrdcached'] && ($config['rrd']['no_local'] == TRUE || $command != 'create'))
-  {
-    $cmd .= ' --daemon ' . $config['rrdcached'];
-  }
 
   $GLOBALS['rrd_status'] = FALSE;
   $GLOBALS['exec_status'] = array('command' => $config['rrdtool'] . ' ' . $cmd,
@@ -360,31 +361,46 @@ function rrdtool($command, $filename, $options)
   {
     print_message("[%rRRD Disabled - $cmd%n]", 'color');
     return NULL;
+  }
+
+  if (in_array($command, array('fetch', 'last', 'lastupdate')))
+  {
+    // This commands require exact STDOUT, skip use pipes
+    $command = $config['rrdtool'] . ' ' . $cmd;
+    $stdout = external_exec($command, 500); // Limit exec time to 500ms
+    $runtime = $GLOBALS['exec_status']['runtime'];
+    $GLOBALS['rrd_status'] = $GLOBALS['exec_status']['exitcode'] === 0;
+    // Check rrdtool's output for the command.
+    if (!$GLOBALS['rrd_status'] && isset($config['rrd']['debug']) && $config['rrd']['debug'])
+    {
+      logfile('rrd.log', "RRD ".$GLOBALS['exec_status']['stderr'].", CMD: $cmd");
+    }
   } else {
     // FIXME, need add check if pipes exist
     $start = microtime(TRUE);
     fwrite($rrd_pipes[0], $cmd."\n");
     usleep(1000);
-  }
 
-  $stdout = trim(stream_get_contents($rrd_pipes[1]));
-  $stderr = trim(stream_get_contents($rrd_pipes[2]));
-  $runtime = microtime(TRUE) - $start;
+    $stdout = trim(stream_get_contents($rrd_pipes[1]));
+    $stderr = trim(stream_get_contents($rrd_pipes[2]));
+    $runtime = microtime(TRUE) - $start;
 
-  // Check rrdtool's output for the command.
-  if (strpos($stdout, 'ERROR') !== FALSE)
-  {
-    if (isset($config['rrd']['debug']) && $config['rrd']['debug'])
+    // Check rrdtool's output for the command.
+    if (strpos($stdout, 'ERROR') !== FALSE)
     {
-      logfile('rrd.log', "RRD $stdout, CMD: $cmd");
+      if (isset($config['rrd']['debug']) && $config['rrd']['debug'])
+      {
+        logfile('rrd.log', "RRD $stdout, CMD: $cmd");
+      }
+    } else {
+      $GLOBALS['rrd_status'] = TRUE;
+      $GLOBALS['exec_status']['exitcode'] = 0;
     }
-  } else {
-    $GLOBALS['rrd_status'] = TRUE;
-    $GLOBALS['exec_status']['exitcode'] = 0;
+    $GLOBALS['exec_status']['stdout']  = $stdout;
+    $GLOBALS['exec_status']['stdin']   = $stdin;
+    $GLOBALS['exec_status']['runtime'] = $runtime;
+
   }
-  $GLOBALS['exec_status']['stdout']  = $stdout;
-  $GLOBALS['exec_status']['stdin']   = $stdin;
-  $GLOBALS['exec_status']['runtime'] = $runtime;
 
   $GLOBALS['rrdtool'][$command]['time'] += $runtime;
   $GLOBALS['rrdtool'][$command]['count']++;
@@ -402,6 +418,8 @@ function rrdtool($command, $filename, $options)
 
     print_message($debug_msg . PHP_EOL, 'console');
   }
+
+  return $stdout;
 }
 
 /**
@@ -426,12 +444,18 @@ function rrdtool_create($device, $filename, $ds, $options = '')
 
   $fsfilename = get_rrd_path($device, $filename);
 
-  if (rrd_exists($device, $filename))
+  if ($config['norrd'])
   {
-    if (OBS_DEBUG > 1)
-    {
-      print_message("RRD $fsfilename already exists - no need to create.");
-    }
+    print_message("[%rRRD Disabled - create $fsfilename%n]", 'color');
+    return NULL;
+  }
+  else if (OBS_RRD_NOLOCAL)
+  {
+    print_debug("RRD create $fsfilename passed to remote rrdcached with --no-overwrite.");
+  }
+  else if (rrd_exists($device, $filename))
+  {
+    print_debug("RRD $fsfilename already exists - no need to create.");
     return FALSE; // Bail out if the file exists already
   }
 
@@ -442,19 +466,14 @@ function rrdtool_create($device, $filename, $ds, $options = '')
 
   $step = "--step ".$config['rrd']['step'];
 
-  if ($config['norrd'])
-  {
-    print_message("[%rRRD Disabled - create $fsfilename%n]", 'color');
-    return NULL;
-  } else {
-    //$command = $config['rrdtool'] . " create $fsfilename $ds $step $options";
-    //return external_exec($command);
+  //$command = $config['rrdtool'] . " create $fsfilename $ds $step $options";
+  //return external_exec($command);
 
-    // Clean up old ds strings. This is kinda nasty.
-    $ds = str_replace("\
+  // Clean up old ds strings. This is kinda nasty.
+  $ds = str_replace("\
 ", '', $ds);
-    return rrdtool('create', $fsfilename, $ds . " $step $options");
-  }
+  return rrdtool('create', $fsfilename, $ds . " $step $options");
+
 }
 
 /**
@@ -462,7 +481,7 @@ function rrdtool_create($device, $filename, $ds, $options = '')
  *
  * @param string filename       Original filename, using %index% (or %custom% %keys%) as placeholder for indexes
  * @param string/array index    Index, if RRD type is indexed (or array of multiple indexes)
- */ 
+ */
 // TESTME needs unit testing
 function rrdtool_generate_filename($filename, $index)
 {
@@ -479,11 +498,8 @@ function rrdtool_generate_filename($filename, $index)
   // This will automatically use %index% as the field to replace (see below).
   if (!is_array($index)) { $index = array('index' => $index); }
 
-  // Replace %index% by $index['index'], %foo% by $index['foo'] etc. 
-  foreach ($index as $key => $value)
-  {
-    $filename = str_replace('%' . $key . '%', $value, $filename);
-  }
+  // Replace %index% by $index['index'], %foo% by $index['foo'] etc.
+  $filename = array_tag_replace($index, $filename);
 
   return $filename;
 }
@@ -520,7 +536,16 @@ function rrdtool_create_ng($device, $type, $index = NULL, $options = NULL)
 
   $fsfilename = get_rrd_path($device, $filename);
 
-  if (rrd_exists($device, $filename))
+  if ($config['norrd'])
+  {
+    print_message("[%rRRD Disabled - create $fsfilename%n]", 'color');
+    return NULL;
+  }
+  else if (OBS_RRD_NOLOCAL)
+  {
+    print_debug("RRD create $fsfilename passed to remote rrdcached with --no-overwrite.");
+  }
+  else if (rrd_exists($device, $filename))
   {
     print_debug("RRD $fsfilename already exists - no need to create.");
     return FALSE; // Bail out if the file exists already
@@ -550,13 +575,9 @@ function rrdtool_create_ng($device, $type, $index = NULL, $options = NULL)
     $ds[] = "DS:$name:" . $def['type'] . ':' . $def['heartbeat'] . ':' . $def['min'] . ':' . $def['max'];
   }
 
-  if ($config['norrd'])
-  {
-    print_message("[%rRRD Disabled - create $fsfilename%n]", 'color');
-    return NULL;
-  } else {
-    return rrdtool('create', $fsfilename, implode(' ', $ds) . " $step $options");
-  }
+
+  return rrdtool('create', $fsfilename, implode(' ', $ds) . " $step $options");
+
 }
 
 /**
@@ -573,12 +594,16 @@ function rrd_exists($device, $filename)
 
   $fsfilename = get_rrd_path($device, $filename);
 
-  if ($config['rrdcached'] && ($config['rrd']['no_local'] == TRUE))
+  if (OBS_RRD_NOLOCAL)
   {
-    $last = rrdtool_last($fsfilename);
-    return $GLOBALS['rrd_status'];
+    // NOTE. RRD last on remote daemon reduce polling times
+    rrdtool_last($fsfilename);
+
+    //ERROR: realpath(vds.coosm.net/status.rrd): No such file or directory
+    return strpos($GLOBALS['exec_status']['stderr'], 'No such file or directory') === FALSE;
+    //return $GLOBALS['rrd_status'];
   } else {
-    if(is_file($fsfilename))
+    if (is_file($fsfilename))
     {
       return TRUE;
     } else {
@@ -602,7 +627,7 @@ function rrd_exists($device, $filename)
 // TESTME needs unit testing
 function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE)
 {
-  global $config;
+  global $config, $graphs;
 
   if (!is_array($type)) // We were passed a string
   {
@@ -613,6 +638,12 @@ function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE)
     }
 
     $definition = $config['rrd_types'][$type];
+
+    // Append graph if not already passed
+    if (!isset($definition['graphs']))
+    {
+      $definition['graphs'] = array(str_replace('-', '_', $type));
+    }
   } else { // We were passed an array, use as-is
     $definition = $type;
   }
@@ -645,6 +676,20 @@ function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE)
       // Data not sent, mark unknown
       $update[] = 'U';
     }
+  }
+
+  /** // This is setting loads of random shit that doesn't exist
+      // ONLY GRAPHS THAT EXIST MAY GO INTO THIS ARRAY
+  // Set global graph variable for store avialable device graphs
+  foreach ($definition['graphs'] as $def)
+  {
+    $graphs[$def] = TRUE;
+  }
+  **/
+
+  if ($config['influxdb']['enabled'])
+  {
+    influxdb_update($device, $filename, $ds, $definition, $index);
   }
 
   return rrdtool('update', $fsfilename, implode(':', $update));
@@ -681,6 +726,10 @@ function rrdtool_update($device, $filename, $options)
 
   $fsfilename = get_rrd_path($device, $filename);
 
+  if ( $config['influxdb']['enabled'] ) {
+    influxdb_update( $device, $filename, $options );
+  }
+
   return rrdtool("update", $fsfilename, $options);
 }
 
@@ -691,16 +740,28 @@ function rrdtool_fetch($filename, $options)
   return rrdtool('fetch', $filename, $options);
 }
 
-// DOCME needs phpdoc block
 // TESTME needs unit testing
-function rrdtool_last($filename, $options)
+/**
+ * Returns the UNIX timestamp of the most recent update of $filename
+ *
+ * @param string $filename RRD filename
+ * @param string $options Mostly not required
+ * @return string UNIX timestamp
+ */
+function rrdtool_last($filename, $options = '')
 {
   return rrdtool('last', $filename, $options);
 }
 
-// DOCME needs phpdoc block
 // TESTME needs unit testing
-function rrdtool_lastupdate($filename, $options)
+/**
+ * Returns the UNIX timestamp and the value stored for each datum in the most recent update of $filename
+ *
+ * @param string $filename RRD filename
+ * @param string $options Mostly not required
+ * @return string UNIX timestamp and the value stored for each datum
+ */
+function rrdtool_lastupdate($filename, $options = '')
 {
   return rrdtool('lastupdate', $filename, $options);
 }
@@ -722,6 +783,11 @@ function rrdtool_rename_ds($device, $filename, $oldname, $newname)
   if ($config['norrd'])
   {
     print_message('[%gRRD Disabled%n] ');
+  }
+  else if (OBS_RRD_NOLOCAL)
+  {
+    ///FIXME Currently unsupported on remote rrdcached
+    print_message('[%gRRD REMOTE UNSUPPORTED%n] ');
   } else {
     $fsfilename = get_rrd_path($device, $filename);
     if (is_file($fsfilename))
@@ -760,6 +826,11 @@ function rrdtool_add_ds($device, $filename, $add)
   if ($config['norrd'])
   {
     print_message("[%gRRD Disabled%n] ");
+  }
+  else if (OBS_RRD_NOLOCAL)
+  {
+    ///FIXME Currently unsupported on remote rrdcached
+    print_message('[%gRRD REMOTE UNSUPPORTED%n] ');
   } else {
     $fsfilename = get_rrd_path($device, $filename);
     if (is_file($fsfilename))
@@ -803,6 +874,11 @@ function rrdtool_add_rra($device, $filename, $options)
   if ($config['norrd'])
   {
     print_message('[%gRRD Disabled%n] ');
+  }
+  else if (OBS_RRD_NOLOCAL)
+  {
+    ///FIXME Currently unsupported on remote rrdcached
+    print_message('[%gRRD REMOTE UNSUPPORTED%n] ');
   } else {
     $fsfilename = get_rrd_path($device, $filename);
 
@@ -867,6 +943,13 @@ function rrdtool_file_info($file)
   global $config;
 
   $info = array('filename'=>$file);
+
+  if (OBS_RRD_NOLOCAL)
+  {
+    ///FIXME Currently unsupported on remote rrdcached
+    print_message('[%gRRD REMOTE UNSUPPORTED%n] ');
+    return $info;
+  }
 
   $rrd = array_filter(explode(PHP_EOL, external_exec($config['rrdtool'] . ' info ' . $file)), 'strlen');
   if ($rrd)

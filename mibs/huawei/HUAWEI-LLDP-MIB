@@ -1,7 +1,7 @@
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: HUAWEI Private Extended Interface MIB
 -- Reference:
--- Version: V2.12
+-- Version: V2.14
 -- History:
 -- Version: V2.0
 -- History:
@@ -29,14 +29,14 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
         FROM IF-MIB
 
     lldpPortConfigPortNum,lldpLocSysCapSupported,lldpLocSysCapEnabled,
-    LldpPortNumber,LldpPortId
+    LldpPortNumber,LldpPortId,lldpRemEntry
       	FROM LLDP-MIB  
 
     hwDatacomm
         FROM HUAWEI-MIB;
  
     hwLldpMIB MODULE-IDENTITY
-        LAST-UPDATED "201503311730Z"
+        LAST-UPDATED "201612240000Z"
 
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
@@ -54,6 +54,12 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
            alarm, clearing statistics on ports and configuring network management 
            IP addresses and some alarms."
 
+        REVISION "201612240000Z"
+        DESCRIPTION "add hwLldpRemNetworkIdTable"
+
+        REVISION "201605160000Z"
+        DESCRIPTION "add trap hwLldpInterfaceRemTablesChange"
+	
         REVISION  "201503311730Z"
         DESCRIPTION "add trap hwLldpRateExcessive"
         
@@ -95,6 +101,7 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
 
   hwLldpConfiguration  OBJECT IDENTIFIER ::= { hwLldpObjects 1}      
   hwLldpRemoteSystemData  OBJECT IDENTIFIER ::= { hwLldpObjects 2} 
+  hwLldpInterfaceRemData  OBJECT IDENTIFIER ::= { hwLldpObjects 3} 
   hwLldpTrapObjects OBJECT IDENTIFIER ::= { hwLldpObjects 51 }
 
   hwLldpEnable OBJECT-TYPE 
@@ -284,7 +291,99 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
    		DESCRIPTION 
    				"The MacAddress of LLDP MacAddress discovery neighbor."     
    		::= {hwLldpMdnRemEntry 8}  
-   		
+
+   hwLldpRemNetworkIdTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwLldpRemNetworkIdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "LLDP remote neighbour network id table."
+        ::= { hwLldpRemoteSystemData  3 }	
+   	
+	hwLldpRemNetworkIdEntry OBJECT-TYPE
+        SYNTAX HwLldpRemNetworkIdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+           "Entries of the LLDP remote neighbour network id table."
+        AUGMENTS  {   lldpRemEntry  }
+        ::= { hwLldpRemNetworkIdTable 1}
+		
+    HwLldpRemNetworkIdEntry ::=
+            SEQUENCE  {				  
+                      hwLldpRemNetworkId OCTET STRING
+                      }
+	
+    hwLldpRemNetworkId  OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Network id of the remote neighbour."
+        ::= {hwLldpRemNetworkIdEntry 1}
+	
+   hwLldpInterfaceRemTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF HwLldpInterfaceRemEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+	 	 	"The LLDP remote table."
+        ::= { hwLldpInterfaceRemData  1 }
+		
+   hwLldpInterfaceRemEntry OBJECT-TYPE
+      SYNTAX HwLldpInterfaceRemEntry
+		MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+           	"Entries of the LLDP remote table."
+ 	    INDEX {
+	        hwLldpRemTablesChangeIfIndex
+	    }
+        ::= { hwLldpInterfaceRemTable 1}  
+		
+  HwLldpInterfaceRemEntry ::=
+	  SEQUENCE  { 
+			   hwLldpRemTablesChangeIfIndex InterfaceIndex,
+			   hwLldpRemTablesChangeType INTEGER,  
+			   hwLldpInterfaceRemAdds Integer32,  
+			   hwLldpInterfaceRemDeletes Integer32
+			   }
+
+   hwLldpRemTablesChangeIfIndex OBJECT-TYPE 
+	  SYNTAX InterfaceIndex
+	    MAX-ACCESS not-accessible
+	    STATUS current
+	    DESCRIPTION
+		      "The LLDP neighbors of this interface was changed."   
+	    ::= { hwLldpInterfaceRemEntry 1 }  
+		
+   hwLldpRemTablesChangeType OBJECT-TYPE 
+	  SYNTAX INTEGER {
+        added(1),
+        deleted(2)
+        }    
+	    MAX-ACCESS accessible-for-notify
+	    STATUS current
+	    DESCRIPTION
+		      "The change type of LLDP remote tables."   
+	    ::= { hwLldpInterfaceRemEntry 2 }  
+
+   hwLldpInterfaceRemAdds OBJECT-TYPE 
+	  SYNTAX Integer32
+	    MAX-ACCESS accessible-for-notify
+	    STATUS current
+	    DESCRIPTION
+		      "The number of LLDP neighbors inserted."   
+	    ::= { hwLldpInterfaceRemEntry 3 }
+
+   hwLldpInterfaceRemDeletes OBJECT-TYPE 
+	  SYNTAX Integer32
+	    MAX-ACCESS accessible-for-notify
+	    STATUS current
+	    DESCRIPTION
+		      "The number of LLDP neighbors deleted."   
+	    ::= { hwLldpInterfaceRemEntry 4 }
+		
    	-- define trap VB
 	  hwLldpTrapIfName OBJECT-TYPE
 			SYNTAX OCTET STRING (SIZE (0..64))
@@ -341,6 +440,17 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
 	DESCRIPTION 
       	"Notify the NMS that the received PDU rate has exceeded the threshold."
 	::= { hwLldpTraps 7}
+	
+  hwLldpInterfaceRemTablesChange  NOTIFICATION-TYPE
+	OBJECTS {
+    hwLldpRemTablesChangeType,
+    hwLldpInterfaceRemAdds,
+    hwLldpInterfaceRemDeletes
+    }
+	STATUS current	
+	DESCRIPTION 
+      	"Notify the NMS that the LLDP neighbor information of the interface was changed."
+	::= { hwLldpTraps 8}
 		
   --
 	-- ***********************************************************
@@ -414,7 +524,8 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
 	hwLldpLocSysCapEnabledChange,
 	hwLldpLocManIPAddrChange,
 	hwLldpMdnRemTablesChange,
-	hwLldpRateExcessive	
+	hwLldpRateExcessive,
+	hwLldpInterfaceRemTablesChange
 	}
 	STATUS current
 	DESCRIPTION
@@ -426,8 +537,6 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
 
     hwLldpMdnRemGroup OBJECT-GROUP
 	OBJECTS {  
-	hwLldpMdnRemLocalPortNum,
-	hwLldpMdnRemIndex,  
 	hwLldpMdnRemLocalPortId,	
 	hwLldpMdnRemMacAddr
 	}
@@ -447,5 +556,26 @@ HUAWEI-LLDP-MIB DEFINITIONS ::= BEGIN
 			DESCRIPTION 
 				"The collection of objects used as trap parameters."
 			::= { hwLldpGroups 6 }
+			
+	hwLldpInterfaceRemGroup OBJECT-GROUP
+			OBJECTS {  
+			hwLldpRemTablesChangeType,  
+			hwLldpInterfaceRemAdds,	
+			hwLldpInterfaceRemDeletes
+			 }
+			STATUS current
+			DESCRIPTION 
+				"The LLDP remote table."
+			::= { hwLldpGroups 7 }
+
+                 hwLldpRemNetworkIdGroup OBJECT-GROUP
+			OBJECTS {  
+			hwLldpRemNetworkId
+			 }
+			STATUS current
+			DESCRIPTION 
+				"The LLDP remote networkId table."
+			::= { hwLldpGroups 8 }
+			  	
 			  	
 END

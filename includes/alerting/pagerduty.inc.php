@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage alerting
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -18,6 +18,9 @@
 // Unless this is a recovery, it is a new incident by default
 $pagerduty_event_type = ($message_tags['ALERT_STATE'] == "RECOVER" ? "resolve" : "trigger");
 
+$json_details = $message_tags;
+unset($json_details['ENTITY_GRAPHS_ARRAY']);
+
 // JSON data
 $data_string = json_encode(array(
   "service_key"  => $endpoint['service_key'],
@@ -25,7 +28,8 @@ $data_string = json_encode(array(
   "description"  => "[".$message_tags['DEVICE_HOSTNAME']."][".$message_tags['ENTITY_TYPE'] . "][" . $message_tags['ENTITY_NAME']."] [" . $message_tags['ENTITY_DESCRIPTION']."] " . $message_tags['ALERT_MESSAGE'],
   "incident_key" => $message_tags['ALERT_ID'],
   "client"       => "Observium Alert Entry",
-  "client_url"   => $message_tags['ALERT_URL']));
+  "client_url"   => $message_tags['ALERT_URL'],
+  "details"      => $json_details));
 
 // JSON data + HTTP headers
 $context_data = array(
@@ -52,5 +56,8 @@ if ($result['status'] == 'success')
 }
 
 unset($result);
+unset($data_string);
+unset($context_data);
+unset($json_details);
 
 // EOF

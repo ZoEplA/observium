@@ -1,10 +1,10 @@
 --  =================================================================
--- Copyright (C) 2011 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: HUAWEI DAD MIB, this mib will maintain information of DAD 
 --              protocol for datacomm product.  
 -- Reference:
--- Version:     V1.00
+-- Version:     V1.02
 -- History:
 --  
 --  V1.00 2011-09-14 initial version
@@ -32,7 +32,7 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
         FROM P-BRIDGE-MIB;
  
     hwDadMIB MODULE-IDENTITY
-        LAST-UPDATED "201109142130Z"          -- Sep 14, 2011 at 21:30 GMT
+        LAST-UPDATED "201607111230Z"     
         ORGANIZATION 
 			"Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -46,6 +46,11 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "This MIB contains private managed object definitions for dual-active
             detection."
+        REVISION "201607111230Z"   
+        DESCRIPTION "Updated to include support for DAD" 
+
+        REVISION "201601201658Z"   
+        DESCRIPTION "Updated to include support for DAD" 
             ::= { hwDatacomm 246 }  
          
       -- Textual Convention
@@ -64,7 +69,7 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
 
     hwDadTraps OBJECT IDENTIFIER ::= { hwDadMIB 1 }
     hwDadConformance OBJECT IDENTIFIER ::= { hwDadMIB 2 }   
-                       
+    hwDadObject OBJECT IDENTIFIER ::= { hwDadMIB 3}                           
                        
   -- ============================================================================
   --
@@ -84,7 +89,30 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
     DESCRIPTION 
           "Notify the NMS that dual-active scenario is merged."
     ::= { hwDadTraps 2}  
-        
+ 
+      hwDadPortProtocolAlarm NOTIFICATION-TYPE
+	OBJECTS {hwDadDetectPort}
+	STATUS current
+	DESCRIPTION     
+		"Notify the NMS that the protocol status of the dual-active port change to down."
+	::= { hwDadTraps 3}  
+
+      hwDadPortProtocolAlarmResume NOTIFICATION-TYPE
+	OBJECTS {hwDadDetectPort}
+	STATUS current
+	DESCRIPTION     
+		"Notify the NMS that the protocol status of the dual-active port change to up, or the dual-active port does not exist."
+	::= { hwDadTraps 4}		
+	
+      hwDadTrapObject OBJECT IDENTIFIER ::= { hwDadObject 1}
+
+      hwDadDetectPort OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"The interface name of dual-active port."
+	::= { hwDadTrapObject 1 }
     --
     -- ***********************************************************
     --
@@ -104,7 +132,7 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
         the HUAWEI-DAD-MIB."
     MODULE -- this module
     MANDATORY-GROUPS {
-    hwDadTrapGroup
+    hwDadTrapGroup,hwDadObjectGroup
     }
     ::= { hwDadCompliances 1 }    
        
@@ -112,7 +140,9 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
     hwDadTrapGroup NOTIFICATION-GROUP
     NOTIFICATIONS {  
     hwDadConflictDetect,
-    hwDadConflictResume            
+    hwDadConflictResume,
+    hwDadPortProtocolAlarm,
+    hwDadPortProtocolAlarmResume          
     }
     STATUS current
     DESCRIPTION
@@ -121,6 +151,14 @@ HUAWEI-DAD-MIB DEFINITIONS ::= BEGIN
         This group is mandatory for agents which implement the DAD
         and have the capability of receiving DAD frames."
     ::= { hwDadGroups 1 }  
+    hwDadObjectGroup OBJECT-GROUP
+        OBJECTS {
+	 hwDadDetectPort
+                }
+        STATUS current
+        DESCRIPTION
+            "Enter the description of the created OBJECT-GROUP."
+        ::= { hwDadGroups 2 }  
     
 END     
     

@@ -132,6 +132,168 @@ nsResSessFailed OBJECT-TYPE
         "Failed session allocation counters."
     ::= { nsResSession 4 }
 
+nsResModTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NsResModEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "System status for multiple modules."
+    ::= { netscreenResource 4 }
+
+nsResModEntry OBJECT-TYPE
+    SYNTAX  NsResModEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "Each entry in the table holds a session status parameters associated 
+           with an instance of security module."
+    INDEX   { nsResModModId,  nsResModCpuId}
+    ::= { nsResModTable 1 }
+
+NsResModEntry ::=
+		SEQUENCE {
+          nsResModModId
+              Integer32,
+          nsResModCpuId
+              Integer32,
+	      nsResModCpuCurr 
+              Integer32,
+	      nsResModCpuLast1Min 
+              Integer32,
+	      nsResModCpuLast5Min 
+              Integer32,
+	      nsResModCpuLast15Min 
+              Integer32,
+	      nsResModMemAllocated 
+              Integer32,
+       	  nsResModMemLeft 
+              Integer32,
+	      nsResModSessAllocated
+              Integer32,
+	      nsResModSessMaximum 
+              Integer32,
+	      nsResModSessFailed 
+              Integer32,
+	      nsResModThresholdMem 
+              Integer32,
+	      nsResModThresholdCpu
+              Integer32,
+	      nsResModThresholdSession 
+              Integer32
+       }
+
+nsResModModId OBJECT-TYPE
+    SYNTAX  Integer32 (1..32)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Module ID for security module.  Each ID uniquely identifies a single Security Module."
+        ::= { nsResModEntry 1 }
+
+nsResModCpuId OBJECT-TYPE
+     SYNTAX  Integer32 (1..2)
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+          "CPU Identifier.  Each ID uniquely identifies a single CPU residing on a Security Module."
+     ::= { nsResModEntry 2 }
+
+nsResModCpuCurr OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+          "Current System CPU utilization in percentage."
+     ::= { nsResModEntry 3 }
+
+nsResModCpuLast1Min OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+ 	 ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+         "Last one minute CPU utilization in percentage."
+     ::= { nsResModEntry 4 }
+
+nsResModCpuLast5Min OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+ 	 ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+        "Last five minutes CPU utilization in percentage."
+     ::= { nsResModEntry 5 }
+
+nsResModCpuLast15Min OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+   	 ACCESS  read-only
+     STATUS  mandatory
+    DESCRIPTION
+       "Last fifteen minutes CPU utilization in percentage."
+    ::= { nsResModEntry 6 }
+
+nsResModMemAllocated OBJECT-TYPE
+     SYNTAX  Integer32 
+	 ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+       "Current memory allocated for this cpu" 
+     ::= { nsResModEntry 7 }
+
+nsResModMemLeft OBJECT-TYPE
+    SYNTAX  Integer32 
+	ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Current free memory for this security module. Since this is shared memory the same value is returned for both the cpus."
+    ::= { nsResModEntry 8 }
+
+nsResModSessAllocated OBJECT-TYPE
+    SYNTAX  Integer32 
+	ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Number of sessions currently allocated for this Security Module's cpu."
+    ::= { nsResModEntry 9 }
+
+nsResModSessMaximum OBJECT-TYPE
+     SYNTAX  Integer32 
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+       "Maximum number of sessions supported by this Security Module's cpu."
+     ::= { nsResModEntry 10 }
+
+nsResModSessFailed OBJECT-TYPE
+    SYNTAX  Integer32 
+	ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Number of sessions failed for this Security Module's cpu."
+    ::= { nsResModEntry 11 }
+
+nsResModThresholdMem OBJECT-TYPE
+    SYNTAX  Integer32 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+		"Memory utilization of the security module exceeds the threshold pre-defined."
+    ::= { nsResModEntry 12 }
+
+nsResModThresholdCpu OBJECT-TYPE
+    SYNTAX  Integer32 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+		"CPU utilization of the security module exceeds the threshold pre-defined."
+    ::= { nsResModEntry 13 }
+
+nsResModThresholdSession OBJECT-TYPE
+    SYNTAX  Integer32 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+		"Session number of the security module exceeds the threshold pre-defined."
+    ::= { nsResModEntry 14 }
+
 END
 
 

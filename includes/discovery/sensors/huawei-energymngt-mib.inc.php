@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -18,7 +18,7 @@
 //HUAWEI-ENERGYMNGT-MIB::hwBoardRatedPower.4294902016 = 165000
 //HUAWEI-ENERGYMNGT-MIB::hwBoardThresholdOfPower.4294902016 = 500000
 
-$huawei['power']  = snmpwalk_cache_oid($device, 'HwBoardPowerMngtEntry', array(), 'HUAWEI-ENERGYMNGT-MIB');
+$huawei['power']  = snmpwalk_cache_oid($device, 'hwBoardCurrentPower', array(), 'HUAWEI-ENERGYMNGT-MIB');
 
 $scale = 0.001;
 foreach ($huawei['power'] as $index => $entry)
@@ -28,7 +28,7 @@ foreach ($huawei['power'] as $index => $entry)
   //$descr = $entry['hwBoardName'];
   if ($entry['hwBoardCurrentPower'] > 0)
   {
-    $options = array('limit_high' => $entry['hwBoardThresholdOfPower'] * $scale);
+    $options = array('limit_high' => snmp_get_oid($device, 'hwBoardThresholdOfPower.' . $index, 'HUAWEI-ENERGYMNGT-MIB') * $scale);
     discover_sensor($valid['sensor'], 'power', $device, $oid, $index, 'huawei', 'Device Power Consumption', $scale, $value, $options);
   }
 }

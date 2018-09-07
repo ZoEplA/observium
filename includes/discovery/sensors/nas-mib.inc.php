@@ -7,11 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-$oids = snmpwalk_cache_oid($device, 'SystemFanTable', array(), 'NAS-MIB', mib_dirs('qnap')); // Can't remove mib_dirs() call, NAS-MIB has a duplicate name so it has no own mib_dir.
+$oids = snmpwalk_cache_oid($device, 'SystemFanTable', array(), 'NAS-MIB');
 
 foreach ($oids as $index => $entry)
 {

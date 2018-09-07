@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -75,7 +75,7 @@ foreach ($oids_array as $graph => $oids)
 
   if (!isset($graphs_db[$graph]) || $graphs_db[$graph] === TRUE)
   {
-    $data = snmp_get_multi($device, $oids, "-OQUs", "ALVARION-DOT11-WLAN-MIB");
+    $data = snmp_get_multi_oid($device, $oids, array(), "ALVARION-DOT11-WLAN-MIB");
     $data = $data[0];
 
     $rrd_file = str_replace('_', '-', $graph).".rrd";

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -24,7 +24,6 @@ if (!$readonly)
     // Convert submit to action (for compatibility)
     $vars['action'] = $vars['submit'];
   }
-
   if (isset($vars['action']) && isset($vars['contact_id']))
   {
     switch ($vars['action'])
@@ -108,6 +107,9 @@ if (!$readonly)
                                                          'alert_checker_id' => $vars['la_id']));
             if ($id) { $rows_updated++; }
           }
+
+          set_obs_attrib('syslog_rules_changed', time()); // Trigger reload syslog script
+
         }
         break;
 
@@ -123,6 +125,9 @@ if (!$readonly)
 
           $rows_updated += dbDelete('alert_contacts_assoc', '`aca_type` = ? AND `contact_id` = ? AND `alert_checker_id` = ?', array('syslog', $contact_id, $vars['alert_test_id']));
         }
+
+        set_obs_attrib('syslog_rules_changed', time()); // Trigger reload syslog script
+
         break;
 
       case 'update-contact-entry':
@@ -141,7 +146,7 @@ if (!$readonly)
           $update_state['contact_descr'] = $vars['contact_descr'];
         }
 
-        $data = $config['alerts']['transports'][$contact['contact_method']];
+        $data = $config['transports'][$contact['contact_method']];
         if (!count($data['parameters']['global']))   { $data['parameters']['global'] = array(); } // Temporary until we separate "global" out.
         if (!count($data['parameters']['optional'])) { $data['parameters']['optional'] = array(); }
         // Plan: add defaults for transport types to global settings, which we use by default, then be able to override the settings via this GUI
@@ -167,7 +172,7 @@ if (!$readonly)
         break;
     }
     // Clean common action vars
-    // unset($vars['submit'], $vars['action'], $vars['confirm']);
+    //unset($vars['submit'], $vars['action'], $vars['confirm']);
   }
 }
 
@@ -197,7 +202,7 @@ foreach ($pages as $page_name => $page_desc)
   $navbar['options'][$page_name]['url'] = generate_url(array('page' => $page_name));
   $navbar['options'][$page_name]['text'] = escape_html($page_desc);
 
-  if (in_array($page_name, array('alert_checks', 'alert_maintenance', 'contacts')))
+  if (in_array($page_name, array('alert_checks', 'alert_maintenance', 'contacts', 'syslog_rules')))
   {
     $navbar['options'][$page_name]['userlevel'] = 5; // Minimum user level to display item
   }

@@ -6,6 +6,12 @@ SAF-IPRADIO DEFINITIONS ::= BEGIN
 --            SAF CFIP IDU (Phoenix)
 --                  released after 2010.02.20
 --            FreeMile
+-- Version:         1.1.9
+-- Date/Time:       2014.01.16 13:20
+-- Version:         1.1.89
+-- Date/Time:       2013.03.14 14:00
+-- Version:         1.1.88
+-- Date/Time:       2012.09.25 11:37
 -- Version:         1.1.87
 -- Date/Time:       2012.07.19 11:22
 -- Version:         1.1.7
@@ -43,14 +49,18 @@ SAF-IPRADIO DEFINITIONS ::= BEGIN
 -- 2012.03.30  minor changes
 -- 2012.06.25  added new QAM modulations to "replace" old PSK modulations.
 -- 2012.07.10  minor syntax changes.
+-- 2012.09.25  reset descripotion change. 1 - cold 2 - warm.
+-- 2013.03.14  minor changes for mib validation
+-- 2014.01.16  add license status
 
 
 IMPORTS
-        enterprises, IpAddress,
-        Counter                  FROM RFC1155-SMI
+        enterprises,  NetworkAddress, IpAddress,
+        Counter, Gauge, TimeTicks    FROM RFC1155-SMI
         OBJECT-TYPE              FROM RFC-1212
-        DisplayString,ifEntry    FROM RFC1213-MIB
-        DateAndTime              FROM SNMPv2-TC;
+        DisplayString, ifEntry        FROM RFC1213-MIB
+        DateAndTime      FROM SNMPv2-TC
+        TRAP-TYPE    FROM RFC-1215;
 
 
 saf                 OBJECT IDENTIFIER ::=   { enterprises 7571 }
@@ -86,11 +96,11 @@ description OBJECT-TYPE
                 "Description of the model."
         ::= { ipRadioCfgGeneral 2 }
 
-radioName OBJECT-TYPE
+hostname OBJECT-TYPE
         SYNTAX  DisplayString (SIZE(0..16))
         ACCESS  read-write
         STATUS  mandatory
-        DESCRIPTION "(same as PROMPT>)."
+        DESCRIPTION "The name of the host."
         ::= { ipRadioCfgGeneral 3 }
 
 sysDateAndTime OBJECT-TYPE
@@ -123,6 +133,18 @@ licenseMask OBJECT-TYPE
         STATUS  mandatory
         DESCRIPTION "Read license mask."
         ::= { ipRadioCfgGeneral 7 }
+
+licenseUpdateStatus OBJECT-TYPE
+--  starting from v 1.64.25
+        SYNTAX  INTEGER {
+                 ok(1),
+                 error(2)
+              }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Status of last license update operation
+                     by setting license using snmp."
+        ::= { ipRadioCfgGeneral 8 }
 
 writeConfig OBJECT-TYPE
         SYNTAX  INTEGER
@@ -1201,6 +1223,7 @@ ethRXByteCounterLow OBJECT-TYPE
 					 collided bytes (bits 62:32)."
         ::= { ipRadioStatEth 19 }
 
+--Counter64 data type is unsupported by SMIv1. Not expected
 --ethRXByteCounter64b OBJECT-TYPE
 --        SYNTAX  Counter64
 --        ACCESS  read-only
@@ -1270,6 +1293,7 @@ ethTXWireByteCounterLow OBJECT-TYPE
 					 (bits 62:32)."
         ::= { ipRadioStatEth 26 }
 
+--Counter64 data type is unsupported by SMIv1. Not expected
 --ethTXWireByteCounter64b OBJECT-TYPE
 --        SYNTAX  Counter64
 --        ACCESS  read-only
@@ -1433,6 +1457,7 @@ ethTXByteCounterLow OBJECT-TYPE
 					 or purification of statistics."
         ::= { ipRadioStatEth 42 }
 
+--Counter64 data type is unsupported by SMIv1. Not expected
 --ethTXByteCounter64b OBJECT-TYPE
 --        SYNTAX  Counter64
 --        ACCESS  read-only
@@ -1633,14 +1658,14 @@ modemErroredSecondRatio  OBJECT-TYPE
         SYNTAX  DisplayString
         ACCESS  read-only
         STATUS  mandatory
-        DESCRIPTION "Errorred Second Ratio"
+        DESCRIPTION "Errored Second Ratio"
         ::= { modemStatistics 7 }
 
 modemSeverelyErroredSecondRatio  OBJECT-TYPE
         SYNTAX  DisplayString
         ACCESS  read-only
         STATUS  mandatory
-        DESCRIPTION "Severely Errorred Second Ratio"
+        DESCRIPTION "Severely Errored Second Ratio"
         ::= { modemStatistics 8 }
 
 modemBackgroundBlockErrorRatio OBJECT-TYPE

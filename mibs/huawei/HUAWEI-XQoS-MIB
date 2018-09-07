@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: This mib file is used for management of huawei Class Based 
 --              QoS information. 
 -- Reference:
--- Version:     V2.39
+-- Version:     V2.62
 -- History:
 --              v1.0 tianli,2004.4.10,publish  
 --              v1.1
@@ -49,15 +49,57 @@
 --              V2.34
 --                  modified by wangxiaoyan
 --              V2.35
---	modified by zhoushujie
+--	                modified by zhoushujie
 --              V2.36
---	modified by wangjing
+--	                modified by wangjing
 --              V2.37
 --	modified by wangjing  
 --              V2.38  
 --      modified by liuxiaoyan
 --              V2.39
 --                  modified by songjian 
+--              V2.40
+--	modified by magang
+--              V2.41
+--                  modified by chenlong
+--              V2.42
+--                  modified by magang
+--              V2.43
+--                  modified by chenlong
+--             V2.44
+--                  modified by chenhao 
+--             V2.45
+--	            modified by liye
+--             V2.46 
+--                           modified by wangzhe
+--             V2.47
+--                   modified by chenhao
+--            V2.48
+--                    modified by chenhao
+--            V2.49
+--                   modified by magang  
+--            V2.50
+--                   modified by zhangjian
+--            V2.51
+--                  modified by magang
+--            V2.52
+--                  modified by dongyanan
+--            V2.53
+--                  modified by xuechenguang
+--            V2.55
+--                  modified by pengsheng
+--            V2.57
+--                  modified by zhangmingming
+--            V2.58
+--                  modified by xiejiale
+--            V2.59
+--                  modified by lizhen
+--            V2.60
+--                  modified by wangcheng
+--            V2.61 
+--                  modified by liangyun 00353956
+--            V2.62 
+--                  modified by wanghongke
 -- =================================================================
 
 HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
@@ -95,7 +137,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
 
 
     hwXQoSMIB MODULE-IDENTITY 
-        LAST-UPDATED "201505201025Z"       
+        LAST-UPDATED  "201701161022Z"       
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -109,9 +151,54 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "The HUAWEI-XQoS-MIB contains objects to 
             Manage configuration and Monitor running state 
-            for Class Based QoS feature."   
+            for Class Based QoS feature." 
+
+      --add by wanghongke wx228773
+       REVISION "201701161022Z"
+       DESCRIPTION
+          "ADD hwXQoSSubPortQueueResPoolIndex TABLE"
+
+       --add by liangyun 00353956
+       REVISION "201701131548Z"
+       DESCRIPTION
+          "ADD hwXQoSHardPipeAccessStatisticsTable TABLE"
+		
+       --add by wangcheng 00215154
+       REVISION "201612211251Z"
+       DESCRIPTION
+          "ADD hwXQoSCarObjects"
 			
-	   REVISION "201505201025Z"
+       --add by lizhen 00379896
+       REVISION "201611291251Z"
+       DESCRIPTION
+          "ADD hwXQoSHardPipeBwAlarmTable NODE"
+
+      REVISION "201611171628Z"
+       DESCRIPTION
+          "ADD add hwXQOSQueueBufferAlarmDiscard "
+ 
+      --add by zhangmingming 00357391
+      REVISION "201609291932Z"
+      DESCRIPTION
+         "Modify hwXQoSCpDefendDiscardedPacketAlarm"    
+
+       REVISION "201609211021Z"
+       DESCRIPTION
+          "ADD hwXQoSHardPipeApplyFailAlarm at 2016-09-21."
+
+       REVISION "201604211021Z"
+       DESCRIPTION
+          "MODIFY hwXQoSIfQueueCfgCosType at 2016-8-8."
+
+       REVISION "201604211021Z"
+       DESCRIPTION
+          "MODIFY hwXQoSPortShapingPbsValue"
+
+       REVISION "201601191628Z"
+       DESCRIPTION
+          "ADD hwRemoteMirrRecoverFailNotify "
+		
+	   REVISION "201512021628Z"
        DESCRIPTION
           "ADD hwXQoSIf8021PCarCfgInfoTable "
 		  
@@ -158,7 +245,8 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       REVISION "201407091428Z"
        DESCRIPTION
           "ADD hwXQoSHardPipeStatisticsTable"  
-                 
+    
+		  
       REVISION "201407101428Z"
        DESCRIPTION
           "ADD hwXQoSBaFrdePhbTable and hwXQoSBaFrdeMapTable and hwXQoSIfTrustFrdeTable"
@@ -177,6 +265,7 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       REVISION "201408071428Z"
        DESCRIPTION
           "MOD hwXQoSHardPipeAlarmTable NODE"   
+
           
       REVISION "201408151428Z"
        DESCRIPTION
@@ -185,7 +274,8 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
      REVISION "201410101428Z"
        DESCRIPTION
           "ADD hwXQoSHardPipeAbilityTable and hwXQoSHardPipeConfigTable"
-
+		  
+		  
 	  REVISION "201411031428Z"
        DESCRIPTION
           "ADD  hwXQoSIfLrDiscardAlarm, hwXQoSIfLrDiscardAlarmResume"	
@@ -239,6 +329,70 @@ HUAWEI-XQoS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "add hwXQoSQppbPolicyApplyFailAlarm, hwXQoSQppbPolicyApplyFailAlarmClear, hwXQoSQppbPolicyApplyFailAlarmObjects"	
 
+     --add by magang 00349451
+     REVISION "201510231050Z"
+      DESCRIPTION
+         "add hwXQoSIfQPPBDelAlarm, hwXQoSIfQPPBDelAlarmObjects"
+
+    --add by chenlong c00230926
+     REVISION "201511261128Z"
+      DESCRIPTION
+         "add hwXQoSBufferStatisticObjects"
+
+     --add by magang 00349451
+     REVISION "201511261851Z"
+      DESCRIPTION
+         "modify hwXQoSIfQPPBDelAlarm, hwXQoSIfQPPBDelAlarmObjects"
+
+    --add by chenlong c00230926
+     REVISION "201512021628Z"
+      DESCRIPTION
+         "modify hwXQoSBufferOverrunHistoryEntry"
+
+    -- added by chenhao 00240449
+    REVISION "201512041150Z"
+      DESCRIPTION
+         "add VB node of hwXQoSCpDefendDiscardedPacketAlarm and hwXQoSCpDefendDiscardedPacketAlarmClear"	
+
+    --add by liye 00200458
+    REVISION "201512142028Z"
+      DESCRIPTION
+         "ADD hwXQosBoardCarResourceTable"
+
+ -- added by chenhao 00240449
+    REVISION "201501281030Z"
+      DESCRIPTION
+         "add trap node of hwXQoSDefendPortCarPassedPacketAlarm and hwXQoSDefendPortCarPassedPacketAlarmClear"
+
+ -- added by chenhao 00240449
+    REVISION "201603221436Z"
+      DESCRIPTION
+         "add VB node of hwXQoSDefendPortCarPassedPacketAlarm and hwXQoSDefendPortCarPassedPacketAlarmClear"	
+	
+    --add by magang 00349451 
+      REVISION "201604051930Z" 
+       DESCRIPTION 
+          "add hwXQoSGlbQPPBEventLog, hwXQoSGlbQPPBEventLogObjects" 
+
+    --add by magang 00349451 
+      REVISION "201605311447Z" 
+       DESCRIPTION 
+          "add hwXQoSQppbPolicyEventLog, hwXQoSQppbPolicyEventLogObjects"
+
+   --add by dongyanan 00229838 
+      REVISION "201606011201Z" 
+       DESCRIPTION 
+          "modify hwXQoSIfQueueCfgInfoTable"
+
+      REVISION "201606201428Z"
+       DESCRIPTION
+          "ADD hwXQoSSoftPipeAlarmTable NODE "  
+
+  --add by pengsheng 00191075
+     REVISION "201609031739Z"
+      DESCRIPTION
+         "ADD  hwXQoSMulticastPktsDiscardAlarm, hwXQoSMulticastPktsDiscardAlarmResume, hwXQoSMulticastPktsDiscardInterfaceAlarm, hwXQoSMulticastPktsDiscardInterfaceAlarmResume"    
+		         
         ::= { hwQoS 4 }  
 --   1.3.6.1.4.1.2011.5.25.32.4          
 -- 
@@ -2804,12 +2958,12 @@ Destroy(6),Active(1).The object has no default value."
           ::= { hwXQoSPortShapingEntry 2 } 
 
       hwXQoSPortShapingPbsValue OBJECT-TYPE
-          SYNTAX Integer32 (1..262144)
+          SYNTAX Integer32 (1..2147483646)
           MAX-ACCESS read-create
           STATUS current
           DESCRIPTION
           " This object indicates the PBS.
-            The value is an integer that ranges from 1 to 262144, in bytes.
+            The value is an integer that ranges from 1 to 2147483646, in bytes.
             the default pbs-value is 131072. 
           "
           ::= { hwXQoSPortShapingEntry 3 }
@@ -4601,7 +4755,7 @@ Destroy(6),Active(1).The object has no default value."
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "CAR Configuration Information Entry."
+            "Qos queue Configuration Information Entry."
         INDEX { hwXQoSIfQueueCfgIfIndex, hwXQoSIfQueueCfgVlanID, hwXQoSIfQueueDirection, hwXQoSIfQueueCfgCosType }
         ::= { hwXQoSIfQueueCfgInfoTable 1 }
 
@@ -4613,14 +4767,18 @@ Destroy(6),Active(1).The object has no default value."
             hwXQoSIfQueueCfgVlanID
                 Integer32,
             hwXQoSIfQueueDirection
-                DirectionType,
+                INTEGER,
             hwXQoSIfQueueCfgCosType
-                CosType,
+                INTEGER,
             hwXQoSIfQueuePriority
-                Integer32,
+                INTEGER,
             hwXQoSIfQueueCir
-                Integer32,
+                Unsigned32,
             hwXQoSIfQueuePir
+                Unsigned32,
+            hwXQoSIfQueueCirPercent
+                Integer32,
+            hwXQoSIfQueuePirPercent
                 Integer32,
             hwXQoSIfQueueWeight
                 Integer32,
@@ -4631,7 +4789,7 @@ Destroy(6),Active(1).The object has no default value."
          }
 
     hwXQoSIfQueueCfgIfIndex OBJECT-TYPE
-        SYNTAX Integer32
+        SYNTAX Integer32 (0..2147483647)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -4639,44 +4797,64 @@ Destroy(6),Active(1).The object has no default value."
         ::= { hwXQoSIfQueueCfgInfoEntry 1 }
 
     hwXQoSIfQueueCfgVlanID OBJECT-TYPE
-        SYNTAX Integer32 (0 | 1..4095)
+        SYNTAX Integer32 (0)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             "Vlan ID.
-            -1 can't be set.
             0 is the default value"
         ::= { hwXQoSIfQueueCfgInfoEntry 2 }
 
     hwXQoSIfQueueDirection OBJECT-TYPE
-        SYNTAX DirectionType
+        SYNTAX INTEGER
+            {
+            outbound(2)
+            }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The value of this object identifies the direction of policy application.The value can be either of the following:Inbound(1),Outbound(2)."
+            "The value of this object identifies the direction of policy application."
         ::= { hwXQoSIfQueueCfgInfoEntry 3 }
 
     hwXQoSIfQueueCfgCosType OBJECT-TYPE
-        SYNTAX CosType
+        SYNTAX INTEGER
+            {
+            be(1),
+            af1(2),
+            af2(3),
+            af3(4),
+            af4(5),
+            ef(6),
+            cs6(7),
+            cs7(8)
+            }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The value of this object identifies CoS of the queue.The value ranges from 0 to 7. CS(7),CS(6),EF(5),AF(4),AF(3)
-,AF(2),AF(1),BE(0).The default value is BE(0). "
+            "The value of this object identifies CoS of the queue.The value ranges from 1 to 8. CS(8),CS(7),EF(6),AF(5),AF(4),AF(3),AF(2),BE(1).The default value is BE(1). "
         ::= { hwXQoSIfQueueCfgInfoEntry 4 }  
         
     hwXQoSIfQueuePriority OBJECT-TYPE
-        SYNTAX Integer32 
-        MAX-ACCESS read-write
+        SYNTAX INTEGER 
+            {
+            pq(1),
+            wfq(2),
+            lpq(3)
+            }
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The queue priority of PQ queue mode. "
+            "The queue priority of PQ queue mode. 
+            The value can be any of the following:
+                PQ(1)
+                WFQ(2)
+                LPQ(3)"
         ::= { hwXQoSIfQueueCfgInfoEntry 5 } 
 
     
     hwXQoSIfQueueCir OBJECT-TYPE
-        SYNTAX Integer32 
-        MAX-ACCESS read-write
+        SYNTAX Unsigned32 
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
             "The value of this object identifies CIR of the queue.The value ranges from 0 to 10000000.The object has no default value."
@@ -4684,20 +4862,37 @@ Destroy(6),Active(1).The object has no default value."
 
     
     hwXQoSIfQueuePir OBJECT-TYPE
-        SYNTAX Integer32 
-        MAX-ACCESS read-write
+        SYNTAX Unsigned32 
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
             "The value of this object identifies PIR of the queue.The value ranges from 0 to 10000000.The object has no default value."
         ::= { hwXQoSIfQueueCfgInfoEntry 7 }  
-        
+
+    hwXQoSIfQueueCirPercent OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The qos queue cir-percentage."
+        ::= { hwXQoSIfQueueCfgInfoEntry 8 }
+
+    
+    hwXQoSIfQueuePirPercent OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The qos queue pir-percentage."
+        ::= { hwXQoSIfQueueCfgInfoEntry 9 }
+
      hwXQoSIfQueueWeight OBJECT-TYPE
         SYNTAX Integer32
-        MAX-ACCESS read-write
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
             "The queue weight of wrr or drr queue mode"
-        ::= { hwXQoSIfQueueCfgInfoEntry 8 } 
+        ::= { hwXQoSIfQueueCfgInfoEntry 10 } 
         
     hwXQoSIfQueueMode OBJECT-TYPE
         SYNTAX INTEGER {
@@ -4707,12 +4902,12 @@ Destroy(6),Active(1).The object has no default value."
             default(5),
             drr(6)
            }
-        MAX-ACCESS read-write
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
             "The value of this object identifies the scheduling mode for queues.The value can be either of the following:
 pq(1),wrr(3),wfq(4),default(5).The NE40E can support either of the following value:pq(1),wfq(4).The default value is default(5). "
-        ::= { hwXQoSIfQueueCfgInfoEntry 9 }
+        ::= { hwXQoSIfQueueCfgInfoEntry 11 }
 
     hwXQoSIfQueueRowStatus OBJECT-TYPE
         SYNTAX RowStatus
@@ -4720,7 +4915,7 @@ pq(1),wrr(3),wfq(4),default(5).The NE40E can support either of the following val
         STATUS current
         DESCRIPTION
             "This value of this object identifies the row status.The value can be any of the following:CreateAndGo(4), Destroy(6),Active(1).The object has no default value."
-        ::= { hwXQoSIfQueueCfgInfoEntry 10 }
+        ::= { hwXQoSIfQueueCfgInfoEntry 12 }
 
     
 --    observe port
@@ -10047,14 +10242,33 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
       hwXQoSUserQueueResPoolIndex OBJECT-TYPE
             SYNTAX  INTEGER
             {
-            tm0(0),
-            tm1(1),
-            tm2(2),
-            tm3(3),
-            tmAll(4),
-            etm0(5),
-            etm1(6),
-            etmAll(7)
+             tm0(0),
+             tm1(1),
+             tm2(2),
+             tm3(3),
+             tmAll(4),
+             etm0(5),
+             etm1(6),
+             etmAll(7),
+             etm2(8),
+             etm3(9),
+             etm4(10),
+             etm5(11),
+             etm6(12),
+             etm7(13),
+             etm8(14),
+             etm9(15),
+             etm10(16),
+             etm11(17),
+             etm12(18),
+             etm13(19),
+             etm14(20),
+             etm15(21),
+             etm16(22),
+             etm04queue(23),
+             etm08queue(24),
+             etm14queue(25),
+             etm18queue(26)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -10069,7 +10283,26 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             5: etm-0
             6: etm-1
             7: etm-all
-            "    
+            8: etm-2
+            9: etm-3
+            10: etm-4
+            11: etm-5
+            12: etm-6
+            13: etm-7
+            14: etm-8
+            15: etm-9
+            16: etm-10
+            17: etm-11
+            18: etm-12
+            19: etm-13
+            20: etm-14
+            21: etm-15
+            22: etm-16
+            23: etm04queue
+            24: etm08queue
+            25: etm14queue
+            26: etm18queue 
+           "    
             ::= { hwXQoSUserQueueResourceEntry 3 }   
             
       -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.7.1.4      
@@ -10242,7 +10475,22 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             tmAll(4),
             etm0(5),
             etm1(6),
-            etmAll(7)
+            etmAll(7),
+            etm2(8),
+            etm3(9),
+            etm4(10),
+            etm5(11),
+            etm6(12),
+            etm7(13),
+            etm8(14),
+            etm9(15),
+            etm10(16),
+            etm11(17),
+            etm12(18),
+            etm13(19),
+            etm14(20),
+            etm15(21),
+            etm16(22)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -10257,6 +10505,21 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             5: etm-0
             6: etm-1
             7: etm-all
+            8: etm-2
+            9: etm-3
+            10: etm-4
+            11: etm-5
+            12: etm-6
+            13: etm-7
+            14: etm-8
+            15: etm-9
+            16: etm-10
+            17: etm-11
+            18: etm-12
+            19: etm-13
+            20: etm-14
+            21: etm-15
+            22: etm-16
             "    
             ::= { hwXQoSUserGroupQueueResourceEntry 3 }   
             
@@ -10374,7 +10637,22 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             tmAll(4),
             etm0(5),
             etm1(6),
-            etmAll(7)
+            etmAll(7),
+            etm2(8),
+            etm3(9),
+            etm4(10),
+            etm5(11),
+            etm6(12),
+            etm7(13),
+            etm8(14),
+            etm9(15),
+            etm10(16),
+            etm11(17),
+            etm12(18),
+            etm13(19),
+            etm14(20),
+            etm15(21),
+            etm16(22)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -10389,6 +10667,21 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             5: etm-0
             6: etm-1
             7: etm-all
+            8: etm-2
+            9: etm-3
+           10: etm-4
+           11: etm-5
+           12: etm-6
+           13: etm-7
+           14: etm-8
+           15: etm-9
+           16: etm-10
+           17: etm-11
+           18: etm-12
+           19: etm-13
+           20: etm-14
+           21: etm-15
+           22: etm-16
             "    
             ::= { hwXQoSSubPortQueueResourceEntry 3 }   
             
@@ -10898,6 +11191,114 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
                                                  
 -- end by wangjing 00280821
 
+-- ******************************************************************
+-- BEGIN: Added by l00200458, 2015/12/1           
+-- ******************************************************************
+-- 
+-- hwXQosBoardCarResourceTable
+-- 
+-- ******************************************************************
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15
+	hwXQosBoardCarResourceTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwXQosBoardCarResourceEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"hwXQosBoardCarResourceTable "
+		::= { hwXQoSGlobalObjects 15 }      
+        
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1
+	hwXQosBoardCarResourceEntry OBJECT-TYPE
+		SYNTAX HwXQosBoardCarResourceEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"hwXQosBoardCarResourceEntry "
+			INDEX { hwXQosBoardCarResourceDirection, hwXQosBoardCarResourceSlotNumber,hwXQosBoardCarResourceType}
+		::= { hwXQosBoardCarResourceTable 1 }
+        
+	HwXQosBoardCarResourceEntry ::=
+	    SEQUENCE {                        
+	        hwXQosBoardCarResourceDirection
+	            INTEGER,
+	        hwXQosBoardCarResourceSlotNumber
+	            Integer32, 
+	        hwXQosBoardCarResourceType
+	            INTEGER,
+	        hwXQosBoardCarResourceTotalValue
+	            Integer32,   
+	        hwXQosBoardCarResourceAllocatedValue
+	            Integer32,
+	        hwXQosBoardCarResourceFreeValue
+	            Integer32	            
+        } 
+             
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1.1
+	hwXQosBoardCarResourceDirection OBJECT-TYPE
+	    SYNTAX INTEGER
+	        {
+	        inbound(1),
+	        outbound(2)
+	        }
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "The value of this object identifies the number of board car resource on which direction."
+	    ::= { hwXQosBoardCarResourceEntry 1 } 
+	    
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1.2
+	hwXQosBoardCarResourceSlotNumber OBJECT-TYPE
+		SYNTAX Integer32 (0..128)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		   "The value of this object identifies the number of board car resource on which slot "
+		::= { hwXQosBoardCarResourceEntry 2 }  
+		
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1.3
+	hwXQosBoardCarResourceType OBJECT-TYPE
+		SYNTAX INTEGER 
+		{     
+		    cartype1(1),
+		    cartype4(2)     
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		   "Car type:
+		    1CAR     (1),
+		    4CAR     (2)"
+		::= { hwXQosBoardCarResourceEntry 3 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1.4
+	hwXQosBoardCarResourceTotalValue OBJECT-TYPE
+	    SYNTAX Integer32 (0..2147483647)
+	    MAX-ACCESS read-only
+	    STATUS current
+	    DESCRIPTION
+	        "The number of the total board car resource"
+	    ::= { hwXQosBoardCarResourceEntry 4 }   
+	    
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1.5
+	hwXQosBoardCarResourceAllocatedValue OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		   "The number of the used board car resource "
+		::= { hwXQosBoardCarResourceEntry 5 }
+		
+    -- 1.3.6.1.4.1.2011.5.25.32.4.1.5.15.1.6
+	hwXQosBoardCarResourceFreeValue OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		   "The number of the free board car resource "
+		::= { hwXQosBoardCarResourceEntry 6 }
+            
+-- END: Added by l00200458, 2015/12/1      
+
   -- defend statistics
         hwXQoSCpDefendObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 6 }
 
@@ -10945,7 +11346,9 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
                 hwXQoSCpDefendChassisID
                     Integer32,
 				hwXQoSCpDefendProtocolDescirption
-					OCTET STRING
+					OCTET STRING,
+                hwXQoSCpDefendIntfPassedNum
+					OCTET STRING    
              }
 
         hwXQoSCpDefendSlotId OBJECT-TYPE
@@ -11050,6 +11453,14 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
           DESCRIPTION
               "The descirption of Protocol."
           ::= { hwXQoSCpDefendStatisticsEntry 21 }
+          
+    hwXQoSCpDefendIntfPassedNum OBJECT-TYPE
+          SYNTAX OCTET STRING
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Number of packets to be sent to the CPU on an interface."
+          ::= { hwXQoSCpDefendStatisticsEntry 22 }
 
 -- Urpf discard statistics
         hwXQoSUrpfObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 7 }
@@ -11335,7 +11746,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
         hwXQoSCpDefendDiscardedPackets,
         hwXQoSCpDefendDiscardedThreshold,
         hwXQoSCpDefendChassisID,
-		hwXQoSCpDefendProtocolDescirption
+        hwXQoSCpDefendProtocolDescirption
         }
      STATUS current
      DESCRIPTION 
@@ -11349,7 +11760,7 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
         hwXQoSCpDefendDiscardedPackets,
         hwXQoSCpDefendDiscardedThreshold,
         hwXQoSCpDefendChassisID,
-		hwXQoSCpDefendProtocolDescirption
+        hwXQoSCpDefendProtocolDescirption
         }
      STATUS current
      DESCRIPTION 
@@ -11531,7 +11942,6 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
     ::= { hwXQoSNotifications 20 } 
 		
 --end add by jinxiaoyan
-
 --begin add by renxiaoyuan 209321, buffer Alram	
 		hwXQOSQueueBufferOverrunAlarm NOTIFICATION-TYPE
 			OBJECTS { 
@@ -11541,7 +11951,8 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 				hwXQOSQueueBufferAlarmQueueID,
 				hwXQOSQueueBufferAlarmUsedCell,
 				hwXQOSQueueBufferAlarmUsedLength,
-				hwXQOSQueueBufferAlarmThreshold}
+				hwXQOSQueueBufferAlarmThreshold,
+				hwXQOSQueueBufferAlarmDiscard}
 			STATUS current
 			DESCRIPTION 
 				"The SNMP trap is generated when the use of queue buffer is over the configured threshold."
@@ -11611,7 +12022,6 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 		::= { hwXQoSHardPipeCfgAlarmEntry 1 }
 		       
 -- end by sunhongliang 00184792       
-
 
 --begin add by wangjing 00280821 for VPN-ACL NE2800 ALARM(TA and VPN-ACL both configured) 2014-12-16     
 
@@ -11765,6 +12175,155 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 			::= { hwXQoSNotifications 33 }
 			
 --end   add by songjian 00280711 for QPPB
+--begin add by magang 00349451 for QPPB
+		hwXQoSIfQPPBDelAlarm NOTIFICATION-TYPE
+			OBJECTS { 
+				  hwXQoSIfQPPBDelInterfaceName,
+				  hwXQoSIfQPPBDelPolicyName,
+				  hwXQoSIfQPPBDelDirection,
+				  hwXQoSIfQPPBDelDiscrip}
+			STATUS current
+			DESCRIPTION 
+			    "The SNMP trap is generated when the interface qppb policy deleted because of conflict."
+			::= { hwXQoSNotifications 34 } 
+--end   add by magang 00349451 for QPPB
+
+        hwXQoSDefendPortCarPassedPacketAlarm NOTIFICATION-TYPE
+			OBJECTS { 
+				hwXQoSCpDefendSlotId,
+				hwXQoSCpDefendObjectIndex,
+				hwXQoSCpDefendIntfPassedNum,
+				hwXQoSCpDefendPassedPackets, 
+				hwXQoSCpDefendDiscardedThreshold}
+			STATUS current
+			DESCRIPTION 
+			    "The number of packets sent to the CPU by port car exceeded the threshold on an interface."
+			::= { hwXQoSNotifications 35 }    
+			
+		hwXQoSDefendPortCarPassedPacketAlarmClear NOTIFICATION-TYPE
+			OBJECTS { 
+				hwXQoSCpDefendSlotId,
+				hwXQoSCpDefendObjectIndex,
+				hwXQoSCpDefendIntfPassedNum,
+				hwXQoSCpDefendPassedPackets, 
+				hwXQoSCpDefendDiscardedThreshold}
+			STATUS current
+			DESCRIPTION 
+			    "The number of packets sent to the CPU by port car fell below the threshold on an interface."
+			::= { hwXQoSNotifications 36 }
+--begin add by magang 00349451 for global QPPB 
+		hwXQoSGlbQPPBEventLog NOTIFICATION-TYPE 
+			OBJECTS { 
+				  hwXQoSGlbQPPBEventSlotId,  
+				  hwXQoSGlbQPPBEventFunction, 
+				  hwXQoSGlbQPPBEventDiscrip } 
+			STATUS current 
+			DESCRIPTION  
+			    "The SNMP trap is generated when The global QPPB will not be effective." 
+			::= { hwXQoSNotifications 37 } 
+--end   add by magang 00349451 for global QPPB 
+--begin add by magang 00349451 for QPPB Policy
+		hwXQoSQppbPolicyEventLog NOTIFICATION-TYPE 
+			OBJECTS {
+			hwXQoSQppbPolicyChassisID,
+			hwXQoSQppbPolicySlotId } 
+			STATUS current 
+			DESCRIPTION  
+			    "The SNMP trap is generated when The QPPB Policy will not be effective." 
+			::= { hwXQoSNotifications 38 } 
+--end   add by magang 00349451 for QPPB Policy
+
+--begin add by xuechenguang
+    hwXQoSSoftPipeAlarm NOTIFICATION-TYPE
+			OBJECTS { 
+			hwXQoSSoftPipeAlarmIfIndex, 
+			hwXQoSSoftPipeAlarmUsage}
+     STATUS current
+     DESCRIPTION 
+    "The softpipe bandwidth usage reached the threshold alarm."
+    ::= { hwXQoSNotifications 39 }  
+
+    hwXQoSSoftPipeAlarmClear NOTIFICATION-TYPE
+			OBJECTS { hwXQoSSoftPipeAlarmIfIndex }
+     STATUS current
+     DESCRIPTION 
+    "The soft pipe bandwidth usage below the threshold alarm."
+    ::= { hwXQoSNotifications 40 } 		       
+-- end by xuechenguang    
+
+--begin add by pengsheng 00191075, Multicast packets discard alarm	
+		hwXQoSMulticastPktsDiscardAlarm NOTIFICATION-TYPE
+			OBJECTS { 
+				hwXQoSMulticastPktsDiscardAlarmSlotid
+				}
+			STATUS current
+			DESCRIPTION 
+				"The SNMP trap is generated when the multicast packets are discarded."
+			::= { hwXQoSNotifications 41}
+		
+		hwXQoSMulticastPktsDiscardAlarmResume NOTIFICATION-TYPE
+			OBJECTS { 
+				hwXQoSMulticastPktsDiscardAlarmSlotid
+				}
+			STATUS current
+			DESCRIPTION 
+				"Clear the SNMP trap which is generated when the multicast packets are discarded."
+			::= { hwXQoSNotifications 42}
+		
+		hwXQoSMulticastPktsDiscardInterfaceAlarm NOTIFICATION-TYPE
+			OBJECTS { 
+				hwXQoSMulticastPktsDiscardInterfaceAlarmIfIndex,
+				hwXQoSMulticastPktsDiscardInterfaceAlarmIfName
+				}
+			STATUS current
+			DESCRIPTION 
+				"The SNMP trap is generated when the multicast packets are discarded."
+			::= { hwXQoSNotifications 43 }
+		
+		hwXQoSMulticastPktsDiscardInterfaceAlarmResume NOTIFICATION-TYPE
+			OBJECTS { 
+				hwXQoSMulticastPktsDiscardInterfaceAlarmIfIndex,
+				hwXQoSMulticastPktsDiscardInterfaceAlarmIfName
+				}
+			STATUS current
+			DESCRIPTION 
+				"Clear the SNMP trap which is generated when the multicast packets are discarded."
+			::= { hwXQoSNotifications 44 }
+
+--end add by pengsheng 00191075, Multicast packets discard alarm
+--begin add by yangting 00248638	
+    hwXQoSHardPipeApplyFailAlarm NOTIFICATION-TYPE
+			OBJECTS { hwXQoSHardPipeAlarmIfIndex }
+     STATUS current
+     DESCRIPTION 
+    "hwXQoSHardPipeApplyFailAlarm."
+    ::= { hwXQoSNotifications 45 }  
+
+    hwXQoSHardPipeApplyFailAlarmClear NOTIFICATION-TYPE
+			OBJECTS { hwXQoSHardPipeAlarmIfIndex }
+     STATUS current
+     DESCRIPTION 
+    "hwXQoSHardPipeApplyFailAlarm."
+    ::= { hwXQoSNotifications 46 } 
+
+--begin add by lizhen
+    hwXQoSHardPipeBwAlarm NOTIFICATION-TYPE
+			OBJECTS {
+			hwXQoSHardPipeBwAlarmIfIndex,
+			hwXQoSHardPipeBwAlarmResvBw } 
+	STATUS current
+	DESCRIPTION
+	"The configed bandwidth value of hardpipe has exceeded the actual bandwidth value."
+	::= { hwXQoSNotifications 47 }
+	 
+	hwXQoSHardPipeBwAlarmClear NOTIFICATION-TYPE
+			OBJECTS { hwXQoSHardPipeBwAlarmIfIndex } 
+	STATUS current
+	DESCRIPTION
+	"The configed bandwidth value of hardpipe is equal to the actual bandwidth value."
+	::= { hwXQoSNotifications 48 }
+--end by lizhen
+
     hwXQoSGeneral OBJECT IDENTIFIER ::= { hwXQoSObjects 12 }
     
     hwXQoSFrameId  OBJECT-TYPE
@@ -12689,7 +13248,9 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 					hwXQOSQueueBufferAlarmUsedLength
 						Integer32,
 					hwXQOSQueueBufferAlarmThreshold
-						Integer32
+						Integer32,
+					hwXQOSQueueBufferAlarmDiscard
+					    Counter64
 					} 
 		
 		hwXQOSQueueBufferAlarmChassisID OBJECT-TYPE
@@ -12747,6 +13308,14 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             DESCRIPTION
                 "The current buffer overrun threshold. "
            ::= { hwXQOSQueueBufferOverrunAlarmEntry 7 }
+
+		hwXQOSQueueBufferAlarmDiscard OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current Discard. "
+           ::= { hwXQOSQueueBufferOverrunAlarmEntry 8 }
 --end add by renxiaoyuan 209321, buffer Alram    
 
 --begin add by renxiaoyuan 209321, IfLrAlram
@@ -12955,6 +13524,109 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 			
 --end add by jinxiaoyan      
 
+--begin add by xuechenguang 
+--soft-pipe alarm
+ 		-- 1.3.6.1.4.1.2011.5.25.32.4.1.41
+		hwXQoSSoftPipeAlarmObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 41 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.41.1
+		hwXQoSSoftPipeAlarmTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwXQoSSoftPipeAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The soft pipe alarm table."
+			::= { hwXQoSSoftPipeAlarmObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.41.1.1
+		hwXQoSSoftPipeAlarmEntry OBJECT-TYPE
+			SYNTAX HwXQoSSoftPipeAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The softpipe alarm entry."
+			INDEX { hwXQoSSoftPipeAlarmIfIndex }
+			::= { hwXQoSSoftPipeAlarmTable 1 }
+		
+		HwXQoSSoftPipeAlarmEntry ::=
+			SEQUENCE { 
+				hwXQoSSoftPipeAlarmIfIndex
+					OCTET STRING,
+			  hwXQoSSoftPipeAlarmUsage
+			    Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.41.1.1.1
+		hwXQoSSoftPipeAlarmIfIndex OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The soft pipe alarm interface index."
+			::= { hwXQoSSoftPipeAlarmEntry 1 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.41.1.1.2
+		hwXQoSSoftPipeAlarmUsage OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The usage of qos soft-pipe bandwidth."
+			::= { hwXQoSSoftPipeAlarmEntry 2 }
+			
+--end add by xuechenguang
+
+--begin add by lizhen
+--hardpipe bandwidth alarm
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.47
+		hwXQoSHardPipeBwAlarmObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 47 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.47.1
+		hwXQoSHardPipeBwAlarmTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwXQoSHardPipeBwAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The hard pipe bandwidth alarm table."
+			::= { hwXQoSHardPipeBwAlarmObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.47.1.1
+		hwXQoSHardPipeBwAlarmEntry OBJECT-TYPE
+			SYNTAX HwXQoSHardPipeBwAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The hard pipe bandwidth alarm entry."
+			INDEX { hwXQoSHardPipeBwAlarmIfIndex }
+			::= { hwXQoSHardPipeBwAlarmTable 1}
+		
+		HwXQoSHardPipeBwAlarmEntry ::=
+			SEQUENCE{
+				hwXQoSHardPipeBwAlarmIfIndex
+					OCTET STRING,
+				hwXQoSHardPipeBwAlarmResvBw
+					Integer32
+				}
+		
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.47.1.1.1
+		hwXQoSHardPipeBwAlarmIfIndex OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The hard pipe bandwidth alarm interface index."
+			::= { hwXQoSHardPipeBwAlarmEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.32.4.1.47.1.1.2
+		hwXQoSHardPipeBwAlarmResvBw OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The soft pipe reserved bandwidth."
+			::= { hwXQoSHardPipeBwAlarmEntry 2 }	
+--end add by lizhen
+     
 --begin add by liuxiaoyan 
 --sq alarm
  		-- 1.3.6.1.4.1.2011.5.25.32.4.1.25
@@ -13706,7 +14378,169 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
             " This object indicates the hard pipe ability of port. "    
             ::= { hwXQoSHardPipeAbilityEntry 2 }       
 --End by sunhongliang 00184792 
-     
+
+--add by liangyun  00353956 
+-- ******************************************************************
+--
+--   hwXQoSHardPipeAccessStatisticsTable
+--
+-- ******************************************************************
+
+        hwXQoSHardPipeAccessStatisticsTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF HwXQoSHardPipeAccessStatisticsEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              " This table is used to query the hard pipe statistics of access interface. "
+          ::= { hwXQoSBaObjects 44 }
+          
+
+      hwXQoSHardPipeAccessStatisticsEntry OBJECT-TYPE
+          SYNTAX HwXQoSHardPipeAccessStatisticsEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              " This table is used to query the hard pipe statistics of access interface. " 
+          INDEX  { hwXQoSHardPipeAccessStatisticsInterfaceIndex,
+				   hwXQoSHardPipeAccessStatisticsDirection }    
+          ::= { hwXQoSHardPipeAccessStatisticsTable 1 }           
+
+      HwXQoSHardPipeAccessStatisticsEntry ::=
+        SEQUENCE {
+                hwXQoSHardPipeAccessStatisticsInterfaceIndex                 
+                    InterfaceIndex,            
+		hwXQoSHardPipeAccessStatisticsDirection
+		    INTEGER, 
+                hwXQoSHardPipeAccessStatisticsReset   
+                    INTEGER,                         
+                hwXQoSHardPipeAccessStatisticsPassPackets 
+                    Counter64,                     
+                hwXQoSHardPipeAccessStatisticsPassBytes
+                    Counter64,             
+                hwXQoSHardPipeAccessStatisticsDiscardPackets 
+                    Counter64, 
+                hwXQoSHardPipeAccessStatisticsDiscardBytes    
+                    Counter64,                
+                hwXQoSHardPipeAccessStatisticsPassPacketsRate
+                    Counter64,
+                hwXQoSHardPipeAccessStatisticsPassBytesRate
+                    Counter64,
+                hwXQoSHardPipeAccessStatisticsDiscardPacketsRate
+                    Counter64,
+                hwXQoSHardPipeAccessStatisticsDiscardBytesRate
+                    Counter64                                                                
+                }
+
+      hwXQoSHardPipeAccessStatisticsInterfaceIndex  OBJECT-TYPE
+            SYNTAX   InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " This object indicates the access interface index. "     
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 1 }   
+			
+	  hwXQoSHardPipeAccessStatisticsDirection  OBJECT-TYPE
+            SYNTAX INTEGER
+              {
+                inbound(1),
+                outbound(2) 
+              }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " This object indicates the direction where access hard pipe statistics are queried.
+              The value can be:
+              1: inbound
+              2: outbound  "
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 2 }  
+        
+      hwXQoSHardPipeAccessStatisticsReset  OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+                reset(1)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            " This object indicates the statistics are reset.  "    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 3 }   
+       
+    
+      hwXQoSHardPipeAccessStatisticsPassPackets OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " This object indicates the number of passed packets. "    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 4 }   
+            
+            
+      hwXQoSHardPipeAccessStatisticsPassBytes OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " This object indicates the number of  passed bytes. "    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 5 }      
+
+
+      hwXQoSHardPipeAccessStatisticsDiscardPackets OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " This object indicates the number of discarded packets."    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 6 }    
+
+
+      hwXQoSHardPipeAccessStatisticsDiscardBytes OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " This object indicates the number of discarded bytes. "    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 7 }   
+
+
+      hwXQoSHardPipeAccessStatisticsPassPacketsRate OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " The value of this object identifies the rate of pass packets."    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 8 }          
+
+
+      hwXQoSHardPipeAccessStatisticsPassBytesRate OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " The value of this object identifies the rate of pass bytes. "    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 9 }      
+
+
+      hwXQoSHardPipeAccessStatisticsDiscardPacketsRate OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " The value of this object identifies the rate of discarded packets."    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 10 } 
+
+ 
+      hwXQoSHardPipeAccessStatisticsDiscardBytesRate OBJECT-TYPE
+            SYNTAX  Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            " The value of this object identifies the rate of discarded bytes."    
+            ::= { hwXQoSHardPipeAccessStatisticsEntry 11 }  
+--End by liangyun 00353956 
+
+
+
+        
             
       --   Beg add by w00176838 for remark payload-dscp
     hwXQoSCompliances  OBJECT IDENTIFIER ::=   { hwXQoSConformance 1 }
@@ -13826,7 +14660,8 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
         hwXQoSCpDefendDiscardedByteRate,
         hwXQoSCpDefendDiscardedThreshold,
         hwXQoSCpDefendChassisID,
-		hwXQoSCpDefendProtocolDescirption
+		hwXQoSCpDefendProtocolDescirption,
+        hwXQoSCpDefendIntfPassedNum
         }
         STATUS      current
         DESCRIPTION
@@ -13856,6 +14691,10 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
         hwXQoSRuleFailAlarmCancel,   -- add by l00241571, RuleFailAlarmCancel
         hwXQoSHardPipeAlarm,
         hwXQoSHardPipeAlarmClear,
+        hwXQoSSoftPipeAlarm,
+        hwXQoSSoftPipeAlarmClear,
+		hwXQoSHardPipeBwAlarm,
+		hwXQoSHardPipeBwAlarmClear,
 		hwXQOSQueueBufferOverrunAlarm,
 		hwXQOSQueueBufferOverrunResume,
 		hwXQoSIfLrDiscardAlarm,
@@ -13863,7 +14702,13 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 		hwXQoSFCoEPriorityAlarm,
 		hwXQoSFCoEPriorityAlarmClear,
 		hwXQoSVpnAclConflictAlarm, --add by wangjing 00280821 
-		hwXQoSVpnAclConflictAlarmClear   --add by wangjing 00280821 
+		hwXQoSVpnAclConflictAlarmClear,   --add by wangjing 00280821 
+		hwXQoSDefendPortCarPassedPacketAlarm,
+		hwXQoSDefendPortCarPassedPacketAlarmClear,
+		hwXQoSMulticastPktsDiscardAlarm,  --add by pengsheng 00191075
+		hwXQoSMulticastPktsDiscardAlarmResume,  --add by pengsheng 00191075
+		hwXQoSMulticastPktsDiscardInterfaceAlarm,  --add by pengsheng 00191075
+		hwXQoSMulticastPktsDiscardInterfaceAlarmResume  --add by pengsheng 00191075
         }
         STATUS  current
         DESCRIPTION
@@ -14428,6 +15273,30 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
                 "Description."
             ::= { hwXQoSGroups 49 }    
         --end add by wangyonggui 176838, CAR/STAT Alarm  
+		
+		
+	--begin add by liangyun 00353956
+	hwXQoSHardPipeAccessStatisticsGroup OBJECT-GROUP
+        OBJECTS {
+		hwXQoSHardPipeAccessStatisticsInterfaceIndex,	
+		hwXQoSHardPipeAccessStatisticsReset, 	
+		hwXQoSHardPipeAccessStatisticsPassPackets,	
+		hwXQoSHardPipeAccessStatisticsPassBytes,	
+		hwXQoSHardPipeAccessStatisticsDiscardPackets,	
+		hwXQoSHardPipeAccessStatisticsDiscardBytes,	
+		hwXQoSHardPipeAccessStatisticsPassPacketsRate,	
+		hwXQoSHardPipeAccessStatisticsPassBytesRate,	
+		hwXQoSHardPipeAccessStatisticsDiscardPacketsRate,	
+		hwXQoSHardPipeAccessStatisticsDiscardBytesRate	
+        }
+        STATUS      current
+        DESCRIPTION
+        "This is a group of HardPipe stastitics for access interfaces."
+        ::= { hwXQoSGroups 51 }        
+	--end add by liangyun 00353956
+		
+		
+		
         
         hwXQoSSecurityStormControlInterfaceObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 21 }
 
@@ -14572,6 +15441,75 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 	DESCRIPTION
 	"LocalID of the qppb policy."
 	::= { hwXQoSQppbPolicyApplyFailAlarmEntry 5 }       
+--  BEGIN: Added by m00349451, 2015/10/23
+        hwXQoSIfQPPBDelAlarmObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 27 }
+		
+        hwXQoSIfQPPBDelAlarmTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwXQoSIfQPPBDelAlarmEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                "It will alarm when the interface qppb policy deleted because of conflict."
+               ::= { hwXQoSIfQPPBDelAlarmObjects 1 }
+			
+        hwXQoSIfQPPBDelAlarmEntry OBJECT-TYPE
+                SYNTAX HwXQoSIfQPPBDelAlarmEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                "It will alarm when the interface qppb policy deleted because of conflict."
+                INDEX { hwXQoSIfQPPBDelInterfaceName, hwXQoSIfQPPBDelPolicyName, hwXQoSIfQPPBDelDirection, hwXQoSIfQPPBDelDiscrip }
+                ::= { hwXQoSIfQPPBDelAlarmTable 1 }
+			
+            HwXQoSIfQPPBDelAlarmEntry ::=
+            SEQUENCE { 
+	               hwXQoSIfQPPBDelInterfaceName
+	                    OCTET STRING,
+	               hwXQoSIfQPPBDelPolicyName
+                            OCTET STRING,
+	               hwXQoSIfQPPBDelDirection
+	                   INTEGER,
+	               hwXQoSIfQPPBDelDiscrip
+                           OCTET STRING
+                                    } 
+ 
+              hwXQoSIfQPPBDelInterfaceName OBJECT-TYPE
+                      SYNTAX OCTET STRING
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION
+	 "Name of the interface when the interface qppb policy deleted because of conflict."
+	 ::= { hwXQoSIfQPPBDelAlarmEntry 1 }
+
+              hwXQoSIfQPPBDelPolicyName OBJECT-TYPE
+                      SYNTAX OCTET STRING
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION
+	 "Name of the QPPB Policy when the interface qppb policy deleted because of conflict."
+	 ::= { hwXQoSIfQPPBDelAlarmEntry 2 }
+
+              hwXQoSIfQPPBDelDirection OBJECT-TYPE
+                      SYNTAX INTEGER
+                     {
+                          inbound(1),
+                          outbound(2) 
+                     }
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION
+	 "Direction of the qppb policy."
+	 ::= { hwXQoSIfQPPBDelAlarmEntry 3 }
+	 
+               hwXQoSIfQPPBDelDiscrip OBJECT-TYPE
+                      SYNTAX OCTET STRING
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION
+	 "precautions descirption."
+	 ::= { hwXQoSIfQPPBDelAlarmEntry 4 }
+
+-- END: Added by m00349451, 2015/10/23
 -- BEGIN: Added by w00218179, 2013/6/13            
         -- 1.3.6.1.4.1.2011.5.25.32.4.2.2.50
 		hwXQosCarResourceGroup OBJECT-GROUP
@@ -14582,8 +15520,663 @@ AF4(5),AF3(4),AF2(3),AF1(2),BE(1)."
 			::= { hwXQoSGroups 50 }  
 -- END: Added by w00218179, 2013/6/13     
  
+
+ 
+ -- QoS Buffer Statistic
+    hwXQoSBufferStatisticObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 28 }
+
+    
+--  Buffer overrun
+    hwXQoSBufferThresholdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSBufferThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS buffer overrun threshold configuration information."
+        ::= { hwXQoSBufferStatisticObjects 1 }
+
+    
+    hwXQoSBufferThresholdEntry OBJECT-TYPE
+        SYNTAX HwXQoSBufferThresholdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "QoS buffer overrun threshold configuration Entry."
+        INDEX { hwXQoSBufferThresholdVrId }
+        ::= { hwXQoSBufferThresholdTable 1 }
+
+    
+    HwXQoSBufferThresholdEntry ::=
+        SEQUENCE {
+            hwXQoSBufferThresholdVrId
+                Integer32,
+            hwXQoSBufferThreshold
+                Integer32,
+            hwXQoSBufferThresholdStatus
+                RowStatus
+         }
+         
+    hwXQoSBufferThresholdVrId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "VS index."
+        ::= { hwXQoSBufferThresholdEntry 1 }
+
+    hwXQoSBufferThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "QoS buffer overrun threshold value."
+        ::= { hwXQoSBufferThresholdEntry 2 }
+
+    hwXQoSBufferThresholdStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwXQoSBufferThresholdEntry 3 }
+
+--  Buffer alarm
+	EnableFlagType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "The enable flag."
+    SYNTAX INTEGER
+        {
+			enable(1),
+			disable(2)
+        }
+		
+    hwXQoSBufferAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSBufferAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS buffer overrun Alarm configuration information."
+        ::= { hwXQoSBufferStatisticObjects 2 }
+
+    
+    hwXQoSBufferAlarmEntry OBJECT-TYPE
+        SYNTAX HwXQoSBufferAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "QoS buffer overrun Alarm configuration Entry."
+        INDEX { hwXQoSBufferAlarmVrId }
+        ::= { hwXQoSBufferAlarmTable 1 }
+
+    HwXQoSBufferAlarmEntry ::=
+        SEQUENCE {
+            hwXQoSBufferAlarmVrId
+                Integer32,
+            hwXQoSBufferAlarmEnable
+                EnableFlagType
+        }
+	
+    hwXQoSBufferAlarmVrId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "VS index."
+        ::= { hwXQoSBufferAlarmEntry 1 }
+        
+    hwXQoSBufferAlarmEnable OBJECT-TYPE
+        SYNTAX EnableFlagType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "QoS buffer overrun alarm enable flag: enable(1), disable(2)."
+        ::= { hwXQoSBufferAlarmEntry 2 }
+
+--  buffer overrun history
+    hwXQoSBufferOverrunHistoryTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSBufferOverrunHistoryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS buffer overrun history information."
+        ::= { hwXQoSBufferStatisticObjects 3 }
+
+    
+hwXQoSBufferOverrunHistoryEntry OBJECT-TYPE
+        SYNTAX HwXQoSBufferOverrunHistoryEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "QoS buffer overrun history Entry."
+        INDEX { hwXQosBufferOverrunHistoryIfindex, hwXQosBufferOverrunHistoryQueueId, hwXQoSBufferOverrunHistoryChasisId, hwXQoSBufferOverrunHistorySlotId, hwXQoSBufferOverrunHistoryNumberId }
+        ::= { hwXQoSBufferOverrunHistoryTable 1 }
+
+    
+    HwXQoSBufferOverrunHistoryEntry ::=
+        SEQUENCE {
+			hwXQosBufferOverrunHistoryIfindex
+				Integer32,
+            hwXQosBufferOverrunHistoryQueueId
+                Integer32,
+			hwXQoSBufferOverrunHistoryChasisId
+                Integer32,
+			hwXQoSBufferOverrunHistorySlotId
+                Integer32,
+            hwXQoSBufferOverrunHistoryNumberId
+                Integer32,
+			hwXQoSBufferOverrunHistoryReset 
+                INTEGER, 
+            hwXQosBufferOverrunHistoryUsedLength
+                Counter64,
+			hwXQoSBufferOverrunHistoryTime
+                OCTET STRING
+         }
+
+    hwXQosBufferOverrunHistoryIfindex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface index."
+            ::= { hwXQoSBufferOverrunHistoryEntry 1 }
+
+    hwXQosBufferOverrunHistoryQueueId OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface queue index.
+                 The value ranges from 0 to 7. 
+                "
+            ::= { hwXQoSBufferOverrunHistoryEntry 2 }
+			
+    hwXQoSBufferOverrunHistoryChasisId OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+				"Chasis index."
+			::= { hwXQoSBufferOverrunHistoryEntry 3 }
+			
+    hwXQoSBufferOverrunHistorySlotId OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+				"Slot index."
+			::= { hwXQoSBufferOverrunHistoryEntry 4 }
+	
+    hwXQoSBufferOverrunHistoryNumberId OBJECT-TYPE
+            SYNTAX Integer32 (1..5)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number index.
+                 The value ranges from 1 to 5. 
+                "
+			::= { hwXQoSBufferOverrunHistoryEntry 5 }
             
-                                                 
+    hwXQoSBufferOverrunHistoryReset OBJECT-TYPE
+          SYNTAX INTEGER
+          {
+              reset(1),
+              none(2)
+          }
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+               " This object indicates the resetting of statistics. " 
+               ::= { hwXQoSBufferOverrunHistoryEntry 6 }
+		  
+    hwXQosBufferOverrunHistoryUsedLength OBJECT-TYPE
+          SYNTAX Counter64
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+               "The used kbyte number of interface buffer."
+               ::= { hwXQoSBufferOverrunHistoryEntry 7 }
+			
+    hwXQoSBufferOverrunHistoryTime OBJECT-TYPE
+          SYNTAX OCTET STRING (SIZE (1..20))
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+               "Buffer overrun systeam time."
+               ::= { hwXQoSBufferOverrunHistoryEntry 8 }
+
+    hwRemoteMirrRecoverFailNotify NOTIFICATION-TYPE
+          STATUS current
+          DESCRIPTION 
+           "Remote mirror recover fail notify"
+          ::= { hwXQoSObjects 29 }
+
+--  BEGIN: Added by m00349451, 2016/03/22 
+              hwXQoSGlbQPPBEventLogObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 30 } 
+                       
+              hwXQoSGlbQPPBEventTable OBJECT-TYPE 
+                      SYNTAX SEQUENCE OF HwXQoSGlbQPPBEventEntry 
+                      MAX-ACCESS not-accessible 
+                      STATUS current 
+                      DESCRIPTION 
+                      "The event occurs when The global QPPB will not be effective." 
+                     ::= { hwXQoSGlbQPPBEventLogObjects 1 } 
+                               
+              hwXQoSGlbQPPBEventEntry OBJECT-TYPE 
+                      SYNTAX HwXQoSGlbQPPBEventEntry 
+                      MAX-ACCESS not-accessible 
+                      STATUS current 
+                      DESCRIPTION 
+                      "The event occurs when The global QPPB will not be effective." 
+                      INDEX { hwXQoSGlbQPPBEventSlotId, hwXQoSGlbQPPBEventFunction, hwXQoSGlbQPPBEventDiscrip } 
+                      ::= { hwXQoSGlbQPPBEventTable 1 } 
+                               
+                  HwXQoSGlbQPPBEventEntry ::= 
+                  SEQUENCE {  
+                             hwXQoSGlbQPPBEventSlotId       
+                                  OCTET STRING, 
+                             hwXQoSGlbQPPBEventFunction 
+                                  OCTET STRING, 
+                             hwXQoSGlbQPPBEventDiscrip 
+                                  OCTET STRING 
+                                          }      
+                   hwXQoSGlbQPPBEventSlotId OBJECT-TYPE 
+                            SYNTAX OCTET STRING 
+              MAX-ACCESS read-only 
+              STATUS current 
+              DESCRIPTION 
+              "Slot ID of the LPU when The global QPPB will not be effective." 
+               ::= { hwXQoSGlbQPPBEventEntry 1 }  
+       
+                    hwXQoSGlbQPPBEventFunction OBJECT-TYPE 
+                            SYNTAX OCTET STRING 
+               MAX-ACCESS read-only 
+               STATUS current 
+               DESCRIPTION 
+               "function of qppb when The global QPPB will not be effective." 
+               ::= { hwXQoSGlbQPPBEventEntry 2 } 
+        
+                    hwXQoSGlbQPPBEventDiscrip OBJECT-TYPE 
+                            SYNTAX OCTET STRING 
+               MAX-ACCESS read-only 
+               STATUS current 
+               DESCRIPTION 
+               "precautions descirption." 
+               ::= { hwXQoSGlbQPPBEventEntry 3 } 
+-- END: Added by m00349451, 2016/03/22
+--  BEGIN: Added by m00349451, 2016/05/31 
+              hwXQoSQppbPolicyEventLogObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 31 } 
+                       
+              hwXQoSQppbPolicyEventTable OBJECT-TYPE 
+                      SYNTAX SEQUENCE OF HwXQoSQppbPolicyEventEntry 
+                      MAX-ACCESS not-accessible 
+                      STATUS current 
+                      DESCRIPTION 
+                      "The event occurs when the QPPB policy will not be effective." 
+                     ::= { hwXQoSQppbPolicyEventLogObjects 1 } 
+                               
+              hwXQoSQppbPolicyEventEntry OBJECT-TYPE 
+                      SYNTAX HwXQoSQppbPolicyEventEntry 
+                      MAX-ACCESS not-accessible 
+                      STATUS current 
+                      DESCRIPTION 
+                      "The event occurs when the QPPB policy will not be effective." 
+                      INDEX { hwXQoSQppbPolicyChassisID, hwXQoSQppbPolicySlotId } 
+                      ::= { hwXQoSQppbPolicyEventTable 1 } 
+                               
+                  HwXQoSQppbPolicyEventEntry ::= 
+                  SEQUENCE {  
+                             hwXQoSQppbPolicyChassisID       
+                                 Integer32, 
+                             hwXQoSQppbPolicySlotId 
+                                 Integer32 }      
+
+                   hwXQoSQppbPolicyChassisID OBJECT-TYPE
+                      SYNTAX Integer32 (1..128)
+                      MAX-ACCESS read-only
+                      STATUS current
+                      DESCRIPTION
+                      "Chassis ID of the LPU where the QPPB policy will not be effective."
+                      ::= { hwXQoSQppbPolicyEventEntry 1 } 
+
+                   hwXQoSQppbPolicySlotId OBJECT-TYPE
+                      SYNTAX Integer32 (1..128)
+                      MAX-ACCESS read-only
+                      STATUS current
+                      DESCRIPTION
+                      "Slot ID of the LPU where the QPPB policy will not be effective."
+                      ::= { hwXQoSQppbPolicyEventEntry 2 } 
+-- END: Added by m00349451, 2016/05/31
+
+--begin add by pengsheng 00191075, multicast packets discard alarm
+    hwXQoSMulticastPktsDiscardAlarmObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 32 }
+	
+    hwXQoSMulticastPktsDiscardAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSMulticastPktsDiscardAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSMulticastPktsDiscardAlarmTable"
+        ::= { hwXQoSMulticastPktsDiscardAlarmObjects 1 }
+		
+    hwXQoSMulticastPktsDiscardAlarmEntry OBJECT-TYPE
+        SYNTAX HwXQoSMulticastPktsDiscardAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSMulticastPktsDiscardAlarmEntry"
+        INDEX { hwXQoSMulticastPktsDiscardAlarmSlotid }
+        ::= { hwXQoSMulticastPktsDiscardAlarmTable 1 }
+		
+    HwXQoSMulticastPktsDiscardAlarmEntry ::=
+        SEQUENCE { 
+            hwXQoSMulticastPktsDiscardAlarmSlotid
+                OCTET STRING
+                } 
+		
+    hwXQoSMulticastPktsDiscardAlarmSlotid OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "slot id."
+        ::= { hwXQoSMulticastPktsDiscardAlarmEntry 1 } 
+
+    hwXQoSMulticastPktsDiscardInterfaceAlarmTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSMulticastPktsDiscardInterfaceAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSMulticastPktsDiscardInterfaceAlarmTable"
+        ::= { hwXQoSMulticastPktsDiscardAlarmObjects 2 }
+		
+    hwXQoSMulticastPktsDiscardInterfaceAlarmEntry OBJECT-TYPE
+        SYNTAX HwXQoSMulticastPktsDiscardInterfaceAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "hwXQoSMulticastPktsDiscardInterfaceAlarmEntry"
+        INDEX { hwXQoSMulticastPktsDiscardInterfaceAlarmIfIndex }
+        ::= { hwXQoSMulticastPktsDiscardInterfaceAlarmTable 1 }
+		
+    HwXQoSMulticastPktsDiscardInterfaceAlarmEntry ::=
+        SEQUENCE { 
+            hwXQoSMulticastPktsDiscardInterfaceAlarmIfIndex
+                InterfaceIndex,
+            hwXQoSMulticastPktsDiscardInterfaceAlarmIfName
+                OCTET STRING
+                } 
+		
+    hwXQoSMulticastPktsDiscardInterfaceAlarmIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The index of physical interface."
+        ::= { hwXQoSMulticastPktsDiscardInterfaceAlarmEntry 1 } 
+		
+    hwXQoSMulticastPktsDiscardInterfaceAlarmIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The name of physical interface."
+        ::= { hwXQoSMulticastPktsDiscardInterfaceAlarmEntry 2 } 
+			
+--end add by pengsheng 00191075, multicast packets discard alarm
+
+--begin add by wangcheng w00215154, qos car configuration, application, query and reset statistics
+    hwXQoSCarObjects OBJECT IDENTIFIER ::= { hwXQoSObjects 33 }
+	
+    hwXQoSCarCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSCarCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table of QoS CAR configuration information."
+        ::= { hwXQoSCarObjects 1 }
+		
+    hwXQoSCarCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwXQoSCarCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "QoS CAR configuration information Entry."
+        INDEX { hwXQoSCarIndex }
+        ::= { hwXQoSCarCfgInfoTable 1 }
+		
+    HwXQoSCarCfgInfoEntry ::=
+        SEQUENCE { 
+              hwXQoSCarIndex
+                Unsigned32,
+		      hwXQoSCarName
+                OCTET STRING,
+		      hwXQoSCarCir
+                Unsigned32,
+		      hwXQoSCarPir
+                Unsigned32,
+		      hwXQoSCarCbs
+                Unsigned32,
+		      hwXQoSCarPbs
+                Unsigned32,
+		      hwXQoSCarCfgRowStatus
+                RowStatus
+                } 
+		
+    hwXQoSCarIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object indicates the index of the QoS CAR template."
+        ::= { hwXQoSCarCfgInfoEntry 1 } 
+	
+	hwXQoSCarName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object indicates the name of the QoS CAR template."
+        ::= { hwXQoSCarCfgInfoEntry 2 }
+	
+	hwXQoSCarCir OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+          "The value of this object identifies the Committed Information Rate(unit: kbps)."
+          ::= { hwXQoSCarCfgInfoEntry 3 } 
+	
+	hwXQoSCarPir OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+          "The value of this object identifies the Peak Information Rate(unit: kbps)."
+          ::= { hwXQoSCarCfgInfoEntry 4 } 
+	
+	hwXQoSCarCbs OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+          "The value of this object identifies the Committed Burst Size(unit: bytes)."
+          ::= { hwXQoSCarCfgInfoEntry 5 } 
+	
+	hwXQoSCarPbs OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+          "The value of this object identifies the Peak Burst Size(unit: bytes)."
+          ::= { hwXQoSCarCfgInfoEntry 6 } 
+	
+	hwXQoSCarCfgRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "RowStatus. Three actions are used: active, createAndGo, destroy."
+        ::= { hwXQoSCarCfgInfoEntry 7 }
+	
+    hwXQoSCarIfApplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSCarIfApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table of QoS CAR applied on interface."
+        ::= { hwXQoSCarObjects 2 }
+		
+    hwXQoSCarIfApplyEntry OBJECT-TYPE
+        SYNTAX HwXQoSCarIfApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "QoS CAR application information on interface."
+        INDEX { hwXQoSCarIfApplyIfIndex }
+        ::= { hwXQoSCarIfApplyTable 1 }
+		
+    HwXQoSCarIfApplyEntry ::=
+        SEQUENCE { 
+            hwXQoSCarIfApplyIfIndex
+                Unsigned32,
+            hwXQoSCarIfApplyDirection
+                INTEGER,
+            hwXQoSCarIfApplyQosCarName
+                OCTET STRING,
+			hwXQoSCarIfApplyRowStatus
+			    RowStatus
+                } 
+		
+    hwXQoSCarIfApplyIfIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The index of physical interface."
+        ::= { hwXQoSCarIfApplyEntry 1 } 
+		
+    hwXQoSCarIfApplyDirection OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            inbound(0)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The direction of QoS CAR application."
+        ::= { hwXQoSCarIfApplyEntry 2 } 
+		
+    hwXQoSCarIfApplyQosCarName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The name of QoS CAR."
+        ::= { hwXQoSCarIfApplyEntry 3 } 
+	
+	hwXQoSCarIfApplyRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "RowStatus. Three actions are used: active, createAndGo, destroy."
+        ::= { hwXQoSCarIfApplyEntry 4 }
+	
+	hwXQoSCarIfApplyStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwXQoSCarIfApplyStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table of QoS CAR statistics information."
+        ::= { hwXQoSCarObjects 3 }
+		
+    hwXQoSCarIfApplyStatisticsEntry OBJECT-TYPE
+        SYNTAX HwXQoSCarIfApplyStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Statistics information of QoS CAR."
+        INDEX { hwXQoSCarIfApplyStatIfIndex }
+        ::= { hwXQoSCarIfApplyStatisticsTable 1 }
+		
+    HwXQoSCarIfApplyStatisticsEntry ::=
+        SEQUENCE { 
+            hwXQoSCarIfApplyStatIfIndex
+                Unsigned32,            
+            hwXQoSCarIfApplyStatQosCarName
+                OCTET STRING,
+            hwXQoSCarIfApplyStatPassPackets
+                Counter64,
+            hwXQoSCarIfApplyStatPassBytes
+                Counter64,
+            hwXQoSCarIfApplyStatDiscardPackets
+                Counter64,
+            hwXQoSCarIfApplyStatDiscardBytes
+                Counter64,
+            hwXQoSCarIfApplyStatResetFlag
+                EnabledStatus
+                } 
+		
+    hwXQoSCarIfApplyStatIfIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The index of physical interface."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 1 } 
+				
+    hwXQoSCarIfApplyStatQosCarName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The name of QoS CAR."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 2 } 
+		
+    hwXQoSCarIfApplyStatPassPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Passed packets."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 3 } 
+		
+    hwXQoSCarIfApplyStatPassBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Passed bytes."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 4 } 
+		
+    hwXQoSCarIfApplyStatDiscardPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Discarded packets."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 5 } 
+		
+    hwXQoSCarIfApplyStatDiscardBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Discarded bytes."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 6 } 
+	
+	hwXQoSCarIfApplyStatResetFlag OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset flag enable(1),disable(2)."
+        ::= { hwXQoSCarIfApplyStatisticsEntry 7 }
+			
+--end add by w00215154
+
     END
 
 --

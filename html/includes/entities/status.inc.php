@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -52,14 +52,21 @@ function humanize_status(&$status)
   $status['humanized'] = TRUE;
 }
 
-function generate_status_query($vars)
+function generate_status_query($vars, $query_count = FALSE)
 {
-  $sql = "SELECT * FROM `status`";
-  //$sql .= " LEFT JOIN `status-state` USING(`status_id`)";
-  if($vars['sort'] == 'hostname' || $vars['sort'] == 'device' || $vars['sort'] == 'device_id')
+
+  if ($query_count)
   {
-    $sql .= ' LEFT JOIN `devices` USING(`device_id`)';
+    $sql = "SELECT COUNT(*) FROM `status`";
+  } else {
+    $sql  = "SELECT * FROM `status`";
+
+    if ($vars['sort'] == 'hostname' || $vars['sort'] == 'device' || $vars['sort'] == 'device_id')
+    {
+      $sql .= ' LEFT JOIN `devices` USING(`device_id`)';
+    }
   }
+
   //$sql .= " WHERE 1";
   $sql .= " WHERE `status_deleted` = 0";
 
@@ -88,7 +95,14 @@ function generate_status_query($vars)
         break;
     }
   }
-  $sql .= $GLOBALS['cache']['where']['devices_permitted'];
+  //$sql .= $GLOBALS['cache']['where']['devices_permitted'];
+  $sql .= generate_query_permitted(array('device', 'status'));
+
+  // If need count, just return sql without sorting
+  if ($query_count)
+  {
+    return $sql;
+  }
 
   switch ($vars['sort_order'])
   {
@@ -136,19 +150,23 @@ function generate_status_query($vars)
 
 function print_status_table($vars)
 {
+
+  pagination($vars, 0, TRUE); // Get default pagesize/pageno
+
   $sql = generate_status_query($vars);
 
   $status_list = array();
   foreach(dbFetchRows($sql) as $status)
   {
-    if (isset($GLOBALS['cache']['devices']['id'][$status['device_id']]))
-    {
+    //if (isset($GLOBALS['cache']['devices']['id'][$status['device_id']]))
+    //{
       $status['hostname'] = $GLOBALS['cache']['devices']['id'][$status['device_id']]['hostname'];
       $status_list[] = $status;
-    }
+    //}
   }
 
-  $status_count = count($status_list);
+  //$status_count = count($status_list); // This is count incorrect, when pagination used!
+  $status_count = dbFetchCell(generate_status_query($vars, TRUE));
 
   // Pagination
   $pagination_html = pagination($vars, $status_count);

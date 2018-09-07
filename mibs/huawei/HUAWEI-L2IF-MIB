@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Layer Two Interface Management MIB
 -- Reference:
--- Version: V1.0
+-- Version: V2.13
 -- History:
 --      V1.0 
 -- ==================================================================
@@ -39,7 +39,7 @@ IMPORTS
      hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
      
     hwL2IfMib MODULE-IDENTITY
-        LAST-UPDATED "201308060900Z"        
+        LAST-UPDATED "201611220900Z"        
     ORGANIZATION 
         "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
@@ -53,6 +53,9 @@ IMPORTS
     DESCRIPTION
         "information of layer2 interface and information of hybrid port and
         information of trunk port"
+    REVISION	 "201611220900Z"
+    DESCRIPTION
+	"Add hwL2IfActivePortType."         
     REVISION	 "201308060900Z"
     DESCRIPTION
 	"Add hwL2IfActivePortType." 
@@ -242,7 +245,8 @@ VlanList ::= TEXTUAL-CONVENTION
             {
                 enabled(1),
                 disabled(2),
-                discard(3)
+                discard(3),
+                invalid(4)
             }
         MAX-ACCESS read-write
         STATUS current

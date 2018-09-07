@@ -24,7 +24,7 @@ MITEL-MIB DEFINITIONS ::= BEGIN
         ifIndex                              FROM IF-MIB;
 
     mitel                 MODULE-IDENTITY
-        LAST-UPDATED      "200601010000Z"
+        LAST-UPDATED      "201402111200Z"
         ORGANIZATION      "MITEL Networks Corporation"
         CONTACT-INFO      "Standards Group,
                            Postal:    MITEL Networks Corporation
@@ -33,8 +33,12 @@ MITEL-MIB DEFINITIONS ::= BEGIN
                            Canada  K2K 2W7
                            Tel: +1 613 592 2122
                            Fax: +1 613 592 4784
-                           E-mail: std@mitel.com"
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replace E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
         DESCRIPTION       "The top-level MITEL MIB module."
+        REVISION          "201107140000Z"
+        DESCRIPTION       "Restoring the mitelIdCallServers from previous revision"
         REVISION          "200601010000Z"
         DESCRIPTION       "To be consistent with all other products this MIB was
                            sanitized." 
@@ -159,15 +163,20 @@ MITEL-MIB DEFINITIONS ::= BEGIN
 
     -- mitelIdCallServers subtree
 
+    mitelIdCsMc2          OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The MC-2 Call Server."
+        ::= { mitelIdCallServers 1 }
+
     mitelIdCs2000Light          OBJECT-IDENTITY
         STATUS            current
-        DESCRIPTION       "The MC-2 call server."
-        ::= { mitelIdCallServers 1 }
+        DESCRIPTION       "The Mitel SX-2000 LIGHT Call Server."
+        ::= { mitelIdCallServers 2 }
 
     mitelIdCsIpera3000      OBJECT-IDENTITY
         STATUS            current
         DESCRIPTION       "The MITEL Networks 3300 ICP Call Server."
-        ::= { mitelIdCallServers 2 }
+        ::= { mitelIdCallServers 3 }
 
     -- mitelIdApplicationPlatforms subtree
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -714,11 +714,16 @@ function ldap_bind_dn($username = "", $password = "")
           // Use session credintials
           print_debug("LDAP[Bind][session]");
           $username = $_SESSION['username'];
-          if (!isset($_SESSION['mcrypt_required']))
+          if (!isset($_SESSION['encrypt_required']))
           {
-            $password = decrypt($_SESSION['user_encpass'], session_unique_id() . get_unique_id());
+            $key = session_unique_id();
+            if (OBS_ENCRYPT_MODULE == 'mcrypt')
+            {
+              $key .= get_unique_id();
+            }
+            $password = decrypt($_SESSION['user_encpass'], $key);
           } else {
-            // WARNING, requires mcrypt
+            // WARNING, requires mcrypt or sodium
             $password = base64_decode($_SESSION['user_encpass'], TRUE);
           }
         }

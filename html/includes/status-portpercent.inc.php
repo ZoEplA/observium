@@ -85,20 +85,19 @@ foreach ($totals_array as $type => $dir)
 
 $legend .= '</table>';
 
-
 $box_args = array('title' => 'Traffic Comparison',
                                 'header-border' => TRUE,
                                 'padding' => FALSE,
                     );
-$box_args['header-controls'] = array('controls' => array('tooltip'   => array('icon'   => $config['icon']['info'],
+$box_args['header-controls'] = array('controls' => array('tooltip'   => array(//'icon'   => $config['icon']['info'],
                                                                               'anchor' => TRUE,
+                                                                              'text' => (($options['graph_format'] == "multi" || $options['graph_format'] == "multi_bare") ? '<span class="label">Day</span><span class="label">Week</span><span class="label">Month</span><span class="label">Year</span>' : '<span class="label">48 Hours</span>'),
                                                                               'class'  => 'tooltip-from-element',
                                                                               //'url'    => '#',
                                                                               'data'   => 'data-tooltip-id="tooltip-help-conditions"')));
 
 
 echo generate_box_open($box_args);
-
 
 ?>
 <div id="tooltip-help-conditions" style="display: none;">
@@ -112,10 +111,9 @@ echo generate_box_open($box_args);
       if($options['graph_format'] != "none")
       {
 
-
         $graph_array = array('type'   => 'multi-port_groups_bits',
                              'width'  => 1239,
-                             'height' => 90,
+                             'height' => 89,
                              'legend' => no,
                              'from'   => $config['time']['twoday'],
                              'to'     => $config['time']['now'],
@@ -131,22 +129,52 @@ echo generate_box_open($box_args);
           case 'single':
             $graph_array['height'] = 100;
             $graph_array['width']  = 1148;
+            $graph_array['draw_all'] = 'yes';
+
+            if(isset($width)) {
+              $graph_array['width'] = ($width - 10 - 76);
+              $graph_array['height'] = $height - 174;
+              if ($graph_array['width'] > 350) { $graph_array['width'] -= 6; }
+            }
+
             echo generate_graph_tag($graph_array);
             break;
 
+            // FIXME - This logic should probably be functionalised, and the cuttoff to switch font should be a variable.
+
           case 'multi':
             $graph_array['height'] = 100;
+            $graph_array['draw_all'] = 'yes';
             unset($graph_array['width']);
+            if(isset($width)) {
+              $graph_array['width'] = round(($width - 19) / 4);
+
+              if($graph_array['width'] > 350) { $graph_array['width'] -= 82; } else { $graph_array['width'] -= 76; }
+
+              $graph_array['height'] = $height - 174;
+            }
             print_graph_row($graph_array);
             break;
 
           case 'multi_bare':
-            $graph_array['width']  = 305;
+            $graph_array['width'] = 305;
+            $graph_array['graph_only'] = 'yes';
+            if(isset($width)) {
+                $graph_array['width'] = ($width - 19) / 4;
+              $graph_array['height'] = $height - 135;
+            }
+
             print_graph_row($graph_array);
             break;
 
           case 'single_bare':
           default:
+              $graph_array['graph_only'] = 'yes';
+          if(isset($width)) {
+
+            $graph_array['width'] = ($width - 10);
+            $graph_array['height'] = $height - 135;
+          }
             echo(generate_graph_tag($graph_array));
            break;
         }

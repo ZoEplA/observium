@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -22,7 +22,8 @@ include($config['html_dir'].'/includes/alerting-navbar.inc.php');
 // Begin Actions
 $readonly = $_SESSION['userlevel'] < 10; // Currently edit allowed only for Admins
 
-if (!$readonly && isset($vars['action']))
+if (!$readonly && isset($vars['action']) &&
+    request_token_valid($vars['requesttoken']))
 {
   switch ($vars['action'])
   {
@@ -35,7 +36,7 @@ if (!$readonly && isset($vars['action']))
 
       if ($rows_updated)
       {
-        set_obs_attrib('syslog_rules_changed', time());
+        set_obs_attrib('syslog_rules_changed', time()); // Trigger reload syslog script
         print_message('Syslog Rule updated ('.$vars['la_id'].')');
       }
       unset($vars['la_id']);
@@ -51,7 +52,7 @@ if (!$readonly && isset($vars['action']))
 
         if ($rows_deleted)
         {
-          set_obs_attrib('syslog_rules_changed', time());
+          set_obs_attrib('syslog_rules_changed', time()); // Trigger reload syslog script
           print_message('Deleted all traces of Syslog Rule ('.$vars['la_id'].')');
         }
       }

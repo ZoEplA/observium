@@ -37,7 +37,9 @@ IMPORTS
     MwlL2SecurityMode,
     MwlVpnStatus,
     MwlApIfModeType,
+    MwlIpMode,
     MwlDeviceType,
+    MwlIpv6AddrType,
     MwlAddressAssignmentType
         FROM MERU-TC;
 
@@ -74,11 +76,14 @@ IMPORTS
        mwStationMacAddress                                         MacAddress,
        mwStationIpv6Address                                        Ipv6Address,
        mwStationAp                                                 Integer32,
+       mwStationIpMode                                             MwlIpMode,
        mwStationApName                                             DisplayString,
        mwStationL3State                                            MwlVpnStatus,
        mwStationVlanTag                                            Unsigned32,
        mwStationAuthUser                                           DisplayString,
        mwStationVlanName                                           DisplayString(SIZE (0..32)),
+       mwStationFilterId                                           DisplayString(SIZE (0..16)),
+       mwStationFpOsType                                           DisplayString,
        mwStationRadioType                                          MwlApIfModeType,
        mwStationDeviceType                                         MwlDeviceType,
        mwStationL2ModeState                                        MwlL2SecurityMode,
@@ -86,6 +91,8 @@ IMPORTS
        mwStationVirtualPort                                        MacAddress,
        mwStationTxThroughput                                       Unsigned32,
        mwStationRxThroughput                                       Unsigned32,
+       mwStationFpDeviceType                                       DisplayString,
+       mwStationVlanPoolName                                       DisplayString(SIZE (0..64)),
        mwStationLossPercentage                                     Integer32,
        mwStationAddrAssignmentType                                 MwlAddressAssignmentType,
        mwStationChannelUtilization                                 Counter64,
@@ -146,7 +153,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-         "This object describes Tag/Id"
+         "This object describes Tag/ID"
     ::= { mwStationEntry    7 }
 
   mwStationAuthUser  OBJECT-TYPE
@@ -242,8 +249,48 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-         "This object describes Device Type"
+         "This object describes Station Type"
     ::= { mwStationEntry   20 }
+
+  mwStationFilterId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Firewall Filter ID"
+    ::= { mwStationEntry   21 }
+
+  mwStationFpDeviceType  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Device Type"
+    ::= { mwStationEntry   22 }
+
+  mwStationFpOsType  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes OS Type"
+    ::= { mwStationEntry   23 }
+
+  mwStationIpMode  OBJECT-TYPE
+    SYNTAX MwlIpMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Mode"
+    ::= { mwStationEntry   24 }
+
+  mwStationVlanPoolName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Pool Name"
+    ::= { mwStationEntry   25 }
 
   mwStationRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
@@ -251,7 +298,7 @@ IMPORTS
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwStationEntry 29 }
+    ::= { mwStationEntry 34 }
 
   mwStationIpaddressTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwStationIpaddressEntry
@@ -272,10 +319,11 @@ IMPORTS
 
   MwStationIpaddressEntry  ::=  SEQUENCE { 
        mwStationIpaddressTableIndex                                Integer32, 
-       mwStationIpaddressIpAddress                                 IpAddress,
+       mwStationIpaddressIpAddress                                 Ipv6Address,
        mwStationIpaddressMacAddress                                MacAddress,
        mwStationIpaddressVirtualAddress                            MacAddress,
        mwStationIpaddressAddrAssignmentType                        MwlAddressAssignmentType,
+       mwStationIpaddressIpv6AddrType                              MwlIpv6AddrType,
        mwStationIpaddressRowStatus                                 RowStatus 
   }
    
@@ -297,11 +345,11 @@ IMPORTS
     ::= { mwStationIpaddressEntry    2 }
 
   mwStationIpaddressIpAddress  OBJECT-TYPE
-    SYNTAX IpAddress
+    SYNTAX Ipv6Address
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-         "This object describes IP Address"
+         "This object describes Client IP"
     ::= { mwStationIpaddressEntry    3 }
 
   mwStationIpaddressAddrAssignmentType  OBJECT-TYPE
@@ -320,13 +368,21 @@ IMPORTS
          "This object describes Client Virtual MAC Address"
     ::= { mwStationIpaddressEntry    5 }
 
+  mwStationIpaddressIpv6AddrType  OBJECT-TYPE
+    SYNTAX MwlIpv6AddrType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Address Type"
+    ::= { mwStationIpaddressEntry    6 }
+
   mwStationIpaddressRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwStationIpaddressEntry 6 }
+    ::= { mwStationIpaddressEntry 7 }
 
   
 END

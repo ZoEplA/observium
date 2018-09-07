@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,11 +17,13 @@ echo(" UBNT-AirFIBER-MIB ");
 
 $radios_snmp = snmpwalk_cache_oid($device, "airFiberConfigIndex", array(), "UBNT-AirFIBER-MIB");
 
-$oids = array('radioLinkMode', 'radioEnable', 'radioDuplex', 'txFrequency', 'rxFrequency', 'regDomain', 'txPower', 'rxGain', 'linkName', 'curTXModRate', 'radioLinkDistM',
-              'rxCapacity', 'txCapacity', 'radioLinkState', 'rxPower0', 'rxPower1',  'linkUpTime', 'remoteMAC', 'remoteIP',
-              'txFramesOK', 'rxFramesOK', 'txOctetsOK', 'rxOctetsOK', 'rxFrameCrcErr', 'rxAlignErr', 'txPauseFrames', 'rxPauseFrames', 'rxErroredFrames', 'txErroredFrames',
-              'rxValidUnicastFrames', 'rxValidMulticastFrames', 'rxValidBroadcastFrames', 'txValidUnicastFrames', 'txValidMulticastFrames', 'txValidBroadcastFrames',
-              'rxDroppedMacErrFrames', 'rxTotalOctets', 'rxTotalFrames');
+$oids = array('radioLinkMode', 'radioEnable', 'radioDuplex', 'radioLinkDistM', 'radioLinkState',
+              'txFrequency', 'txPower', 'txCapacity', 'txFramesOK', 'txOctetsOK', 'txPauseFrames',
+              'txErroredFrames', 'txValidUnicastFrames', 'txValidMulticastFrames', 'txValidBroadcastFrames',
+              'rxFrequency', 'rxGain', 'rxCapacity', 'rxPower0', 'rxPower1', 'rxFramesOK', 'rxOctetsOK',
+              'rxFrameCrcErr', 'rxAlignErr', 'rxPauseFrames', 'rxErroredFrames', 'rxValidUnicastFrames',
+              'rxValidMulticastFrames', 'rxValidBroadcastFrames', 'rxDroppedMacErrFrames', 'rxTotalOctets', 'rxTotalFrames',
+              'regDomain', 'linkName', 'linkUpTime', 'remoteMAC', 'remoteIP', 'curTXModRate');
 
 // Goes through the SNMP radio data
 foreach ($radios_snmp as $index => $radio)
@@ -33,7 +35,7 @@ foreach ($radios_snmp as $index => $radio)
     $get_oids[] = $oid . '.' . $index;
   }
 
-  $data = snmp_get_multi($device, $get_oids, "-OQUs", "UBNT-AirFIBER-MIB");
+  $data = snmp_get_multi_oid($device, $get_oids, array(), 'UBNT-AirFIBER-MIB');
   $data = $data[$index];
 
   print_r($data);
@@ -59,7 +61,7 @@ foreach ($radios_snmp as $index => $radio)
   $radio['radio_standard']       = array('NULL');
   $radio['radio_cur_capacity']   = $data['txCapacity'];
 
-print_r($radio);
+  //print_debug_vars($radio);
 
   poll_p2p_radio($device, 'ubnt-airfiber-mib', $index, $radio);
 

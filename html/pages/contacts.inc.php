@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -20,25 +20,20 @@ if ($_SESSION['userlevel'] < 7)
 }
 
 include($config['html_dir'].'/includes/alerting-navbar.inc.php');
-
 include($config['html_dir'].'/includes/contacts-navbar.inc.php');
 
 // Begin Actions
 $readonly = $_SESSION['userlevel'] < 10; // Currently edit allowed only for Admins
 
-
-
-
-
-if (isset($vars['action']) && $_SESSION['userlevel'] = 10)
+if (!$readonly && isset($vars['action']))
 {
   switch ($vars['action'])
   {
     case 'add_contact':
       // Only proceed if the contact_method is valid in our transports array
-      if (is_array($config['alerts']['transports'][$vars['contact_method']]))
+      if (is_array($config['transports'][$vars['contact_method']]))
       {
-        foreach ($config['alerts']['transports'][$vars['contact_method']]['parameters'] as $section => $parameters)
+        foreach ($config['transports'][$vars['contact_method']]['parameters'] as $section => $parameters)
         {
           foreach ($parameters as $parameter => $description)
           {
@@ -57,7 +52,6 @@ if (isset($vars['action']) && $_SESSION['userlevel'] = 10)
       break;
 
     case 'delete_contact':
-
       if (in_array($vars['confirm_'.$vars['contact_id']], array('1', 'on', 'yes', 'confirm')))
       {
         $rows_deleted  = dbDelete('alert_contacts',       '`contact_id` = ?', array($vars['contact_id']));
@@ -117,16 +111,16 @@ if (count($contacts))
 
     // If we have "identifiers" set for this type of transport, use those to print a user friendly destination.
     // If we don't, just dump the JSON array as we don't have a better idea what to do right now.
-    if (isset($config['alerts']['transports'][$contact['contact_method']]['identifiers']))
+    if (isset($config['transports'][$contact['contact_method']]['identifiers']))
     {
       // Decode JSON for use below
       $contact['endpoint_variables'] = json_decode($contact['contact_endpoint'], TRUE);
 
       // Add all identifier strings to an array and implode them into the description variable
       // We can't just foreach the identifiers array as we don't know what section the variable is in
-      foreach ($config['alerts']['transports'][$contact['contact_method']]['identifiers'] as $key)
+      foreach ($config['transports'][$contact['contact_method']]['identifiers'] as $key)
       {
-        foreach ($config['alerts']['transports'][$contact['contact_method']]['parameters'] as $section => $parameters)
+        foreach ($config['transports'][$contact['contact_method']]['parameters'] as $section => $parameters)
         {
           if (isset($parameters[$key]) && isset($contact['endpoint_variables'][$key]))
           {
@@ -145,7 +139,7 @@ if (count($contacts))
     echo '    <tr>';
     echo '      <td></td>';
     echo '      <td>'.$contact['contact_id'].'</td>';
-    echo '      <td><span class="label">'.$config['alerts']['transports'][$contact['contact_method']]['name'].'</span></td>';
+    echo '      <td><span class="label">'.$config['transports'][$contact['contact_method']]['name'].'</span></td>';
     echo '      <td class="text-nowrap">'.escape_html($contact['contact_descr']).'</td>';
     echo '      <td><a href="' . generate_url(array('page' => 'contact', 'contact_id' => $contact['contact_id'])) . '">' . $contact['endpoint_descr'] . '</a></td>';
     echo '      <td><span class="label label-primary">'.$num_assocs.'</span></td>';
@@ -174,7 +168,7 @@ if (count($contacts))
                   'userlevel'  => 10,          // Minimum user level for display form
                   'id'         => 'modal-contact_delete_'.$contact['contact_id'],
                   'title'      => 'Delete Contact "'   . $contact['contact_descr'] .
-                                  '" (Id: '. $contact['contact_id'] . ', ' . $config['alerts']['transports'][$contact['contact_method']]['name'] . ')',
+                                  '" (Id: '. $contact['contact_id'] . ', ' . $config['transports'][$contact['contact_method']]['name'] . ')',
                   //'modal_args' => $modal_args, // modal specific options
                   //'help'      => 'This will delete the selected contact and any alert assocations.',
                   //'class'     => '', // Clean default box class (default for modals)
@@ -204,13 +198,13 @@ if (count($contacts))
                                     'type'        => 'html',
                                     'fieldset'    => 'body',
                                     'html'        => '<h4 class="alert-heading"><i class="icon-warning-sign"></i> Warning!</h4>' .
-                                                     ' Are you sure you want to delete this alert association?',
+                                                     ' Are you sure you want to delete this contact?',
                                     'div_style'   => 'display: none', // hide initially
                                     'div_class'   => 'alert alert-warning');
 
     $form['row'][8]['close'] = array(
                                     'type'        => 'submit',
-                                    'fieldset'    => 'footer',
+                                    'fieldset'    => 'footer', 
                                     'div_class'   => '', // Clean default form-action class!
                                     'name'        => 'Close',
                                     'icon'        => '',

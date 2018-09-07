@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -45,8 +45,7 @@ foreach ($oids as $index => $entry)
     // Not numerical values, only states
     if (!$ent_count)
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'temp-'.$index, $sensor_state_type, $descr, NULL,
-                      $entry['ciscoEnvMonTemperatureState'], array('entPhysicalClass' => 'temperature'));
+      discover_status($device, $oid, 'temp-'.$index, $sensor_state_type, $descr, $entry['ciscoEnvMonTemperatureState'], array('entPhysicalClass' => 'temperature'));
     }
   }
 }
@@ -58,7 +57,7 @@ $oids = snmpwalk_cache_oid($device, 'ciscoEnvMonVoltageStatusEntry', array(), 'C
 
 foreach ($oids as $index => $entry)
 {
-  $descr = $entry['ciscoEnvMonVoltageStatusDescr'];
+  $descr = str_replace(' in mV', '', $entry['ciscoEnvMonVoltageStatusDescr']);
   if ($descr == '') { continue; } // Skip sensors with empty description, seems like Cisco bug
 
   if (isset($entry['ciscoEnvMonVoltageStatusValue']))
@@ -79,13 +78,11 @@ foreach ($oids as $index => $entry)
   else if (isset($entry['ciscoEnvMonVoltageState']))
   {
     $oid   = '.1.3.6.1.4.1.9.9.13.1.2.1.7.'.$index;
-    //Not numerical values, only states
     $query = 'SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_type` = ? AND (`sensor_descr` LIKE ? OR `sensor_descr` LIKE ?);';
     $ent_count = dbFetchCell($query, array($device['device_id'], 'cisco-entity-state', $descr.'%', '%- '.$descr));
     if (!$ent_count)
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'voltage-'.$index, $sensor_state_type, $descr, NULL,
-                      $entry['ciscoEnvMonVoltageState'], array('entPhysicalClass' => 'voltage'));
+      discover_status($device, $oid, 'voltage-'.$index, $sensor_state_type, $descr, $entry['ciscoEnvMonVoltageState'], array('entPhysicalClass' => 'voltage'));
     }
   }
 }
@@ -104,11 +101,16 @@ foreach ($oids as $index => $entry)
     // Exclude duplicated entries from CISCO-ENTITY-SENSOR
     $ent_count = dbFetchCell('SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_type` = ? AND (`status_descr` LIKE ? OR `status_descr` LIKE ?);',
                               array($device['device_id'], 'cisco-entity-state', $descr.'%', '%- '.$descr));
-    //Not numerical values, only states
     if (!$ent_count)
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'supply-'.$index, $sensor_state_type, $descr, NULL,
-                      $entry['ciscoEnvMonSupplyState'], array('entPhysicalClass' => 'power'));
+      discover_status($device, $oid, 'supply-'.$index, $sensor_state_type, $descr, $entry['ciscoEnvMonSupplyState'], array('entPhysicalClass' => 'power'));
+
+      $oid_name = 'ciscoEnvMonSupplySource';
+      $oid_num  = '.1.3.6.1.4.1.9.9.13.1.5.1.4.'.$index;
+      $type     = 'ciscoEnvMonSupplySource';
+      $value    = $entry[$oid_name];
+
+      discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr . ' Source', $value, array('entPhysicalClass' => 'powersupply'));
     }
   }
 }
@@ -129,11 +131,10 @@ foreach ($oids as $index => $entry)
     // Exclude duplicated entries from CISCO-ENTITY-SENSOR
     $ent_count = dbFetchCell('SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_type` = ? AND (`status_descr` LIKE ? OR `status_descr` LIKE ?);',
                               array($device['device_id'], 'cisco-entity-state', $descr.'%', '%- '.$descr));
-    //Not numerical values, only states
+
     if (!$ent_count)
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'fan-'.$index, $sensor_state_type, $descr, NULL,
-                      $entry['ciscoEnvMonFanState'], array('entPhysicalClass' => 'fan'));
+      discover_status($device, $oid, 'fan-'.$index, $sensor_state_type, $descr, $entry['ciscoEnvMonFanState'], array('entPhysicalClass' => 'fan'));
     }
   }
 }

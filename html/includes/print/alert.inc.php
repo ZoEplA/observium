@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -121,6 +121,7 @@ function print_alert_table($vars)
   // Short? (no pagination, small out)
   $short = (isset($vars['short']) && $vars['short']);
 
+
   list($query, $param, $query_count) = build_alert_table_query($vars);
 
   // Fetch alerts
@@ -214,18 +215,24 @@ function print_alert_table($vars)
     // Get the entity array using the cache
     $entity = get_entity_by_id_cache($alert['entity_type'], $alert['entity_id']);
 
+    $entity_type = entity_type_translate_array($alert['entity_type']);
+
     // Get the device array using the cache
     $device = device_by_id_cache($alert['device_id']);
 
-    // Get the entity_name.
-    ### FIXME - This is probably duplicated effort from above. We should pass it $entity
-    $entity_name = entity_name($alert['entity_type'], $entity);
+    // If our parent is an actual type, we need to use the type
+    /* -- Currently unused.
+    if(isset($entity_type['parent_type']))
+    {
+      $parent_entity_type = entity_type_translate_array($entity_type['parent_type']);
+      $parent_entity = get_entity_by_id_cache($entity_type['parent_type'], $entity[$entity_type['parent_id_field']]);
+    }
+    */
 
     // Set the alert_rule from the prebuilt cache array
     $alert_rule = $alert_rules[$alert['alert_test_id']];
 
     echo('<tr class="'.$alert['html_row_class'].'" style="cursor: pointer;" onclick="openLink(\''.generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'alert', 'alert_entry' => $alert['alert_table_id'])).'\')">');
-
     echo('<td class="state-marker"></td>');
     echo('<td style="width: 1px;"></td>');
 
@@ -241,7 +248,17 @@ function print_alert_table($vars)
     // Print a link to the entity
     if ($list['entity_id'])
     {
-      echo('<td><span class="entity-title"><i class="' . $config['entities'][$alert['entity_type']]['icon'] . '"></i> '.generate_entity_link($alert['entity_type'], $alert['entity_id']).'</span></td>');
+      echo '<td><span class="entity-title">';
+
+      // If we have a parent type, display it here.
+      // FIXME - this is perhaps messy. Find a better way and a better layout. We can't have a new table column because it would be empty 90% of the time!
+      if(isset($entity_type['parent_type']))
+      {
+        echo '  <i class="' . $config['entities'][$entity_type['parent_type']]['icon'] . '"></i> '.generate_entity_link($entity_type['parent_type'], $entity[$entity_type['parent_id_field']]).'</span> - ';
+
+      }
+      echo '  <i class="' . $config['entities'][$alert['entity_type']]['icon'] . '"></i> '.generate_entity_link($alert['entity_type'], $alert['entity_id'],NULL, NULL, TRUE, $short).'</span>';
+      echo '</td>';
     }
 
     // Print link to the alert rule page

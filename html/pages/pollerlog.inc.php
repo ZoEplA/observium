@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -15,7 +15,10 @@ register_html_title("Poller/Discovery Timing");
 
 $navbar = array('brand' => "Performance", 'class' => "navbar-narrow");
 
-$navbar['options']['wrapper']['text']        = 'Wrapper';
+if ($_SESSION['userlevel'] >= 7)
+{
+  $navbar['options']['wrapper']['text']        = 'Wrapper';
+}
 $navbar['options']['devices']['text']        = 'Per-Device';
 $navbar['options']['modules']['text']        = 'Per-Module';
 
@@ -79,23 +82,31 @@ foreach ($cache['devices']['hostname'] as $hostname => $id)
 
 // End generate statistics
 
-if($vars['view'] == "modules")
+if ($vars['view'] == "modules")
 {
 
-  echo generate_box_open(array('header-border' => TRUE, 'title' => 'Poller Modules'));
+  if ($_SESSION['userlevel'] >= 7)
+  {
+    echo generate_box_open(array('header-border' => TRUE, 'title' => 'Poller Modules'));
 
-  $graph_array = array('type'   => 'global_pollermods',
-                       'from'   => $config['time']['week'],
-                       'to'     => $config['time']['now'],
-                       'legend' => 'no'
-                       );
-  print_graph_row($graph_array);
+    $graph_array = array('type'   => 'global_pollermods',
+                         'from'   => $config['time']['week'],
+                         'to'     => $config['time']['now'],
+                         'legend' => 'no'
+                         );
+    print_graph_row($graph_array);
 
-  echo generate_box_close();
+    echo generate_box_close();
+  }
 
 
   echo generate_box_open();
-  echo('<table class="'.OBS_CLASS_TABLE_STRIPED_TWO.'">' . PHP_EOL);
+  if ($_SESSION['userlevel'] >= 7)
+  {
+    echo('<table class="'.OBS_CLASS_TABLE_STRIPED_TWO.'">' . PHP_EOL);
+  } else {
+    echo('<table class="'.OBS_CLASS_TABLE_STRIPED.'">' . PHP_EOL);
+  }
 
   $mods = array_sort_by($mods, 'time', SORT_DESC, SORT_NUMERIC);
 
@@ -111,17 +122,20 @@ if($vars['view'] == "modules")
     echo '  <td width="60">'.$data['count'].'</td>';
     echo '  <td width="60">'.round($data['time'], 3).'s</td>';
     echo '</tr>';
-    echo '<tr>';
-    echo '  <td colspan=6>';
+    if ($_SESSION['userlevel'] >= 7)
+    {
+      echo '<tr>';
+      echo '  <td colspan=6>';
 
-    $graph_array = array('type'   => 'global_pollermod',
-                         'module' => $mod,
-                         'legend' => 'no');
+      $graph_array = array('type'   => 'global_pollermod',
+                           'module' => $mod,
+                           'legend' => 'no');
 
-    print_graph_row($graph_array);
+      print_graph_row($graph_array);
 
-    echo '  </td>';
-    echo '</tr>';
+      echo '  </td>';
+      echo '</tr>';
+    }
 
   }
 
@@ -133,10 +147,12 @@ if($vars['view'] == "modules")
 
   echo generate_box_close();
 
-} else if($vars['view'] == "wrapper") {
+}
+else if ($vars['view'] == "wrapper" && $_SESSION['userlevel'] >= 7)
+{
 
  $rrd_file = $config['rrd_dir'].'/poller-wrapper.rrd';
- if (is_file($rrd_file) && $_SESSION['userlevel'] >= 7)
+ if (is_file($rrd_file))
  {
   echo generate_box_open(array('header-border' => TRUE, 'title' => 'Poller Wrapper History'));
 
@@ -172,19 +188,23 @@ if($vars['view'] == "modules")
   echo generate_box_close(array('footer_content' => '<b>Please note:</b> The total time for the poller wrapper is not the same as the timings below. Total poller wrapper time is real polling time for all devices and all threads.'));
  }
 
-} elseif($vars['view'] == "devices") {
+}
+else if ($vars['view'] == "devices")
+{
 
+  if ($_SESSION['userlevel'] >= 7)
+  {
+    echo generate_box_open(array('header-border' => TRUE, 'title' => 'All Devices Poller Performance'));
 
-  echo generate_box_open(array('header-border' => TRUE, 'title' => 'All Devices Poller Performance'));
+    $graph_array = array('type'   => 'global_poller',
+                         'from'   => $config['time']['week'],
+                         'to'     => $config['time']['now'],
+                         'legend' => 'no'
+                         );
+    print_graph_row($graph_array);
 
-  $graph_array = array('type'   => 'global_poller',
-                       'from'   => $config['time']['week'],
-                       'to'     => $config['time']['now'],
-                       'legend' => 'no'
-                       );
-  print_graph_row($graph_array);
-
-  echo generate_box_close();
+    echo generate_box_close();
+  }
 
 echo generate_box_open(array('header-border' => TRUE, 'title' => 'Poller/Discovery Timing'));
 echo('<table class="'.OBS_CLASS_TABLE_STRIPED_MORE.'">' . PHP_EOL);

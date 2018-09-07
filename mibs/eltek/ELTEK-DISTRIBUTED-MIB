@@ -8,92 +8,43 @@ IMPORTS
 	NOTIFICATION-GROUP
 		FROM SNMPv2-CONF
 	DisplayString
-		FROM SNMPv2-TC;
+		FROM SNMPv2-TC
+	eltek 
+		FROM ELTEK-COMMON-MIB;
+		
+--Branch overview:
+--Aeongold branch will be 1
+--AL175 branch will be 2
+--AL6000 branch will be 3
+--Internal used branch will be 4
+--Internal used branch will be 5
+--OEM Smartpack branch will be 6
+--ELTEK Common branch will be 7 (SmartPack, MCU, AEON w/WebPower sw V2.x)
+--ELTEK Distributed branch will be 8 (SmartPack w/WebPower sw V3.x)
+--ELTEK Distributed V2 branch will be 9 (SmartPack w/WebPower sw V4.0)
+--ELTEK Distributed V3 branch will be 9 (SmartPack w/WebPower sw V4.1)
+--ELTEK Distributed V4 branch will be 9 (SmartPack w/WebPower sw V4.1, V4.2, V4.3 and compack 1.xx)
+--ELTEK Distributed V5 branch will be 9 (SmartPack w/WebPower sw V4.6)
+--ELTEK Distributed V6 branch will be 9 (SmartPack w/WebPower sw V4.6, Smartpack2 V1.1)
+--ELTEK Distributed V7 branch will be 9 (SmartPack w/WebPower sw V4.7, V4.8, ComPack V1.04, Smartpack2 V1.1, V1.2)
+--ELTEK Distributed V8 branch will be 9 (SmartPack w/WebPower sw V4.9, ComPack V1.04, Smartpack2 V1.1, V1.2)"
 
-eltek MODULE-IDENTITY
-	LAST-UPDATED "201012221248Z"
-	ORGANIZATION 
-		"ELTEK dcSystem MIB Working Group"
-	CONTACT-INFO 
-		"EltekValere R&D.
-		      Postal: Eltek Valere AS
-		      P.O. Box 3043
-		      N-3003 Drammen
-		      Norway
-		      Tel: +47-32 20 32 00
-		      Fax: +47-32 20 31 20
-		      web:  www.eltekvalere.com"
-	DESCRIPTION 
-		"An ongoing effort toward a generic MIB for all ELTEK products.
-		Branch overview:
-		Aeongold branch will be 1
-		AL175 branch will be 2
-		AL6000 branch will be 3
-		Internal used branch will be 4
-		Internal used branch will be 5
-		OEM Smartpack branch will be 6
-		ELTEK Common branch will be 7 (SmartPack, MCU, AEON w/WebPower sw V2.x)
-		ELTEK Distributed branch will be 8 (SmartPack w/WebPower sw V3.x)
-		ELTEK Distributed V2 branch will be 9 (SmartPack w/WebPower sw V4.0)
-		ELTEK Distributed V3 branch will be 9 (SmartPack w/WebPower sw V4.1)
-		ELTEK Distributed V4 branch will be 9 (SmartPack w/WebPower sw V4.1, V4.2, V4.3 and compack 1.xx)
-		ELTEK Distributed V5 branch will be 9 (SmartPack w/WebPower sw V4.6)
-		ELTEK Distributed V6 branch will be 9 (SmartPack w/WebPower sw V4.6, Smartpack2 V1.1)
-		ELTEK Distributed V7 branch will be 9 (SmartPack w/WebPower sw V4.7, ComPack V1.04, Smartpack2 V1.1, V1.2)"
-
-	REVISION "201106051444Z"
-	DESCRIPTION 
-		"Added RectifierCapacityTraps.
-		Added systemServiceMode."
-
-	REVISION "201103221441Z"
-	DESCRIPTION 
-		"added smartpack2(7)  to systemSiteInfoControllerType"
-
-	REVISION "201010290829Z"
-	DESCRIPTION 
-		"Added traps and OID's for SolarChargers.
-		Added reading of values on programmable inputs of IO Monitor."
-
-	REVISION "200903121515Z"
-	DESCRIPTION 
-		"Added support for external IO monitor and Load monitor units.
-		Changes are done in the MIB to accomodate the v2c standard."
-
-	REVISION "200801301149Z"
-	DESCRIPTION 
-		"Some OIDs were added to this revision. Since all new stuff are additions and no existing information was moved, this V3 revision stays in branch 9. enjoy!"
-
-	REVISION "200706221127Z"
-	DESCRIPTION 
-		"Branch 9, contains mainly changes in the Traps format. The traps now meets SNMP v2c specification."
-
-	REVISION "200509071238Z"
-	DESCRIPTION 
-		"added battery test and boost start/stop and ac voltages"
-
-	REVISION "200506281130Z"
-	DESCRIPTION 
-		"First revision"
-::= { enterprises 12148 }
-
-
--- Supported by SmartPack w/WebPower sw V4.1, V4.2x, V4.3, V4.4, V4.6 ,V4.7,  Compack V1.00, V1.01, V1.02, V1.03, V1.04 and Smartpack2 V1.0, V1.1 and V1.2.
+-- Supported by SmartPack w/WebPower sw V4.1, V4.2x, V4.3, V4.4, V4.6 , V4.7, V4.8, V4.9, Compack V1.00, V1.01, V1.02, V1.03, V1.04 and Smartpack2 V1.0, V1.1 and V1.2.
 -- SNMP v2-C
 
-eltekDistributedPlantV7  OBJECT IDENTIFIER ::= { eltek 9 }
+eltekDistributedPlantV8  OBJECT IDENTIFIER ::= { eltek 9 }
 
 -- This branch contains OIDs for configuration of the Smartpack & ComPack Control System's
 -- basic data and settings
 
-controlSystem        OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 1 }
+controlSystem        OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 1 }
 systemTime           OBJECT IDENTIFIER ::= { controlSystem 1 }
 ioUnits              OBJECT IDENTIFIER ::= { controlSystem 17 }
 
 -- This branch contains OID's for configuration of the DC Power System's
 -- basic factory data and user's installation settings.
 
-dcSystem             OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 2 }
+dcSystem             OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 2 }
 dcPlant              OBJECT IDENTIFIER ::= { dcSystem 1 }
 
 -- This branch contains OID's for configuration of the DC Power System's
@@ -104,7 +55,7 @@ systemSiteInfo       OBJECT IDENTIFIER ::= { dcPlant 3 }
 -- This branch contains OIDs for configuration of the DC Power System's
 -- battery charging and battery protection related settings.
 
-battery              OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 3 }
+battery              OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 3 }
 
 -- This branch contains OIDs for configuration of the DC Power System's
 -- Low Voltage Battery Disconnect Contactor (LVBD) related settings
@@ -125,7 +76,7 @@ batteryMonitorUnits  OBJECT IDENTIFIER ::= { battery 21 }
 
 -- This branch contains OIDs related to the DC Load Distribution equipment
 
-loadDistribution     OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 4 }
+loadDistribution     OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 4 }
 
 -- This branch contains OIDs related to the Load Disconnect. This is related to Control unit 1 only.
 
@@ -137,13 +88,13 @@ loadMonitorUnits     OBJECT IDENTIFIER ::= { loadDistribution 4 }
 
 -- This branch contains OIDs related to the rectifier parameters
 
-rectifier            OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 5 }
+rectifier            OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 5 }
 
 -- This branch contains OIDs for polling of the rectifier status.
 
 rectifierStatus      OBJECT IDENTIFIER ::= { rectifier 5 }
-acDistribution       OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 6 }
-alarmGroup           OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 7 }
+acDistribution       OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 6 }
+alarmGroup           OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 7 }
 
 -- A selection of important alarms and events. These are used by the traps.
 
@@ -151,7 +102,7 @@ alarmWellknownAlarms  OBJECT IDENTIFIER ::= { alarmGroup 1 }
 
 -- This branch contains OIDs related to the solar charger parameters
 
-solarCharger         OBJECT IDENTIFIER ::= { eltekDistributedPlantV7 9 }
+solarCharger         OBJECT IDENTIFIER ::= { eltekDistributedPlantV8 9 }
 
 -- This branch contains OIDs for polling of the solar charger status.
 
@@ -3120,7 +3071,7 @@ dcSystemTraps  NOTIFICATION-GROUP
 		" This branch contains the Alarm Notification Traps, which duplicate the alarmGroup OIDs.
 		       Each alarm condition is represented by a Alarm Condition Trap and an associated OFF
 		       Trap, which is optionally transmitted according to the state of  OID systemSendOffTrap"
-	::= { eltekDistributedPlantV7 8 }
+	::= { eltekDistributedPlantV8 8 }
 
 alarmMajorHighBattVoltTrap  NOTIFICATION-TYPE
 	OBJECTS { alarmMajorHighBattVolt, 

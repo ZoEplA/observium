@@ -133,8 +133,6 @@ trait StandardPsr6StructureTrait
      */
     public function hasItem($key)
     {
-        CacheManager::$ReadHits++;
-
         return $this->getItem($key)->isHit();
     }
 
@@ -157,7 +155,7 @@ trait StandardPsr6StructureTrait
     public function deleteItem($key)
     {
         $item = $this->getItem($key);
-        if ($this->hasItem($key) && $this->driverDelete($item)) {
+        if ($item->isHit() && $this->driverDelete($item)) {
             $item->setHit(false);
             CacheManager::$WriteHits++;
             /**
@@ -165,6 +163,13 @@ trait StandardPsr6StructureTrait
              * then collect gc cycles
              */
             $this->deregisterItem($key);
+
+            /**
+             * Perform a tag cleanup to avoid memory leaks
+             */
+            if (strpos($key, self::DRIVER_TAGS_KEY_PREFIX) !== 0) {
+                $this->cleanItemTags($item);
+            }
 
             return true;
         }

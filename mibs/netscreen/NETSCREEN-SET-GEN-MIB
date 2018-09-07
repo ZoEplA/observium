@@ -6,7 +6,7 @@
 NETSCREEN-SET-GEN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    netscreenSettingMibModule, netscreenSetting
+    netscreenSetting, netscreenSettingMibModule
         FROM NETSCREEN-SMI
     IpAddress, MODULE-IDENTITY, OBJECT-TYPE
         FROM SNMPv2-SMI
@@ -28,6 +28,9 @@ netscreenSetGenMibModule MODULE-IDENTITY
          Tel: 1-800-638-8296
          E-mail: customerservice@juniper.net
          HTTP://www.juniper.net"
+    DESCRIPTION
+         "obsolete nsSetGenSysIp"
+    REVISION      "200508120000Z" -- Aug 12, 2005
     DESCRIPTION
         "This module defines the object that are used to monitor all
          the configuration info"
@@ -53,7 +56,7 @@ nsSetGeneral OBJECT IDENTIFIER ::= { netscreenSetting 1 }
 nsSetGenSysIp OBJECT-TYPE
     SYNTAX        IpAddress
     MAX-ACCESS    read-only
-    STATUS        current
+    STATUS        obsolete
     DESCRIPTION
         "System Ip address"
     ::= { nsSetGeneral 1 }

@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -136,60 +136,6 @@ if ($GLOBALS['snmp_status'])
           $options['measured_entity']  = $port['port_id'];
           $options['entPhysicalIndex_measured'] = $port['ifIndex'];
         }
-
-        // FIXME, remove at r8500 if errors not found, this code moved to get_port_by_ent_index()
-        /*
-        $sensor_index = $index; // Initial ifIndex
-        do
-        {
-          $sensor_port = $entity_array[$sensor_index];
-          //print_vars($sensor_port);
-          if ($sensor_port['entPhysicalClass'] === 'port')
-          {
-            // Port found, get mapped ifIndex
-            if (isset($sensor_port['0']['entAliasMappingIdentifier']) &&
-                strpos($sensor_port['0']['entAliasMappingIdentifier'], 'fIndex'))
-            {
-              list(, $ifIndex) = explode('.', $sensor_port['0']['entAliasMappingIdentifier']);
-
-              $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-              if (is_array($port))
-              {
-                // Hola, port really found
-                $options['entPhysicalIndex_measured'] = $ifIndex;
-                $options['measured_class']  = 'port';
-                $options['measured_entity'] = $port['port_id'];
-                print_debug("Port is found: ifIndex = $ifIndex, port_id = " . $port['port_id']);
-              }
-            }
-
-            break; // Exit while
-          }
-          else if ($device['os'] == 'arista_eos' && $sensor_port['entPhysicalClass'] == 'container' && strlen($sensor_port['entPhysicalAlias']))
-          {
-            // Arista not have entAliasMappingIdentifier, but used entPhysicalAlias as ifDescr
-            $port_id = get_port_id_by_ifDescr($device['device_id'], $sensor_port['entPhysicalAlias']);
-            if (is_numeric($port_id))
-            {
-              // Hola, port really found
-              $port    = get_port_by_id($port_id);
-              $ifIndex = $port['ifIndex'];
-              $options['entPhysicalIndex_measured'] = $ifIndex;
-              $options['measured_class']  = 'port';
-              $options['measured_entity'] = $port_id;
-              print_debug("Port is found: ifIndex = $ifIndex, port_id = " . $port_id);
-              break; // Exit while
-            }
-            $sensor_index = $sensor_port['entPhysicalContainedIn']; // Next ifIndex
-          }
-          else if ($sensor_index == $sensor_port['entPhysicalContainedIn'])
-          {
-            break; // Break if current index same as next to avoid loop
-          } else {
-            $sensor_index = $sensor_port['entPhysicalContainedIn']; // Next ifIndex
-          }
-        } while ($sensor_port['entPhysicalClass'] !== 'port' && $sensor_port['entPhysicalContainedIn'] > 0 && ($sensor_port['entPhysicalParentRelPos'] > 0 || $device['os'] == 'arista_eos'));
-        */
 
       }
 

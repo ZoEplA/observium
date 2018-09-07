@@ -101,7 +101,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-         "This object describes Local External FastEthernet Index"
+         "This object describes Local External Ethernet Index"
     ::= { mwGreEntry    3 }
 
   mwGreDHCPServerIpAddress  OBJECT-TYPE

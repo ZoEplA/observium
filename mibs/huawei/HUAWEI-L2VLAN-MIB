@@ -1,9 +1,9 @@
 --==================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Layer Two VLAN MIB
 -- Reference:
--- Version: V2.06
+-- Version: V2.07
 -- History:
 -- ==================================================================
 -- ==================================================================
@@ -42,7 +42,7 @@ IMPORTS
     hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
     
     hwL2Vlan MODULE-IDENTITY
-            LAST-UPDATED "201409170000Z"                
+            LAST-UPDATED "201609180000Z"                
     ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
@@ -55,6 +55,10 @@ IMPORTS
              "
     DESCRIPTION
             "The L2Vlan MIB module is defined to manage several layer two function of Huawei Technologies co.,Ltd."
+   REVISION
+            "201609180000Z"
+   DESCRIPTION
+            "Add hwL2VlanMultiVoiceVlanPortTag0Enable."            
    REVISION
             "201409170000Z"
    DESCRIPTION
@@ -2729,6 +2733,7 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
          hwL2VlanMultiVoiceVlanIfIndex         InterfaceIndex,
          hwL2VlanMultiVoiceVlanPortVLanId        VlanId,
          hwL2VlanMultiVoiceVlanPortUntagEnable   INTEGER,
+         hwL2VlanMultiVoiceVlanPortTag0Enable   INTEGER,
          hwL2VlanMultiVoiceVlanPortRowStatus     RowStatus 
          }
                
@@ -2756,7 +2761,18 @@ hwL2VlanStatistics     OBJECT IDENTIFIER ::= { hwL2VlanMngObjects 3 }
         STATUS current
         DESCRIPTION "The value of this object identifies whether untagged voice packets can be forwarded in voice VLAN, 1 for enabled, 2 for disabled."
         ::= { hwL2VlanMultiVoiceVlanPortEntry 3}   
-        
+
+   hwL2VlanMultiVoiceVlanPortTag0Enable OBJECT-TYPE
+        SYNTAX  INTEGER  
+         {
+         enabled (1),
+         disabled (2)
+         }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "The value of this object identifies whether tag0 voice packets can be forwarded in voice VLAN, 1 for enabled, 2 for disabled."
+        ::= { hwL2VlanMultiVoiceVlanPortEntry 4}  
+                
     hwL2VlanMultiVoiceVlanPortRowStatus OBJECT-TYPE
         SYNTAX  RowStatus
         MAX-ACCESS read-create
@@ -5113,6 +5129,7 @@ hwL2vlanQinQInterfaceGroup OBJECT-GROUP
     OBJECTS {
               hwL2VlanMultiVoiceVlanPortVLanId,
               hwL2VlanMultiVoiceVlanPortUntagEnable,
+              hwL2VlanMultiVoiceVlanPortTag0Enable,
               hwL2VlanMultiVoiceVlanPortRowStatus }
      STATUS current
      DESCRIPTION

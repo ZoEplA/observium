@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: File.php 160 2012-07-18 03:57:32Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.1.0
  *
@@ -83,10 +83,10 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
         //
         // check that the file exists first
         //
-        if ( (file_exists($this->cache_file) == true) 
+        if ( ($this->cache_opened == false) 
+            && (file_exists($this->cache_file) == true) 
             && (filesize($this->cache_file) > 0)
         ) {
-
             //
             // open the file for reading
             //
@@ -135,6 +135,11 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 // clean up the data
                 //
                 $this->clean();
+
+                //
+                // mark this so we don't read this contents more than once per instance.
+                //
+                $this->cache_opened = true;
             }
         }
     }

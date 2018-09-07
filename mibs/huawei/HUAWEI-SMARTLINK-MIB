@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI SMARTLINK MIB
 -- Reference:
--- Version: V3.03
+-- Version: V3.04
 -- History:
 -- ==================================================================
 
@@ -29,7 +29,7 @@
                         
         hwSmartLinkMib MODULE-IDENTITY 
 
-			      LAST-UPDATED "201507271717Z"		-- Jul 27, 2015 at 17:17 GMT
+			      LAST-UPDATED "201607091717Z"		-- Jul 9, 2016 at 17:17 GMT
 			      ORGANIZATION 
 				        "Huawei Technologies Co.,Ltd."
 			      CONTACT-INFO 
@@ -42,8 +42,11 @@
                 "
             DESCRIPTION 
                 "This module includes the information about smart link.
-                The information can be read and some of them can be set."
-            
+                The information can be read and some of them can be set."  
+                
+            REVISION  "201607091717Z"
+            DESCRIPTION  "Update to increase  hwSmartLinkPcIfName."
+
             REVISION  "201507271717Z"
             DESCRIPTION  "Update to increase  hwSmartLinkRpcRevAuthMode and hwSmartLinkMulRpcRevAuthMode ENUM elemt as null(0)."
 
@@ -848,7 +851,15 @@
 	             used to create a new instance, and operation of Destroy be 
 	             used to destroy an existent index."
             ::= { hwSmartLinkMulRevPortCfgEntry 50 }
-                        
+
+	hwSmartLinkPcIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..80))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface name."
+            ::= { hwSmartLinkMibObjects 14 } 
+	                      
         hwSmartLinkMibTraps OBJECT-IDENTITY
             STATUS current
             DESCRIPTION 
@@ -863,14 +874,14 @@
             ::= { hwSmartLinkMibTraps 1 }
         
         hwSmartLinkInactiveLinkFail NOTIFICATION-TYPE
-            OBJECTS { hwSmartLinkPcIfIndex }
+            OBJECTS { hwSmartLinkPcIfIndex, hwSmartLinkPcIfName }
             STATUS current
             DESCRIPTION 
                 "The SNMP trap that is generated when detect the link change to abnormal status."
             ::= { hwSmartLinkMibTraps 2 }
         
         hwSmartLinkInactiveLinkResume NOTIFICATION-TYPE
-            OBJECTS { hwSmartLinkPcIfIndex }
+            OBJECTS { hwSmartLinkPcIfIndex, hwSmartLinkPcIfName }
             STATUS current
             DESCRIPTION 
                 "The SNMP trap that is generated when detect the link change to normal status from abnormal status."
@@ -979,7 +990,8 @@
                       hwSmartLinkPcPortStatus,
                       hwSmartLinkPcSendFlushNum,
                       hwSmartLinkPcSendFlushTime, 
-                      hwSmartLinkPcRowStatus }
+                      hwSmartLinkPcRowStatus,
+                      hwSmartLinkPcIfName }
             STATUS current
             DESCRIPTION 
                 "A collection of objects providing smart link port configuration."

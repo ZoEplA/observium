@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -60,7 +60,7 @@ unset($navbar);
                   'icon'       => 'oicon-sql-join-inner',
                   //'modal_args' => $modal_args, // !!! This generate modal specific form
                   //'class'      => '',          // Clean default box class!
-                  //'url'       => 'delhost/'
+                  'url'        => 'contacts/'
                   );
     //$form['fieldset']['body']   = array('class' => 'modal-body');   // Required this class for modal body!
     //$form['fieldset']['footer'] = array('class' => 'modal-footer'); // Required this class for modal footer!
@@ -76,17 +76,18 @@ unset($navbar);
                                       //'values'      => $form_params['method'],
                                       'value'       => 'email');
     $row_tmp = $row; // Store row number
-    foreach (array_keys($config['alerts']['transports']) as $transport)
+    foreach (array_keys($config['transports']) as $transport)
     {
-      $form_params['method'][$transport] = $config['alerts']['transports'][$transport]['name'];
+      $form_params['method'][$transport] = $config['transports'][$transport]['name'];
 
-      $docs_link = OBSERVIUM_URL . '/docs/alerting_transports/#' . str_replace(' ', '-', strtolower($config['alerts']['transports'][$transport]['name']));
+      $docs_link = OBSERVIUM_URL . '/docs/alerting_transports/#' . str_replace(' ', '-', strtolower($config['transports'][$transport]['name']));
       $form['row'][++$row]['contact_' . $transport . '_doc'] = array(
                                       'type'        => 'html',
                                       'fieldset'    => 'body',
                                       'offset'      => TRUE,
                                       'html'        => '<a id="contact_' . $transport . '_doc" href="' . $docs_link . '" target="_blank">See documentation for this Transport (new page)</a>');
     }
+    asort($form_params['method']);
     $form['row'][$row_tmp]['contact_method']['values'] = $form_params['method'];
 
     $form['row'][++$row]['contact_descr'] = array(
@@ -96,7 +97,7 @@ unset($navbar);
                                       'class'       => 'input-xlarge',
                                       'value'       => '');
 
-    foreach ($config['alerts']['transports'] as $transport => $data)
+    foreach ($config['transports'] as $transport => $data)
     {
       $row++;
       if (count($data['parameters']['required']) || count($data['parameters']['global']))
@@ -191,7 +192,7 @@ $("#contact_method").change(function() {
   // Generate javascript function which hides all configuration part panels except the ones for the currently chosen transport
   // Alternative would be to hide them all, then unhide the one selected. Hmm...
   $count = 0;
-  foreach ($config['alerts']['transports'] as $transport => $description)
+  foreach ($config['transports'] as $transport => $description)
   {
     if ($count == 0)
     {
@@ -200,7 +201,7 @@ $("#contact_method").change(function() {
       $script .= "  } else if (select === '" . $transport . "') {" . PHP_EOL;
     }
     $script .= "    \$('[id^=\"contact_${transport}\"]').show();" . PHP_EOL;
-    foreach ($config['alerts']['transports'] as $ltransport => $ldescription)
+    foreach ($config['transports'] as $ltransport => $ldescription)
     {
       if ($transport != $ltransport)
       {

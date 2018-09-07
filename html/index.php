@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage webinterface
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -38,25 +38,6 @@ if (!is_writable($config['temp_dir']))
   print_error("Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.");
 }
 
-if (ini_get('register_globals'))
-{
-  $notifications[] = array('text' => 'The PHP Option "register_globals" enabled in the php.ini. Please disable it!', 'severity' => 'alert');
-}
-
-if (version_compare(PHP_VERSION, OBS_MIN_PHP_VERSION, '<'))
-{
-  $notifications[] = array('text' => '<h4>Your PHP version is too old.</h4>
-                                      Your currently installed PHP version <b>' . PHP_VERSION . '</b>
-                                      is older than the required minimum of <b>' . OBS_MIN_PHP_VERSION . '</b>.
-                                      Please upgrade your version of PHP to prevent possible incompatibilities and security problems.', 'severity' => 'danger');
-}
-
-if (isset($config['alerts']['suppress']) && $config['alerts']['suppress'])
-{
-  $notifications[] = array('text' => '<h4>All Alert Notifications Suppressed</h4>'.
-                                     'All alert notifications have been suppressed in the configuration.',
-                                     'severity' => 'warning');
-}
 
 // verify if PHP supports session, die if it does not
 check_extension_exists('session', '', TRUE);
@@ -78,13 +59,8 @@ ob_start('html_callback');
 <?php
 
 register_html_resource('css', 'observium.css');
-//register_html_resource('css', 'bootstrap-select.css');
-//register_html_resource('css', 'bootstrap-switch.css');
-//register_html_resource('css', 'bootstrap-hacks.css');
-register_html_resource('css', 'jquery.qtip.min.css');
-register_html_resource('css', 'svg_png.css');
-
-//register_html_resource('js', 'iconizr.min.js');
+//register_html_resource('css', 'jquery.qtip.min.css');
+register_html_resource('css', 'sprite.css');
 
 register_html_resource('js', 'jquery.min.js');
 // register_html_resource('js', 'jquery-ui.min.js'); // FIXME. We don't use JQueryUI or am I wrong? (mike)
@@ -150,15 +126,11 @@ if ($_SESSION['widescreen'])
   register_html_resource('css', 'styles-wide.css');
 }
 
-echo '</head>';
+?>
 
-if($vars['bare'] == 'yes')
-{
-  echo '<body style="padding-top: 10px;">';
-} else {
-  echo '<body>';
-}
+</head>
 
+<?php
 // Determine type of web browser.
 $browser_type = detect_browser_type();
 if ($browser_type == 'mobile' || $browser_type == 'tablet') { session_set_var('touch', 'yes'); }
@@ -170,11 +142,13 @@ if ($_SESSION['authenticated'])
   $allow_mobile = (in_array(detect_browser_type(), array('mobile', 'tablet')) ? $config['web_mouseover_mobile'] : TRUE);
   if ($config['web_mouseover'] && $allow_mobile)
   {
-    // Enable qTip tooltips
     register_html_resource('js', 'jquery.qtip.min.js');
+    register_html_resource('css', 'jquery.qtip.min.css');
   }
   // Do various queries which we use in multiple places
   include($config['html_dir'] . "/includes/cache-data.inc.php");
+  // Add some cached notifications
+  include($config['html_dir'] . "/includes/notifications.inc.php");
 
   // Include navbar
   if ($vars['bare'] != "yes") { include($config['html_dir'] . "/includes/navbar.inc.php"); }
@@ -182,80 +156,16 @@ if ($_SESSION['authenticated'])
 }
 ?>
 
-  <div class="container">
+  <div class="container" <?php echo ($vars['bare'] == 'yes' ? 'style="padding-top: 10px;"' : ''); ?> >
 
 <?php
 
 if ($_SESSION['authenticated'])
 {
-  if ($_SESSION['userlevel'] > 7)
-  {
-    $latest['version']  = get_obs_attrib('latest_ver');
-    $latest['revision'] = get_obs_attrib('latest_rev');
-    $latest['date']     = get_obs_attrib('latest_rev_date');
-
-    if ($latest['revision'] > OBSERVIUM_REV + $config['version_check_revs'])
-    {
-      $notifications[] = array('text' => '<h4>There is a newer revision of Observium available!</h4> Version '. $latest['version'] .' ('.format_unixtime(datetime_to_unixtime($latest['date']), 'jS F Y').') is ' .($latest['revision']-OBSERVIUM_REV) .' revisions ahead.', 'severity' => 'warning');
-      $alerts[]        = array('text' => '<h4>There is a newer revision of Observium available!</h4> Version '. $latest['version'] .' ('.format_unixtime(datetime_to_unixtime($latest['date']), 'jS F Y').') is ' .($latest['revision']-OBSERVIUM_REV) .' revisions ahead.', 'severity' => 'warning');
-    }
-
-    // Warn about lack of mcrypt unless told not to.
-    if ($config['login_remember_me'] || isset($_SESSION['mcrypt_required']))
-    {
-      check_extension_exists('mcrypt', 'This extension required for use by the "remember me" feature. Please install the php5-mcrypt package on Ubuntu/Debian or the php-mcrypt package on RHEL/CentOS. Alternatively, you can disable this feature by setting $config[\'login_remember_me\'] = FALSE; in your config.');
-    }
-
-    // Warning about web_url config, only for ssl
-    if (is_ssl() && preg_match('/^http:/', $config['web_url']))
-    {
-      $notifications[] = array('text' => 'Setting \'web_url\' for "External Web URL" not set or incorrect, please update on ' . generate_link('Global Settings Edit', array('page' => 'settings', 'section' => 'wui')) . ' page.', 'severity' => 'warning');
-    }
-
-    // Warning about need DB schema update
-    $db_version = get_db_version();
-    $db_version = sprintf("%03d", $db_version+1);
-    if (is_file($config['install_dir'] . "/update/$db_version.sql") || is_file($config['install_dir'] . "/update/$db_version.php"))
-    {
-      $notifications[] = array('text' => 'Your database schema is old and needs updating. Run from server console:
-                  <pre style="padding: 3px" class="small">' . $config['install_dir'] . '/discovery.php -u</pre>', 'severity' => 'alert');
-    }
-    unset($db_version);
-
-    // Check mysqli extension
-    if (OBS_DB_EXTENSION != 'mysqli' && check_extension_exists('mysqli', ''))
-    {
-      $notifications[] = array('title'    => 'Deprecated MySQL Extension', 
-                               'text'     => 'The deprecated mysql extension is still in use, we recommend using mysqli.<br />To switch, add the following to your config.php: <pre>$config[\'db_extension\']  = \'mysqli\';</pre>', 
-                               'severity' => 'warning');
-    }
-    //$notifications[] = array('text' => dbHostInfo(), 'severity' => 'debug');
-
-    // Warning about obsolete config on some pages
-    if (OBS_DEBUG ||
-        in_array($vars['tab'], array('data', 'perf', 'edit', 'showtech')) ||
-        in_array($vars['page'], array('pollerlog', 'settings', 'preferences')))
-    {
-      // FIXME move to notification center?
-      print_obsolete_config();
-    }
-  }
-
-  // Display warning for scheduled maintenance
-  if (isset($cache['maint']['count']) && $cache['maint']['count'] > 0)
-  {
-    $notifications[] = array('text' => '<h4>Scheduled Maintenance in Progress</h4>'.
-                                     'Some or all alert notifications have been suppressed due to a scheduled maintenance.',
-                                     'severity' => 'warning');
-
-
-    $alerts[] = array('text' => '<h4>Scheduled Maintenance in Progress</h4>'.
-                                     'Some or all alert notifications have been suppressed due to a scheduled maintenance.',
-                                     'severity' => 'warning');
-  }
 
   // Execute form actions
-  if(isset($vars['action']) && !strstr("..", $vars['action']) && is_file($config['html_dir']."/includes/actions/" . $vars['action'] . ".inc.php"))
+  if (isset($vars['action']) && !strstr("..", $vars['action']) &&
+      is_file($config['html_dir']."/includes/actions/" . $vars['action'] . ".inc.php"))
   {
     include($config['html_dir']."/includes/actions/" . $vars['action'] . ".inc.php");
   }
@@ -279,35 +189,36 @@ if ($_SESSION['authenticated'])
     }
   }
 
-  /*
   if ($config['pages'][$vars['page']]['custom_panel'])
   {
     include($page_file);
   } else {
 
+    echo '<div class="row">';
 
-    if (is_file($config['html_dir']."/includes/panels/".$vars['page'].".inc.php"))
+    if ($config['pages'][$vars['page']]['no_panel'])
     {
-      $panel_file = $config['html_dir']."/includes/panels/".$vars['page'].".inc.php";
+      echo '<div class="col-lg-12">';
     } else {
-      $panel_file = $config['html_dir']."/includes/panels/default.inc.php";
-    }
-  */
-  ?>
 
-<div class="row">
+      echo '
   <div class="col-xl-4 visible-xl">
     <div id="myAffix" data-spy="affix" data-offset-top="60">
 
-##PAGE_PANEL##
+    ##PAGE_PANEL##
 
     </div>
 
   </div>
 
-<div class="col-xl-8 col-lg-12">
+<div class="col-xl-8 col-lg-12">';
 
-<?php include($page_file); ?>
+    }
+
+}
+
+include($page_file);
+?>
 
 </div>
 
@@ -331,6 +242,7 @@ if ($_SESSION['authenticated'])
     register_html_panel($panel_html);
   }
 
+
 } else if ($config['auth_mechanism'] == 'cas') {
   // Not Authenticated. CAS logon.
   echo('Not authorized.');
@@ -342,7 +254,6 @@ if ($_SESSION['authenticated'])
 
   exit;
 }
-
 $gentime = utime() - $runtime_start;
 $fullsize = memory_get_usage();
 unset($cache);
@@ -350,14 +261,16 @@ $cachesize = $fullsize - memory_get_usage();
 if ($cachesize < 0) { $cachesize = 0; } // Silly PHP!
 
 ?>
+
 </div>
 
 <?php
+
 if($vars['bare'] != 'yes')
 {
 ?>
 
-<div class="navbar navbar-fixed-bottom">
+<footer class="navbar navbar-fixed-bottom">
   <div class="navbar-inner">
     <div class="container">
       <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -375,7 +288,8 @@ if($vars['bare'] != 'yes')
      echo '<a href="' . OBSERVIUM_URL . '" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">';
      echo OBSERVIUM_PRODUCT . ' ' . OBSERVIUM_VERSION_LONG; 
      echo '</a>';
-   }?>
+   }
+            ?>
             <div class="dropdown-menu" style="padding: 10px;">
               <div style="max-width: 145px;"><img src="images/login-hamster-large.png" alt="" /></div>
 
@@ -397,7 +311,7 @@ if($vars['bare'] != 'yes')
               }
             ?>
             <a href="<?php echo(generate_url(array('page'=>'overview'))); ?>" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
-              <i class="<?php echo $config['icon']['exclamation']; ?>"></i> <b class="caret"></b></a>
+              <i class="<?php echo $config['icon']['alert']; ?>"></i> <b class="caret"></b></a>
             <div class="<?php echo($div_class); ?>" style="width: 700px; max-height: 500px; z-index: 2000; padding: 10px 10px 0px;">
 
               <h3>Notifications</h3>
@@ -405,8 +319,26 @@ if($vars['bare'] != 'yes')
 foreach ($notifications as $notification)
 {
   // FIXME handle severity parameter with colour or icon?
+  if (isset($config['syslog']['priorities'][$notification['severity']]))
+  {
+    // Numeric severity to string
+    $notification['severity'] = $config['syslog']['priorities'][$notification['severity']]['label-class'];
+  }
   echo('<div width="100%" class="callout callout-'.$notification['severity'].'">');
-  if(isset($notification['title'])) { echo('<h4>'.$notification['title'].'</h4>'); }
+  $notification_title = '';
+  if (isset($notification['unixtime']))
+  {
+    $timediff = $GLOBALS['config']['time']['now'] - $notification['unixtime'];
+    $notification_title .= formatUptime($timediff, "short-3") . ' ago: ';
+  }
+  if (isset($notification['title']))
+  {
+    $notification_title .= $notification['title'];
+  }
+  if ($notification_title)
+  {
+    echo('<h4>'.$notification_title.'</h4>');
+  }
   echo($notification['text'] . '</div>');
 }
 ?>
@@ -537,11 +469,13 @@ if ($form_time)
       </div>
     </div>
   </div>
-</div>
+</footer>
 
 <?php
 
 } // end if bare
+
+clear_duplicate_cookies();
 
 //  <script type="text/javascript">
 //  $(document).ready(function()
@@ -585,12 +519,15 @@ if ($form_time)
   // No dropdowns on touch gadgets
   if ($_SESSION['touch'] != 'yes')
   {
-    echo '<script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>';
+    register_html_resource('js', 'twitter-bootstrap-hover-dropdown.min.js');
+    //echo '<script type="text/javascript" src="js/twitter-bootstrap-hover-dropdown.min.js"></script>';
   }
 
   // FIXME vvvv change to register_html_resource(), but maybe better to keep them at the bottom? Function has no way to do this right now
+  register_html_resource('js', 'bootstrap-select.min.js');
+  register_html_resource('js', 'bootstrap-switch.min.js');
 ?>
-  <script type="text/javascript" src="js/bootstrap-select.min.js"></script>
+
   <script type="text/javascript">
 $('.selectpicker').selectpicker({
   iconBase: '', // reset iconbase from glyphicon
@@ -598,11 +535,6 @@ $('.selectpicker').selectpicker({
 });
   </script>
 
-  <script type="text/javascript" src="js/bootstrap-switch.min.js"></script>
   <!-- ##SCRIPT_CACHE## -->
-
   </body>
 </html>
-<?php
-
-// EOF

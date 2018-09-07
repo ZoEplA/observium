@@ -4,11 +4,11 @@
 define('OBS_QUIET', TRUE); // Disable any additional output from tests
 ini_set('opcache.enable', 0);
 
-include(dirname(__FILE__) . '/../includes/defaults.inc.php');
-include(dirname(__FILE__) . '/../config.php');
-//include(dirname(__FILE__) . '/data/test_definitions.inc.php'); // Fake definitions for testing
-include(dirname(__FILE__) . '/../includes/definitions.inc.php');
-include(dirname(__FILE__) . '/../includes/functions.inc.php');
+include(dirname(__FILE__) . '/../includes/sql-config.inc.php');
+//include(dirname(__FILE__) . '/../includes/defaults.inc.php');
+//include(dirname(__FILE__) . '/../config.php');
+//include(dirname(__FILE__) . '/../includes/definitions.inc.php');
+//include(dirname(__FILE__) . '/../includes/functions.inc.php');
 
 /**
  * How install snmpsim:
@@ -74,6 +74,10 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
     {
       $this->markTestSkipped('SNMPsimd unavailable or daemon not started, test skipped.');
     }
+
+    // Just get first snmp request, for alive snmpsimd
+    $device = build_initial_device_array($snmpsimd_ip, 'ios-1', 'v2c', $snmpsimd_port, 'udp');
+    snmp_get_oid($device, '.1.3.6.1.2.1.1.2.0');
   }
 
   /**
@@ -103,7 +107,7 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       {
         if (filetype($snmpsimd_data . '/' . $file) == 'file' && preg_match('/^(?<community>(?<os>[\S]+?)(?:\-\d+)?)\.snmprec$/', $file, $matches))
         {
-          //if (!str_starts($matches['os'], 'halon')) { continue; }
+          //if (!str_starts($matches['os'], 'eltex')) { continue; }
           $results[] = array($matches['os'], $matches['community']);
         }
       }
@@ -193,12 +197,15 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       array(        'airos-1',       'linux'),
       array(     'airos-af-1',       'linux'),
       array(        'unifi-1',       'linux'),
+      array(        'unifi-2',       'linux'),
       array('netgear-readyos-1',     'linux'),
       //array('pcoweb-chiller-1',      'linux'),
       //array(  'pcoweb-crac-1',       'linux'),
+      array(      'edgemax-5',       'airos'),
 
       // FreeBSD based
       array(     'opnsense-1',     'freebsd'),
+      array(     'opnsense-2',     'freebsd'),
       array(     'monowall-2',     'freebsd'),
       array(   'compellent-1',     'freebsd'),
       array(      'pfsense-1',     'freebsd'),
@@ -209,6 +216,10 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       // Solaris based
       array(  'opensolaris-1',     'solaris'),
       array(  'openindiana-1',     'solaris'),
+
+      // Extreme
+      array(  'xos-1',             'extremeware'),
+      array(  'extreme-wlc-1',     'extremeware'),
     );
   }
 
@@ -220,33 +231,63 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
   {
     global $snmpsimd_ip, $snmpsimd_port;
 
-    $community = $os . '-1';
-    $device = build_initial_device_array($snmpsimd_ip, $community, 'v2c', $snmpsimd_port, 'udp');
-    $device['snmp_timeout'] = 2;
-    $device['snmp_retries'] = 1;
-    //var_dump($device);
-    if ($test_os)
+    foreach (array('v2c', 'v3') as $snmp_version)
+    //foreach (array('v3') as $snmp_version)
     {
-      $device['os'] = $test_os;
-    }
-    if ($result)
-    {
-      // good response - int greater than 0
-      $this->assertGreaterThan(0, isSNMPable($device));
-    } else {
-      // bad response return 0
-      $device['snmp_timeout'] = 1;
-      $this->assertSame(0, isSNMPable($device));
+      switch ($snmp_version)
+      {
+        case 'v2c':
+          $community = $os . '-1';
+          $device = build_initial_device_array($snmpsimd_ip, $community, $snmp_version, $snmpsimd_port, 'udp');
+          break;
+        case 'v3':
+          $snmp_version = 'v3';
+          $snmp_v3 = array('authlevel'  => 'authPriv',
+                           'authname'   => 'simulator',
+                           'authpass'   => 'auctoritas',
+                           'authalgo'   => 'MD5',
+                           'cryptopass' => 'privatus',
+                           'cryptoalgo' => 'DES');
+          $device = build_initial_device_array($snmpsimd_ip, NULL, $snmp_version, $snmpsimd_port, 'udp', $snmp_v3);
+          $device['snmp_context'] = $os . '-1';
+          break;
+      }
+      $device['snmp_timeout'] = 2;
+      $device['snmp_retries'] = 1;
+      //var_dump($device);
+      if ($test_os)
+      {
+        $device['os'] = $test_os;
+      }
+      if ($result)
+      {
+        // good response - int greater than 0
+        $this->assertGreaterThan(0, isSNMPable($device));
+      } else {
+        // bad response return 0
+        $device['snmp_timeout'] = 1;
+        $this->assertSame(0, isSNMPable($device));
+      }
     }
   }
 
   public function providerIsSNMPable()
   {
     return array(
-      // Common sysObjectID.0 or sysUpTime.0 available
+      // Both sysObjectID.0 and sysUpTime.0 available
+      array(        'linux',            NULL, TRUE), // os not known
+      array(        'linux',         'linux', TRUE), // known os
+      array(        'linux', '8734hr7hf3f38', TRUE), // simulate os name changed
+
+      // Only sysObjectID.0 available
       array(          'ios',            NULL, TRUE), // os not known
       array(          'ios',           'ios', TRUE), // known os
       array(          'ios', '8734hr7hf3f38', TRUE), // simulate os name changed
+
+      // Only sysUpTime.0 available
+      array(      'airport',            NULL, TRUE), // os not known
+      array(      'airport',       'airport', TRUE), // known os
+      array(      'airport', '8734hr7hf3f38', TRUE), // simulate os name changed
 
       // sysObjectID.0 and sysUpTime.0 not exist
       array('hikvision-cam',            NULL, TRUE), // os not known

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -21,12 +21,12 @@ if (!isset($config['os'][$device['os']]))
 // Cache hardware/version/serial info from ENTITY-MIB (if possible use inventory module data)
 if (is_device_mib($device, 'ENTITY-MIB') &&
     (in_array($device['os_group'], array('unix', 'cisco')) ||
-     in_array($device['os'], array('acme', 'nos', 'ibmnos', 'acsw', 'fabos', 'wlc', 'h3c', 'hh3c', 'hpuww'))))
+     in_array($device['os'], array('acme', 'nos', 'ibmnos', 'acsw', 'fabos', 'wlc', 'h3c', 'hh3c', 'hpuww', 'lenovo-cnos'))))
 {
   // Get entPhysical tables for some OS and OS groups
   if ($config['discovery_modules']['inventory'])
   {
-    $entPhysical = dbFetchRow('SELECT * FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalContainedIn` = ?', array($device['device_id'], '0'));
+    $entPhysical = dbFetchRow('SELECT * FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalContainedIn` = ? AND `deleted` IS NULL', array($device['device_id'], '0'));
   } else {
     switch (TRUE)
     {
@@ -42,10 +42,13 @@ if (is_device_mib($device, 'ENTITY-MIB') &&
       case ($device['os'] == 'wlc'):
         $oids = 'entPhysicalDescr.1 entPhysicalModelName.1 entPhysicalSoftwareRev.1';
         break;
+      case ($device['os'] == 'lenovo-cnos'):
+        $oids = 'entPhysicalDescr.1 entPhysicalName.1 entPhysicalSoftwareRev.1 entPhysicalModelName.1';
+        break;
       default:
         $oids = 'entPhysicalDescr.1 entPhysicalSerialNum.1';
     }
-    $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
+    $data = snmp_get_multi_oid($device, $oids, array(), snmp_mib_entity_vendortype($device, 'ENTITY-MIB'));
     $entPhysical = $data[1];
   }
 

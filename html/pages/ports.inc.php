@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ * Observium
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage webui
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -119,10 +119,18 @@ $form['row'][0]['device_id'] = array(
                                 'width'       => '100%', //'180px',
                                 'values'      => $form_items['devices']);
 
+/*
 $form['row'][0]['ifDescr'] = array(
                                 'type'        => 'text',
                                 'name'        => 'Port Name',
                                 'value'       => $vars['ifDescr'],
+                                'width'       => '100%', //'180px',
+                                'placeholder' => TRUE);
+*/
+$form['row'][0]['label'] = array(
+                                'type'        => 'text',
+                                'name'        => 'Port Name',
+                                'value'       => $vars['label'],
                                 'width'       => '100%', //'180px',
                                 'placeholder' => TRUE);
 
@@ -165,7 +173,7 @@ $form['row'][1]['hostname']  = array(
 
 $form['row'][1]['ifAlias'] = array(
                                 'type'        => 'text',
-                                'name'        => 'Port Description',
+                                'name'        => 'Port Description (alias)',
                                 'value'       => $vars['ifAlias'],
                                 'width'       => '100%', //'180px',
                                 'placeholder' => TRUE);
@@ -216,7 +224,8 @@ $panel_form = array('type'  => 'rows',
 $panel_form['row'][0]['device_id'] = $form['row'][0]['device_id'];
 $panel_form['row'][0]['hostname'] = $form['row'][1]['hostname'];
 
-$panel_form['row'][1]['ifDescr'] = $form['row'][0]['ifDescr'];
+//$panel_form['row'][1]['ifDescr'] = $form['row'][0]['ifDescr'];
+$panel_form['row'][1]['label'] = $form['row'][0]['label'];
 $panel_form['row'][1]['ifAlias'] = $form['row'][1]['ifAlias'];
 
 $panel_form['row'][2]['state'] = $form['row'][0]['state'];

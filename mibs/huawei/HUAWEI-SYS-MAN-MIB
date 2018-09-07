@@ -1,10 +1,14 @@
 -- =====================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei Configuration management MIB
 -- Reference:   HUAWEI Enterprise MIB
--- Version:     V2.14
+-- Version:     V2.18
 -- History:
+--  2017-01-25  V2.18  xuxiangdong modify TrustStartup
+--  2017-01-05  V2.17  Hanxian modify hwCodeSign for software code signature
+--  2016-12-20  V2.16  Hanxian add hwCodeSign for software code signature
+--  2016-09-08  V2.15  Zhangquanquan add hwTpmStaticMeasureAlarm for TrustStartup
 --  2015-03-10  V2.14  Lin Bing Modified hwPatchFailReason for patch
 --  2015-01-12  V2.13  chenruirui Add hwSysEvmTraps for evm
 --  2014-09-15  V2.12  xuetao Modified hwSysRebootReason for cfm
@@ -43,10 +47,12 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
         RowPointer, DateAndTime, DisplayString, RowStatus, TEXTUAL-CONVENTION            
             FROM SNMPv2-TC
         hwDatacomm            
-            FROM HUAWEI-MIB;
+            FROM HUAWEI-MIB
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB;
 
     huaweiSystemManMIB MODULE-IDENTITY 
-        LAST-UPDATED "201503100000Z"        -- March 10, 2015  GMT
+        LAST-UPDATED "201701250000Z"        -- January 25, 2017  GMT
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -64,6 +70,22 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
             reload actions, and notifications. By querying the system time,
             configuration files and system image files, NMS can reboot the device
             in the specified time and the specified configuration and system image."
+       REVISION
+           "201701250000Z"
+       DESCRIPTION 
+           "modify TrustStartup."	    
+       REVISION
+           "201701250000Z"	   
+       DESCRIPTION 
+           "modify hwCodeSign for software code signature."	    
+       REVISION
+           "201612200000Z"
+       DESCRIPTION 
+           "add hwCodeSign for software code signature."			
+       REVISION
+           "201609080000Z"
+       DESCRIPTION 
+           "Add hwTpmStaticMeasureAlarm for TrustStartup."
        REVISION
            "201503100000Z"
        DESCRIPTION 
@@ -2850,7 +2872,385 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         DESCRIPTION
             "This object indicates the error cause of the android file." 
         ::= { hwSysAndroidFileEntry 5 }
+    
+    hwTrustStartup OBJECT IDENTIFIER  ::= { huaweiSystemManMIBObjects 26 }  
+    
+    hwTpmStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTpmStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Tpm status query table."
+        ::= { hwTrustStartup 1 }
 
+    hwTpmStatusEntry OBJECT-TYPE
+        SYNTAX HwTpmStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines an entry in the hwTpmStatusTable."
+        INDEX { hwTpmPhysicalIndex }  
+        ::= { hwTpmStatusTable 1 } 
+
+    HwTpmStatusEntry ::=
+        SEQUENCE {
+            hwTpmPhysicalIndex
+                PhysicalIndex,
+            hwTpmPhysicalName
+                SnmpAdminString,
+            hwTpmVersion
+                DisplayString,
+            hwTpmManufacturer
+                DisplayString,
+            hwTpmStatus  
+                INTEGER,
+            hwSetTpmStatusRst
+                INTEGER
+         }
+         
+    hwTpmPhysicalIndex OBJECT-TYPE
+        SYNTAX      PhysicalIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of the physical entity."
+        ::= { hwTpmStatusEntry 1 }
+
+    hwTpmPhysicalName OBJECT-TYPE
+        SYNTAX      SnmpAdminString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The textual name of the physical entity."
+        ::= { hwTpmStatusEntry 2 }         
+    
+    hwTpmVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..50))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Tpm version of hwTpmStatusTable."
+        ::= { hwTpmStatusEntry 3 }
+    
+    hwTpmManufacturer OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..50))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Tpm manufacturer of hwTpmStatusTable."
+        ::= { hwTpmStatusEntry 4 }
+        
+    hwTpmStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            active(1),
+            inactive(2),
+            unknown(3)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Tpm status of hwTpmStatusTable, value can be active, inactive or unknown."
+        ::= { hwTpmStatusEntry 5 }
+        
+    hwSetTpmStatusRst OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            noSetting(1),
+            success(2),
+            failure(3),
+            setting(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Set tpm status:
+            noSetting(1): No setting tpm status. 
+            success(2): Setting tpm status succeeded.
+            failure(3): Setting tpm status failed.
+            setting(4): Setting tpm status is processing."
+        ::= { hwTpmStatusEntry 6 }   
+
+    hwTrustStartupReportTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTrustStartupReportEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Trust-startup report query table."
+        ::= { hwTrustStartup 2 }
+
+    hwTrustStartupReportEntry OBJECT-TYPE
+        SYNTAX HwTrustStartupReportEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines an entry in the hwTrustStartupReportTable."
+        INDEX { hwTrustPhysicalIndex, hwTrustItemIndex}    
+        ::= { hwTrustStartupReportTable 1 }  
+
+    HwTrustStartupReportEntry ::=
+        SEQUENCE {
+            hwTrustPhysicalIndex
+                PhysicalIndex,
+            hwTrustItemIndex
+                Integer32,
+            hwTrustPhysicalName
+                SnmpAdminString,
+            hwTrustStartupReportItem
+                DisplayString,
+            hwTpmPcr
+                DisplayString,
+            hwTpmPcrBenchmark
+                DisplayString,
+            hwVerifyResult
+                INTEGER
+         }
+
+    hwTrustPhysicalIndex OBJECT-TYPE
+        SYNTAX      PhysicalIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of the physical entity."
+        ::= { hwTrustStartupReportEntry 1 }
+         
+    hwTrustItemIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the index of the table."
+        ::= { hwTrustStartupReportEntry 2 }
+        
+    hwTrustPhysicalName OBJECT-TYPE
+        SYNTAX      SnmpAdminString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The textual name of the physical entity."
+        ::= { hwTrustStartupReportEntry 3 } 
+        
+    hwTrustStartupReportItem OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..100))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Report item of hwTrustStartupReportTable."
+        ::= { hwTrustStartupReportEntry 4 }
+    
+    hwTpmPcr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..100))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Report tpm-pcr of hwTrustStartupReportTable."
+        ::= { hwTrustStartupReportEntry 5 }
+        
+    hwTpmPcrBenchmark OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..100))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Tpm pcr benchmark of hwTrustStartupReportTable."
+        ::= { hwTrustStartupReportEntry 6 } 
+
+    hwVerifyResult OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ok(1),
+            error(2),
+            unknown(3),
+            update(4),
+            okAndUpdate(5),
+            errorAndUpdate(6)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Verify result of hwTrustStartupReportTable, value can be ok, error, unknown,update,okAndUpdate or errorAndUpdate now."
+        ::= { hwTrustStartupReportEntry 7 } 
+		
+	hwCodeSign OBJECT IDENTIFIER  ::= { huaweiSystemManMIBObjects 27 }
+	
+	hwSoftCrlInfoTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwSoftCrlInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Software crl info query table."
+	::= { hwCodeSign 1 }
+	
+    hwSoftCrlInfoEntry OBJECT-TYPE
+        SYNTAX HwSoftCrlInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines an entry in the hwSoftCrlInfoTable."
+        INDEX { hwCrlInfoIndex }    
+        ::= { hwSoftCrlInfoTable 1 } 	
+    HwSoftCrlInfoEntry ::=
+        SEQUENCE {
+            hwCrlInfoIndex
+                Integer32,
+			hwCrlSlotId
+				DisplayString,
+            hwCrlPublisher
+                DisplayString,
+            hwCrlIssueDate
+                DateAndTime,
+            hwCrlStatus  
+                INTEGER
+         }
+
+    hwCrlInfoIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..64)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of this object identifies the index of this table."
+        ::= { hwSoftCrlInfoEntry 1 } 
+        
+     hwCrlSlotId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The slot ID of board."
+        ::= { hwSoftCrlInfoEntry 2 }    
+
+	hwCrlPublisher OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Publisher of the CRL."
+        ::= { hwSoftCrlInfoEntry 3 }
+    
+    hwCrlIssueDate OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The issue date of the CRL."
+        ::= { hwSoftCrlInfoEntry 4 }
+        
+    hwCrlStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            invalid(0),
+            valid(1)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the CRL."
+        ::= { hwSoftCrlInfoEntry 5 }
+
+	hwSoftCrlFileTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwSoftCrlFileEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Software crl file query table."
+	::= { hwCodeSign 2 }
+	
+    hwSoftCrlFileEntry OBJECT-TYPE
+        SYNTAX HwSoftCrlFileEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines an entry in the hwSoftCrlFileEntry."
+        INDEX { hwCrlFileIndex }    
+        ::= { hwSoftCrlFileTable 1 } 
+		
+    HwSoftCrlFileEntry ::=
+        SEQUENCE {
+            hwCrlFileIndex
+                Integer32,
+            hwCrlFileName
+                DisplayString
+         }
+
+    hwCrlFileIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..128)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of this object identifies the index of this table."
+        ::= { hwSoftCrlFileEntry 1 }         
+    
+    hwCrlFileName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..63))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The name of crl files in MMB's home directory."
+        ::= { hwSoftCrlFileEntry 2 }
+
+	hwSoftCrlLoadTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwSoftCrlLoadEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Software crl load table."
+	::= { hwCodeSign 3 }
+	
+    hwSoftCrlLoadEntry OBJECT-TYPE
+        SYNTAX HwSoftCrlLoadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Defines an entry in the hwSoftCrlLoadEntry."
+        INDEX { hwCrlFileIndex }    
+        ::= { hwSoftCrlLoadTable 1 } 
+		
+    HwSoftCrlLoadEntry ::=
+        SEQUENCE {
+            hwCrlLoadAction
+                INTEGER,
+			hwCrlLoadRst
+				INTEGER
+         }
+
+    hwCrlLoadAction OBJECT-TYPE
+        SYNTAX      INTEGER
+		{
+			load(1)
+		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The action of loading software crl."
+        ::= { hwSoftCrlLoadEntry 1 }
+		
+    hwCrlLoadRst OBJECT-TYPE
+        SYNTAX      INTEGER
+		{
+			loadSuccess(0),
+			fileNotExist(1),
+			fileNotNew(2),
+			publisherNotSame(3),
+			nextStartupSoftwareCheckFailed(4),
+			crlLoadFailed(5),
+			crlFormatError(6),
+			loading(7),
+			crlNameInvalid(8)
+		}
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The result of Loading software crl:
+			loadSuccess(0): Succeeded in loading the CRL.
+			fileNotExist(1): The file of CRL does not exist on the main control board.
+			fileNotNew(2): The CRL file is not the latest.
+			publisherNotSame(3): The publisher of the CRL file to be updated is inconsistent with that of the CRL file on the device.
+			nextStartupSoftwareCheckFailed(4): The code signature verification of the next startup software package failed. Update the software package.
+			crlLoadFailed(5): Loading the CRL failed.
+			crlFormatError(6): The CRL format is error.
+			loading(7): Loading.
+			crlNameInvalid(8): The file name is invalid."
+        ::= { hwSoftCrlLoadEntry 2 }		
+        
 --    ====================================
 -- HUAWEI-SYS-MAN-MIB MIB - Notification Information
 -- ====================================     
@@ -3104,7 +3504,20 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
 		"The board(s) excluded retrieved during software upgrading"
 	::= { hwSysEvmNotifications 5 }
 
-		
+    hwTpmStaticMeasureAlarm NOTIFICATION-TYPE
+    OBJECTS { hwTrustPhysicalName, hwTrustStartupReportItem}
+    STATUS current
+    DESCRIPTION 
+        "Results of static integrity measurement mismatch during a boot"
+    ::= { huaweiSystemManMIBNotifications 21 }
+
+    hwTpmStaticMeasureAlarmClear NOTIFICATION-TYPE
+    OBJECTS { hwTrustPhysicalName, hwTrustStartupReportItem}
+    STATUS current
+    DESCRIPTION 
+        "Results of static integrity measurement resume matching during a boot"
+    ::= { huaweiSystemManMIBNotifications 22 }
+    
     huaweiSystemManMIBConformance OBJECT IDENTIFIER ::= { huaweiSystemManMIB 3 }
 
     huaweiSystemManMIBCompliances OBJECT IDENTIFIER ::= { huaweiSystemManMIBConformance 1 }
@@ -3115,7 +3528,7 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
             "The compliance statement for entities which implement
             the Huawei system management MIB."
         MODULE -- this module
-            MANDATORY-GROUPS { huaweiSysClockGroup, huaweiSysReloadGroup, huaweiSysImageGroup, huaweiSysCFGFileGroup, huaweiSystemManNotificationGroup, huaweihwSysEvmTrapsObjectGroup
+            MANDATORY-GROUPS { huaweiSysClockGroup, huaweiSysReloadGroup, huaweiSysImageGroup, huaweiSysCFGFileGroup, huaweiSystemManNotificationGroup
                  }
         ::= { huaweiSystemManMIBCompliances 1 }
 

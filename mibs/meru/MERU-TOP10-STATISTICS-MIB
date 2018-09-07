@@ -70,8 +70,9 @@ IMPORTS
        mwTop10ApStationProblemIfIndex                              Integer32,
        mwTop10ApStationProblemWepErrors                            Unsigned32,
        mwTop10ApStationProblemNmsApNodeId                          Integer32,
-       mwTop10ApStationProblemStationIPAddress                     IpAddress,
-       mwTop10ApStationProblemStationMacAddress                    MacAddress 
+       mwTop10ApStationProblemStationIPAddress                     Ipv6Address,
+       mwTop10ApStationProblemStationMacAddress                    MacAddress,
+       mwTop10ApStationProblemStationIPv4Address                   IpAddress 
   }
    
    
@@ -116,7 +117,7 @@ IMPORTS
     ::= { mwTop10ApStationProblemEntry    5 }
 
   mwTop10ApStationProblemStationIPAddress  OBJECT-TYPE
-    SYNTAX IpAddress
+    SYNTAX Ipv6Address
     MAX-ACCESS  read-only 
     STATUS     current
     DESCRIPTION
@@ -130,6 +131,14 @@ IMPORTS
     DESCRIPTION
          "This object describes Station MAC Address"
     ::= { mwTop10ApStationProblemEntry    7 }
+
+  mwTop10ApStationProblemStationIPv4Address  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwTop10ApStationProblemEntry    9 }
 
   mwTop10ApStationRxtxTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwTop10ApStationRxtxEntry
@@ -155,8 +164,9 @@ IMPORTS
        mwTop10ApStationRxtxNmsApNodeId                             Integer32,
        mwTop10ApStationRxtxRxPacketCount                           Unsigned32,
        mwTop10ApStationRxtxTxPacketCount                           Unsigned32,
-       mwTop10ApStationRxtxStationIPAddress                        IpAddress,
-       mwTop10ApStationRxtxStationMacAddress                       MacAddress 
+       mwTop10ApStationRxtxStationIPAddress                        Ipv6Address,
+       mwTop10ApStationRxtxStationMacAddress                       MacAddress,
+       mwTop10ApStationRxtxStationIPv4Address                      IpAddress 
   }
    
    
@@ -209,7 +219,7 @@ IMPORTS
     ::= { mwTop10ApStationRxtxEntry    6 }
 
   mwTop10ApStationRxtxStationIPAddress  OBJECT-TYPE
-    SYNTAX IpAddress
+    SYNTAX Ipv6Address
     MAX-ACCESS  read-only 
     STATUS     current
     DESCRIPTION
@@ -223,6 +233,14 @@ IMPORTS
     DESCRIPTION
          "This object describes Station MAC Address"
     ::= { mwTop10ApStationRxtxEntry    8 }
+
+  mwTop10ApStationRxtxStationIPv4Address  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwTop10ApStationRxtxEntry    9 }
 
   mwTop10ApProblemTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwTop10ApProblemEntry

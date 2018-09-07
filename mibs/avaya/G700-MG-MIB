@@ -73,6 +73,7 @@
 -- Version  : 1.65                           06-Jun-2012
 -- Version  : 1.66                           27-Feb-2014
 -- Version  : 1.67                           08-May-2014
+-- Version  : 1.68                           23-Mar-2015
 --==========================================================
 --
 -- Copyright 2001-2014 Avaya, Inc.  All Rights Reserved.
@@ -88,6 +89,9 @@
 --    problems for some SNMP MIB compilers. A bypass is to temporally rename
 --    both groups in LOAD-MIB to 'lucentProduct' and 'lucentMibs' before 
 --    compiling this module.                                            
+--        
+--  Changes in 1.68 -  23-Mar-2015 - Matthew Chandler
+--  1.) Add OCSP Access Denied support.
 --        
 --  Changes in 1.67 -  08-May-2014 - Gordon Gustafson
 --  1.) Add Voip DSP core fault support.
@@ -524,7 +528,7 @@ g700MediaGatewayMIB	OBJECT IDENTIFIER ::= { mibs 9 }
 
 
 cmgmib MODULE-IDENTITY
-       LAST-UPDATED   "201405081600Z"
+       LAST-UPDATED   "201503230600Z"
        ORGANIZATION   "Avaya, Inc."
        CONTACT-INFO
            "Avaya Customer Services 
@@ -538,9 +542,9 @@ cmgmib MODULE-IDENTITY
        DESCRIPTION
 	       "A MIB to support the Avaya H248 Media Gateways.
            "
-       REVISION      "201405081600Z"
+       REVISION      "201503230600Z"
        DESCRIPTION
-	       "Added traps for DSP core faults/clear"
+	       "Added trap for OCSP feature"
        ::= { g700MediaGatewayMIB 1 }
 
 -- Textual Conventions
@@ -4564,6 +4568,12 @@ cmgCertErrorIdAuthentication NOTIFICATION-TYPE
         STATUS      current
         DESCRIPTION "A Gateway TLS Certificate could not be authenticated"
         ::= { cmgTrapV3separator 161 }
+
+cmgOcspAccessDenied NOTIFICATION-TYPE
+        OBJECTS   { cmgTrapSubsystem, cmgTrapOnBoard, cmgTrapLocation, cmgTrapSeverity }
+        STATUS      current
+        DESCRIPTION "The Gateway could not access an OCSP Responder."
+        ::= { cmgTrapV3separator 162 }
 
 
 -- ************************************************************************* --

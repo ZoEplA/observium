@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -23,8 +23,6 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $mempool)
 {
   $mib_lower = strtolower($mempool['mempool_mib']);
   $file = $config['install_dir'].'/includes/polling/mempools/'.$mib_lower.'.inc.php';
-
-  if (!isset($mempool['mempool_multiplier']) && isset($mempool['mempool_precision'])) { $mempool['mempool_multiplier'] = $mempool['mempool_precision']; } // CLEANME, remove in r9000, but not before CE 0.17.6
 
   if (!$mempool['mempool_multiplier']) { $mempool['mempool_multiplier'] = 1; }
 

@@ -9,7 +9,7 @@
  * @subpackage poller
  * @subpackage raspberrypi
  * @author     Dennis de Houx <info@all-in-one.be>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  * @version    1.0.1
  *
  */

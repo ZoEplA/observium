@@ -7,11 +7,11 @@ TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
 OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "201702070000Z"
+  LAST-UPDATED "201801030000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "201702070000Z"
+  REVISION "201801030000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -38,6 +38,7 @@ mtxrPOE OBJECT IDENTIFIER ::= { mtXRouterOs 15 }
 mtxrLTEModem OBJECT IDENTIFIER ::= { mtXRouterOs 16 }
 mtxrPartition OBJECT IDENTIFIER ::= { mtXRouterOs 17 }
 mtxrScriptRun OBJECT IDENTIFIER ::= { mtXRouterOs 18 }
+mtxrOptical OBJECT IDENTIFIER ::= { mtXRouterOs 19 }
 
 ObjectIndex ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "x"
@@ -77,6 +78,24 @@ Power ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-1"
     STATUS current
     DESCRIPTION ""
+    SYNTAX Integer32 (-2147483648..2147483647)
+
+GDiv100 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION "/100"
+    SYNTAX Gauge32
+
+GDiv1000 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS current
+    DESCRIPTION "/1000"
+    SYNTAX Gauge32
+
+IDiv1000 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS current
+    DESCRIPTION "/1000"
     SYNTAX Integer32 (-2147483648..2147483647)
 
 BoolValue ::= TEXTUAL-CONVENTION
@@ -486,10 +505,11 @@ MtxrWlCMRtabEntry ::= SEQUENCE {
 
 mtxrWlCMRtabAddr OBJECT-TYPE
     SYNTAX MacAddress
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION ""
     ::= { mtxrWlCMRtabEntry 1 }
+    -- should not be accessible in SMIv2
 
 mtxrWlCMRtabIface OBJECT-TYPE
     SYNTAX ObjectIndex
@@ -575,6 +595,228 @@ mtxrWlCMRtabEntryCount OBJECT-TYPE
     DESCRIPTION "Wireless CAPSMAN registration table entry count"
     ::= { mtxrWireless 6 }
 
+mtxrWlCMTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrWlCMEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWireless 7 }
+
+mtxrWlCMEntry OBJECT-TYPE
+    SYNTAX MtxrWlCMEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "CAPS-MAN mode interface"
+    INDEX { mtxrWlCMIndex }
+    ::= { mtxrWlCMTable 1 }
+
+MtxrWlCMEntry ::= SEQUENCE {
+    mtxrWlCMIndex ObjectIndex,
+    mtxrWlCMRegClientCount Counter32,
+    mtxrWlCMAuthClientCount Counter32
+}
+
+mtxrWlCMIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlCMEntry 1 }
+
+mtxrWlCMRegClientCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlCMEntry 2 }
+
+mtxrWlCMAuthClientCount OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWlCMEntry 3 }
+
+-- W60G
+mtxrWl60GTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrWl60GEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWireless 8 }
+
+mtxrWl60GEntry OBJECT-TYPE
+    SYNTAX MtxrWl60GEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "W60G interface"
+    INDEX { mtxrWl60GIndex }
+    ::= { mtxrWl60GTable 1 }
+
+MtxrWl60GEntry ::= SEQUENCE {
+    mtxrWl60GIndex ObjectIndex,
+    mtxrWl60GMode INTEGER,
+    mtxrWl60GSsid DisplayString,
+    mtxrWl60GConnected BoolValue,
+    mtxrWl60GRemote MacAddress,
+    mtxrWl60GFreq Integer32,
+    mtxrWl60GMcs Integer32,
+    mtxrWl60GSignal Integer32,
+    mtxrWl60GTxSector Integer32,
+    mtxrWl60GRxSector Integer32
+}
+
+mtxrWl60GIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 1 }
+
+mtxrWl60GMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        apBridge(0),
+        stationBridge(1),
+        sniff(2),
+        bridge(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 2 }
+
+mtxrWl60GSsid OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 3 }
+
+mtxrWl60GConnected OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 4 }
+
+mtxrWl60GRemote OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 5 }
+
+mtxrWl60GFreq OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Mhz"
+    ::= { mtxrWl60GEntry 6 }
+
+mtxrWl60GMcs OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 7 }
+
+mtxrWl60GSignal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 8 }
+
+mtxrWl60GTxSector OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 9 }
+
+mtxrWl60GRxSector OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GEntry 10 }
+
+-- W60GSta
+mtxrWl60GStaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrWl60GStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWireless 9 }
+
+mtxrWl60GStaEntry OBJECT-TYPE
+    SYNTAX MtxrWl60GStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "W60G stations"
+    INDEX { mtxrWl60GStaIndex }
+    ::= { mtxrWl60GStaTable 1 }
+
+MtxrWl60GStaEntry ::= SEQUENCE {
+    mtxrWl60GStaIndex ObjectIndex,
+    mtxrWl60GStaConnected BoolValue,
+    mtxrWl60GStaRemote MacAddress,
+    mtxrWl60GStaMcs Integer32,
+    mtxrWl60GStaSignal Integer32,
+    mtxrWl60GStaTxSector Integer32,
+    mtxrWl60GStaRxSector Integer32
+}
+
+mtxrWl60GStaIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 1 }
+
+mtxrWl60GStaConnected OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 2 }
+
+mtxrWl60GStaRemote OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 3 }
+
+mtxrWl60GStaMcs OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 4 }
+
+mtxrWl60GStaSignal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 5 }
+
+mtxrWl60GStaTxSector OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 6 }
+
+mtxrWl60GStaRxSector OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrWl60GStaEntry 7 }
+
+
 mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWlStatTxRate,
 	mtxrWlStatRxRate,
@@ -611,6 +853,7 @@ mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWlApNoiseFloor,
         mtxrWlApOverallTxCCQ,
         mtxrWlApAuthClientCount,
+        mtxrWlCMRtabAddr,
         mtxrWlCMRtabTxBytes,
         mtxrWlCMRtabRxBytes,
         mtxrWlCMRtabTxPackets,
@@ -621,7 +864,24 @@ mtxrWirelessGroup OBJECT-GROUP OBJECTS {
         mtxrWlCMRtabTxStrength,
         mtxrWlCMRtabRxStrength,
         mtxrWlCMRtabSsid,
-        mtxrWlCMRtabEntryCount
+        mtxrWlCMRtabEntryCount,
+        mtxrWlCMRegClientCount,
+        mtxrWlCMAuthClientCount,
+        mtxrWl60GMode,
+        mtxrWl60GSsid,
+        mtxrWl60GConnected,
+        mtxrWl60GRemote,
+        mtxrWl60GFreq,
+        mtxrWl60GMcs,
+        mtxrWl60GSignal,
+        mtxrWl60GTxSector,
+        mtxrWl60GRxSector,
+        mtxrWl60GStaConnected,
+        mtxrWl60GStaRemote,
+        mtxrWl60GStaMcs,
+        mtxrWl60GStaSignal,
+        mtxrWl60GStaTxSector,
+        mtxrWl60GStaRxSector
     }
     STATUS current
     DESCRIPTION ""
@@ -2600,6 +2860,127 @@ mtxrPartitionGroup OBJECT-GROUP OBJECTS {
     DESCRIPTION ""
     ::= { mtXRouterOsGroups 20 }
 
+-- OPTICAL *****************************************************************
+
+mtxrOpticalTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MtxrOpticalTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "SFP and GPON information"
+    ::= { mtxrOptical 1 }
+
+mtxrOpticalTableEntry OBJECT-TYPE
+    SYNTAX MtxrOpticalTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    INDEX { mtxrOpticalIndex }
+    ::= { mtxrOpticalTable 1 }
+
+MtxrOpticalTableEntry ::= SEQUENCE {
+	mtxrOpticalIndex ObjectIndex,
+        mtxrOpticalName DisplayString,
+        mtxrOpticalRxLoss BoolValue,
+        mtxrOpticalTxFault BoolValue,
+        mtxrOpticalWavelength GDiv100,
+        mtxrOpticalTemperature Gauge32,
+        mtxrOpticalSupplyVoltage GDiv1000,
+        mtxrOpticalTxBiasCurrent Gauge32,
+        mtxrOpticalTxPower IDiv1000,
+        mtxrOpticalRxPower IDiv1000
+}
+
+mtxrOpticalGroup OBJECT-GROUP OBJECTS {
+        mtxrOpticalName,
+        mtxrOpticalRxLoss,
+        mtxrOpticalTxFault,
+        mtxrOpticalWavelength,
+        mtxrOpticalTemperature,
+        mtxrOpticalSupplyVoltage,
+        mtxrOpticalTxBiasCurrent,
+        mtxrOpticalTxPower,
+        mtxrOpticalRxPower
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtXRouterOsGroups 6 }
+
+mtxrOpticalIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 1 }
+
+mtxrOpticalName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 2 }
+
+mtxrOpticalRxLoss OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 3 }
+
+mtxrOpticalTxFault OBJECT-TYPE
+    SYNTAX BoolValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 4 }
+
+mtxrOpticalWavelength OBJECT-TYPE
+    SYNTAX GDiv100
+    UNITS "nm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 5 }
+
+mtxrOpticalTemperature OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "C"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 6 }
+
+mtxrOpticalSupplyVoltage OBJECT-TYPE
+    SYNTAX GDiv1000
+    UNITS "V"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 7 }
+
+mtxrOpticalTxBiasCurrent OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "mA"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 8 }
+
+mtxrOpticalTxPower OBJECT-TYPE
+    SYNTAX IDiv1000
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 9 }
+
+mtxrOpticalRxPower OBJECT-TYPE
+    SYNTAX IDiv1000
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { mtxrOpticalTableEntry 10 }
+
 -- TRAPS **********************************************************************
 
 mtxrNotifications OBJECT IDENTIFIER ::= { mtxrTraps 0 }
@@ -2625,3 +3006,4 @@ mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
 -- ***************************************************************************
 
 END
+

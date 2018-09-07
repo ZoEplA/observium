@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage db
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -303,10 +303,10 @@ function dbLastID($connection = NULL)
  * Fetches all of the rows (associatively) from the last performed query.
  * Most other retrieval functions build off this
  * */
-function dbFetchRows($sql, $parameters = array())
+function dbFetchRows($sql, $parameters = array(), $print_query = FALSE)
 {
   $time_start = utime();
-  $result = dbQuery($sql, $parameters);
+  $result = dbQuery($sql, $parameters, $print_query);
 
   $rows = array();
   if ($result instanceof mysqli_result)
@@ -331,10 +331,10 @@ function dbFetchRows($sql, $parameters = array())
  * Like fetch(), accepts any number of arguments
  * The first argument is an sprintf-ready query stringTypes
  * */
-function dbFetchRow($sql = NULL, $parameters = array())
+function dbFetchRow($sql = NULL, $parameters = array(), $print_query = FALSE)
 {
   $time_start = utime();
-  $result = dbQuery($sql, $parameters);
+  $result = dbQuery($sql, $parameters, $print_query);
   if ($result)
   {
     $row = mysqli_fetch_assoc($result);
@@ -353,11 +353,11 @@ function dbFetchRow($sql = NULL, $parameters = array())
 /*
  * Fetches the first call from the first row returned by the query
  * */
-function dbFetchCell($sql, $parameters = array())
+function dbFetchCell($sql, $parameters = array(), $print_query = FALSE)
 {
   $time_start = utime();
   //$row = dbFetchRow($sql, $parameters);
-  $result = dbQuery($sql, $parameters);
+  $result = dbQuery($sql, $parameters, $print_query);
   if ($result)
   {
     $row = mysqli_fetch_assoc($result);

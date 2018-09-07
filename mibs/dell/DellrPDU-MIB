@@ -195,7 +195,7 @@ productStatusRESERVED3 OBJECT-TYPE
    STATUS mandatory
     DESCRIPTION
       "RESERVED"
-   ::= { productStatus  6	}
+   ::= { productStatus  6 }
 
 
 rPDU                             OBJECT IDENTIFIER ::=  { hardware 200 }

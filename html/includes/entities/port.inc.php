@@ -8,7 +8,7 @@
  *
  * @package        observium
  * @subpackage     functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -53,8 +53,12 @@ function build_ports_where_array($vars)
           break;
         case 'hostname':
         case 'ifAlias':
-        case 'ifDescr':
+        case 'ifDescr': // FIXME, probably better always use port_label instead ifDescr for search
           $where[] = generate_query_values($value, $var, '%LIKE%');
+          break;
+        case 'label':
+        case 'port_label':
+          $where[] = generate_query_values($value, 'port_label', '%LIKE%');
           break;
         case 'port_descr_type':
           $where[] = generate_query_values($value, $var, 'LIKE');
@@ -119,17 +123,17 @@ function generate_port_popup_header($port)
   // Push through processing function to set attributes
   humanize_port($port);
 
-      $contents .= generate_box_open();
-      $contents .= '<table class="'. OBS_CLASS_TABLE .'">
-        <tr class="' . $port['row_class'] . '" style="font-size: 10pt;">
-          <td class="state-marker"></td>
-          <td style="width: 10px;"></td>
-          <td style="width: 250px;"><a href="#" class="' . $port['html_class'] . '" style="font-size: 15px; font-weight: bold;">' . $port['port_label'] . '</a><br />' . escape_html($port['ifAlias']) . '</td>
-          <td style="width: 100px;">' . $port['human_speed'] . '<br />' . $port['ifMtu'] . '</td>
-          <td>' . $port['human_type'] . '<br />' . $port['human_mac'] . '</td>
-        </tr>
-          </table>';
-     $contents .= generate_box_close();
+  $contents .= generate_box_open();
+  $contents .= '<table class="'. OBS_CLASS_TABLE .'">
+     <tr class="' . $port['row_class'] . '" style="font-size: 10pt;">
+       <td class="state-marker"></td>
+       <td style="width: 10px;"></td>
+       <td style="width: 250px;"><a href="#" class="' . $port['html_class'] . '" style="font-size: 15px; font-weight: bold;">' . $port['port_label'] . '</a><br />' . escape_html($port['ifAlias']) . '</td>
+       <td style="width: 100px;">' . $port['human_speed'] . '<br />' . $port['ifMtu'] . '</td>
+       <td>' . $port['human_type'] . '<br />' . $port['human_mac'] . '</td>
+     </tr>
+     </table>';
+  $contents .= generate_box_close();
 
   return $contents;
 }
@@ -156,7 +160,7 @@ function generate_port_popup($port, $text = NULL, $type = NULL)
 
   if (!$text)
   {
-    $text = rewrite_ifname($port['port_label']);
+    $text = escape_html($port['port_label']);
   }
   if ($type)
   {
@@ -211,7 +215,7 @@ function generate_port_link($port, $text = NULL, $type = NULL, $escape = FALSE, 
   humanize_port($port);
 
   //if (!isset($port['html_class'])) { $port['html_class'] = ifclass($port['ifOperStatus'], $port['ifAdminStatus']); }
-  //if (!isset($text)) { $text = rewrite_ifname($port['port_label'], !$escape); } // Negative escape flag for exclude double escape
+  //if (!isset($text)) { $text = escape_html($port['port_label'], !$escape); } // Negative escape flag for exclude double escape
 
   // Fixme -- does this function even need alternative $text? I think not. It's a hangover from before label.
   if (!isset($text) && !$short)
@@ -234,7 +238,7 @@ function generate_port_link($port, $text = NULL, $type = NULL, $escape = FALSE, 
   }
   else
   {
-    return rewrite_ifname($text);
+    return escape_html($text);
   }
 }
 
@@ -321,6 +325,12 @@ function generate_port_row($port, $vars = array())
     $port['tags'] .= '<a href="'.generate_url(array('page' => 'deleted-ports')).'"><span class="label label-important">Deleted</span></a>';
   }
 
+  // Port IPv6
+  if(isset($port['attribs']['ipv6-octets']))
+  {
+    $port['tags'] .= '<span class="label label-primary">IPv6</span>';
+  }
+
   // Port CBQoS
   if (isset($cache['ports_option']['ports_cbqos']))
   {
@@ -372,7 +382,8 @@ function generate_port_row($port, $vars = array())
                 <span class="em">' . escape_html(truncate($port['location'], 32, "")) . '</span></td>';
     }
 
-    $string .= '    <td><span class="entity">' . generate_port_link($port, rewrite_ifname($port['port_label'])) . ' ' . $port['tags'] . '</span><br />
+
+    $string .= '    <td><span class="entity">' . generate_port_link($port, escape_html($port['port_label'])) . '</span> <span class="pull-right">' . $port['tags'] . '</span><br />
                 <span class="em">' . escape_html(truncate($port['ifAlias'], 50, '')) . '</span></td>' .
 
       '<td style="width: 110px;"> <i class="icon-circle-arrow-down" style="' . $port['bps_in_style'] . '"></i>  <span class="small" style="' . $port['bps_in_style'] . '">' . formatRates($port['in_rate']) . '</span><br />' .
@@ -410,7 +421,7 @@ function generate_port_row($port, $vars = array())
          <td style="min-width: 250px;">';
 
     $string .= '        <span class="entity-title">
-              ' . generate_port_link($port) . ' '.$port['tags'].'
+              ' . generate_port_link($port) . '</span> <span class="pull-right">'.$port['tags'].'
            </span><br /><span class="small">'.escape_html($port['ifAlias']).'</span>';
 
     if ($port['ifAlias']) { $string .= '<br />'; }
@@ -486,7 +497,8 @@ function generate_port_row($port, $vars = array())
     //$string .= '<br />';
 
     // Set VLAN data if the port has ifTrunk populated
-    if ($port['ifTrunk'])
+    if (strlen($port['ifTrunk']) &&
+        !in_array($port['ifTrunk'], array('access', 'routed'))) // Skip on routed (or access)
     {
       if ($port['ifVlan'])
       {
@@ -567,7 +579,9 @@ function generate_port_row($port, $vars = array())
         default:           $class = '';
       }
       $rel = ($native_name) ? 'tooltip' : ''; // Hide tooltip for empty
-      $string .= '<br /><span data-rel="'.$rel.'" class="label '.$class.'"  data-tooltip="<strong class=\'small\'>'.$port['ifVlan'].' ['.$native_name.']</strong>">VLAN ' . $port['ifVlan'] . '</span>';
+      $vlan_name = ($port['ifTrunk'] != 'access') ? nicecase($port['ifTrunk']) . ' ' : '';
+      $vlan_name .= 'VLAN ' . $port['ifVlan'];
+      $string .= '<br /><span data-rel="'.$rel.'" class="label '.$class.'"  data-tooltip="<strong class=\'small\'>'.$port['ifVlan'].' ['.$native_name.']</strong>">' . $vlan_name . '</span>';
     }
     else if ($port['ifVrf']) // Print the VRF name if the port is assigned to a VRF
     {
@@ -614,7 +628,7 @@ function generate_port_row($port, $vars = array())
           // print_r($link);
           if ($neighbour['remote_port_id']) {
             $int_links[$neighbour['remote_port_id']] = $neighbour['remote_port_id'];
-            $int_links_phys[$neighbour['remote_port_id']] = 1;
+            $int_links_phys[$neighbour['remote_port_id']] = $neighbour['protocol'];
           } else {
             $int_links_unknown[] = $neighbour;
           }
@@ -670,17 +684,27 @@ function generate_port_row($port, $vars = array())
       // Output contents of links array
       foreach ($int_links as $int_link)
       {
+        //r($int_link);
+        //r($int_links_phys);
         $link_if  = get_port_by_id_cache($int_link);
         if (!device_permitted($link_if['device_id'])) { continue; } // Skip not permitted links
 
         $link_dev = device_by_id_cache($link_if['device_id']);
         $string .= $br;
 
-        if ($int_links_phys[$int_link]) { $string .= '<a data-alt="Directly connected" class="'.$config['icon']['connected'].'"></a> '; }
-        else { $string .= '<a data-alt="Same subnet" class="'.$config['icon']['network'].'"></a> '; }
+        if ($int_links_phys[$int_link])
+        {
+          $string .= generate_tooltip_link(NULL, NULL, 'Directly connected', $config['icon']['connected']) . ' ';
+        } else {
+          $string .= generate_tooltip_link(NULL, NULL, 'Same subnet', $config['icon']['network']) . ' ';
+        }
 
         $string .= '<b>' . generate_port_link($link_if, $link_if['port_label_short']) . ' on ' . generate_device_link($link_dev, short_hostname($link_dev['hostname'])) . '</b>';
 
+        if (isset($int_links_phys[$int_link]) && !is_numeric($int_links_phys[$int_link]))
+        {
+          $string .= '&nbsp;<span class="label">'.nicecase($int_links_phys[$int_link]).'</span>';
+        }
         ## FIXME -- do something fancy here.
 
         if ($int_links_v6[$int_link]) { $string .= '&nbsp;'.overlib_link('', '<span class="label label-success">IPv6</span>', implode("<br />", $int_links_v6[$int_link]), NULL); }
@@ -692,12 +716,18 @@ function generate_port_row($port, $vars = array())
 
       foreach ($int_links_unknown as $int_link)
       {
-        // FIXME -- Expose platform and version here.
-        $string .= '<a data-alt="Directly connected" class="'.$config['icon']['connected'].'"></a> ';
+        //r($int_link);
+        $string .= generate_tooltip_link(NULL, NULL, 'Directly connected', $config['icon']['connected']) . ' ';
         $string .= '<b><i>'.short_ifname($int_link['remote_port']).'</i></b> on ';
 
-        $string .= '<i><b>'.generate_tooltip_link(NULL, $int_link['remote_hostname'], '<div class="small" style="max-width: 500px;"><b>'.$int_link['remote_platform'].'</b><br />'.$int_link['remote_version'].'</div>').'</b></i>';
-        $string .= '<br />';
+        $text = '<div class="small" style="max-width: 500px;">';
+        if (strlen($int_link['remote_platform']))
+        {
+          $text .= '<strong>' . $int_link['remote_platform'].'</strong><br />';
+        }
+        $text .= $int_link['remote_version'].'</div>';
+        $string .= '<i><b>'.generate_tooltip_link(NULL, $int_link['remote_hostname'], $text).'</b></i>';
+        $string .= '&nbsp;<span class="label">'.nicecase($int_link['protocol']).'</span><br />';
       }
     }
 

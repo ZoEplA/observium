@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -19,7 +19,7 @@ $oids = snmpwalk_cache_oid($device, "wwpLeosPortXcvrLowBiasAlarmThreshold",  $oi
 foreach ($oids as $index => $entry)
 {
   $entry['descr']   = dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `device_id` = ? AND `ifName` = ?", array($device['device_id'], $index)) . " Bias mA";
-  $entry['oid']     = "1.3.6.1.4.1.6141.2.60.4.1.1.1.1.18.".$index;
+  $entry['oid']     = ".1.3.6.1.4.1.6141.2.60.4.1.1.1.1.18.".$index;
   $entry['current'] = $entry['wwpLeosPortXcvrBias'];
   $options = array('limit_high'       => $entry['wwpLeosPortXcvrHighBiasAlarmThreshold'],
                    'limit_low'        => $entry['wwpLeosPortXcvrLowBiasAlarmThreshold'],
@@ -59,7 +59,7 @@ $scale = 0.0001;
 foreach ($oids as $index => $entry)
 {
   $entry['descr']   = dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `device_id` = ? AND `ifName` = ?", array($device['device_id'], $index)) . " Tx power";
-  $entry['oid']     = ".1.3.6.1.4.1.6141.2.60.4.1.1.1.1.105." . $index;
+  $entry['oid']     = ".1.3.6.1.4.1.6141.2.60.4.1.1.1.1.106." . $index;
   $entry['current'] = $entry['wwpLeosPortXcvrTxDbmPower'];
   $options = array('limit_high'       => $entry['wwpLeosPortXcvrHighTxDbmPwAlarmThreshold'] * $scale,
                    'limit_low'        => $entry['wwpLeosPortXcvrLowTxDbmPwAlarmThreshold']  * $scale,
@@ -101,7 +101,7 @@ $oids = snmpwalk_cache_oid($device, "wwpLeosPortXcvrLowVccAlarmThreshold",  $oid
 foreach ($oids as $index => $entry)
 {
   $entry['descr']   = dbFetchCell("SELECT ifDescr FROM `ports` WHERE `device_id` = ? AND `ifName` = ?", array($device['device_id'], $index)) . " Volts";
-  $entry['oid']     = ".1.3.6.1.4.1.6141.2.60.4.1.1.1.1.16.".$index;
+  $entry['oid']     = ".1.3.6.1.4.1.6141.2.60.4.1.1.1.1.17.".$index;
   $entry['current'] = $entry['wwpLeosPortXcvrVcc'];
   $options = array('limit_high'       => $entry['wwpLeosPortXcvrHighVccAlarmThreshold'],
                    'limit_low'        => $entry['wwpLeosPortXcvrLowVccAlarmThreshold'],

@@ -5,77 +5,66 @@
  *
  *   This file is part of Observium.
  *
- * @package    observium
- * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @package        observium
+ * @subpackage     discovery
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-//.1.3.6.1.4.1.32050.2.1.27.1.0 = 0
-//.1.3.6.1.4.1.32050.2.1.27.1.1 = 1
-//.1.3.6.1.4.1.32050.2.1.27.1.2 = 2
-//.1.3.6.1.4.1.32050.2.1.27.1.3 = 3
-//.1.3.6.1.4.1.32050.2.1.27.1.4 = 4
-//.1.3.6.1.4.1.32050.2.1.27.1.5 = 5
-//.1.3.6.1.4.1.32050.2.1.27.1.6 = 6
-//.1.3.6.1.4.1.32050.2.1.27.2.0 = "Temperature (0.1C)"
-//.1.3.6.1.4.1.32050.2.1.27.2.1 = "Shunt Input (0.1mV)"
-//.1.3.6.1.4.1.32050.2.1.27.2.2 = "Power 1 In (0.1V)"
-//.1.3.6.1.4.1.32050.2.1.27.2.3 = "Power 2 In (0.1V)"
-//.1.3.6.1.4.1.32050.2.1.27.2.4 = "Exp Current (mA)"
-//.1.3.6.1.4.1.32050.2.1.27.2.5 = "Relay on Above (0.1C)"
-//.1.3.6.1.4.1.32050.2.1.27.2.6 = "Relay on Below (0.1C)"
-//.1.3.6.1.4.1.32050.2.1.27.3.0 = 0
-//.1.3.6.1.4.1.32050.2.1.27.3.1 = 0
-//.1.3.6.1.4.1.32050.2.1.27.3.2 = 0
-//.1.3.6.1.4.1.32050.2.1.27.3.3 = 0
-//.1.3.6.1.4.1.32050.2.1.27.3.4 = 0
-//.1.3.6.1.4.1.32050.2.1.27.3.5 = 0
-//.1.3.6.1.4.1.32050.2.1.27.3.6 = 0
-//.1.3.6.1.4.1.32050.2.1.27.4.0 = 0
-//.1.3.6.1.4.1.32050.2.1.27.4.1 = 1
-//.1.3.6.1.4.1.32050.2.1.27.4.2 = 2
-//.1.3.6.1.4.1.32050.2.1.27.4.3 = 3
-//.1.3.6.1.4.1.32050.2.1.27.4.4 = 4
-//.1.3.6.1.4.1.32050.2.1.27.4.5 = 5
-//.1.3.6.1.4.1.32050.2.1.27.4.6 = 6
-//.1.3.6.1.4.1.32050.2.1.27.5.0 = 303
-//.1.3.6.1.4.1.32050.2.1.27.5.1 = -8
-//.1.3.6.1.4.1.32050.2.1.27.5.2 = 529
-//.1.3.6.1.4.1.32050.2.1.27.5.3 = 531
-//.1.3.6.1.4.1.32050.2.1.27.5.4 = 0
-//.1.3.6.1.4.1.32050.2.1.27.5.5 = 1000
-//.1.3.6.1.4.1.32050.2.1.27.5.6 = -1000
-//.1.3.6.1.4.1.32050.2.1.27.6.0 = 0
-//.1.3.6.1.4.1.32050.2.1.27.6.1 = 0
-//.1.3.6.1.4.1.32050.2.1.27.6.2 = 0
-//.1.3.6.1.4.1.32050.2.1.27.6.3 = 0
-//.1.3.6.1.4.1.32050.2.1.27.6.4 = 0
-//.1.3.6.1.4.1.32050.2.1.27.6.5 = 1000
-//.1.3.6.1.4.1.32050.2.1.27.6.6 = -1000
+$oids         = snmpwalk_cache_oid($device, 'analogInputEntry', array(), 'PACKETFLUX-SITEMONITOR');
 
-$index_analog = '.1.3.6.1.4.1.32050.2.1.27';
-$packetflux_analog = snmpwalk_numericoids($device, $index_analog, array(), 'SNMPv2');
-
-$oids_analog[0] = array('class' => 'temperature', 'scale' => 0.1);
-$oids_analog[1] = array('class' => 'voltage',     'scale' => 0.0001);
-$oids_analog[2] = array('class' => 'voltage',     'scale' => 0.1);
-$oids_analog[3] = array('class' => 'voltage',     'scale' => 0.1);
-$oids_analog[4] = array('class' => 'current',     'scale' => 0.001);
-$oids_analog[5] = array('class' => 'temperature', 'scale' => 0.1); // What is this?
-$oids_analog[6] = array('class' => 'temperature', 'scale' => 0.1); // What is this?
-
-foreach ($oids_analog as $index => $entry)
+foreach ($oids as $index => $data)
 {
-  $oid = "$index_analog.5.$index";
-  if (is_numeric($packetflux_analog[$oid]))
-  {
-    list($descr) = explode(' (', $packetflux_analog["$index_analog.2.$index"]);
-    $class       = $oids_analog[$index]['class'];
-    $scale       = $oids_analog[$index]['scale'];
-    $value       = $packetflux_analog[$oid];
-    discover_sensor($valid['sensor'], $class, $device, $oid, "packetflux-analog-$index", 'packetflux', $descr, $scale, $value);
-  }
+
+   $match   = array();
+   $match[] = array('string' => '(0.1C)',      'class' => 'temperature',   'scale' => 0.1);
+   $match[] = array('string' => '(0.1mV)',     'class' => 'voltage',       'scale' => 0.0001);
+   $match[] = array('string' => '(C)',         'class' => 'temperature',   'scale' => 1);
+   $match[] = array('string' => '(0.1V)',      'class' => 'voltage',       'scale' => 0.1);
+   $match[] = array('string' => '(mA)',        'class' => 'current',       'scale' => 0.001);
+   $match[] = array('string' => 'AH*10',       'class' => 'charge',        'scale' => 0.1);
+   $match[] = array('string' => 'KwH*10',      'class' => 'energy',        'scale' => 0.0001);
+   $match[] = array('string' => 'V*100',       'class' => 'voltage',       'scale' => 0.01);
+   $match[] = array('string' => 'Volts*100',   'class' => 'voltage',       'scale' => 0.01);
+   $match[] = array('string' => 'Amps*100',    'class' => 'current',       'scale' => 0.01);
+   $match[] = array('string' => 'Watts*100',   'class' => 'power',         'scale' => 0.01);
+   $match[] = array('string' => 'W*100',       'class' => 'power',         'scale' => 0.01);
+   $match[] = array('string' => 'Temperature', 'class' => 'temperature',   'scale' => 0.1); // This seems common.
+
+
+   foreach($match as $m)
+   {
+
+      if (strpos($data['analogInputDescr'], $m['string']))
+      {
+         $data['class'] = $m['class'];
+         $data['scale'] = $m['scale'];
+         $data['analogInputDescr'] = str_replace($m['string'], "", $data['analogInputDescr']);
+         $data['analogInputDescr'] = str_replace('()', "", $data['analogInputDescr']);
+         $data['analogInputDescr'] = trim($data['analogInputDescr']);
+         continue;
+      }
+
+   }
+
+   foreach(array('Min', 'Max', 'LdLow', 'LdHi', 'Avg', 'ChgHi', 'Tdy') as $m)
+   {
+      if(strpos($data['analogInputDescr'], $m) !== FALSE) { unset($data); }
+   }
+
+   if(is_array($data) && !isset($data['class'])) { print_r($data); unset($data); }
+
+   if($data['analogInputPowerOnValue'] != '0') { unset($data); } // Ignore these, I think they're thresholds or something odd. }
+
+   $data['oid'] = '.1.3.6.1.4.1.32050.2.1.27.5.' . $index;
+
+   if (is_array($data))
+   {
+      discover_sensor($valid['sensor'], $data['class'], $device, $data['oid'], 'packetflux-analog-' . $index, 'packetflux', $data['analogInputDescr'], $data['scale'], $data['analogInputValue']);
+   }
+
 }
+
+unset($data, $match, $m, $index);
 
 // EOF

@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This mib is used for defining huawei's Easy Opearation MIB objects
 -- Reference: None
--- Version:   V1.05
+-- Version:   V1.07
 -- ============================================================================
 
     HUAWEI-EASY-OPERATION-MIB DEFINITIONS ::= BEGIN
@@ -23,7 +23,7 @@
     
     
         hwEasyOperationMIB MODULE-IDENTITY 
-            LAST-UPDATED "201409090000Z"       
+            LAST-UPDATED "201608190000Z"       
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
                 CONTACT-INFO 
@@ -36,6 +36,15 @@
                "
             DESCRIPTION 
                 "Huawei Easy Opearation MIB."
+
+            REVISION      "201608190000Z" 
+            DESCRIPTION 
+               "Add new node hwEasyOperationDtlsEnable " 
+
+            REVISION      "201601130000Z" 
+            DESCRIPTION 
+               "Add new node hwEasyOperationClientProcessFail " 
+
             REVISION      "201409090000Z" 
             DESCRIPTION 
                "Revisions made by HUAWEI." 
@@ -316,6 +325,14 @@
             DESCRIPTION
                 "The aging time of client which is lost. The unit is hour(s)."
             ::= { hwEasyOperationGlobalObjects 26 }
+
+        hwEasyOperationDtlsEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object specifies the DTLS whether is enabled."
+            ::= { hwEasyOperationGlobalObjects 27 }
 
         
         hwEasyOperationGroup OBJECT IDENTIFIER ::= { hwEasyOperationMIB 2 }
@@ -1299,7 +1316,13 @@
 
         
         hwEasyOperationTrapVar OBJECT IDENTIFIER ::= { hwEasyOperationNotification 1 }
-
+		        hwEasyOperationReasonDescr OBJECT-TYPE
+			          SYNTAX OCTET STRING
+			          MAX-ACCESS accessible-for-notify
+			          STATUS current
+			          DESCRIPTION
+				            "The reason description."
+			          ::= { hwEasyOperationTrapVar 1 }
         
         hwEasyOperationTrap OBJECT IDENTIFIER ::= { hwEasyOperationNotification 2 }
 
@@ -1325,6 +1348,13 @@
             DESCRIPTION 
                 "The notification of not permit client to join."
             ::= { hwEasyOperationTrap 3 }
+
+        hwEasyOperationClientProcessFail NOTIFICATION-TYPE
+            OBJECTS { hwEasyOperationClientInfoClientHostName, hwEasyOperationClientInfoClientIpAddress, hwEasyOperationClientInfoClientMacAddress, hwEasyOperationClientInfoClientEsn, hwEasyOperationReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "The notification of process failed."
+            ::= { hwEasyOperationTrap 4 }
 
 		hwEasyOperationMonitor OBJECT IDENTIFIER ::= { hwEasyOperationMIB 7 }
 
@@ -1765,7 +1795,7 @@
                 hwEasyOperationDefaultConfig, hwEasyOperationDefaultPatch, hwEasyOperationDefaultWebfile, hwEasyOperationDefaultLicense, hwEasyOperationDefaultCustomfile1, 
                 hwEasyOperationDefaultCustomfile2, hwEasyOperationDefaultCustomfile3, hwEasyOperationDefaultSysSoftware, hwEasyOperationBackupConfigInterval, hwEasyOperationCommanderUdpPort, 
 				hwEasyOperationServerPort, hwEasyOperationClientAgingTime, hwEasyOperationTopologyEnable, hwEasyOperationCommanderIpAddress, hwEasyOperationCommanderEnable, 
-				hwEasyOperationClientAutoJoinEnable }
+				hwEasyOperationClientAutoJoinEnable, hwEasyOperationDtlsEnable }
             STATUS current
             DESCRIPTION 
                 "The global objects group."
@@ -1835,7 +1865,7 @@
 
         
         hwEasyOperationNotificationGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwEasyOperationClientAdded, hwEasyOperationClientLost }
+            NOTIFICATIONS { hwEasyOperationClientAdded, hwEasyOperationClientLost, hwEasyOperationClientJoinNotPermit, hwEasyOperationClientProcessFail }
             STATUS current
             DESCRIPTION 
                 "The notification objects group."

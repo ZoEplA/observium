@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -22,7 +22,7 @@ $units = array();
 
 $oids = snmpwalk_cache_oid($device, "chStackUnitTemp",       array(), "F10-S-SERIES-CHASSIS-MIB");
 $oids = snmpwalk_cache_oid($device, "chStackUnitStatus",       $oids, "F10-S-SERIES-CHASSIS-MIB");
-$oids = snmpwalk_cache_oid($device, "chStackUnitRowStatus",    $oids, "F10-S-SERIES-CHASSIS-MIB");
+//$oids = snmpwalk_cache_oid($device, "chStackUnitRowStatus",    $oids, "F10-S-SERIES-CHASSIS-MIB"); // Ignore this Row, in some cases it return incorrect data
 
 foreach ($oids as $index => $entry)
 {

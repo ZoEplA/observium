@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 $ip_data = array('ipv4' => array(),
                  'ipv6' => array());
-$valid['ip-addresses'] = array();
+//$valid['ip-addresses'] = array();
 
 $include_dir   = 'includes/discovery/ip-addresses';
 $include_order = 'default'; // Use MIBs from default os definitions by first!
@@ -25,15 +25,21 @@ $table_rows = array();
 $check_networks = array();
 foreach (array('ipv4', 'ipv6') as $ip_version)
 {
-  if (OBS_DEBUG && count($ip_data[$ip_version])) { print_vars($ip_data[$ip_version]); }
+  print_debug_vars($ip_data[$ip_version]);
 
   // Caching old IP addresses table
   $query = 'SELECT * FROM `'.$ip_version.'_addresses`
-            LEFT JOIN `ports` USING(`port_id`)
             WHERE `device_id` = ?';
   foreach (dbFetchRows($query, array($device['device_id'])) as $entry)
   {
-    $old_table[$ip_version][$entry['ifIndex']][$entry[$ip_version.'_address']] = $entry;
+    if (empty($entry['ifIndex']))
+    {
+      // Compatability
+      $ifIndex = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?', array($entry['port_id']));
+    } else {
+      $ifIndex = $entry['ifIndex'];
+    }
+    $old_table[$ip_version][$ifIndex][$entry[$ip_version.'_address']] = $entry;
   }
   if (!count($ip_data[$ip_version]) && !count($old_table[$ip_version]))
   {
@@ -45,14 +51,21 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
   foreach ($ip_data[$ip_version] as $ifIndex => $addresses)
   {
     $port = get_port_by_index_cache($device, $ifIndex);
-    if (!is_array($port)) { continue; } // continue if ifIndex not found
-    $port_id = $port['port_id'];
+    if (is_array($port) && !$port['deleted'])
+    {
+      $port_id = $port['port_id'];
+    } else {
+      // Allow to store IP addresses without associted port, but ifIndex avialable
+      // ie, Nortel/Avaya devices have hidden vlan ifIndexes
+      $port_id = '0';
+    }
 
     foreach ($addresses as $ip_address => $entry)
     {
-      // Here different parts for IPv4/v6
+
       if ($ip_version == 'ipv4')
       {
+        // IPv4
         if (isset($entry['prefix']))
         {
           if (!is_numeric($entry['prefix']))
@@ -71,10 +84,16 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
         $ip_prefix = $entry['prefix'];
         $ip_origin = $entry['origin'];
         $ip_compressed = $ip_address; // just for compat with IPv6
+
         if (is_ipv4_valid($ip_address, $ip_prefix) === FALSE)
         {
           print_debug("Address '$ip_compressed/$ip_prefix' skipped as invalid.");
           continue;
+        }
+
+        if (empty($entry['type']))
+        {
+          $entry['type'] = get_ip_type("$ip_compressed/$ip_prefix");
         }
         $addr = Net_IPv4::parseAddress($ip_address.'/'.$ip_prefix);
         $ip_cidr = $addr->bitmask;
@@ -82,9 +101,13 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
         $full_address = $ip_address . '/' . $ip_cidr;
 
         $new_address = array('port_id'         => $port_id,
+                             'ifIndex'         => $ifIndex,
+                             'device_id'       => $device['device_id'],
                              'ipv4_address'    => $ip_address,
+                             'ipv4_binary'     => inet_pton($ip_address),
                              'ipv4_prefixlen'  => $ip_cidr);
       } else {
+        // IPv6
         if (!is_numeric($entry['prefix'])) { $entry['prefix'] = '128'; }
         $ip_prefix = $entry['prefix'];
         $ip_origin = $entry['origin'];
@@ -95,11 +118,17 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
           continue;
         }
         $full_address = $ip_compressed.'/'.$ip_prefix;
-
+        if (empty($entry['type']))
+        {
+          $entry['type'] = get_ip_type($full_address);
+        }
         $ip_network = Net_IPv6::getNetmask($full_address) . '/' . $ip_prefix;
         //$full_compressed = $ip_compressed.'/'.$ipv6_prefixlen;
         $new_address = array('port_id'         => $port_id,
+                             'ifIndex'         => $ifIndex,
+                             'device_id'       => $device['device_id'],
                              'ipv6_address'    => $ip_address,
+                             'ipv6_binary'     => inet_pton($ip_address),
                              'ipv6_compressed' => $ip_compressed,
                              'ipv6_prefixlen'  => $ip_prefix,
                              'ipv6_origin'     => $ip_origin);
@@ -126,13 +155,40 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
         $ip_address_id = $old_address[$ip_version.'_address_id'];
         foreach (array_keys($new_address) as $param)
         {
-          if ($old_address[$param] != $new_address[$param]) { $update_array[$param] = $new_address[$param]; }
+          if ($param == 'ipv6_binary')
+          {
+            // Compare decoded binary IPv6 address
+            if (inet_ntop($old_address[$param]) != $new_address['ipv6_compressed']) { $update_array[$param] = $new_address[$param]; }
+          }
+          else if ($param == 'ipv4_binary')
+          {
+            // Compare decoded binary IPv4 address
+            if (inet_ntop($old_address[$param]) != $new_address['ipv4_address'])    { $update_array[$param] = $new_address[$param]; }
+          } else {
+            // All other params as string
+            if ($old_address[$param] != $new_address[$param])
+            {
+              $update_array[$param] = $new_address[$param];
+            }
+          }
         }
-        if (count($update_array))
+
+        $update_count = count($update_array);
+        if ($update_count === 1 && (isset($update_array['ipv4_binary']) || isset($update_array['ipv6_binary'])))
+        {
+          // Silent update binary address after upgrade
+          dbUpdate($update_array, $ip_version.'_addresses', '`'.$ip_version.'_address_id` = ?', array($old_address[$ip_version.'_address_id']));
+          $GLOBALS['module_stats'][$module]['unchanged']++;
+        }
+        else if ($update_count)
         {
           // Updated
           dbUpdate($update_array, $ip_version.'_addresses', '`'.$ip_version.'_address_id` = ?', array($old_address[$ip_version.'_address_id']));
-          if (isset($update_array['port_id']))
+          if (!$port_id)
+          {
+            log_event("IP address changed: $ip_compressed/".$old_address[$ip_version.'_prefixlen']." -> $full_address", $device, 'device', $device['device_id']);
+          }
+          else if (isset($update_array['port_id']))
           {
             // Address moved to another port
             log_event("IP address removed: $ip_compressed/".$old_address[$ip_version.'_prefixlen'], $device, 'port', $old_address['port_id']);
@@ -151,7 +207,12 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
         // New IP
         $update_array = $new_address;
         $ip_address_id = dbInsert($update_array, $ip_version.'_addresses');
-        log_event("IP address added: $full_address", $device, 'port', $port_id);
+        if ($port_id)
+        {
+          log_event("IP address added: $full_address", $device, 'port', $port_id);
+        } else {
+          log_event("IP address added: $full_address", $device, 'device', $device['device_id']);
+        }
         $GLOBALS['module_stats'][$module]['added']++; //echo "+";
       }
 
@@ -170,7 +231,12 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
 
       // Delete IP
       dbDelete($ip_version.'_addresses', '`'.$ip_version.'_address_id` = ?', array($ip_address_id));
-      log_event("IP address removed: $full_address", $device, 'port', $entry['port_id']);
+      if ($port_id)
+      {
+        log_event("IP address removed: $full_address", $device, 'port', $entry['port_id']);
+      } else {
+        log_event("IP address removed: $full_address", $device, 'device', $entry['device_id']);
+      }
       $GLOBALS['module_stats'][$module]['deleted']++; //echo "-";
 
       $check_networks[$ip_version][$entry[$ip_version.'_network_id']] = 1;

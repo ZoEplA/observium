@@ -11,5 +11,6 @@ echo '<<<app-ioping>>>'
 
 for dev in $devlist
 do
+#echo '<<<app-ioping-'$dev'>>>'
   echo $dev `ioping -q -s 16k -D -c 3 -p 3 $dev`
 done

@@ -39,7 +39,7 @@ IMPORTS
 -- =============================================================================
 
 peakflowTmsMIB MODULE-IDENTITY
-        LAST-UPDATED "201308190000Z" -- August 19, 2013
+        LAST-UPDATED "201403120000Z" -- March 12, 2014
         ORGANIZATION "Arbor Networks, Inc."
         CONTACT-INFO
                 "       Arbor Networks, Inc.
@@ -57,6 +57,12 @@ peakflowTmsMIB MODULE-IDENTITY
                 "Peakflow TMS MIB"
 
         -- Revision log, reverse chrono
+        REVISION    "201403120000Z" -- March 12, 2014
+        DESCRIPTION "Added entry for tmsTrapGreName field"
+
+        REVISION    "201309190000Z" -- September 19, 2013
+        DESCRIPTION "Added entry for tmsSpCommunicationDegraded trap"
+
         REVISION    "201308190000Z" -- August 19, 2013
         DESCRIPTION "Updated contact information"
 
@@ -320,6 +326,14 @@ tmsTrapIpv6Nexthop      OBJECT-TYPE
         DESCRIPTION
                 "Nexthop IPv6 address"
         ::= { peakflowTmsMgr 20 }
+
+tmsTrapGreName          OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "User-defined tunnel name"
+        ::= { peakflowTmsMgr 21 }
 
 -- =============================================================================
 -- peakflowTmsTraps
@@ -890,6 +904,18 @@ tmsSystemPrefixesMissing    NOTIFICATION-TYPE
         DESCRIPTION
                 "BGP is not currently advertising all mitigation prefixes."
         ::= { peakflowTmsTrapsEnumerate 45 }
+
+tmsSpCommunicationDegraded NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Communication with SP host is degraded."
+        ::= { peakflowTmsTrapsEnumerate 46 }
 
 -- =============================================================================
 -- peakflowTmsObj

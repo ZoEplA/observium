@@ -25,6 +25,16 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
     $this->assertSame($result, generate_query_values($value, $column, $condition));
   }
 
+  /**
+   * @dataProvider providerGenerateQueryValues
+   * @group sql
+   */
+  public function testGenerateQueryValuesNoAnd($value, $column, $condition, $result)
+  {
+    $result = preg_replace('/^ AND/', '', $result);
+    $this->assertSame($result, generate_query_values($value, $column, $condition, FALSE));
+  }
+
   public function providerGenerateQueryValues()
   {
     return array(
@@ -35,6 +45,7 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array(array('1,sf','98u8', ''), '`I`.`test`', FALSE, " AND (`I`.`test` IN ('1,sf','98u8','') OR `I`.`test` IS NULL)"),
       array(OBS_VAR_UNSET,              '`test`', FALSE, " AND (`test` = '' OR `test` IS NULL)"),
       array('"*%F@W)b\'_u<[`R1/#F"',      'test', FALSE, " AND `test` = '\\\"*%F@W)b\'_u<[`R1/#F\\\"'"),
+      array('*?%_',                       'test', FALSE, " AND `test` = '*?%_'"),
       // Negative
       array(array('1,sf,98u8'),         'I.test', 'NOT', " AND `I`.`test` != '1,sf,98u8'"),
       array(array('1,sf,98u8'),         'I.test',  '!=', " AND `I`.`test` != '1,sf,98u8'"),
@@ -46,6 +57,8 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array(array('1,sf,98u8', ''), '`I`.`test`',   'LIKE', " AND (`I`.`test` LIKE '1,sf,98u8' OR ISNULL(`I`.`test`, '') LIKE '')"),
       array(OBS_VAR_UNSET,              '`test`',   'LIKE', " AND (`test` LIKE '".OBS_VAR_UNSET."')"),
       array('"*%F@W)b\'_u<[`R1/#F"',      'test',   'LIKE', " AND (`test` LIKE '\\\"%\%F@W)b\'\_u<[`R1/#F\\\"')"),
+      // LIKE with match *?
+      array('*?%_',                       'test',   'LIKE', " AND (`test` LIKE '%_\%\_')"),
       // Negative LIKE
       array('1,sf,98u8',                '`test`', 'NOT LIKE%', " AND (`test` NOT LIKE '1,sf,98u8%')"),
       array(array('1,sf,98u8', ''), '`I`.`test`',  'NOT LIKE', " AND (`I`.`test` NOT LIKE '1,sf,98u8' AND ISNULL(`I`.`test`, '') NOT LIKE '')"),

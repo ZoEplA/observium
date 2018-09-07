@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Request.php 155 2012-05-06 23:45:23Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -104,9 +104,15 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         $q = new Net_DNS2_Question();
 
-        $name   = trim(strtolower($name), " \t\n\r\0\x0B.");
-        $type   = strtoupper(trim($type));
-        $class  = strtoupper(trim($class));
+        //
+        // allow queries directly to . for the root name servers
+        //
+        if ($name != '.') {
+            $name = trim(strtolower($name), " \t\n\r\0\x0B.");
+        }
+
+        $type = strtoupper(trim($type));
+        $class = strtoupper(trim($class));
 
         //
         // check that the input string has some data in it
@@ -139,12 +145,15 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
             );
         }
 
-        //
-        // if it's a PTR request for an IP address, then make sure we tack on 
-        // the arpa domain
-        //
         if ($type == 'PTR') {
 
+            //
+            // if it's a PTR request for an IP address, then make sure we tack on
+            // the arpa domain.
+            //
+            // there are other types of PTR requests, so if an IP adress doesn't match,
+            // then just let it flow through and assume it's a hostname
+            //
             if (Net_DNS2::isIPv4($name) == true) {
 
                 //
@@ -174,19 +183,6 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
                         Net_DNS2_Lookups::E_PACKET_INVALID
                     );
                 }
-
-            } else if (preg_match('/arpa$/', $name) == true) {
-
-                //
-                // an already formatted IPv4 or IPv6 address in the arpa domain
-                //
-
-            } else {
-
-                throw new Net_DNS2_Exception(
-                    'unsupported PTR value: ' . $name,
-                    Net_DNS2_Lookups::E_PACKET_INVALID
-                );
             }
         }
 

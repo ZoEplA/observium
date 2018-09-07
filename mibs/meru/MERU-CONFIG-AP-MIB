@@ -102,10 +102,12 @@ IMPORTS
        mwApUpTime                                                  TimeTicks,
        mwApHwRev                                                   DisplayString,
        mwApHwType                                                  MwlApHwType,
+       mwApVlanName                                                DisplayString,
        mwApParentMac                                               MacAddress,
        mwApAlarmState                                              MwlAlarmState,
        mwApBootVersion                                             DisplayString,
        mwApFPGAVersion                                             DisplayString,
+       mwApIpAddress                                               IpAddress,
        mwApRuntimeVersion                                          DisplayString,
        mwApOperationalState                                        MwlOperationalState,
        mwApAvailabilityStatus                                      MwlAvailabilityStatus,
@@ -207,7 +209,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-         "This object describes Serial Number"
+         "This object describes MAC Address"
     ::= { mwApEntry   13 }
 
   mwApIndoorOutdoor  OBJECT-TYPE
@@ -330,13 +332,29 @@ IMPORTS
          "This object describes KeepAlive Timeout(seconds)"
     ::= { mwApEntry   30 }
 
+  mwApVlanName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Name"
+    ::= { mwApEntry   38 }
+
+  mwApIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP IP Address for L3"
+    ::= { mwApEntry   39 }
+
   mwApRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwApEntry 50 }
+    ::= { mwApEntry 56 }
 
   mwAp2controllerMapTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwAp2controllerMapEntry
@@ -916,7 +934,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-         "This object describes Serial Number"
+         "This object describes MAC Address"
     ::= { mwApCertificateEntry    4 }
 
   mwApCertificateOperationalState  OBJECT-TYPE

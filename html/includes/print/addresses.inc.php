@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -40,6 +40,7 @@ function print_addresses($vars)
   $ip_array = array();
   $param = array();
   $where = ' WHERE 1 ';
+  $join_ports = FALSE;
   $param_netscaler = array();
   $where_netscaler = " WHERE `vsvr_ip` != '0.0.0.0' AND `vsvr_ip` != '' ";
   foreach ($vars as $var => $value)
@@ -50,37 +51,51 @@ function print_addresses($vars)
       {
         case 'device':
         case 'device_id':
-          $where .= generate_query_values($value, 'I.device_id');
+          $where .= generate_query_values($value, 'A.device_id');
           $where_netscaler .= generate_query_values($value, 'N.device_id');
           break;
         case 'interface':
           $where .= generate_query_values($value, 'I.ifDescr', 'LIKE%');
+          $join_ports = TRUE;
           break;
         case 'network':
-          list($net, $mask) = explode('/', $value);
-          if (is_numeric(stripos($net, ':abcdef'))) { $address_type = 'ipv6'; }
-          $where .= generate_query_values($value, 'N.ip_network', 'LIKE%');
+          if (!is_array($value))
+          {
+            $value = explode(',', $value);
+          }
+          if ($ids = get_entity_ids_ip_by_network($address_type, $value))
+          {
+            // Full network with prefix
+            $where .= generate_query_values($ids, 'A.ip_address_id');
+          } else {
+            // Part of network string
+            $where .= ' AND 0'; // Nothing!
+          }
+          $where_netscaler .= ' AND 0'; // Currently unsupported for netscaller
           break;
         case 'address':
-          list($addr, $mask) = explode('/', $value);
-          if (is_numeric(stripos($addr, ':abcdef'))) { $address_type = 'ipv6'; }
-          switch ($address_type)
+          if (!is_array($value))
           {
-            case 'ipv6':
-              $ip_valid = Net_IPv6::checkIPv6($addr);
-              break;
-            case 'ipv4':
-              $ip_valid = Net_IPv4::validateIP($addr);
-              break;
+            $value = explode(',', $value);
           }
-          if ($ip_valid)
+          // Remove prefix part
+          $addr = array();
+          foreach ($value as $tmp)
           {
-            // If address valid -> seek occurrence in network
-            if (!$mask) { $mask = ($address_type === 'ipv4') ? '32' : '128'; }
+            list($addr[], $mask) = explode('/', $tmp);
+          }
+          if ($ids = get_entity_ids_ip_by_network($address_type, $addr))
+          {
+            // Full network with prefix
+            $where .= generate_query_values($ids, 'A.ip_address_id');
+          } else {
+            $where .= ' AND 0'; // Nothing!
+          }
+          if (get_ip_version($addr))
+          {
+            // Netscaller for valid IP address
             $where_netscaler .= generate_query_values($addr, 'N.vsvr_ip');
           } else {
-            // If address not valid -> seek LIKE
-            $where .= generate_query_values($addr, 'A.ip_address', '%LIKE%');
             $where_netscaler .= generate_query_values($addr, 'N.vsvr_ip', '%LIKE%');
           }
           break;
@@ -88,16 +103,16 @@ function print_addresses($vars)
     }
   }
 
-  $query_device_permitted = generate_query_permitted(array('device'), array('device_table' => 'D'));
-  $query_port_permitted   = generate_query_permitted(array('port'),   array('port_table' => 'I'));
+  $query_device_permitted = generate_query_permitted(array('device'));
+  $query_port_permitted   = generate_query_permitted(array('device', 'port'));
 
   // Also search netscaler Vserver IPs
   $query_netscaler = 'FROM `netscaler_vservers` AS N ';
-  $query_netscaler .= 'LEFT JOIN `devices` AS D ON N.`device_id` = D.`device_id` ';
+  $query_netscaler .= 'LEFT JOIN `devices` USING(`device_id`) ';
   $query_netscaler .= $where_netscaler . $query_device_permitted;
   //$query_netscaler_count = 'SELECT COUNT(`vsvr_id`) ' . $query_netscaler;
   $query_netscaler =  'SELECT * ' . $query_netscaler;
-  $query_netscaler .= ' ORDER BY N.`vsvr_ip`';
+  $query_netscaler .= ' ORDER BY `vsvr_ip`';
   // Override by address type
   if ($address_type == 'ipv6')
   {
@@ -125,26 +140,30 @@ function print_addresses($vars)
   //print_message($query_netscaler_count);
 
   $query = 'FROM `ip_addresses` AS A ';
-  $query .= 'LEFT JOIN `ports`   AS I ON I.`port_id`   = A.`port_id` ';
-  $query .= 'LEFT JOIN `devices` AS D ON I.`device_id` = D.`device_id` ';
-  $query .= 'LEFT JOIN `ip_networks` AS N ON N.`ip_network_id` = A.`ip_network_id` ';
+  $query .= ' LEFT JOIN `ip_networks` AS N USING(`ip_network_id`)';
+  if ($join_ports)
+  {
+    $query .= ' LEFT JOIN `ports`       USING(`port_id`)';
+  }
+  //$query .= ' LEFT JOIN `devices`     USING(`device_id`)';
   $query .= $where . $query_port_permitted;
   //$query_count = 'SELECT COUNT(`ip_address_id`) ' . $query;
-  $query =  'SELECT * ' . $query;
-  $query .= ' ORDER BY A.`ip_address`';
+  $query =  'SELECT A.*, N.* ' . $query;
+  $query .= ' ORDER BY A.`ip_binary`';
   if ($ip_valid)
   {
     $pagination = FALSE;
   }
 
   // Override by address type
-  $query = str_replace(array('ip_address', 'ip_network'), array($address_type.'_address', $address_type.'_network'), $query);
+  //$query = str_replace(array('ip_address', 'ip_network'), array($address_type.'_address', $address_type.'_network'), $query);
+  $query = preg_replace('/ip_(address|network|binary)/', $address_type.'_$1', $query);
   //$query_count = str_replace(array('ip_address', 'ip_network'), array($address_type.'_address', $address_type.'_network'), $query_count);
 
   // Query addresses
   $entries = dbFetchRows($query, $param);
-  $ip_array = array_merge($ip_array, $entries);
-  $ip_array = array_sort($ip_array, $address_type.'_address');
+  $ip_array = array_sort($ip_array, $address_type.'_address'); // Sort netscaller
+  $ip_array = array_merge($entries, $ip_array);
 
   // Query address count
   //if ($pagination) { $count = dbFetchCell($query_count, $param); }
@@ -190,31 +209,39 @@ function print_addresses($vars)
     {
       list($prefix, $length) = explode('/', $entry[$address_type.'_network']);
 
-      if (port_permitted($entry['port_id']) || $entry['type'] == 'netscaler_vsvr')
+      if ($entry['type'] == 'netscalervsvr')
       {
-        if ($entry['type'] == 'netscalervsvr')
-        {
-          $entity_link = generate_entity_link($entry['type'], $entry);
-        } else {
-          humanize_port ($entry);
-          if ($entry['ifInErrors_delta'] > 0 || $entry['ifOutErrors_delta'] > 0)
-          {
-            $port_error = generate_port_link($entry, '<span class="label label-important">Errors</span>', 'port_errors');
-          }
-          $entity_link = generate_port_link($entry, $entry['port_label_short']) . ' ' . $port_error;
-        }
-        $device_link = generate_device_link($entry);
-        $string .= '  <tr>' . PHP_EOL;
-        if ($list['device'])
-        {
-          $string .= '    <td class="entity" style="white-space: nowrap">' . $device_link . '</td>' . PHP_EOL;
-        }
-        $string .= '    <td class="entity">' . $entity_link . '</td>' . PHP_EOL;
-        if ($address_type === 'ipv6') { $entry[$address_type.'_address'] = Net_IPv6::compress($entry[$address_type.'_address']); }
-        $string .= '    <td>' . generate_popup_link('ip', $entry[$address_type.'_address'] . '/' . $length) . '</td>' . PHP_EOL;
-        $string .= '    <td>' . $entry['ifAlias'] . '</td>' . PHP_EOL;
-        $string .= '  </tr>' . PHP_EOL;
+        $entity_link = generate_entity_link($entry['type'], $entry);
       }
+      else if ($port = get_port_by_id_cache($entry['port_id']))
+      {
+        if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0)
+        {
+          $port_error = generate_port_link($port, '<span class="label label-important">Errors</span>', 'port_errors');
+        }
+        $entity_link = generate_port_link($port, $port['port_label_short']) . ' ' . $port_error;
+        $entry['ifAlias'] = $port['ifAlias'];
+      }
+      else if ($vlan = dbFetchRow('SELECT * FROM `vlans` WHERE `device_id` = ? AND `ifIndex` = ?', array($entry['device_id'], $entry['ifIndex'])))
+      {
+        // Vlan ifIndex (without associated port)
+        $entity_link = 'Vlan ' . $vlan['vlan_vlan'];
+        $entry['ifAlias'] = $vlan['vlan_name'];
+      } else {
+        $entity_link = 'ifIndex ' . $entry['ifIndex'];
+      }
+      $device_link = generate_device_link($entry);
+      $string .= '  <tr>' . PHP_EOL;
+      if ($list['device'])
+      {
+        $string .= '    <td class="entity" style="white-space: nowrap">' . $device_link . '</td>' . PHP_EOL;
+      }
+      $string .= '    <td class="entity">' . $entity_link . '</td>' . PHP_EOL;
+      if ($address_type === 'ipv6') { $entry[$address_type.'_address'] = Net_IPv6::compress($entry[$address_type.'_address']); }
+      $string .= '    <td>' . generate_popup_link('ip', $entry[$address_type.'_address'] . '/' . $length) . '</td>' . PHP_EOL;
+      $string .= '    <td>' . $entry['ifAlias'] . '</td>' . PHP_EOL;
+      $string .= '  </tr>' . PHP_EOL;
+
     }
   }
 

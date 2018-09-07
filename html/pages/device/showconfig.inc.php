@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -85,10 +85,19 @@ if ($_SESSION['userlevel'] >= 7)
   if ($rev['count'])
   {
     $rev_active_index = 0;
+    $rev_max = intval($config['rancid_revisions']);
+    if ($rev_max <= 0)
+    {
+      $rev_max = 1;
+    }
+    else if ($rev_max > 32)
+    {
+      $rev_max = 32;
+    }
     foreach ($rev['list'] as $i => $entry)
     {
       $rev_name = ($rev['type'] == 'svn' ? 'r'.$entry['rev'] : $entry['rev']);
-      if ($i > 9)
+      if ($i > ($rev_max - 1))
       {
         break; // Show only last 10 revisions
       }

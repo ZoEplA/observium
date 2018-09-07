@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: BitMap.php 198 2013-05-26 05:05:22Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -77,7 +77,7 @@ class Net_DNS2_BitMap
     public static function bitMapToArray($data)
     {
         if (strlen($data) == 0) {
-            return null;
+            return array();
         }
 
         $output = array();
@@ -141,7 +141,7 @@ class Net_DNS2_BitMap
     public static function arrayToBitMap(array $data)
     {
         if (count($data) == 0) {
-            return null;
+            return '';
         }
 
         $current_window = 0;

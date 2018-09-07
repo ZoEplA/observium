@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -67,13 +67,13 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $processor)
   // Check alerts
   check_entity('processor', $processor, array('processor_usage' => $proc));
 
-    $table_row = array();
-    $table_row[] = $processor['processor_descr'];
-    $table_row[] = $processor['processor_type'];
-    $table_row[] = $processor['processor_index'];
-    $table_row[] = $processor['processor_usage'].'%';
-    $table_rows[] = $table_row;
-    unset($table_row);
+  $table_row = array();
+  $table_row[] = $processor['processor_descr'];
+  $table_row[] = $processor['processor_type'];
+  $table_row[] = $processor['processor_index'];
+  $table_row[] = $processor['processor_usage'].'%';
+  $table_rows[] = $table_row;
+  unset($table_row);
 
 }
 

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private IPFPM MIB
 -- Reference:
--- Version: V1.26
+-- Version: V1.32
 -- History:
 --          Wang XuanXuan,2012-08-13,Create 
 -- ==================================================================
@@ -31,7 +31,7 @@ IMPORTS
     
     
     hwIpfpmMib MODULE-IDENTITY 
-        LAST-UPDATED "201510131700Z"-- 
+        LAST-UPDATED "201608191122Z"-- 
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -53,6 +53,18 @@ IMPORTS
             get measurement data from them to report to MCP. MCP 
             works as the control role to collect and calculate the 
             measurement data that DCP reported."
+        REVISION "201608191122Z"  
+        DESCRIPTION  "revision 1.32, add hwIpfpmDcpFlowVxlan and hwIpfpmDcpFlowVni,hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum"
+        REVISION "201607262022Z"  
+        DESCRIPTION  "revision 1.31, modify hwIpfpmDcpInstTlpLspLabel2 and hwIpfpmDcpInstTlpBackwardLspLabel2"
+        REVISION "201605172022Z"  
+        DESCRIPTION  "revision 1.30, modify the description of hwIpfpmDcpNexthopIp"
+        REVISION "201603292003Z"      
+        DESCRIPTION  "revision 1.29, modify hwIpfpmMcpAuthKey, hwIpfpmDcpAuthKey, hwIpfpmDcpInstAuthKey OBJECT-TYPE range"
+        REVISION "201602251100Z"      
+        DESCRIPTION  "revision 1.28, add hwIpfpmDcpInstTlpNHTable"
+        REVISION "201510211700Z"      
+        DESCRIPTION  "revision 1.27, add for multiDelay"
         REVISION "201510131700Z"      
         DESCRIPTION  "revision 1.26, modify the spelling mistake of the word label"
         REVISION "201508142059Z"      
@@ -325,7 +337,17 @@ IMPORTS
         manage-vpn (1),
         vpn-instance (2)        
         }
-   
+
+    HWIpfpmClockSoure ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of ClockSoure.
+         The value 'ntp' represents using ntp."
+    SYNTAX INTEGER
+        {
+        default  (0),
+        ntp      (1)
+        }
 --
 -- Node definitions
 --    
@@ -432,7 +454,7 @@ IMPORTS
     ::= { hwIpfpmMcpAuthEntry 2 }
     
     hwIpfpmMcpAuthKey OBJECT-TYPE
-    SYNTAX OCTET STRING(SIZE (0..392))
+    SYNTAX OCTET STRING(SIZE (0..432))
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -846,6 +868,24 @@ IMPORTS
         "This object indicates the current instance number of MCP."
     ::= { hwIpfpmMcpStatisticsTable 2 }
     
+    hwIpfpmMcpInstTlpMaxNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the maximum number of all instance TLP can be managed by MCP.
+		-1 means unused of this number"
+    ::= { hwIpfpmMcpStatisticsTable 3 }
+
+    hwIpfpmMcpAchMaxNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the total number of all ACH can be managed by MCP.
+		-1 means unused of this number"
+    ::= { hwIpfpmMcpStatisticsTable 4 }
+
     --
     -- hwIpfpmMcpInstAchIndexTable: One-way delay statistics of test 
     -- instance
@@ -1286,8 +1326,291 @@ IMPORTS
         "The backward flow variation(us) in two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayStatEntry 7 }
     
-   
--- ==================================================================    
+    --
+    -- hwIpfpmMcpOneDelayMultiStatTable: Multi-in-point one-way delay statistics of test instance 
+    -- 
+    hwIpfpmMcpOneDelayMultiStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpOneDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains multi-in-point one-way delay measure statistics of MCP
+        test instances."
+    ::= { hwIpfpmMcpStatistics 7 }
+
+    hwIpfpmMcpOneDelayMultiStatEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpOneDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multi-in-point one-way delay measure statistics of an interval for a
+        particular test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow, hwIpfpmMcpOneDelayFlowType, hwIpfpmMcpOneDelayMultiSrcDCP, hwIpfpmMcpOneDelayMultiSrcTLP, hwIpfpmMcpOneDelayMultiDesDCP, hwIpfpmMcpOneDelayMultiDesTLP}
+    ::= { hwIpfpmMcpOneDelayMultiStatTable 1 }
+    
+    HwIpfpmMcpOneDelayMultiStatEntry ::=
+        SEQUENCE {
+                hwIpfpmMcpOneDelayFlowType
+                    HWIpfpmMcpFlowType,				
+                hwIpfpmMcpOneDelayMultiSrcDCP
+                    IpAddress,
+                hwIpfpmMcpOneDelayMultiSrcTLP
+                    Integer32,
+                hwIpfpmMcpOneDelayMultiDesDCP
+                    IpAddress,
+                hwIpfpmMcpOneDelayMultiDesTLP
+                    Integer32,
+                hwIpfpmMcpOneDelayMultiErrInfo
+                    HWIpfpmStatErrInfo,
+                hwIpfpmMcpOneDelayMulti
+                    Integer32,
+                hwIpfpmMcpOneDelayMultiVariation
+                    Integer32
+    }
+
+    hwIpfpmMcpOneDelayFlowType OBJECT-TYPE
+    SYNTAX HWIpfpmMcpFlowType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The flow type for multi-in-point one-delay. "
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 1 }	
+    
+    hwIpfpmMcpOneDelayMultiSrcDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay source DCP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 2 }
+
+    hwIpfpmMcpOneDelayMultiSrcTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay source TLP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 3 }
+
+    hwIpfpmMcpOneDelayMultiDesDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay destination DCP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 4 }
+
+    hwIpfpmMcpOneDelayMultiDesTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay destination TLP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 5 }
+
+    hwIpfpmMcpOneDelayMultiErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation
+        reason of an interval's multi-in-point one-way delay measure statistics."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 6 }
+
+    hwIpfpmMcpOneDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay(us)."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 7 }
+
+    hwIpfpmMcpOneDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay variation(us)."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 8 }
+
+    --
+    -- hwIpfpmMcpTwoDelayMultiStatTable: Multi-in-point two-way delay statistics of test instance
+    --
+    hwIpfpmMcpTwoDelayMultiStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpTwoDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains multi-in-point two-way delay measure statistics of MCP
+        test instances."
+    ::= { hwIpfpmMcpStatistics 8 }
+
+    hwIpfpmMcpTwoDelayMultiStatEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpTwoDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multi-in-point two-way delay measure statistics of an interval for a
+        particular test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow, hwIpfpmMcpForwardDelayMultiSrcDCP, hwIpfpmMcpForwardDelayMultiSrcTLP, hwIpfpmMcpForwardDelayMultiDesDCP, hwIpfpmMcpForwardDelayMultiDesTLP, hwIpfpmMcpBackwardDelayMultiSrcDCP, hwIpfpmMcpBackwardDelayMultiSrcTLP, hwIpfpmMcpBackwardDelayMultiDesDCP, hwIpfpmMcpBackwardDelayMultiDesTLP}
+    ::= { hwIpfpmMcpTwoDelayMultiStatTable 1 }
+
+    HwIpfpmMcpTwoDelayMultiStatEntry ::=
+        SEQUENCE {
+                hwIpfpmMcpForwardDelayMultiSrcDCP
+                    IpAddress,
+                hwIpfpmMcpForwardDelayMultiSrcTLP
+                    Integer32,
+                hwIpfpmMcpForwardDelayMultiDesDCP
+                    IpAddress,
+                hwIpfpmMcpForwardDelayMultiDesTLP
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMultiSrcDCP
+                    IpAddress,
+                hwIpfpmMcpBackwardDelayMultiSrcTLP
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMultiDesDCP
+                    IpAddress,
+                hwIpfpmMcpBackwardDelayMultiDesTLP
+                    Integer32,
+                hwIpfpmMcpTwoDelayMultiErrInfo
+                    HWIpfpmStatErrInfo,
+                hwIpfpmMcpTwoDelayMulti
+                    Integer32,
+                hwIpfpmMcpTwoDelayMultiVariation
+                    Integer32,
+                hwIpfpmMcpForwardDelayMulti
+                    Integer32,
+                hwIpfpmMcpForwardDelayMultiVariation
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMulti
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMultiVariation
+                    Integer32
+    }
+
+    hwIpfpmMcpForwardDelayMultiSrcDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source DCP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 1 }
+
+    hwIpfpmMcpForwardDelayMultiSrcTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source TLP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 2 }
+
+    hwIpfpmMcpForwardDelayMultiDesDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination DCP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 3 }
+
+    hwIpfpmMcpForwardDelayMultiDesTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination TLP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 4 }
+
+    hwIpfpmMcpBackwardDelayMultiSrcDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source DCP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 5 }
+
+    hwIpfpmMcpBackwardDelayMultiSrcTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source TLP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 6 }
+
+    hwIpfpmMcpBackwardDelayMultiDesDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination DCP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 7 }
+
+    hwIpfpmMcpBackwardDelayMultiDesTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination TLP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 8 }
+
+    hwIpfpmMcpTwoDelayMultiErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation
+        reason of an interval's multi-in-point two-way delay measure statistics."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 9 }
+
+    hwIpfpmMcpTwoDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay(us) of monitored flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 10 }
+
+    hwIpfpmMcpTwoDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay variation(us) of monitored flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 11 }
+
+    hwIpfpmMcpForwardDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The forward flow delay(us) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 12 }
+
+    hwIpfpmMcpForwardDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The forward flow variation(us) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 13 }
+
+    hwIpfpmMcpBackwardDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The backward flow delay(us) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 14 }
+
+    hwIpfpmMcpBackwardDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The backward flow variation(us) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 15 }
+
+-- ==================================================================
 -- IPFPM DCP configuration group
 -- ==================================================================
     --
@@ -1377,7 +1700,16 @@ IMPORTS
         "The type of the VPN instance. 'hwIpfpmDcpInstMcpId' should be setted first 
 	before setting this object."
     ::= { hwIpfpmDcpGlobalTable 9 } 
-       	
+
+    hwIpfpmPeriodSource OBJECT-TYPE
+    SYNTAX HWIpfpmClockSoure
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The clock source using by period.Priority should be given to the use of
+         this setting in period calculation."
+    ::= { hwIpfpmDcpGlobalTable 10 } 
+
     --
     -- hwIpfpmDcpAuthTable: DCP global authentication information
     --
@@ -1429,7 +1761,7 @@ IMPORTS
     ::= { hwIpfpmDcpAuthEntry 2 }
     
     hwIpfpmDcpAuthKey OBJECT-TYPE
-    SYNTAX OCTET STRING(SIZE (0..392))
+    SYNTAX OCTET STRING(SIZE (0..432))
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1650,7 +1982,7 @@ IMPORTS
     ::= { hwIpfpmDcpInstAuthEntry 2 }
     
     hwIpfpmDcpInstAuthKey OBJECT-TYPE
-    SYNTAX OCTET STRING(SIZE (0..392))
+    SYNTAX OCTET STRING(SIZE (0..432))
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1720,7 +2052,11 @@ IMPORTS
                                                                                   hwIpfpmDcpFlowForwardGtpTeid
                                                                                         Unsigned32,
                                                                                  hwIpfpmDcpFlowBackwardGtpTeid
-                                                                                        Unsigned32	    
+                                                                                        Unsigned32,
+                                                                                 hwIpfpmDcpFlowVxlan
+                                                                                       TruthValue,
+                                                                                 hwIpfpmDcpFlowVni
+                                                                                       Integer32	    
     }
     
     hwIpfpmDcpFlowType OBJECT-TYPE
@@ -1893,6 +2229,26 @@ IMPORTS
     DEFVAL { 0 }
     ::= { hwIpfpmDcpFlowEntry 16 }
     
+    hwIpfpmDcpFlowVxlan OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The Vxlan of the flow feature. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpFlowEntry 17 }
+	
+    hwIpfpmDcpFlowVni OBJECT-TYPE
+    SYNTAX Integer32(0..16000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the value of vni
+        specified as the flow feature. The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 18 }
+
     --
     -- hwIpfpmDcpInstTlpTable: DCP TLP information of DCP test instance 
     --
@@ -2074,12 +2430,13 @@ IMPORTS
     ::= { hwIpfpmDcpInstTlpEntry 11 } 
 
     hwIpfpmDcpInstTlpLspLabel2 OBJECT-TYPE
-    SYNTAX Integer32(-1..1048575)
+    SYNTAX Integer32(-2..1048575)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
         "The LSP label of the flow that the TLP measured. The value 
-        -1 represents that this object is not configured."
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
     DEFVAL { -1 }
     ::= { hwIpfpmDcpInstTlpEntry 12 }
 
@@ -2144,12 +2501,13 @@ IMPORTS
     ::= { hwIpfpmDcpInstTlpEntry 18 }
     
     hwIpfpmDcpInstTlpBackwardLspLabel2 OBJECT-TYPE
-    SYNTAX Integer32(-1..1048575)
+    SYNTAX Integer32(-2..1048575)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
         "The LSP label of the flow that the TLP measured. The value 
-        -1 represents that this object is not configured."
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
     DEFVAL { -1 }
     ::= { hwIpfpmDcpInstTlpEntry 19 }
     
@@ -2798,6 +3156,55 @@ IMPORTS
         "This object indicates the ONT port ID.
         The value -1 represents that this object is not configured."
     ::= { hwIpfpmDcpTlpExtEntry 7 }
+
+	
+    --Begin add for nexthop
+    -- hwIpfpmDcpInstTlpNHTable: DCP TLP nexthop information
+    hwIpfpmDcpInstTlpNHTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpNHEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a particular TLP of the test instance."
+    ::= { hwIpfpmDcpConfiguration 19 }
+    
+    hwIpfpmDcpInstTlpNHEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpNHEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a particular TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId,
+	    hwIpfpmDcpNexthopIp}
+    ::= { hwIpfpmDcpInstTlpNHTable 1 }
+    
+    HwIpfpmDcpInstTlpNHEntry ::=
+		SEQUENCE { 		                
+				hwIpfpmDcpNexthopIp
+				    IpAddress,								    
+				hwIpfpmDcpInstTlpNHRowStatus
+				    RowStatus    					    				     				    
+    }
+	
+    hwIpfpmDcpNexthopIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The object indicates the nexthop information for a particular TLP."
+    ::= { hwIpfpmDcpInstTlpNHEntry 1 }  
+		
+	
+    hwIpfpmDcpInstTlpNHRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpNHEntry 2 }
+	
+    --End add for nexthop 
     
 -- ==================================================================    
 -- IPFPM Traps
@@ -2919,6 +3326,49 @@ IMPORTS
         "A hwIpfpmTlpRecovery trap is sent when the number of board tlp is under the threshold."
     ::= { hwIpfpmTraps 9 }   
     
+    hwIpfpmMultiOneDelayExceed NOTIFICATION-TYPE
+    OBJECTS {
+  	        hwIpfpmMcpOneDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiOneDelayExceed trap is sent when the one-way delay 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals. This trap supports multi one-way delay for a period."
+    ::= { hwIpfpmTraps 10 }
+    
+    hwIpfpmMultiOneDelayRecovery NOTIFICATION-TYPE
+    OBJECTS {
+    		hwIpfpmMcpOneDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiOneDelayRecovery trap is sent when the one-way delay 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 11 }
+    
+    hwIpfpmMultiTwoDelayExceed NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmMcpTwoDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiTwoDelayExceed trap is sent when the two-way delay 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals. This trap supports multi two-way delay for a period."
+    ::= { hwIpfpmTraps 12 }
+    
+    hwIpfpmMultiTwoDelayRecovery NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmMcpTwoDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiTwoDelayRecovery trap is sent when the two-way delay 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 13 }
     
 -- ==================================================================    
 -- IPFPM Compliances and groups
@@ -2987,7 +3437,9 @@ IMPORTS
     hwIpfpmMcpStatsGroup OBJECT-GROUP
     OBJECTS {
     		hwIpfpmMcpInstSpec,
- 		hwIpfpmMcpInstCurNum,   		
+ 		hwIpfpmMcpInstCurNum, 
+	                     hwIpfpmMcpInstTlpMaxNum,
+		hwIpfpmMcpAchMaxNum,  		
     		hwIpfpmMcpSeqNo, 
     		hwIpfpmMcpLossErrInfo,
 		hwIpfpmMcpForwardLossPkts,
@@ -3028,16 +3480,17 @@ IMPORTS
     
     hwIpfpmDcpConfigGroup OBJECT-GROUP
     OBJECTS {
-                                          hwIpfpmDcpEnable,
-                                          hwIpfpmDcpId,
+		hwIpfpmDcpEnable,
+		hwIpfpmDcpId,
 		hwIpfpmDcpMeasureColorFlag,
 		hwIpfpmDcpMcpId,
 		hwIpfpmDcpMcpPort,
 		hwIpfpmDcpMcpVpnName,
 		hwIpfpmDcpMcpVpnType,
-	                     hwIpfpmDcpAuthType,
+		hwIpfpmDcpAuthType,
 		hwIpfpmDcpAuthKey,
-		hwIpfpmDcpAuthRowStatus		
+		hwIpfpmDcpAuthRowStatus,
+       hwIpfpmPeriodSource		
     }
     STATUS current
     DESCRIPTION
@@ -3077,6 +3530,8 @@ IMPORTS
 		hwIpfpmDcpFlowOuterDstAddr,
 		hwIpfpmDcpFlowForwardGtpTeid,
 		hwIpfpmDcpFlowBackwardGtpTeid,
+	                     hwIpfpmDcpFlowVxlan,
+		hwIpfpmDcpFlowVni,
 		hwIpfpmDcpInstTlpRole,                                                               
 		hwIpfpmDcpInstTlpFlowType,                           
                                           hwIpfpmDcpInstTlpDirec,                                 
@@ -3101,7 +3556,8 @@ IMPORTS
 		hwIpfpmDcpInstTlpBackwardFlowLabelFlag,
 		hwIpfpmDcpInstTlpBackwardOuterVlan,
 		hwIpfpmDcpInstTlpBackwardInnerVlan,
-		hwIpfpmDcpInstTlpBackwardTpId,
+		hwIpfpmDcpInstTlpBackwardTpId,							    
+	                     hwIpfpmDcpInstTlpNHRowStatus,
 		hwIpfpmDcpLossEnable,                     	    
 		hwIpfpmDcpLossContEnable,                            
 		hwIpfpmDcpLossTimeRange,
@@ -3145,7 +3601,11 @@ IMPORTS
 		hwIpfpmTwoDelayRecovery,
 		hwIpfpmDcpFlowConflict,
 		hwIpfpmTlpExceed,
-		hwIpfpmTlpRecovery		
+		hwIpfpmTlpRecovery,
+		hwIpfpmMultiOneDelayExceed,
+		hwIpfpmMultiOneDelayRecovery,
+		hwIpfpmMultiTwoDelayExceed,
+		hwIpfpmMultiTwoDelayRecovery		
     }
     STATUS current
     DESCRIPTION
@@ -3153,4 +3613,22 @@ IMPORTS
         network performance is in fault or not."
     ::= { hwIpfpmGroups 7 }  
 
-END        
+    hwIpfpmMcpMultiDelayStatsGroup OBJECT-GROUP
+    OBJECTS {
+        hwIpfpmMcpOneDelayMultiErrInfo,
+        hwIpfpmMcpOneDelayMulti,
+        hwIpfpmMcpOneDelayMultiVariation,
+        hwIpfpmMcpTwoDelayMultiErrInfo,
+        hwIpfpmMcpTwoDelayMulti,
+        hwIpfpmMcpTwoDelayMultiVariation,
+        hwIpfpmMcpForwardDelayMulti,
+        hwIpfpmMcpForwardDelayMultiVariation,
+        hwIpfpmMcpBackwardDelayMulti,
+        hwIpfpmMcpBackwardDelayMultiVariation
+		}
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to represent the
+        IPFPM test instance statistics for multi-in-point delay measurement"
+    ::= { hwIpfpmGroups 8 }
+END

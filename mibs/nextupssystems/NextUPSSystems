@@ -958,7 +958,7 @@ upsTstBatteryTest OBJECT-TYPE
             none(1),
             battTest10sec(2),
             battTestUntilLow(3),
-            battTestWithTime(4),                                                //poll process command
+            battTestWithTime(4),       
             battTestCancelTest(5),
             battTestClearInfo(6)
             
@@ -1044,7 +1044,7 @@ upsCtlShutdownDelay OBJECT-TYPE
 
 
 upsCtlSleepTime OBJECT-TYPE
-        SYNTAX INTEGER (-1,2147483648)
+        SYNTAX INTEGER (-1..2147483648)
         UNITS "minutes"
         ACCESS read-write
         STATUS current
@@ -1163,8 +1163,7 @@ upsCtlResetConfigure OBJECT-TYPE
  ::= { upsControl 10 }
 
 
- 
-===========================================================================
+--===========================================================================
 --
 -- agentConfig
 -- prefix=agent
@@ -1242,7 +1241,7 @@ commTimeout OBJECT-TYPE
     ::= { commConfig 5 }
         
  
-===========================================================================
+--===========================================================================
 --
 -- upsConfig
 --prefix=upsCfg
@@ -1639,7 +1638,7 @@ upsCfgQSK2Status OBJECT-TYPE
   ::= { upsConfig 31 }
 
 upsCfgQSKT1Delaytime OBJECT-TYPE
-   SYNTAX INTEGER (000-999)
+   SYNTAX INTEGER (0..999)
    UNITS      "minutes "
    ACCESS read-only
    STATUS current
@@ -1648,7 +1647,7 @@ upsCfgQSKT1Delaytime OBJECT-TYPE
   ::= { upsConfig 32 }
 
 upsCfgQSKT2Delaytime OBJECT-TYPE
-   SYNTAX INTEGER (000-999)
+   SYNTAX INTEGER (0..999)
    UNITS      "minutes "
    ACCESS read-only
    STATUS current
@@ -5508,7 +5507,7 @@ ATSInfoOutputCurrent  OBJECT-TYPE
 
 ATSInfoSynchronAngle  OBJECT-TYPE
      SYNTAX INTEGER
-     UNITS      "¡£"
+     UNITS      "??"
      ACCESS read-only
      STATUS current
      DESCRIPTION
@@ -5778,7 +5777,7 @@ ATSCfgOverLoadFaultPoint OBJECT-TYPE
 
 ATSCfgAcceptablePhases OBJECT-TYPE
    SYNTAX INTEGER (0..180)
-   UNITS      " ¡£ "
+   UNITS      " ?? "
    ACCESS read-write
    STATUS current
    DESCRIPTION

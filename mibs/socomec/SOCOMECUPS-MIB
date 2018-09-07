@@ -9,13 +9,20 @@
 -- vers. 4.12: Changes upsAgentBaudRate by Kenneth (R&D of Ingrasys)
 -- vers. 4.13: Add receiverContextName by Kenneth (2008-05-20)
 -- vers. 5.01-5.0x : Changes made my LGI (R&D Dept - Socomec UPS)
---		   a) Syntax compliancy improvements
---		   b) Introduced OID upsAgentTrapString to avoid warning on some NMS receiving Traps with DisplayString
--- vers. 5.01-5.0x: Remove receiverContextName by Kenneth (2008-06-12)     
--- vers. 5.01-5.0x: Modify NTP server by Ming Lu (2009-12-25)
+--         a) Syntax compliancy improvements
+--         b) Introduced OID upsAgentTrapString to avoid warning on some NMS receiving Traps with DisplayString
+-- vers. 5.01-5.0x: Remove receiverContextName by Kenneth (2008-06-12)
+-- vers. 5.01-5.0x: Modify NTP server by Ming Lu (2009-12-25) 
 -- vers. 5.01-5.5x: Added battery temperature,emd status by Ethan (2011-08-23)
 -- vers. 5.01-5.5x: Added receiverSeverityLevel in the UpsAgentTrapsReceiversEntry by Chain (2011-10-28)
 -- vers. 5.01-5.5x: Modified some object for nv6 by Chain (2012-05-30)
+-- vers. 6.00-6.01: Added EMD trap for nv6 by Brian (2013-03-13)
+-- vers. 6.01: Modified upsBatteryStatus item by Brian (2013-04-24)
+-- vers. 6.20: modified SOCOMEC: description alignement.
+-- vers. 6.20: modified upsBatteryStatus (add batteryDisconnected) item by brian (2014-12-13).
+-- vers. 6.20: modified upsBypassVoltage and upsBypassCurrent description by brian (2015-01-12).
+-- vers. 6.20: Remove upsControlSeverity by brian (2015-01-19).
+
 SOCOMECUPS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -125,7 +132,7 @@ upsBatteryStatus OBJECT-TYPE
            batteryDepleted(4),
            batteryDischarging(5),
            batteryFailure(6),
-           upsOff(7)
+           batteryDisconnected(7)
      }
      ACCESS read-only
      STATUS mandatory
@@ -172,7 +179,7 @@ upsBatteryVoltage OBJECT-TYPE
      DESCRIPTION
          "The magnitude of the present battery voltage in 0.1 Volt DC."
      ::= { upsBattery 5 }
-     
+
 upsBatteryTemperature OBJECT-TYPE
     SYNTAX     INTEGER    
     ACCESS read-only
@@ -296,10 +303,7 @@ upsOutputSource OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "The present source of output power.  The enumeration
-             none(2) indicates that there is no source of output
-             power (and therefore no output power), for example,
-             the system has opened the output breaker."
+         "The present source of output power."
      ::= { upsOutput 1 }
 
 upsOutputFrequency OBJECT-TYPE
@@ -388,7 +392,7 @@ upsOutputKva OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Output KVA."
+         "Output apparent power of the UPS in kVA."
      ::= { upsOutputEntry 5 }
      
 -- ===========================================================================
@@ -452,7 +456,7 @@ upsBypassVoltage OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "The present bypass voltage."
+         "The present bypass voltage of the UPS system in 0.1 volts."
      ::= { upsBypassEntry 2 }
 
 upsBypassCurrent OBJECT-TYPE
@@ -460,7 +464,7 @@ upsBypassCurrent OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "The present bypass current."
+         "The present bypass current of the UPS system in 0.1 Amps."
      ::= { upsBypassEntry 3 }
 
 -- ===========================================================================
@@ -516,7 +520,7 @@ upsAlarmTable OBJECT-TYPE
 
 upsAlarmEntry OBJECT-TYPE
     SYNTAX      UpsAlarmEntry
-    ACCESS		not-accessible
+    ACCESS      not-accessible
     STATUS      mandatory
     DESCRIPTION
         "An entry containing information applicable to a
@@ -539,7 +543,7 @@ UpsAlarmEntry ::=
 
    upsAlarmId OBJECT-TYPE
        SYNTAX     PositiveInteger
-	   ACCESS     read-only
+       ACCESS     read-only
        STATUS     mandatory
        DESCRIPTION
                "A unique identifier for an alarm condition.  This
@@ -602,7 +606,7 @@ upsAlarmLowBattery OBJECT-TYPE
      STATUS mandatory
      DESCRIPTION
          "The remaining battery run-time is less than or equal
-          to upsConfigLowBattTime."
+          to battery low threshold"
      ::= { upsWellKnownAlarms 3 }
 
 upsAlarmDepletedBattery OBJECT-TYPE
@@ -611,7 +615,7 @@ upsAlarmDepletedBattery OBJECT-TYPE
      STATUS mandatory
      DESCRIPTION
          "The UPS will be unable to sustain the present load
-          when and if the utility power is lost."
+          when and if the utility power is lost. The Battery is discharched."
      ::= { upsWellKnownAlarms 4 }
 
 upsAlarmTempBad OBJECT-TYPE
@@ -619,7 +623,7 @@ upsAlarmTempBad OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "A temperature is out of tolerance."
+         "UPS temperature is out of tolerance."
      ::= { upsWellKnownAlarms 5 }
 
 upsAlarmInputBad OBJECT-TYPE
@@ -627,7 +631,7 @@ upsAlarmInputBad OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "An input condition is out of tolerance."
+         "Input power supply is out of tolerance."
      ::= { upsWellKnownAlarms 6 }
 
 upsAlarmOutputBad OBJECT-TYPE
@@ -652,7 +656,7 @@ upsAlarmOnBypass OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "The Bypass is presently engaged on the UPS."
+         "Load supplied by bypass"
      ::= { upsWellKnownAlarms 9 }
 
 upsAlarmBypassBad OBJECT-TYPE
@@ -660,7 +664,7 @@ upsAlarmBypassBad OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "The Bypass is out of tolerance."
+         "Bypass input supply is detected as absent."
      ::= { upsWellKnownAlarms 10 }
 
 upsAlarmOutputOffAsRequested OBJECT-TYPE
@@ -799,7 +803,7 @@ upsAlarmAuxMainFail OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Auxiliary mains out of tolerance."
+         "Bypass input supply is out of tolerance."
      ::= { upsWellKnownAlarms 26 }
 
 upsAlarmManualBypassClose OBJECT-TYPE
@@ -807,7 +811,7 @@ upsAlarmManualBypassClose OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Manual By-pass closed"
+         "The maintenance bypass breaker is closed"
      ::= { upsWellKnownAlarms 27 }
 
 upsAlarmShortCircuit OBJECT-TYPE
@@ -919,7 +923,7 @@ upsAlarmInputGeneralAlarm OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Input mains general alarm."
+         "Rectifier input supply out of tolorances or absent."
      ::= { upsWellKnownAlarms 41 }
 
 upsAlarmRectifierGeneralAlarm OBJECT-TYPE
@@ -951,7 +955,7 @@ upsAlarmBatteryGeneralAlarm OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Bettery charger general alarm."
+         "Battery charger general alarm."
      ::= { upsWellKnownAlarms 45 }
 
 upsAlarmOutputOver OBJECT-TYPE
@@ -975,7 +979,7 @@ upsAlarmBypassGeneralAlarm OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Bypass charger general alarm."
+         "Bypass general alarm."
      ::= { upsWellKnownAlarms 48 }
 
 upsAlarmStopForOverload OBJECT-TYPE
@@ -1079,7 +1083,7 @@ upsAlarmEService OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "E-Service General Alarm"
+         "Remote Service Alarm"
      ::= { upsWellKnownAlarms 61 }
 
 upsAlarmRedundancyLost OBJECT-TYPE
@@ -1127,7 +1131,7 @@ upsAlarmManualBypass OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Manual bypass alarm"
+         "Maintenance bypass alarm"
      ::= { upsWellKnownAlarms 67 }
 
 upsAlarmBatteryDischarged OBJECT-TYPE
@@ -1207,7 +1211,7 @@ upsAlarmEmergencyStopActive OBJECT-TYPE
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "Emergency stop active"
+         "UPS power off active"
      ::= { upsWellKnownAlarms 77 }
 
 upsAlarmBatteryCircuitOpen OBJECT-TYPE
@@ -1234,12 +1238,12 @@ upsAlarmPhaseRotationFault OBJECT-TYPE
          "Phase rotation fault"
      ::= { upsWellKnownAlarms 80 }
 
-upsAlarmA62 OBJECT-TYPE
+upsAlarmBypassFault OBJECT-TYPE
      SYNTAX INTEGER
      ACCESS read-only
      STATUS mandatory
      DESCRIPTION
-         "A62."
+         "Bypass fault"
      ::= { upsWellKnownAlarms 81 }
 
 upsAlarmA63 OBJECT-TYPE
@@ -1249,6 +1253,46 @@ upsAlarmA63 OBJECT-TYPE
      DESCRIPTION
          "A63."
      ::= { upsWellKnownAlarms 82 }
+
+upsAlarmModule7Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Module 7 in parallel general alarm."
+     ::= { upsWellKnownAlarms 83 }
+
+upsAlarmModule8Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Module 8 in parallel general alarm."
+     ::= { upsWellKnownAlarms 84 }
+
+upsAlarmBatteryTemperature OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Battery Temperature Alarm."
+     ::= { upsWellKnownAlarms 85 }
+
+upsAlarmRecRedundancy OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Rectifier Redundancy Alarm."
+     ::= { upsWellKnownAlarms 86 }
+
+upsAlarmInvRedundancy OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Inverter Redundancy Alarm."
+     ::= { upsWellKnownAlarms 87 }
 
 -- ===========================================================================
 -- upsTest
@@ -1526,12 +1570,11 @@ shutdownParametersEntry OBJECT-TYPE
                 ::= { upsControlShutdownParametersTable 1 }
 
 ShutdownParametersEntry  ::= SEQUENCE {                
-                upsControlEventDescr		DisplayString,
-                upsControlEventStatus		INTEGER,
-                upsControlDelay				INTEGER,
-                upsControlFirstWarning		INTEGER,
-                upsControlWarningInterval   INTEGER,
-                upsControlSeverity          INTEGER
+                upsControlEventDescr        DisplayString,
+                upsControlEventStatus       INTEGER,
+                upsControlDelay             INTEGER,
+                upsControlFirstWarning      INTEGER,
+                upsControlWarningInterval   INTEGER
                 }
 
 upsControlEventDescr OBJECT-TYPE
@@ -1590,14 +1633,6 @@ upsControlWarningInterval OBJECT-TYPE
                 The value is in units of seconds."
                 ::= { shutdownParametersEntry 5 }
 
-upsControlSeverity OBJECT-TYPE
-        SYNTAX INTEGER (0..2)
-        ACCESS read-write
-        STATUS mandatory
-        DESCRIPTION
-                "Shutdown daemon severity."
-                ::= { shutdownParametersEntry 6 }
-
 upsControlWeeklyScheduleTable OBJECT-TYPE
         SYNTAX SEQUENCE OF UpsControlWeeklyScheduleEntry
         ACCESS not-accessible
@@ -1629,7 +1664,7 @@ UpsControlWeeklyScheduleEntry ::= SEQUENCE {
         }
 
 upsControlWeeklyIndex OBJECT-TYPE
-	    SYNTAX INTEGER(1..7)	
+        SYNTAX INTEGER(1..7)    
         ACCESS read-only
         STATUS mandatory
         DESCRIPTION
@@ -1719,7 +1754,7 @@ UpsControlSpecialScheduleEntry ::= SEQUENCE {
         }
 
 upsControlSpecialIndex OBJECT-TYPE
-	    SYNTAX INTEGER(1..8)
+        SYNTAX INTEGER(1..8)
         ACCESS read-only
         STATUS mandatory
         DESCRIPTION
@@ -1793,7 +1828,7 @@ UpsControlEcoModeScheduleEntry ::= SEQUENCE {
         }
 
 upsControlEcoModeIndex OBJECT-TYPE
-	  	SYNTAX INTEGER(1..7)
+        SYNTAX INTEGER(1..7)
         ACCESS read-only
         STATUS mandatory
         DESCRIPTION
@@ -1924,7 +1959,7 @@ UpsDevicesEntry ::=
         }
 
 indexOfDevice OBJECT-TYPE
-	  	SYNTAX INTEGER(1..255)
+        SYNTAX INTEGER(1..255)
         ACCESS read-only
         STATUS mandatory
         DESCRIPTION
@@ -2289,20 +2324,21 @@ upsAgentTrapsReceiversEntry OBJECT-TYPE
         INDEX  { trapsIndex}
         ::= { upsAgentTrapsReceiversTable 1 }
 
-UpsAgentTrapsReceiversEntry ::=
-        SEQUENCE {
+UpsAgentTrapsReceiversEntry ::= SEQUENCE{
                 trapsIndex
-                        INTEGER,
+                    INTEGER,
                 trapsReceiverAddr
-                        DisplayString,
+                    DisplayString,
                 receiverCommunityString
-                         DisplayString,
-                receiverDescription
-                         DisplayString
+                    DisplayString,
+                receiverNmstype
+                    INTEGER
+--                receiverDescription
+--                    DisplayString
         }
 
 trapsIndex OBJECT-TYPE
-	  	SYNTAX INTEGER(1..8)
+        SYNTAX INTEGER(1..8)
         ACCESS read-only
         STATUS mandatory
         DESCRIPTION
@@ -2322,17 +2358,28 @@ receiverCommunityString OBJECT-TYPE
         ACCESS read-write
         STATUS mandatory
         DESCRIPTION
-                "The community name to use in the trap when
-                 sent to the manager."
+                "The community name to use in the trap when sent to the manager."
         ::= { upsAgentTrapsReceiversEntry 3 }
 
-receiverDescription OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(0..31))
+receiverNmstype OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                netVision-trap(2),
+                rfc1628-trap(3)
+                }
         ACCESS read-write
         STATUS mandatory
         DESCRIPTION
-                "Description of trap receivers"
+                "The trap group that NMS desired."
         ::= { upsAgentTrapsReceiversEntry 4 }
+
+--receiverDescription OBJECT-TYPE
+--        SYNTAX DisplayString (SIZE(0..31))
+--        ACCESS read-write
+--        STATUS mandatory
+--        DESCRIPTION
+--                "Description of trap receivers"
+--        ::= { upsAgentTrapsReceiversEntry 5 }
 
 upsAgentAccessControlTable OBJECT-TYPE
         SYNTAX SEQUENCE OF UpsAgentAccessControlEntry
@@ -2354,10 +2401,10 @@ upsAgentAccessControlEntry OBJECT-TYPE
 
 UpsAgentAccessControlEntry ::=
         SEQUENCE {
-                accessIndex			INTEGER,
-                accessControlAddr		DisplayString,
-                accessCommunityString	DisplayString,
-                accessControlMode		INTEGER
+                accessIndex         INTEGER,
+                accessControlAddr       DisplayString,
+                accessCommunityString   DisplayString,
+                accessControlMode       INTEGER
         }
 
 
@@ -2415,7 +2462,7 @@ upsAgentTrapString OBJECT-TYPE
         DESCRIPTION
                 "This OID allows traps to be sent with an octet string argument that my not be defined in the. A get of this OID will return error or NULL string."
         ::= { upsAgent 50 }
-
+        
 -- ===========================================================================
 --
 -- emdStatus
@@ -2437,7 +2484,7 @@ emdSatatusHumidity OBJECT-TYPE
         DESCRIPTION
                 "The measurement of EMD humidity, in 0.1 degree"
         ::= { emdStatus 2}
-        
+
 -- ===========================================================================
 -- upsTraps
 --
@@ -2491,141 +2538,169 @@ emdSatatusHumidity OBJECT-TYPE
      
      
    upsTrapUpsNormal TRAP-TYPE
-	ENTERPRISE upsTraps
-	VARIABLES { upsAgentTrapString }
-	DESCRIPTION
-		  "INFORMATION: The UPS status is normal."
-	::= 5
+    ENTERPRISE upsTraps
+    VARIABLES { upsAgentTrapString }
+    DESCRIPTION
+          "INFORMATION: The UPS status is normal."
+    ::= 5
 
-	upsTrapUpsBattTestFailed TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: UPS failed the last test of battery."
-	::= 6
+    upsTrapUpsBattTestFailed TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: UPS failed the last test of battery."
+    ::= 6
 
-	upsTrapOnBatteryPower TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"WARNING: The UPS has switched to battery backup power."
-	::= 7
+    upsTrapOnBatteryPower TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "WARNING: The UPS has switched to battery backup power."
+    ::= 7
 
-	upsTrapBatteryLow TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: Battery is near to be discharged."      
-	::= 8
+    upsTrapBatteryLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: Battery is near to be discharged."
+    ::= 8
 
-	upsTrapPowerRestored TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"INFORMATION: Input power has been restored."
-	::= 9
+    upsTrapPowerRestored TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "INFORMATION: Input power has been restored."
+    ::= 9
 
-	upsTrapImminentStop TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: The UPS is near to switch off the
-			output power."
-	::= 10
+    upsTrapImminentStop TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: The UPS is near to switch off the
+            output power."
+    ::= 10
 
-	upsTrapTurnedOff TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"WARNING: The UPS has been turned off by the management station."
-	::= 11
+    upsTrapTurnedOff TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "WARNING: The UPS has been turned off by the management station."
+    ::= 11
 
-	upsTrapOverTemperature TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: The UPS has sensed a temperature 
-			greater than its limit."
-	::= 12
+    upsTrapOverTemperature TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: The UPS has sensed a temperature 
+            greater than its limit."
+    ::= 12
 
-	upsTrapOverload TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-	      "SEVERE: The UPS has sensed a load greater than 100 percent
-		   of its rated capacity."
-	::= 13
+    upsTrapOverload TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+          "SEVERE: The UPS has sensed a load greater than 100 percent
+           of its rated capacity."
+    ::= 13
 
 
-	upsTrapOnMains TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-		"SEVERE: The UPS output is on mains."
-	::= 14
+    upsTrapOnMains TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+        "SEVERE: The UPS output is on mains."
+    ::= 14
  
-	upsTrapRedoundancyLost TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: Redoundancy is lost."
-	::= 15
+    upsTrapRedoundancyLost TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: Redoundancy is lost."
+    ::= 15
 
-	upsTrapEmdTempLow TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: EMD Sensor detected low temperature."
-	::= 16
+    upsTrapEmdTempLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: EMD Sensor detected low temperature."
+    ::= 16
 
-	upsTrapEmdTempHigh TRAP-TYPE
-		ENTERPRISE upsTraps
-	    VARIABLES { upsAgentTrapString }
-	DESCRIPTION
-		"SEVERE: EMD Sensor detected high temperature."
-	::= 17
+    upsTrapEmdTempNotLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "information: EMD Sensor Not under low temperature."
+    ::= 17
 
-	upsTrapEmdHumidityLow TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: EMD Sensor detected low humidity."
-	::= 18
+    upsTrapEmdTempHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+    DESCRIPTION
+            "SEVERE: EMD Sensor detected high temperature."
+    ::= 18
 
-	upsTrapEmdHumidityHigh TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: EMD Sensor detected high humidity."
-	::= 19
+    upsTrapEmdTempNotHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+    DESCRIPTION
+            "information: EMD Sensor Not over high temperature."
+    ::= 19
 
-	upsTrapEmdFirstInputActive TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: The <customized string_1> input is active."
-	::= 20
+    upsTrapEmdHumidityLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: EMD Sensor detected low humidity."
+    ::= 20
 
-	upsTrapEmdFirstInputRestored TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"INFORMATION: The <customized string_1> input is restored."
-	::= 21
+    upsTrapEmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "information: EMD Sensor Not under low humidity."
+    ::= 21
 
-	upsTrapEmdSecondInputActive TRAP-TYPE
-		ENTERPRISE upsTraps
-		VARIABLES { upsAgentTrapString }
-		DESCRIPTION
-			"SEVERE: The <customized string_2> input is active."
-	::= 22
+    upsTrapEmdHumidityHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: EMD Sensor detected high humidity."
+    ::= 22
 
-	upsTrapEmdSecondInputRestored TRAP-TYPE
-	     ENTERPRISE upsTraps
+    upsTrapEmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "information: EMD Sensor Not over high humidity."
+    ::= 23
+
+    upsTrapEmdFirstInputActive TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: The <customized string_1> input is active."
+    ::= 24
+
+    upsTrapEmdFirstInputRestored TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "INFORMATION: The <customized string_1> input is restored."
+    ::= 25
+
+    upsTrapEmdSecondInputActive TRAP-TYPE
+        ENTERPRISE upsTraps
+        VARIABLES { upsAgentTrapString }
+        DESCRIPTION
+            "SEVERE: The <customized string_2> input is active."
+    ::= 26
+
+    upsTrapEmdSecondInputRestored TRAP-TYPE
+         ENTERPRISE upsTraps
          VARIABLES { upsAgentTrapString }
-	     DESCRIPTION
-		     "INFORMATION: The <customized string_2> input is restored."
-	::= 23
+         DESCRIPTION
+             "INFORMATION: The <customized string_2> input is restored."
+    ::= 27
 
    END
- 
+

@@ -28,12 +28,21 @@ IMPORTS
     OBJECT-TYPE,
     Unsigned32
                                         FROM  SNMPv2-SMI
+    SnmpAdminString
+                                        FROM  SNMP-FRAMEWORK-MIB
     fspR7,
     neEventLogTimeStamp,
     neEventLogIdentityTranslation,
     ServiceImpairment,
     TrapAlarmSeverity
-                                        FROM  ADVA-MIB;
+                                        FROM  ADVA-MIB
+    flowEntityIndexEth,
+    flowEntityIndexFlow
+                                        FROM  FspR7-LAYER2-MIB
+    dot1agCfmMdIndex,
+    dot1agCfmMaIndex,
+    dot1agCfmMepIdentifier
+                                        FROM  IEEE8021-CFM-MIB;
     
 
 cfmExtensionMIB MODULE-IDENTITY
@@ -74,6 +83,12 @@ cfmAlarms
 
 cfmAlarmsPrefix
     OBJECT IDENTIFIER ::= { cfmAlarms 0 }
+
+cfmStatusMIB
+    OBJECT IDENTIFIER ::= { cfmExtensionMIB 2 }
+
+cfmStatus
+    OBJECT IDENTIFIER ::= { cfmStatusMIB 1 }
 
 CfmAlarmType ::= TEXTUAL-CONVENTION
   STATUS        current
@@ -279,7 +294,7 @@ alarmCfmOosAins NOTIFICATION-TYPE
 alarmCfmPriVidNotEqualExtVid NOTIFICATION-TYPE 
     OBJECTS     { mepAlarmSeverity,mepAlarmAffect,neEventLogTimeStamp,neEventLogIdentityTranslation } 
     STATUS      current
-    DESCRIPTION   "The MEP PRIMARY-VID and the EXT-VID/SVID on the FLW is not equal"
+    DESCRIPTION   "MEP Primary VLAN ID and Flow External VLAN ID are different"
     ::=  { cfmAlarmsPrefix 13004 }
 
 
@@ -324,6 +339,38 @@ alarmCfmCcmXConn NOTIFICATION-TYPE
     DESCRIPTION   "Cross connected CCM"
     ::=  { cfmAlarmsPrefix 13010 }
 
+
+mepOnFlowTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MepOnFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   ""
+    ::=  { cfmStatus 1 }
+
+mepOnFlowEntry OBJECT-TYPE
+    SYNTAX      MepOnFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   ""
+    INDEX       {
+                  flowEntityIndexEth,
+                  flowEntityIndexFlow,
+                  dot1agCfmMdIndex,
+                  dot1agCfmMaIndex,
+                  dot1agCfmMepIdentifier
+                }
+    ::=  { mepOnFlowTable 1 }
+
+MepOnFlowEntry ::=  SEQUENCE
+  { mepOnFlowMepString SnmpAdminString }
+
+mepOnFlowMepString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name" 
+    ::=  { mepOnFlowEntry 1 }
 
 
 -- conformance information

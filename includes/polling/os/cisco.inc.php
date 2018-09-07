@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,7 +16,7 @@ if (is_device_mib($device, 'CISCO-CONFIG-MAN-MIB'))
   // Check Cisco configuration age
 
   $oids = 'sysUpTime.0 ccmHistoryRunningLastChanged.0 ccmHistoryRunningLastSaved.0 ccmHistoryStartupLastChanged.0';
-  $data = snmp_get_multi($device, $oids, '-OQUst', 'SNMPv2-MIB:CISCO-CONFIG-MAN-MIB');
+  $data = snmp_get_multi_oid($device, $oids, array(), 'SNMPv2-MIB:CISCO-CONFIG-MAN-MIB', NULL, OBS_SNMP_ALL_TIMETICKS);
   $config_age = $data[0];
 
   foreach ($config_age as $key => $val)
@@ -148,7 +148,7 @@ if (is_array($entPhysical))
     {
       $version = $entPhysical['entPhysicalSoftwareRev'];
     }
-    if (!empty($entPhysical['entPhysicalModelName']))
+    if (!empty($entPhysical['entPhysicalModelName']) & preg_match('/^\.+$/', $entPhysical['entPhysicalModelName']) != 1)
     {
       if (preg_match('/ (rev|dev)/', $entPhysical['entPhysicalModelName']))
       {
@@ -159,7 +159,7 @@ if (is_array($entPhysical))
         $hardware = $entPhysical['entPhysicalModelName'];
       }
     } else {
-      $hardware = $entPhysical['entPhysicalName'];
+      $hardware = str_replace(' chassis', '', $entPhysical['entPhysicalName']);
     }
     if (!empty($entPhysical['entPhysicalSerialNum']))
     {
@@ -191,12 +191,6 @@ if (empty($hardware))
 if ($device['os'] == 'ios')
 {
   if (stristr($hardware, 'AIRAP') || substr($hardware,0,4) == 'AIR-') { $ios_type = 'wireless'; }
-
-  // Disable max-rep for 2960S and other stacked switches (causes a heavy load)
-  if ($hardware == 'cat29xxStack' || strpos($hardware, 'C2960S'))
-  {
-    unset($config['os'][$device['os']]['snmp']['max-rep']);
-  }
 }
 
 // Set type to a predefined type for the OS if it's not already set

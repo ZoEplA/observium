@@ -7,12 +7,13 @@
  *
  * @package        observium
  * @subpackage     webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-echo('<table class="table table-hover  table-condensed  table-striped"
-             style="vertical-align: middle; margin-top: 5px; margin-bottom: 10px;">');
+echo generate_box_open();
+
+echo '<table class="table table-hover  table-condensed  table-striped">';
 
 echo('<thead><tr>
           <th class="state-marker"></th>
@@ -114,6 +115,8 @@ echo("</table>");
 
 $pagetitle[] = "Radios";
 
+echo generate_box_close();
+
 // EOF
 
 // FIXME wot? vv
@@ -121,3 +124,5 @@ function humanize_wifi_wlan(&$wlan)
 {
 
 }
+
+

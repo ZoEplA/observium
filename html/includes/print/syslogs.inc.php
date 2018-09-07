@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -59,7 +59,12 @@ function print_syslogs($vars)
             // Rewrite priority strings to numbers
             $value[$k] = priority_string_to_numeric($v);
           }
-          // Do not break here, it's true!
+          $where .= generate_query_values($value, $var);
+          break;
+        case 'tag':
+          if (!is_array($value)) { $value = explode(',', $value); }
+          $where .= generate_query_values($value, $var);
+          break;
         case 'program':
           $where .= generate_query_values($value, $var);
           break;
@@ -124,7 +129,7 @@ See <a href="'.OBSERVIUM_URL.'/wiki/Category:Documentation" target="_blank">docu
       $string .= '      <th>Date</th>' . PHP_EOL;
       if ($list['device']) { $string .= '      <th>Device</th>' . PHP_EOL; }
       if ($list['priority']) { $string .= '      <th>Priority</th>' . PHP_EOL; }
-      $string .= '      <th>Message</th>' . PHP_EOL;
+      $string .= '      <th>[Program] [Tags] Message</th>' . PHP_EOL;
       $string .= '    </tr>' . PHP_EOL;
       $string .= '  </thead>' . PHP_EOL;
     }
@@ -162,12 +167,31 @@ See <a href="'.OBSERVIUM_URL.'/wiki/Category:Documentation" target="_blank">docu
       if ($short)
       {
         $string .= '    <td class="syslog">';
-        $string .= '<span class="label label-' . $priorities[$entry['priority']]['label-class'] . '"><strong>' . $entry['program'] . '</strong></span> ';
+        $string .= '<span class="label label-' . $priorities[$entry['priority']]['label-class'] . '"><strong>' . $entry['program'] . '</strong></span>';
       } else {
         $string .= '    <td>';
         $string .= '<span class="label label-' . $priorities[$entry['priority']]['label-class'] . '">' . $entry['program'] . '</span>';
+
+        /* Show tags if not short */
+        $tags = array();
+        foreach(explode(',', $entry['tag']) as $tag)
+        {
+          if (!str_istarts($tag, $entry['program']) &&
+              !preg_match('/^(\d+\:|[\da-f]{2})$/i', $tag) &&
+              !preg_match('/^<(Emer|Aler|Crit|Err|Warn|Noti|Info|Debu)/i', $tag)) // Skip tags same as program or old numeric tags or syslog-ng 2x hex numbers
+          {
+            $tags[] = $tag;
+          }
+        }
+        if ($tags)
+        {
+          $string .= '<span class="label">';
+          $string .= implode('</span><span class="label">', $tags);
+          $string .= '</span>';
+        }
+        /* End tags */
       }
-      $string .= escape_html($entry['msg']) . '</td>' . PHP_EOL;
+      $string .= ' ' . escape_html($entry['msg']) . '</td>' . PHP_EOL;
       $string .= '  </tr>' . PHP_EOL;
     }
 

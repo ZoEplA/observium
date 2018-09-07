@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Cache.php 218 2013-11-28 22:34:20Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.1.0
  *
@@ -81,6 +81,12 @@ class Net_DNS2_Cache
      * the cache serializer
      */
     protected $cache_serializer;
+
+    /*
+     * an internal flag to make sure we don't load the cache content more
+     * than once per instance.
+     */ 
+    protected $cache_opened = false;
 
     /**
      * returns true/false if the provided key is defined in the cache

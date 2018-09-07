@@ -1,14 +1,17 @@
 -- ============================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  
 -- Reference:  
--- Version: V2.05
+-- Version: V2.08
 -- History:
 -- Created by hexingjian  2008-12-30 
 -- modified by xuxuguang  2009-12-10
 -- modified by dingshenyu 2011-12-26
 -- modified by wangweiwei 2014-09-18
+-- modified by shafangzhou 2016-06-23
+-- modified by shafangzhou 2016-08-16
+-- modified by shafangzhou 2016-10-11
 -- ============================================================================
          
 HUAWEI-L2MULTICAST-MIB DEFINITIONS ::= BEGIN
@@ -35,7 +38,11 @@ IMPORTS
         FROM IF-MIB
         
     hwDatacomm
-            FROM HUAWEI-MIB;
+            FROM HUAWEI-MIB
+        
+    Ipv6Address			
+            FROM IPV6-TC; 
+        
             
 VlanIdOrAnyOrNone ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -53,7 +60,7 @@ VlanIdOrAnyOrNone ::= TEXTUAL-CONVENTION
     SYNTAX       Integer32 (0 | 1..4094 | 4095)
     
 hwL2MultiCastMIB MODULE-IDENTITY 
-    LAST-UPDATED "201409180000Z" 
+    LAST-UPDATED "201610110000Z" 
     ORGANIZATION "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
              "Huawei Industrial Base
@@ -75,7 +82,20 @@ hwL2MultiCastMIB MODULE-IDENTITY
          the hosts and router, then provides selective transmission of 
          multicast traffic based on multicast mac destination address
          or multicast group address."   
-    REVISION "201409180000Z"-- 18 Sep 2014
+
+    REVISION "201610110000Z"-- 10 Oct 2016
+    DESCRIPTION 
+        "Add hwMldFwdTable."  
+ 
+   REVISION "201608160000Z"-- 16 Aug 2016
+    DESCRIPTION 
+        "Add hwL2mcLimitGroupTable ."  
+
+    REVISION "201606230000Z"-- 23 Jun 2016
+    DESCRIPTION 
+        "Modify range of hwL2mcLimitMaxBandWidth ."  
+      
+   REVISION "201409180000Z"-- 18 Sep 2014
     DESCRIPTION 
         "Import NOTIFICATION-TYPE."        
     REVISION "201401120000Z"-- 12 Jan 2014
@@ -1021,7 +1041,222 @@ hwL2mcFwdHostFlag4 OBJECT-TYPE
                 the default value is 1
                 "
     ::= { hwL2mcFwdEntry 21 }    
-    
+ hwMldFwdTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwMldFwdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table contains l2 multicast forward information
+		for IGMP Snooping."
+	::= { hwL2mcFwdInfo 2 }
+
+hwMldFwdEntry OBJECT-TYPE
+	SYNTAX HwMldFwdEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry is created for each active VLAN or VSI in the device create a forwarding table entry and delete when 
+		a forwarding table entry deleted."
+	INDEX { hwL2mcFwdVlanIndex, hwL2mcFwdVsiName, hwL2mcFwdGroupAddress, hwL2mcFwdSourceAddress, hwL2mcFwdPortType, 
+		hwL2mcFwdPortIfIndex, hwL2mcFwdPortPeId, hwL2mcFwdPortCeId, hwL2mcFwdPeerAddress, hwL2mcFwdVcOrSiteId
+		 }
+	::= { hwMldFwdTable 1 }
+
+	HwMldFwdEntry ::= SEQUENCE { 
+    hwMldFwdVlanIndex      VlanIdOrAny,
+    hwMldFwdVsiName        DisplayString,
+    hwMldFwdGroupAddress   Ipv6Address,
+    hwMldFwdSourceAddress  Ipv6Address,      
+    hwMldFwdPortType       HWPortType,
+    hwMldFwdPortIfIndex    InterfaceIndexOrZero,
+    hwMldFwdPortPeId       VlanIdOrAny,
+    hwMldFwdPortCeId       VlanIdOrAny,
+    hwMldFwdPeerAddress    Ipv6Address,
+    hwMldFwdVcOrSiteId     Unsigned32,
+    hwMldFwdAddressType    INTEGER,
+    hwMldFwdHostFlag1      INTEGER, 
+    hwMldFwdHostFlag2      INTEGER,
+    hwMldFwdHostFlag3      INTEGER,
+    hwMldFwdHostFlag4      INTEGER
+    }
+
+hwMldFwdVlanIndex OBJECT-TYPE
+	SYNTAX VlanIdOrAny
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The VLAN ID, which is the configuration index in a VLAN. If a VSI is specified, the value is 4095.
+		The value ranges from 1 to 4095.
+		"
+	::= { hwMldFwdEntry 1 }
+
+hwMldFwdVsiName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..31))
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The name of a VSI. If a VLAN is specified, the value is 32."
+	::= { hwMldFwdEntry 2 }
+
+hwMldFwdGroupAddress OBJECT-TYPE
+	SYNTAX Ipv6Address
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The group address of a multicast group. In the case of MAC forwarding, the group address is the smallest of 32 IP addresses."
+	::= { hwMldFwdEntry 3 }
+
+hwMldFwdSourceAddress OBJECT-TYPE
+	SYNTAX Ipv6Address
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The source IP address of a multicast group."
+	::= { hwMldFwdEntry 4 }
+
+hwMldFwdPortType OBJECT-TYPE
+	SYNTAX HWPortType
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface type:
+		1: Invalid
+		2: PW interface
+		3: L2 interface
+		4: Encapsulation sub-interface
+		5: Termination sub-interface
+		6: Interface Board
+		7: Vlanif Port
+		11: Main-interface-bound-to-vsi
+		"
+	::= { hwMldFwdEntry 5 }
+
+hwMldFwdPortIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndexOrZero
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The interface index. The value 0 indicates that the interface index is invalid."
+	::= { hwMldFwdEntry 6 }
+
+hwMldFwdPortPeId OBJECT-TYPE
+	SYNTAX VlanIdOrAny
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The PE VID of an interface.
+		The value ranges from 1 to 4095.
+		The value 4095 indicates that the PE VID is invalid.
+		"
+	::= { hwMldFwdEntry 7 }
+
+hwMldFwdPortCeId OBJECT-TYPE
+	SYNTAX VlanIdOrAny
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The CE VID of an interface.
+		The value ranges from 1 to 4095.
+		The value 4095 indicates that the CE VID is invalid.
+		"
+	::= { hwMldFwdEntry 8 }
+
+hwMldFwdPeerAddress OBJECT-TYPE
+	SYNTAX Ipv6Address
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The peer IP address of a PW interface. The value 0.0.0.0 indicates that the IP address is invalid."
+	::= { hwMldFwdEntry 9 }
+hwMldFwdVcOrSiteId OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4294967295)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The VC ID or SITE ID of a PW interface."
+	::= { hwMldFwdEntry 10 }
+
+hwMldFwdAddressType OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		ip(1),
+		mac(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The address type of an entry:
+		1: IP
+		2: MAC
+		The default value is 1.
+		"
+	::= { hwMldFwdEntry 11 }
+
+hwMldFwdHostFlag1 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		static(1),
+		dynamic(2),
+		staticDynamic(3),
+		invalid(4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The mode to create an interface on the host:
+		1: static
+		2: dynamic
+		3: static and dynamic
+		4: invalid
+		"
+	::= { hwMldFwdEntry 12 }
+hwMldFwdHostFlag2 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		nonMapping(1),
+		mapping(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether an interface on the host is created through SSM-mapping:
+		1: non-mapping
+		2: mapping
+		"
+	::= { hwMldFwdEntry 13 }
+
+hwMldFwdHostFlag3 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		host(1),
+		router(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The type of an interface created on a router:
+		1: Interface connected to the host
+		2: Router interface that replicates multicast data flows
+		"
+	::= { hwMldFwdEntry 14 }
+
+hwMldFwdHostFlag4 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		port(1),
+		static(2),
+		both(3)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates (S, G) table created :
+		1: from port;
+		2: from static;
+		3: from both
+		the default value is 1
+		"
+	::= { hwMldFwdEntry 15 }   
     
 --
 --  The hwGroupInfo group.
@@ -1819,7 +2054,7 @@ hwL2mcLimitEntryCnt OBJECT-TYPE
     ::= { hwL2mcLimitEntry 5 }
     
 hwL2mcLimitMaxBandWidth OBJECT-TYPE
-    SYNTAX       Integer32(0..4194304)
+    SYNTAX       Integer32(0..10000000)
     MAX-ACCESS   read-create
     STATUS       current
     DESCRIPTION
@@ -1853,7 +2088,66 @@ hwL2mcLimitCfgRowStatus OBJECT-TYPE
         "The row status."
     ::= { hwL2mcLimitEntry 100 }   
     
-    
+hwL2mcLimitGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwL2mcLimitGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwL2mcLimitInfo 2 }
+
+hwL2mcLimitGroupEntry OBJECT-TYPE
+    SYNTAX HwL2mcLimitGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Description."
+    INDEX { hwL2mcLimitGroupIndex }
+    ::= { hwL2mcLimitGroupTable 1 }
+
+HwL2mcLimitGroupEntry ::=
+    SEQUENCE { 
+        hwL2mcLimitGroupIndex
+            Unsigned32,
+        hwL2mcLimitGroupStartAddr
+            IpAddress,
+        hwL2mcLimitGroupEndAddr
+            IpAddress,
+        hwL2mcLimitGroupBandwidth
+            Unsigned32
+     }
+
+hwL2mcLimitGroupIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwL2mcLimitGroupEntry 1 }
+
+hwL2mcLimitGroupStartAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwL2mcLimitGroupEntry 2 }
+
+hwL2mcLimitGroupEndAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwL2mcLimitGroupEntry 3 }
+
+hwL2mcLimitGroupBandwidth OBJECT-TYPE
+    SYNTAX Unsigned32 (1..100000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { hwL2mcLimitGroupEntry 4 }
 --
 --  The hwL2mcPortLimitInfo group.
 --

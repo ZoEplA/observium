@@ -93,7 +93,7 @@ acProductTrunkPack12610                     OBJECT IDENTIFIER       ::= { acKnow
 acProductMediant1000MSBG                    OBJECT IDENTIFIER       ::= { acKnownProducts 67 }
 acProductMediant600MSBG                     OBJECT IDENTIFIER       ::= { acKnownProducts 68 }
 acProductMediaPack500MSBG                   OBJECT IDENTIFIER       ::= { acKnownProducts 69 }
-
+acProductMediant1000ESBC                    OBJECT IDENTIFIER       ::= { acKnownProducts 71 }
 
 
 

@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -31,24 +31,30 @@ function generate_sla_query($vars)
         $sql .= generate_query_values($value, 'slas.device_id');
         break;
       case "id":
+      case "sla_id":
         $sql .= generate_query_values($value, 'slas.sla_id');
         break;
       case "owner":
         $sql .= generate_query_values($value, 'slas.sla_owner');
         break;
       case "target":
-        $sql .= generate_query_values($value, 'slas.sla_target');
+      case "sla_target":
+        $sql .= generate_query_values($value, 'slas.sla_target', '%LIKE%');
+        break;
+      case "sla_tag":
+        $sql .= generate_query_values($value, 'slas.sla_tag');
         break;
       case "rtt_type":
-        $sql .= generate_query_values($value, 'slas.rtt_type');
+      case "rtt_sense":
+        $sql .= generate_query_values($value, 'slas.'.$var);
         break;
       case "event":
-        $sql .= generate_query_values($value, 'rtt_event');
+      case "rtt_event":
+        $sql .= generate_query_values($value, 'slas.rtt_event');
         break;
     }
   }
   $sql .= $GLOBALS['cache']['where']['devices_permitted'];
-
   return $sql;
 }
 
@@ -305,6 +311,7 @@ function generate_sla_row($sla, $vars)
     $out .= '<td class="entity">' . generate_device_link($sla) . '</td>';
     $table_cols++;
   }
+
   $out .= '<td class="entity">'. generate_entity_link('sla', $sla) .'</td>';
   $out .= '<td>'. $sla['sla_owner'] .'</td>';
   $out .= '<td>'. $sla['rtt_label'] .'</td>';

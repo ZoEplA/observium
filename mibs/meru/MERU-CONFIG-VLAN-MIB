@@ -35,6 +35,9 @@ IMPORTS
     mwConfiguration
         FROM MERU-SMI
     MwlOnOffSwitch,
+    MwlAddressIfAssignmentType,
+    MwlNmsInterfaceType,
+    MwlArrayDataTypeAction,
     MwlProfileOwner
         FROM MERU-TC;
 
@@ -74,6 +77,7 @@ IMPORTS
        mwVlanIpAddress                                             IpAddress,
        mwVlanInterfaceIndex                                        Unsigned32,
        mwVlanDefaultGateway                                        IpAddress,
+       mwVlanMaxNumberOfClients                                    Unsigned32,
        mwVlanDHCPServerIpAddress                                   IpAddress,
        mwVlanDhcpRelayPassThroughFlag                              MwlOnOffSwitch,
        mwVlanOverrideDefaultDHCPServer                             MwlOnOffSwitch,
@@ -127,7 +131,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-         "This object describes Fast Ethernet Interface Index"
+         "This object describes Ethernet Interface Index"
     ::= { mwVlanEntry    6 }
 
   mwVlanDefaultGateway  OBJECT-TYPE
@@ -170,13 +174,198 @@ IMPORTS
          "This object describes Owner"
     ::= { mwVlanEntry   11 }
 
+  mwVlanMaxNumberOfClients  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Maximum number of clients"
+    ::= { mwVlanEntry   13 }
+
   mwVlanRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwVlanEntry 14 }
+    ::= { mwVlanEntry 15 }
+
+  mwVlanMgmtTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwVlanMgmtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Management VLAN Configuration "
+    ::= { mwConfigVlan 2 }
+
+  mwVlanMgmtEntry  OBJECT-TYPE
+    SYNTAX MwVlanMgmtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Management VLAN Configuration "
+    INDEX {  mwVlanMgmtTableIndex  }
+    ::= { mwVlanMgmtTable 1 }
+
+  MwVlanMgmtEntry  ::=  SEQUENCE { 
+       mwVlanMgmtTableIndex                                        Integer32, 
+       mwVlanMgmtTag                                               Unsigned32,
+       mwVlanMgmtName                                              DisplayString(SIZE (1..32)),
+       mwVlanMgmtNetMask                                           IpAddress,
+       mwVlanMgmtIpAddress                                         IpAddress,
+       mwVlanMgmtInterfaceIndex                                    Unsigned32,
+       mwVlanMgmtDefaultGateway                                    IpAddress,
+       mwVlanMgmtAssignedType                                      MwlAddressIfAssignmentType,
+       mwVlanMgmtInterfaceType                                     MwlNmsInterfaceType,
+       mwVlanMgmtRowStatus                                         RowStatus 
+  }
+   
+   
+  mwVlanMgmtTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwVlanMgmtEntry 1 }
+
+  mwVlanMgmtTag  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tag"
+    ::= { mwVlanMgmtEntry    2 }
+
+  mwVlanMgmtName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Name"
+    ::= { mwVlanMgmtEntry    3 }
+
+  mwVlanMgmtInterfaceIndex  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Number"
+    ::= { mwVlanMgmtEntry    4 }
+
+  mwVlanMgmtIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Address"
+    ::= { mwVlanMgmtEntry    5 }
+
+  mwVlanMgmtNetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Netmask"
+    ::= { mwVlanMgmtEntry    6 }
+
+  mwVlanMgmtDefaultGateway  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Gateway Address"
+    ::= { mwVlanMgmtEntry    7 }
+
+  mwVlanMgmtAssignedType  OBJECT-TYPE
+    SYNTAX MwlAddressIfAssignmentType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assignment Type"
+    ::= { mwVlanMgmtEntry    8 }
+
+  mwVlanMgmtInterfaceType  OBJECT-TYPE
+    SYNTAX MwlNmsInterfaceType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Mode"
+    ::= { mwVlanMgmtEntry    9 }
+
+  mwVlanMgmtRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwVlanMgmtEntry 11 }
+
+  mwVlanPoolTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwVlanPoolEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Pool Configuration "
+    ::= { mwConfigVlan 3 }
+
+  mwVlanPoolEntry  OBJECT-TYPE
+    SYNTAX MwVlanPoolEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Pool Configuration "
+    INDEX {  mwVlanPoolTableIndex  }
+    ::= { mwVlanPoolTable 1 }
+
+  MwVlanPoolEntry  ::=  SEQUENCE { 
+       mwVlanPoolTableIndex                                        Integer32, 
+       mwVlanPoolName                                              DisplayString(SIZE (1..64)),
+       mwVlanPoolTagList                                           DisplayString,
+       mwVlanPoolOwner                                             MwlProfileOwner,
+       mwVlanPoolRowStatus                                         RowStatus 
+  }
+   
+   
+  mwVlanPoolTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwVlanPoolEntry 1 }
+
+  mwVlanPoolName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Pool Name"
+    ::= { mwVlanPoolEntry    3 }
+
+  mwVlanPoolTagList  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Vlan Pool Tag List"
+    ::= { mwVlanPoolEntry    4 }
+
+  mwVlanPoolOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwVlanPoolEntry    5 }
+
+  mwVlanPoolRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwVlanPoolEntry 6 }
 
   
 END

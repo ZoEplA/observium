@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -27,7 +27,7 @@ $hwversion = trim(snmp_get($device, 'entHwVersion.0', '-OQv', 'SENAO-ENTERPRISE-
 
 // There doesn't seem to be a real hardware identification.. sysName will have to do?
 // On Engenius APs this is changeable in the system properties!
-$hardware = str_replace('EnGenius ','',snmp_get($device,'sysName.0', '-OQv')) . ($hwversion == '' ? '' : ' v' . $hwversion);
+$hardware = str_replace('EnGenius ', '', $poll_device['sysName']) . ($hwversion == '' ? '' : ' v' . $hwversion);
 if ($hardware[0] != 'E') { $hardware = ''; } // If the user has changed sysName, don't use it as hardware. Silly check, will work in 99% of cases?
 
 // Operational mode

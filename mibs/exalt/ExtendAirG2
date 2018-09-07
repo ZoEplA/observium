@@ -3,8 +3,8 @@ ExtendAirG2 DEFINITIONS ::= BEGIN
     MODULE-IDENTITY, OBJECT-TYPE, Integer32
         FROM SNMPv2-SMI
     RadioSourceT, BandwidthT, ModulationT, 
-    RadioTxPwr15gT, BuzTimeoutT, DiplexerConfigG2T, ExaltEnableT, 
-    AcmBaseModulationT, AcmTargetModulationT, AcmPolicyT
+    RadioTxPwr11gT, BuzTimeoutT, DiplexerConfigG2T, ExaltEnableT, 
+    AcmBaseModulationT, AcmTargetModulationT, AcmPolicyT, AcmPowerBoostEnableT
         FROM ExaltComm
     OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -16,10 +16,9 @@ ExtendAirG2 DEFINITIONS ::= BEGIN
     extendAirG2 MODULE-IDENTITY
         LAST-UPDATED	    "201304261021Z"
         ORGANIZATION	    "Exalt"
-        CONTACT-INFO        "Exalt Communication Inc.                     
-                            
-                            254 E Hacienda Ave.,
-                            Campbell, CA 95008
+        CONTACT-INFO        "Exalt Wireless Inc.
+                            250 E Hacienda Ave.,
+                            Campbell, CA, 95008
                             USA"
         DESCRIPTION         "This is the Device Specific configuration for
                             the ExtendAirG2 Licensed radio."
@@ -30,7 +29,7 @@ ExtendAirG2 DEFINITIONS ::= BEGIN
 
 
     extendAirG2TxPower OBJECT-TYPE
-        SYNTAX              RadioTxPwr15gT
+        SYNTAX              RadioTxPwr11gT
         UNITS               "Tenths of dBm."
         MAX-ACCESS          read-write
         STATUS              current
@@ -118,5 +117,12 @@ ExtendAirG2 DEFINITIONS ::= BEGIN
         STATUS              current
         DESCRIPTION         "The ACM Target Mode."
         ::= { extendAirG2 12 }
+
+    extendAirG2AcmPowerBoostMode OBJECT-TYPE
+        SYNTAX              AcmPowerBoostEnableT
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The ACM Power Boost Mode."
+        ::= { extendAirG2 15 }
 
 END

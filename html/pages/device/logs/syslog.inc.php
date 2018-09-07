@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -46,7 +46,7 @@ if ($timestamp_min)
                                 'values'      => $form_items['priorities']);
 
   // Program field
-  $form_filter = dbFetchColumn('SELECT DISTINCT `program` FROM `syslog` IGNORE INDEX (`program`)' . $where);
+  $form_filter = dbFetchColumn('SELECT DISTINCT `program` FROM `syslog`' . $where);
   $form_items['programs'] = generate_form_values('syslog', $form_filter, 'programs');
   $form['row'][0]['program'] = array(
                                 'type'        => 'multiselect',

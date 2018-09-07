@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -161,6 +161,10 @@ foreach (dbFetchRows("SELECT * FROM `alert_table`" . $where) as $entry)
   </thead>
   <tbody>', PHP_EOL;
 
+// FIXME -- make sort order configurable
+
+$alert_check = array_sort($alert_check, 'alert_name');
+
 foreach ($alert_check as $check)
 {
 
@@ -194,51 +198,63 @@ foreach ($alert_check as $check)
 
   echo('<td>');
 
-  echo generate_box_open();
-  echo('<table class="table table-condensed-more table-striped" style="margin-bottom: 0px;">');
-
-  // Loop the associations which link this alert to this device
-  foreach ($alert_assoc[$check['alert_test_id']] as $assoc_id => $assoc)
+  if(!is_null($check['alert_assoc']))
   {
 
-    echo('<tr>');
-    echo('<td style="width: 50%">');
-    if (is_array($assoc['device_attribs']))
-    {
-      $text_block = array();
-      foreach ($assoc['device_attribs'] as $attribute)
-      {
-        $text_block[] = escape_html($attribute['attrib'].' '.$attribute['condition'].' '.$attribute['value']);
-      }
-      echo('<code>'.implode($text_block,'<br />').'</code>');
-    } else {
-      echo '<code>*</code>';
-    }
+     $check['assoc'] = json_decode($check['alert_assoc'], TRUE);
+     echo render_qb_rules($check['entity_type'], $check['assoc']);
 
-    echo('</td>');
+  } else {
 
-    echo('<td>');
-    if (is_array($assoc['entity_attribs']))
-    {
-      $text_block = array();
-      foreach ($assoc['entity_attribs'] as $attribute)
-      {
-        $text_block[] = escape_html($attribute['attrib'].' '.$attribute['condition'].' '.$attribute['value']);
-      }
-      echo('<code>'.implode($text_block,'<br />').'</code>');
-    } else {
-      echo '<code>*</code>';
-    }
-    echo('</td>');
+     echo generate_box_open();
+     echo('<table class="table table-condensed-more table-striped" style="margin-bottom: 0px;">');
 
-    echo('</tr>');
+     // Loop the associations which link this alert to this device
+     foreach ($alert_assoc[$check['alert_test_id']] as $assoc_id => $assoc)
+     {
 
+        echo('<tr>');
+        echo('<td style="width: 50%">');
+        if (is_array($assoc['device_attribs']))
+        {
+           $text_block = array();
+           foreach ($assoc['device_attribs'] as $attribute)
+           {
+              $text_block[] = escape_html($attribute['attrib'] . ' ' . $attribute['condition'] . ' ' . $attribute['value']);
+           }
+           echo('<code>' . implode($text_block, '<br />') . '</code>');
+        }
+        else
+        {
+           echo '<code>*</code>';
+        }
+
+        echo('</td>');
+
+        echo('<td>');
+        if (is_array($assoc['entity_attribs']))
+        {
+           $text_block = array();
+           foreach ($assoc['entity_attribs'] as $attribute)
+           {
+              $text_block[] = escape_html($attribute['attrib'] . ' ' . $attribute['condition'] . ' ' . $attribute['value']);
+           }
+           echo('<code>' . implode($text_block, '<br />') . '</code>');
+        }
+        else
+        {
+           echo '<code>*</code>';
+        }
+        echo('</td>');
+
+        echo('</tr>');
+
+     }
+     // End loop of associations
+
+     echo '</table>';
+     echo generate_box_close();
   }
-  // End loop of associations
-
-  echo '</table>';
-  echo generate_box_close();
-
   echo '</td>';
 
   // Print the count of entities this alert applies to and a popup containing a list and Print breakdown of entities by status.

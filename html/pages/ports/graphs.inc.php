@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -85,7 +85,7 @@ foreach ($ports as $port)
   $link_array['page'] = "graphs";
   unset($link_array['height'], $link_array['width'], $link_array['legend']);
   $link = generate_url($link_array);
-  $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . ' - ' . rewrite_ifname($port['port_label'], FALSE));
+  $overlib_content = generate_overlib_content($graph_array, $port['hostname'] . ' - ' . $port['port_label']);
   $graph_array['title']  = "yes";
   $graph_array['width']  = $width;
   $graph_array['height'] = $height;

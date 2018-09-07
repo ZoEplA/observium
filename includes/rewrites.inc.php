@@ -10,7 +10,7 @@
  * @package    observium
  * @subpackage functions
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -293,6 +293,9 @@ function humanize_device(&$device)
   // Set the name we print for the OS
   $device['os_text'] = $config['os'][$device['os']]['text'];
 
+  // Format ASN as asdot if configured
+  $device['human_local_as'] = $config['web_show_bgp_asdot'] ? bgp_asplain_to_asdot($device['bgpLocalAs']) : $device['bgpLocalAs'];
+
   // Mark this device as being humanized
   $device['humanized'] = TRUE;
 }
@@ -310,6 +313,8 @@ function humanize_device(&$device)
 // TESTME needs unit testing
 function humanize_bgp(&$peer)
 {
+  global $config;
+
   // Exit if already humanized
   if ($peer['humanized']) { return; }
 
@@ -338,14 +343,32 @@ function humanize_bgp(&$peer)
   }
 
   // Set text and colour if peer is same AS, private AS or external.
-  if ($peer['bgpPeerRemoteAs'] == $peer['bgpLocalAs'])                                  { $peer['peer_type_class'] = "info";    $peer['peer_type'] = "iBGP"; }
-  else if ($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535')  { $peer['peer_type_class'] = "warning"; $peer['peer_type'] = "Priv eBGP"; }
+  if ($peer['bgpPeerRemoteAs'] == $peer['local_as'])                                    { $peer['peer_type_class'] = "info";    $peer['peer_type'] = "iBGP"; }
   else                                                                                  { $peer['peer_type_class'] = "primary"; $peer['peer_type'] = "eBGP"; }
+
+  // Private AS numbers, see: https://tools.ietf.org/html/rfc6996
+  if (is_bgp_as_private($peer['bgpPeerRemoteAs']))
+  {
+    $peer['peer_type_class'] = "warning";
+    $peer['peer_type'] = "Priv ".$peer['peer_type'];
+  }
+  if (is_bgp_as_private($peer['local_as']))
+  {
+    $peer['peer_local_class'] = "warning";
+    $peer['peer_local_type']  = "private";
+  } else {
+    $peer['peer_local_class'] = "";
+    $peer['peer_local_type']  = "public";
+  }
 
   // Format (compress) the local/remote IPs if they're IPv6
   $peer['human_localip']  = (strstr($peer['bgpPeerLocalAddr'],  ':')) ? Net_IPv6::compress($peer['bgpPeerLocalAddr'])  : $peer['bgpPeerLocalAddr'];
   $peer['human_remoteip'] = (strstr($peer['bgpPeerRemoteAddr'], ':')) ? Net_IPv6::compress($peer['bgpPeerRemoteAddr']) : $peer['bgpPeerRemoteAddr'];
 
+  // Format ASN as asdot if configured
+  $peer['human_local_as']  = $config['web_show_bgp_asdot'] ? bgp_asplain_to_asdot($peer['local_as']) : $peer['local_as'];
+  $peer['human_remote_as'] = $config['web_show_bgp_asdot'] ? bgp_asplain_to_asdot($peer['bgpPeerRemoteAs']) : $peer['bgpPeerRemoteAs'];
+  
   // Set humanized entry in the array so we can tell later
   $peer['humanized'] = TRUE;
 }
@@ -354,19 +377,19 @@ function process_port_label(&$this_port, $device)
 {
   global $config;
 
+  //file_put_contents('/tmp/process_port_label_'.$device['hostname'].'_'.$this_port['ifIndex'].'.port', var_export($this_port, TRUE)); ///DEBUG
+
   // OS Specific rewrites (get your shit together, vendors)
   if ($device['os'] == 'zxr10') { $this_port['ifAlias'] = preg_replace("/^" . str_replace("/", "\\/", $this_port['ifName']) . "\s*/", '', $this_port['ifDescr']); }
-  if ($device['os'] == 'ciscosb' && $this_port['ifType'] == 'propVirtual' && is_numeric($this_port['ifDescr'])) { $this_port['ifName'] = 'Vl'.$this_port['ifDescr']; }
-
-  // Please don't use snmp_ functions here
-  //$this_port['ifAlias'] = snmp_fix_string($this_port['ifAlias']); // Fix ord chars
+  if ($device['os'] == 'ciscosb' && $this_port['ifType'] == 'propVirtual' && is_numeric($this_port['ifDescr'])) { $this_port['ifName'] = 'Vlan'.$this_port['ifDescr']; }
 
   // Added for Brocade NOS. Will copy ifDescr -> ifAlias if ifDescr != ifName
-  // ifAlias can be passed over SW-MIB
+  /* ifAlias passed over SW-MIB
   if ($config['os'][$device['os']]['ifDescr_ifAlias'] && $this_port['ifAlias'] == '' && $this_port['ifDescr'] != $this_port['ifName'])
   {
     $this_port['ifAlias'] = $this_port['ifDescr'];
   }
+  */
 
   // Write port_label, port_label_base and port_label_num
 
@@ -417,15 +440,13 @@ function process_port_label(&$this_port, $device)
       $this_port['port_label'] .= ' ' . $this_port['ifIndex'];
     }
   }
-  if ($device['os'] == "speedtouch")
-  {
-    list($this_port['port_label']) = explode("thomson", $this_port['port_label']);
-  }
 
   // Process label by os definition rewrites
   $oid = 'port_label';
   if (isset($config['os'][$device['os']][$oid]))
   {
+    $this_port['port_label'] = preg_replace('/\ {2,}/', ' ', $this_port['port_label']); // clear 2 and more spaces
+
     $oid_base = $oid.'_base';
     $oid_num  = $oid.'_num';
     foreach ($config['os'][$device['os']][$oid] as $pattern)
@@ -440,11 +461,28 @@ function process_port_label(&$this_port, $device)
         }
         if (isset($matches[$oid_num]))
         {
-          $this_port[$oid_num] = $matches[$oid_num];
+          if ($matches[$oid_num] === '')
+          {
+            // See cisco-altiga os definition
+            // If port_label_num match set, but it empty, use ifIndex as num
+            $this_port[$oid_num] = $this_port['ifIndex'];
+            $this_port[$oid] .= $this_port['ifIndex'];
+          } else {
+            $this_port[$oid_num] = $matches[$oid_num];
+          }
+        }
+
+        // Additionally possible to parse ifAlias from ifDescr (ie timos)
+        if (isset($matches['ifAlias']))
+        {
+          $this_port['ifAlias'] = $matches['ifAlias'];
         }
         break;
       }
     }
+  } else {
+    // Common port name rewrites (do not escape)
+    $this_port['port_label'] = rewrite_ifname($this_port['port_label'], FALSE);
   }
 
   // Extract bracket part from port label and remove it
@@ -453,7 +491,7 @@ function process_port_label(&$this_port, $device)
   {
     // GigaVUE-212 Port  8/48 (Network Port)
     // rtif(172.20.30.46/28)
-    $label_bracket = $matches[0];
+    $label_bracket = $matches[0]; // fallback
     list($this_port['port_label']) = explode($matches[0], $this_port['port_label'], 2);
   }
   else if (preg_match('!^10*(?:/10*)*\s*[MGT]Bit\s+(.*)!i', $this_port['port_label'], $matches))
@@ -461,13 +499,22 @@ function process_port_label(&$this_port, $device)
     // remove 10/100 Mbit part from beginning, this broke detect label_base/label_num (see hirschmann-switch os)
     // 10/100 MBit Ethernet Switch Interface 6
     // 1 MBit Ethernet Switch Interface 6
-    $label_bracket = $this_port['port_label'];
+    $label_bracket = $this_port['port_label']; // fallback
+    $this_port['port_label'] = $matches[1];
+  }
+  else if (preg_match('/^(.+)\s*:\s+(.+)/', $this_port['port_label'], $matches))
+  {
+    // Another case with colon
+    // gigabitEthernet 1/0/24 : copper
+    // port 3: Gigabit Fiber
+    $label_bracket = $this_port['port_label']; // fallback
     $this_port['port_label'] = $matches[1];
   }
 
   // Detect port_label_base and port_label_num
   if (isset($this_port['port_label_base'])) {} // already set by previous processing, ie os definitions
-  else if (preg_match('/\d+(?:(?:[\/:](?:[a-z])?[\d\.:]+)+[a-z\d\.\:]*(?:[\-\_][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
+  //else if (preg_match('/\d+(?:(?:[\/:](?:[a-z])?[\d\.:]+)+[a-z\d\.\:]*(?:[\-\_][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
+  else if (preg_match('/\d+((?<periodic>(?:[\/:][a-z]*\d+(?:\.\d+)?)+)(?<last>[\-\_\.][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
   {
     // Multipart numeric
     /*
@@ -483,6 +530,7 @@ function process_port_label(&$this_port, $device)
     dot11radio0/0
     Dialer0/0.1
     Downstream 0/2/0
+    ControlEthernet0/RSP0/CPU0/S0/10
     1000BaseTX Port 8/48 Name
     Backplane-GigabitEthernet0/3
     Ethernet1/10
@@ -495,6 +543,7 @@ function process_port_label(&$this_port, $device)
     sonet_12/1
     GigaVUE-212 Port  8/48 (Network Port)
     Stacking Port 1/StackA
+    gigabitEthernet 1/0/24 : copper
     1:38
     1/4/x24, mx480-xe-0-0-0
     1/4/x24
@@ -547,7 +596,8 @@ function process_port_label(&$this_port, $device)
     $this_port['port_label'] .= $label_bracket;
   }
 
-  $this_port['port_label_short'] = short_ifname($this_port['port_label']);
+  // Make short version (do not escape)
+  $this_port['port_label_short'] = short_ifname($this_port['port_label'], FALSE);
 
   // Set entity variables for use by code which uses entities
   // Base label part: TenGigabitEthernet3/3 -> TenGigabitEthernet, GigabitEthernet4/8.722 -> GigabitEthernet, Vlan2603 -> Vlan
@@ -590,6 +640,8 @@ function humanize_port(&$port)
 
   // Exit if already humanized
   if ($port['humanized']) { return; }
+
+  $port['attribs'] = get_entity_attribs('port', $port['port_id']);
 
   // If we can get the device data from the global cache, do it, else pull it from the db (mostly for external scripts)
   if (is_array($GLOBALS['cache']['devices']['id'][$port['device_id']]))
@@ -698,14 +750,7 @@ function humanize_port(&$port)
 }
 
 // Rewrite arrays
-
-$rewrite_entSensorType = array(
-  'celsius' => 'C',
-  'unknown' => '',
-  'specialEnum' => 'C',
-  'watts' => 'W',
-  'truthvalue' => '',
-);
+/// FIXME. Clean, rename GLOBAL $rewrite_* variables into $config['rewrite'] definition
 
 // List of real names for cisco entities
 $entPhysicalVendorTypes = array(
@@ -1208,125 +1253,6 @@ $rewrite_liebert_hardware = array(
   'lgpPMPonSTS2PDU'                   => array('name' => 'PMP version 4 for STS2/PDU',                  'type' => 'power'),
 );
 
-// rewrite oids used for snmp_translate()
-$rewrite_oids = array(
-  // JunOS/JunOSe BGP4 V2
-  'BGP4-V2-MIB-JUNIPER' => array(
-    'jnxBgpM2PeerTable'                 => '.1.3.6.1.4.1.2636.5.1.1.2.1.1',
-    'jnxBgpM2PeerState'                 => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2',
-    'jnxBgpM2PeerStatus'                => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.3',
-    'jnxBgpM2PeerInUpdates'             => '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.1',
-    'jnxBgpM2PeerOutUpdates'            => '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.2',
-    'jnxBgpM2PeerInTotalMessages'       => '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.3',
-    'jnxBgpM2PeerOutTotalMessages'      => '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.4',
-    'jnxBgpM2PeerFsmEstablishedTime'    => '.1.3.6.1.4.1.2636.5.1.1.2.4.1.1.1',
-    'jnxBgpM2PeerInUpdatesElapsedTime'  => '.1.3.6.1.4.1.2636.5.1.1.2.4.1.1.2',
-    'jnxBgpM2PeerLocalAddr'             => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.7',
-    'jnxBgpM2PeerIdentifier'            => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.1',
-    'jnxBgpM2PeerRemoteAs'              => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13',
-    'jnxBgpM2PeerRemoteAddr'            => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.11',
-    'jnxBgpM2PeerRemoteAddrType'        => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.10',
-    'jnxBgpM2PeerIndex'                 => '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14',
-    'jnxBgpM2PrefixInPrefixesAccepted'  => '.1.3.6.1.4.1.2636.5.1.1.2.6.2.1.8',
-    'jnxBgpM2PrefixInPrefixesRejected'  => '.1.3.6.1.4.1.2636.5.1.1.2.6.2.1.9',
-    'jnxBgpM2PrefixOutPrefixes'         => '.1.3.6.1.4.1.2636.5.1.1.2.6.2.1.10',
-    'jnxBgpM2PrefixCountersSafi'        => '.1.3.6.1.4.1.2636.5.1.1.2.6.2.1.2',
-    'jnxBgpM2CfgPeerAdminStatus'        => '.1.3.6.1.4.1.2636.5.1.1.2.8.1.1.1',
-  ),
-  // Force10 BGP4 V2
-  'FORCE10-BGP4-V2-MIB' => array(
-    'f10BgpM2PeerTable'                 => '.1.3.6.1.4.1.6027.20.1.2.1.1',
-    'f10BgpM2PeerState'                 => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.3',
-    'f10BgpM2PeerStatus'                => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.4',
-    'f10BgpM2PeerInUpdates'             => '.1.3.6.1.4.1.6027.20.1.2.6.1.1.1',
-    'f10BgpM2PeerOutUpdates'            => '.1.3.6.1.4.1.6027.20.1.2.6.1.1.2',
-    'f10BgpM2PeerInTotalMessages'       => '.1.3.6.1.4.1.6027.20.1.2.6.1.1.3',
-    'f10BgpM2PeerOutTotalMessages'      => '.1.3.6.1.4.1.6027.20.1.2.6.1.1.4',
-    'f10BgpM2PeerFsmEstablishedTime'    => '.1.3.6.1.4.1.6027.20.1.2.3.1.1.1',
-    'f10BgpM2PeerInUpdatesElapsedTime'  => '.1.3.6.1.4.1.6027.20.1.2.3.1.1.2',
-    'f10BgpM2PeerLocalAddr'             => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.8',
-    'f10BgpM2PeerIdentifier'            => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.2',
-    'f10BgpM2PeerRemoteAs'              => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.14',
-    'f10BgpM2PeerRemoteAddr'            => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.12',
-    'f10BgpM2PeerRemoteAddrType'        => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.11',
-    'f10BgpM2PeerIndex'                 => '.1.3.6.1.4.1.6027.20.1.2.1.1.1.15',
-    'f10BgpM2PrefixInPrefixesAccepted'  => '.1.3.6.1.4.1.6027.20.1.2.6.2.1.8',
-    'f10BgpM2PrefixInPrefixesRejected'  => '.1.3.6.1.4.1.6027.20.1.2.6.2.1.9',
-    'f10BgpM2PrefixOutPrefixes'         => '.1.3.6.1.4.1.6027.20.1.2.6.2.1.10',
-    'f10BgpM2PrefixCountersSafi'        => '.1.3.6.1.4.1.6027.20.1.2.6.2.1.2',
-    'f10BgpM2CfgPeerAdminStatus'        => '.1.3.6.1.4.1.6027.20.1.2.8.1.1.1'
-  ),
-  // Arista BGP4 V2
-  // Note that these rewrites are only here because of the
-  // bgp-peer code; the MIB has the right info.
-  // To regenerate this array:
-  // SMIPATH=/usr/share/snmp/eos-mibs:/usr/share/snmp/mibs smidump -f identifiers ARISTA-BGP4V2-MIB | awk '{print "'"'"'" $2 "'"'"'", "=>", "'"'"'." $4 "'"'"',"}'
-  'ARISTA-BGP4V2-MIB' => array(
-    'aristaBgp4V2PeerTable' => '.1.3.6.1.4.1.30065.4.1.1.2',
-    'aristaBgp4V2PeerEntry' => '.1.3.6.1.4.1.30065.4.1.1.2.1',
-    'aristaBgp4V2PeerInstance' => '.1.3.6.1.4.1.30065.4.1.1.2.1.1',
-    'aristaBgp4V2PeerLocalAddrType' => '.1.3.6.1.4.1.30065.4.1.1.2.1.2',
-    'aristaBgp4V2PeerLocalAddr' => '.1.3.6.1.4.1.30065.4.1.1.2.1.3',
-    'aristaBgp4V2PeerRemoteAddrType' => '.1.3.6.1.4.1.30065.4.1.1.2.1.4',
-    'aristaBgp4V2PeerRemoteAddr' => '.1.3.6.1.4.1.30065.4.1.1.2.1.5',
-    'aristaBgp4V2PeerLocalPort' => '.1.3.6.1.4.1.30065.4.1.1.2.1.6',
-    'aristaBgp4V2PeerLocalAs' => '.1.3.6.1.4.1.30065.4.1.1.2.1.7',
-    'aristaBgp4V2PeerLocalIdentifier' => '.1.3.6.1.4.1.30065.4.1.1.2.1.8',
-    'aristaBgp4V2PeerRemotePort' => '.1.3.6.1.4.1.30065.4.1.1.2.1.9',
-    'aristaBgp4V2PeerRemoteAs' => '.1.3.6.1.4.1.30065.4.1.1.2.1.10',
-    'aristaBgp4V2PeerRemoteIdentifier' => '.1.3.6.1.4.1.30065.4.1.1.2.1.11',
-    'aristaBgp4V2PeerAdminStatus' => '.1.3.6.1.4.1.30065.4.1.1.2.1.12',
-    'aristaBgp4V2PeerState' => '.1.3.6.1.4.1.30065.4.1.1.2.1.13',
-    'aristaBgp4V2PeerDescription' => '.1.3.6.1.4.1.30065.4.1.1.2.1.14',
-    'aristaBgp4V2PeerErrorsTable' => '.1.3.6.1.4.1.30065.4.1.1.3',
-    'aristaBgp4V2PeerErrorsEntry' => '.1.3.6.1.4.1.30065.4.1.1.3.1',
-    'aristaBgp4V2PeerLastErrorCodeReceived' => '.1.3.6.1.4.1.30065.4.1.1.3.1.1',
-    'aristaBgp4V2PeerLastErrorSubCodeReceived' => '.1.3.6.1.4.1.30065.4.1.1.3.1.2',
-    'aristaBgp4V2PeerLastErrorReceivedTime' => '.1.3.6.1.4.1.30065.4.1.1.3.1.3',
-    'aristaBgp4V2PeerLastErrorReceivedText' => '.1.3.6.1.4.1.30065.4.1.1.3.1.4',
-    'aristaBgp4V2PeerLastErrorReceivedData' => '.1.3.6.1.4.1.30065.4.1.1.3.1.5',
-    'aristaBgp4V2PeerLastErrorCodeSent' => '.1.3.6.1.4.1.30065.4.1.1.3.1.6',
-    'aristaBgp4V2PeerLastErrorSubCodeSent' => '.1.3.6.1.4.1.30065.4.1.1.3.1.7',
-    'aristaBgp4V2PeerLastErrorSentTime' => '.1.3.6.1.4.1.30065.4.1.1.3.1.8',
-    'aristaBgp4V2PeerLastErrorSentText' => '.1.3.6.1.4.1.30065.4.1.1.3.1.9',
-    'aristaBgp4V2PeerLastErrorSentData' => '.1.3.6.1.4.1.30065.4.1.1.3.1.10',
-    'aristaBgp4V2PeerEventTimesTable' => '.1.3.6.1.4.1.30065.4.1.1.4',
-    'aristaBgp4V2PeerEventTimesEntry' => '.1.3.6.1.4.1.30065.4.1.1.4.1',
-    'aristaBgp4V2PeerFsmEstablishedTime' => '.1.3.6.1.4.1.30065.4.1.1.4.1.1',
-    'aristaBgp4V2PeerInUpdatesElapsedTime' => '.1.3.6.1.4.1.30065.4.1.1.4.1.2',
-    'aristaBgp4V2PeerConfiguredTimersTable' => '.1.3.6.1.4.1.30065.4.1.1.5',
-    'aristaBgp4V2PeerConfiguredTimersEntry' => '.1.3.6.1.4.1.30065.4.1.1.5.1',
-    'aristaBgp4V2PeerConnectRetryInterval' => '.1.3.6.1.4.1.30065.4.1.1.5.1.1',
-    'aristaBgp4V2PeerHoldTimeConfigured' => '.1.3.6.1.4.1.30065.4.1.1.5.1.2',
-    'aristaBgp4V2PeerKeepAliveConfigured' => '.1.3.6.1.4.1.30065.4.1.1.5.1.3',
-    'aristaBgp4V2PeerMinASOrigInterval' => '.1.3.6.1.4.1.30065.4.1.1.5.1.4',
-    'aristaBgp4V2PeerMinRouteAdverInterval' => '.1.3.6.1.4.1.30065.4.1.1.5.1.5',
-    'aristaBgp4V2PeerNegotiatedTimersTable' => '.1.3.6.1.4.1.30065.4.1.1.6',
-    'aristaBgp4V2PeerNegotiatedTimersEntry' => '.1.3.6.1.4.1.30065.4.1.1.6.1',
-    'aristaBgp4V2PeerHoldTime' => '.1.3.6.1.4.1.30065.4.1.1.6.1.1',
-    'aristaBgp4V2PeerKeepAlive' => '.1.3.6.1.4.1.30065.4.1.1.6.1.2',
-    'aristaBgp4V2PeerCountersTable' => '.1.3.6.1.4.1.30065.4.1.1.7',
-    'aristaBgp4V2PeerCountersEntry' => '.1.3.6.1.4.1.30065.4.1.1.7.1',
-    'aristaBgp4V2PeerInUpdates' => '.1.3.6.1.4.1.30065.4.1.1.7.1.1',
-    'aristaBgp4V2PeerOutUpdates' => '.1.3.6.1.4.1.30065.4.1.1.7.1.2',
-    'aristaBgp4V2PeerInTotalMessages' => '.1.3.6.1.4.1.30065.4.1.1.7.1.3',
-    'aristaBgp4V2PeerOutTotalMessages' => '.1.3.6.1.4.1.30065.4.1.1.7.1.4',
-    'aristaBgp4V2PeerFsmEstablishedTransitions' => '.1.3.6.1.4.1.30065.4.1.1.7.1.5',
-    'aristaBgp4V2PrefixGaugesTable' => '.1.3.6.1.4.1.30065.4.1.1.8',
-    'aristaBgp4V2PrefixGaugesEntry' => '.1.3.6.1.4.1.30065.4.1.1.8.1',
-    'aristaBgp4V2PrefixGaugesAfi' => '.1.3.6.1.4.1.30065.4.1.1.8.1.1',
-    'aristaBgp4V2PrefixGaugesSafi' => '.1.3.6.1.4.1.30065.4.1.1.8.1.2',
-    'aristaBgp4V2PrefixInPrefixes' => '.1.3.6.1.4.1.30065.4.1.1.8.1.3',
-    'aristaBgp4V2PrefixInPrefixesAccepted' => '.1.3.6.1.4.1.30065.4.1.1.8.1.4',
-    'aristaBgp4V2PrefixOutPrefixes' => '.1.3.6.1.4.1.30065.4.1.1.8.1.5',
-  ),
-  // IPV6-MIB
-  'IPV6-MIB' => array(
-    'ipv6AddrPfxLength'                 => '.1.3.6.1.2.1.55.1.8.1.2',
-    'ipv6AddrType'                      => '.1.3.6.1.2.1.55.1.8.1.3'
-  )
-);
-
 $rewrite_iftype = array(
   'other' => 'Other',
   'regular1822',
@@ -1603,50 +1529,59 @@ $rewrite_iftype = array(
 );
 
 $rewrite_ifname = array(
+  '-802.1q vlan subif' => '',
+  '-802.1q' => '',
+  '-aal5 layer' => ' aal5',
+  'hp procurve switch software loopback interface' => 'Loopback',
+  //'uniping server solution v3/sms' => '', // moved to os definition
+  'control plane interface' => 'Control Plane',
+  '802.1q encapsulation tag' => 'Vlan',
+  'stacking port' => 'Port',
+  '_Physical_Interface' => '',
+
+  // Case changes.
+  // FIXME. I'm not sure that this is correct for label changes (mike)
   'ether' => 'Ether',
   'gig' => 'Gig',
   'fast' => 'Fast',
   'ten' => 'Ten',
-  '-802.1q vlan subif' => '',
-  '-802.1q' => '',
   'bvi' => 'BVI',
   'vlan' => 'Vlan',
   'ether' => 'Ether',
   'tunnel' => 'Tunnel',
   'serial' => 'Serial',
-  '-aal5 layer' => ' aal5',
   'null' => 'Null',
-  'atm' => 'ATM',
+  'atm' => 'Atm',
   'port-channel' => 'Port-Channel',
   'dial' => 'Dial',
-  'hp procurve switch software loopback interface' => 'Loopback Interface',
-  'uniping server solution v3/sms' => '',
-  'control plane interface' => 'Control Plane',
   'loopback' => 'Loopback',
-  '802.1q encapsulation tag' => 'Vlan',
 );
 
 $rewrite_ifname_regexp = array(
-  '/Nortel .* Module - /i' => '',
+  //'/Nortel .* Module - /i' => '', // moved no avaya group
   '/Baystack .* - /i' => '',
   '/DEC [a-z\d]+ PCI /i' => '',
-  //'/^APC /' => '',
+  '/\s?Switch Interface/' => '',
+  '/\ {2,}/' => ' ',
 );
 
 $rewrite_shortif = array(
+  'bundle-ether' => 'BE',         // IOS XR
+  'controlethernet' => 'CE',      // IOS XR
+  'fortygigabitethernet' => 'Fo',
   'tengigabitethernet' => 'Te',
   'tengige' => 'Te',
   'gigabitethernet' => 'Gi',
   'gigabit ethernet' => 'Gi',
   'fastethernet' => 'Fa',
   'fast ethernet' => 'Fa',
+  'managementethernet' => 'Mgmt', // DNOS
   'ethernet' => 'Et',
   'fortygige' => 'Fo',
   'management' => 'Mgmt',
   'serial' => 'Se',
   'pos' => 'Pos',
   'port-channel' => 'Po',
-  'bundle-ether' => 'BE',
   'atm' => 'Atm',
   'null' => 'Null',
   'loopback' => 'Lo',
@@ -1655,6 +1590,14 @@ $rewrite_shortif = array(
   'tunnel' => 'Tu',
   'serviceinstance' => 'SI',
   'dwdm' => 'DWDM',
+  'link aggregation' => 'Lagg',
+  'backplane' => 'Bpl',
+);
+
+$rewrite_shortif_regexp = array(
+  '/^10\w+ (Port)/i' => '\1',      // 1000BaseTX Port 8/48 -> Port 8/48
+  '/^(?:GigaVUE)\S* (Port)/i' => '\1', // GigaVUE-212 Port 8/48
+  '/.*(Upstream|Downstream)(\s*)[^\d]*(\d.*)/' => '\1\2\3', // Logical Upstream Channel 1/0.0/0, Video Downstream 0/0/38, Downstream RF Port 4/7
 );
 
 $rewrite_adslLineType = array(
@@ -1675,47 +1618,6 @@ $rewrite_hrDevice = array (
 );
 
 // Rewrite functions
-
-/**
- * Return model array, based on device sysObjectID
- *
- * @param	array	 $device          Device array required keys -> os, sysObjectID
- * @param	string $sysObjectID_new If passed, than use "new" sysObjectID instead from device array
- * @return array                  Model array
- */
-function get_model_array($device, $sysObjectID_new = NULL)
-{
-  if (isset($GLOBALS['config']['os'][$device['os']]['model']))
-  {
-    $model  = $GLOBALS['config']['os'][$device['os']]['model'];
-    $models = $GLOBALS['config']['model'][$model];
-    if ($sysObjectID_new && preg_match('/^\.\d[\d\.]+$/', $sysObjectID_new))
-    {
-      $sysObjectID = $sysObjectID_new;
-    }
-    else if (preg_match('/^\.\d[\d\.]+$/', $device['sysObjectID']))
-    {
-      $sysObjectID = $device['sysObjectID'];
-    } else {
-      // Just random non empty string
-      $sysObjectID = 'WRONG_ID_3948ffakc';
-    }
-    if (isset($models[$sysObjectID]))
-    {
-      // Exactly match
-      return $models[$sysObjectID];
-    }
-    krsort($GLOBALS['config']['model'][$model]); // Resort array by key with high to low order!
-    foreach ($GLOBALS['config']['model'][$model] as $key => $entry)
-    {
-      if (strpos($sysObjectID, $key) === 0)
-      {
-        return $entry;
-        break;
-      }
-    }
-  }
-}
 
 /**
  * Rewrites device hardware based on device os/sysObjectID and hw definitions
@@ -1927,6 +1829,7 @@ function short_hostname($hostname, $len = NULL, $escape = TRUE)
 
 // DOCME needs phpdoc block
 // TESTME needs unit testing
+// NOTE, this is shorting for ifAlias! Can be rename to short_ifalias() ?
 function short_port_descr($descr, $len = NULL, $escape = TRUE)
 {
   $len = (is_numeric($len) ? (int)$len : (int)$GLOBALS['config']['short_port_descr']['length']);
@@ -1960,6 +1863,7 @@ function short_ifname($if, $len = NULL, $escape = TRUE)
   $if = rewrite_ifname($if, $escape);
   // $if = strtolower($if);
   $if = array_str_replace($GLOBALS['rewrite_shortif'], $if);
+  $if = array_preg_replace($GLOBALS['rewrite_shortif_regexp'], $if);
   if ($len) { $if = truncate($if, $len, ''); }
 
   return $if;
@@ -2056,8 +1960,14 @@ function rewrite_location($location)
 }
 
 // Underlying rewrite functions
-// DOCME needs phpdoc block
-// TESTME needs unit testing
+
+/**
+ * Replace strings equals to key string with appropriate value from array: key -> replace
+ *
+ * @param array  $array     Array with string and replace string (key -> replace)
+ * @param string $string    String subject where replace
+ * @return string           Result string with replaced strings
+ */
 function array_key_replace($array, $string)
 {
   if (array_key_exists($string, $array))
@@ -2067,25 +1977,84 @@ function array_key_replace($array, $string)
   return $string;
 }
 
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-function array_str_replace($array, $string)
+/**
+ * Replace strings matched by key string with appropriate value from array: string -> replace
+ * Note, by default CASE INSENSITIVE
+ *
+ * @param array  $array     Array with string and replace string (string -> replace)
+ * @param string $string    String subject where replace
+ * @return string           Result string with replaced strings
+ */
+function array_str_replace($array, $string, $case_sensitive = FALSE)
 {
-  foreach ($array as $search => $replace)
+  $search = array();
+  $replace = array();
+
+  foreach ($array as $key => $entry)
   {
+    if ($search === '') { continue; }
+
+    $search[] = $key;
+    $replace[] = $entry;
+  }
+
+  if ($case_sensitive)
+  {
+    $string = str_replace($search, $replace, $string);
+  } else {
     $string = str_ireplace($search, $replace, $string);
   }
 
   return $string;
 }
 
-// DOCME needs phpdoc block
-// TESTME needs unit testing
+/**
+ * Replace strings matched by pattern key with appropriate value from array: pattern -> replace
+ *
+ * @param array  $array     Array with pattern and replace string (pattern -> replace)
+ * @param string $string    String subject where replace
+ * @return string           Result string with replaced patterns
+ */
 function array_preg_replace($array, $string)
 {
   foreach ($array as $search => $replace)
   {
     $string = preg_replace($search, $replace, $string);
+  }
+
+  return $string;
+}
+
+/**
+ * Replace tag(s) inside string with appropriate key from array: %tag% -> $array['tag']
+ * Note, not exist tags in array will cleaned from string!
+ *
+ * @param array  $array     Array with keys appropriate for tags, wich used for replace
+ * @param string $string    String with tag(s) for replace (between percent sign, ie: %key%)
+ * @param string $tag_scope Scope string for detect tag(s), default: %
+ * @return string           Result string with replaced tags
+ */
+function array_tag_replace($array, $string, $tag_scope = '%')
+{
+  if (empty($tag_scope))
+  {
+    // Default key scopes string %
+    $tag_scope = '%';
+  }
+  $pattern = '/'.$tag_scope.'(?<tag>\w+)'.$tag_scope.'/';
+  //var_dump($pattern);
+
+  if (preg_match_all($pattern, $string, $matches)) // Search all tags
+  {
+    //var_dump($matches['tag']);
+    $search = array();
+    $replace = array();
+    foreach (array_unique($matches['tag']) as $tag) // Unique tags
+    {
+      $search[] = $tag_scope . $tag . $tag_scope;
+      $replace[] = $array[$tag];
+    }
+    $string = str_replace($search, $replace, $string);
   }
 
   return $string;

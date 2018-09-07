@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2011 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: CDS.php 130 2011-12-03 05:02:37Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.2.0
  *
@@ -53,7 +53,7 @@
  * The CDS RR is implemented exactly like the DS record, so
  * for now we just extend the DS RR and use it.
  *
- * http://tools.ietf.org/html/draft-barwood-dnsop-ds-publish-02
+ * http://www.rfc-editor.org/rfc/rfc7344.txt
  *
  * @category Networking
  * @package  Net_DNS2

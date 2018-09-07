@@ -9,11 +9,11 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 procera MODULE-IDENTITY
-	LAST-UPDATED "201209261248Z"
+	LAST-UPDATED "201212131322Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for PacketLogic2"
-	REVISION "201209261248Z"
+	REVISION "201212131322Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={enterprises 15397}
@@ -14313,6 +14313,24 @@ plsdConnPropHashMax	OBJECT-TYPE
 	DESCRIPTION "Connection Properties Hashtables"
 
 	::={plsdConnPropHash 3}
+
+plsdCorruptPath	OBJECT IDENTIFIER ::={plsd 43}
+
+plsdCorruptPathVal	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Corrupted value paths"
+
+	::={plsdCorruptPath 1}
+
+plsdCorruptPathMax	OBJECT-TYPE
+	SYNTAX	 CounterBasedGauge64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Corrupted value paths"
+
+	::={plsdCorruptPath 3}
 
 plsw	OBJECT IDENTIFIER ::={sysdiag 137}
 

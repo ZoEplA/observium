@@ -1,15 +1,19 @@
 <?php
 
+$base_dir = realpath(dirname(__FILE__) . '/..');
+$config['install_dir'] = $base_dir;
+
 include(dirname(__FILE__) . '/../includes/defaults.inc.php');
 //include(dirname(__FILE__) . '/../config.php'); // Do not include user editable config here
-//include(dirname(__FILE__) . '/data/test_definitions.inc.php'); // Fake definitions for testing
-include(dirname(__FILE__) . '/../includes/definitions.inc.php');
 include(dirname(__FILE__) . '/../includes/functions.inc.php');
+include(dirname(__FILE__) . '/../includes/definitions.inc.php');
+//include(dirname(__FILE__) . '/data/test_definitions.inc.php'); // Fake definitions for testing
 
 class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
 {
   /**
   * @dataProvider providerMibDirs
+  * @group mib
   */
   public function testMibDirs($result, $value1, $value2 = '')
   {
@@ -40,6 +44,7 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
 
   /**
   * @dataProvider providerSnmpMib2MibDir
+  * @group mib
   */
   public function testSnmpMib2MibDir($result, $mib)
   {
@@ -59,7 +64,38 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco', 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB'),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco:/opt/observium/mibs/broadcom', 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB:FASTPATH-SWITCHING-MIB'),
       // Unknown
-      array('/opt/observium/mibs', 'HOST-RESOURCES'),
+      //array('/opt/observium/mibs', 'HOST-RESOURCES'),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', 'HOST-RESOURCES'),
+    );
+    return $results;
+  }
+
+  /**
+  * @dataProvider providerSnmpMibEntityVendortype
+  * @group mib
+  */
+  public function testSnmpMibEntityVendortype($device, $mib, $result)
+  {
+    //global $config;
+    //
+    //$config['mib_dir'] = '/opt/observium/mibs';
+
+    $this->assertSame($result, snmp_mib_entity_vendortype($device, $mib));
+  }
+
+  public function providerSnmpMibEntityVendortype()
+  {
+    $device_linux = array('device_id' => 999, 'os' => 'linux');
+    $device_ios   = array('device_id' => 998, 'os' => 'ios');
+    $device_vrp   = array('device_id' => 997, 'os' => 'vrp');
+
+    $results = array(
+      // Basic, no additional mibs
+      array($device_linux, 'UCD-SNMP-MIB', 'UCD-SNMP-MIB'),
+      // Expand
+      array($device_linux, 'ENTITY-MIB', 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB'),
+      array($device_ios,   'ENTITY-MIB', 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB'),
+      array($device_vrp,   'ENTITY-MIB', 'ENTITY-MIB:HUAWEI-TC-MIB'),
     );
     return $results;
   }

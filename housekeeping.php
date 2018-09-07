@@ -9,13 +9,13 @@
  * @package    observium
  * @subpackage housekeeping
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 chdir(dirname($argv[0]));
 
-$options = getopt("A:Vyaselurptdbi");
+$options = getopt("A:Vyaselurpdbi");
 
 include("includes/sql-config.inc.php");
 
@@ -50,7 +50,6 @@ if (isset($options['a']) || isset($options['e'])) { $modules[] = 'eventlog'; }
 if (isset($options['a']) || isset($options['l'])) { $modules[] = 'alertlog'; }
 if (isset($options['a']) || isset($options['u'])) { $modules[] = 'authlog'; }
 if (isset($options['a']) || isset($options['p'])) { $modules[] = 'ports'; }
-if (isset($options['a']) || isset($options['t'])) { $modules[] = 'timing'; }
 if (isset($options['a']) || isset($options['b'])) { $modules[] = 'staledb'; }
 if (isset($options['a']) || isset($options['i'])) { $modules[] = 'inventory'; }
 if (isset($options['a']) || isset($options['r'])) { $modules[] = 'rrd'; }
@@ -94,7 +93,6 @@ OPTIONS:
  -i                                          Clean up inventory
  -r                                          Clean up unused RRD files
  -p                                          Clean up deleted ports
- -t                                          Clean up timing data (discovery and poll times)
  -b                                          Clean up stale database entries
  -A <age>                                    Specifies maximum age for all modules (overrides configuration)
 

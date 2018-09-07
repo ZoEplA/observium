@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: RR.php 188 2013-03-31 01:25:46Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -548,16 +548,18 @@ abstract class Net_DNS2_RR
         //
         foreach ($values as $value) {
 
-            switch($value) {
+            switch(true) {
             case is_numeric($value):
 
                 $ttl = array_shift($values);
                 break;
 
             //
-            // PHP SUCKS!
+            // this is here because of a bug in is_numeric() in certain versions of
+            // PHP on windows.
             //
             case ($value === 0):
+                
                 $ttl = array_shift($values);
                 break;
 
@@ -570,7 +572,8 @@ abstract class Net_DNS2_RR
 
                 $type = strtoupper(array_shift($values));
                 break 2;
-                break;   
+                break;
+
             default:
 
                 throw new Net_DNS2_Exception(

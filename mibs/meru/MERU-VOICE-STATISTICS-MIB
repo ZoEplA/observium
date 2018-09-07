@@ -112,7 +112,7 @@ IMPORTS
     MAX-ACCESS  read-only 
     STATUS     current
     DESCRIPTION
-         "This object describes Mac Address"
+         "This object describes MAC Address"
     ::= { mwPhoneEntry    4 }
 
   mwPhoneType  OBJECT-TYPE
@@ -160,7 +160,7 @@ IMPORTS
     MAX-ACCESS  read-only 
     STATUS     current
     DESCRIPTION
-         "This object describes Device Type"
+         "This object describes Station Type"
     ::= { mwPhoneEntry   10 }
 
   mwPhoneCallTable  OBJECT-TYPE

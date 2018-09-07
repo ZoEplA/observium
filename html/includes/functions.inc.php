@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -245,7 +245,7 @@ function get_vars($vars_order = array(), $auth = FALSE)
             if (strpos($vars[$name], '%1F') !== FALSE)
             {
               $vars[$name] = str_replace('%1F', ',', $vars[$name]); // %1F (US, unit separator) - not defined in HTML 4 standard
-            }
+            }            
           }
         }
         break;
@@ -273,7 +273,7 @@ function get_vars($vars_order = array(), $auth = FALSE)
     }
   }
 
-  //print_vars($vars);
+  //r($vars);
   return($vars);
 }
 
@@ -576,66 +576,6 @@ function detect_browser($user_agent = NULL)
   return $GLOBALS['cache']['detect_browser'];
 }
 
-// DOCME needs phpdoc block
-function safe_base64_encode($string)
-{
-  $data = base64_encode($string);
-  $data = str_replace(array('+','/','='), array('-','_',''), $data);
-  return $data;
-}
-
-// DOCME needs phpdoc block
-function safe_base64_decode($string)
-{
-  $data = str_replace(array('-','_'), array('+','/'), $string);
-  $mod4 = strlen($data) % 4;
-  if ($mod4)
-  {
-    $data .= substr('====', $mod4);
-  }
-  return base64_decode($data);
-}
-
-// DOCME needs phpdoc block
-// MOVEME includes/common.inc.php
-function encrypt($string, $key)
-{
-  $key = pad_key($key);
-  return safe_base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $string, MCRYPT_MODE_ECB));
-}
-
-// DOCME needs phpdoc block
-// MOVEME includes/common.inc.php
-function decrypt($encrypted, $key)
-{
-  $key = pad_key($key);
-  return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, safe_base64_decode($encrypted), MCRYPT_MODE_ECB), "\t\n\r\0\x0B");
-}
-
-// This function required for encrypt/decrypt, since php 5.6
-// see: http://stackoverflow.com/questions/27254432/mcrypt-decrypt-error-change-key-size
-function pad_key($key)
-{
-  // key is too large
-  if (strlen($key) > 32) { return FALSE; }
-
-  // set sizes
-  $sizes = array(16, 24, 32);
-
-  // loop through sizes and pad key
-  foreach($sizes as $s)
-  {
-    while (strlen($key) < $s)
-    {
-      $key = $key . "\0";
-    }
-    if (strlen($key) == $s) { break; } // finish if the key matches a size
-  }
-
-  // return
-  return $key;
-}
-
 // TESTME needs unit testing
 // DOCME needs phpdoc block
 function data_uri($file, $mime)
@@ -666,6 +606,7 @@ function toner_to_colour($descr, $percent)
   if (substr($descr, -1) == 'M' || toner_map($descr, "magenta")) { $colour['left'] = "FBA8E6"; $colour['right'] = "D028A6"; }
   if (substr($descr, -1) == 'Y' || toner_map($descr, "yellow" )) { $colour['left'] = "FFF764"; $colour['right'] = "DDD000"; }
   if (substr($descr, -1) == 'K' || toner_map($descr, "black"  )) { $colour['left'] = "888787"; $colour['right'] = "555555"; }
+  if (substr($descr, -1) == 'R' || toner_map($descr, "red"    )) { $colour['left'] = "FB6A4A"; $colour['right'] = "CB181D"; }
 
   if (!isset($colour['left'])) { $colour = get_percentage_colours(100-$percent); $colour['found'] = FALSE; } else { $colour['found'] = TRUE; }
 
@@ -896,7 +837,7 @@ function generate_url($vars, $new_vars = array())
     }
     else if ($value == "0" || $value != "" && strstr($var, "opt") === FALSE && is_numeric($var) === FALSE)
     {
-      $url .= urlencode($var) . '=' . urlencode($value).'/';
+      $url .= urlencode($var) . '=' . urlencode(str_replace('/', '%7F', $value)).'/'; // %7F converted back to / in get_vars()
     }
   }
 
@@ -1143,20 +1084,77 @@ function overlib_link($url, $text, $contents, $class = NULL, $escape = FALSE)
  * @param boolean $escape Escape or not link text
  */
 // TESTME needs unit testing
-function generate_menu_link($url, $text, $count = NULL, $class = 'label', $escape = FALSE)
+function generate_menu_link($url, $text, $count = NULL, $class = 'label', $escape = FALSE, $alert_count = NULL)
 {
   $href = (strlen($url) ? 'href="' . $url . '"' : '');
   if ($escape) { $text = escape_html($text); }
 
   $output = '<a role="menuitem" ' . $href . '><span>' . $text . '</span>';
+
+  if (is_numeric($alert_count))
+  {
+    $output .= '<span class="label label-danger">' . $alert_count . '</span>';
+  }
+
   if (is_numeric($count))
   {
     $output .= '<span class="' . $class . '">' . $count . '</span>';
+  }
+
+  $output .= '</a>';
+
+  return $output;
+}
+
+
+/**
+ * Generate menu links with item counts from URL, link text, contents and a class.
+ *
+ * Replaces previous function with multiple arguments. Should be used for all navbar menus
+ *
+ * @param string $array Array of options
+ */
+// TESTME needs unit testing
+function generate_menu_link_new($array)
+{
+
+  $array = array_merge(array(
+                           'count' => NULL,
+                           'escape' => FALSE,
+                            'class' => 'label'
+                         ), $array);
+
+  if (isset($array['link_opts'])) { $link_opts .= ' ' . $array['link_opts']; }
+  if (isset($array['alt']))       { $link_opts .= ' data-rel="tooltip" data-tooltip="'.$array['alt'].'"'; }
+  if (isset($array['id']))        { $link_opts .= ' id="'.$array['id'].'"'; }
+
+  if (empty($array['url']) || $array['url'] == '#') { $array['url'] = 'javascript:void(0)'; }
+
+  if ($array['escape']) { $array['text'] = escape_html($array['text']); }
+
+  $output .= '<a role="menuitem" href="'.$array['url'].'" '.$link_opts.'>';
+
+  $output .= '<span>';
+  if (isset($array['icon']))
+  {
+    $output .= '<i class="' . $array['icon'] . '"></i>&nbsp;';
+  }
+  $output .= $array['text'] . '</span>';
+
+  if (is_numeric($array['alert_count']))
+  {
+    $output .= ' <span class="label label-danger">' . $array['alert_count'] . '</span> ';
+  }
+
+  if (is_numeric($array['count']))
+  {
+    $output .= ' <span class="' . $array['class'] . '">' . $array['count'] . '</span>';
   }
   $output .= '</a>';
 
   return $output;
 }
+
 
 // Generate a typical 4-graph popup using $graph_array
 // TESTME needs unit testing
@@ -1236,6 +1234,10 @@ function permissions_cache($user_id)
     }
   }
 
+/**
+
+  // Please don't do this, it's INCREDIBLY SLOW.
+
   // For limited users expand device permission into entity permission
   if ((!isset($_SESSION['user_limited']) || $_SESSION['user_limited']) && count($permissions['device']))
   {
@@ -1254,6 +1256,7 @@ function permissions_cache($user_id)
       }
     }
   }
+**/
 
   // Alerts
   $alert = array();
@@ -1274,6 +1277,71 @@ function permissions_cache($user_id)
 }
 
 /**
+ * Return WEB client remote IP address.
+ * In mostly cases (also by default) this is just $_SERVER['REMOTE_ADDR'],
+ * but if config options ($config['web_remote_addr_header']) set, this can use specified HTTP headers
+ *
+ * @param boolean Use or not HTTP header specified in $config['web_remote_addr_header']
+ * @return string IP address of remote client
+ */
+function get_remote_addr($use_http_header = FALSE)
+{
+  if ($use_http_header)
+  {
+    // Note, this headers is very dangerous for use as auth!
+    switch ($config['web_remote_addr_header'])
+    {
+      case 'CF-Connecting-IP': // CloudFlare network
+      case 'X-Real-IP':
+      case 'Client-IP':
+      case 'X-Forwarded-For':
+        $header = 'HTTP_' . strtoupper(str_replace('-', '_', $config['web_remote_addr_header']));
+        if (!empty($_SERVER[$header]) && preg_match(OBS_PATTERN_IP_FULL, $_SERVER[$header], $matches))
+        {
+          // HTTP header founded and it contains valid IP address
+          return $matches[1];
+        }
+        break;
+    }
+  }
+
+  // By default just use server remote address
+  return $_SERVER['REMOTE_ADDR'];
+}
+
+/**
+ * Every time you call session_start(), PHP adds another
+ * identical session cookie to the response header. Do this
+ * enough times, and your response header becomes big enough
+ * to choke the web server.
+ *
+ * This method clears out the duplicate session cookies. You can
+ * call it after each time you've called session_start(), or call it
+ * just before you send your headers.
+ */
+function clear_duplicate_cookies() {
+  // If headers have already been sent, there's nothing we can do
+  if (headers_sent()) {
+    return;
+  }
+
+  $cookies = array();
+  foreach (headers_list() as $header) {
+    // Identify cookie headers
+    if (strpos($header, 'Set-Cookie:') === 0) {
+      $cookies[] = $header;
+    }
+  }
+  // Removes all cookie headers, including duplicates
+  header_remove('Set-Cookie');
+
+  // Restore one copy of each cookie
+  foreach(array_unique($cookies) as $cookie) {
+    header($cookie, false);
+  }
+}
+
+/**
  * Store cached device/port/etc permitted IDs into $_SESSION['cache']
  *
  * IDs collected in html/includes/cache-data.inc.php
@@ -1285,6 +1353,8 @@ function permissions_cache($user_id)
 function permissions_cache_session()
 {
   if (!$_SESSION['authenticated']) { return; }
+
+  if (isset($GLOBALS['permissions_cached_session'])) { return; } // skip if this function already run. FIXME?
 
   @session_start(); // Re-enable write to session
 
@@ -1299,6 +1369,8 @@ function permissions_cache_session()
   {
     $_SESSION['cache']['ports'][$key] = $GLOBALS['cache']['ports'][$key];
   }
+
+  $GLOBALS['permissions_cached_session'] = TRUE;
 
   session_commit(); // Write and close session
 }
@@ -1446,7 +1518,7 @@ function print_graph_tag($args)
 
 // TESTME needs unit testing
 // DOCME needs phpdoc block
-function generate_graph_tag($args)
+function generate_graph_tag($args, $return_array = FALSE)
 {
   if (empty($args)) { return ''; } // Quick return if passed empty array
 
@@ -1462,6 +1534,13 @@ function generate_graph_tag($args)
     unset($args['style']);
   }
 
+  if (isset($args['img_id']))
+  {
+      $i['img_id'] = $args['img_id'];
+  } else {
+      $i['img_id'] = generate_random_string(8);
+  }
+
   // Detect allowed screen ratio for current browser
   $ua_info = detect_browser();
   $zoom = $ua_info['screen_ratio'];
@@ -1472,12 +1551,25 @@ function generate_graph_tag($args)
     $args_x = $args;
     $args_x['zoom'] = $zoom;
     $srcset = ' srcset="'.generate_graph_url($args_x).' '.$args_x['zoom'].'x"';
+    $i['srcset'] = $srcset;
   } else{
     $srcset = '';
   }
 
-  return '<img src="'.generate_graph_url($args).'"' . $srcset . ' style="' . $style . '" alt="" />';
+  $img_url = generate_graph_url($args);
+
+  $i['img_url'] = $img_url;
+  $i['img_tag'] = '<img id="' . $i['img_id'] . '" src="' . $img_url . '"' . $srcset . ' style="' . $style . '" alt="" />';
+
+
+  if($return_array === TRUE)
+  {
+      return $i;
+  } else {
+      return $i['img_tag'];
+  }
 }
+
 
 function generate_graph_url($args)
 {
@@ -1805,20 +1897,21 @@ function generate_ap_link($args, $text = NULL, $type = NULL, $escape = FALSE)
   global $config;
 
   humanize_port($args);
-  if (!$text) { $text = rewrite_ifname($args['port_label'], !$escape); } // Negative escape flag for exclude double escape
+
+  if (!$text) { $text = escape_html($args['port_label']); }
   if ($type) { $args['graph_type'] = $type; }
   if (!isset($args['graph_type'])) { $args['graph_type'] = 'port_bits'; }
 
   if (!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
 
-  $content = "<div class=entity-title>".$args['text']." - " . rewrite_ifname($args['port_label'], !$escape) . "</div>";
-  if ($args['ifAlias']) { $content .= $args['ifAlias']."<br />"; }
+  $content = "<div class=entity-title>". $args['text'] . " - " . escape_html($args['port_label']) . "</div>";
+  if ($args['ifAlias']) { $content .= escape_html($args['ifAlias']) . "<br />"; }
   $content .= "<div style=\'width: 850px\'>";
   $graph_array['type']     = $args['graph_type'];
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
   $graph_array['width']    = "340";
-  $graph_array['to']           = $config['time']['now'];
+  $graph_array['to']       = $config['time']['now'];
   $graph_array['from']     = $config['time']['day'];
   $graph_array['id']       = $args['accesspoint_id'];
   $content .= generate_graph_tag($graph_array);
@@ -1835,7 +1928,7 @@ function generate_ap_link($args, $text = NULL, $type = NULL, $escape = FALSE)
   {
     return overlib_link($url, $text, $content, $class, $escape);
   } else {
-    return rewrite_ifname($text);
+    return $text;
   }
 }
 
@@ -1945,7 +2038,8 @@ function generate_query_permitted($type_array = array('device'), $options = arra
         }
 
         // At the end excluded entries with empty/null device_id (wrong entries)
-        $query_permitted[] = " ($column != '' AND $column IS NOT NULL)";
+        //$query_permitted[] = " ($column != '' AND $column IS NOT NULL)";
+        $query_permitted[] = " $column IS NOT NULL"; // Note: SELECT '' = 0; is TRUE
         $query_part[] = implode(" AND ", $query_permitted);
         unset($query_permitted);
         break;
@@ -2040,7 +2134,8 @@ function generate_query_permitted($type_array = array('device'), $options = arra
         }
 
         // At the end excluded entries with empty/null port_id (wrong entries)
-        $query_permitted[] = "($column != '' AND $column IS NOT NULL)";
+        //$query_permitted[] = "($column != '' AND $column IS NOT NULL)";
+        $query_permitted[] = "$column IS NOT NULL";
 
         $query_part[] = implode(" AND ", $query_permitted);
         unset($query_permitted);
@@ -2109,8 +2204,16 @@ function generate_query_permitted($type_array = array('device'), $options = arra
     }
   }
   if (count($query_part))
-  { //r($query_part);
-    $query_permitted = " AND ((".implode(") OR (", $query_part)."))";
+  {
+    //r($query_part);
+    if ($user_limited)
+    {
+      // Limited user must use OR for include multiple entities
+      $query_permitted = " AND ((".implode(") OR (", $query_part)."))";
+    } else {
+      // Unlimited used must use AND for exclude multiple hidden entities
+      $query_permitted = " AND ((".implode(") AND (", $query_part)."))";
+    }
   }
 
   $query_permitted .= ' ';

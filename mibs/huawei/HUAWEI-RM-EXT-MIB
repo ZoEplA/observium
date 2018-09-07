@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  This mib file is used for Manage the static route table configuration.
 -- Reference:  
--- Version:      V2.06
+-- Version:      V2.10
 -- 
 -- ============================================================================
 
@@ -26,7 +26,7 @@
 	
 		-- 1.3.6.1.4.1.2011.5.25.145
 		hwRmExt MODULE-IDENTITY 
-			LAST-UPDATED "201412110000Z"
+			LAST-UPDATED "201612290000Z"
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -40,6 +40,23 @@
 			DESCRIPTION 
 				"This mib file is used for Manage the static route table configuration."
                                                                   -- Revision history
+
+                                                            REVISION "201612290000Z"		-- Dec 29, 2016 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.10, Add hwVlinkTraps,hwVlinkImportExceed."
+
+                                                           REVISION "201602290000Z"		-- Feb 29, 2016 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.09, Chang hwNhmRestrain,hwNhmRestrainClear."
+
+                                                          REVISION "201602180000Z"		-- Feb 18, 2016 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.08, Add hwNhmRestrain,hwNhmRestrainClear."
+
+		                      REVISION "201511180000Z"		-- Nov  18, 2015 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.07, Change the description of hwTunnelGroupUp and hwTunnelGroupDown."
+
                                                                   REVISION "201412110000Z"		-- Dec  11, 2014 at 00:00 GMT
 			DESCRIPTION 
                                                                                          "Version: V2.06, modify hwEvpnMacLimitTrapObjects to hwEvpnMacObjects, 
@@ -1590,8 +1607,7 @@
 			OBJECTS { hwTnlDestination, hwTnlPolicy }
 			STATUS current
 			DESCRIPTION 
-				"Tunnels selected by the applications are defined by the next hop and the tunnel policy. 
-				If all the tunnels used for load balancing are Down, this trap will be sent to the user."
+				"Tunnels selected by the applications are defined by the next hop and the tunnel policy. If any one of the tunnels used for load balancing is Up, this trap will be sent to the user. "
 			::= { hwTnlGroupTraps 1 }
 
 		
@@ -1600,7 +1616,8 @@
 			OBJECTS { hwTnlDestination, hwTnlPolicy }
 			STATUS current
 			DESCRIPTION 
-				"Tunnels selected by the applications are defined by the next hop and the tunnel policy. If any one of the tunnels used for load balancing is Up, this trap will be sent to the user. "
+				"Tunnels selected by the applications are defined by the next hop and the tunnel policy. 
+				If all the tunnels used for load balancing are Down, this trap will be sent to the user."
 			::= { hwTnlGroupTraps 2 }
 
 		
@@ -2282,5 +2299,149 @@
 			DESCRIPTION 
 				"The object indicates the number of MAC addresses of the EVPN instance."
 			::= { hwEvpnMacLimitConformance 2 }	
-						
+                                 -- 1.3.6.1.4.1.2011.5.25.145.24
+		hwNhmRestrainObjects OBJECT IDENTIFIER ::= { hwRmExt 24 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.1
+		hwNhmRestrainType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				routerelay(1),
+				tunnelrelay(2),
+				ipv6routerelay(3)
+				}
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of cyclic iteration that is suppressed."
+			::= { hwNhmRestrainObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.2
+		hwNhmRestrainKey OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the key of cyclic iteration that is suppressed."
+			::= { hwNhmRestrainObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.3
+		hwNhmRestrainVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VPN to which the iteration next hop belongs."
+			::= { hwNhmRestrainObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.4
+		hwNhmRestrainNextHop OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the iteration next hop."
+			::= { hwNhmRestrainObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.25
+		hwNhmRestrainTraps OBJECT IDENTIFIER ::= { hwRmExt 25 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.25.1
+		hwNhmRestrain NOTIFICATION-TYPE
+			OBJECTS { hwNhmRestrainType, hwNhmRestrainKey, hwNhmRestrainVpnName, hwNhmRestrainNextHop }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that cyclic iteration is suppressed."
+			::= { hwNhmRestrainTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.25.2
+		hwNhmRestrainClear NOTIFICATION-TYPE
+			OBJECTS { hwNhmRestrainType, hwNhmRestrainKey }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that cyclic iteration suppression is removed."
+			::= { hwNhmRestrainTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.26
+		hwNhmRestrainTrapConformance OBJECT IDENTIFIER ::= { hwRmExt 26 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.26.1
+		hwNhmRestrainNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwNhmRestrain, hwNhmRestrainClear }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the content of the cyclic iteration that is suppressed."
+			::= { hwNhmRestrainTrapConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.26.2
+		hwNhmRestrainObjectGroup OBJECT-GROUP
+			OBJECTS { hwNhmRestrainType, hwNhmRestrainKey, hwNhmRestrainVpnName, hwNhmRestrainNextHop }
+			STATUS current
+			DESCRIPTION 
+				"This object represents iterative information suppressed the content."
+			::= { hwNhmRestrainTrapConformance 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.27
+		hwVlinkImportObjects OBJECT IDENTIFIER ::= { hwRmExt 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.27.1		
+		hwVlinkImportCurNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current number of import vlink route number."
+			::= { hwVlinkImportObjects 1 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.145.27.2		
+		hwVlinkImportMaxNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the upper limit value of import vlink route number."
+			::= { hwVlinkImportObjects 2 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.28
+		hwVlinkTraps OBJECT IDENTIFIER ::= { hwRmExt 28 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.28.1
+		hwVlinkImportExceed NOTIFICATION-TYPE
+			OBJECTS { hwVlinkImportCurNumber, hwVlinkImportMaxNumber }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the number of import vlink items exceeded the maximum number."
+			::= { hwVlinkTraps 1 }		
+
+		-- 1.3.6.1.4.1.2011.5.25.145.29
+		hwVlinkImportConformance OBJECT IDENTIFIER ::= { hwRmExt 29 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.29.1
+		hwVlinkImportNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwVlinkImportExceed }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the alarm of import vlink route."
+			::= { hwVlinkImportConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.29.2
+		hwVlinkImportObjectGroup OBJECT-GROUP
+			OBJECTS { hwVlinkImportCurNumber, hwVlinkImportMaxNumber }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of import vlink route."
+			::= { hwVlinkImportConformance 2 }
+	
 	END

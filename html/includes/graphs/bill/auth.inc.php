@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,14 +17,14 @@
 
 if (is_numeric($vars['id']) && ($auth || bill_permitted($vars['id'])))
 {
-  $bill     = dbFetchRow("SELECT * FROM `bills` WHERE bill_id = ?", array($vars['id']));
+  $bill     = dbFetchRow("SELECT * FROM `bills` WHERE `bill_id` = ?", array($vars['id']));
 
   $datefrom = date('YmdHis', $vars['from']);
   $dateto   = date('YmdHis', $vars['to']);
 
   $rates = getRates($vars['id'], $datefrom,  $dateto);
 
-  $ports = dbFetchRows("SELECT * FROM `bill_entities` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id", array($vars['id']));
+  $ports = dbFetchRows("SELECT * FROM `bill_entities` AS B, `ports` AS P, `devices` AS D WHERE B.`bill_id` = ? AND P.`port_id` = B.`entity_id` AND D.`device_id` = P.`device_id`", array($vars['id']));
 
   $auth = TRUE;
 }

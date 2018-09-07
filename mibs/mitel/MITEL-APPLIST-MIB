@@ -19,7 +19,7 @@ MITEL-APPLIST-MIB DEFINITIONS ::= BEGIN
            FROM MITEL-MIB;
 
     mitelIdApplications    MODULE-IDENTITY
-        LAST-UPDATED      "200811250000Z"
+        LAST-UPDATED      "201402111200Z"
         ORGANIZATION      "MITEL Networks Corporation"
         CONTACT-INFO      "Standards Group,
                            Postal:    MITEL Networks Corporation
@@ -28,7 +28,9 @@ MITEL-APPLIST-MIB DEFINITIONS ::= BEGIN
                            Canada  K2K 2W7
                            Tel: +1 613 592 2122
                            Fax: +1 613 592 4784
-                           E-mail: std@mitel.com"
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replaced E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
         DESCRIPTION       "The MITEL Application List MIB module.
                            Applications that provide value-added capabilities.
                            These typically will not be used for the sysObjectID

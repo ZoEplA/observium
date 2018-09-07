@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: configuration mangement mib
 -- Reference:   huawei enterprise mib
--- Version:     V2.13
+-- Version:     V2.16
 -- History:
 --                initial version 2002-12-20
 -- =================================================================
@@ -26,7 +26,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
 
     -- 1.3.6.1.4.1.2011.6.10
     hwConfig MODULE-IDENTITY 
-        LAST-UPDATED "201504271402Z"         -- April 27, 2015 at 14:02GMT
+        LAST-UPDATED"201605261925Z"         -- May 26, 2016 at 19:56GMT
         ORGANIZATION
               "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -43,6 +43,21 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
             in the system and in peripheral devices. The MIB is proper for system configuration.
             NMS can query configuration change log information and operate configuration.
             There are no constraints on this MIB."
+
+         REVISION "201605261925Z"         -- May 26, 2016 at 19:56GMT
+           DESCRIPTION 
+            "modified trap node value hwCfgRestoreErrCode ."
+
+
+         REVISION "201603251010Z"         -- March 25, 2016 at 10:10GMT
+           DESCRIPTION 
+            "modified trap node name hwConfigInconsistentResume."
+
+         REVISION "201602221010Z"         -- February 22, 2016 at 10:10GMT
+           DESCRIPTION 
+            "modified trap node hwConfigInconsistent and hwConfigConsistent."
+
+
         REVISION "201504271402Z"         -- April 27, 2015 at 14:02GMT
            DESCRIPTION 
             "add trap node hwConfigInconsistent and hwConfigConsistent."
@@ -1129,7 +1144,7 @@ HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
     hwCfgRestoreErrCode OBJECT-TYPE
             SYNTAX INTEGER
 		{
-		warnning(1),
+		warning(1),
 		fileOpenFail(2),
 		fileNotExist(3),
 		fileVerifyFail(4),
@@ -1545,19 +1560,19 @@ the function of saving configuration automatically is disable when the interval 
             "When configuration restoration fails, this trap is generated."
         ::= { hwConfigManNotifications 7 }
 
-    -- 1.3.6.1.4.1.2011.6.10.2.8
+    -- 1.3.6.1.4.1.2011.6.10.2.9
     hwConfigInconsistent  NOTIFICATION-TYPE    		
         STATUS current
         DESCRIPTION 
             "When system automatically detects that configurations of the main board and the slave board are inconsistent, this trap is generated."
-        ::= { hwConfigManNotifications 8 }
+        ::= { hwConfigManNotifications 9 }
 
-    -- 1.3.6.1.4.1.2011.6.10.2.9
-    hwConfigConsistent  NOTIFICATION-TYPE    		
+    -- 1.3.6.1.4.1.2011.6.10.2.10
+    hwConfigInconsistentResume  NOTIFICATION-TYPE    		
         STATUS current
         DESCRIPTION 
             "When system automatically detects that configurations of the main board and the slave board change from inconsistent to consistent, this trap is generated."
-        ::= { hwConfigManNotifications 9 }
+        ::= { hwConfigManNotifications 10 }
         
     -- 1.3.6.1.4.1.2011.6.10.3
     hwConfigManConformance OBJECT IDENTIFIER ::= { hwConfig 3 }
@@ -1625,7 +1640,7 @@ the function of saving configuration automatically is disable when the interval 
     
     -- 1.3.6.1.4.1.2011.6.10.3.2.3
     hwCfgManNotificationGroup NOTIFICATION-GROUP
-        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume, hwCfgB2STransferFail, hwCfgB2SOperate, hwCfgRestoreFail, hwConfigInconsistent, hwConfigConsistent}
+        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume, hwCfgB2STransferFail, hwCfgB2SOperate, hwCfgRestoreFail, hwConfigInconsistent, hwConfigInconsistentResume}
         STATUS current
         DESCRIPTION 
             "Collection of notification objects."

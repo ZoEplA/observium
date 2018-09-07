@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2015 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -81,7 +81,12 @@ foreach ($prt_supplies as $index => $entry)
   $level    = $entry['prtMarkerSuppliesLevel'];
   $capacity = $entry['prtMarkerSuppliesMaxCapacity'];
 
-  if ($level == '-1' || $capacity == '-1')
+  if (($level < 0 || $capacity < 0) && is_device_mib($device, 'RicohPrivateMIB'))
+  {
+    // Skip unknown toners on ricoh printers (use self mib)
+    continue;
+  }
+  else if ($level == '-1' || $capacity == '-1')
   {
     // Unlimited
     $level    = 100;
@@ -174,26 +179,6 @@ foreach ($prt_supplies as $index => $entry)
   }
   discover_printersupply($valid['printersupplies'], $device, $update_array);
 }
-
-// CLEANME remove after r8500 but not before CE 2016/10
-del_dev_attrib($device, 'pagecounter_oid');
-del_dev_attrib($device, 'transferroller_oid');
-del_dev_attrib($device, 'fuser_oid');
-del_dev_attrib($device, 'imagingdrum_oid');
-del_dev_attrib($device, 'imagingdrum_c_oid');
-del_dev_attrib($device, 'imagingdrum_m_oid');
-del_dev_attrib($device, 'imagingdrum_y_oid');
-del_dev_attrib($device, 'imagingdrum_k_oid');
-del_dev_attrib($device, 'wastebox_oid');
-del_dev_attrib($device, 'imagingdrum_c_cap_oid');
-del_dev_attrib($device, 'imagingdrum_m_cap_oid');
-del_dev_attrib($device, 'imagingdrum_y_cap_oid');
-del_dev_attrib($device, 'imagingdrum_k_cap_oid');
-del_dev_attrib($device, 'imagingdrum_cap_oid');
-del_dev_attrib($device, 'transferroller_cap_oid');
-del_dev_attrib($device, 'fuser_cap_oid');
-del_dev_attrib($device, 'pagecount_oid'); // Pagecounter moved to Counter Sensors
-// END CLEANME
 
 echo(PHP_EOL);
 

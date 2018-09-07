@@ -67,7 +67,9 @@ AutoNegCapabilitiesBits ::= TEXTUAL-CONVENTION
         fastFull(5),
         gigaHalf(6),
         gigaFull(7),
-        tenGigaFull(8)
+        tenGigaFull(8),
+		fiveGigaFull(9),
+		twoPointFiveGigaFull(10)
     }
 
 --
@@ -137,8 +139,9 @@ SwIfEntry ::= SEQUENCE {
         swIfSpeedDuplexNegotiationRemoteCapabilities            AutoNegCapabilitiesBits,
         swIfAdminComboMode                                      INTEGER,
         swIfOperComboMode                                       INTEGER,
-        swIfAutoNegotiationMasterSlavePreference                INTEGER
-    }
+        swIfAutoNegotiationMasterSlavePreference                INTEGER,
+		swIfPortCapabilities									AutoNegCapabilitiesBits
+	}
 
 
 swIfIndex OBJECT-TYPE
@@ -279,11 +282,13 @@ swIfType  OBJECT-TYPE
         eth10M(1),
         eth100M(2),
         eth1000M(3),
-        eth10G(4),
-        eth20G(5),
-        eth40G(6),
-        eth100G(7),
-        unknown(8)
+        eth2500M(4),
+        eth5G(5),
+        eth10G(6),
+        eth20G(7),
+        eth40G(8),
+        eth100G(9),
+        unknown(10)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -758,7 +763,13 @@ swIfAutoNegotiationMasterSlavePreference OBJECT-TYPE
 --    DEFVAL - according to MTSC parameter
     ::= {  swIfEntry 45 }
 
-
+swIfPortCapabilities OBJECT-TYPE
+    SYNTAX AutoNegCapabilitiesBits
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Returns the port capabilities."
+    ::= { swIfEntry 46 }
 
 --
 -- swIfMibVersion

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ * Observium
  *
- * @package    observium
- * @subpackage webui
- * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ *   This file is part of Observium.
+ *
+ * @package        observium
+ * @subpackage     webui
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -103,11 +103,37 @@ if ($device['serial'])
       </tr>');
 }
 
+if ($device['state']['la']['5min'])
+{
+  if ($device['state']['la']['5min'] > 10)
+  {
+    $la_class = 'text-danger';
+  }
+  else if ($device['state']['la']['5min'] > 4)
+  {
+    $la_class = 'text-warning';
+  } else {
+    $la_class = '';
+  }
+  echo('<tr>
+        <td class="entity">Load average</td>
+        <td class="'.$la_class.'">' . $device['state']['la']['1min'] . ', ' . $device['state']['la']['5min'] . ', ' . $device['state']['la']['15min'] . '</td>
+      </tr>');
+}
+
 if ($device['uptime'])
 {
   echo('<tr>
         <td class="entity">Uptime</td>
         <td>' . deviceUptime($device) . '</td>
+      </tr>');
+}
+
+if ($device['last_rebooted'])
+{
+  echo('<tr>
+        <td class="entity">Last reboot</td>
+        <td>' . format_unixtime($device['last_rebooted']) . '</td>
       </tr>');
 }
 

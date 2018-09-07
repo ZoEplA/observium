@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -25,12 +25,18 @@ if (!count($ip_data[$ip_version]))
   foreach (array('cIpAddressIfIndex', 'cIpAddressPrefix', 'cIpAddressType', 'cIpAddressOrigin') as $oid)
   {
     $oid_data = snmpwalk_cache_twopart_oid($device, $oid.'.'.$ip_version, $oid_data, 'CISCO-IETF-IP-MIB', NULL, $flags);
-    if ($oid == 'cIpAddressIfIndex' && $GLOBALS['snmp_status'] === FALSE)
+    if ($oid == 'cIpAddressIfIndex' && snmp_status() === FALSE)
     {
       break; // Stop walk, not exist table
     }
   }
   //print_vars($oid_data);
+
+  // IPv6z
+  if (isset($oid_data[$ip_version . 'z']))
+  {
+    $oid_data[$ip_version] = array_merge((array)$oid_data[$ip_version], $oid_data[$ip_version . 'z']);
+  }
 
   // Rewrite CISCO-IETF-IP-MIB array
   foreach ($oid_data[$ip_version] as $ip_snmp => $entry)

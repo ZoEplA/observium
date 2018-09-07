@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 // Include description parser (usually ifAlias) if config option set
 $custom_port_parser = FALSE;
-if (isset($config['port_descr_parser']) && $config['port_descr_parser'] != FALSE && is_file($config['install_dir'] . "/" . $config['port_descr_parser']))
+if (isset($config['port_descr_parser']) && is_file($config['install_dir'] . "/" . $config['port_descr_parser']))
 {
   include_once($config['install_dir'] . "/" . $config['port_descr_parser']);
 
@@ -52,9 +52,12 @@ foreach ($ports_db as $port)
 $ports_ignored_count_db = intval(get_entity_attrib('device', $device, 'ports_ignored_count')); // Cache last ports ignored count
 
 // Ports module options
-// FIXME - why are we defining an array here? Just use the config options.
-foreach (array('etherlike', 'adsl', 'poe', 'docsis', 'junoseatmvp', 'sros_egress_qstat', 'sros_ingress_qstat', 'jnx_cos_qstat', 'separate_walk') as $ports_module)
+$ports_modules = array(); // Ports sub-modules enabled/disabled
+foreach (array_keys($config) as $ports_module)
 {
+  if (!str_starts($ports_module, 'enable_ports_')) { continue; } // Filter only enable_ports_* config entries
+  $ports_module = str_replace('enable_ports_', '', $ports_module);
+
   $ports_modules[$ports_module] = isset($attribs['enable_ports_' . $ports_module]) ? (bool)$attribs['enable_ports_' . $ports_module] : $config['enable_ports_' . $ports_module];
 }
 // Additionally force enable separate walk feature for some device oses, but only if ports total count >10
@@ -159,17 +162,6 @@ $cisco_oids = array('locIfHardType', 'locIfInRunts', 'locIfInGiants', 'locIfInCR
 //                   'pagpPartnerDeviceName', 'pagpEthcOperationMode', 'pagpDeviceId', 'pagpGroupIfIndex');
 $pagp_oids = array(); // PAgP disabled since r7987, while not moved to new polling style
 
-// PoE OIDs
-
-$cpe_oids = array('cpeExtPsePortEnable', 'cpeExtPsePortDiscoverMode', 'cpeExtPsePortDeviceDetected', 'cpeExtPsePortIeeePd',
-  'cpeExtPsePortAdditionalStatus', 'cpeExtPsePortPwrMax', 'cpeExtPsePortPwrAllocated', 'cpeExtPsePortPwrAvailable', 'cpeExtPsePortPwrConsumption',
-  'cpeExtPsePortMaxPwrDrawn', 'cpeExtPsePortEntPhyIndex', 'cpeExtPsePortEntPhyIndex', 'cpeExtPsePortPolicingCapable', 'cpeExtPsePortPolicingEnable',
-  'cpeExtPsePortPolicingAction', 'cpeExtPsePortPwrManAlloc');
-
-$peth_oids = array('pethPsePortAdminEnable', 'pethPsePortPowerPairsControlAbility', 'pethPsePortPowerPairs', 'pethPsePortDetectionStatus',
-  'pethPsePortPowerPriority', 'pethPsePortMPSAbsentCounter', 'pethPsePortType', 'pethPsePortPowerClassifications', 'pethPsePortInvalidSignatureCounter',
-  'pethPsePortPowerDeniedCounter', 'pethPsePortOverLoadCounter', 'pethPsePortShortCounter', 'pethMainPseConsumptionPower');
-
 //$ifmib_oids = array_merge($data_oids, $stat_oids);
 
 print_cli_data_field("Caching Oids");
@@ -183,12 +175,12 @@ if (!$ports_modules['separate_walk'])
     $has_name = 'has_' . $oid;
     echo("$oid ");
     $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "IF-MIB");
-    $$has_name = $GLOBALS['snmp_status'] || $GLOBALS['snmp_error_code'] === 2; // $has_ifEntry, $has_ifXEntry
+    $$has_name = snmp_status() || snmp_error_code() === 2; // $has_ifEntry, $has_ifXEntry
     //print_vars($$has_name);
     if ($oid == 'ifEntry')
     {
       // Store error_code, 1000 == not exist table, 2 and 3 - not complete request
-      $has_ifEntry_error_code = $GLOBALS['snmp_error_code'];
+      $has_ifEntry_error_code = snmp_error_code();
     }
   }
 
@@ -203,8 +195,8 @@ if (!$ports_modules['separate_walk'])
   {
     echo("$oid ");
     $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "IF-MIB");
-    $has_ifEntry = $has_ifEntry || $GLOBALS['snmp_status'];
-    $has_ifEntry_error_code = $GLOBALS['snmp_error_code'];
+    $has_ifEntry = $has_ifEntry || snmp_status();
+    $has_ifEntry_error_code = snmp_error_code();
   }
   $has_ifXEntry = FALSE;
   foreach (array('ifAlias', 'ifName', 'ifHighSpeed') as $oid)
@@ -277,17 +269,6 @@ include("includes/include-dir-mib.inc.php");
 
 if (count($port_stats))
 {
-  // Fetch POWER-ETHERNET-MIB and CISCO-POWER-ETHERNET-EXT-MIB if enable_ports_poe is enabled.
-  // This data is used in the per-port poe include.
-  if ($ports_modules['poe'])
-  {
-    $port_stats = snmpwalk_cache_oid($device, "pethPsePortEntry", $port_stats, "POWER-ETHERNET-MIB");
-    if ($device['os_group'] == 'cisco')
-    {
-      $port_stats = snmpwalk_cache_oid($device, "cpeExtPsePortEntry", $port_stats, "CISCO-POWER-ETHERNET-EXT-MIB");
-    }
-  }
-
   // FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
   #foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
 
@@ -303,73 +284,35 @@ if (count($port_stats))
       if ($oid == 'pagpOperationMode' && $GLOBALS['snmp_status'] === FALSE) { break; }
     }
     */
-
-    // Grab data to put ports into vlans or make them trunks
-    // FIXME we probably shouldn't be doing this from the VTP MIB, right?
-    $port_stats = snmpwalk_cache_oid($device, "vmVlan", $port_stats, "CISCO-VLAN-MEMBERSHIP-MIB");
-    if ($GLOBALS['snmp_status'] === TRUE)
-    {
-      $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $port_stats, "CISCO-VTP-MIB");
-      $port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $port_stats, "CISCO-VTP-MIB");
-    }
-  } else {
-
-    // The port is not Cisco. Try to get VLAN data from Q-BRIDGE-MIB.
-
-    $port_stats = snmpwalk_cache_oid($device, "dot1qPortVlanTable", $port_stats, "Q-BRIDGE-MIB");
-
-    $vlan_ports = snmpwalk_cache_oid($device, "dot1qVlanStaticUntaggedPorts", $vlan_stats, "Q-BRIDGE-MIB");
-    if ($GLOBALS['snmp_status'] === TRUE)
-    {
-      $vlan_ifindex_map = snmpwalk_cache_oid($device, "dot1dBasePortIfIndex", $vlan_stats, "Q-BRIDGE-MIB");
-      $vlan_ifindex_min = $vlan_ifindex_map[key($vlan_ifindex_map)]['dot1dBasePortIfIndex'];
-
-      foreach ($vlan_ports as $vlan_id => $instance)
-      {
-        $parts = explode(' ',$instance['dot1qVlanStaticUntaggedPorts']);
-        $binary = '';
-        foreach ($parts as $part)
-        {
-          $binary .= zeropad(base_convert($part, 16, 2),8);
-        }
-        $length = strlen($binary);
-        for ($i = 0; $i < $length; $i++)
-        {
-          if ($binary[$i])
-          {
-            $ifindex = $i + $vlan_ifindex_min;
-            $q_bridge_untagged[$ifindex] = $vlan_id;
-          }
-        }
-      }
-    }
   }
 
   // End Building SNMP Cache Array
 
-  if (OBS_DEBUG > 1) { print_vars($port_stats); }
+  $graphs['bits'] = TRUE; // Create global device_bits graph, since we have ports.
 
-  $graphs['bits'] = TRUE;
+  if (OBS_DEBUG > 1) { print_vars($port_stats); }
 }
 
 // New interface detection
 $ports_ignored_count = 0; // Counting ignored ports
 foreach ($port_stats as $ifIndex => $port)
 {
-  if (!isset($port['ifIndex']))
-  {
-    // Some ports have only ifXEntry without ifIndex inside
-    //$port_stats[$ifIndex]['ifIndex'] = $ifIndex;
-    $port['ifIndex'] = $ifIndex;
-  }
+  // Always use ifIndex from index part (not from Oid!),
+  // Oid can have incorrect ifIndex, ie:
+  // ifIndex.0 = 1
+  $port['ifIndex'] = $ifIndex;
 
   if (is_port_valid($port, $device))
   {
     if (!is_array($ports[$port['ifIndex']]))
     {
+      $port_insert = array('device_id' => $device['device_id'],
+                           'ifIndex'  => $ifIndex,
+                           'ignore'   => isset($port['ignore']) ? $port['ignore'] : '0',
+                           'disabled' => isset($port['disabled']) ? $port['disabled'] : '0');
       $port_id = dbInsert(array('device_id' => $device['device_id'], 'ifIndex' => $ifIndex), 'ports');
       $ports[$port['ifIndex']] = dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($port_id));
-      print_message("Adding: ".$port['ifName']."(".$ifIndex.")(".$ports[$port['ifIndex']]['port_id'].")");
+      print_message("Adding: ".$port['ifDescr']."(".$ifIndex.")(".$ports[$port['ifIndex']]['port_id'].")");
     }
     else if ($ports[$ifIndex]['deleted'] == "1")
     {
@@ -421,10 +364,21 @@ foreach ($ports as $port)
     $port['state']['poll_time'] = $polled;
     $port['state']['poll_period'] = $polled_period;
 
+    $this_port['port_id'] = $port['port_id'];
+    $this_port['ifIndex'] = $port['ifIndex'];
+
     // Store original port walked OIDs for debugging later
     if ($config['debug_port']['spikes'] || $config['debug_port'][$port['port_id']])
     {
       $debug_port = $this_port; // DEBUG
+    }
+
+    // Before process_port_label()
+    // Fix ord (UTF-8) chars, ie:
+    // ifAlias.3 = Conexi<F3>n de <E1>rea local* 3
+    foreach (array('ifAlias', 'ifDescr', 'ifName') as $oid_fix)
+    {
+      if (isset($this_port[$oid_fix])) { $this_port[$oid_fix] = snmp_fix_string($this_port[$oid_fix]); }
     }
 
     //print_vars($process_port_functions);
@@ -555,23 +509,9 @@ foreach ($ports as $port)
           $this_port['ifOut'.$hc] = $this_port[$hcout];
         }
         // Additionally override (In|Out)NUcastPkts
-        if (defined('GMP_VERSION'))
-        {
-          // Better to use GMP extension, for more correct operations with big numbers
-          // $a = "18446742978492891134"; $b = "0"; $sum = gmp_add($a, $b); echo gmp_strval($sum) . "\n"; // Result: 18446742978492891134
-          // $a = "18446742978492891134"; $b = "0"; $sum = $a + $b; printf("%.0f\n", $sum);               // Result: 18446742978492891136
-          $sum                          = gmp_add($this_port['ifInBroadcastPkts'], $this_port['ifInMulticastPkts']);
-          $this_port['ifInNUcastPkts']  = gmp_strval($sum);
-          $sum                          = gmp_add($this_port['ifOutBroadcastPkts'], $this_port['ifOutMulticastPkts']);
-          $this_port['ifOutNUcastPkts'] = gmp_strval($sum);
-        } else {
-          $this_port['ifInNUcastPkts']  = $this_port['ifInBroadcastPkts']  + $this_port['ifInMulticastPkts'];
-          $this_port['ifOutNUcastPkts'] = $this_port['ifOutBroadcastPkts'] + $this_port['ifOutMulticastPkts'];
-          // Convert this values to int string, for prevent rrd update error with big Counter64 numbers,
-          // see: http://jira.observium.org/browse/OBSERVIUM-1749
-          $this_port['ifInNUcastPkts']  = sprintf("%.0f", $this_port['ifInNUcastPkts']);
-          $this_port['ifOutNUcastPkts'] = sprintf("%.0f", $this_port['ifOutNUcastPkts']);
-        }
+        // see: http://jira.observium.org/browse/OBSERVIUM-1749
+        $this_port['ifInNUcastPkts']  = int_add($this_port['ifInBroadcastPkts'],  $this_port['ifInMulticastPkts']);
+        $this_port['ifOutNUcastPkts'] = int_add($this_port['ifOutBroadcastPkts'], $this_port['ifOutMulticastPkts']);
       }
     }
 
@@ -612,45 +552,6 @@ foreach ($ports as $port)
         $this_port['ifSpeed'] = $port['ifSpeed'];
         print_debug('Port ifSpeed fixed from zero.');
       }
-    }
-
-    // Set VLAN and Trunk from Cisco
-    if (isset($this_port['vlanTrunkPortEncapsulationOperType']) && $this_port['vlanTrunkPortEncapsulationOperType'] != "notApplicable")
-    {
-      $this_port['ifTrunk'] = $this_port['vlanTrunkPortEncapsulationOperType'];
-      if (isset($this_port['vlanTrunkPortNativeVlan'])) { $this_port['ifVlan'] = $this_port['vlanTrunkPortNativeVlan']; }
-    }
-
-    if (isset($this_port['vmVlan']))
-    {
-      $this_port['ifVlan']  = $this_port['vmVlan'];
-    }
-
-    // Set VLAN and Trunk from Q-BRIDGE-MIB
-    if (!isset($this_port['ifVlan']) && $q_bridge_untagged[$this_port['ifIndex']])
-    {
-      $this_port['ifVlan'] = $q_bridge_untagged[$this_port['ifIndex']];
-    }
-    if (!isset($this_port['ifVlan']) && isset($this_port['dot1qPvid']))
-    {
-      $this_port['ifVlan'] = $this_port['dot1qPvid'];
-      if ((isset($this_port['dot1qPortIngressFiltering']) && $this_port['dot1qPortIngressFiltering'] == 'true') ||
-          (isset($this_port['dot1qPortAcceptableFrameTypes']) && $this_port['dot1qPortAcceptableFrameTypes'] == 'admitOnlyVlanTagged'))
-      {
-        $this_port['ifTrunk'] = 'dot1Q';
-      }
-    }
-
-    if ($this_port['ifVlan'])
-    {
-      //print_cli_data("VLAN", $this_port['ifVlan'], $cli_level);
-      $this_port['vlan_id'] = $this_port['ifVlan'];
-    }
-
-    if ($this_port['ifTrunk'])
-    {
-      //print_cli_data("Trunk", $this_port['ifTrunk'], $cli_level);
-      $this_port['vlan_id'] .= " ".$this_port['ifTrunk'];
     }
 
     // Update TrustSec
@@ -803,7 +704,8 @@ foreach ($ports as $port)
       $port['state'][$oid] = $this_port[$oid];
       if (isset($port[$oid]) && is_numeric($port[$oid]))
       {
-        $oid_diff = $this_port[$oid] - $port[$oid];
+        //$oid_diff = $this_port[$oid] - $port[$oid];
+        $oid_diff = int_sub($this_port[$oid], $port[$oid]); // Use accurate substract
         $oid_rate  = $oid_diff / $polled_period;
         if ($oid_rate < 0)
         {
@@ -814,19 +716,18 @@ foreach ($ports as $port)
         $port['stats'][$oid.'_rate'] = $oid_rate;
 
 
-          // Perhaps need to protect these from false polls.
-          $port['alert_array'][$oid.'_rate']  = $oid_rate;
-          $port['alert_array'][$oid.'_delta'] = $oid_diff;
+        // Perhaps need to protect these from false polls.
+        $port['alert_array'][$oid.'_rate']  = $oid_rate;
+        $port['alert_array'][$oid.'_delta'] = $oid_diff;
 
-          $port['stats'][$oid.'_diff'] = $oid_diff;
-          $port['state'][$oid.'_rate'] = $oid_rate;
+        $port['stats'][$oid.'_diff'] = $oid_diff;
+        $port['state'][$oid.'_rate'] = $oid_rate;
 
-          // Record delta in database only for In/Out errors.
-          if($oid == "ifInErrors" || $oid == "ifOutErrors")
-          {
-            $port['state'][$oid.'_delta'] = $oid_diff;
-          }
-
+        // Record delta in database only for In/Out errors.
+        if($oid == "ifInErrors" || $oid == "ifOutErrors")
+        {
+          $port['state'][$oid.'_delta'] = $oid_diff;
+        }
 
         print_debug("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs");
       }
@@ -996,9 +897,6 @@ foreach ($ports as $port)
     }
     // End Update PAgP
     */
-
-    // Do PoE MIBs
-    if ($ports_modules['poe']) { include("port-poe.inc.php"); }
 
 #    if (OBS_DEBUG > 1) { print_vars($port['alert_array']); echo(PHP_EOL); print_vars($this_port);}
 

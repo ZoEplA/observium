@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -190,6 +190,7 @@ unset($form, $panel_form, $form_items);
   if ($vars['graph'] == 'updates') { $navbar['options_right']['updates']['class'] .= ' active'; }
   $navbar['options_right']['updates']['url'] = generate_url($vars, array('view' => 'graphs', 'graph' => 'updates'));
 
+  /*
   $bgp_graphs = array();
   foreach ($cache['graphs'] as $entry)
   {
@@ -202,8 +203,18 @@ unset($form, $panel_form, $form_items);
       $bgp_graphs[$matches['safi']]['types'][$matches['subtype'].'_'.$matches['afi'].$matches['safi']] = nicecase($matches['afi']) . ' ' . nicecase($matches['safi']) . ' ' . nicecase($matches['subtype']);
     }
   }
+  */
 
-  $bgp_graphs['mac'] = array('text' => 'MACaccounting');
+  $bgp_graphs = array('unicast'   => array('text' => 'Unicast'),
+                      'multicast' => array('text' => 'Multicast'),
+                      'mac'       => array('text' => 'MAC Accounting'));
+  $bgp_graphs['unicast']['types'] = array('prefixes_ipv4unicast' => 'IPv4 Ucast Prefixes',
+                                          'prefixes_ipv6unicast' => 'IPv6 Ucast Prefixes',
+                                          'prefixes_ipv4vpn'     => 'VPNv4 Prefixes');
+  $bgp_graphs['multicast']['types'] = array('prefixes_ipv4multicast' => 'IPv4 Mcast Prefixes',
+                                            'prefixes_ipv6multicast' => 'IPv6 Mcast Prefixes');
+
+  $bgp_graphs['mac'] = array('text' => 'MAC Accounting');
   $bgp_graphs['mac']['types'] = array('macaccounting_bits' => 'MAC Bits',
                                       'macaccounting_pkts' => 'MAC Pkts');
   foreach ($bgp_graphs as $bgp_graph => $bgp_options)
@@ -230,6 +241,6 @@ unset($form, $panel_form, $form_items);
   $vars['pagination'] = TRUE;
 
   //r($cache['bgp']);
-  print_bgp_table($vars);
+  print_bgp_peer_table($vars);
 
 // EOF

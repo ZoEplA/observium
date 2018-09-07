@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,7 +16,7 @@
 //AIRESPACE-SWITCHING-MIB::agentInventoryProductName.0 = STRING: Cisco Controller
 //AIRESPACE-SWITCHING-MIB::agentInventoryProductVersion.0 = STRING: 7.6.100.0
 
-$data = snmp_get_multi($device, 'agentInventoryMachineModel.0 agentInventoryProductVersion.0', '-OQUs', 'AIRESPACE-SWITCHING-MIB');
+$data = snmp_get_multi_oid($device, 'agentInventoryMachineModel.0 agentInventoryProductVersion.0', array(), 'AIRESPACE-SWITCHING-MIB');
 
 if (is_array($data[0]))
 {

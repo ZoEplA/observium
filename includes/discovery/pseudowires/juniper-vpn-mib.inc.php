@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -34,6 +34,7 @@ if ($GLOBALS['snmp_status'] === FALSE)
     echo('PWS_WALK: '.count($pws)."\n"); print_vars($pws);
   }
 
+  $peer_where = generate_query_values($device['device_id'], 'device_id', '!='); // Additional filter for exclude self IPs
   foreach ($pws as $pw_type => $entry)
   {
     foreach ($entry as $pw_name => $entry2)
@@ -54,15 +55,25 @@ if ($GLOBALS['snmp_status'] === FALSE)
         {
           $peer_addr_type = 'ipv' . $peer_addr_version; // Override address type, because snmp sometime return incorrect
           $peer_rdns = gethostbyaddr6($peer_addr); // PTR name
-          if ($peer_addr_type == 'ipv6')
-          {
-            $peer_addr = Net_IPv6::uncompress($peer_addr, TRUE);
-          }
 
-          // FIXME. Retarded way
-          $remote_device = dbFetchCell('SELECT `device_id` FROM `'.$peer_addr_type.'_addresses`
-                                        LEFT JOIN `ports` USING(`port_id`)
-                                        WHERE `'.$peer_addr_type.'_address` = ? LIMIT 1;', array($peer_addr));
+          // Fetch all devices with peer IP and filter by UP
+          if ($ids = get_entity_ids_ip_by_network('device', $peer_addr, $peer_where))
+          {
+            $remote_device = $ids[0];
+            if (count($ids) > 1)
+            {
+              // If multiple same IPs found, get first NOT disabled or down
+              foreach ($ids as $id)
+              {
+                $tmp_device = device_by_id_cache($id);
+                if (!$tmp_device['disabled'] && $tmp_device['status'])
+                {
+                  $remote_device = $id;
+                  break;
+                }
+              }
+            }
+          }
         } else {
           $peer_rdns = '';
           $peer_addr = ''; // Unset peer address

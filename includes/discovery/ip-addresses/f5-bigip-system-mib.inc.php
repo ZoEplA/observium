@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -84,8 +84,7 @@
       $ip_data[$ip_version][$ifIndex][$ip_address] = array('ifIndex' => $ifIndex,
                                                             'ip'      => $ip_address,
                                                             'mask'    => $ip_mask,
-                                                            'prefix'  => $prefix,
-                                                            'type'    => 'unicast');
+                                                            'prefix'  => $prefix);
     }
     unset($ifName, $ifIndex, $ip_version, $ip_address, $ip_mask, $prefix);
   }

@@ -7,15 +7,14 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-$data = snmp_get_multi($device, 'extremeImageBooted.0 extremePrimarySoftwareRev.0 extremeSecondarySoftwareRev.0 sysObjectID.0 extremeImageSshCapability.cur extremeImageUAACapability.cur', '-OUQs', 'EXTREME-SYSTEM-MIB');
+$data = snmp_get_multi_oid($device, 'extremeImageBooted.0 extremePrimarySoftwareRev.0 extremeSecondarySoftwareRev.0 extremeImageSshCapability.cur extremeImageUAACapability.cur', array(), 'EXTREME-SYSTEM-MIB');
 
 // hardware platform
-$hardware = $data[0]['sysObjectID'];
-$hardware = rewrite_extreme_hardware($hardware);
+$hardware = rewrite_extreme_hardware(snmp_cache_sysObjectID($device));
 
 // determine running firmware version
 switch ($data[0]['extremeImageBooted'])

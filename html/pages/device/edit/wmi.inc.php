@@ -7,9 +7,10 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
+
 
 if ($vars['editing'])
 {
@@ -17,20 +18,12 @@ if ($vars['editing'])
   {
     print_error_permission('You have insufficient permissions to edit settings.');
   } else {
-    $wmi_override = $vars['wmi_override'];
-    if ($wmi_override)
-    {
-      $wmi_hostname = $vars['wmi_hostname'];
-      $wmi_domain   = $vars['wmi_domain'];
-      $wmi_username = $vars['wmi_username'];
-      $wmi_password = $vars['wmi_password'];
-    }
 
-    if ($wmi_override)         { set_dev_attrib($device, 'wmi_override', $wmi_override); } else { del_dev_attrib($device, 'wmi_override'); }
-    if (!empty($wmi_hostname)) { set_dev_attrib($device, 'wmi_hostname', $wmi_hostname); } else { del_dev_attrib($device, 'wmi_hostname'); }
-    if (!empty($wmi_domain))   { set_dev_attrib($device, 'wmi_domain', $wmi_domain); } else { del_dev_attrib($device, 'wmi_domain'); }
-    if (!empty($wmi_username)) { set_dev_attrib($device, 'wmi_username', $wmi_username); } else { del_dev_attrib($device, 'wmi_username'); }
-    if (!empty($wmi_password)) { set_dev_attrib($device, 'wmi_password', $wmi_password); } else { del_dev_attrib($device, 'wmi_password'); }
+    if ($vars['wmi_override'])         { set_dev_attrib($device, 'wmi_override', $vars['wmi_override']); } else { del_dev_attrib($device, 'wmi_override'); }
+    if (!empty($vars['wmi_hostname'])) { set_dev_attrib($device, 'wmi_hostname', $vars['wmi_hostname']); } else { del_dev_attrib($device, 'wmi_hostname'); }
+    if (!empty($vars['wmi_domain']))   { set_dev_attrib($device, 'wmi_domain',   $vars['wmi_domain']); } else { del_dev_attrib($device, 'wmi_domain'); }
+    if (!empty($vars['wmi_username'])) { set_dev_attrib($device, 'wmi_username', $vars['wmi_username']); } else { del_dev_attrib($device, 'wmi_username'); }
+    if (!empty($vars['wmi_password'])) { set_dev_attrib($device, 'wmi_password', $vars['wmi_password']); } else { del_dev_attrib($device, 'wmi_password'); }
 
     $update_message = "Device WMI data updated.";
     $updated = 1;

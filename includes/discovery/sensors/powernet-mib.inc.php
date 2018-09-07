@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -424,7 +424,7 @@ foreach ($cache['apc'] as $index => $entry)
 // PowerNet-MIB::upsAdvTestDiagnosticsResults.0 = INTEGER: ok(1)
 // PowerNet-MIB::upsAdvTestLastDiagnosticsDate.0 = STRING: "05/27/2015"
 
-$cache['apc'] = snmp_get_multi($device, 'upsAdvTestDiagnosticSchedule.0 upsAdvTestDiagnosticsResults.0 upsAdvTestLastDiagnosticsDate.0', '-OQUs', 'PowerNet-MIB');
+$cache['apc'] = snmp_get_multi_oid($device, 'upsAdvTestDiagnosticSchedule.0 upsAdvTestDiagnosticsResults.0 upsAdvTestLastDiagnosticsDate.0', array(), 'PowerNet-MIB');
 
 if (isset($cache['apc'][0]) && $cache['apc'][0]['upsAdvTestDiagnosticSchedule'] != 'never')
 {
@@ -452,8 +452,8 @@ if ($value !== '')
 
 #### ATS #############################################################################################
 
-$inputs = snmp_get($device, "atsNumInputs.0", "-Ovq", "PowerNet-MIB");
-$outputs = snmp_get($device, "atsNumOutputs.0", "-Ovq", "PowerNet-MIB");
+$inputs  = snmp_get_oid($device, "atsNumInputs.0",  "PowerNet-MIB");
+$outputs = snmp_get_oid($device, "atsNumOutputs.0", "PowerNet-MIB");
 
 // Check if we have values for these, if not, try other code paths below.
 if ($inputs || $outputs)
@@ -461,18 +461,17 @@ if ($inputs || $outputs)
   echo(' ');
   $cache['apc'] = array();
 
-  foreach (array("atsInputTable", "atsOutputTable", "atsInputPhaseTable", "atsOutputPhaseTable") as $table)
+  foreach (array("atsInputPhaseTable", "atsOutputPhaseTable") as $table)
   {
     echo("$table ");
-    // FIXME, not sure, that here required numeric index, seems as the remains of old snmp code with caching (added in r4685)
     $cache['apc'] = snmpwalk_cache_threepart_oid($device, $table, $cache['apc'], "PowerNet-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
   }
   foreach (array("atsInputTable", "atsOutputTable") as $table)
   {
     echo("$table ");
-    // FIXME, not sure, that here required numeric index, seems as the remains of old snmp code with caching (added in r4685)
     $cache['apc'] = snmpwalk_cache_multi_oid($device, $table, $cache['apc'], "PowerNet-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
   }
+  print_debug_vars($cache['apc']);
 
   // Not tested with threephase, but I don't see any on the APC product list anyway, so...
 
@@ -485,33 +484,53 @@ if ($inputs || $outputs)
   {
     $descr = $entry['atsInputName'];
 
-    $oid   = ".1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.$index.1.1";
-    $value = $entry[1][1]['atsInputVoltage'];
-
-    if ($value != '' && $value != -1)
+    // Input
+    for ($phase = 1; $phase <= $entry['atsNumInputPhases']; $phase++)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "atsInputVoltage.$index.1.1", 'apc', $descr, 1, $value);
+      if ($entry['atsNumInputPhases'] > 1)
+      {
+        $descr .= " (Phase $phase)";
+      }
+
+      $entry_phase = $entry[$phase][1];
+      $dot_index = ".$index.$phase.1";
+
+      // Input Voltage
+      $oid_name  = 'atsInputVoltage';
+      $oid_num   = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3' . $dot_index;
+      $value     = $entry_phase[$oid_name];
+
+      if ($value != -1)
+      {
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
+      }
+
+      // Input Current
+      $oid_name  = 'atsInputCurrent';
+      $oid_num   = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.6' . $dot_index;
+      $value     = $entry_phase[$oid_name];
+
+      if ($value != -1)
+      {
+        discover_sensor($valid['sensor'], 'current', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
+      }
+
+      // Input Power
+      $oid_name  = 'atsInputPower';
+      $oid_num   = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.9' . $dot_index;
+      $value     = $entry_phase[$oid_name];
+
+      if ($value != -1)
+      {
+        $limits = array('limit_high'      => snmp_get_oid($device, "atsConfigPhaseOverLoadThreshold.$phase",     "PowerNet-MIB"),
+                        'limit_low'       => snmp_get_oid($device, "atsConfigPhaseLowLoadThreshold.$phase",      "PowerNet-MIB"),
+                        'limit_high_warn' => snmp_get_oid($device, "atsConfigPhaseNearOverLoadThreshold.$phase", "PowerNet-MIB"));
+
+        discover_sensor($valid['sensor'], 'power', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
+      }
     }
 
-    $oid   = ".1.3.6.1.4.1.318.1.1.8.5.3.3.1.9.$index.1.1";
-    $value = $entry[1][1]['atsInputPower'];
-
-    if ($value != '' && $value != -1)
-    {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "atsInputPower.$index.1.1", 'apc', $descr, 1, $value);
-    }
-
-    $oid   = ".1.3.6.1.4.1.318.1.1.8.5.3.3.1.6.$index.1.1";
-    $value = $entry[1][1]['atsInputCurrent'];
-
-    if ($value != '' && $value != -1)
-    {
-      $limits = array('limit_high'      => snmp_get($device, "atsConfigPhaseOverLoadThreshold.1",     "-Oqv", "PowerNet-MIB"),
-                      'limit_low'       => snmp_get($device, "atsConfigPhaseLowLoadThreshold.1",      "-Oqv", "PowerNet-MIB"),
-                      'limit_high_warn' => snmp_get($device, "atsConfigPhaseNearOverLoadThreshold.1", "-Oqv", "PowerNet-MIB"));
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "atsInputCurrent.$index.1.1", 'apc', $descr, $scale, $value, $limits);
-    }
-
+    // Input Frequency
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.3.2.1.4.$index";
     $value = $entry['atsInputFrequency'];
 
@@ -521,31 +540,34 @@ if ($inputs || $outputs)
     }
 
     $descr = "Output"; // No check for multiple output feeds, currently - I don't think this exists.
+    $phase = 1;
+    $dot_index = ".$index.$phase.1";
+    $entry_phase = $entry[$phase][1];
 
-    $oid   = ".1.3.6.1.4.1.318.1.1.8.5.4.3.1.3.$index.1.1";
-    $value = $entry[1][1]['atsOutputVoltage'];
+    $oid   = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3'.$dot_index;
+    $value = $entry_phase['atsOutputVoltage'];
 
-    if ($value != '' && $value != -1)
+    if ($value != -1)
     {
       discover_sensor($valid['sensor'], 'voltage', $device, $oid, "atsOutputVoltage.$index.1.1", 'apc', $descr, 1, $value);
     }
 
-    $oid   = ".1.3.6.1.4.1.318.1.1.8.5.4.3.1.13.$index.1.1";
-    $value = $entry[1][1]['atsOutputPower'];
+    $oid   = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.13'.$dot_index;
+    $value = $entry_phase['atsOutputPower'];
 
-    if ($value != '' && $value != -1)
+    if ($value != -1)
     {
       discover_sensor($valid['sensor'], 'power', $device, $oid, "atsOutputPower.$index.1.1", 'apc', $descr, 1, $value);
     }
 
-    $oid   = ".1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.$index.1.1";
-    $value = $entry[1][1]['atsOutputCurrent'];
+    $oid   = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.4'.$dot_index;
+    $value = $entry_phase['atsOutputCurrent'];
 
-    if ($value != '' && $value != -1)
+    if ($value != -1)
     {
-      $limits = array('limit_high'      => snmp_get($device, "atsConfigPhaseOverLoadThreshold.1",     "-Oqv", "PowerNet-MIB"),
-                      'limit_low'       => snmp_get($device, "atsConfigPhaseLowLoadThreshold.1",      "-Oqv", "PowerNet-MIB"),
-                      'limit_high_warn' => snmp_get($device, "atsConfigPhaseNearOverLoadThreshold.1", "-Oqv", "PowerNet-MIB"));
+      $limits = array('limit_high'      => snmp_get_oid($device, "atsConfigPhaseOverLoadThreshold.1",     "PowerNet-MIB"),
+                      'limit_low'       => snmp_get_oid($device, "atsConfigPhaseLowLoadThreshold.1",      "PowerNet-MIB"),
+                      'limit_high_warn' => snmp_get_oid($device, "atsConfigPhaseNearOverLoadThreshold.1", "PowerNet-MIB"));
 
       discover_sensor($valid['sensor'], 'current', $device, $oid, "atsOutputCurrent.$index.1.1", 'apc', $descr, $scale, $value, $limits);
     }
@@ -553,7 +575,7 @@ if ($inputs || $outputs)
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.4.2.1.4.$index";
     $value = $entry['atsOutputFrequency'];
 
-    if ($value != '' && $value != -1)
+    if ($value != -1)
     {
       discover_sensor($valid['sensor'], 'frequency', $device, $oid, "atsOutputFrequency.$index", 'apc', $descr, 1, $value);
     }
@@ -610,8 +632,8 @@ PowerNet-MIB::atsStatusMinus12VPowerSupply.0 = INTEGER: atsPowerSupplyOK(2)
 
 #### PDU #############################################################################################
 
-$outlets = snmp_get($device, "rPDUIdentDeviceNumOutlets.0", "-Ovq", "PowerNet-MIB");
-$banks   = snmp_get($device, "rPDULoadDevNumBanks.0", "-Ovq", "PowerNet-MIB");
+$outlets = snmp_get_oid($device, "rPDUIdentDeviceNumOutlets.0", "PowerNet-MIB");
+$banks   = snmp_get_oid($device, "rPDULoadDevNumBanks.0", "PowerNet-MIB");
 $loadDev = snmpwalk_cache_multi_oid($device, "rPDULoadDevice", array(), "PowerNet-MIB");
 
 // Check if we have values for these, if not, try other code paths below.
@@ -667,46 +689,47 @@ if ($outlets)
       discover_status($device, $oid, "rPDU2DeviceStatusPowerSupplyAlarm.$index", 'powernet-rpdu2supplyalarm-state', $descr, $value, array('entPhysicalClass' => 'power'));
 
       // PowerNet-MIB::rPDU2DeviceStatusPower.1 = INTEGER: 185
-      /* FIXME Disabled as currently duplicated by rPDU tree. We should decide if a device does rPDU2, and do only rPDU2 calls.
       $descr = $unit . "Output";
       $oid   = ".1.3.6.1.4.1.318.1.1.26.4.3.1.5.$index";
       $value = $entry['rPDU2DeviceStatusPower'];
 
-      if ($value != 0)
+      if ($value != 0 && $value != -1 && $loadDev[0]['rPDULoadDevNumPhases'] > 1)
       {
+        // Device Output if more than 1 Phase
         discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDU2DeviceStatusPower.$index", 'apc', $descr, 10, $value, array('entPhysicalClass' => 'power'));
-      } */
+      }
 
       // PowerNet-MIB::rPDU2DeviceStatusApparentPower.1 = INTEGER: 198
       $descr = $unit . "Output";
       $oid   = ".1.3.6.1.4.1.318.1.1.26.4.3.1.16.$index";
       $value = $entry['rPDU2DeviceStatusApparentPower'];
 
-      if ($value != 0)
+      if ($value != 0 && $value != -1)
       {
         discover_sensor($valid['sensor'], 'apower', $device, $oid, "rPDU2DeviceStatusApparentPower.$index", 'apc', $descr, 10, $value, array('entPhysicalClass' => 'power'));
       }
 
-      // PowerNet-MIB::rPDU2DeviceStatusPowerFactor.1 = INTEGER: 93 -- Not used right now.
-      // PowerNet-MIB::rPDU2DeviceStatusEnergy.1 = INTEGER: 170982 -- kWh counter, not supported right now
+      // rPDU2DeviceStatusPowerFactor.1 = INTEGER: 93 -- Not used right now.
+      // rPDU2DeviceStatusEnergy.1 = INTEGER: 170982 -- kWh counter, not supported right now
+      // rPDU2DeviceStatusEnergyStartTime.1 = "05/30/2011 00:12:17"
 
-      // PowerNet-MIB::rPDU2PhaseConfigIndex.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseConfigModule.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseConfigNumber.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseConfigOverloadRestriction.1 = INTEGER: notSupported(4)
-      // PowerNet-MIB::rPDU2PhaseConfigLowLoadCurrentThreshold.1 = INTEGER: 0
-      // PowerNet-MIB::rPDU2PhaseConfigNearOverloadCurrentThreshold.1 = INTEGER: 26
-      // PowerNet-MIB::rPDU2PhaseConfigOverloadCurrentThreshold.1 = INTEGER: 32
-      // PowerNet-MIB::rPDU2PhasePropertiesIndex.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhasePropertiesModule.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhasePropertiesNumber.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseStatusIndex.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseStatusModule.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseStatusNumber.1 = INTEGER: 1
-      // PowerNet-MIB::rPDU2PhaseStatusLoadState.1 = INTEGER: normal(2)
-      // PowerNet-MIB::rPDU2PhaseStatusCurrent.1 = INTEGER: 28
-      // PowerNet-MIB::rPDU2PhaseStatusVoltage.1 = INTEGER: 228
-      // PowerNet-MIB::rPDU2PhaseStatusPower.1 = INTEGER: 57
+      // rPDU2PhaseConfigIndex.1 = INTEGER: 1
+      // rPDU2PhaseConfigModule.1 = INTEGER: 1
+      // rPDU2PhaseConfigNumber.1 = INTEGER: 1
+      // rPDU2PhaseConfigOverloadRestriction.1 = INTEGER: notSupported(4)
+      // rPDU2PhaseConfigLowLoadCurrentThreshold.1 = INTEGER: 0
+      // rPDU2PhaseConfigNearOverloadCurrentThreshold.1 = INTEGER: 26
+      // rPDU2PhaseConfigOverloadCurrentThreshold.1 = INTEGER: 32
+      // rPDU2PhasePropertiesIndex.1 = INTEGER: 1
+      // rPDU2PhasePropertiesModule.1 = INTEGER: 1
+      // rPDU2PhasePropertiesNumber.1 = INTEGER: 1
+      // rPDU2PhaseStatusIndex.1 = INTEGER: 1
+      // rPDU2PhaseStatusModule.1 = INTEGER: 1
+      // rPDU2PhaseStatusNumber.1 = INTEGER: 1
+      // rPDU2PhaseStatusLoadState.1 = INTEGER: normal(2)
+      // rPDU2PhaseStatusCurrent.1 = INTEGER: 28
+      // rPDU2PhaseStatusVoltage.1 = INTEGER: 228
+      // rPDU2PhaseStatusPower.1 = INTEGER: 57
       $phasetable = array();
       foreach (array("rPDU2PhaseStatusTable", "rPDU2PhaseConfigTable") as $table)
       {
@@ -717,41 +740,12 @@ if ($outlets)
 
       if (count($phasetable))
       {
-        //rPDU2BankStatusIndex.1 = 1
-        //rPDU2BankStatusIndex.2 = 2
-        //rPDU2BankStatusModule.1 = 1
-        //rPDU2BankStatusModule.2 = 1
-        //rPDU2BankStatusNumber.1 = 1
-        //rPDU2BankStatusNumber.2 = 2
-        //rPDU2BankStatusLoadState.1 = normal
-        //rPDU2BankStatusLoadState.2 = normal
-        //rPDU2BankStatusCurrent.1 = 7
-        //rPDU2BankStatusCurrent.2 = 27
-        if ($banks > 1)
-        {
-          echo("rPDU2BankStatusTable ");
-          $cache['banks'] = snmpwalk_cache_multi_oid($device, 'rPDU2BankStatusTable', array(), "PowerNet-MIB");
-
-          foreach ($cache['banks'] as $index => $entry)
-          {
-            $oid      = ".1.3.6.1.4.1.318.1.1.26.8.3.1.5.$index";
-            $value    = $entry['rPDU2BankStatusCurrent'];
-            $bank     = $entry['rPDU2BankStatusNumber'];
-            $descr    = "Bank $bank";
-
-            if ($value != '' && $value != -1)
-            {
-              discover_sensor($valid['sensor'], 'current', $device, $oid, "rPDU2BankStatusCurrent.$index", 'apc', $descr, $scale, $value);
-            }
-          }
-        }
 
         foreach ($phasetable as $index => $entry)
         {
           $oid     = ".1.3.6.1.4.1.318.1.1.26.6.3.1.5.$index";
           $value   = $entry['rPDU2PhaseStatusCurrent'];
           $limits  = array('limit_high'      => $entry['rPDU2PhaseConfigOverloadCurrentThreshold'],
-                           'limit_low'       => $entry['rPDU2PhaseConfigLowLoadCurrentThreshold'],
                            'limit_high_warn' => $entry['rPDU2PhaseConfigNearOverloadCurrentThreshold']);
           $phase   = $entry['rPDU2PhaseStatusNumber'];
           $unit    = $entry['rPDU2PhaseStatusModule'];
@@ -798,17 +792,73 @@ if ($outlets)
             discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDU2PhaseStatusPower.$index", 'apc', $descr, 10, $value);
           }
 
-          // PowerNet-MIB::rPDU2PhaseStatusLoadState.1 = INTEGER: normal(2)
+          $oid       = ".1.3.6.1.4.1.318.1.1.26.4.3.1.17.$index";
+          $value     = $entry['rPDU2DeviceStatusPowerFactor'];
+
+          if ($value != -1)
+          {
+            discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, "rPDU2DeviceStatusPowerFactor.$index", 'apc', $descr, 1, $value);
+          }
+
+          // rPDU2PhaseStatusLoadState.1 = INTEGER: normal(2)
+          $oid      = ".1.3.6.1.4.1.318.1.1.26.6.3.1.4.$index";
+          $value    = $entry['rPDU2PhaseStatusLoadState'];
+          discover_status($device, $oid, "rPDU2PhaseStatusLoadState.$index", 'powernet-rpdu2statusload-state', "$descr Load", $value);
         }
       }
+
+      if ($banks > 1)
+      {
+        echo("rPDU2BankStatusTable ");
+        //rPDU2BankStatusIndex.1 = 1
+        //rPDU2BankStatusIndex.2 = 2
+        //rPDU2BankStatusModule.1 = 1
+        //rPDU2BankStatusModule.2 = 1
+        //rPDU2BankStatusNumber.1 = 1
+        //rPDU2BankStatusNumber.2 = 2
+        //rPDU2BankStatusLoadState.1 = normal
+        //rPDU2BankStatusLoadState.2 = normal
+        //rPDU2BankStatusCurrent.1 = 7
+        //rPDU2BankStatusCurrent.2 = 27
+        //rPDU2BankConfigLowLoadCurrentThreshold.1 = INTEGER: 0
+        //rPDU2BankConfigLowLoadCurrentThreshold.2 = INTEGER: 0
+        //rPDU2BankConfigNearOverloadCurrentThreshold.1 = INTEGER: 13
+        //rPDU2BankConfigNearOverloadCurrentThreshold.2 = INTEGER: 13
+        //rPDU2BankConfigOverloadCurrentThreshold.1 = INTEGER: 16
+        //rPDU2BankConfigOverloadCurrentThreshold.2 = INTEGER: 16
+        $bank_oids = snmpwalk_cache_multi_oid($device, 'rPDU2BankStatusTable', array(), "PowerNet-MIB");
+        $bank_oids = snmpwalk_cache_multi_oid($device, 'rPDU2BankConfigTable', $bank_oids, "PowerNet-MIB");
+
+        foreach ($bank_oids as $index => $entry)
+        {
+          $bank     = $entry['rPDU2BankStatusNumber'];
+          $descr    = "Bank $bank";
+
+          $oid      = ".1.3.6.1.4.1.318.1.1.26.8.3.1.5.$index";
+          $value    = $entry['rPDU2BankStatusCurrent'];
+          if ($value != '' && $value != -1)
+          {
+            $options = array('limit_high'      => $entry['rPDU2BankConfigOverloadCurrentThreshold'],
+                             'limit_high_warn' => $entry['rPDU2BankConfigNearOverloadCurrentThreshold']);
+            discover_sensor($valid['sensor'], 'current', $device, $oid, "rPDU2BankStatusCurrent.$index", 'apc', $descr, $scale, $value, $options);
+          }
+
+          $oid      = ".1.3.6.1.4.1.318.1.1.26.8.3.1.4.$index";
+          $value    = $entry['rPDU2BankStatusLoadState'];
+          discover_status($device, $oid, "rPDU2BankStatusLoadState.$index", 'powernet-rpdu2statusload-state', "$descr Load", $value);
+        }
+      }
+
     }
+
   } else {
-    // Fall back to rPDU tree only if no rPDU2 data is available
+
+    /* Fall back to rPDU tree only if no rPDU2 data is available */
 
     // PowerNet-MIB::rPDUPowerSupply1Status.0 = INTEGER: powerSupplyOneOk(1)
     // PowerNet-MIB::rPDUPowerSupply2Status.0 = INTEGER: powerSupplyTwoNotPresent(3)
     // PowerNet-MIB::rPDUPowerSupplyAlarm.0 = INTEGER: allAvailablePowerSuppliesOK(1) -- FIXME not used right now
-    $cache['apc'] = snmp_get_multi($device, 'rPDUPowerSupply1Status.0 rPDUPowerSupply2Status.0', '-OQUs', 'PowerNet-MIB');
+    $cache['apc'] = snmp_get_multi_oid($device, 'rPDUPowerSupply1Status.0 rPDUPowerSupply2Status.0', array(), 'PowerNet-MIB');
     if (isset($cache['apc'][0]))
     {
       // FIXME ugly code. Just hardcode as above instead of weird index and unit calculations.
@@ -851,7 +901,6 @@ if ($outlets)
       $oid     = ".1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.$index";
       $value   = $entry['rPDULoadStatusLoad'];
       $limits  = array('limit_high'      => $entry['rPDULoadPhaseConfigOverloadThreshold'],
-                       'limit_low'       => $entry['rPDULoadPhaseConfigLowLoadThreshold'],
                        'limit_high_warn' => $entry['rPDULoadPhaseConfigNearOverloadThreshold']);
       $bank    = $entry['rPDULoadStatusBankNumber'];
       $phase   = $entry['rPDUStatusPhaseNumber'];
@@ -879,49 +928,81 @@ if ($outlets)
       // [rPDULoadStatusLoadState] => phaseLoadNormal
       // [rPDULoadPhaseConfigAlarm] => noLoadAlarm
     }
+
+    if ($banks > 1)
+    {
+      echo("rPDUStatusBankState ");
+      //rPDUStatusBankIndex.1 = INTEGER: 1
+      //rPDUStatusBankIndex.2 = INTEGER: 2
+      //rPDUStatusBankNumber.1 = INTEGER: 1
+      //rPDUStatusBankNumber.2 = INTEGER: 2
+      //rPDUStatusBankState.1 = INTEGER: bankLoadNormal(1)
+      //rPDUStatusBankState.2 = INTEGER: bankLoadNormal(1)
+      $bank_oids = snmpwalk_cache_multi_oid($device, 'rPDUStatusBankState', array(), "PowerNet-MIB");
+
+      foreach ($bank_oids as $index => $entry)
+      {
+        $bank     = $index;
+        $descr    = "Bank $bank";
+
+        $oid      = ".1.3.6.1.4.1.318.1.1.12.5.2.1.3.$index";
+        $value    = $entry['rPDUStatusBankState'];
+        discover_status($device, $oid, "rPDUStatusBankState.$index", 'powernet-rpdustatusload-state', "$descr Load", $value);
+      }
+    }
   }
 
   // PowerNet-MIB::rPDUIdentDeviceLinetoLineVoltage.0 = INTEGER: 400
   // PowerNet-MIB::rPDUIdentDevicePowerWatts.0 = INTEGER: 807
-  // PowerNet-MIB::rPDUIdentDevicePowerFactor.0 = INTEGER: 1000 - currently not used (1000=1) - FUTUREME
+  // PowerNet-MIB::rPDUIdentDevicePowerFactor.0 = INTEGER: 1000
   // PowerNet-MIB::rPDUIdentDevicePowerVA.0 = INTEGER: 807 - no VA sensor type yet
-  $cache['apc'] = array();
-  foreach (array("rPDUIdent", "rPDU2Ident") as $table)
+
+  //PowerNet-MIB::rPDUIdentDeviceLinetoLineVoltage.0 = INTEGER: -1
+  //PowerNet-MIB::rPDUIdentDevicePowerWatts.0 = INTEGER: 290
+  //PowerNet-MIB::rPDUIdentDevicePowerFactor.0 = INTEGER: -1
+  //PowerNet-MIB::rPDUIdentDevicePowerVA.0 = INTEGER: 360
+
+  $oids = snmp_get_multi_oid($device, 'rPDUIdentDeviceLinetoLineVoltage.0 rPDUIdentDevicePowerWatts.0 rPDUIdentDevicePowerFactor.0 rPDUIdentDevicePowerVA.0', array(), 'PowerNet-MIB');
+  foreach ($oids as $index => $entry)
   {
-    echo("$table ");
-    // FIXME, not sure, that here required numeric index, seems as the remains of old snmp code with caching (added in r4685)
-    $cache['apc'] = snmpwalk_cache_multi_oid($device, $table, $cache['apc'], "PowerNet-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-  }
+    $descr = "Input";
 
-  if (count($cache['apc']) == 1)
-  { // Skip this section if rPDU2Ident table is present (it has index 1, so count() will be 2)
-    // All data reported in rPDUIdent is duplicated in the rPDU2 tables we poll below.
-    // FIXME omg. do this differently!
-    foreach ($cache['apc'] as $index => $entry)
+    /// NOTE. rPDUIdentDeviceLinetoLineVoltage - is not actual voltage from device.
+    //DESCRIPTION
+    //   "Getting/Setting this OID will return/set the Line to Line Voltage.
+    //    This OID defaults to the nominal input line voltage in volts AC.
+    //    This setting is used to calculate total power and must be configured for best accuracy.
+    //    This OID does not apply to AP86XX, AP88XX, or AP89XX SKUs.
+    $oid   = ".1.3.6.1.4.1.318.1.1.12.1.15.$index";
+    $value = $entry['rPDUIdentDeviceLinetoLineVoltage'];
+
+    if ($value != -1)
     {
-      $descr = "Input";
+      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "rPDUIdentDeviceLinetoLineVoltage.$index", 'apc', 'Line-to-Line', 1, $value);
+    }
 
-      /// NOTE. rPDUIdentDeviceLinetoLineVoltage - is not actual voltage from device.
-      //DESCRIPTION
-      //   "Getting/Setting this OID will return/set the Line to Line Voltage.
-      //    This OID defaults to the nominal input line voltage in volts AC.
-      //    This setting is used to calculate total power and must be configured for best accuracy.
-      //    This OID does not apply to AP86XX, AP88XX, or AP89XX SKUs.
-      $oid   = ".1.3.6.1.4.1.318.1.1.12.1.15.$index";
-      $value = $entry['rPDUIdentDeviceLinetoLineVoltage'];
+    $oid   = ".1.3.6.1.4.1.318.1.1.12.1.16.$index";
+    $value = $entry['rPDUIdentDevicePowerWatts'];
 
-      if ($value != '' && $value != -1)
-      {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "rPDUIdentDeviceLinetoLineVoltage.$index", 'apc', 'Line-to-Line', 1, $value);
-      }
+    if ($value != -1 && !isset($valid['sensor']['power']['apc']['rPDU2PhaseStatusPower.1']))
+    {
+      discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDUIdentDevicePowerWatts.$index", 'apc', $descr, 1, $value);
+    }
 
-      $oid   = ".1.3.6.1.4.1.318.1.1.12.1.16.$index";
-      $value = $entry['rPDUIdentDevicePowerWatts'];
+    $oid   = ".1.3.6.1.4.1.318.1.1.12.1.17.$index";
+    $value = $entry['rPDUIdentDevicePowerFactor'];
 
-      if ($value != '' && $value != -1)
-      {
-        discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDUIdentDevicePowerWatts.$index", 'apc', $descr, 1, $value);
-      }
+    if ($value != -1)
+    {
+      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, "rPDUIdentDevicePowerFactor.$index", 'apc', $descr, 0.001, $value);
+    }
+
+    $oid   = ".1.3.6.1.4.1.318.1.1.12.1.18.$index";
+    $value = $entry['rPDUIdentDevicePowerVA'];
+
+    if ($value != -1)
+    {
+      discover_sensor($valid['sensor'], 'apower', $device, $oid, "rPDUIdentDevicePowerVA.$index", 'apc', $descr, 1, $value);
     }
   }
 
@@ -1767,7 +1848,7 @@ echo(' ');
 //mUpsEnvironRelativeHumidity.0 = 25
 //mUpsEnvironAmbientTemperature2.0 = 0
 //mUpsEnvironRelativeHumidity2.0 = 255
-$cache['apc'] = snmp_get_multi($device, "mUpsEnvironAmbientTemperature.0 mUpsEnvironRelativeHumidity.0 mUpsEnvironAmbientTemperature2.0 mUpsEnvironRelativeHumidity2.0", "-OUQs", "PowerNet-MIB");
+$cache['apc'] = snmp_get_multi_oid($device, "mUpsEnvironAmbientTemperature.0 mUpsEnvironRelativeHumidity.0 mUpsEnvironAmbientTemperature2.0 mUpsEnvironRelativeHumidity2.0", array(), "PowerNet-MIB");
 
 foreach ($cache['apc'] as $index => $entry)
 {

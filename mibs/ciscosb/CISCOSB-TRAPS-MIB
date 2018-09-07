@@ -746,7 +746,35 @@ pseOverloadPort NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating that Port (x) requires more power than it should require."
     ::=  { rndNotifications 241 }
+	
+poePowerNegotiationInfo NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power negotiation resolved power in Watts."
+    ::=  { rndNotifications 242 }
+	
+poePowerNegotiation4Wire NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power negotiation 4-Wire status."
+    ::=  { rndNotifications 243 }
 
+poePowerHWFail NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power HW fail status."
+    ::=  { rndNotifications 244 }
+	
+poePowerNegotiationExpiredInfo NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating power negotiation expired."
+    ::=  { rndNotifications 245 }
+    
 -- Storm control
 rlStormControlMinRateTrap NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
@@ -762,7 +790,7 @@ rlApBackplanePortResolutionTrap NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating about backplane ethernet port resolution."
     ::=  { rndNotifications 247 }
-    
+
 -- Sfp
 sfpPortPresent NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
@@ -770,27 +798,86 @@ sfpPortPresent NOTIFICATION-TYPE
     DESCRIPTION
         "Informational trap indicating that gbic is now present on port (X)."
     ::=  { rndNotifications 248}
-        
+
 sfpPortNotPresent NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
         "Informational trap indicating that gbic is not present anymore on port (X)."
-    ::=  { rndNotifications 249 }    
-    
+    ::=  { rndNotifications 249 }
+
 sfpPortLoss NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
         "Informational trap indicating that loss Diagnosed on port (X)."
-    ::=  { rndNotifications 250} 
+    ::=  { rndNotifications 250}
 
 sfpPortNotLoss NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
         "Informational trap indicating that loss isn't active anymore on port (X)."
-    ::=  { rndNotifications 251 }     
+    ::=  { rndNotifications 251 }
+
+-- Storm control
+rlStormControlOccursTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that port storm control occurs on a port."
+    ::=  { rndNotifications 252 }
+
+-- Radius Server
+rlRadiusServTrapAcct NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Radius server accounting event trap."
+    ::=  { rndNotifications 255 }
+
+rlRadiusServTrapAuthFailure NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Radius server authentication failure event trap."
+    ::=  { rndNotifications 256 }
+
+rlRadiusServTrapAuthSuccess NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Radius server authentication success event trap."
+    ::=  { rndNotifications 257 }
+
+rldot1xSupplicantPortAuthorizedTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating that 802.1x supplicant port status is authorized."
+    ::= { rndNotifications 260 }
+
+rldot1xSupplicantPortUnauthorizedTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that 802.1x supplicant port status is unAuthorized."
+    ::=  { rndNotifications 261 }
+
+rldot1xCredentialTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Warning trap indicating that credential is changed, rejected or not updated."
+    ::=  { rndNotifications 262 }
+    
+rlRedundantFanStateChange NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating the redundant fan status change."
+    ::=  { rndNotifications 258 }
+
 
 END
 

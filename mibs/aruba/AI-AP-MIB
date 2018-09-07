@@ -1,4 +1,4 @@
--- ArubaOS 6.5.1.3_58402
+--- ArubaOS 6.5.2.0_59123
    AI-AP-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
@@ -895,6 +895,16 @@ ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
         internetFailover(4)
     }
 
+ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the reason for Portal server down.
+
+        connectFail - Connect Portal server fail"
+    SYNTAX  INTEGER {
+        connectFail(1)
+    }
+
    aiInfoGroup                OBJECT IDENTIFIER ::= { aiMIB 1 }
    aiStateGroup               OBJECT IDENTIFIER ::= { aiMIB 2 }
    aiManagedInfoGroup         OBJECT IDENTIFIER ::= { aiMIB 3 }
@@ -947,6 +957,7 @@ ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
        DESCRIPTION
             "IP Address of AP where virtual controller software is active"
        ::= { aiInfoGroup 6 }
+    
 
    aiWlanSSIDTable  OBJECT-TYPE 
          SYNTAX       SEQUENCE OF AiWlanSSIDEntry
@@ -998,6 +1009,7 @@ ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
        DESCRIPTION
             "Indicates the whether the SSID is enabled(0) or disabled(1)"
        ::= { aiWlanSSIDEntry 3 }
+
 
    aiAccessPointTable  OBJECT-TYPE 
        SYNTAX       SEQUENCE OF AiAccessPointEntry
@@ -1625,6 +1637,69 @@ ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
             0 and uptime gets reset to 0."
        ::= { aiClientEntry 16 }
 
+
+--- Begining of voice client location entry       
+
+   aiVoiceClientTable  OBJECT-TYPE
+       SYNTAX       SEQUENCE OF AiVoiceClientEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+            "Table of voice clients"
+       ::= { aiStateGroup 5 }
+
+   aiVoiceClientEntry   OBJECT-TYPE
+       SYNTAX       AiVoiceClientEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION 
+            "Entry of a voice client"
+           INDEX        { aiClientMac }
+       ::= { aiVoiceClientTable 1}
+   
+   AiVoiceClientEntry ::=
+   SEQUENCE {
+        aiClientMac      MacAddress, 
+        aiClientIP       IpAddress,
+        aiClientAPMac    MacAddress,
+        aiClientAPName   DisplayString
+   }
+
+   aiClientMac  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "MAC address of voice client"
+        ::= { aiVoiceClientEntry 1 }
+
+
+   aiClientIP   OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "IP address of voice client"
+       ::= { aiVoiceClientEntry 2 }
+   
+   aiClientAPMac  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "MAC address of AP on which voice client is associated currently"
+        ::= { aiVoiceClientEntry 3 }
+
+
+   aiClientAPName   OBJECT-TYPE
+       SYNTAX       DisplayString
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Name of AP on which voice client is associated currently"
+       ::= { aiVoiceClientEntry 4 }
+
+--- End of voice client location entry
 
    aiManagedModeSinceLastSync OBJECT-TYPE 
          SYNTAX       DisplayString 
@@ -2830,6 +2905,38 @@ ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
             Authentication Server IP used for Authentication.
                     "
     ::= {aiTrapObjectsGroup 139 }
+
+    wlsxTrapPortalServerName OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object is used in the traps to indicate the
+            Captive Portal Server used for Authentication.
+                    "
+    ::= {aiTrapObjectsGroup 140 }
+
+    wlsxTrapPortalServerAddress OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object is used in the traps to indicate the
+            Captive Portal Server IP or host name used for Authentication.
+                    "
+    ::= {aiTrapObjectsGroup 141 }
+
+    wlsxTrapPortalServerDownReason OBJECT-TYPE 
+        SYNTAX      ArubaPortalServerDownReason
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object specifies the captive portal server down reason.
+                    "
+    ::= {aiTrapObjectsGroup 142 }
 
        
 -- Definition of traps
@@ -4718,5 +4825,35 @@ ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
          This trap indicates that the authentication server accounting timed out.
         	"
 	::= {aiTrapDefinitionsGroup 1256 }
+
+    wlsxPortalServerDown NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapPortalServerName, wlsxTrapPortalServerAddress,
+				wlsxTrapAPName,wlsxTrapPortalServerDownReason}
+		STATUS		current
+		DESCRIPTION
+			"			
+         This trap indicates that the portal server is down.
+        	"
+	::= {aiTrapDefinitionsGroup 1259 }
+
+    wlsxPortalServerUp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapPortalServerName, wlsxTrapPortalServerAddress,
+				wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+         This trap indicates that the portal server is up.
+        	"
+	::= {aiTrapDefinitionsGroup 1260 }
+
+    wlsxIAPVoiceClientLocationUpdate NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapVcIpAddress, wlsxTrapVcMacAddress,
+				wlsxTrapAPMacAddress, wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+         The trap represents a IAP voice client location update.
+        	"
+	::= {aiTrapDefinitionsGroup 1262 }
 
 END

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI ALARM MIB
 -- Reference:
--- Version: V1.0
+-- Version: V2.13
 -- History: 
 --  V1.0      2009-03-20   publish
 -- ==================================================================
@@ -23,7 +23,7 @@
     
     
         hwAlarmMIB MODULE-IDENTITY 
-            LAST-UPDATED "201310280943Z"        -- October 28, 2013 at 9:43 GMT
+            LAST-UPDATED "201702160943Z"        -- February 16, 2017 at 9:43 GMT
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
                 "Huawei Industrial Base
@@ -35,6 +35,9 @@
             DESCRIPTION 
                 "The MIB module for creating and deleting bulk files of
                 SNMP data for file transfer."
+            REVISION "201702160943Z"        -- February 16, 2017 at 9:43 GMT
+            DESCRIPTION
+                "Revert to the revision 2.10."
             REVISION "201310280943Z"        -- October 28, 2013 at 9:43 GMT
             DESCRIPTION
                 "Revert to the revision 2.10."
@@ -206,7 +209,7 @@
             ::= { hwAlarmSyncEntry 2 }
         
         hwAlarmSyncPara OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..1400))
+            SYNTAX OCTET STRING (SIZE (0..4096))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -274,7 +277,7 @@
             ::= { hwEventSyncEntry 2 }
         
         hwEventSyncPara OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..1400))
+            SYNTAX OCTET STRING (SIZE (0..4096))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -330,7 +333,7 @@
             ::= { hwAlarmActiveEntry 2 }
         
         hwActiveAlarmPara OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..1400))
+            SYNTAX OCTET STRING (SIZE (0..4096))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -393,7 +396,7 @@
             ::= { hwEventEntry 2 }
         
         hwEventPara OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..1400))
+            SYNTAX OCTET STRING (SIZE (0..4096))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -410,7 +413,7 @@
         
         hwAlarmDateAndTime OBJECT-TYPE
             SYNTAX DateAndTime
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "This object indicates the time when an alarm is generated or cleared."
@@ -422,7 +425,7 @@
                 alarm(1),
                 event(2)
                 }
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "Indicates the type of alarm messages.
@@ -433,7 +436,7 @@
         
         hwAlarmReasonInfo OBJECT-TYPE
             SYNTAX OCTET STRING (SIZE (0..255))
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "The reason for the alarm."
@@ -449,7 +452,7 @@
                 indeterminate(5),
                 cleared(6)
                 }
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "Alarm severity."
@@ -959,7 +962,7 @@
                     rootcause(1),
                     nonrootcause(2)
                 }
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "If alarm has passed correaltion analysis, this indication is 
@@ -968,7 +971,7 @@
         
         hwAlarmCorrAnalyzeSuppressionParentSequence OBJECT-TYPE
             SYNTAX OCTET STRING
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "The parent sequence of alarm, whose indication is nonrootcause."

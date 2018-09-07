@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage definitions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -35,10 +35,10 @@ define('OBS_SNMP_NUMERIC',        16); // Use numeric OIDs  (-On)
 define('OBS_SNMP_NUMERIC_INDEX',  32); // Use numeric index (-Ob)
 define('OBS_SNMP_CONCAT',         64); // Concatinate multiline snmp variable (newline chars removed)
 define('OBS_SNMP_ENUM',          128); // Don't enumerate SNMP values
-define('OBS_SNMP_HEX',           256); // Force HEX output (-Ox)
+define('OBS_SNMP_HEX',           256); // Force HEX output (-Ox) and disable use of DISPLAY-HINT information when assigning values (-Ih).
 define('OBS_SNMP_TABLE',         512); // Force Program Like output (-OX)
-#define('OBS_SNMP_',            1024); // Reserved
-#define('OBS_SNMP_',            2048); // Reserved
+define('OBS_SNMP_DISPLAY_HINT', 1024); // Disables the use of DISPLAY-HINT information when assigning values (-Ih). This would then require providing the raw value.
+define('OBS_SNMP_TIMETICKS',    2048); // Force TimeTicks values as raw numbers (-Ot)
 
 define('OBS_SNMP_ALL',               OBS_QUOTES_TRIM | OBS_QUOTES_STRIP);    // Set of common snmp options
 define('OBS_SNMP_ALL_MULTILINE',     OBS_QUOTES_TRIM | OBS_SNMP_CONCAT);     // Set of common snmp options with concatinate multiline snmp variable
@@ -47,6 +47,7 @@ define('OBS_SNMP_ALL_ENUM',          OBS_SNMP_ALL | OBS_SNMP_ENUM);          // 
 define('OBS_SNMP_ALL_NUMERIC',       OBS_SNMP_ALL | OBS_SNMP_NUMERIC);       // Set of common snmp options with numeric OIDs
 define('OBS_SNMP_ALL_NUMERIC_INDEX', OBS_SNMP_ALL | OBS_SNMP_NUMERIC_INDEX); // Set of common snmp options with numeric indexes
 define('OBS_SNMP_ALL_TABLE',         OBS_SNMP_ALL | OBS_SNMP_TABLE);         // Set of common snmp options with Program Like (help for MAC parse in indexes)
+define('OBS_SNMP_ALL_TIMETICKS',     OBS_SNMP_ALL | OBS_SNMP_TIMETICKS);     // Set of common snmp options with TimeTicks as raw numbers
 
 // Bits 12-15 network flags
 define('OBS_DNS_A',             4096); // Use only IPv4 dns queries
@@ -68,6 +69,55 @@ define('OBS_CONFIG_BASIC',          1); // 0001: Basic view, 0001
 define('OBS_CONFIG_ADVANCED',       3); // 0011: Advanced view, includes basic
 define('OBS_CONFIG_EXPERT',         7); // 0111: Expert view, includes advanced and basic
 
+// Common regex patterns
+define('OBS_PATTERN_START', '%(?:^|[\s\"\(=])');    // Begining of any pattern, matched string can start from newline, space, double quote, opening parenthesis, equal sign
+define('OBS_PATTERN_END',   '(?:[\s\"\),]|\:\ |$)%i'); // End of any pattern, matched string can ended with endline, space, double quote, closing parenthesis, comma
+define('OBS_PATTERN_END_U', OBS_PATTERN_END . 'u'); // ++Unicode
+
+// IPv4 string in group \1 or 'ipv4'
+define('OBS_PATTERN_IPV4',      '(?<ipv4>(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]))');
+define('OBS_PATTERN_IPV4_FULL', OBS_PATTERN_START . OBS_PATTERN_IPV4 . OBS_PATTERN_END);
+// IPv4 netmask string in group \1 or 'ipv4_mask'
+define('OBS_PATTERN_IPV4_MASK',  '(?<ipv4_mask>(?:0|128|192|224|240|248|252|254)\.0\.0\.0|255\.(?:0|128|192|224|240|248|252|254)\.0\.0|255\.255\.(?:0|128|192|224|240|248|252|254)\.0|255\.255\.255\.(?:0|128|192|224|240|248|252|254|255))');
+// IPv4 inverse netmask string in group \1 or 'ipv4_inverse_mask'
+define('OBS_PATTERN_IPV4_INVERSE_MASK', '(?<ipv4_inverse_mask>(?:255|127|63|31|15|7|3|1|0)\.255\.255\.255|0\.(?:255|127|63|31|15|7|3|1|0)\.255\.255|0\.0\.(?:255|127|63|31|15|7|3|1|0)\.255|0\.0\.0\.(?:255|127|63|31|15|7|3|1|0))');
+// IPv4 network string in group \1 or 'ipv4_network', additionally 'ipv4', 'ipv4_prefix' or 'ipv4_mask' or 'ipv4_inverse_mask'
+define('OBS_PATTERN_IPV4_NET',  '(?<ipv4_network>' . OBS_PATTERN_IPV4 . '\/(?:(?<ipv4_prefix>3[0-2]|[1-2][0-9]|[0-9])|' . OBS_PATTERN_IPV4_MASK . '|' . OBS_PATTERN_IPV4_INVERSE_MASK . '))');
+define('OBS_PATTERN_IPV4_NET_FULL', OBS_PATTERN_START . OBS_PATTERN_IPV4_NET . OBS_PATTERN_END);
+
+// IPv6 string in group \1 or 'ipv6'
+define('OBS_PATTERN_IPV6',      '(?<ipv6>(?:(?:(?:[a-f\d]{1,4}:){5}[a-f\d]{1,4}|(?:[a-f\d]{1,4}:){4}:[a-f\d]{1,4}|(?:[a-f\d]{1,4}:){3}(?::[a-f\d]{1,4}){1,2}|(?:[a-f\d]{1,4}:){2}(?::[a-f\d]{1,4}){1,3}|[a-f\d]{1,4}:(?::[a-f\d]{1,4}){1,4}|(?:[a-f\d]{1,4}:){1,5}|:(?::[a-f\d]{1,4}){1,5}|:):(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])|(?:[a-f\d]{1,4}:){7}[a-f\d]{1,4}|(?:[a-f\d]{1,4}:){6}:[a-f\d]{1,4}|(?:[a-f\d]{1,4}:){5}(?::[a-f\d]{1,4}){1,2}|(?:[a-f\d]{1,4}:){4}(?::[a-f\d]{1,4}){1,3}|(?:[a-f\d]{1,4}:){3}(?::[a-f\d]{1,4}){1,4}|(?:[a-f\d]{1,4}:){2}(?::[a-f\d]{1,4}){1,5}|[a-f\d]{1,4}:(?::[a-f\d]{1,4}){1,6}|(?:[a-f\d]{1,4}:){1,7}:|:(?::[a-f\d]{1,4}){1,7}|::))');
+define('OBS_PATTERN_IPV6_FULL', OBS_PATTERN_START . OBS_PATTERN_IPV6 . OBS_PATTERN_END);
+// IPv6 network string in group \1 or 'ipv6_network', additionally 'ipv6', 'ipv6_prefix'
+define('OBS_PATTERN_IPV6_NET',  '(?<ipv6_network>' . OBS_PATTERN_IPV6 . '\/(?<ipv6_prefix>12[0-8]|1[0-1][0-9]|[0-9]{1,2}))');
+define('OBS_PATTERN_IPV6_NET_FULL', OBS_PATTERN_START . OBS_PATTERN_IPV6_NET . OBS_PATTERN_END);
+
+// IPv4 or IPv6 string in group \1 or 'ip'
+define('OBS_PATTERN_IP',        '(?<ip>' . OBS_PATTERN_IPV4 . '|' . OBS_PATTERN_IPV6 . ')');
+define('OBS_PATTERN_IP_FULL',   OBS_PATTERN_START . OBS_PATTERN_IP . OBS_PATTERN_END);
+
+// MAC string in group \1 or 'mac'
+define('OBS_PATTERN_MAC',       '(?<mac>(?:[a-f\d]{1,2}(?:\:[a-f\d]{1,2}){5}|[a-f\d]{2}(?:\-[a-f\d]{2}){5}|[a-f\d]{2}(?:\ [a-f\d]{2}){5}|[a-f\d]{4}(?:\.[a-f\d]{4}){2}|(?:0x)?[a-f\d]{12}))');
+define('OBS_PATTERN_MAC_FULL',  OBS_PATTERN_START . OBS_PATTERN_MAC . OBS_PATTERN_END);
+
+// FQDN string in group \1 or 'domain'
+//define('OBS_PATTERN_FQDN',      '(?<domain>(?:(?:(?:xn--)?[a-z0-9_]+(?:\-[a-z0-9_]+)*\.)+(?:[a-z]{2,}|xn--[a-z0-9]{4,}))|localhost)'); // Alternative, less correct
+//define('OBS_PATTERN_FQDN',      '(?<domain>(?:(?:(?=[a-z0-9\-_]{1,63}\.)(?:xn--)?[a-z0-9_]+(?:\-[a-z0-9_]+)*\.)+(?:[a-z]{2,63}|xn--[a-z0-9]{4,}))|localhost)'); // Punicode, Non-unicode
+define('OBS_PATTERN_FQDN',      '(?<domain>(?:(?:(?=[\p{L}\d\-_]{1,63}\.)(?:xn--)?[\p{L}\d_]+(?:\-[\p{L}\d_]+)*\.)+(?:[\p{L}]{2,63}|xn--[a-z\d]{4,}))|localhost)');
+define('OBS_PATTERN_FQDN_FULL', OBS_PATTERN_START . OBS_PATTERN_FQDN . OBS_PATTERN_END_U);
+
+// pattern for email only (without Name, ie: user@domain.name)
+// Email string in group \1 or 'email', additional groups: 'user', 'domain'
+define('OBS_PATTERN_EMAIL',     '(?<email>(?<user>[\p{L}\d\.\'_\%\+\-]{1,63}|\"[\p{L}\d\.\'_\%\+\-\ \\\\]{1,63}\")@' . OBS_PATTERN_FQDN . ')');
+define('OBS_PATTERN_EMAIL_FULL', OBS_PATTERN_START . OBS_PATTERN_EMAIL . OBS_PATTERN_END_U);
+// pattern for Full email with Name (ie: "My Name" <user@domain.name>), but name is optional
+// Long Email string in group \1 or 'email_long', additional groups: 'name', 'email', 'user', 'domain'
+define('OBS_PATTERN_EMAIL_LONG', '(?<email_long>(?<name>[\"\'][\p{L}\d\.\'_\%\+\-\ \\\\]+[\"\']|(?:[\p{L}\d\.\'_\%\+\-]+\ )*[\p{L}\d\.\'_\%\+\-]+)?\s*<' . OBS_PATTERN_EMAIL . '>)');
+define('OBS_PATTERN_EMAIL_LONG_FULL', OBS_PATTERN_START . OBS_PATTERN_EMAIL_LONG . OBS_PATTERN_END_U);
+
+//define('OBS_PATTERN_URL',       '(?<url>(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@|\d{1,3}(?:\.\d{1,3}){3}|(?:(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)(?:\.(?:[a-z\d\x{00a1}-\x{ffff}]+-?)*[a-z\d\x{00a1}-\x{ffff}]+)*(?:\.[a-z\x{00a1}-\x{ffff}]{2,6}))(?::\d+)?(?:[^\s]*)?)');
+//define('OBS_PATTERN_URL_FULL',  OBS_PATTERN_START . OBS_PATTERN_URL . OBS_PATTERN_END_U);
+
 // Json flags
 define('OBS_JSON_BIGINT_AS_STRING', version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4)); // Check if BIGINT supported
 $json_encode = defined('JSON_UNESCAPED_UNICODE') ? JSON_UNESCAPED_UNICODE : 0;
@@ -77,11 +127,46 @@ define('OBS_JSON_ENCODE', $json_encode);
 define('OBS_JSON_DECODE', $json_decode);
 unset($json_encode, $json_decode);
 
+// Detect encrypt module
+if (PHP_VERSION_ID >= 70200 && check_extension_exists('sodium'))
+{
+  // Libsodium is part of php since 7.2
+  define('OBS_ENCRYPT', TRUE);
+  define('OBS_ENCRYPT_MODULE', 'sodium');
+}
+else if (check_extension_exists('mcrypt'))
+{
+  // Older php can use mcrypt (not supported since php 7.2)
+  define('OBS_ENCRYPT', TRUE);
+  define('OBS_ENCRYPT_MODULE', 'mcrypt');
+} else {
+  // No encrypt modules found
+  define('OBS_ENCRYPT', FALSE);
+}
+//var_dump(OBS_ENCRYPT);
+
 // Always use "enhanced algorithm" for rounding float numbers in JSON/serialize
 ini_set('serialize_precision', -1);
 
+// Use more accurate math
+if (defined('GMP_VERSION'))
+{
+  // GMP
+  define('OBS_MATH', 'gmp');
+}
+else if (function_exists('bcadd'))
+{
+  // BC Math
+  define('OBS_MATH', 'bc');
+} else {
+  // Fallback to php math
+  define('OBS_MATH', 'php');
+}
+//var_dump(OBS_MATH);
+
 // Minimum supported versions
-define('OBS_MIN_PHP_VERSION', '5.5.0'); // PHP
+define('OBS_MIN_PHP_VERSION',   '5.6.26'); // PHP
+define('OBS_MIN_MYSQL_VERSION', '5.1.59'); // MySQL, really 5.6+
 
 // Set QUIET
 define('OBS_QUIET', isset($options['q']));
@@ -103,8 +188,8 @@ if (isset($options['d']))
   }
 }
 else if ($debug_web_requested = (isset($_REQUEST['debug']) && $_REQUEST['debug']) ||
-         (isset($_SERVER['PATH_INFO']) && strpos($_SERVER['PATH_INFO'], 'debug')) ||
-         (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'debug')))
+                                (isset($_SERVER['PATH_INFO']) && strpos($_SERVER['PATH_INFO'], 'debug')) ||
+                                (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'debug')))
 {
   // WEB
 
@@ -165,8 +250,10 @@ require_once("hash-compat/hash_equals.php");
 // Debug nicer functions
 if (OBS_DEBUG || strlen($_SERVER['REMOTE_ADDR']))
 {
-  // Nicer for print_vars(), for WUI loaded always
-  if (!function_exists('rt') && is_file($config['install_dir']."/libs/ref.inc.php"))
+  // Nicer for print_vars(), for WUI loaded always,
+  // Required php tokenizer extension!
+  if (!function_exists('rt') && function_exists('token_get_all') &&
+      is_file($config['install_dir']."/libs/ref.inc.php"))
   {
     include($config['install_dir']."/libs/ref.inc.php");
   }
@@ -195,8 +282,8 @@ $definition_files = array('os',           // OS definitions
                           'rewrites',     // Rewriting array definitions
                           'mibs',         // MIB definitions
                           'models',       // Hardware model definitions (leave it after os and rewrites)
-                          'sensors',      // Sensors definitions
-                          'status',       // Status definitions
+                          //'sensors',      // Sensors definitions (moved to entities/ dir)
+                          //'status',       // Status definitions (moved to entities/ dir)
                           'geo',          // Geolocation api definitions
                           'vm',           // Virtual Machine definitions
                           'transports',   // Alerting transport definitions
@@ -231,132 +318,96 @@ $config['alert_graphs']['status']['status_state']        = array('type' => 'stat
 $config['alert_graphs']['processor']['processor_usage']  = array('type' => 'processor_usage', 'id' => '@processor_id');
 $config['alert_graphs']['storage']['storage_perc']  = array('type' => 'storage_usage', 'id' => '@storage_id');
 
-// Device Types
+// IP types
 
-$i = (is_array($config['device_types']) ? count($config['device_types']) : 0); // Allow config.php-set device_types to exist
-
-$config['device_types'][$i]['text']  = 'Servers';
-$config['device_types'][$i]['type']  = 'server';
-$config['device_types'][$i]['icon']  = 'sprite-device';
-$config['device_types'][$i]['descr'] = 'Rack mounted or tower or remote used servers';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Server Blades';
-$config['device_types'][$i]['type']  = 'blade';
-$config['device_types'][$i]['icon']  = 'sprite-devices';
-$config['device_types'][$i]['descr'] = 'Rack modular server blades';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Workstations';
-$config['device_types'][$i]['type']  = 'workstation';
-$config['device_types'][$i]['icon']  = 'sprite-workstation';
-$config['device_types'][$i]['descr'] = 'PC and workstations';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Network';
-$config['device_types'][$i]['type']  = 'network';
-$config['device_types'][$i]['icon']  = 'sprite-network';
-$config['device_types'][$i]['descr'] = 'Switches and routers';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Wireless';
-$config['device_types'][$i]['type']  = 'wireless';
-$config['device_types'][$i]['icon']  = 'sprite-wifi';
-$config['device_types'][$i]['descr'] = 'Wireless network devices';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Firewalls';
-$config['device_types'][$i]['type']  = 'firewall';
-$config['device_types'][$i]['icon']  = 'sprite-firewall';
-$config['device_types'][$i]['descr'] = 'Firewall specific devices';
-
-$i++;
-$config['device_types'][$i]['text'] = 'Security';
-$config['device_types'][$i]['type'] = 'security';
-$config['device_types'][$i]['icon'] = 'sprite-security';
-$config['device_types'][$i]['descr'] = 'Security appliance, DDoS protection devices';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Power';
-$config['device_types'][$i]['type']  = 'power';
-$config['device_types'][$i]['icon']  = 'sprite-power';
-$config['device_types'][$i]['descr'] = 'UPS, PDU and outlet devices';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Environment';
-$config['device_types'][$i]['type']  = 'environment';
-$config['device_types'][$i]['icon']  = 'sprite-humidity';
-$config['device_types'][$i]['descr'] = 'Environment sensor devices and conditioners';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Load Balancers';
-$config['device_types'][$i]['type']  = 'loadbalancer';
-$config['device_types'][$i]['icon']  = $config['icon']['loadbalancer'];
-$config['device_types'][$i]['descr'] = 'Load balancer servers';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Communication';
-$config['device_types'][$i]['type']  = 'communication';
-$config['device_types'][$i]['icon']  = 'sprite-communication';
-$config['device_types'][$i]['descr'] = 'Video/VoIP/Text communication servers';
-
-$i++;
-$config['device_types'][$i]['text']  = 'VoIP';
-$config['device_types'][$i]['type']  = 'voip';
-$config['device_types'][$i]['icon']  = 'sprite-voice';
-$config['device_types'][$i]['descr'] = 'VoIP phones';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Video';
-$config['device_types'][$i]['type']  = 'video';
-$config['device_types'][$i]['icon']  = 'sprite-video';
-$config['device_types'][$i]['descr'] = 'Webcams, video record devices';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Storage';
-$config['device_types'][$i]['type']  = 'storage';
-$config['device_types'][$i]['icon']  = $config['icon']['databases'];
-$config['device_types'][$i]['descr'] = 'NAS';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Management';
-$config['device_types'][$i]['type']  = 'management';
-$config['device_types'][$i]['icon']  = 'sprite-management'; // FIXME. I really not know what icon better
-$config['device_types'][$i]['descr'] = 'IPMI, IP-KVM and other management (ie serial console)';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Radio';
-$config['device_types'][$i]['type']  = 'radio';
-$config['device_types'][$i]['icon']  = 'sprite-antenna';
-$config['device_types'][$i]['descr'] = 'Radio transmit devices';
-
-$i++;
-$config['device_types'][$i]['text']  = 'Printers';
-$config['device_types'][$i]['type']  = 'printer';
-$config['device_types'][$i]['icon']  = 'sprite-printer';
-$config['device_types'][$i]['descr'] = 'Printers and print servers';
-unset($i);
-
-// SLA colours
-
-$config['sla']['loss_colour'] = array('55FF00', '00FFD5', '00D5FF', '00AAFF', '0080FF', '0055FF', '0000FF', '8000FF', 'D400FF', 'FF00D4', 'FF0080', 'FF0000');
-$config['sla']['loss_value'] = array(0, 2, 4, 6, 8, 10, 15, 20, 25, 40, 50, 100);
+$config['ip_types']['unspecified']    = array('networks' => array('0.0.0.0', '::/128'),
+                                              'name'     => 'Unspecified', 'subtext' => 'Example: ::/128, 0.0.0.0',
+                                              'descr'    => 'This address may only be used as a source address by an initialising host before it has learned its own address. Example: ::/128, 0.0.0.0');
+$config['ip_types']['loopback']       = array('networks' => array('127.0.0.0/8', '::1/128'),
+                                              'name'     => 'Loopback', 'subtext' => 'Example: ::1/128, 127.0.0.1',
+                                              'descr'    => 'This address is used when a host talks to itself. Example: ::1/128, 127.0.0.1');
+$config['ip_types']['private']        = array('networks' => array('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', 'fc00::/7'),
+                                              'name'     => 'Private Local Addresses', 'subtext' => 'Example: fdf8:f53b:82e4::53, 192.168.0.1',
+                                              'descr'    => 'These addresses are reserved for local use in home and enterprise environments and are not public address space. Example: fdf8:f53b:82e4::53, 192.168.0.1');
+$config['ip_types']['multicast']      = array('networks' => array('224.0.0.0/4', 'ff00::/8'),
+                                              'name'     => 'Multicast', 'subtext' => 'Example: ff01:0:0:0:0:0:0:2, 224.0.0.1',
+                                              'descr'    => 'These addresses are used to identify multicast groups. Example: ff01:0:0:0:0:0:0:2, 224.0.0.1');
+$config['ip_types']['link-local']     = array('networks' => array('169.254.0.0/16', 'fe80::/10'),
+                                              'name'     => 'Link-Local Addresses', 'subtext' => 'Example: fe80::200:5aee:feaa:20a2, 169.254.3.1',
+                                              'descr'    => 'These addresses are used on a single link or a non-routed common access network, such as an Ethernet LAN. Example: fe80::200:5aee:feaa:20a2, 169.254.3.1');
+$config['ip_types']['ipv4mapped']     = array('networks' => array('::ffff/96'),
+                                              'name'     => 'IPv6 IPv4-Mapped', 'subtext' => '::ffff:192.0.2.47',
+                                              'descr'    => 'These addresses are used to embed IPv4 addresses in an IPv6 address. Example: ::ffff:192.0.2.47');
+$config['ip_types']['6to4']           = array('networks' => array('192.88.99.0/24', '2002::/16'),
+                                              'name'     => 'IPv6 6to4', 'subtext' => 'Example: 2002:cb0a:3cdd:1::1, 192.88.99.1',
+                                              'descr'    => 'A 6to4 gateway adds its IPv4 address to this 2002::/16, creating a unique /48 prefix. Example: 2002:cb0a:3cdd:1::1, 192.88.99.1');
+$config['ip_types']['documentation']  = array('networks' => array('192.0.2.0/24', '198.51.100.0/24', '203.0.113.0/24', '2001:db8::/32'),
+                                              'name'     => 'Documentation', 'subtext' => 'Example: 2001:db8:8:4::2, 203.0.113.1',
+                                              'descr'    => 'These addresses are used in examples and documentation. Example: 2001:db8:8:4::2, 203.0.113.1');
+$config['ip_types']['teredo']         = array('networks' => array('2001:0000::/32'),
+                                              'name'     => 'IPv6 Teredo', 'subtext' => 'Example: 2001:0000:4136:e378:8000:63bf:3fff:fdd2',
+                                              'descr'    => 'This is a mapped address allowing IPv6 tunneling through IPv4 NATs. The address is formed using the Teredo prefix, the servers unique IPv4 address, flags describing the type of NAT, the obfuscated client port and the client IPv4 address, which is probably a private address. Example: 2001:0000:4136:e378:8000:63bf:3fff:fdd2');
+$config['ip_types']['benchmark']      = array('networks' => array('198.18.0.0/15', '2001:0002::/48'),
+                                              'name'     => 'Benchmarking', 'subtext' => 'Example: 2001:0002:6c::430, 198.18.0.1',
+                                              'descr'    => 'These addresses are reserved for use in documentation. Example: 2001:0002:6c::430, 198.18.0.1');
+$config['ip_types']['orchid']         = array('networks' => array('2001:0010::/28', '2001:0020::/28'),
+                                              'name'     => 'IPv6 Orchid', 'subtext' => 'Example: 2001:10:240:ab::a',
+                                              'descr'    => 'These addresses are used for a fixed-term experiment. Example: 2001:10:240:ab::a');
+$config['ip_types']['reserved']       = array(//'networks' => array(),
+                                              'name'     => 'Reserved',
+                                              'descr'    => 'Reserved address space');
+$config['ip_types']['broadcast']      = array(//'networks' => array(),
+                                              'name'     => 'IPv4 Broadcast', 'subtext' => 'Example: 255.255.255.255',
+                                              'descr'    => 'IPv4 broadcast address. Example: 255.255.255.255');
+$config['ip_types']['anycast']        = array(//'networks' => array(),
+                                              'name'     => 'Anycast',
+                                              'descr'    => 'Anycast is a network addressing and routing methodology in which a single destination address has multiple routing paths to two or more endpoint destinations.');
+// Keep this at last!
+$config['ip_types']['unicast']        = array('networks' => array('2000::/3'), // 'networks' => array('0.0.0.0/0', '2000::/3'),'
+                                              'name'     => 'Global Unicast', 'subtext' => 'Example: 2a02:408:7722::, 80.94.60.2', 'disabled' => 1,
+                                              'descr'    => 'Global Unicast addresses. Example: 2a02:408:7722::, 80.94.60.2');
 
 // Syslog colour and name translation
 
-$config['syslog']['priorities']['0'] = array('name' => 'emergency',     'color' => '#D94640', 'label-class' => 'inverse',    'row-class' => 'error');
-$config['syslog']['priorities']['1'] = array('name' => 'alert',         'color' => '#D94640', 'label-class' => 'delayed',    'row-class' => 'error');
-$config['syslog']['priorities']['2'] = array('name' => 'critical',      'color' => '#D94640', 'label-class' => 'error',      'row-class' => 'error');
-$config['syslog']['priorities']['3'] = array('name' => 'error',         'color' => '#E88126', 'label-class' => 'error',      'row-class' => 'error');
-$config['syslog']['priorities']['4'] = array('name' => 'warning',       'color' => '#F2CA3F', 'label-class' => 'warning',    'row-class' => 'warning');
-$config['syslog']['priorities']['5'] = array('name' => 'notification',  'color' => '#107373', 'label-class' => 'success',    'row-class' => 'recovery');
-$config['syslog']['priorities']['6'] = array('name' => 'informational', 'color' => '#499CA6', 'label-class' => 'primary',    'row-class' => ''); //'row-class' => 'info');
-$config['syslog']['priorities']['7'] = array('name' => 'debugging',     'color' => '#5AA637', 'label-class' => 'suppressed', 'row-class' => 'suppressed');
+$config['syslog']['priorities'][0] = array('name' => 'emergency',     'color' => '#D94640', 'label-class' => 'inverse',    'row-class' => 'error');
+$config['syslog']['priorities'][1] = array('name' => 'alert',         'color' => '#D94640', 'label-class' => 'delayed',    'row-class' => 'error');
+$config['syslog']['priorities'][2] = array('name' => 'critical',      'color' => '#D94640', 'label-class' => 'error',      'row-class' => 'error');
+$config['syslog']['priorities'][3] = array('name' => 'error',         'color' => '#E88126', 'label-class' => 'error',      'row-class' => 'error');
+$config['syslog']['priorities'][4] = array('name' => 'warning',       'color' => '#F2CA3F', 'label-class' => 'warning',    'row-class' => 'warning');
+$config['syslog']['priorities'][5] = array('name' => 'notification',  'color' => '#107373', 'label-class' => 'success',    'row-class' => 'recovery');
+$config['syslog']['priorities'][6] = array('name' => 'informational', 'color' => '#499CA6', 'label-class' => 'primary',    'row-class' => ''); //'row-class' => 'info');
+$config['syslog']['priorities'][7] = array('name' => 'debugging',     'color' => '#5AA637', 'label-class' => 'suppressed', 'row-class' => 'suppressed');
 
 for ($i = 8; $i < 16; $i++)
 {
   $config['syslog']['priorities'][$i] = array('name' => 'other',        'color' => '#D2D8F9', 'label-class' => 'disabled',   'row-class' => 'disabled');
 }
+
+// https://tools.ietf.org/html/draft-ietf-netmod-syslog-model-14
+$config['syslog']['facilities'][0]  = array('name' => 'kern',     'descr' => 'kernel messages');
+$config['syslog']['facilities'][1]  = array('name' => 'user',     'descr' => 'user-level messages');
+$config['syslog']['facilities'][2]  = array('name' => 'mail',     'descr' => 'mail system');
+$config['syslog']['facilities'][3]  = array('name' => 'daemon',   'descr' => 'system daemons');
+$config['syslog']['facilities'][4]  = array('name' => 'auth',     'descr' => 'security/authorization messages');
+$config['syslog']['facilities'][5]  = array('name' => 'syslog',   'descr' => 'messages generated internally by syslogd');
+$config['syslog']['facilities'][6]  = array('name' => 'lpr',      'descr' => 'line printer subsystem');
+$config['syslog']['facilities'][7]  = array('name' => 'news',     'descr' => 'network news subsystem');
+$config['syslog']['facilities'][8]  = array('name' => 'uucp',     'descr' => 'UUCP subsystem');
+$config['syslog']['facilities'][9]  = array('name' => 'cron',     'descr' => 'clock daemon');
+$config['syslog']['facilities'][10] = array('name' => 'authpriv', 'descr' => 'security/authorization messages');
+$config['syslog']['facilities'][11] = array('name' => 'ftp',      'descr' => 'FTP daemon');
+$config['syslog']['facilities'][12] = array('name' => 'ntp',      'descr' => 'NTP subsystem');
+$config['syslog']['facilities'][13] = array('name' => 'audit',    'descr' => 'log audit');
+$config['syslog']['facilities'][14] = array('name' => 'console',  'descr' => 'log alert');
+$config['syslog']['facilities'][15] = array('name' => 'cron2',    'descr' => 'clock daemon');
+$config['syslog']['facilities'][16] = array('name' => 'local0',   'descr' => 'local use 0 (local0)');
+$config['syslog']['facilities'][17] = array('name' => 'local1',   'descr' => 'local use 1 (local1)');
+$config['syslog']['facilities'][18] = array('name' => 'local2',   'descr' => 'local use 2 (local2)');
+$config['syslog']['facilities'][19] = array('name' => 'local3',   'descr' => 'local use 3 (local3)');
+$config['syslog']['facilities'][20] = array('name' => 'local4',   'descr' => 'local use 4 (local4)');
+$config['syslog']['facilities'][21] = array('name' => 'local5',   'descr' => 'local use 5 (local5)');
+$config['syslog']['facilities'][22] = array('name' => 'local6',   'descr' => 'local use 6 (local6)');
+$config['syslog']['facilities'][23] = array('name' => 'local7',   'descr' => 'local use 7 (local7)');
 
 // Possible transports for net-snmp, used for enumeration in several functions
 $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
@@ -366,7 +417,8 @@ $config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 // note, rate not fully correct after server reboot (it will less than really)
 $config['snmp']['errorcodes'][0]    = array('reason' => 'OK',
                                             'msg'    => '');
-// Non critical
+
+// [1-99] Non critical
 $config['snmp']['errorcodes'][1]    = array('reason' => 'Empty response',           // exitcode = 0, but not have any data
                                             'count'  => 288,                        // 288 with rate 1/poll ~ 1 day
                                             'rate'   => 0.9,
@@ -380,7 +432,10 @@ $config['snmp']['errorcodes'][4]    = array('reason' => 'Too big max-repetition 
                                             'rate'   => 0.9,
                                             'msg'    => '');
 
+// [900-999] Critical errors, but this is incorrect auth or config or missed files on client side
 $config['snmp']['errorcodes'][900]  = array('reason' => 'isSNMPable',               // Device up/down test, not used for counting
+                                            'msg'    => '');
+$config['snmp']['errorcodes'][991]  = array('reason' => 'Authentication failure',   // Snmp auth errors
                                             'msg'    => '');
 $config['snmp']['errorcodes'][995]  = array('reason' => 'Incorrect arguments',      // Incorrect arguments passed to snmpcmd
                                             'msg'    => '');
@@ -394,29 +449,21 @@ $config['snmp']['errorcodes'][999]  = array('reason' => 'Unknown',              
                                             'count'  => 288,                        // 288 with rate 1.95/poll ~ 12 hours
                                             'rate'   => 0.9,
                                             'msg'    => '');
-// Critical, can autodisable
+
+// [1000-1xxx] Critical errors on device side, can autodisable
 $config['snmp']['errorcodes'][1000] = array('reason' => 'Failed response',          // Any critical error in snmp output, which not return useful data
                                             'count'  => 70,                         // errors in every poll run, disable after ~ 6 hours
                                             'rate'   => 0.9,
                                             'msg'    => '');
-$config['snmp']['errorcodes'][1001] = array('reason' => 'Authentication failure',   // Snmp auth errors
-                                            'count'  => 25,                         // errors in every poll run, disable after ~ 1.5 hour
-                                            'rate'   => 0.9,
-                                            'msg'    => '');
+//$config['snmp']['errorcodes'][1001] = array('reason' => 'Authentication failure',   // Snmp auth errors
+//                                            'count'  => 25,                         // errors in every poll run, disable after ~ 1.5 hour
+//                                            'rate'   => 0.9,
+//                                            'msg'    => '');
 $config['snmp']['errorcodes'][1002] = array('reason' => 'Request timeout',          // Cmd exit by timeout
                                             'count'  => 25,                         // errors in every poll run, disable after ~ 1.5 hour
                                             'rate'   => 0.9,
                                             'msg'    => '');
 
-
-// Routing types
-
-$config['routing_types']['isis']      = array('text' => 'ISIS');
-$config['routing_types']['ospf']      = array('text' => 'OSPF');
-$config['routing_types']['cef']       = array('text' => 'CEF');
-$config['routing_types']['bgp']       = array('text' => 'BGP');
-$config['routing_types']['eigrp']     = array('text' => 'EIGRP');
-$config['routing_types']['vrf']       = array('text' => 'VRFs');
 
 // IPMI user levels (used in GUI, first entry = default if unset)
 
@@ -432,75 +479,60 @@ $config['ipmi']['interfaces']['lanplus'] = array('text' => 'IPMI v2.0 RMCP+ LAN 
 $config['ipmi']['interfaces']['imb']     = array('text' => 'Intel IMB Interface');
 $config['ipmi']['interfaces']['open']    = array('text' => 'Linux OpenIPMI Interface');
 
-// Toner colour mapping
-$config['toner']['cyan']    = array('cyan');
-$config['toner']['magenta'] = array('magenta');
-$config['toner']['yellow']  = array('yellow', 'giallo', 'gul');
-$config['toner']['black']   = array('black', 'preto', 'nero', 'svart');
-
-// Nicer labels for the SLA types
-$config['sla_type_labels']['echo'] = 'ICMP ping';
-$config['sla_type_labels']['pathEcho'] = 'Path ICMP ping';
-$config['sla_type_labels']['fileIO'] = 'File I/O';
-$config['sla_type_labels']['script'] = 'Script';
-$config['sla_type_labels']['udpEcho'] = 'UDP ping';
-$config['sla_type_labels']['tcpConnect'] = 'TCP connect';
-$config['sla_type_labels']['http'] = 'HTTP';
-$config['sla_type_labels']['dns'] = 'DNS';
-$config['sla_type_labels']['jitter'] = 'Jitter';
-$config['sla_type_labels']['dlsw'] = 'DLSW';
-$config['sla_type_labels']['dhcp'] = 'DHCP';
-$config['sla_type_labels']['ftp'] = 'FTP';
-$config['sla_type_labels']['voip'] = 'VoIP';
-$config['sla_type_labels']['rtp'] = 'RTP';
-$config['sla_type_labels']['lspGroup'] = 'LSP group';
-$config['sla_type_labels']['icmpjitter'] = 'ICMP jitter';
-$config['sla_type_labels']['lspPing'] = 'LSP ping';
-$config['sla_type_labels']['lspTrace'] = 'LSP trace';
-$config['sla_type_labels']['ethernetPing'] = 'Ethernet ping';
-$config['sla_type_labels']['ethernetJitter'] = 'Ethernet jitter';
-$config['sla_type_labels']['lspPingPseudowire'] = 'LSP Pseudowire ping';
-$config['sla_type_labels']['video'] = 'Video';
-$config['sla_type_labels']['y1731Delay'] = 'Y.1731 delay';
-$config['sla_type_labels']['y1731Loss'] = 'Y.1731 loss';
-$config['sla_type_labels']['mcastJitter'] = 'Multicast jitter';
-$config['sla_type_labels']['IcmpEcho'] = 'ICMP ping';
-$config['sla_type_labels']['UdpEcho'] = 'UDP ping';
-$config['sla_type_labels']['SnmpQuery'] = 'SNMP';
-$config['sla_type_labels']['TcpConnectionAttempt'] = 'TCP connect';
-$config['sla_type_labels']['IcmpTimeStamp'] = 'ICMP timestamp';
-$config['sla_type_labels']['HttpGet'] = 'HTTP';
-$config['sla_type_labels']['HttpGetMetadata'] = 'HTTP metadata';
-$config['sla_type_labels']['DnsQuery'] = 'DNS';
-$config['sla_type_labels']['NtpQuery'] = 'NTP';
-$config['sla_type_labels']['UdpTimestamp'] = 'UDP timestamp';
-
 // RANCID OS map (for config generation script)
 $config['rancid']['os_map']['arista_eos'] = 'arista';
-$config['rancid']['os_map']['asa']        = 'cisco';
 //$config['rancid']['os_map']['avocent']    = 'avocent';
-$config['rancid']['os_map']['ciena-waveserveros']   = 'ciena-ws';
+//$config['rancid']['os_map']['ciena-waveserveros']   = 'ciena-ws';
 $config['rancid']['os_map']['cyclades']   = 'avocent';
-$config['rancid']['os_map']['f5']         = 'f5';
+$config['rancid']['os_map']['f5']         = 'f5'; // Only for <= v10
 $config['rancid']['os_map']['fortigate']  = 'fortigate';
 $config['rancid']['os_map']['ftos']       = 'force10';
 $config['rancid']['os_map']['ios']        = 'cisco';
 $config['rancid']['os_map']['iosxe']      = 'cisco';
 $config['rancid']['os_map']['iosxr']      = 'cisco-xr';
-$config['rancid']['os_map']['ironware']   = 'foundry';
-$config['rancid']['os_map']['procurve']   = 'hp';
+$config['rancid']['os_map']['asa']        = 'cisco';
 $config['rancid']['os_map']['pixos']      = 'cisco';
-$config['rancid']['os_map']['junos']      = 'juniper';
 $config['rancid']['os_map']['nxos']       = 'cisco-nx';
+$config['rancid']['os_map']['ironware']   = 'foundry';
+//$config['rancid']['os_map']['procurve']   = 'hp'; // v3 only
+$config['rancid']['os_map']['junos']      = 'juniper';
+$config['rancid']['os_map']['screenos']   = 'netscreen';
 $config['rancid']['os_map']['opengear']   = 'opengear';
 $config['rancid']['os_map']['routeros']   = 'mikrotik';
-$config['rancid']['os_map']['screenos']   = 'netscreen';
 $config['rancid']['os_map']['pfsense']    = 'pfsense';
 $config['rancid']['os_map']['netscaler']  = 'netscaler';
-// Rancid v3.x specific os map
-$config['rancid']['os_map_3']['a10-ax']   = 'a10';
-$config['rancid']['os_map_3']['a10-ex']   = 'a10';
-$config['rancid']['os_map_3']['ciena-waveserveros'] = 'ciena-ws';
+// Rancid v3.0+ specific os map
+//$config['rancid']['os_map_3']['adtran-aos']            = 'adtran';
+$config['rancid']['os_map_3']['arbos']                 = 'arbor';
+$config['rancid']['os_map_3']['powerconnect-fastpath'] = 'dell';
+$config['rancid']['os_map_3']['powerconnect-radlan']   = 'dell';
+$config['rancid']['os_map_3']['dnos6']                 = 'dell';
+$config['rancid']['os_map_3']['enterasys']             = 'enterasys';
+$config['rancid']['os_map_3']['xos']                   = 'extreme';
+//$config['rancid']['os_map_3']['juniper-srx']           = 'juniper-srx'; // SRX in junos..
+$config['rancid']['os_map_3']['mrvos']                 = 'mrv';
+$config['rancid']['os_map_3']['seos']                  = 'redback';
+// Rancid v3.2+ specific os map
+//$config['rancid']['os_map_3.2']['wlc']                 = 'cisco-wlc4';
+$config['rancid']['os_map_3.2']['wlc']                 = 'cisco-wlc5';
+$config['rancid']['os_map_3.2']['panos']               = 'paloalto';
+$config['rancid']['os_map_3.2']['procurve']            = 'hp';
+// Rancid v3.3+ specific os map
+$config['rancid']['os_map_3.3']['ciena-waveserveros']  = 'ciena-ws';
+$config['rancid']['os_map_3.3']['steelhead']           = 'riverbed';
+// Rancid v3.4+ specific os map
+$config['rancid']['os_map_3.4']['a10-ax']              = 'a10';
+$config['rancid']['os_map_3.4']['a10-ex']              = 'a10';
+// Rancid v3.5+ specific os map
+$config['rancid']['os_map_3.5']['edgemax']             = 'edgemax';
+//$config['rancid']['os_map_3.5']['f5']                  = 'bigip'; // v11+
+// Rancid v3.7+ specific os map
+$config['rancid']['os_map_3.7']['ciscosb']             = 'cisco-sb';
+//$config['rancid']['os_map_3.7']['wlc']                 = 'cisco-wlc8';
+$config['rancid']['os_map_3.7']['timos']               = 'sros';
+// Rancid v3.8+ specific os map
+$config['rancid']['os_map_3.8']['cisco-firepower']     = 'fxos';
+$config['rancid']['os_map_3.8']['vrp']                 = 'vrp';
 
 # Enable these (in config.php) if you added the powerconnect addon to your RANCID install
 #$config['rancid']['os_map']['powerconnect-fastpath'] = 'dell';
@@ -618,36 +650,13 @@ $config['time']['threemonth'] = $config['time']['now'] - 8035200;  //time() - (3
 $config['time']['sixmonth']   = $config['time']['now'] - 16070400; //time() - (6 * 31 * 24 * 60 * 60);
 $config['time']['year']       = $config['time']['now'] - 31536000; //time() - (365 * 24 * 60 * 60);
 $config['time']['twoyear']    = $config['time']['now'] - 63072000; //time() - (2 * 365 * 24 * 60 * 60);
+$config['time']['threeyear']  = $config['time']['now'] - 94608000; //time() - (3 * 365 * 24 * 60 * 60);
 
 $config['printersupplies']['types'] = array(
   'toner', 'tonerCartridge', 'wasteToner', 'ink', 'inkCartridge', 'wasteInk',
   'opc', 'transferUnit', 'cleanerUnit', 'fuser', 'developer', 'other'
 );
 
-// Tables to clean up when deleting a device.
-// FIXME. Need simple way for fetch list tables with column 'device_id', like 'SHOW TABLES'
-$config['device_tables'] = array(
-  'accesspoints', 'alert_log', 'alert_table', 'syslog_alerts', 'applications', 'bgpPeers', 'bgpPeers_cbgp',
-  'cef_prefix', 'cef_switching', 'devices_mibs', 'devices_locations', 'devices_perftimes',
-  'device_graphs', 'eigrp_ports', 'entPhysical', 'eventlog', 'hrDevice', 'ipsec_tunnels',
-  'loadbalancer_rservers', 'loadbalancer_vservers', 'mempools', 'munin_plugins', 'netscaler_services',
-  'netscaler_services_vservers', 'netscaler_vservers', 'ospf_areas', 'ospf_instances',
-  'ospf_nbrs', 'ospf_ports', 'packages', 'ports', 'ports_stack', 'ports_vlans', 'processors',
-  'pseudowires', 'sensors', 'status', 'services', 'slas', 'storage', 'syslog', 'printersupplies',
-  'ucd_diskio', 'vlans', 'vlans_fdb', 'vminfo', 'vrfs', 'wifi_accesspoints', 'wifi_sessions',
-  'group_table', 'p2p_radios', 'oids_entries', 'lb_virtuals', 'observium_processes',
-  'devices' // always leave the table devices as last
-);
-
-// Generate proper device types
-
-// $config['device_types'][$i]['type'] = 'management';
-
-foreach ($config['device_types'] as $device_order => $device_type)
-{
-  $config['devicetypes'][$device_type['type']] = $device_type;
-  $config['devicetypes'][$device_type['type']]['order'] = $device_order;
-}
 
 // Obsolete config variables
 // Note, for multiarray config options use conversion with '->'

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -95,21 +95,20 @@ $last_checked = get_obs_attrib('last_versioncheck');
 
 if (!is_numeric($last_checked) || $last_checked < time()-3600 || $options['u'])
 {
-  $stats = get_instance_stats();
+  //$stats = get_instance_stats();
+  $stats = array('version' => OBSERVIUM_VERSION);
 
   // Serialize and base64 encode stats array for transportation
   $stat_serial = serialize($stats);
   $stat_base64 = base64_encode($stat_serial);
 
   $query = http_build_query(array('stats' => $stat_base64));
+
   $context_data = array (
                 'method' => 'POST',
                 'header' => "Connection: close\r\n".
                             "Content-Length: ".strlen($query)."\r\n",
                 'content'=> $query);
-
-  //$context  = stream_context_create(array( 'http' => $context_data ));
-  //$versions = file_get_contents( 'http://www.observium.org/versions.php', false, $context);
 
   $versions = get_http_request('http://www.observium.org/versions.php', $context_data);
 

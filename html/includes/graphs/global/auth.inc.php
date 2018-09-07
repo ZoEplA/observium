@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-if ($_SESSION['userlevel'] >= "5")
+if ($_SESSION['userlevel'] >= 5)
 {
   $auth = 1;
 }
 
-?>
+// EOF

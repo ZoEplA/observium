@@ -3,7 +3,7 @@
 -- 
 -- Description: HUAWEI MSTP MIB
 -- Reference:
--- Version:     V2.07
+-- Version:     V2.08
 -- History:     2008-06-14  MSTP Process
 -- History:     2008-10-08  MSTP Process- v3     
 -- History:     2009-3-01  MSTP Process- v4
@@ -37,7 +37,7 @@
         
         
                 hwMstp MODULE-IDENTITY
-                        LAST-UPDATED "201505291000Z"
+                        LAST-UPDATED "201511261000Z"
                         ORGANIZATION
                                 "Huawei Technologies Co.,Ltd."
                         CONTACT-INFO
@@ -51,7 +51,14 @@
                         DESCRIPTION
                                 "This module include the information about MSTP protocol in the bridge.
                                 The information can be read and some of them can be set."
-                        
+
+                        REVISION    "201511261000Z"
+                        DESCRIPTION "modified for:hwMstpDiameter 
+                                                                            hwMstpProDiameter 
+                                                                            hwMstpiStpTransLimit
+                                                                            hwMstpTransmitLimitDefault
+                                                                            hwMstpProNewPortStpTransLimit."
+                       
                         REVISION    "201505291000Z"
                         DESCRIPTION "Add for: hwMstpProFlushCapability."
 
@@ -150,9 +157,7 @@
                                 forward delay time, maxage. Every bridge can set
                                 the diameter of Bridge, and it is effective when
                                 the bridge is root bridge. Effective in the CIST
-                                By default, the diameter is 7.
-                                The value of hwMstpDiameter is only unused(65535) when it is 
-                                read."                        
+                                By default, the diameter is 7."                        
                         ::= { hwMstpObjects 3 }
                 
                 hwMstpBridgeMaxHops OBJECT-TYPE
@@ -801,7 +806,6 @@
                                 "The value is used to set BPDU maximum transmission rate of the port .
                                  When the value is set, the hwMstpInstanceID must be 0.
                                  If value is set 0, the transmit limit of the port is equal to the hwMstpTransmitLimitDefault value."
-                        DEFVAL { 147 }
                         ::= { hwMstpPortEntry 12 }
                 
                 hwMstpiStpRXStpBPDU OBJECT-TYPE
@@ -1238,9 +1242,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The Spanning-Tree diameter of a MSTP process, the default value
-                                 is 7.
-                                 The value of hwMstpProDiameter is only unused(65535) when it is 
-                                 read."
+                                 is 7."
                         DEFVAL { 7 }
                         ::= { hwMstpProEntry 9 }
                 
@@ -2399,7 +2401,6 @@
                         DESCRIPTION
                                 "The value is used to set BPDU maximum transmission rate of the port. 
                                  If value is set 0, the transmit limit of the port is equal to the wMstpTransmitLimitDefault value "
-                        DEFVAL { 147 }
                         ::= { hwMstpProNewPortEntry 11 }
                 
                 hwMstpProNewPortStpRXStpBPDU OBJECT-TYPE
@@ -2663,7 +2664,7 @@
                         STATUS current
                         DESCRIPTION
                                 "The value is used to set BPDU maximum transmission rate of all port in the device."
-                        DEFVAL { 147 }
+                        DEFVAL { 6 }
                         ::= { hwMstpObjects 32 }           
 
                 hwMstpPwName OBJECT-TYPE

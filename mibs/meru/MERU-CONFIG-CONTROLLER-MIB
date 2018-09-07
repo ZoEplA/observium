@@ -39,10 +39,11 @@ IMPORTS
     MwlAlarmState,
     MwlControllerHwType,
     MwlRegionSettings,
-    MwlOnOffSwitch,
     MwlBonding,
     MwlEnableDisableOption,
-    MwlVpnConnectivityStatus
+    MwlVpnClientProtocol,
+    MwlVpnConnectivityStatus,
+    MwlOnOffSwitch
         FROM MERU-TC;
 
   mwConfigController  MODULE-IDENTITY
@@ -147,14 +148,6 @@ IMPORTS
     DESCRIPTION
          "This object describes Controller Index. The value must be either 0, or 0-31"
     ::= { mwWncVars   11 }
-
-  mwWncVarsTopoUpdate  OBJECT-TYPE
-    SYNTAX MwlOnOffSwitch
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Topology Information Update"
-    ::= { mwWncVars   12 }
 
   mwWncVarsFastPath  OBJECT-TYPE
     SYNTAX MwlOnOffSwitch
@@ -308,14 +301,6 @@ IMPORTS
          "This object describes Roaming Domain State"
     ::= { mwWncVars   34 }
 
-  mwWncVarsAssocStationMaxIdlePeriod  OBJECT-TYPE
-    SYNTAX Unsigned32
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Associated Station Max Idle Period"
-    ::= { mwWncVars   36 }
-
   mwWncVarsL3RoutingMode  OBJECT-TYPE
     SYNTAX MwlOnOffSwitch
     MAX-ACCESS read-only
@@ -331,6 +316,14 @@ IMPORTS
     DESCRIPTION
          "This object describes Region Setting"
     ::= { mwWncVars   38 }
+
+  mwWncVarsRoamingTimeOutPeriod  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Roaming Time Out Period(minutes)"
+    ::= { mwWncVars   41 }
 
   mwSystemFileVarspHostName  OBJECT-TYPE
     SYNTAX DisplayString(SIZE (1..32))
@@ -513,7 +506,9 @@ IMPORTS
        mwWncNetworkConfigTableIndex                                Integer32, 
        mwWncNetworkConfigBonding                                   MwlBonding,
        mwWncNetworkConfigFastPath                                  MwlOnOffSwitch,
+       mwWncNetworkConfigOneGigSFP                                 MwlEnableDisableOption,
        mwWncNetworkConfigTenGigModule                              MwlEnableDisableOption,
+       mwWncNetworkConfigRebridHandOffLogic                        MwlOnOffSwitch,
        mwWncNetworkConfigRowStatus                                 RowStatus 
   }
    
@@ -550,13 +545,29 @@ IMPORTS
          "This object describes Enabling 10 Gig module card"
     ::= { mwWncNetworkConfigEntry    4 }
 
+  mwWncNetworkConfigRebridHandOffLogic  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client Handoff Logic"
+    ::= { mwWncNetworkConfigEntry    5 }
+
+  mwWncNetworkConfigOneGigSFP  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enabling 1 Gig SF Port Mode"
+    ::= { mwWncNetworkConfigEntry    6 }
+
   mwWncNetworkConfigRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwWncNetworkConfigEntry 5 }
+    ::= { mwWncNetworkConfigEntry 7 }
 
   mwVirtualInterfaceProfileTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwVirtualInterfaceProfileEntry
@@ -887,6 +898,14 @@ IMPORTS
          "This object describes Connectivity Status"
     ::= { mwVpnClient    5 }
 
+  mwVpnClientProtocol  OBJECT-TYPE
+    SYNTAX MwlVpnClientProtocol
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Protocol"
+    ::= { mwVpnClient    6 }
+
   mwUdpBcastUpstreamBridgedTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwUdpBcastUpstreamBridgedEntry
     MAX-ACCESS not-accessible
@@ -982,6 +1001,111 @@ IMPORTS
     DESCRIPTION
          "This object is used to create and delete rows in the table"
     ::= { mwUdpBcastDownstreamBridgedEntry 3 }
+
+  mwWncMobilityVarsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwWncMobilityVarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Mobility Configuration Parameters "
+    ::= { mwConfigController 14 }
+
+  mwWncMobilityVarsEntry  OBJECT-TYPE
+    SYNTAX MwWncMobilityVarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Mobility Configuration Parameters "
+    INDEX {  mwWncMobilityVarsTableIndex  }
+    ::= { mwWncMobilityVarsTable 1 }
+
+  MwWncMobilityVarsEntry  ::=  SEQUENCE { 
+       mwWncMobilityVarsTableIndex                                 Integer32, 
+       mwWncMobilityVarsTopoUpdate                                 MwlOnOffSwitch,
+       mwWncMobilityVarsAdequateRssi                               Integer32(-75..-25),
+       mwWncMobilityVarsAssocStationMaxIdlePeriod                  Unsigned32,
+       mwWncMobilityVarsRowStatus                                  RowStatus 
+  }
+   
+   
+  mwWncMobilityVarsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwWncMobilityVarsEntry 1 }
+
+  mwWncMobilityVarsTopoUpdate  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Topology Information Update"
+    ::= { mwWncMobilityVarsEntry    3 }
+
+  mwWncMobilityVarsAssocStationMaxIdlePeriod  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Station Max Idle Period"
+    ::= { mwWncMobilityVarsEntry    4 }
+
+  mwWncMobilityVarsAdequateRssi  OBJECT-TYPE
+    SYNTAX Integer32(-75..-25)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Adequate Signal Threshold"
+    ::= { mwWncMobilityVarsEntry    6 }
+
+  mwWncMobilityVarsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwWncMobilityVarsEntry 7 }
+
+  mwWncIpv6VarsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwWncIpv6VarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Configuration Parameters "
+    ::= { mwConfigController 15 }
+
+  mwWncIpv6VarsEntry  OBJECT-TYPE
+    SYNTAX MwWncIpv6VarsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Configuration Parameters "
+    INDEX {  mwWncIpv6VarsTableIndex  }
+    ::= { mwWncIpv6VarsTable 1 }
+
+  MwWncIpv6VarsEntry  ::=  SEQUENCE { 
+       mwWncIpv6VarsTableIndex                                     Integer32, 
+       mwWncIpv6VarsNeighborDiscOptimization                       MwlOnOffSwitch 
+  }
+   
+   
+  mwWncIpv6VarsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwWncIpv6VarsEntry 1 }
+
+  mwWncIpv6VarsNeighborDiscOptimization  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Neighbor Discovery Optimization"
+    ::= { mwWncIpv6VarsEntry    2 }
 
   
 END

@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Streams.php 217 2013-11-16 21:44:58Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -53,7 +53,7 @@
  * Socket handling class using the PHP Streams
  *
  * The sockets extension is faster than the stream functions in PHP, but it's
- * not standard. So if the extension is loaded, then the Net_DNS_Socket_Sockets
+ * not standard. So if the extension is loaded, then the Net_DNS2_Socket_Sockets
  * class it used, otherwise, this class it used.
  *   
  * @category Networking
@@ -264,7 +264,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
      * @access public
      *
      */
-    public function read(&$size)
+    public function read(&$size, $max_size)
     {
         $read   = array($this->sock);
         $write  = null;
@@ -291,7 +291,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         }
 
         $data = '';
-        $length = Net_DNS2_Lookups::DNS_MAX_UDP_SIZE;
+        $length = $max_size;
 
         //
         // if it's a TCP socket, then the first two bytes is the length of the DNS

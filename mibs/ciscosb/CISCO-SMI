@@ -19,15 +19,15 @@ IMPORTS
 
 cisco MODULE-IDENTITY
     LAST-UPDATED "200011012246Z" -- November 1, 2000 05:46 PM
-	ORGANIZATION "Cisco Small Business"
+	ORGANIZATION "Cisco Systems, Inc."
 
 	CONTACT-INFO
 	"Postal: 170 West Tasman Drive
 	San Jose , CA 95134-1706
 	USA
 
-	Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-	Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+	
+	Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
     DESCRIPTION
         "The Structure of Management Information for the

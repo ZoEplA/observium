@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Response.php 198 2013-05-26 05:05:22Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -73,6 +73,11 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
      * The socket type the answer came from (TCP/UDP)
      */
     public $answer_socket_type;
+
+    /*
+     * The query response time in microseconds
+     */
+    public $response_time = 0;
 
     /**
      * Constructor - builds a new Net_DNS2_Packet_Response object

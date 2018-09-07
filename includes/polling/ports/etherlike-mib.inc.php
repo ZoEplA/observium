@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -18,14 +18,18 @@ $port_module = 'etherlike';
 if ($ports_modules[$port_module])
 {
   echo("dot3Stats ");
+  $start = microtime(TRUE);
+
   $port_stats = snmpwalk_cache_oid($device, "dot3StatsEntry", $port_stats, "EtherLike-MIB");
-  $process_port_functions[$port_module] = $GLOBALS['snmp_status'];
+  $process_port_functions[$port_module] = snmp_status();
+
+  $device_state['poller_ports_perf'][$port_module] += microtime(TRUE) - $start; // Module timing
 }
 else if ($has_ifEntry)
 {
   echo("dot3StatsDuplexStatus ");
   $port_stats = snmpwalk_cache_oid($device, "dot3StatsDuplexStatus", $port_stats, "EtherLike-MIB");
-  $process_port_functions[$port_module] = $GLOBALS['snmp_status'];
+  $process_port_functions[$port_module] = snmp_status();
 }
 
 // Additional db fields for update

@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Resolver.php 191 2013-04-07 23:28:20Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -82,7 +82,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      * @param string $type  the name of the RR type to lookup
      * @param string $class the name of the RR class to lookup
      *
-     * @return Net_DNS_RR object
+     * @return Net_DNS2_RR object
      * @throws Net_DNS2_Exception
      * @access public
      *
@@ -229,9 +229,9 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             foreach ($response->answer as $index => $object) {
 
-                if ( (strcasecmp($object->name, $name) == 0)
-                    && ($object->type == $type)
-                    && ($object->class == $class)
+                if ( (strcasecmp(trim($object->name, '.'), trim($packet->question[0]->qname, '.')) == 0)
+                    && ($object->type == $packet->question[0]->qtype)
+                    && ($object->class == $packet->question[0]->qclass)
                 ) {
                     $found = true;
                     break;
@@ -271,7 +271,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      *
      * @param Net_DNS2_RR $rr the RR object to lookup
      * 
-     * @return Net_DNS_RR object
+     * @return Net_DNS2_RR object
      * @throws Net_DNS2_Exception
      * @access public
      *

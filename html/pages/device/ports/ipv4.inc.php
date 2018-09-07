@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -38,12 +38,14 @@ $form['row'][0]['interface']  = array(
                                 'type'        => 'select',
                                 'name'        => 'Interface',
                                 'width'       => '100%',
+                                'grid'        => 3,
                                 'value'       => $vars['interface'],
                                 'values'      => array('' => 'All Interfaces', 'Lo' => 'Loopbacks', 'Vlan' => 'Vlans'));
 $form['row'][0]['network'] = array(
                                 'type'        => 'text',
                                 'name'        => 'IP Network',
                                 'width'       => '100%',
+                                'grid'        => 3,
                                 'placeholder' => TRUE,
                                 'ajax'        => TRUE,
                                 'ajax_vars'   => array('field' => 'ipv4_network'),
@@ -52,13 +54,13 @@ $form['row'][0]['address']  = array(
                                 'type'        => 'text',
                                 'name'        => 'IP Address',
                                 'width'       => '100%',
-                                'grid'        => 3,
+                                'grid'        => 4,
                                 'placeholder' => TRUE,
                                 'value'       => escape_html($vars['address']));
 // search button
 $form['row'][0]['search']   = array(
                                 'type'        => 'submit',
-                                'grid'        => 3,
+                                'grid'        => 2,
                                 //'name'        => 'Search',
                                 //'icon'        => 'icon-search',
                                 'value'       => 'ipv4',

@@ -9,7 +9,7 @@
  * @subpackage discovery
  * @subpackage functions
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -81,14 +81,15 @@ function discover_new_device($hostname, $source = 'xdp', $protocol = NULL, $devi
       if ($pingable)
       {
         // Check if device duplicated by IP
-        $ip = ($ip_version == 4 ? $ip : Net_IPv6::uncompress($ip, TRUE));
-        $db = dbFetchRow('SELECT D.`hostname` FROM ipv'.$ip_version.'_addresses AS A
-                         LEFT JOIN `ports`   AS P ON A.`port_id`   = P.`port_id`
-                         LEFT JOIN `devices` AS D ON D.`device_id` = P.`device_id`
-                         WHERE D.`disabled` = 0 AND A.`ipv'.$ip_version.'_address` = ?', array($ip));
+        //$ip = ($ip_version == 4 ? $ip : Net_IPv6::uncompress($ip, TRUE));
+        $ip_binary = inet_pton($ip);
+        $db = dbFetchRow('SELECT `hostname` FROM `ipv'.$ip_version.'_addresses`
+                         LEFT JOIN `devices` USING(`device_id`)
+                         WHERE `disabled` = 0 AND `ipv'.$ip_version.'_binary` = ? LIMIT 1', array($ip_binary));
         if ($db)
         {
           print_debug('Already have device '.$db['hostname']." with IP $ip");
+          $reason = 'already in db';
           return FALSE;
         }
 
@@ -102,9 +103,14 @@ function discover_new_device($hostname, $source = 'xdp', $protocol = NULL, $devi
           {
             // Detect FQDN hostname
             // by sysName
-            $snmphost = snmp_get($new_device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
+            $snmphost = snmp_get_oid($new_device, 'sysName.0', 'SNMPv2-MIB');
             if ($snmphost)
             {
+              // Add "mydomain" configuration if this resolves, converts switch1 -> switch1.mydomain.com
+              if (!empty($config['mydomain']) && isDomainResolves($snmphost . '.' . $config['mydomain'], $flags))
+              {
+                $snmphost .= '.' . $config['mydomain'];
+              }
               $snmp_ip = gethostbyname6($snmphost, $flags);
             }
 
@@ -116,6 +122,11 @@ function discover_new_device($hostname, $source = 'xdp', $protocol = NULL, $devi
               $ptr = gethostbyaddr6($ip);
               if ($ptr)
               {
+                // Add "mydomain" configuration if this resolves, converts switch1 -> switch1.mydomain.com
+                if (!empty($config['mydomain']) && isDomainResolves($ptr . '.' . $config['mydomain'], $flags))
+                {
+                  $ptr .= '.' . $config['mydomain'];
+                }
                 $ptr_ip = gethostbyname6($ptr, $flags);
               }
 
@@ -128,6 +139,7 @@ function discover_new_device($hostname, $source = 'xdp', $protocol = NULL, $devi
                 print_debug("Device IP $ip does not seem to have FQDN.");
                 return FALSE;
               } else {
+                // Hostname as IP string
                 $hostname = $ip_version == 4 ? $ip : Net_IPv6::compress($hostname, TRUE); // Always use compressed IPv6 name
               }
             }
@@ -167,11 +179,22 @@ function discover_new_device($hostname, $source = 'xdp', $protocol = NULL, $devi
 
               //array_push($GLOBALS['devices'], $remote_device); // createHost() already puth this
               return $remote_device_id;
+            } else {
+              $reason = 'db insert error';
             }
+          } else {
+            // When detected duplicate device, this mean it already SNMPable and not need check next auth!
+            $reason = 'duplicated';
+            //return FALSE;
           }
+        } else {
+          $reason = 'not snmpable';
         }
+      } else {
+        $reason = 'not pingable';
       }
     } else {
+      $reason = 'not permitted network';
       print_debug("IP $ip ($hostname) not permitted inside \$config['autodiscovery']['ip_nets'] in config.php");
     }
     print_debug('Autodiscovery for host ' . $hostname . ' failed.');
@@ -223,7 +246,25 @@ function discover_device($device, $options = NULL)
     {
       print_cli_data("Device OS changed",  $old_os . " -> ".$device['os'], 1);
       log_event('OS changed: '.$old_os.' -> '.$device['os'], $device, 'device', $device['device_id'], 'warning');
-      dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
+
+      // Additionally reset icon and type for device if os changed
+      dbUpdate(array('os' => $device['os'], 'icon' => array('NULL'), 'type' => array('NULL')), 'devices', '`device_id` = ?', array($device['device_id']));
+      if (isset($attribs['override_icon']))
+      {
+        del_entity_attrib('device', $device, 'override_icon');
+      }
+      if (isset($attribs['override_type']))
+      {
+        del_entity_attrib('device', $device, 'override_type');
+      }
+    }
+
+    // Set device sysObjectID when device just added (required for some cases before other discovery/polling)
+    $sysObjectID = snmp_cache_sysObjectID($device);
+    if ($device['sysObjectID'] != $sysObjectID)
+    {
+      dbUpdate(array('sysObjectID' => $sysObjectID), 'devices', '`device_id` = ?', array($device['device_id']));
+      $device['sysObjectID'] = $sysObjectID;
     }
   }
 
@@ -357,19 +398,46 @@ function discover_device($device, $options = NULL)
     }
   }
 
-  $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
+  $device_end = utime();
+  $device_run = $device_end - $device_start;
+  $device_time = round($device_run, 4);
 
-  dbUpdate(array('last_discovered' => array('NOW()'), 'type' => $device['type'], 'last_discovered_timetaken' => $device_time, 'force_discovery' => 0), 'devices', '`device_id` = ?', array($device['device_id']));
+  $update_array = array('last_discovered' => array('NOW()'), 'type' => $device['type'], 'last_discovered_timetaken' => $device_time, 'force_discovery' => 0);
+
+  // Store device stats and history data (only) if we're not doing a single-module poll
+  if (!$options['m'])
+  {
+    // Fetch previous device state (do not use $device array here, for exclude update history collisions)
+    $old_device_state = dbFetchCell('SELECT `device_state` FROM `devices` WHERE `device_id` = ?;', array($device['device_id']));
+    $old_device_state = unserialize($old_device_state);
+
+    // Add first entry
+    $discovery_history = array(intval($device_start) => $device_time); // start => duration
+    // Add and keep not more than 100 last entries
+    if (isset($old_device_state['discovery_history']))
+    {
+      print_debug_vars($old_device_state['discovery_history']);
+      $discovery_history = array_slice($discovery_history + $old_device_state['discovery_history'], 0, 100, TRUE);
+    }
+    print_debug_vars($discovery_history);
+
+    $device_state = $old_device_state; // Keep old devices state (from poller)
+    $device_state['discovery_history'] = $discovery_history;
+
+    unset($discovery_history, $old_device_state);
+
+    $update_array['device_state'] = serialize($device_state);
+
+    // Not worth putting discovery data into rrd. it's not done every 5 mins :)
+  }
+
+  dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
 
   // Clean force discovery
   if (isset($attribs['force_discovery_modules']))
   {
     del_entity_attrib('device', $device['device_id'], 'force_discovery_modules');
   }
-
-  // Put performance into devices_perftimes table
-  // Not worth putting discovery data into rrd. it's not done every 5 mins :)
-  dbInsert(array('device_id' => $device['device_id'], 'operation' => 'discover', 'start' => $device_start, 'duration' => $device_run), 'devices_perftimes');
 
   print_cli_heading($device['hostname']. " [" . $device['device_id'] . "] completed discovery modules at " . date("Y-m-d H:i:s"), 1);
 
@@ -502,7 +570,7 @@ function discover_status($device, $oid, $index, $type, $status_descr, $value = N
   $param_main = array('oid' => 'status_oid', 'status_descr' => 'status_descr', 'status_deleted' => 'status_deleted');
 
   // Init optional
-  $param_opt = array('entPhysicalIndex', 'entPhysicalClass', 'entPhysicalIndex_measured', 'measured_class', 'measured_entity');
+  $param_opt = array('entPhysicalIndex', 'entPhysicalClass', 'entPhysicalIndex_measured', 'measured_class', 'measured_entity', 'status_map');
   foreach ($param_opt as $key)
   {
     $$key = ($options[$key] ? $options[$key] : NULL);
@@ -512,7 +580,7 @@ function discover_status($device, $oid, $index, $type, $status_descr, $value = N
   $status_state = array();
   //if ($value !== NULL)
   //{
-    $state_array = get_state_array($type, $value, $poller_type);
+    $state_array = get_state_array($type, $value, $status_map, $poller_type);
     $state = $state_array['value'];
     if ($state === FALSE)
     {
@@ -547,7 +615,7 @@ function discover_status($device, $oid, $index, $type, $status_descr, $value = N
                            'status_type'  => $type,
                            'status_id'    => $status_id,
                            'status_value' => $value,
-                           'status_polled' => array('NOW()'),
+                           'status_polled' => time(), //array('NOW()'), // this field is INT(11)
                            'status_event' => $state_array['event'],
                            'status_name'  => $state_array['name']
                           );
@@ -564,12 +632,6 @@ function discover_status($device, $oid, $index, $type, $status_descr, $value = N
     }
 
     $status_id = dbInsert($status_insert, 'status');
-
-    // Insert initial state for status sensor
-    //$status_state['status_id']     = $status_id;
-    //$status_state['status_value']  = $value;
-    //$status_state['status_polled'] = array('NOW()');
-    //dbInsert($status_state, 'status-state');
 
     print_debug("( $status_id inserted )");
     echo('+');
@@ -641,6 +703,15 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $sensor_
   {
     print_debug("Redirecting call to discover_status().");
     return discover_status($device, $oid, $index, $type, $sensor_descr, $value, $options, $poller_type);
+  }
+  else if ($class == 'power' && $options['measured_class'] == 'port' &&            // Power sensor with measured port entity
+           $config['sensors']['port']['power_to_dbm'] &&                           // Convert option set to TRUE
+           $options['sensor_unit'] != 'W' && !str_icontains($sensor_descr, 'PoE')) // Not forced W unit, not PoE
+  {
+    // DOM Power sensors convert to dBm
+    print_debug("DOM power sensor forced to dBm sensor.");
+    $options['sensor_unit'] = 'W';
+    return discover_sensor($valid, 'dbm', $device, $oid, $index, $type, $sensor_descr, $scale, $value, $options, $poller_type);
   }
 
   // Init main
@@ -742,7 +813,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $sensor_
     }
 
     $sensor_insert['sensor_value'] = $value;
-    $sensor_insert['sensor_polled'] = array('NOW()');
+    $sensor_insert['sensor_polled'] = time(); // array('NOW()'); // this field is INT(11)
 
     $sensor_id = dbInsert($sensor_insert, 'sensors');
 
@@ -752,9 +823,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $sensor_
       // Add sensor attrib for use in poller
       set_entity_attrib('sensor', $sensor_id, $attrib_type, $options[$attrib_type]);
     }
-
-    //$state_insert = array('sensor_id' => $sensor_id, 'sensor_value' => $value, 'sensor_polled' => 'NOW()');
-    //dbInsert($state_insert, 'sensors-state');
 
     print_debug("( $sensor_id inserted )");
     echo('+');
@@ -1607,5 +1675,63 @@ function discovery_module_excluded($device, $module)
     return false;
   }
 }
+
+// DOCME needs phpdoc block
+// TESTME needs unit testing
+// FIXME don't pass valid, use this as a global variable
+function discover_lsp(&$valid, $device, $lsp_index, $lsp_mib, $lsp_name, $lsp_state, $lsp_uptime, $lsp_total_uptime, $lsp_primary_uptime, $lsp_proto,
+                      $lsp_transitions, $lsp_path_changes, $lsp_bandwidth, $lsp_octets, $lsp_packets, $lsp_polled)
+{
+   global $config;
+
+   print_debug($device['device_id']." -> $lsp_index, $lsp_mib, $lsp_name, $lsp_state, $lsp_uptime, $lsp_total_uptime, $lsp_primary_uptime, $lsp_proto, " .
+      "$lsp_transitions, $lsp_path_changes, $lsp_bandwidth, $lsp_octets, $lsp_packets, $lsp_polled");
+
+   $lsp_mib  = strtolower($lsp_mib);
+
+   // Check lsp ignore filters
+   foreach ($config['ignore_lsp'] as $bi)        { if (strcasecmp($bi, $lsp_name) == 0)   { print_debug("Skipped by equals: $bi, $lsp_name "); return FALSE; } }
+   foreach ($config['ignore_lsp_string'] as $bi) { if (stripos($lsp_name, $bi) !== FALSE) { print_debug("Skipped by strpos: $bi, $lsp_name "); return FALSE; } }
+   foreach ($config['ignore_lsp_regexp'] as $bi) { if (preg_match($bi, $lsp_name) > 0)    { print_debug("Skipped by regexp: $bi, $lsp_name "); return FALSE; } }
+   // Search duplicates for same mib/descr
+   if (in_array($lsp_name, array_values($valid[$lsp_mib]))) { print_debug("Skipped by already exist: $lsp_name "); return FALSE; }
+
+   $params       = array('lsp_index', 'lsp_mib', 'lsp_name', 'lsp_proto');
+   $params_state = array('lsp_polled', 'lsp_state', 'lsp_uptime', 'lsp_total_uptime', 'lsp_primary_uptime', 'lsp_transitions', 'lsp_path_changes',
+                         'lsp_bandwidth', 'lsp_octets', 'lsp_packets'); // This is changable params, not required for update
+
+   $device_id    = $device['device_id'];
+
+   $lsp_db = dbFetchRow("SELECT * FROM `lsp` WHERE `device_id` = ? AND `lsp_index` = ? AND `lsp_mib` = ?", array($device_id, $lsp_index, $lsp_mib));
+   if (!isset($lsp_db['lsp_id']))
+   {
+      $update = array('device_id' => $device_id);
+      foreach (array_merge($params, $params_state) as $param)
+      {
+         $update[$param] = ($$param === NULL ? array('NULL') : $$param);
+      }
+      $id = dbInsert($update, 'lsp');
+
+      $GLOBALS['module_stats']['lsp']['added']++;
+      log_event("$lsp_proto LSP added: index $lsp_index, mib $lsp_mib, name $lsp_name", $device, 'lsp', $id);
+   } else {
+      $update = array();
+      foreach ($params as $param)
+      {
+         if ($$param != $lsp_db[$param] ) { $update[$param] = ($$param === NULL ? array('NULL') : $$param); }
+      }
+      if (count($update))
+      {
+         dbUpdate($update, 'lsp', '`lsp_id` = ?', array($lsp_db['lsp_id']));
+         $GLOBALS['module_stats']['lsp']['updated']++;
+         log_event("$lsp_proto LSP updated: index $lsp_index, mib $lsp_mib, name $lsp_name", $device, 'lsp', $lsp_db['lsp_id']);
+      } else {
+         $GLOBALS['module_stats']['lsp']['unchanged']++;
+      }
+   }
+   print_debug_vars($update);
+   $valid[$lsp_mib][$lsp_index] = $lsp_name;
+}
+
 
 // EOF

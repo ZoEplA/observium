@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -15,6 +15,12 @@
 // args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, previous
 
 include($config['html_dir']."/includes/graphs/common.inc.php");
+
+$graph_return['valid_options'][] = "previous";
+//$graph_return['valid_options'][] = "total";
+$graph_return['valid_options'][] = "trend";
+$graph_return['valid_options'][] = "inverse";
+
 
 if ($format == "octets" || $format == "bytes")
 {
@@ -137,12 +143,12 @@ if ($format == "octets" || $format == "bytes")
 
 if ($graph_max)
 {
-  $rrd_options .= " AREA:in".$format."_max#B6D14B:";
+  $rrd_options .= " AREA:in".$format."_max#C4E5AC:";
 }
-$rrd_options .= " AREA:in".$format."#92B73F";
+$rrd_options .= " AREA:in".$format."#84BB5C";
 if ($graph_style != 'mrtg')
 {
-  $rrd_options .= " LINE1.25:in".$format."#4A8328";
+  $rrd_options .= " LINE1.25:in".$format."#357F44";
 }
 $rrd_options .= ":'In '";
 $rrd_options .= " GPRINT:in".$format.":LAST:%6.2lf%s";
@@ -158,13 +164,13 @@ if ($graph_max)
   } else {
     $rrd_options .= " AREA:dout";
   }
-  $rrd_options .= $format."_max#A0A0E5:";
+  $rrd_options .= $format."_max#ACC2E5:";
 }
 if ($graph_style != 'mrtg')
 {
-  $rrd_options .= " AREA:dout".$format."#7075B8";
+  $rrd_options .= " AREA:dout".$format."#7394CB";
 }
-$rrd_options .= " LINE1.25:dout".$format."#323B7C:'Out'";
+$rrd_options .= " LINE1.25:dout".$format."#284C7F:'Out'";
 $rrd_options .= " GPRINT:out".$format.":LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:out".$format.":AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:out".$format."_max:MAX:%6.2lf%s";

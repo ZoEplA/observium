@@ -1,5 +1,5 @@
 /*!
- * Bootstrap-select v1.12.2 (http://silviomoreto.github.io/bootstrap-select)
+ * Bootstrap-select v1.13.0-alpha (http://silviomoreto.github.io/bootstrap-select)
  *
  * Copyright 2013-2017 bootstrap-select
  * Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)
@@ -145,6 +145,9 @@ select.selectpicker {
      -moz-box-sizing: border-box;
           box-sizing: border-box;
 }
+.bootstrap-select.btn-group .dropdown-menu > .inner:focus {
+  outline: none !important;
+}
 .bootstrap-select.btn-group .dropdown-menu.inner {
   position: static;
   float: none;
@@ -167,9 +170,9 @@ select.selectpicker {
 .bootstrap-select.btn-group .dropdown-menu li a {
   cursor: pointer;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .bootstrap-select.btn-group .dropdown-menu li a.opt {
   position: relative;
@@ -305,11 +308,11 @@ select.selectpicker {
   float: none;
 }
 
+/* Added by Observium developers */
 .bootstrap-select .btn,
 .bs-placeholder,
 .add-on .btn, {
   box-shadow: none;
 }
-
 
 /*# sourceMappingURL=bootstrap-select.css.map */

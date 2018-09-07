@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -25,10 +25,13 @@ foreach (dbFetchRows('SELECT F.`device_id`, `vlan_vlan`, `vlan_name` FROM `vlans
                      LEFT JOIN `vlans` as V ON V.`vlan_vlan` = F.`vlan_id` AND V.`device_id` = F.`device_id`' .
                      $where . 'GROUP BY `device_id`, `vlan_vlan`;') as $data)
 {
+  $form_devices[] = $data['device_id'];
   if (is_numeric($data['vlan_vlan']))
   {
-    $form_devices[] = $data['device_id'];
     $form_items['vlans'][$data['vlan_vlan']] = 'Vlan ' . $data['vlan_vlan'];
+  }
+  if (strlen($data['vlan_name']))
+  {
     $form_items['vlan_name'][$data['vlan_name']] = $data['vlan_name'];
   }
 }

@@ -1,10 +1,10 @@
 
 -- ==================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This mib which contains objects manages the 
 --              SSH server and SSH client configuration. 
 -- Reference:  
--- Version: V2.15
+-- Version: V2.16
 -- ==================================================================
 -- ==================================================================
 -- 
@@ -25,7 +25,7 @@
     
         -- 1.3.6.1.4.1.2011.5.25.118
             hwSSH MODULE-IDENTITY 
-            LAST-UPDATED "201409260000Z"        
+            LAST-UPDATED "201701240000Z"        
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO                                        
                          "Huawei Industrial Base                
@@ -40,6 +40,17 @@
                 SSH server and SSH client configuration. 
                 "   
 --  Revision history
+             REVISION    "201701240000Z"
+             DESCRIPTION "V2.16, 
+                           1.Add hwSSHIPv4ServerPort                OID:1.3.6.1.4.1.2011.5.25.118.1.19;
+                           2.Add hwSSHIPv6ServerPort                OID:1.3.6.1.4.1.2011.5.25.118.1.20;
+                           3.Add hwStelnetIPv4ServerEnable        OID:1.3.6.1.4.1.2011.5.25.118.1.21;
+                           4.Add hwStelnetIPv6ServerEnable        OID:1.3.6.1.4.1.2011.5.25.118.1.22;
+                           5.Add hwSftpIPv4ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.23;
+                           6.Add hwSftpIPv6ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.24;
+                           7.Add hwSCPIPv4ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.25;
+                          8.Add hwSCPIPv6ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.26."
+
              REVISION    "201409260000Z"
              DESCRIPTION "V2.15, defect - DTS2014091709267 (default value in the description is updated)."
 
@@ -941,6 +952,133 @@
                 "The object specifies the max number of SCP user that SCP Server supporting.
                 The default is 2."
             ::= { hwSSHServer 18 }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.1.19
+        hwSSHIPv4ServerPort OBJECT-TYPE
+            SYNTAX Integer32 (22 | 1025..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies port number for SSH IPv4 server supporting.
+                The default value is 22."
+            ::= { hwSSHServer 19 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.20
+        hwSSHIPv6ServerPort OBJECT-TYPE
+            SYNTAX Integer32 (22 | 1025..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies port number for SSH IPv6 server supporting.
+                The default value is 22."
+            ::= { hwSSHServer 20 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.21
+        hwStelnetIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH stelnet IPv4 server is enable.
+                Options:
+                1. enable(1) -The SSH stelnet IPv4 server is enable.
+                2. disable(2)-The SSH stelnet IPv4 server is disable.
+                "
+            ::= { hwSSHServer 21 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.22
+        hwStelnetIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH stelnet IPv6 server is enable.
+                Options:
+                1. enable(1) -The stelnet IPv6 server is enable.
+                2. disable(2)-The stelnet IPv6 server is disable.
+                "
+            ::= { hwSSHServer 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.23
+        hwSftpIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the sftp IPv4 server is enable.
+                Options:
+                1.enable(1) -The sftp IPv4 server is enable
+                2.disable(2)-The sftp IPv4 server is disable.
+                "
+            ::= { hwSSHServer 23 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.24
+        hwSftpIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the sftp IPv6 server is enable.
+                Options:
+                1.enable(1) -the sftp IPv6 server is enable
+                2.disable(2)-the sftp IPv6 server is disable.
+                "
+            ::= { hwSSHServer 24 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.25
+        hwSCPIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SCP IPv4 Server is enable.
+                The default is 2."
+            ::= { hwSSHServer 25 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.26
+        hwSCPIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SCP IPv6 Server is enable.
+                The default is 2."
+            ::= { hwSSHServer 26 }
 
         
         -- 1.3.6.1.4.1.2011.5.25.118.2

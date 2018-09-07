@@ -363,7 +363,8 @@ rlIgmpSnoopMulticastTvEntry OBJECT-TYPE
 RlIgmpSnoopMulticastTvEntry ::= SEQUENCE {
         rlIgmpSnoopMulticastTvVID           VlanIndex,
         rlIgmpSnoopMulticastTvGroup         IpAddress,
-        rlIgmpSnoopMulticastTvStatus        RowStatus
+        rlIgmpSnoopMulticastTvStatus        RowStatus,
+        rlIgmpSnoopMulticastTvCount         INTEGER
     }
 
 rlIgmpSnoopMulticastTvVID OBJECT-TYPE
@@ -390,6 +391,15 @@ rlIgmpSnoopMulticastTvStatus OBJECT-TYPE
        "The row status variable, used according to
         row installation and removal conventions."
     ::= { rlIgmpSnoopMulticastTvEntry 3 }
+
+ rlIgmpSnoopMulticastTvCount OBJECT-TYPE
+     SYNTAX      INTEGER (1 .. 268435456 )
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The number of addresses starting with rlIgmpSnoopMulticastTvGroup."
+     DEFVAL  {1}
+     ::= { rlIgmpSnoopMulticastTvEntry 4 }
 
 --  rlIgmpSnoopMembershipTable  changed to Inet type (November 2007)   (See rlIgmpMldSnoopMembershipTable)
 
@@ -1116,14 +1126,14 @@ rlIgmpMldSnoopVlanAdminLastMemberQueryInterval OBJECT-TYPE
     ::= { rlIgmpMldSnoopVlanEntry 27 }
 
 rlIgmpMldSnoopVlanAdminLastMemberQueryCount OBJECT-TYPE
-    SYNTAX     Unsigned32 (1..7)
+    SYNTAX     Unsigned32 (0..7)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
             "Represents the number of group-specific and
             group-and-source-specific queries sent by the router before
-            it assumes there are no local members.
-          DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness }"
+            it assumes there are no local members. Value 0 is used to indicate 
+             usage of default value. DEFVAL  { rlIgmpMldSnoopVlanAdminRobustness }"
     ::= { rlIgmpMldSnoopVlanEntry 28 }
 
 rlIgmpMldSnoopVlanAdminStartupQueryInterval OBJECT-TYPE

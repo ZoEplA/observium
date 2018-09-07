@@ -116,6 +116,15 @@ function showDiv(checked, id) {
   }
 }
 
+function revealHiddenOverflow(d)
+{
+  if (d.style.overflow == "hidden" ) {
+    d.style.overflow = "visible";
+  } else {
+    d.style.overflow = "hidden";
+  }
+}
+
 // This function open links by onclick event and prevent duplicate windows when Meta/Ctrl key pressed
 function openLink(url) {
   document.onclick = function (event) {
@@ -141,7 +150,7 @@ jQuery(document).ready(function() {
   // Enable bootstrap-switch by default for data-toggle="switch" attribute
   // See options here: http://www.bootstrap-switch.org/documentation-3.html
   $('[data-toggle="switch"]').bootstrapSwitch();
-  
+
   // Preconfigured switch-mini
   $('[data-toggle="switch-mini"]').bootstrapSwitch({
     size:        'mini',

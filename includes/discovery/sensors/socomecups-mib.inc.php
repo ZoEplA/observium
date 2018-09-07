@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,7 +17,7 @@ $scale  = 0.1;
 $limits = array('limit_low' => 0);
 
 // Input
-$phases = snmp_get($device, "upsInputNumLines.0", "-Oqv", $mib);
+$phases = snmp_get_oid($device, "upsInputNumLines.0", $mib);
 $oids   = snmpwalk_cache_oid($device, "upsInputTable", array(), $mib);
 foreach ($oids as $index => $entry)
 {
@@ -40,12 +40,12 @@ foreach ($oids as $index => $entry)
 // Input Frequency
 $oid   = ".1.3.6.1.4.1.4555.1.1.1.1.3.2.0";
 $descr = "Input";
-$value = snmp_get($device, "upsInputFrequency.0", "-Oqv", $mib);
+$value = snmp_get_oid($device, "upsInputFrequency.0", $mib);
 
 discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsInputFrequency.0", 'netvision', $descr, $scale, $value);
 
 // Output
-$phases = snmp_get($device, "upsOutputNumLines.0", "-Oqv", $mib);
+$phases = snmp_get_oid($device, "upsOutputNumLines.0", $mib);
 $oids   = snmpwalk_cache_oid($device, "upsOutputTable", array(), $mib);
 foreach ($oids as $index => $entry)
 {
@@ -75,12 +75,12 @@ foreach ($oids as $index => $entry)
 // Output Frequency
 $oid   = ".1.3.6.1.4.1.4555.1.1.1.1.4.2.0";
 $descr = "Output";
-$value = snmp_get($device, "upsOutputFrequency.0", "-Oqv", $mib);
+$value = snmp_get_oid($device, "upsOutputFrequency.0", $mib);
 
 discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsOutputFrequency.0", 'netvision', $descr, $scale, $value);
 
 // Bypass
-$phases = snmp_get($device, "upsBypassNumLines.0", "-Oqv", $mib);
+$phases = snmp_get_oid($device, "upsBypassNumLines.0", $mib);
 $oids   = snmpwalk_cache_oid($device, "upsBypassTable", array(), $mib);
 foreach ($oids as $index => $entry)
 {
@@ -103,11 +103,11 @@ foreach ($oids as $index => $entry)
 // Bypass Frequency
 $oid   = ".1.3.6.1.4.1.4555.1.1.1.1.5.1.0";
 $descr = "Bypass";
-$value = snmp_get($device, "upsBypassFrequency.0", "-Oqv", $mib);
+$value = snmp_get_oid($device, "upsBypassFrequency.0", $mib);
 discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsBypassFrequency.0", 'netvision', $descr, $scale, $value);
 
 // Battery
-$oids  = snmp_get_multi($device, 'upsEstimatedMinutesRemaining.0 upsEstimatedChargeRemaining.0 upsBatteryVoltage.0 upsBatteryTemperature.0', '-OQUs', $mib);
+$oids  = snmp_get_multi_oid($device, 'upsEstimatedMinutesRemaining.0 upsEstimatedChargeRemaining.0 upsBatteryVoltage.0 upsBatteryTemperature.0', array(), $mib);
 $entry = $oids[0];
 
 $oid   = ".1.3.6.1.4.1.4555.1.1.1.1.2.3.0";

@@ -1067,7 +1067,10 @@ class SqlFormatter
         if (self::is_cli()) {
             return $string."\n";
         } else {
-            $string=trim($string);
+            $string = trim($string);
+            // This is derp truncate for long list
+            $string = preg_replace('!(IN</span>\s*)(\()([^\)]+)(\))!', '$1$2<div class="text-truncate" onclick="revealHiddenOverflow(this)">$3</div>$4', $string);
+
             if (!self::$use_pre) {
                 return $string;
             }

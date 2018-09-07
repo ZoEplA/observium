@@ -7,14 +7,15 @@
  *
  * @package        observium
  * @subpackage     webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-echo('<table class="table table-hover  table-condensed  table-striped"
-             style="vertical-align: middle; margin-top: 5px; margin-bottom: 10px;">');
+echo generate_box_open();
 
-echo('<thead><tr>
+echo '<table class="table table-hover  table-condensed  table-striped">';
+
+echo '<thead><tr>
           <th></th>
           <th></th>
           <th>AP</th>
@@ -26,7 +27,7 @@ echo('<thead><tr>
           <th>Protection</th>
           <th>Status</th>
           <th>Clients</th>
-        </tr></thead>');
+        </tr></thead>';
 
 $i = "1";
 
@@ -115,7 +116,9 @@ foreach ($radios as $radio)
 
 }
 
-echo("</table>");
+echo "</table>";
+
+echo generate_box_close();
 
 $pagetitle[] = "Radios";
 

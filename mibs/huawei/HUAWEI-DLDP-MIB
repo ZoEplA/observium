@@ -5,7 +5,7 @@
 --
 
 --   =================================================================
--- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: HUAWEI DLDP MIB, this mib will maintain information of DLDP 
 --              protocol for datacomm product.  

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -42,7 +42,7 @@ if ($GLOBALS['snmp_status'])
     $oid     = '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.1';
     $value   = $oids[1]['wtWebGraphThermHygroBinaryTempValue'];
 
-    $limits  = snmp_get_multi($device, 'wtWebGraphThermHygroAlarmMin.1 wtWebGraphThermHygroAlarmMax.1', '-OQUs', $mib);
+    $limits  = snmp_get_multi_oid($device, 'wtWebGraphThermHygroAlarmMin.1 wtWebGraphThermHygroAlarmMax.1', array(), $mib);
     $limits['limit_high'] = trim($limits[1]['wtWebGraphThermHygroAlarmMax'], ' "');
     $limits['limit_low']  = trim($limits[1]['wtWebGraphThermHygroAlarmMin'], ' "');
     $options = array('limit_high' => (is_numeric($limits['limit_high']) ? $limits['limit_high'] : NULL),
@@ -72,7 +72,7 @@ if ($GLOBALS['snmp_status'])
     if ($octet == "01")
     {
       // Humidity
-      $limits  = snmp_get_multi($device, 'wtWebGraphThermHygroAlarmRHMin.1 wtWebGraphThermHygroAlarmRHMax.1', '-OQUs', $mib);
+      $limits  = snmp_get_multi_oid($device, 'wtWebGraphThermHygroAlarmRHMin.1 wtWebGraphThermHygroAlarmRHMax.1', array(), $mib);
       $limits['limit_high'] = trim($limits[1]['wtWebGraphThermHygroAlarmRHMax'], ' "');
       $limits['limit_low']  = trim($limits[1]['wtWebGraphThermHygroAlarmRHMin'], ' "');
       $options = array('limit_high' => (is_numeric($limits['limit_high']) ? $limits['limit_high'] : NULL),

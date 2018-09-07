@@ -35,6 +35,7 @@ IMPORTS
     mwStatistics
         FROM MERU-SMI
     MwlNodeType,
+    MwlOnOffSwitch,
     MwlBandType
         FROM MERU-TC;
 
@@ -995,10 +996,10 @@ IMPORTS
 
   MwIfStatsEntry  ::=  SEQUENCE { 
        mwIfStatsTableIndex                                         Integer32, 
-       mwIfStatsIfIndex                                            Integer32,
        mwIfStatsIfDescr                                            DisplayString,
        mwIfStatsIfNodeId                                           Integer32,
        mwIfStatsIfOutQLen                                          Counter64,
+       mwIfStatsIfIndexStr                                         DisplayString,
        mwIfStatsIfNodeName                                         DisplayString,
        mwIfStatsIfNodeType                                         MwlNodeType,
        mwIfStatsIfInOctets                                         Counter64,
@@ -1023,14 +1024,6 @@ IMPORTS
     DESCRIPTION
          "The index value of the  table "
     ::= { mwIfStatsEntry 1 }
-
-  mwIfStatsIfIndex  OBJECT-TYPE
-    SYNTAX Integer32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-         "This object describes Interface Index"
-    ::= { mwIfStatsEntry    2 }
 
   mwIfStatsIfDescr  OBJECT-TYPE
     SYNTAX DisplayString
@@ -1160,13 +1153,21 @@ IMPORTS
          "This object describes In Unknown Protocols"
     ::= { mwIfStatsEntry   18 }
 
+  mwIfStatsIfIndexStr  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwIfStatsEntry   22 }
+
   mwIfStatsRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwIfStatsEntry 19 }
+    ::= { mwIfStatsEntry 20 }
 
   mwAuthStatsAuth8021xRequestCount  OBJECT-TYPE
     SYNTAX Unsigned32
@@ -1332,7 +1333,9 @@ IMPORTS
   MwStationStatsEntry  ::=  SEQUENCE { 
        mwStationStatsTableIndex                                    Integer32, 
        mwStationStatsMacAddress                                    MacAddress,
+       mwStationStatsRssiReportCount                               Unsigned32,
        mwStationStatsDhcpRequestCount                              Counter64,
+       mwStationStatsBssidReportCount                              Unsigned32,
        mwStationStatsSipVideoBandwidth                             Counter64,
        mwStationStatsSipVideoFlowCount                             Counter64,
        mwStationStatsSipAudioBandwidth                             Counter64,
@@ -1567,6 +1570,22 @@ IMPORTS
          "This object describes Involuntary Handoff Count"
     ::= { mwStationStatsEntry   26 }
 
+  mwStationStatsRssiReportCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rssi Report Count"
+    ::= { mwStationStatsEntry   27 }
+
+  mwStationStatsBssidReportCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Bssid Report Count"
+    ::= { mwStationStatsEntry   28 }
+
   mwApStationStatsTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwApStationStatsEntry
     MAX-ACCESS not-accessible
@@ -1602,11 +1621,16 @@ IMPORTS
        mwApStationStatsDhcpErrorCount                              Counter64,
        mwApStationStatsLRUSwapCounter                              Counter64,
        mwApStationStatsRxFcsErrorCount                             Counter64,
-       mwApStationStatsStationIPAddress                            IpAddress,
+       mwApStationStatsStationIPAddress                            Ipv6Address,
        mwApStationStatsRxDuplicateCount                            Counter64,
        mwApStationStatsDhcpRequestCount                            Counter64,
+       mwApStationStatsSUBeamFormerSupp                            MwlOnOffSwitch,
+       mwApStationStatsSUBeamFormeeSupp                            MwlOnOffSwitch,
+       mwApStationStatsMUBeamFormeeSupp                            MwlOnOffSwitch,
        mwApStationStatsStationMacAddress                           MacAddress,
+       mwApStationStatsStationIPv4Address                          IpAddress,
        mwApStationStatsChannelUtilization                          Counter64,
+       mwApStationStatsSoundingFrameCount                          Integer32,
        mwApStationStatsRxRetriedFrameCount                         Counter64,
        mwApStationStatsRxAverageAggrLength                         Counter64,
        mwApStationStatsTxAverageAggrLength                         Counter64,
@@ -1749,7 +1773,7 @@ IMPORTS
     ::= { mwApStationStatsEntry   16 }
 
   mwApStationStatsStationIPAddress  OBJECT-TYPE
-    SYNTAX IpAddress
+    SYNTAX Ipv6Address
     MAX-ACCESS  read-only 
     STATUS     current
     DESCRIPTION
@@ -1875,6 +1899,46 @@ IMPORTS
     DESCRIPTION
          "This object describes Tx Failed Count by Hardware Retry Exceed"
     ::= { mwApStationStatsEntry   32 }
+
+  mwApStationStatsSUBeamFormerSupp  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SU Beamformer support"
+    ::= { mwApStationStatsEntry   38 }
+
+  mwApStationStatsSUBeamFormeeSupp  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SU Beamformee support"
+    ::= { mwApStationStatsEntry   39 }
+
+  mwApStationStatsSoundingFrameCount  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SU/MU Sounding Frame Count"
+    ::= { mwApStationStatsEntry   40 }
+
+  mwApStationStatsStationIPv4Address  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwApStationStatsEntry   41 }
+
+  mwApStationStatsMUBeamFormeeSupp  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MU Beamformee support"
+    ::= { mwApStationStatsEntry   42 }
 
   mwCacApStatsTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwCacApStatsEntry
@@ -3171,6 +3235,54 @@ IMPORTS
          "This object describes Root File System Usage[%]"
     ::= { mwSystemResource   10 }
 
+  mwSystemResourceHighCpuUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes High CPU Usage [%]"
+    ::= { mwSystemResource   11 }
+
+  mwSystemResourceAvgCpuUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Average CPU Usage [%]"
+    ::= { mwSystemResource   12 }
+
+  mwSystemResourceCurCpuUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current CPU Usage [%]"
+    ::= { mwSystemResource   13 }
+
+  mwSystemResourceHighMemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes High Memory Usage [%]"
+    ::= { mwSystemResource   14 }
+
+  mwSystemResourceAvgMemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Average Memory Usage [%]"
+    ::= { mwSystemResource   15 }
+
+  mwSystemResourceCurMemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current Memory Usage [%]"
+    ::= { mwSystemResource   16 }
+
   mwSystemStationTotal11aStations  OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS  read-only 
@@ -3258,6 +3370,46 @@ IMPORTS
     DESCRIPTION
          "This object describes Associated Phone Station Count"
     ::= { mwSystemStation   11 }
+
+  mwSystemStationTotalWiredStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Wired Station Count"
+    ::= { mwSystemStation   12 }
+
+  mwSystemStationTotal11ac1Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac1stream Station Count"
+    ::= { mwSystemStation   13 }
+
+  mwSystemStationTotal11ac2Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac2stream Station Count"
+    ::= { mwSystemStation   14 }
+
+  mwSystemStationTotal11ac3Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac3stream Station Count"
+    ::= { mwSystemStation   15 }
+
+  mwSystemStationUnknown  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown rf band station count"
+    ::= { mwSystemStation   16 }
 
   mwSystemThruputTotalControllerRxBytes  OBJECT-TYPE
     SYNTAX Counter64
@@ -3350,6 +3502,7 @@ IMPORTS
        mwPerEss80211StatsTxThroughput                              Unsigned32,
        mwPerEss80211StatsTotalRxBytes                              Counter64,
        mwPerEss80211StatsTotalTxBytes                              Counter64,
+       mwPerEss80211StatsUnknownStation                            Integer32,
        mwPerEss80211StatsTotalThroughput                           Unsigned32,
        mwPerEss80211StatsTotalVideoRxBytes                         Counter64,
        mwPerEss80211StatsTotalVideoTxBytes                         Counter64,
@@ -3370,6 +3523,9 @@ IMPORTS
        mwPerEss80211StatsAssociated11an1StationNum                 Integer32,
        mwPerEss80211StatsAssociated11an2StationNum                 Integer32,
        mwPerEss80211StatsAssociated11an3StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11ac1StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11ac2StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11ac3StationNum                 Integer32,
        mwPerEss80211StatsAssociated11bgn1StationNum                Integer32,
        mwPerEss80211StatsAssociated11bgn2StationNum                Integer32,
        mwPerEss80211StatsAssociated11bgn3StationNum                Integer32 
@@ -3632,6 +3788,38 @@ IMPORTS
          "This object describes Associated 802.11an3stream station count"
     ::= { mwPerEss80211StatsEntry   48 }
 
+  mwPerEss80211StatsAssociated11ac1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11ac1stream station count"
+    ::= { mwPerEss80211StatsEntry   49 }
+
+  mwPerEss80211StatsAssociated11ac2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11ac2stream station count"
+    ::= { mwPerEss80211StatsEntry   50 }
+
+  mwPerEss80211StatsAssociated11ac3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11ac3stream station count"
+    ::= { mwPerEss80211StatsEntry   51 }
+
+  mwPerEss80211StatsUnknownStation  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown station count"
+    ::= { mwPerEss80211StatsEntry   52 }
+
   mwEssStatsSummaryTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwEssStatsSummaryEntry
     MAX-ACCESS not-accessible
@@ -3665,8 +3853,12 @@ IMPORTS
        mwEssStatsSummaryAN1StationNum                              Integer32,
        mwEssStatsSummaryAN2StationNum                              Integer32,
        mwEssStatsSummaryAN3StationNum                              Integer32,
+       mwEssStatsSummaryAC1StationNum                              Integer32,
+       mwEssStatsSummaryAC2StationNum                              Integer32,
+       mwEssStatsSummaryAC3StationNum                              Integer32,
        mwEssStatsSummaryTotalThroughput                            Unsigned32,
-       mwEssStatsSummaryTotalStationNum                            Integer32 
+       mwEssStatsSummaryTotalStationNum                            Integer32,
+       mwEssStatsSummaryUnknownStationNum                          Integer32 
   }
    
    
@@ -3805,6 +3997,38 @@ IMPORTS
     DESCRIPTION
          "This object describes 802.11an3stream station count"
     ::= { mwEssStatsSummaryEntry   19 }
+
+  mwEssStatsSummaryAC1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac1stream station count"
+    ::= { mwEssStatsSummaryEntry   20 }
+
+  mwEssStatsSummaryAC2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac2stream station count"
+    ::= { mwEssStatsSummaryEntry   21 }
+
+  mwEssStatsSummaryAC3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac3stream station count"
+    ::= { mwEssStatsSummaryEntry   22 }
+
+  mwEssStatsSummaryUnknownStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown station count"
+    ::= { mwEssStatsSummaryEntry   23 }
 
   
 END

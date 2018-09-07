@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-DC-BASE-MIB provides information about DataComm TRAPS
 -- 
 -- Reference:
--- Version:     V2.06
+-- Version:     V2.08
 -- History:
 -- 
 -- =================================================================
@@ -20,7 +20,7 @@
                 FROM HUAWEI-MIB            
             IANAItuProbableCause, IANAItuEventType            
                 FROM IANA-ITU-ALARM-TC-MIB            
-            ifIndex, ifName, ifDescr            
+            ifIndex, ifName, ifDescr           
                 FROM IF-MIB            
             ItuPerceivedSeverity            
                 FROM ITU-ALARM-TC-MIB            
@@ -35,11 +35,13 @@
             hwStorageSpaceFree
                 FROM  HUAWEI-FLASH-MAN-MIB
             hwStorageName
-                FROM  HUAWEI-FLASH-MAN-MIB;
-    
+                FROM  HUAWEI-FLASH-MAN-MIB
+            hwSecStatTrapSlot, hwSecStatTrapCPU
+               FROM  HUAWEI-SECURITY-STAT-MIB;           
+
     
         hwBaseTrapMIB MODULE-IDENTITY 
-            LAST-UPDATED "201506021411Z"        -- Jun 25, 2013 at 14:11 GMT
+            LAST-UPDATED "201609091200Z"        -- Sep 9, 2016 at 12:00 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -53,6 +55,12 @@
             DESCRIPTION 
                 "This is the base trap definition for DataCom."
             -- Revision history
+                                                          REVISION     "201609091200Z"
+                                                          DESCRIPTION  "v2.08, add new node: hwHdlcIICPacketCrcErr"
+
+                                                     REVISION     "201607251400Z"
+			DESCRIPTION  "V2.07,hwEntBandwidthMode, hwEntityBandwidthModeChange"
+
 			REVISION     "201506021411Z"
 			DESCRIPTION  "V2.06, hwVsDiskFullAlarm,hwVsDiskResume"
 
@@ -520,6 +528,17 @@
            SOFT_FORCE_DOWN: The interface was DOWN triggered by a protocol module or was administratively shut down."
        ::= { hwBaseTrapObject 17 }
 
+    hwEntBandwidthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                eth28x10gf(1),
+                eth26x10gf18xgf(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth mode of card."
+            ::= { hwBaseTrapObject 18 }   
 
         hwBaseTraps OBJECT IDENTIFIER ::= { hwBaseTrapMIB 2 }
 
@@ -699,6 +718,14 @@
             DESCRIPTION 
                 "Dying gasp event is occurred."
             ::= { hwEntityTrap 19 }
+
+        hwEntityBandwidthModeChange NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapEventType, entPhysicalIndex, entPhysicalContainedIn, entPhysicalName, 
+                hwEntBandwidthMode}
+            STATUS current
+            DESCRIPTION 
+                "The bandwidth mode of physical entity is changed."
+            ::= { hwEntityTrap 20 }
         
         hwEnvironmentTrap OBJECT IDENTIFIER ::= { hwBaseTraps 2 }
 
@@ -903,7 +930,8 @@
         DESCRIPTION 
             "ACU current startup system software and next startup system software are difference."
         ::= { hwEnvironmentTrap 23 }
-        
+
+
         hwPowerTrap OBJECT IDENTIFIER ::= { hwBaseTraps 3 }
 
         
@@ -1288,6 +1316,13 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
             DESCRIPTION 
                 "The interface is recovered from Loopback."
             ::= { hwHdlcTrap 2 }
+       
+         hwHdlcIICPacketCrcErr NOTIFICATION-TYPE
+             OBJECTS {hwSecStatTrapSlot, hwSecStatTrapCPU}
+             STATUS current
+             DESCRIPTION 
+                 "The packet(s) crc error"
+              ::= { hwHdlcTrap 3 }
 
     hwAutoFtpTrap OBJECT IDENTIFIER ::= { hwBaseTraps 16 }
         
@@ -1339,7 +1374,7 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
                 hwBaseThresholdLowCritical, hwBaseThresholdLowWarning, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical, hwBaseUsageValue, 
                 hwBaseUsageUnit, hwBaseUsageThreshold, hwDevAvailablePower, hwEntityRatedPower, hwDeviceTotalPower, 
                 hwBaseTrapLastPortType, hwPortPhysicalDownReason, hwBaseTrapCurPortType, hwBaseTrapReasonDescr, 
-                hwBaseTrapRelativeResource, hwFIBOverloadModule, hwBaseFlowDirectionType, hwPowerDirection, hwBaseTrapTrafficDir
+                hwBaseTrapRelativeResource, hwFIBOverloadModule, hwBaseFlowDirectionType, hwPowerDirection, hwBaseTrapTrafficDir,hwEntBandwidthMode
                 }
             STATUS current
             DESCRIPTION 
@@ -1364,7 +1399,7 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
                 hwPppLoopbackDetect, hwPppLoopbackDetResume, hwEntityCheckFail, hwEntityCheckResume, hwFlowCongestion, hwFlowCongestionResume, hwDeviceAbnormalRisingAlarm, 
                 hwResExhaustBfdAlarm, hwResExhaustBfdResume, hwResExhaustOamAlarm, hwResExhaustOamResume, hwHdlcLoopbackDetect, 
                 hwAutoFtpFailAlarm, hwOpticalPowerResume, hwHdlcLoopbackDetResume, hwPortPhysicalPortTypeChange, hwPortPhysicalAutoNegotiateFail, 
-                hwPortPhysicalAutoNegotiateResume, hwOpticalPowerAbnormal, hwAcuSoftwareUpgradeFailure}
+                hwPortPhysicalAutoNegotiateResume, hwOpticalPowerAbnormal, hwAcuSoftwareUpgradeFailure, hwEntityBandwidthModeChange,hwHdlcIICPacketCrcErr}
             STATUS current
             DESCRIPTION 
                 "Group for all base traps."

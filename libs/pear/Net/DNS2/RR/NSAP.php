@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: NSAP.php 179 2012-11-23 05:49:01Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -130,7 +130,7 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
         //
         // make sure the afi value is 47
         //
-        if ($x['afi'] == 47) {
+        if ($x['afi'] == '47') {
 
             $this->afi  = '0x' . $x['afi'];
             $this->idi  = $x['idi'];
@@ -169,7 +169,7 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
             //
             // we only support AFI 47- there arent' any others defined.
             //
-            if ($this->afi == 47) {
+            if ($this->afi == '47') {
 
                 //
                 // unpack the rest of the values
@@ -212,7 +212,7 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        if ($this->afi == 0x47) {
+        if ($this->afi == '0x47') {
 
             //
             // build the aa field

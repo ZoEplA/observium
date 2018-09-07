@@ -28,7 +28,7 @@ ExaltComm DEFINITIONS ::= BEGIN
                                 khz14000( 14000 ),
                                 khz16000( 16000 ),
                                 khz20000( 20000 ),
-                                kgz25000( 25000 ),
+                                khz25000( 25000 ),
                                 khz27500( 27500 ),
                                 khz28000( 28000 ),
                                 khz29650( 29650 ),
@@ -291,20 +291,30 @@ ExaltComm DEFINITIONS ::= BEGIN
         DESCRIPTION         "The 5 GHz Band Power levels."
         SYNTAX		    Integer32 (-70..240)
 
+    RadioTxPwr6gT ::= TEXTUAL-CONVENTION
+        STATUS		    current
+        DESCRIPTION         "The 6 GHz Band Power levels."
+        SYNTAX		    Integer32 (0..320)
+
+    RadioTxPwr7LgT ::= TEXTUAL-CONVENTION
+        STATUS		    current
+        DESCRIPTION         "The 7.0L GHz Band Power levels."
+        SYNTAX		    Integer32 (0..320)
+
     RadioTxPwr7gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 7 GHz Band Power levels."
-        SYNTAX		    Integer32 (30..260)
+        SYNTAX		    Integer32 (30..270)
 
     RadioTxPwr8gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 8 GHz Band Power levels."
-        SYNTAX		    Integer32 (30..260)
+        SYNTAX		    Integer32 (30..270)
 
     RadioTxPwr11gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 11 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..260)
+        SYNTAX		    Integer32 (0..270)
 
     RadioTxPwrHP11gT ::= TEXTUAL-CONVENTION
         STATUS		    current
@@ -314,32 +324,37 @@ ExaltComm DEFINITIONS ::= BEGIN
     RadioTxPwr13gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 13 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..260)
+        SYNTAX		    Integer32 (0..270)
 
     RadioTxPwr15gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 15 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..260)
+        SYNTAX		    Integer32 (0..270)
 
     RadioTxPwr18gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 18 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..230)
+        SYNTAX		    Integer32 (0..270)
 
     RadioTxPwr23gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 23 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..230)
+        SYNTAX		    Integer32 (0..260)
+
+    RadioTxPwr24gT ::= TEXTUAL-CONVENTION
+        STATUS		    current
+        DESCRIPTION         "The 24 GHz Band Power levels."
+        SYNTAX		    Integer32 (-250..50)
 
     RadioTxPwr28gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 28 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..230)
+        SYNTAX		    Integer32 (0..260)
 
     RadioTxPwr38gT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "The 38 GHz Band Power levels."
-        SYNTAX		    Integer32 (0..210)
+        SYNTAX		    Integer32 (0..240)
 
     RadioTxPwr42gT ::= TEXTUAL-CONVENTION
         STATUS		    current
@@ -518,6 +533,58 @@ ExaltComm DEFINITIONS ::= BEGIN
                                 diplexer864( 864 ),
                                 diplexer865( 865 ),
                                 diplexer866( 866 ),
+                                diplexer867( 867 ),
+                                diplexer868( 868 ),
+                                diplexer869( 869 ),
+                                diplexer870( 870 ),
+                                diplexer871( 871 ),
+                                diplexer872( 872 ),
+                                diplexer875( 875 ),
+                                diplexer876( 876 ),
+                                diplexer877( 877 ),
+                                diplexer878( 878 ),
+                                diplexer879( 879 ),
+                                diplexer880( 880 ),
+                                diplexer881( 881 ),
+                                diplexer882( 882 ),
+                                diplexer883( 883 ),
+                                diplexer884( 884 ),
+                                diplexer885( 885 ),
+                                diplexer886( 886 ),
+                                diplexer887( 887 ),
+                                diplexer888( 888 ),
+                                diplexer889( 889 ),
+                                diplexer890( 890 ),
+                                diplexer891( 891 ),
+                                diplexer892( 892 ),
+                                diplexer893( 893 ),
+                                diplexer894( 894 ),
+                                diplexer895( 895 ),
+                                diplexer896( 896 ),
+                                diplexer897( 897 ),
+                                diplexer898( 898 ),
+                                diplexer899( 899 ),
+                                diplexer900( 900 ),
+                                diplexer901( 901 ),
+                                diplexer902( 902 ),
+                                diplexer903( 903 ),
+                                diplexer904( 904 ),
+                                diplexer905( 905 ),
+                                diplexer906( 906 ),
+                                diplexer907( 907 ),
+                                diplexer908( 908 ),
+                                diplexer909( 909 ),
+                                diplexer910( 910 ),
+                                diplexer911( 911 ),
+                                diplexer912( 912 ),
+                                diplexer913( 913 ),
+                                diplexer914( 914 ),
+                                diplexer915( 915 ),
+                                diplexer916( 916 ),
+                                diplexer917( 917 ),
+                                diplexer918( 918 ),
+                                diplexer919( 919 ),
+                                diplexer920( 920 ),
                                 other( 7 )
                             }
 
@@ -775,37 +842,10 @@ ExaltComm DEFINITIONS ::= BEGIN
 	                     gain ranges from 18 to 38 dB, with 1 dB step."
         SYNTAX		    Integer32 (18..38)
 
-    QosModeT ::= TEXTUAL-CONVENTION
-        STATUS		    current
-        DESCRIPTION         "This MIB variable sets Qos Mode"
-        SYNTAX		    INTEGER {
-	                        disable(0),
-				qos-mode-mac-da(1),
-				qos-mode-mac-sa(2),
-				qos-mode-vlan-id(3),
-				qos-mode-802-1p(4),
-				qos-mode-port(5)
-			    }
-
     QosTagT ::= TEXTUAL-CONVENTION
         STATUS		    current
         DESCRIPTION         "This MIB variable sets Qos 802.1p tag."
         SYNTAX		    INTEGER (0..7)
-
-    QosPriorityT ::= TEXTUAL-CONVENTION
-        STATUS		    current
-        DESCRIPTION         "This MIB variable sets Qos priority, the higher number 
-                             the higher priority"
-        SYNTAX	           INTEGER {
-                                     priority0(0),
-                                     priority1(1),
-                                     priority2(2),
-                                     priority3(3),
-                                     priority4(4),
-                                     priority5(5),
-                                     priority6(6),
-                                     priority7(7)
-                            }
 
     QosQueueSizePercentT ::= TEXTUAL-CONVENTION
         STATUS		    current
@@ -971,16 +1011,16 @@ ExaltComm DEFINITIONS ::= BEGIN
            m128QAM( 3 ),
            m256QAM( 4 ),
            m512QAM( 6 ),
-           mBPSK( 8 ),
-           mQPSK( 9 ),
-           m8PSK( 10 ),
-           m32QAM( 11 ),
-           m64QAM( 12 ),
-           m128QAM( 13 ),
-           m16QAM( 14 ),
-           m512QAM( 15 ),
-           mQPSK( 16 ),
-           mBPSK( 17 )
+           mBPSK2( 8 ),
+           mQPSK2( 9 ),
+           m8PSK2( 10 ),
+           m16QAM2( 14 ),
+           m32QAM2( 11 ),
+           m64QAM2( 12 ),
+           m128QAM2( 13 ),
+           m512QAM2( 15 ),
+           mQPSK3( 16 ),
+           mBPSK3( 17 )
         }
 
     TcmModulationT ::= TEXTUAL-CONVENTION
@@ -1010,6 +1050,14 @@ ExaltComm DEFINITIONS ::= BEGIN
            m256QAMSysG( 20 )
 
         }
+
+    AcmPowerBoostEnableT ::= TEXTUAL-CONVENTION
+        STATUS		    current
+        DESCRIPTION         "ACM Power Boost Enable / Disable parameter"
+        SYNTAX		    INTEGER {
+                                disable( 0 ),
+                                enable( 1 )
+                            }
 
     FileTransferTypeT ::= TEXTUAL-CONVENTION
         STATUS		    current

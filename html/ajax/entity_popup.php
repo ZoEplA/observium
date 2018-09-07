@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage ajax
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -53,9 +53,9 @@ switch ($vars['entity_type'])
     if (is_numeric($vars['entity_id']) && $_SESSION['userlevel'] >= 5)
     {
       $group = get_group_by_id($vars['entity_id']);
-      generate_group_popup_header($group, array());
+      echo generate_group_popup_header($group, array());
     } else {
-      print_warning("You are not permitted to view this device.");
+      print_warning("You are not permitted to view this group.");
     }
     exit;
     break;

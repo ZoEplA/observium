@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: PTR.php 127 2011-12-03 03:29:39Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -80,7 +80,7 @@ class Net_DNS2_RR_PTR extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->cleanString($this->ptrdname) . '.';
+        return rtrim($this->ptrdname, '.') . '.';
     }
 
     /**
@@ -94,7 +94,7 @@ class Net_DNS2_RR_PTR extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->ptrdname = $this->cleanString(array_shift($rdata));
+        $this->ptrdname = rtrim(implode(' ', $rdata), '.');
         return true;
     }
 

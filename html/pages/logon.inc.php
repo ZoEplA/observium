@@ -1,21 +1,22 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ * Observium
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 ?>
 <div class="row" style="margin-top: 50px;">
   <div class="col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-xl-6 col-xl-offset-3">
-    <div class="box box-solid" style="background-image: url('images/login-hamster-large.png');  background-position: left 10px top -65px; background-repeat: no-repeat;">
-     <div class="login-box">
+    <div class="box box-solid" <?php if(TRUE) { echo 'style="background-image: url(\'images/login-hamster-large.png\');  background-position: left 10px top -65px; background-repeat: no-repeat;"'; } ?> >
+     <div class="login-box" <?php if(isset($config['web']['logo'])) { echo 'style="background-image: url(../images/'.$config['web']['logo'].');"'; }  ?> >
       <div class="row">
         <div class="col-xs-4 col-sm-4 col-md-4">
         </div>
@@ -47,7 +48,7 @@
                                       'class'       => 'input-xlarge',
                                       //'width'       => '95%',
                                       'value'       => '');
-if ($config['login_remember_me'] && check_extension_exists('mcrypt'))
+if ($config['login_remember_me'] && OBS_ENCRYPT)
 {
       $form['row'][2]['remember']  = array(
                                       'type'        => 'checkbox',

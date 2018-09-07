@@ -361,8 +361,17 @@ class Net_IPv6
 
                 if (2 == count($elements)) {
 
-                     $netmask = $elements[0];
-                     $bits    = $elements[1];
+                    $netmask = $elements[0];
+                    $bits    = $elements[1];
+
+                    // Correctly uncompress netmasks with prefixes, ie ::FFFF/96 == 0:0:0:0:0:FFFF:0:0/96
+                    // Need only for xxx::yyy/zz and ::yyy/zz
+                    // Added by Observium developers
+                    if (preg_match('/\:\:[a-f\d]{1,4}$/', $netmask) ||                  // ::yyy/zz
+                        preg_match('/^[a-f\d]{1,4}.*\:\:.*[a-f\d]{1,4}$/', $netmask)) { // xxx::yyy/zz
+                        $c_bits = intval((128 - $bits) / 16);
+                        $netmask .= str_repeat(':0', $c_bits);
+                    }
 
                 }
 
@@ -380,6 +389,9 @@ class Net_IPv6
 
         $binIp      = Net_IPv6::_ip2Bin(Net_IPv6::removeNetmaskSpec($ip));
         $binNetmask = Net_IPv6::_ip2Bin(Net_IPv6::removeNetmaskSpec($netmask));
+        //echo("IP: $ip, Net: $netmask, CIDR: /$bits\n");
+        //echo("IP:  ".substr($binIp, 0, $bits)." ".substr($binIp, $bits)." (".strlen($binIp).
+        //     ")\nNet: ".substr($binNetmask, 0, $bits)." ".substr($binNetmask, $bits)." (".strlen($binNetmask).")\n");
 
         if (null != $bits
             && "" != $bits
@@ -537,7 +549,7 @@ class Net_IPv6
 
         } else {
 
-            $ip     = Net_IPv6::removePrefixLength($ip);
+            $ip     = Net_IPv6::removeNetmaskSpec($ip);
             $prefix = '/'.$prefix;
 
         }
@@ -697,7 +709,7 @@ class Net_IPv6
 
         } else {
 
-            $ip     = Net_IPv6::removePrefixLength($ip);
+            $ip     = Net_IPv6::removeNetmaskSpec($ip);
             $prefix = '/'.$prefix;
 
         }
@@ -822,7 +834,7 @@ class Net_IPv6
 
         if ($uncompress) {
 
-            $ip = Net_IPv6::Uncompress($ip);
+            $ip = Net_IPv6::uncompress($ip);
 
         }
 
@@ -1036,6 +1048,17 @@ class Net_IPv6
         $binstr = '';
 
         $ip = Net_IPv6::removeNetmaskSpec($ip);
+
+        // Correctly convert IPv4 mapped addresses
+        // Added by Observium developers
+        list(, $ipv4) = Net_IPv6::SplitV64($ip, FALSE);
+        if (strlen($ipv4))
+        {
+            $ipv4map = explode('.', $ipv4, 4);
+            $ipv4replace = dechex($ipv4map[0] * 256 + $ipv4map[1]) . ':' . dechex($ipv4map[2] * 256 + $ipv4map[3]);
+            $ip = str_replace($ipv4, $ipv4replace, $ip);
+        }
+
         $ip = Net_IPv6::Uncompress($ip);
 
         $parts = explode(':', $ip);

@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: This mib file is used for management of huawei Class Based
 --              QoS information.
 -- Reference:
--- Version:     V2.17
+-- Version:     V2.29
 -- History:
 --              V1.0 tianli,2004.4.10,publish
 --              V1.1 lizhiyong, 2004-9-14
@@ -32,6 +32,22 @@
 --                  modified by yanruiqing 2015-09-01
 --              v2.17
 --                  modified by liuxiaoyan 2015-09-17
+--              v2.18
+--                  modified by liuxiaoyan 2016-05-13
+--              v2.22
+--                  modified by liye 2016-06-03
+--              v2.23
+--                  modified by wangcheng 2016-06-30
+--              v2.24
+--                  modified by shanruitang 2016-07-05
+--              v2.25
+--                  modified by yanruiqing 2016-08-22
+--              v2.26
+--                  modified by zhangyong 2016-10-19
+--              v2.27
+--                  modified by wangcheng 2016-11-30
+--              v2.29
+--                  modified by chenlong  2017-1-23
 -- ==========================================================================
 
     HUAWEI-CBQOS-MIB DEFINITIONS ::= BEGIN
@@ -54,7 +70,7 @@
     
     
         hwCBQoSMIB MODULE-IDENTITY 
-            LAST-UPDATED "201509011737Z"
+            LAST-UPDATED "201701231931Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -71,6 +87,46 @@
                 for Class Based QoS feature.                    
         
         "
+            REVISION "201701231931Z"
+               DESCRIPTION
+                  "MOD HwCBQoSMultiPolicyStatisticsEntry HwCBQoSMultiPolicyStatisticsClassifierEntry"
+
+            REVISION "201612141025Z"
+               DESCRIPTION
+                  "MOD  hwCBQoSCarStatisticsTable hwCBQoSCarExceededByteRate"
+
+            REVISION "201611301025Z"
+               DESCRIPTION
+                  "Add hwCBQoSGlobalApplyMultiPolicyTable"
+
+            REVISION "201607051025Z"
+               DESCRIPTION
+                 "hwCBQoSRedirectCfgInfoTable hwCBQoSWredType"
+                         
+            REVISION "201606301025Z"
+               DESCRIPTION
+                 "MOD hwCBQoSMatchRuleType"
+
+            REVISION "201606031025Z"
+               DESCRIPTION
+                 "ADD hwCBQoSUpdateUserQueueResourceNotEnoughAlarmTable hwCBQoSSetUserQueueResourceNotEnoughAlarmTable"
+
+            REVISION "201605131719Z"
+               DESCRIPTION
+                 "ADD hwCBQoSSubPolicyClassName"
+
+            REVISION "201604141737Z"
+               DESCRIPTION
+                 "ADD hwCBQoSGlobalCarStatisticsTable hwCBQoSGlobalPolicyStatisticsTable hwCBQoSGlobalClassifierStatisticsTable"
+
+            REVISION "201512031737Z"
+               DESCRIPTION
+                 "hwCBQoSPolicyStatClassifierName"
+
+            REVISION "201512021737Z"
+               DESCRIPTION
+                 "hwCBQoSPolicyStatClassifierName"
+
             REVISION "201509011737Z"
                DESCRIPTION
                  "MOD hwCBQoSClassifierCfgInfoEntry hwCBQoSBehaviorCfgInfoEntry hwCBQoSCarCfgInfoEntry NODE"
@@ -98,11 +154,16 @@
             REVISION "201509171808Z"
                DESCRIPTION
                   "MOD hwCBQoSIfApplyPolicyLinkLayer mpls-layer"
-				  				  
+		  
+            REVISION "201607051025Z"
+               DESCRIPTION
+                  "MOD  hwCBQoSGlobalCarStatisticsTable INDEX"
+            
+            REVISION "201607051025Z"
+               DESCRIPTION
+                  "MOD  hwCBQoSPolicyCfgInfoTable hwCBQoSPolicyShareFlag"	
+    	  
                ::= { hwQoS 1 }
-
-        
-    
 --
 -- Textual conventions
 --
@@ -156,8 +217,10 @@
                 app-protocol(35),
                 protocol-group(36),
                 vlanid-cvlanid(37),
-		tagged-vxlan(38),
-		untagged-vxlan(39)
+                tagged-vxlan(38),
+                untagged-vxlan(39),
+                transit-tagged-vxlan(40),
+                transit-untagged-vxlan(41)
                 }
 
 -- CarAction
@@ -375,7 +438,19 @@
                 cs7(8)
                 }
 
-  
+-- PolicyApplyType
+        PolicyApplyType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "UCL(0)
+                ACL(1)
+                ALL(2)"
+            SYNTAX INTEGER
+                {
+                ucl(0),
+                acl(1),
+                all(2)
+                } 
 --
 -- Node definitions
 --
@@ -578,6 +653,8 @@ This object has no default value."
 				hwCBQoSMatchInnerDstPort
 					Unsigned32,
 				hwCBQoSMatchInnerProtocol
+					Unsigned32,
+				hwCBQoSMatchVxlanVni
 					Unsigned32
              }
 
@@ -651,8 +728,10 @@ The value of this object can be match(1) or match-not(2)."
                 app-protocol(35),
                 protocol-group(36),
                 vlanid-cvlanid(37),
-				tagged-vxlan(38),
-				untagged-vxlan(39)
+                tagged-vxlan(38),
+                untagged-vxlan(39),
+                transit-tagged-vxlan(40),
+                transit-untagged-vxlan(41)
                 This object has no default value.
                 "
             ::= { hwCBQoSMatchRuleCfgInfoEntry 3 }
@@ -803,7 +882,16 @@ This object has no default value.
             DESCRIPTION
                 "Inner IP protocol, ranges from 0 to 255.
 		 The invalid value is 65536."
-            ::= { hwCBQoSMatchRuleCfgInfoEntry 17 }				
+            ::= { hwCBQoSMatchRuleCfgInfoEntry 17 }
+			
+        hwCBQoSMatchVxlanVni OBJECT-TYPE
+            SYNTAX Unsigned32 (1..16000000|0)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Vxlan VNI, ranges from 1 to 16000000.
+		 The invalid value is 0."
+            ::= { hwCBQoSMatchRuleCfgInfoEntry 18 }				
 
         
 -- hwCBQoSBehaviorObjects
@@ -1528,7 +1616,7 @@ This object has no default value.
             DESCRIPTION
                 "IP-Prec Based (1)
                 DSCP Based (2)"
-            DEFVAL { ip-precbased }
+            DEFVAL { ipPrecbased }
             ::= { hwCBQoSWredCfgInfoEntry 1 }
 
         
@@ -2114,10 +2202,10 @@ This object has no default value.
             STATUS current
             DESCRIPTION
                 "The value of this object identifies whether a primary or a standby LSP is used.
-The value can be main-lsp-path(1) or backup-lsp-path(2).
-The default value is main-lsp-path(1).
+The value can be mainLSPPath(1) or backupLSPPath(2).
+The default value is mainLSPPath(1).
 "
-            DEFVAL { main-LSP-Path }
+            DEFVAL { mainLSPPath }
             ::= { hwCBQoSRedirectCfgInfoEntry 8 }
 
         
@@ -3416,8 +3504,8 @@ This object has no default value.
             DESCRIPTION
                 "The value of the object identifies the attribute flag deciding sharing or not sharing a policy.
 The value can be either of the following:
-multiple(1): indicates that a policy is not shared.
-single(2): indicates that a policy is shared.
+multiple(1): indicates that a policy is shared.
+single(2): indicates that a policy is not shared.
 The default value is multiple(1).
 "
             DEFVAL { multiple }
@@ -4479,6 +4567,242 @@ This object has no default value.
                                 "RowStatus. Three actions are used: active, createAndGo, destroy."
                         ::= { hwCBQoSVlanApplyMultiPolicyEntry 5 }
 
+		--add by zhangyong 00291234
+                hwCBQoSGlobalAclNotSupportAlarmTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCBQoSGlobalAclNotSupportAlarmEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwCBQoSGlobalAclNotSupportAlarmTable"
+                        ::= { hwCBQoSApplyPolicyObjects 12 }
+                        
+              hwCBQoSGlobalAclNotSupportAlarmEntry OBJECT-TYPE
+            SYNTAX HwCBQoSGlobalAclNotSupportAlarmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwCBQoSGlobalAclNotSupportAlarmEntry"
+            INDEX { hwCBQoSGlobalAclDirection, hwCBQoSGlobalAclSlotID }
+            ::= { hwCBQoSGlobalAclNotSupportAlarmTable 1 }
+            
+              HwCBQoSGlobalAclNotSupportAlarmEntry ::=
+            SEQUENCE { 
+                  hwCBQoSGlobalAclDirection
+                    OCTET STRING,
+                  hwCBQoSGlobalAclSlotID      
+                        Integer32
+                 }
+                 
+            hwCBQoSGlobalAclDirection OBJECT-TYPE
+                    SYNTAX OCTET STRING (SIZE (1..31))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSGlobalAclDirection"
+                 ::= { hwCBQoSGlobalAclNotSupportAlarmEntry 1 }
+                 
+            hwCBQoSGlobalAclSlotID OBJECT-TYPE
+                    SYNTAX Integer32 (1..128)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSGlobalAclSlotID"
+                 ::= { hwCBQoSGlobalAclNotSupportAlarmEntry 2 }     
+		--end by zhangyong 00291234
+        --Beg: mod by l00200458 on 20160528                        
+       hwCBQoSUpdateUserQueueResourceNotEnoughAlarmTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwCBQoSUpdateUserQueueResourceNotEnoughAlarmTable"
+                        ::= { hwCBQoSApplyPolicyObjects 13 }
+                        
+              hwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry OBJECT-TYPE
+            SYNTAX HwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry"
+            INDEX { hwCBQoSUpdateUserQueueBehaviorName, hwCBQoSUpdateUserQueueSlotID, hwCBQoSUpdateUserQueueCir, hwCBQoSUpdateUserQueuePir }
+            ::= { hwCBQoSUpdateUserQueueResourceNotEnoughAlarmTable 1 }
+            
+              HwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry ::=
+            SEQUENCE { 
+                  hwCBQoSUpdateUserQueueBehaviorName
+                    OCTET STRING,
+                  hwCBQoSUpdateUserQueueSlotID      
+                        Integer32,
+                  hwCBQoSUpdateUserQueueCir
+                        Integer32,
+                  hwCBQoSUpdateUserQueuePir
+                        Integer32
+                 }
+                 
+            hwCBQoSUpdateUserQueueBehaviorName OBJECT-TYPE
+                    SYNTAX OCTET STRING (SIZE (1..31))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSUpdateUserQueueBehaviorName"
+                 ::= { hwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry 1 }
+                 
+            hwCBQoSUpdateUserQueueSlotID OBJECT-TYPE
+                    SYNTAX Integer32 (1..128)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSUpdateUserQueueSlotID"
+                 ::= { hwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry 2 }     
+            hwCBQoSUpdateUserQueueCir OBJECT-TYPE
+                    SYNTAX Integer32 (0..4294967295)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSUpdateUserQueueCir"
+                 ::= { hwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry 3 }                  
+            hwCBQoSUpdateUserQueuePir OBJECT-TYPE
+                    SYNTAX Integer32 (0..4294967295)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSUpdateUserQueuePir"
+                 ::= { hwCBQoSUpdateUserQueueResourceNotEnoughAlarmEntry 4 }                  
+
+       hwCBQoSSetUserQueueResourceNotEnoughAlarmTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCBQoSSetUserQueueResourceNotEnoughAlarmEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwCBQoSSetUserQueueResourceNotEnoughAlarmTable"
+                        ::= { hwCBQoSApplyPolicyObjects 14 }
+                        
+              hwCBQoSSetUserQueueResourceNotEnoughAlarmEntry OBJECT-TYPE
+            SYNTAX HwCBQoSSetUserQueueResourceNotEnoughAlarmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "hwCBQoSSetUserQueueResourceNotEnoughAlarmEntry"
+            INDEX { hwCBQoSSetUserQueueBehaviorName, hwCBQoSSetUserQueueSlotID }
+            ::= { hwCBQoSSetUserQueueResourceNotEnoughAlarmTable 1 }
+            
+              HwCBQoSSetUserQueueResourceNotEnoughAlarmEntry ::=
+            SEQUENCE { 
+                  hwCBQoSSetUserQueueBehaviorName
+                    OCTET STRING,
+                  hwCBQoSSetUserQueueSlotID      
+                        Integer32
+                 }
+                 
+            hwCBQoSSetUserQueueBehaviorName OBJECT-TYPE
+                    SYNTAX OCTET STRING (SIZE (1..31))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSSetUserQueueBehaviorName"
+                 ::= { hwCBQoSSetUserQueueResourceNotEnoughAlarmEntry 1 }
+                 
+            hwCBQoSSetUserQueueSlotID OBJECT-TYPE
+                    SYNTAX Integer32 (1..128)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "hwCBQoSSetUserQueueSlotID"
+                 ::= { hwCBQoSSetUserQueueResourceNotEnoughAlarmEntry 2 }                
+        --End: mod by l00200458 on 20160528                        
+
+-- multi-policy applied on global
+                hwCBQoSGlobalApplyMultiPolicyTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwCBQoSGlobalApplyMultiPolicyEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "A table of applying multi-policy on global."
+                        ::= { hwCBQoSApplyPolicyObjects 15 }
+
+                
+                hwCBQoSGlobalApplyMultiPolicyEntry OBJECT-TYPE
+                        SYNTAX HwCBQoSGlobalApplyMultiPolicyEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Policy applied on global Configuration Information Entry."
+                        INDEX { hwCBQoSGlobalApplyMultiPolicyChassisId, hwCBQoSGlobalApplyMultiPolicySlotId, hwCBQoSGlobalApplyMultiPolicyDirection, hwCBQoSGlobalApplyMultiPolicyIndex}
+                        ::= { hwCBQoSGlobalApplyMultiPolicyTable 1 }
+
+                
+                HwCBQoSGlobalApplyMultiPolicyEntry::=
+                        SEQUENCE 
+                        { 
+                            hwCBQoSGlobalApplyMultiPolicyChassisId
+                                    Integer32,
+                            hwCBQoSGlobalApplyMultiPolicySlotId
+                                    Integer32,
+                            hwCBQoSGlobalApplyMultiPolicyDirection
+                                    INTEGER,
+                            hwCBQoSGlobalApplyMultiPolicyIndex
+                                    Integer32,
+                            hwCBQoSGlobalApplyMultiPolicyName
+                                    OCTET STRING,
+                            hwCBQoSGlobalApplyMultiPolicyRowStatus
+                                    RowStatus
+                         }
+
+                hwCBQoSGlobalApplyMultiPolicyChassisId OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Chassis ID. When both this node and the next node(hwCBQoSGlobalApplyMultiPolicySlotId) are 0, it identifies all slot."
+                        ::= { hwCBQoSGlobalApplyMultiPolicyEntry 1 }
+
+                hwCBQoSGlobalApplyMultiPolicySlotId OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "slot ID. When both this node and the previous node(hwCBQoSGlobalApplyMultiPolicyChassisId) are 0, it identifies all slot."
+                        ::= { hwCBQoSGlobalApplyMultiPolicyEntry 2 }
+
+                
+                hwCBQoSGlobalApplyMultiPolicyDirection OBJECT-TYPE
+                        SYNTAX INTEGER
+                        {
+                            inbound(1),
+                            outbound(2)
+                        }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Policy Direction:
+                                 inbound(1), apply policy inbound;
+                                 outbound(2), apply policy outbound."
+                        ::= { hwCBQoSGlobalApplyMultiPolicyEntry 3 }
+
+                hwCBQoSGlobalApplyMultiPolicyIndex OBJECT-TYPE
+	       SYNTAX Integer32
+	       MAX-ACCESS read-only
+	       STATUS current
+	       DESCRIPTION
+		"The value of this object identifies the policy index."
+                        ::= { hwCBQoSGlobalApplyMultiPolicyEntry 4 }
+                
+                hwCBQoSGlobalApplyMultiPolicyName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (1..31))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Name of the applied policy."
+                        ::= { hwCBQoSGlobalApplyMultiPolicyEntry 5 }
+
+                
+                hwCBQoSGlobalApplyMultiPolicyRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "RowStatus. Three actions are used: active, createAndGo, destroy."
+                        ::= { hwCBQoSGlobalApplyMultiPolicyEntry 6 }
                 
 --  Running statistics information
         hwCBQoSApplyPolicyStaticsObjects OBJECT IDENTIFIER ::= { hwCBQoSObjects 5 }
@@ -7476,7 +7800,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the bytes rate within the range of CIR, in bps."
+                "This object indicates the bytes rate within the range of CIR, in Bps."
             ::= { hwCBQoSCarStatisticsEntry 14 }
 
         
@@ -7512,7 +7836,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the byte rate between PIR and CIR, in pps."
+                "This object indicates the byte rate between PIR and CIR, in Bps."
             ::= { hwCBQoSCarStatisticsEntry 18 }
 
         
@@ -7548,7 +7872,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the rate of bytes that exceeds the PIR."
+                "This object indicates the rate of bytes that exceeds the PIR, in Bps."
             ::= { hwCBQoSCarStatisticsEntry 22 }
 
         
@@ -7921,7 +8245,7 @@ This object has no default value.
                     }
 
         hwCBQoSPolicyStatClassifierName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..64))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -8189,7 +8513,35 @@ This object has no default value.
                 hwCBQoSMultiPolicyMatchedDropBytes
                     Counter64,
                 hwCBQoSMultiPolicyResetFlag
-                    EnabledStatus        
+                    EnabledStatus,
+                hwCBQoSMultiPolicyMatchedPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyMatchedBytesRate
+                    Counter64,
+                hwCBQoSMultiPolicyMatchedPassPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyMatchedPassBytesRate
+                    Counter64,
+                hwCBQoSMultiPolicyMatchedDropPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyMatchedDropBytesRate
+                    Counter64,	
+                hwCBQoSMultiPolicyFltPackets
+                    Counter64,
+                hwCBQoSMultiPolicyFltBytes
+                    Counter64,
+                hwCBQoSMultiPolicyFltPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyFltBytesRate
+                    Counter64,
+                hwCBQoSMultiPolicyCarPackets
+                    Counter64,
+                hwCBQoSMultiPolicyCarBytes
+                    Counter64,
+                hwCBQoSMultiPolicyCarPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyCarBytesRate
+                    Counter64
              }
 
 		hwCBQoSMultiPolicyIndex OBJECT-TYPE
@@ -8274,7 +8626,119 @@ This object has no default value.
             DESCRIPTION
                 "Reset flag enable(1),disable(2)."
             ::= { hwCBQoSMultiPolicyStatisticsEntry 20 }
+			
+        hwCBQoSMultiPolicyMatchedPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched packets"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 21 }
+			
+        hwCBQoSMultiPolicyMatchedBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 22 }
+			
+        hwCBQoSMultiPolicyMatchedPassPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched pass packets"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 23 }
+			
+        hwCBQoSMultiPolicyMatchedPassBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched pass bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 24 }	
 
+        hwCBQoSMultiPolicyMatchedDropPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched drop packets"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 25 }
+			
+        hwCBQoSMultiPolicyMatchedDropBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched drop bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 26 }
+			
+        hwCBQoSMultiPolicyFltPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that filtered by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 27 }
+			
+        hwCBQoSMultiPolicyFltBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that filtered by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 28 }
+			
+        hwCBQoSMultiPolicyFltPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of filterd drop packets"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 29 }
+			
+        hwCBQoSMultiPolicyFltBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of filterd drop bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 30 }
+			
+        hwCBQoSMultiPolicyCarPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that limited by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 31 }
+			
+        hwCBQoSMultiPolicyCarBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that limited by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 32 }
+			
+        hwCBQoSMultiPolicyCarPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of limited packets"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 33 }
+			
+        hwCBQoSMultiPolicyCarBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of limited bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsEntry 34 }
+			
 --  class based multi-policy stat     
         hwCBQoSMultiPolicyStatisticsClassifierTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwCBQoSMultiPolicyStatisticsClassifierEntry
@@ -8316,6 +8780,34 @@ This object has no default value.
                 hwCBQoSMultiPolicyStatClassifierMatchedDropPackets
                     Counter64,
                 hwCBQoSMultiPolicyStatClassifierMatchedDropBytes
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierMatchedPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierMatchedBytesRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierMatchedPassPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierMatchedPassBytesRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierMatchedDropPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierMatchedDropBytesRate
+                    Counter64,	
+                hwCBQoSMultiPolicyStatClassifierFltPackets
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierFltBytes
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierFltPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierFltBytesRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierCarPackets
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierCarBytes
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierCarPacketsRate
+                    Counter64,
+                hwCBQoSMultiPolicyStatClassifierCarBytesRate
                     Counter64
                     }
 			
@@ -8413,6 +8905,118 @@ This object has no default value.
                 "Number of bytes that match the traffic classifier and discard"
             ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 11 }
 
+        hwCBQoSMultiPolicyStatClassifierMatchedPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched packets"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 12 }
+			
+        hwCBQoSMultiPolicyStatClassifierMatchedBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 13 }
+			
+        hwCBQoSMultiPolicyStatClassifierMatchedPassPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched pass packets"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 14 }
+			
+        hwCBQoSMultiPolicyStatClassifierMatchedPassBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched pass bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 15 }	
+
+        hwCBQoSMultiPolicyStatClassifierMatchedDropPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched drop packets"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 16 }
+			
+        hwCBQoSMultiPolicyStatClassifierMatchedDropBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of matched drop bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 17 }
+			
+        hwCBQoSMultiPolicyStatClassifierFltPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that filtered by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 18 }
+			
+        hwCBQoSMultiPolicyStatClassifierFltBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that filtered by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 19 }
+			
+        hwCBQoSMultiPolicyStatClassifierFltPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of filterd drop packets"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 20 }
+			
+        hwCBQoSMultiPolicyStatClassifierFltBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of filterd drop bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 21 }
+			
+        hwCBQoSMultiPolicyStatClassifierCarPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that limited by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 22 }
+			
+        hwCBQoSMultiPolicyStatClassifierCarBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that limited by the traffic classification policy"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 23 }
+			
+        hwCBQoSMultiPolicyStatClassifierCarPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of limited packets"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 24 }
+			
+        hwCBQoSMultiPolicyStatClassifierCarBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of limited bytes"
+            ::= { hwCBQoSMultiPolicyStatisticsClassifierEntry 25 }
+
  --  class based subpolicy stat   
         hwCBQoSPolicyStatSubPolicyClassifierRunInfoTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwCBQoSPolicyStatSubPolicyClassifierRunInfoEntry
@@ -8506,7 +9110,9 @@ This object has no default value.
                 hwCBQoSSubPolicyStatClassifierCarRedPassedPacketsRate 
                     Counter64,
                 hwCBQoSSubPolicyStatClassifierCarRedPassedBytesRate 
-                    Counter64  
+                    Counter64,
+                hwCBQoSSubPolicyClassName    
+                    OCTET STRING                                         
                       }
 
         hwCBQoSSubPolicyClassIndex OBJECT-TYPE
@@ -8808,7 +9414,755 @@ This object has no default value.
                 "Rate of red bytes."
             ::= { hwCBQoSPolicyStatSubPolicyClassifierRunInfoEntry 37 }
       
-              
+        hwCBQoSSubPolicyClassName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Name of sub classifier."
+            ::= { hwCBQoSPolicyStatSubPolicyClassifierRunInfoEntry 38 }              
+--  Global Policy car statistics     
+        hwCBQoSGlobalCarStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCBQoSGlobalCarStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of CAR statistics for class-based traffic classification applied in traffic monitoring."
+            ::= { hwCBQoSPolicyStatisticsObjects 10 }
+
+        
+        hwCBQoSGlobalCarStatisticsEntry OBJECT-TYPE
+            SYNTAX HwCBQoSGlobalCarStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of CAR statistics for class-based traffic classification applied
+                in traffic monitoring, including the statistics of  packets that have the
+                rate within CIR, of CIR, of PIR or exceeds PIR."
+            INDEX { hwCBQoSGlobalCarApplyType, hwCBQoSGlobalCarDirection, hwCBQoSGlobalCarSlotId, hwCBQoSGlobalCarClassifierName }
+            ::= { hwCBQoSGlobalCarStatisticsTable 1 }
+
+        
+        HwCBQoSGlobalCarStatisticsEntry ::=
+            SEQUENCE { 
+                hwCBQoSGlobalCarSlotId
+                    Integer32,
+				hwCBQoSGlobalCarApplyType
+                    PolicyApplyType,
+                hwCBQoSGlobalCarDirection
+                    INTEGER,
+                hwCBQoSGlobalCarClassifierName
+                    OCTET STRING,
+                hwCBQoSGlobalCarConformedPackets
+                    Counter64,
+                hwCBQoSGlobalCarConformedBytes
+                    Counter64,
+                hwCBQoSGlobalCarConformedPacketRate
+                    Counter64,
+                hwCBQoSGlobalCarConformedByteRate
+                    Counter64,
+                hwCBQoSGlobalCarExceededPackets
+                    Counter64,
+                hwCBQoSGlobalCarExceededBytes
+                    Counter64,
+                hwCBQoSGlobalCarExceededPacketRate
+                    Counter64,
+                hwCBQoSGlobalCarExceededByteRate
+                    Counter64,
+                hwCBQoSGlobalCarOverflowPackets
+                    Counter64,
+                hwCBQoSGlobalCarOverflowBytes
+                    Counter64,
+                hwCBQoSGlobalCarOverflowPacketRate
+                    Counter64,
+                hwCBQoSGlobalCarOverflowByteRate
+                    Counter64,
+                hwCBQoSGlobalCarPassedPackets
+                    Counter64,
+                hwCBQoSGlobalCarPassedBytes
+                    Counter64,
+                hwCBQoSGlobalCarDroppedPackets
+                    Counter64,
+                hwCBQoSGlobalCarDroppedBytes
+                    Counter64
+             }
+
+        hwCBQoSGlobalCarSlotId OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ID of the slot that the interface is located."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 1 }
+
+
+        hwCBQoSGlobalCarApplyType OBJECT-TYPE
+            SYNTAX PolicyApplyType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of car applied in global."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 2 }
+
+
+        hwCBQoSGlobalCarDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inbound(1),
+                outbound(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the direction where the CAR statistics are queried."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 3 }
+
+
+        hwCBQoSGlobalCarClassifierName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of classifier."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 4 }
+
+
+        hwCBQoSGlobalCarConformedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of packets within the range of CIR."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 5 }
+
+        
+        hwCBQoSGlobalCarConformedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of bytes within the range of CIR."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 6 }
+
+        
+        hwCBQoSGlobalCarConformedPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the packet rate within the range of CIR, in pps."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 7 }
+
+        
+        hwCBQoSGlobalCarConformedByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the bytes rate within the range of CIR, in Bps."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 8 }
+
+        
+        hwCBQoSGlobalCarExceededPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of packets between PIR and CIR."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 9 }
+
+        
+        hwCBQoSGlobalCarExceededBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of bytes between PIR and CIR."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 10 }
+
+        
+        hwCBQoSGlobalCarExceededPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the packet rate between PIR and CIR, in pps."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 11 }
+
+        
+        hwCBQoSGlobalCarExceededByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the byte rate between PIR and CIR, in Bps."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 12 }
+
+        
+        hwCBQoSGlobalCarOverflowPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate of packets that exceeds the PIR."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 13 }
+
+        
+        hwCBQoSGlobalCarOverflowBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of bytes when PIR is exceeded."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 14 }
+
+        
+        hwCBQoSGlobalCarOverflowPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate of packets that exceeds the PIR."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 15 }
+
+        
+        hwCBQoSGlobalCarOverflowByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate of bytes that exceeds the PIR, in Bps."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 16 }
+
+        
+        hwCBQoSGlobalCarPassedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of packets passed after the Committed Access Rate (CAR) is set."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 17 }
+			 
+        hwCBQoSGlobalCarPassedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of the bytes passed after CAR is set."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 18 }
+
+        
+        hwCBQoSGlobalCarDroppedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of discarded packets after CAR is set."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 19 }
+
+        hwCBQoSGlobalCarDroppedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of discarded packets after CAR is set."
+            ::= { hwCBQoSGlobalCarStatisticsEntry 20 }			
+        
+		
+-- Global policy statics
+        hwCBQoSGlobalPolicyStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCBQoSGlobalPolicyStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of policy statistics applied on the system.
+                It takes the slot as a unit to sum up all the classes
+                in the policy that are matched or are not matched."
+            ::= { hwCBQoSPolicyStatisticsObjects 11 }
+
+        
+        hwCBQoSGlobalPolicyStatisticsEntry OBJECT-TYPE
+            SYNTAX HwCBQoSGlobalPolicyStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Statistics information of the policy."
+            INDEX { hwCBQoSGlobalPolicyApplyType, hwCBQoSGlobalPolicyDirection, hwCBQoSGlobalPolicySlotId }
+            ::= { hwCBQoSGlobalPolicyStatisticsTable 1 }
+
+        
+        HwCBQoSGlobalPolicyStatisticsEntry ::=
+            SEQUENCE { 
+                hwCBQoSGlobalPolicySlotId
+                    Integer32,
+				hwCBQoSGlobalPolicyApplyType
+                    PolicyApplyType,
+                hwCBQoSGlobalPolicyDirection
+                    INTEGER,
+                hwCBQoSGlobalPolicyMatchedPackets
+                    Counter64,
+                hwCBQoSGlobalPolicyMatchedBytes
+                    Counter64,
+                hwCBQoSGlobalPolicyUnmatchedPackets
+                    Counter64,
+                hwCBQoSGlobalPolicyUnmatchedBytes
+                    Counter64,
+                hwCBQoSGlobalPolicyMatchedPassPackets
+                    Counter64,
+                hwCBQoSGlobalPolicyMatchedPassBytes
+                    Counter64,
+                hwCBQoSGlobalPolicyMatchedDropPackets
+                    Counter64,
+                hwCBQoSGlobalPolicyMatchedDropBytes
+                    Counter64,
+                hwCBQoSGlobalPolicyResetFlag
+                    EnabledStatus					
+             }
+
+
+        hwCBQoSGlobalPolicySlotId OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ID of the slot that the interface is located."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 1 }
+
+
+        hwCBQoSGlobalPolicyApplyType OBJECT-TYPE
+            SYNTAX PolicyApplyType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of car."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 2 }
+
+
+        hwCBQoSGlobalPolicyDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inbound(1),
+                outbound(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the direction where the CAR statistics are queried."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 3 }
+	    
+	    
+	hwCBQoSGlobalPolicyMatchedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of packets matching the traffic classification policy."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 4 }
+
+        
+        hwCBQoSGlobalPolicyMatchedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of bytes matching the traffic classification policy."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 5 }
+
+        
+        hwCBQoSGlobalPolicyUnmatchedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of packets mismatching the traffic classification policy."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 6 }
+
+        
+        hwCBQoSGlobalPolicyUnmatchedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of bytes mismatching the traffic classification policy."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 7 } 
+
+        hwCBQoSGlobalPolicyMatchedPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that match the traffic classification policy and pass through"
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 8 }
+            
+        hwCBQoSGlobalPolicyMatchedPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that match the traffic classification policy and pass through"
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 9 }
+            
+        hwCBQoSGlobalPolicyMatchedDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that match the traffic classification policy and are discarded"
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 10 }
+            
+        hwCBQoSGlobalPolicyMatchedDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that match the traffic classification policy and are discarded"
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 11 }
+            
+        hwCBQoSGlobalPolicyResetFlag OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset flag enable(1),disable(2)."
+            ::= { hwCBQoSGlobalPolicyStatisticsEntry 12 }
+
+
+
+--  Global classifier statistics
+        hwCBQoSGlobalClassifierStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCBQoSGlobalClassifierStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of classifier statistics applied on the interface.
+                It takes the interface as a unit in the class that are matched or are not matched."
+            ::= { hwCBQoSPolicyStatisticsObjects 12 }
+            
+        hwCBQoSGlobalClassifierStatisticsEntry OBJECT-TYPE
+            SYNTAX HwCBQoSGlobalClassifierStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Statistics information of the class."
+            INDEX { hwCBQoSGlobalClassifierApplyType, hwCBQoSGlobalClassifierDirection, hwCBQoSGlobalClassifierSlotId, hwCBQoSGlobalClassifierClassifierName }
+            ::= { hwCBQoSGlobalClassifierStatisticsTable 1 }
+
+        
+        HwCBQoSGlobalClassifierStatisticsEntry ::=
+            SEQUENCE {
+				hwCBQoSGlobalClassifierSlotId
+                    Integer32,
+				hwCBQoSGlobalClassifierApplyType
+                    PolicyApplyType,
+                hwCBQoSGlobalClassifierDirection
+                    INTEGER,
+                hwCBQoSGlobalClassifierClassifierName
+                    OCTET STRING,
+                hwCBQoSGlobalClassifierMatchedPackets
+                    Counter64,
+                hwCBQoSGlobalClassifierMatchedBytes
+                    Counter64,
+                hwCBQoSGlobalClassifierMatchedPassPackets
+                    Counter64,
+                hwCBQoSGlobalClassifierMatchedPassBytes
+                    Counter64,
+                hwCBQoSGlobalClassifierMatchedDropPackets
+                    Counter64,
+                hwCBQoSGlobalClassifierMatchedDropBytes
+                    Counter64
+             }
+			 
+                  
+        hwCBQoSGlobalClassifierSlotId OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ID of the slot that the interface is located."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 1 }
+
+
+        hwCBQoSGlobalClassifierApplyType OBJECT-TYPE
+            SYNTAX PolicyApplyType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of car."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 2 }
+
+
+        hwCBQoSGlobalClassifierDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inbound(1),
+                outbound(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the direction where the CAR statistics are queried."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 3 }
+
+
+        hwCBQoSGlobalClassifierClassifierName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of classifier."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 4 }
+	      
+	      
+	hwCBQoSGlobalClassifierMatchedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the number of packets that match the class."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 5 }
+
+        
+        hwCBQoSGlobalClassifierMatchedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the number of matched bytes."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 6 }     
+        
+        hwCBQoSGlobalClassifierMatchedPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the matched and passed traffic in packets."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 7 }
+            
+        hwCBQoSGlobalClassifierMatchedPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the matched and passed traffic in bytes."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 8 }
+            
+        hwCBQoSGlobalClassifierMatchedDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the matched and discarded traffic in packets."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 9 }
+            
+        hwCBQoSGlobalClassifierMatchedDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the matched and discarded traffic in bytes."
+            ::= { hwCBQoSGlobalClassifierStatisticsEntry 10 }            
+
+-- multi-policy applied on global statistics based on policy
+        hwCBQoSGlobalMultiPolicyStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCBQoSGlobalMultiPolicyStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of statistics for policy applied on global.
+                It sums up all the classes in the policy that are matched."
+            ::= { hwCBQoSPolicyStatisticsObjects 13 }
+
+        
+        hwCBQoSGlobalMultiPolicyStatisticsEntry OBJECT-TYPE
+            SYNTAX HwCBQoSGlobalMultiPolicyStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Statistics information of the policy."
+            INDEX { hwCBQoSGlobalApplyMultiPolicyChassisId, hwCBQoSGlobalApplyMultiPolicySlotId, hwCBQoSGlobalApplyMultiPolicyDirection, hwCBQoSGlobalApplyMultiPolicyIndex }
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsTable 1 }
+
+        
+        HwCBQoSGlobalMultiPolicyStatisticsEntry ::=
+            SEQUENCE {
+                hwCBQoSGlobalMultiPolicyMatchedPackets
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyMatchedBytes
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyMatchedPassPackets
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyMatchedPassBytes
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyMatchedDropPackets
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyMatchedDropBytes
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyResetFlag
+                    EnabledStatus        
+             }
+			 
+        hwCBQoSGlobalMultiPolicyMatchedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of packets matching the traffic policy."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 1 }
+
+        
+        hwCBQoSGlobalMultiPolicyMatchedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of bytes matching the traffic policy."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 2 }
+  
+        hwCBQoSGlobalMultiPolicyMatchedPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that match the traffic classification policy and pass through"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 3 }
+            
+        hwCBQoSGlobalMultiPolicyMatchedPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that match the traffic classification policy and pass through"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 4 }
+            
+        hwCBQoSGlobalMultiPolicyMatchedDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that match the traffic classification policy and are discarded"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 5 }
+            
+        hwCBQoSGlobalMultiPolicyMatchedDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that match the traffic classification policy and are discarded"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 6 }
+            
+        hwCBQoSGlobalMultiPolicyResetFlag OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset flag enable(1),disable(2)."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsEntry 7 }
+
+--  class based multi-policy applied on global stat     
+        hwCBQoSGlobalMultiPolicyStatisticsClassifierTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCBQoSGlobalMultiPolicyStatisticsClassifierEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of class based policy statistics."
+            ::= { hwCBQoSPolicyStatisticsObjects 14 }
+        
+        hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry OBJECT-TYPE
+            SYNTAX HwCBQoSGlobalMultiPolicyStatisticsClassifierEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Class based policy statistics entry."
+            INDEX { hwCBQoSGlobalApplyMultiPolicyChassisId, hwCBQoSGlobalApplyMultiPolicySlotId, hwCBQoSGlobalApplyMultiPolicyDirection, hwCBQoSGlobalApplyMultiPolicyIndex, hwCBQoSGlobalMultiPolicyStatClassifierIndex }
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierTable 1 }
+        
+        HwCBQoSGlobalMultiPolicyStatisticsClassifierEntry ::=
+            SEQUENCE {               
+                hwCBQoSGlobalMultiPolicyStatClassifierIndex
+                    Integer32,
+                hwCBQoSGlobalMultiPolicyStatClassifierName
+                    OCTET STRING,				
+                hwCBQoSGlobalMultiPolicyStatClassifierMatchedPackets
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyStatClassifierMatchedBytes
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyStatClassifierMatchedPassPackets
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyStatClassifierMatchedPassBytes
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyStatClassifierMatchedDropPackets
+                    Counter64,
+                hwCBQoSGlobalMultiPolicyStatClassifierMatchedDropBytes
+                    Counter64
+                    }
+			            
+        hwCBQoSGlobalMultiPolicyStatClassifierIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the classifier index."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 1 }    
+		
+        hwCBQoSGlobalMultiPolicyStatClassifierName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Name of classifier."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 2 }
+        
+        hwCBQoSGlobalMultiPolicyStatClassifierMatchedPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of matched packets."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 3 }
+        
+        hwCBQoSGlobalMultiPolicyStatClassifierMatchedBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of matched bytes."
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 4 }
+  
+        hwCBQoSGlobalMultiPolicyStatClassifierMatchedPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that match the traffic classifier and pass through"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 5 }
+            
+
+        hwCBQoSGlobalMultiPolicyStatClassifierMatchedPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that match the traffic classifier and pass through"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 6 }
+            
+
+        hwCBQoSGlobalMultiPolicyStatClassifierMatchedDropPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets that match the traffic classifier and discard"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 7 }
+            
+ 
+        hwCBQoSGlobalMultiPolicyStatClassifierMatchedDropBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of bytes that match the traffic classifier and discard"
+            ::= { hwCBQoSGlobalMultiPolicyStatisticsClassifierEntry 8 }
+			
 -- hwCBQoSGeneral
 
     hwCBQoSGeneral OBJECT IDENTIFIER ::= { hwCBQoSObjects 6 }    
@@ -9005,10 +10359,34 @@ This object has no default value.
             DESCRIPTION 
                 "The SNMP trap is generated when the action is not supported."
             ::= { hwCBQoSNotifications 4 }
+			
+        hwCBQoSGlobalAclNotSupportAlarm NOTIFICATION-TYPE
+            OBJECTS { hwCBQoSGlobalAclDirection, hwCBQoSGlobalAclSlotID }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap is generated when the Global ACL is not support the ACL."
+            ::= { hwCBQoSNotifications 5 }
+       --end: mod by j00126783 for policy-alarm
+ 
+       --Beg: mod by l00200458 on 20160528                        
+       -- 1.3.6.1.4.1.2011.5.25.32.1.2.6
+       hwCBQoSUpdateUserQueueResourceNotEnoughAlarm NOTIFICATION-TYPE
+            OBJECTS { hwCBQoSUpdateUserQueueBehaviorName, hwCBQoSUpdateUserQueueSlotID, hwCBQoSUpdateUserQueueCir, hwCBQoSUpdateUserQueuePir }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap is generated when the action user-queue update failed."
+            ::= { hwCBQoSNotifications 6 }
+       -- 1.3.6.1.4.1.2011.5.25.32.1.2.7
+       hwCBQoSSetUserQueueResourceNotEnoughAlarm NOTIFICATION-TYPE
+            OBJECTS { hwCBQoSSetUserQueueBehaviorName, hwCBQoSSetUserQueueSlotID }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap is generated when the action user-queue config failed."
+            ::= { hwCBQoSNotifications 7 }
+       --End: mod by l00200458 on 20160528                        
         hwCBQoSConformance OBJECT IDENTIFIER ::= { hwCBQoSMIB 3 }
         hwCBQoSCompliances OBJECT IDENTIFIER ::= { hwCBQoSConformance 1 }
-       --end: mod by j00126783 for policy-alarm
-    
+   
 --  compliance statements
 -- this module
         hwCBQoSCompliance MODULE-COMPLIANCE
@@ -9026,7 +10404,8 @@ This object has no default value.
                     hwCBQoSAtmPvcWredRunInfoGroup, hwCBQoSFrPvcCbqRunInfoGroup, hwCBQoSFrPvcClassMatchRunInfoGroup, hwCBQoSFrPvcCarRunInfoGroup, hwCBQoSFrPvcGtsRunInfoGroup, 
                     hwCBQoSFrPvcRemarkRunInfoGroup, hwCBQoSFrPvcQueueRunInfoGroup, hwCBQoSFrPvcWredRunInfoGroup, hwCBQoSIfVlanClassMatchRunInfoGroup, hwCBQoSLrGroup, 
                     hwCBQoSNestPolicyGroup, hwCBQoSIfLrRunInfoGroup, hwCBQoSAtmPvcLrRunInfoGroup, hwCBQoSFrPvcLrRunInfoGroup, hwCBQoSCarStatisticsGroup, 
-                    hwCBQoSPolicyStatisticsGroup,  hwCBQoSRuleNotSupportAlarmGroup, hwCBQoSActionNotSupportAlarmGroup}
+                    hwCBQoSPolicyStatisticsGroup,  hwCBQoSRuleNotSupportAlarmGroup, hwCBQoSActionNotSupportAlarmGroup, hwCBQoSGlobalAclNotSupportAlarmGroup, 
+                    hwCBQoSUpdateUserQueueResourceNotEnoughAlarmGroup, hwCBQoSSetUserQueueResourceNotEnoughAlarmGroup}
             ::= { hwCBQoSCompliances 1 }
 
         
@@ -9039,7 +10418,7 @@ This object has no default value.
                 hwCBQoSClassifierLayer, hwCBQoSClassifierRowStatus, hwCBQoSMatchRuleIndex, hwCBQoSMatchRuleIfNot, hwCBQoSMatchRuleType, 
                 hwCBQoSMatchRuleStringValue, hwCBQoSMatchMacMask, hwCBQoSMatchRuleIntValue1, hwCBQoSMatchRuleIntValue2, hwCBQoSMatchRuleRowStatus,
                 hwCBQoSMatchVlanEndId, hwCBQoSMatchInnerSrcIp, hwCBQoSMatchInnerSrcIpMask, hwCBQoSMatchInnerDstIp, hwCBQoSMatchInnerDstIpMask,
-                hwCBQoSMatchInnerSrcPort,  hwCBQoSMatchInnerDstPort, hwCBQoSMatchInnerProtocol
+                hwCBQoSMatchInnerSrcPort,  hwCBQoSMatchInnerDstPort, hwCBQoSMatchInnerProtocol, hwCBQoSMatchVxlanVni
                  }
             STATUS current
             DESCRIPTION 
@@ -9647,12 +11026,37 @@ This object has no default value.
                 hwCBQoSSubPolicyStatClassifierCarYellowPassedPacketsRate, 
                 hwCBQoSSubPolicyStatClassifierCarYellowPassedBytesRate, 
                 hwCBQoSSubPolicyStatClassifierCarRedPassedPacketsRate ,
-                hwCBQoSSubPolicyStatClassifierCarRedPassedBytesRate
+                hwCBQoSSubPolicyStatClassifierCarRedPassedBytesRate ,
+                hwCBQoSSubPolicyClassName
                     }
 
         STATUS current
         DESCRIPTION 
             "This is a optional group of information."
         ::= { hwCBQoSGroups 64 }
+		--add by zhangyong 00291234
+		-- 1.3.6.1.4.1.2011.5.25.32.1.3.2.64	
+		hwCBQoSGlobalAclNotSupportAlarmGroup OBJECT-GROUP
+			OBJECTS { hwCBQoSGlobalAclDirection, hwCBQoSGlobalAclSlotID }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwCBQoSGroups 65 } 
            
+        --Beg: mod by l00200458 on 20160528                        
+        -- 1.3.6.1.4.1.2011.5.25.32.1.3.2.66
+        hwCBQoSUpdateUserQueueResourceNotEnoughAlarmGroup OBJECT-GROUP
+            OBJECTS { hwCBQoSUpdateUserQueueBehaviorName, hwCBQoSUpdateUserQueueSlotID, hwCBQoSUpdateUserQueueCir, hwCBQoSUpdateUserQueuePir }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwCBQoSGroups 66 }    
+        hwCBQoSSetUserQueueResourceNotEnoughAlarmGroup OBJECT-GROUP
+            OBJECTS { hwCBQoSSetUserQueueBehaviorName, hwCBQoSSetUserQueueSlotID }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwCBQoSGroups 67 }    
+        --End: mod by l00200458 on 20160528                        
+
     END

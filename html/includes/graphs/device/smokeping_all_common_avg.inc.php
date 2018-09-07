@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -22,9 +22,9 @@ include_once($config['html_dir']."/includes/graphs/common.inc.php");
 include("smokeping_common.inc.php");
 
 $i = 0;
-$pings = 20;
+$pings = $config['smokeping']['pings'];
 $iter = 0;
-$colourset = "mixed";
+$colourset = "mixed-10c";
 
 if($width > "500")
 {
@@ -51,10 +51,10 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
   $descr = rrdtool_escape($source, $descr_len);
 
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
-  $rrd_options .= " CDEF:dm$i=median$i,UN,0,median$i,IF";
+#  $rrd_options .= " CDEF:dm$i=median$i,UN,0,median$i,IF";
   $rrd_options .= " DEF:loss$i=".$filename.":loss:AVERAGE";
   $rrd_options .= " CDEF:ploss$i=loss$i,$pings,/,100,*";
-#  $rrd_options .= " CDEF:dm$i=median$i";
+  $rrd_options .= " CDEF:dm$i=median$i";
 #  $rrd_options .= " CDEF:dm$i=median$i,0,".$max->{$start}.",LIMIT";
 
   // start emulate Smokeping::calc_stddev

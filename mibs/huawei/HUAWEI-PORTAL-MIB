@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:The HUAWEI-PORTAL-MIB  provides information about portal server
 -- Reference:
--- Version: V2.11
+-- Version: V2.18
 -- History:
 --     
 -- =================================================================
@@ -28,7 +28,7 @@
     
     
         hwPortal MODULE-IDENTITY 
-            LAST-UPDATED "201507302040Z"
+            LAST-UPDATED"201610211331Z" 
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -41,6 +41,34 @@
                     "
             DESCRIPTION 
                 "The MIB contains objects of module PORTAL." 
+			
+			REVISION "201610211331Z"              -- Oct 21, 2016 at 13:21 GMT
+            DESCRIPTION
+                "Modify  hwWebAuthServerReplyErrorCode ."
+
+            REVISION "201608291738Z"              -- Aug 29, 2016 at 17:38 GMT
+            DESCRIPTION
+                "hwWebAuthServerCfgGroup  hwWebAuthServerUrltemplate to hwWebAuthServerUrlTemplate"
+
+            REVISION "201607191100Z"              -- July 19, 2016 at 11:00 GMT
+            DESCRIPTION
+                "Enable web-auth-server http/https docking"
+				
+            REVISION "201605181210Z"              -- May 18, 2016 at 12:10 GMT
+            DESCRIPTION
+                "portal captive-adaptive enable"
+
+            REVISION "201604261035Z"              -- April 26, 2016 at 10:35 GMT
+            DESCRIPTION
+                "portal captive-adaptive enable"
+
+            REVISION "201604041212Z"              -- April 04, 2016 at 12:12 GMT
+            DESCRIPTION
+                "portal url-encode enable"
+
+            REVISION "201512222040Z"              -- Dec  22, 2015 at 20:40 GMT
+            DESCRIPTION
+                "Modify hwWebAuthServerServerDetectInterval hwWebAuthServerServerDetectMaxTimes add value 0 " 
 
            REVISION "201507302040Z"              -- JULY 30, 2015 at 20:40 GMT
             DESCRIPTION
@@ -82,7 +110,7 @@
 
             REVISION "201503262210Z"
             DESCRIPTION
-            "Add hwPortalUserAlarmPercentageLower, hwPortalUserAlarmPercentageUpper and hwPortalCaptiveBypassEnable"   
+            "Add hwPortalUserAlarmPercentageLower, hwPortalUserAlarmPercentageUpper and hwPortalCaptiveBypassEnable"  
             ::= { huaweiMgmt 4 }
 
 
@@ -175,7 +203,48 @@
                 parse http message to obtain user agent information.
                 "
            ::= { hwPortalConfigPara 7 }  
+
+        hwPortalConfigWebProxyEnable OBJECT-TYPE
+           SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable http proxy"
+           ::= { hwPortalConfigPara 8 } 
             
+        hwPortalConfigWebProxyPort OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set http proxy port"
+            DEFVAL { 80 }
+           ::= { hwPortalConfigPara 9 }
+		   
+        hwWebServerHTTPPortNumber  OBJECT-TYPE
+            SYNTAX Integer32 (0 | 1024..65535)           
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set WebServer HTTP PortNumber"
+           ::= { hwPortalConfigPara 10 } 
+                                         
+        hwWebServerHTTPSPortNumber OBJECT-TYPE
+            SYNTAX Integer32 (0 | 1024..65535)           
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set WebServer HTTPS PortNumber"
+           ::= { hwPortalConfigPara 11 }
+           
+        hwWebServerHTTPSPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))           
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set WebServer HTTPS PolicyName"
+           ::= { hwPortalConfigPara 12 }  
+		   
     --  ============== hwPortalConfigPara  define end ==============         
                 
     --  ============== hwPortalPacketStatisticsPara  define beginning ==============
@@ -380,7 +449,10 @@
                 hwPortalConfigStatus
                     RowStatus,
                 hwPortalConfigDetectTime  
-                	Integer32
+                	Integer32,
+                hwPortalConfigSecretKeyType
+                	INTEGER
+
              }
 
         hwPortalConfigPortalServerIpAddress OBJECT-TYPE
@@ -441,6 +513,21 @@
             DESCRIPTION
                 "WEB authentication server detect time."
             ::= { hwPortalConfigSecretKeyEntry 7 }
+
+        hwPortalConfigSecretKeyType OBJECT-TYPE
+            SYNTAX INTEGER  
+            {
+                simple(1),
+                cipher(2),
+                invalid(3)
+            }
+
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Portal Config Secret Key Type."
+            ::= { hwPortalConfigSecretKeyEntry 8 }
+
 
         
     --  ============== hwPortalConfigSecretKeyTable  define end ==============         
@@ -1085,6 +1172,52 @@
 		hwWebAuthServerUrlTemplateIvParameterName
 			OCTET STRING,
 		hwWebAuthServerUrlTemplateShareKey
+			OCTET STRING,
+		hwWebAuthServerProtocol
+			INTEGER,
+		hwWebAuthServerPasswordEncrypt
+			INTEGER,
+		hwWebAuthServerHTTPMethod
+			INTEGER,
+		hwWebAuthServerCmdKey
+			OCTET STRING,
+		hwWebAuthServerLoginCmd
+			OCTET STRING,
+		hwWebAuthServerLogoutCmd
+			OCTET STRING,
+		hwWebAuthServerUserNameKey
+			OCTET STRING,
+		hwWebAuthServerPasswordKey
+			OCTET STRING,
+		hwWebAuthServerInitURLKey
+			OCTET STRING,
+		hwWebAuthServerUserIPKey
+			OCTET STRING,
+		hwWebAuthServerUserMACKey
+			OCTET STRING,
+		hwWebAuthServerLoginSuccessResponseRedirectURL
+			OCTET STRING,
+		hwWebAuthServerLoginSuccessResponseMsg
+			OCTET STRING,
+		hwWebAuthServerLoginSuccessResponseInitURL
+			INTEGER,
+		hwWebAuthServerLoginfailResponseRedirectURL
+			OCTET STRING,
+		hwWebAuthServerLoginfailResponseAppendReplyMsgKey
+			OCTET STRING,
+		hwWebAuthServerLoginfailResponseErrMsg
+			OCTET STRING,
+		hwWebAuthServerLoginfailResponseAuthenServerReplyMsg
+			INTEGER,
+		hwWebAuthServerLoginfailLoginURL
+			INTEGER,
+		hwWebAuthServerLogoutSuccessResponseRedirectURL
+			OCTET STRING,
+		hwWebAuthServerLogoutSuccessResponseMsg
+			OCTET STRING,
+		hwWebAuthServerLogoutFailResponseRedirectURL
+			OCTET STRING,
+		hwWebAuthServerLogoutFailResponseMsg
 			OCTET STRING
 		 }
 
@@ -1275,7 +1408,214 @@
 	STATUS current
 	DESCRIPTION
 		"Description."
-	::= { hwWebAuthServerCfgEntry 20 }
+	::= { hwWebAuthServerCfgEntry 20 }	
+
+	hwWebAuthServerProtocol OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		portal(1),
+		httpORhttps(2)
+		}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 22 }
+	
+	hwWebAuthServerPasswordEncrypt OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		none(1),
+		uam(2)
+		}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 23 }
+	
+	hwWebAuthServerHTTPMethod OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		post(1)
+		}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 24 }	
+
+	hwWebAuthServerCmdKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 25 }		
+	
+	hwWebAuthServerLoginCmd  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 26 }		
+	
+	hwWebAuthServerLogoutCmd  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 27 }
+	
+	hwWebAuthServerUserNameKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 28 }	
+	
+	hwWebAuthServerPasswordKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 29 }		
+	
+	hwWebAuthServerInitURLKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 30 }
+
+	hwWebAuthServerUserIPKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 31 }		
+	
+	hwWebAuthServerUserMACKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 32 }	
+	
+	hwWebAuthServerLoginSuccessResponseRedirectURL  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 33 }	
+	
+	hwWebAuthServerLoginSuccessResponseMsg  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 34 }		
+	
+	hwWebAuthServerLoginSuccessResponseInitURL  OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		disable(1),
+		enable(2)
+		}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 35 }	
+	
+	hwWebAuthServerLoginfailResponseRedirectURL  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 36 }		
+	
+	hwWebAuthServerLoginfailResponseAppendReplyMsgKey  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..16))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 37 }	
+	
+	hwWebAuthServerLoginfailResponseErrMsg  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 38 }	
+	
+	hwWebAuthServerLoginfailResponseAuthenServerReplyMsg  OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		disable(1),
+		enable(2)
+		}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 39 }	
+	
+	hwWebAuthServerLoginfailLoginURL  OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		disable(1),
+		enable(2)
+		}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 40 }	
+	
+	hwWebAuthServerLogoutSuccessResponseRedirectURL  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 41 }
+
+	hwWebAuthServerLogoutSuccessResponseMsg  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 42 }
+
+	hwWebAuthServerLogoutFailResponseRedirectURL  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 43 }
+
+	hwWebAuthServerLogoutFailResponseMsg  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..200))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 44 }
 	
 	hwWebAuthServerIpCfgTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF HwWebAuthServerIpCfgEntry
@@ -1568,9 +1908,48 @@
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION
-		"Portal captive bypass enable."
+		"Portal captive-bypass enable."
 	DEFVAL { false }
 	::= { hwPortalMibObjects 27 }
+
+	hwPortalCaptiveAdaptiveEnable OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Portal captive-adaptive enable."
+	DEFVAL { false }
+	::= { hwPortalMibObjects 28 }
+	
+	hwPortalUrlEncodeEnable OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Portal url-encode enable."
+	DEFVAL { true }
+	::= { hwPortalMibObjects 29 }
+	
+	hwWebAuthServerReplyErrorCode OBJECT-TYPE
+	SYNTAX INTEGER
+	   {
+		 disable(2),
+		 enable(1)
+	   }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"portal user-roam-out reply enable."
+	DEFVAL { enable }
+	::= { hwPortalMibObjects 30 }
+
+	hwGlobleWebAuthServerSourceIp OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwPortalMibObjects 31 }
 
 
     --  ============== hwPortalFreeRuleTable  define ending ==============
@@ -1713,7 +2092,9 @@
                       hwPortalConfigServerUdpSendPort, 
                       hwPortalConfigTrapUdpPort, 
                       hwPortalConfigSourecIfIndex ,
-                      hwPortalConfigUserAgentEnableSwitch}
+                      hwPortalConfigUserAgentEnableSwitch,
+                     hwPortalConfigWebProxyEnable,
+                     hwPortalConfigWebProxyPort}
             STATUS current
             DESCRIPTION 
                 "The config parameter group."
@@ -1817,7 +2198,7 @@
             OBJECTS { hwWebAuthServerName, hwWebAuthServerUrl, hwWebAuthServerSourceIp, hwWebAuthServerShareKeyFormat, 
 				hwWebAuthServerShareKey, hwWebAuthServerPort, hwWebAuthServerServerDetectInterval, hwWebAuthServerServerDetectMaxTimes, hwWebAuthServerCriticalNum, 
 				hwWebAuthServerServerDetectAction, hwWebAuthServerWebRedirection, hwWebAuthServerUserSyncInterval, hwWebAuthServerUserSyncMaxTimes, hwWebAuthServerVpnInstance, 
-				hwWebAuthServerRowStatus, hwWebAuthServerPortAll, hwWebAuthServerUrltemplate }
+				hwWebAuthServerRowStatus, hwWebAuthServerPortAll, hwWebAuthServerUrlTemplate }
             STATUS current
             DESCRIPTION 
             "The WEB auth server configuration."

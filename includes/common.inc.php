@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage common
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -53,10 +53,10 @@ function observium_autoload($class_name)
     case 'Ramsey':
       $class_file = str_replace('Ramsey/', '', $class_file);
       break;
-    //case 'Uuid':
-    //  //$class_file = array_pop($class_array) . '.php';
-    //  $class_file = 'Uuid/' . $class_file;
-    //  break;
+
+    case 'Defuse':
+      $class_file = str_replace('Defuse/', '', $class_file);
+      break;
 
     default:
       if (is_file($base_dir . 'pear/' . $class_file))
@@ -613,19 +613,46 @@ function get_versions()
 
     if (strlen($GLOBALS['config']['rrdcached']))
     {
-      $rrdcached_exec = str_replace('rrdtool', 'rrdcached', $GLOBALS['config']['rrdtool']);
-      if (!is_executable($rrdcached_exec))
+      if (OBS_RRD_NOLOCAL)
       {
-        $rrdcached_exec = '/usr/bin/env rrdcached -h';
+        // Remote rrdcached daemon (unknown version)
+        $rrdtool_version .= ' (rrdcached remote: ' . $GLOBALS['config']['rrdcached'] . ')';
+      } else {
+        $rrdcached_exec = str_replace('rrdtool', 'rrdcached', $GLOBALS['config']['rrdtool']);
+        if (!is_executable($rrdcached_exec))
+        {
+          $rrdcached_exec = '/usr/bin/env rrdcached -h';
+        }
+        list(,$versions['rrdcached_version']) = explode(' ', external_exec($rrdcached_exec . ' -h | head -n1'));
+        $rrdtool_version .= ' (rrdcached ' . $versions['rrdcached_version'] . ': ' . $GLOBALS['config']['rrdcached'] . ')';
       }
-      list(,$versions['rrdcached_version']) = explode(' ', external_exec($rrdcached_exec . ' -h | head -n1'));
-      $rrdtool_version .= ' (rrdcached ' . $versions['rrdcached_version'] . ': ' . $GLOBALS['config']['rrdcached'] . ')';
     }
   } else {
     $rrdtool_version = 'not found';
     $versions['rrdtool_version'] = $rrdtool_version;
   }
   $versions['rrdtool_text'] = $rrdtool_version;
+
+  // Fping
+  $fping_version = 'not found';
+  if (is_executable($GLOBALS['config']['fping']))
+  {
+    $fping  = external_exec($GLOBALS['config']['fping'] . " -v 2>&1");
+    if (preg_match('/Version\s+(\d\S+)/', $fping, $matches))
+    {
+      $fping_version = $matches[1];
+      $fping_text    = $fping_version;
+
+      if (is_executable($GLOBALS['config']['fping6']))
+      {
+        $fping_text .= ' (IPv4 and IPv6)';
+      } else {
+        $fping_text .= ' (IPv4 only)';
+      }
+    }
+  }
+  $versions['fping_version'] = $fping_version;
+  $versions['fping_text']    = $fping_text;
 
   // Apache (or any http used?)
   if (is_cli())
@@ -674,6 +701,7 @@ function print_versions()
   $mysql_version   = $GLOBALS['cache']['versions']['mysql_text'];
   $snmp_version    = $GLOBALS['cache']['versions']['snmp_text'];
   $rrdtool_version = $GLOBALS['cache']['versions']['rrdtool_text'];
+  $fping_version   = $GLOBALS['cache']['versions']['fping_text'];
   $http_version    = $GLOBALS['cache']['versions']['http_text'];
 
   if (is_cli())
@@ -687,8 +715,8 @@ function print_versions()
     // PHP memory_limit
     //$php_memory_limit      = $GLOBALS['cache']['versions']['php_memory_limit'];
     //$php_memory_limit_text = $GLOBALS['cache']['versions']['php_memory_limit_text'];
-  
-    $php_memory_limit = ini_get('memory_limit');
+
+    $php_memory_limit = unit_string_to_numeric(ini_get('memory_limit'));
     if ($php_memory_limit < 0)
     {
       $php_memory_limit_text = 'Unlimited';
@@ -705,6 +733,7 @@ function print_versions()
     print_cli_data("MySQL",   $mysql_version);
     print_cli_data("SNMP",    $snmp_version);
     print_cli_data("RRDtool", $rrdtool_version);
+    print_cli_data("Fping",   $fping_version);
 
     // Additionally in CLI always display Memory Limit, MySQL Mode and Charset info
 
@@ -743,6 +772,7 @@ function print_versions()
             <tr><td><b>MySQL</b></td><td>'.escape_html($mysql_version).'</td></tr>
             <tr><td><b>SNMP</b></td><td>'.escape_html($snmp_version).'</td></tr>
             <tr><td><b>RRDtool</b></td><td>'.escape_html($rrdtool_version).'</td></tr>
+            <tr><td><b>Fping</b></td><td>'.escape_html($fping_version).'</td></tr>
           </tbody>
         </table>'.PHP_EOL);
     echo generate_box_close();
@@ -882,7 +912,11 @@ function timeticks_to_sec($timetick, $float = FALSE)
     $secs = $timetick;
     $microsecs = 0;
   } else {
-    list($days, $hours, $mins, $secs) = $timetick_array;
+    //list($days, $hours, $mins, $secs) = $timetick_array;
+    $secs  = array_pop($timetick_array);
+    $mins  = array_pop($timetick_array);
+    $hours = array_pop($timetick_array);
+    $days  = array_pop($timetick_array);
     list($secs, $microsecs) = explode('.', $secs);
 
     $hours += $days  * 24;
@@ -1047,6 +1081,30 @@ function formatUptime($uptime, $format = "long")
   }
 
   return trim($result);
+}
+
+/**
+ * This function convert human written Uptime to seconds.
+ * Opposite function for formatUptime().
+ *
+ * Also applicable for some uptime formats in MIB, like EigrpUpTimeString:
+ *  'hh:mm:ss', reflecting hours, minutes, and seconds
+ *  If the up time is greater than 24 hours, is less precise and
+ *  the minutes and seconds are not reflected. Instead only the days
+ *  and hours are shown and the string will be formatted like this: 'xxxdxxh'
+ *
+ * @param string $uptime Uptime in human readable string or timetick
+ * @return int Uptime in seconds
+ */
+function uptime_to_seconds($uptime)
+{
+  if (str_contains($uptime, ':')) {
+    $seconds = timeticks_to_sec($uptime);
+  } else {
+    $seconds = age_to_seconds($uptime);
+  }
+
+  return $seconds;
 }
 
 /**
@@ -1304,7 +1362,7 @@ function external_exec($command, $timeout = NULL)
     {
       // Hide snmp auth params from debug cmd out,
       // for help users who want send debug output to developers
-      $pattern = "/\s+(-[cuxXaA])\s*(?:'.+?')(@\d+)?/";
+      $pattern = "/\s+(-[cnuxXaA])\s*(?:'.+?(@\S+)?')/";
       $debug_command = preg_replace($pattern, ' \1 ***\2', $debug_command);
     }
     print_message(PHP_EOL . 'CMD[%y' . $debug_command . '%n]' . PHP_EOL, 'console');
@@ -1356,7 +1414,8 @@ function external_exec($command, $timeout = NULL)
     2 => array('pipe', 'w')  // stderr
   );
 
-  $process = proc_open($command, $descriptorspec, $pipes);
+  //$process = proc_open($command, $descriptorspec, $pipes);
+  $process = proc_open('exec ' . $command, $descriptorspec, $pipes); // exec prevent to use shell
   //stream_set_blocking($pipes[0], 0); // Make stdin/stdout/stderr non-blocking
   stream_set_blocking($pipes[1], 0);
   stream_set_blocking($pipes[2], 0);
@@ -1492,60 +1551,93 @@ function get_pid_info($pid, $stats = FALSE)
     return FALSE;
   }
 
-  if ($stats)
+  if (!$stats && stripos(PHP_OS, 'Linux') === 0)
   {
-    // Add CPU/Mem stats
-    $options = 'pid,ppid,uid,gid,pcpu,pmem,vsz,rss,tty,stat,time,lstart,args';
+    // Do not use call to ps on Linux and extended stat not required
+    // FIXME. Need something same on BSD and other Unix platforms
+
+    if ($pid_stat = lstat("/proc/$pid"))
+    {
+      $pid_info = array('PID' => "$pid");
+      $ps_stat = explode(" ", file_get_contents("/proc/$pid/stat"));
+      //echo PHP_EOL; print_vars($ps_stat); echo PHP_EOL;
+      //echo PHP_EOL; print_vars($pid_stat); echo PHP_EOL;
+      $pid_info['PPID']         = $ps_stat[3];
+      $pid_info['UID']          = $pid_stat['uid'].'';
+      $pid_info['GID']          = $pid_stat['gid'].'';
+      $pid_info['STAT']         = $ps_stat[2];
+      $pid_info['COMMAND']      = trim(str_replace("\0", " ", file_get_contents("/proc/$pid/cmdline")));
+      $pid_info['STARTED']      = date("r", $pid_stat['mtime']);
+      $pid_info['STARTED_UNIX'] = $pid_stat['mtime'];
+    } else {
+      $pid_info = FALSE;
+    }
+
   } else {
-    $options = 'pid,ppid,uid,gid,tty,stat,time,lstart,args';
+    // Use ps call, have troubles on high load systems!
+
+    if ($stats)
+    {
+      // Add CPU/Mem stats
+      $options = 'pid,ppid,uid,gid,pcpu,pmem,vsz,rss,tty,stat,time,lstart,args';
+    } else {
+      $options = 'pid,ppid,uid,gid,tty,stat,time,lstart,args';
+    }
+
+    $timezone = get_timezone(); // Get system timezone info, for correct started time conversion
+
+    $ps = external_exec('/bin/ps -ww -o '.$options.' -p '.$pid, 1); // Set timeout 1sec for exec
+    $ps = explode("\n", rtrim($ps));
+
+    if ($GLOBALS['exec_status']['exitcode'] === 127)
+    {
+      print_debug("/bin/ps command not found, not possible to get process info.");
+      return NULL;
+    }
+    else if ($GLOBALS['exec_status']['exitcode'] !== 0 || count($ps) < 2)
+    {
+      print_debug("PID ".$pid." doesn't exists");
+      //trigger_error("PID ".$pid." doesn't exists", E_USER_WARNING);
+      return FALSE;
+    }
+
+    // "  PID  PPID   UID   GID %CPU %MEM    VSZ   RSS TT       STAT     TIME                  STARTED COMMAND"
+    // "14675 10250  1000  1000  0.0  0.2 194640 11240 pts/4    S+   00:00:00 Mon Mar 21 14:48:08 2016 php ./test_pid.php"
+    //
+    // "  PID  PPID   UID   GID TT       STAT     TIME                  STARTED COMMAND"
+    // "14675 10250  1000  1000 pts/4    S+   00:00:00 Mon Mar 21 14:48:08 2016 php ./test_pid.php"
+    //print_vars($ps);
+
+    // Parse output
+    $keys = preg_split("/\s+/", $ps[0], -1, PREG_SPLIT_NO_EMPTY);
+    $entries = preg_split("/\s+/", $ps[1], count($keys) - 1, PREG_SPLIT_NO_EMPTY);
+    $started = preg_split("/\s+/", array_pop($entries), 6, PREG_SPLIT_NO_EMPTY);
+    $command = array_pop($started);
+
+    $started[]    = str_replace(':', '', $timezone['system']); // Add system TZ to started time
+    $started_rfc  = array_shift($started) . ','; // Sun
+    // Reimplode and convert to RFC2822 started date 'Sun, 20 Mar 2016 18:01:53 +0300'
+    $started_rfc .= ' ' . $started[1]; // 20
+    $started_rfc .= ' ' . $started[0]; // Mar
+    $started_rfc .= ' ' . $started[3]; // 2016
+    $started_rfc .= ' ' . $started[2]; // 18:01:53
+    $started_rfc .= ' ' . $started[4]; // +0300
+    //$started_rfc .= implode(' ', $started);
+    $entries[] = $started_rfc;
+
+    $entries[] = $command; // Re-add command
+    //print_vars($entries);
+    //print_vars($started);
+
+    $pid_info = array();
+    foreach ($keys as $i => $key)
+    {
+      $pid_info[$key] = $entries[$i];
+    }
+    $pid_info['STARTED_UNIX'] = strtotime($pid_info['STARTED']);
+    //print_vars($pid_info);
+
   }
-
-  $ps = external_exec('/bin/ps -ww -o '.$options.' -p '.$pid);
-  $ps = explode("\n", rtrim($ps));
-
-  if ($GLOBALS['exec_status']['exitcode'] === 127)
-  {
-    print_debug("/bin/ps command not found, not possible to get process info.");
-    return NULL;
-  }
-  else if ($GLOBALS['exec_status']['exitcode'] !== 0 || count($ps) < 2)
-  {
-    print_debug("PID ".$pid." doesn't exists");
-    //trigger_error("PID ".$pid." doesn't exists", E_USER_WARNING);
-    return FALSE;
-  }
-
-  // "  PID  PPID   UID   GID %CPU %MEM    VSZ   RSS TT       STAT     TIME                  STARTED COMMAND" 
-  // "14675 10250  1000  1000  0.0  0.2 194640 11240 pts/4    S+   00:00:00 Mon Mar 21 14:48:08 2016 php ./test_pid.php"
-  //
-  // "  PID  PPID   UID   GID TT       STAT     TIME                  STARTED COMMAND"
-  // "14675 10250  1000  1000 pts/4    S+   00:00:00 Mon Mar 21 14:48:08 2016 php ./test_pid.php"
-  //print_vars($ps);
-
-  $timezone = get_timezone(); // Get system timezone info, for correct started time conversion
-
-  // Parse output
-  $keys = preg_split("/\s+/", $ps[0], -1, PREG_SPLIT_NO_EMPTY);
-  $entries = preg_split("/\s+/", $ps[1], count($keys) - 1, PREG_SPLIT_NO_EMPTY);
-  $started = preg_split("/\s+/", array_pop($entries), 6, PREG_SPLIT_NO_EMPTY);
-  $command = array_pop($started);
-
-  $started[]    = str_replace(':', '', $timezone['system']); // Add system TZ to started time
-  $started_rfc  = array_shift($started) . ', ';
-  $started_rfc .= implode(' ', $started); // Reimplode and convert to RFC2822 started date 'Sun, Mar 20 18:01:53 2016 +0300'
-  $entries[] = $started_rfc;
-
-  $entries[] = $command; // Readd command
-  //print_vars($entries);
-  //print_vars($started);
-
-  $pid_info = array();
-  foreach ($keys as $i => $key)
-  {
-    $pid_info[$key] = $entries[$i];
-  }
-  $pid_info['STARTED_UNIX'] = strtotime($pid_info['STARTED']);
-  //print_vars($pid_info);
 
   return $pid_info;
 }
@@ -2173,7 +2265,7 @@ function check_extension_exists($extension, $text = FALSE, $fatal = FALSE)
     'mysql'    => 'mysql_connect',
     'mysqli'   => 'mysqli_connect',
     'mbstring' => 'mb_detect_encoding',
-    'mcrypt'   => 'mcrypt_encrypt', // FIXME, in php7.1 mcrypt will be removed
+    'mcrypt'   => 'mcrypt_encrypt', // CLEANME, mcrypt not used anymore (deprecated since php 7.1, removed since php 7.2)
     'posix'    => 'posix_isatty',
     'session'  => 'session_name',
     'svn'      => 'svn_log'
@@ -2356,9 +2448,9 @@ function get_port_by_ifIndex($device_id, $ifIndex)
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 // MOVEME to includes/functions.inc.php
-function get_port_id_by_ifDescr($device_id, $ifDescr)
+function get_port_id_by_ifDescr($device_id, $ifDescr, $deleted = 0)
 {
-  $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND (`ifDescr` = ? OR `ifName` = ?) LIMIT 1", array($device_id, $ifDescr, $ifDescr));
+  $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND (`ifDescr` = ? OR `ifName` = ?) AND `deleted` = ? LIMIT 1", array($device_id, $ifDescr, $ifDescr, $deleted));
 
   if (is_numeric($port_id))
   {
@@ -2372,9 +2464,9 @@ function get_port_id_by_ifDescr($device_id, $ifDescr)
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 // MOVEME to includes/functions.inc.php
-function get_port_id_by_ifAlias($device_id, $ifAlias)
+function get_port_id_by_ifAlias($device_id, $ifAlias, $deleted = 0)
 {
-  $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifAlias` = ? LIMIT 1", array($device_id, $ifAlias));
+  $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifAlias` = ? AND `deleted` = ? LIMIT 1", array($device_id, $ifAlias, $deleted));
 
   if (is_numeric($port_id))
   {
@@ -2463,24 +2555,32 @@ function get_port_id_by_customer($customer)
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 // MOVEME to includes/functions.inc.php
-function get_all_devices($device, $type = "")
+function get_all_devices()
 {
   global $cache;
 
   // FIXME needs access control checks!
   // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
 
+  $devices = array();
   if (isset($cache['devices']['hostname']))
   {
-    $devices = array_keys($cache['devices']['hostname']);
+    foreach ($cache['devices']['hostname'] as $hostname => $device_id)
+    {
+      $devices[$device_id] = $hostname;
+    }
+    //$devices = array_keys($cache['devices']['hostname']);
   }
   else
   {
-    foreach (dbFetchRows("SELECT `hostname` FROM `devices`") as $data)
+    foreach (dbFetchRows("SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`") as $data)
     {
-      $devices[] = $data['hostname'];
+      $devices[$data['device_id']] = $data['hostname'];
     }
   }
+  //r($devices);
+  //asort($devices);
+  //r($devices);
 
   return $devices;
 }
@@ -2640,7 +2740,22 @@ function truncate($substring, $max = 50, $rep = '...')
 // TESTME needs unit testing
 function escape_html($string, $flags = ENT_QUOTES)
 {
-  return htmlspecialchars($string, $flags, 'UTF-8');
+
+  $string = htmlspecialchars($string, $flags, 'UTF-8');
+
+  // Un-escape allowed tags
+  foreach($GLOBALS['config']['escape_html']['tags'] as $tag)
+  {
+    $string = str_ireplace('&lt;' .$tag.'&gt;', '<' .$tag.'>', $string);
+    $string = str_ireplace('&lt;/'.$tag.'&gt;', '</'.$tag.'>', $string);
+  }
+  // Un-escape allowed entities
+  foreach($GLOBALS['config']['escape_html']['entities'] as $tag)
+  {
+    $string = str_ireplace('&amp;'.$tag.';', '&'.$tag.';', $string);
+  }
+
+  return $string;
 }
 
 // DOCME needs phpdoc block
@@ -2876,25 +2991,15 @@ function get_device_mibs($device, $check_sysORID = TRUE, $mibs_order = NULL)
   if (!isset($cache['devices']['mibs'][$device_id]))
   {
     $mibs = array();
+    $model_array = get_model_array($device);
     foreach ($mibs_order as $order)
     {
       switch ($order)
       {
         case 'model':
-          if (isset($config['os'][$device['os']]['model']))
+          if (is_array($model_array) && isset($model_array['mibs']))
           {
-            $model       = $config['os'][$device['os']]['model'];
-            $sysObjectID = (preg_match('/^\.\d[\d\.]+$/', $device['sysObjectID']) ? $device['sysObjectID'] : 'WRONG_ID');
-            krsort($config['model'][$model]); // Resort array by key with high to low order!
-
-            foreach ($config['model'][$model] as $key => $entry)
-            {
-              if (isset($entry['mibs']) && strpos($sysObjectID, $key) === 0)
-              {
-                $mibs = array_merge($mibs, (array)$entry['mibs']);
-                break;
-              }
-            }
+            $mibs = array_merge($mibs, (array)$model_array['mibs']);
           }
           break;
         case 'os':
@@ -3002,6 +3107,81 @@ function is_device_mib($device, $mib, $check_permissions = TRUE, $check_sysORID 
   }
 
   return $mib_permitted;
+}
+
+/**
+ * Return model array from definitions, based on device sysObjectID
+ *
+ * @param	array	 $device          Device array required keys -> os, sysObjectID
+ * @param	string $sysObjectID_new If passed, than use "new" sysObjectID instead from device array
+ * @return array|FALSE            Model array or FALSE if no model specific definitions
+ */
+function get_model_array($device, $sysObjectID_new = NULL)
+{
+  global $config, $cache;
+
+  if (isset($config['os'][$device['os']]['model']))
+  {
+    $model  = $config['os'][$device['os']]['model'];
+    $models = $config['model'][$model];
+    $set_cache = FALSE;
+    if ($sysObjectID_new && preg_match('/^\.\d[\d\.]+$/', $sysObjectID_new))
+    {
+      // Use passed as param sysObjectID
+      $sysObjectID = $sysObjectID_new;
+    }
+    else if (isset($cache['devices']['model'][$device['device_id']]))
+    {
+      // Return already cached array if no passed param sysObjectID
+      return $cache['devices']['model'][$device['device_id']];
+    }
+    else if (preg_match('/^\.\d[\d\.]+$/', $device['sysObjectID']))
+    {
+      // Use sysObjectID from device array
+      $sysObjectID = $device['sysObjectID'];
+      $set_cache = TRUE;
+    } else {
+      // Just random non empty string
+      $sysObjectID = 'empty_sysObjectID_3948ffakc';
+      $set_cache = TRUE;
+    }
+    if ($set_cache && (!is_numeric($device['device_id']) || defined('__PHPUNIT_PHAR__')))
+    {
+      // Do not set cache for unknown device_id (not added device) or phpunit
+      $set_cache = FALSE;
+    }
+    if (isset($models[$sysObjectID]))
+    {
+      // Exactly match
+      if ($set_cache)
+      {
+        $cache['devices']['model'][$device['device_id']] = $models[$sysObjectID];
+      }
+      return $models[$sysObjectID];
+    }
+    // Resort sysObjectID array by oids with from high to low order!
+    //krsort($config['model'][$model]);
+    uksort($config['model'][$model], 'compare_numeric_oids_reverse');
+    foreach ($config['model'][$model] as $key => $entry)
+    {
+      if (strpos($sysObjectID, $key) === 0)
+      {
+        if ($set_cache)
+        {
+          $cache['devices']['model'][$device['device_id']] = $entry;
+        }
+        return $entry;
+        break;
+      }
+    }
+    // If model array not found, set cache entry to FALSE,
+    // for do not search again
+    if ($set_cache)
+    {
+      $cache['devices']['model'][$device['device_id']] = FALSE;
+    }
+  }
+  return FALSE;
 }
 
 // DOCME needs phpdoc block
@@ -3524,8 +3704,8 @@ function get_http_request($request, $context = array(), $rate_limit = FALSE)
       $GLOBALS['response_headers'] = array('code' => 408, 'descr' => 'Request Timeout');
       $GLOBALS['request_status'] = FALSE;
 
-      // Validate host from url and check if it timeout request
-      if (gethostbyname6(parse_url($url, PHP_URL_HOST)))
+      // Validate host from request and check if it timeout request
+      if (gethostbyname6(parse_url($request, PHP_URL_HOST)))
       {
         // Timeout error, only if not received response headers
         define('OBS_HTTP_REQUEST', FALSE);
@@ -3708,13 +3888,13 @@ function age_to_seconds($age)
   }
 
   $pattern = '/^';
-  $pattern .= '(?:(?P<years>\d+(?:\.\d)*)y\ *)*';   // y (years)
-  $pattern .= '(?:(?P<months>\d+(?:\.\d)*)M\ *)*';  // M (months)
-  $pattern .= '(?:(?P<weeks>\d+(?:\.\d)*)w\ *)*';   // w (weeks)
-  $pattern .= '(?:(?P<days>\d+(?:\.\d)*)d\ *)*';    // d (days)
-  $pattern .= '(?:(?P<hours>\d+(?:\.\d)*)h\ *)*';   // h (hours)
-  $pattern .= '(?:(?P<minutes>\d+(?:\.\d)*)m\ *)*'; // m (minutes)
-  $pattern .= '(?:(?P<seconds>\d+(?:\.\d)*)s)*';    // s (seconds)
+  $pattern .= '(?:(?<years>\d+(?:\.\d)*)\ ?(?:years?|y)[,\ ]*)*';         // y (years)
+  $pattern .= '(?:(?<months>\d+(?:\.\d)*)\ ?(?:months?|M)[,\ ]*)*';       // M (months)
+  $pattern .= '(?:(?<weeks>\d+(?:\.\d)*)\ ?(?:weeks?|w)[,\ ]*)*';         // w (weeks)
+  $pattern .= '(?:(?<days>\d+(?:\.\d)*)\ ?(?:days?|d)[,\ ]*)*';           // d (days)
+  $pattern .= '(?:(?<hours>\d+(?:\.\d)*)\ ?(?:hours?|h)[,\ ]*)*';         // h (hours)
+  $pattern .= '(?:(?<minutes>\d+(?:\.\d)*)\ ?(?:minutes?|min|m)[,\ ]*)*'; // m (minutes)
+  $pattern .= '(?:(?<seconds>\d+(?:\.\d)*)\ ?(?:seconds?|sec|s))*';       // s (seconds)
   $pattern .= '$/';
 
   if (!empty($age) && preg_match($pattern, $age, $matches))
@@ -4010,13 +4190,62 @@ function value_to_si($value, $unit, $type = NULL)
 
       $type  = 'temperature';
       $from  = $value    . ' Kelvin';
-      $to    = $si_value . ' Celsius';
+      if ($value < 0)
+      {
+        // Kelvin not possible less than 0
+        $si_value = FALSE;
+        $to    = 'FALSE';
+      } else {
+        $to    = $si_value . ' Celsius';
+      }
       break;
 
     case 'c':
     case 'celsius':
       // not convert, just keep correct value
       $type  = 'temperature';
+      break;
+
+    case 'w':
+    case 'watts':
+      if ($type == 'dbm')
+      {
+        // Used when Power convert to dBm
+        // https://en.wikipedia.org/wiki/DBm
+        // https://www.everythingrf.com/rf-calculators/watt-to-dbm
+        if ($value > 0)
+        {
+          $si_value = 10 * log10($value) + 30;
+
+          $from  = $value    . ' W';
+          $to    = $si_value . ' dBm';
+        } else {
+          $si_value = FALSE;
+          $from  = $value    . ' W';
+          $to    = 'FALSE';
+        }
+      } else {
+        // not convert, just keep correct value
+        $type  = 'power';
+      }
+      break;
+
+    case 'dbm':
+      if ($type == 'power')
+      {
+        // Used when Power convert to dBm
+        // https://en.wikipedia.org/wiki/DBm
+        // https://www.everythingrf.com/rf-calculators/dbm-to-watts
+
+          $si_value = pow(10, ($value / 10)) / 1000;
+
+          $from  = $value    . ' dBm';
+          $to    = $si_value . ' W';
+
+      } else {
+        // not convert, just keep correct value
+        $type  = 'dbm';
+      }
       break;
 
     case 'psi':

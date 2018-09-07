@@ -5,7 +5,7 @@
  *
  * @package    observium
  * @subpackage config
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -95,8 +95,6 @@ $config['rrd']['rra']  = "RRA:AVERAGE:0.5:1:2016  RRA:AVERAGE:0.5:6:2976  RRA:AV
 $config['rrd']['rra'] .= "                        RRA:MIN:0.5:6:1440      RRA:MIN:0.5:96:360       RRA:MIN:0.5:288:1440 ";
 $config['rrd']['rra'] .= "                        RRA:MAX:0.5:6:1440      RRA:MAX:0.5:96:360       RRA:MAX:0.5:288:1440 ";
 
-$config['rrd']['no_local'] = FALSE;
-
 // RRDCacheD - Make sure it can write to your RRD dir!
 
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
@@ -131,17 +129,25 @@ $config['page_title_separator'] = ' - ';
 $config['timestamp_format']  = 'Y-m-d H:i:s';
 $config['date_format']       = 'Y-m-d';
 $config['login_message']     = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
-$config['login_remember_me'] = TRUE;     // Enable or disable the remember me feature.
-$config['web_mouseover']     = TRUE;     // Enable or disable mouseover popups.
-$config['web_mouseover_mobile'] = FALSE; // Enable mouseover popups on Mobile phones and tablets. Disabled by default.
-$config['web_show_disabled'] = TRUE;    // Show or not disabled devices on major pages.
-$config['web_pagesize']      = 100;      // Default pagesize for tables (items per page)
+$config['login_remember_me'] = TRUE;        // Enable or disable the remember me feature.
+$config['web_mouseover']     = TRUE;        // Enable or disable mouseover popups.
+$config['web_mouseover_mobile'] = FALSE;    // Enable mouseover popups on Mobile phones and tablets. Disabled by default.
+$config['web_show_disabled'] = TRUE;        // Show or not disabled devices on major pages.
+$config['web_pagesize']      = 100;         // Default pagesize for tables (items per page)
 
-$config['web_session_lifetime'] = 0;     // Default user sessions lifetime in seconds (0 - until browser restart)
-$config['web_session_ip']       = TRUE;  // Bind user sessions to his IP address
-$config['web_session_cidr']     = array(); // Allow user authorisation from certain IP ranges (if empty allow from any)
+$config['web_session_lifetime'] = 86400;    // Default user sessions lifetime in seconds (86400 - one day). This lifetime actual for sessions without "remember me" checkbox.
+$config['web_session_ip']       = TRUE;     // Bind user sessions to his IP address
+$config['web_session_cidr']     = array();  // Allow user authorisation from certain IP ranges (if empty allow from any)
+$config['web_session_ip_by_header'] = FALSE;     // Allow to use alternative Remote Address header for Session Auth (DANGEROUS)
+$config['web_remote_addr_header']   = 'default'; // Remote Address header for Web session logging (CF-Connecting-IP, X-Real-IP, Client-IP, X-Forwarded-For)
 
-$config['web_enable_showtech']	= FALSE;  // Enable display of 'show tech' menu option. Currently only for device entries.
+$config['web_enable_showtech']	= FALSE;    // Enable display of 'show tech' menu option. Currently only for device entries.
+
+$config['web_show_bgp_asdot']   = FALSE;    // Display BGP 32bit ASNs in asdot format (ie 5.20 instead 327700)
+
+$config['show_overview_tab']    = TRUE;     // FIXME. Not sure, still required?
+$config['overview_show_sysDescr'] = TRUE;   // FIXME. Not sure, still required?
+
 
 // Graphs Settings
 
@@ -151,6 +157,8 @@ $config['graphs']['style']                = "default"; // Possible values: defau
 $config['graphs']['ports_scale_force']    = 1;         // Force scale also if real data more than selected scale
 $config['graphs']['ports_scale_default']  = "auto";    // Possible values: auto, speed, scales from $config['graphs']['ports_scale_list']
 $config['graphs']['ports_scale_list']     = array('10Gbit', '1Gbit', '100Mbit', '10Mbit');
+$config['graphs']['stacked_processors']   = TRUE;
+$config['graphs']['always_draw_max']      = FALSE;     // Allow suppression of MAX region for aesthetic reasons on graphs < 1 week long
 
 $config['int_customers']           = 1;  // Enable Customer Port Parsing
 $config['int_customers_graphs' ]   = 1;  // Enable Customer Port List Graphs
@@ -178,12 +186,13 @@ $config['snmp']['community'][0] = "public"; // Communities to try during adding 
 
 // SNMPv3 default settings
 // The array can be expanded to give another set of parameters
-$config['snmp']['v3'][0]['authlevel']  = "noAuthNoPriv"; // noAuthNoPriv | authNoPriv | authPriv
-$config['snmp']['v3'][0]['authname']   = "observium";    // User Name (required even for noAuthNoPriv)
-$config['snmp']['v3'][0]['authpass']   = "";             // Auth Passphrase
-$config['snmp']['v3'][0]['authalgo']   = "MD5";          // MD5 | SHA
-$config['snmp']['v3'][0]['cryptopass'] = "";             // Privacy (Encryption) Passphrase
-$config['snmp']['v3'][0]['cryptoalgo'] = "AES";          // AES | DES
+$config['snmp']['v3'] = array();
+// $config['snmp']['v3'][0]['authlevel']  = "noAuthNoPriv"; // noAuthNoPriv | authNoPriv | authPriv
+// $config['snmp']['v3'][0]['authname']   = "observium";    // User Name (required even for noAuthNoPriv)
+// $config['snmp']['v3'][0]['authpass']   = "";             // Auth Passphrase
+// $config['snmp']['v3'][0]['authalgo']   = "MD5";          // MD5 | SHA
+// $config['snmp']['v3'][0]['cryptopass'] = "";             // Privacy (Encryption) Passphrase
+// $config['snmp']['v3'][0]['cryptoalgo'] = "AES";          // AES | DES
 
 // Also ask devices for their supported MIBs
 $config['snmp']['snmp_sysorid']   = TRUE;
@@ -193,6 +202,8 @@ $config['snmp']['snmp_sysorid']   = TRUE;
 $config['autodiscovery']['xdp']            = TRUE; // Autodiscover hosts via discovery protocols (CDP, LLDP, FDP, AMAP and other)
 $config['autodiscovery']['ospf']           = TRUE; // Autodiscover hosts via OSPF
 $config['autodiscovery']['bgp']            = TRUE; // Autodiscover hosts via iBGP
+$config['autodiscovery']['bgp_as_private'] = FALSE; //Autodiscovery hosts via eBGP a Private AS (64512 - 65535)
+$config['autodiscovery']['bgp_as_whitelist'] = array(); // Array of ASNs we will try to auto-discover hosts for. (eg for confederations).
 $config['autodiscovery']['snmp_scan']      = TRUE; // Autodiscover hosts via SNMP scanning - currently not implemented. (FIXME)
 $config['autodiscovery']['libvirt']        = TRUE; // Autodiscover hosts found via libvirt
 $config['autodiscovery']['vmware']         = TRUE; // Autodiscover hosts found via vmware
@@ -440,13 +451,6 @@ $config['frontpage']['micrograph_settings']['height']          = 30;
 // Frontpage order you can use: status_summary, map, device_status_boxes, overall_traffic, custom_traffic, minigraphs, splitlog, syslog, eventlog
 $config['frontpage']['order']           = array('status_summary', 'map', 'device_status_boxes', 'device_status', 'eventlog');
 
-// Device page options
-
-$config['show_overview_tab'] = TRUE;
-
-// The device overview page options
-
-$config['overview_show_sysDescr'] = TRUE;
 
 // Enable version checker & stats
 $config['version_check']                = 1; // Enable checking of version in discovery
@@ -469,19 +473,6 @@ $config['enable_vrfs']                  = 1; // Enable VRFs
 $config['enable_sla']                   = 1; // Enable SLA/RPM collection and display
 $config['enable_pseudowires']           = 1; // Enable Pseudowires
 
-// Ports extension modules
-
-$config['port_descr_parser']               = "includes/port-descr-parser.inc.php"; // Parse port descriptions into fields
-$config['enable_ports_etherlike']          = 0; // Enable Polling EtherLike-MIB (doubles interface processing time)
-$config['enable_ports_junoseatmvp']        = 0; // Enable JunOSe ATM VC Discovery/Poller
-$config['enable_ports_adsl']               = 1; // Enable ADSL-LINE-MIB
-$config['enable_ports_poe']                = 0; // Enable PoE stats collection
-$config['enable_ports_fdbcount']           = 0; // Enable count of FDB per-port.
-$config['enable_ports_jnx_cos_qstat']      = 1; // Enable graphing of CoS queues per-port.
-$config['enable_ports_sros_egress_qstat']  = 1; // Enable graphing of egress queues per-port.
-$config['enable_ports_sros_ingress_qstat'] = 1; // Enable graphing of ingress queues per-port.
-$config['enable_ports_separate_walk']      = 0; // NOT ENABLED, do not use this! Walk separate IF-MIB tables instead global ifEntry, ifXEntry
-
 // Billing System Configuration
 
 $config['enable_billing']               = 0; // Enable Billing
@@ -496,6 +487,7 @@ $config['rancid_version']               = '2'; // In generate-rancid.php use del
 #$config['rancid_configs']               = array('/var/lib/rancid/network/configs/');
 #$config['rancid_suffix']                = 'yourdomain.com'; // Domain suffix for non-FQDN device names
 $config['rancid_ignorecomments']        = 0; // Ignore lines starting with #
+$config['rancid_revisions']             = 10; // Show such last count revisions in device page
 #$config['collectd_dir']                 = '/var/lib/collectd/rrd';
 
 // Smokeping
@@ -503,6 +495,7 @@ $config['rancid_ignorecomments']        = 0; // Ignore lines starting with #
 $config['smokeping']['split_char']      = "_";
 #$config['smokeping']['suffix']          = ".yourdomain.com";
 #$config['smokeping']['slaves'][] = 'slave01'; // Used in the generate-smokeping script only
+$config['smokeping']['pings']      = 20;
 
 // NFSen RRD dir.
 $config['nfsen_enable'] = 0;
@@ -510,10 +503,17 @@ $config['nfsen_enable'] = 0;
 #$config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
 #$config['nfsen_suffix']   = "_yourdomain_com";
 
+// Entities specific config options
+
+$config['devices']['serverscheck']['temp_f'] = FALSE; // Specifies that any ServersCheck devices will return temperature sensors in Fahrenheit.
+
+$config['sensors']['port']['power_to_dbm']   = FALSE; // Convert power Port DOM sensors to dBm
+
+
 // Ignores & Allows
 // Has to be lowercase
 
-// FIXME. Rename to 'ignore_if'
+// FIXME. Rename to $config['ports']['ignore_name']
 $config['bad_if'][] = "voip-null";
 $config['bad_if'][] = "virtual-";
 $config['bad_if'][] = "unrouted";
@@ -536,13 +536,14 @@ $config['bad_if'][] = "pppoe-";
 $config['bad_if'][] = "ovs-system";
 #$config['bad_if'][] = "control plane";  // Example for cisco control plane
 
+// FIXME. Rename to $config['ports']['ignore_name_regexp']
 $config['bad_if_regexp'][] = "/^ng[0-9]+$/";
 $config['bad_if_regexp'][] = "/^sl[0-9]/";
 $config['bad_if_regexp'][] = "/^<(none|invalid)>$/";              // calix: <none>, <invalid>
 $config['bad_if_regexp'][] = "/^<(invalid|ethportany):[\d-]+>$/"; // calix: <INVALID:0-0-0-1-0-0-0-4-91-219>, <EthPortAny:0-0-0-0-0-0-0-0-0-0>
 
 // Ignore ports based on ifType. Case-sensitive.
-// FIXME. Rename to 'ignore_if_type'
+// FIXME. Rename to $config['ports']['ignore_type']
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_iftype'][] = "voiceEM";
 #$config['bad_iftype'][] = "voiceFXO";  // show Voice Foreign Exchange Office
@@ -563,10 +564,13 @@ $config['bad_iftype'][] = "mpls";
 $config['bad_iftype'][] = "usb";        // Ignore USB pseudo interface (BSD)
 
 // Ignore ports based on ifAlias
-
+// FIXME. Rename to $config['ports']['ignore_alias_regexp']
 $config['bad_ifalias_regexp'] = array();
 
 // Ignore discover remote devices via discovery protocols (CDP, LLDP, FDP, AMAP and other)
+// FIXME. Rename to $config['xdp']['ignore_name']
+// FIXME. Rename to $config['xdp']['ignore_name_regexp']
+// FIXME. Rename to $config['xdp']['ignore_platform']
 #$config['bad_xdp'][] = "badhost.donotwant";      // by hostname
 #$config['bad_xdp_regexp'][] = "/^SIP.*/";        // by hostname regex
 #$config['bad_xdp_regexp'][] = "/^$/";
@@ -575,11 +579,14 @@ $config['bad_xdp_platform'][] = "Cisco IP Phone"; // by platform (not case sensi
 #$config['bad_xdp_platform'][] = "Cisco AIR-LAP";
 
 // Filesystems ignore
-// FIXME. Rename to 'ignore_storage'
+// FIXME. Rename to $config['storages']['ignore_removable']
+// FIXME. Rename to $config['storages']['ignore_network']
+// FIXME. Rename to $config['storages']['ignore_optical']
 $config['ignore_mount_removable']  = 1; // Ignore removable disk storage
 $config['ignore_mount_network']    = 1; // Ignore network mounted storage
 $config['ignore_mount_optical']    = 1; // Ignore mounted optical discs
 
+// FIXME. Rename to $config['storages']['ignore_mount']
 $config['ignore_mount'][] = "/kern";
 $config['ignore_mount'][] = "/mnt/cdrom";
 $config['ignore_mount'][] = "/proc";
@@ -587,19 +594,22 @@ $config['ignore_mount'][] = "/dev";
 $config['ignore_mount'][] = "/dev/shm";
 $config['ignore_mount'][] = "/run";
 
+// FIXME. Rename to $config['storages']['ignore_mount_string']
 $config['ignore_mount_string'][] = "packages";
 $config['ignore_mount_string'][] = "devfs";
 $config['ignore_mount_string'][] = "procfs";
 $config['ignore_mount_string'][] = "UMA";
 $config['ignore_mount_string'][] = "MALLOC";
 
-$config['ignore_mount_regexp'][] = '/on: \/packages/';
-$config['ignore_mount_regexp'][] = '/on: \/dev/';
-$config['ignore_mount_regexp'][] = '/on: \/proc/';
+// FIXME. Rename to $config['storages']['ignore_mount_regexp']
+$config['ignore_mount_regexp'][] = '/on: (\/\.mount)?\/packages/';  // /dev/md5.uzip, mounted on: /.mount/packages/mnt/py-base32-26e85274
+$config['ignore_mount_regexp'][] = '/on: \/dev/';                   // devfs: dev file system, mounted on: /dev
+$config['ignore_mount_regexp'][] = '/on: (\/\.mount)?\/proc/';      // procfs: process file system, mounted on: /.mount/proc
+$config['ignore_mount_regexp'][] = '/on: (\/\.mount)?\/tmp/';       // tmpfs, mounted on: /.mount/tmp
 $config['ignore_mount_regexp'][] = '/on: \/junos^/';
 $config['ignore_mount_regexp'][] = '/on: \/junos\/dev/';
 $config['ignore_mount_regexp'][] = '/on: \/jail\/dev/';
-$config['ignore_mount_regexp'][] = '/^(dev|proc)fs/';
+$config['ignore_mount_regexp'][] = '/^(dev|proc)fs/';               // devfs: dev file system, mounted on: /.mount/dev
 $config['ignore_mount_regexp'][] = '/^\/dev\/md0/';
 $config['ignore_mount_regexp'][] = '/^\/var\/dhcpd\/dev,/';
 $config['ignore_mount_regexp'][] = '/UMA/';
@@ -611,27 +621,38 @@ $config['ignore_mount_regexp'][] = '/^\/sys\//';
 
 
 // Mempools ignore
+// FIXME. Rename to $config['mempools']['ignore_name']
+// FIXME. Rename to $config['mempools']['ignore_name_string']
+// FIXME. Rename to $config['mempools']['ignore_name_regexp']
 #$config['ignore_mempool'][] = 'EXAMPLE';
 #$config['ignore_mempool'][] = 'Cached Memory';
 #$config['ignore_mempool'][] = 'Shared Memory';
 #$config['ignore_mempool'][] = 'Physical Memory';
-
 #$config['ignore_mempool_string'][] = 'EXAMPLE';
 $config['ignore_mempool_regexp'][] = '/ - (reserved|image)$/';
 $config['ignore_mempool_regexp'][] = '/ \((reserved|image)\)$/';
 
 
 // Processors ignore
+// FIXME. Rename to $config['processors']['ignore_name']
+// FIXME. Rename to $config['processors']['ignore_name_string']
+// FIXME. Rename to $config['processors']['ignore_name_regexp']
 #$config['ignore_processor'][] = 'EXAMPLE';
 #$config['ignore_processor_string'][] = 'EXAMPLE';
 #$config['ignore_processor_regexp'][] = '/^ExampleCPU$/';
 
 // Sensors ignore
+// FIXME. Rename to $config['sensors']['ignore_name']
+// FIXME. Rename to $config['sensors']['ignore_name_string']
+// FIXME. Rename to $config['sensors']['ignore_name_regexp']
 #$config['ignore_sensor'][] = 'EXAMPLE';
 #$config['ignore_sensor_string'][] = 'EXAMPLE';
 $config['ignore_sensor_regexp'][] = '/(OSR-7600|C6K)\ Clock\ FRU\ 2/'; // Always ignore Cisco Clock 2 sensors
 
 // Toner ignore
+// FIXME. Rename to $config['toners']['ignore_name']
+// FIXME. Rename to $config['toners']['ignore_name_string']
+// FIXME. Rename to $config['toners']['ignore_name_regexp']
 #$config['ignore_toner'][] = 'EXAMPLE';
 #$config['ignore_toner_string'][] = 'EXAMPLE';
 #$config['ignore_toner_regexp'][] = '/^Fuchsia$/';
@@ -664,6 +685,12 @@ $config['device_traffic_descr'][]  = '/bond/';
 $config['device_traffic_descr'][]  = '/null/';
 $config['device_traffic_descr'][]  = '/dummy/';
 $config['device_traffic_descr'][]  = '/^dwdm/';
+
+// IP address options
+// Ignore IP address discovery by type
+$config['ip-address']['ignore_type'][] = 'unspecified'; // ::, 0.0.0.0
+$config['ip-address']['ignore_type'][] = 'broadcast';   // IPv4 Broadcasts
+$config['ip-address']['ignore_type'][] = 'link-local';  // IPv6 Link Local fe80::200:5aee:feaa:20a2
 
 // IRC Bot configuration
 
@@ -774,7 +801,6 @@ $config['housekeeping']['inventory']['age'] = '1M';      // Maximum age of delet
 $config['housekeeping']['deleted_ports']['age'] = '1M';  // Maximum age of deleted ports before automatically purging; 0 to disable
 $config['housekeeping']['rrd']['age'] = '3M';            // Maximum age of unused rrd files before automatically purging; 0 to disable
 $config['housekeeping']['rrd']['invalid'] = TRUE;        // Delete .rrd files that are not valid RRD files (eg created with a full disk)
-$config['housekeeping']['timing']['age'] = '1M';         // Maximum age of timing (discovery and poll time) entries; 0 to disable
 
 // Virtualization
 
@@ -831,6 +857,7 @@ $config['poller_modules']['cisco-ipsec-flow-monitor']     = 1;
 $config['poller_modules']['cisco-remote-access-monitor']  = 1;
 $config['poller_modules']['cisco-cef']                    = 1;
 $config['poller_modules']['sla']                          = 1;
+$config['poller_modules']['lsp']                          = 1;
 $config['poller_modules']['pseudowires']                  = 1;
 $config['poller_modules']['mac-accounting']               = 1;
 $config['poller_modules']['arista-software-ip-forwarding']= 1;
@@ -871,6 +898,7 @@ $config['discovery_modules']['mac-accounting']            = 1;
 $config['discovery_modules']['cisco-vrf']                 = 1;
 #$config['discovery_modules']['cisco-cef']                 = 1;
 $config['discovery_modules']['sla']                       = 1;
+$config['discovery_modules']['lsp']                      = 1;
 $config['discovery_modules']['pseudowires']               = 1;
 $config['discovery_modules']['virtual-machines']          = 1;
 $config['discovery_modules']['cisco-cbqos']               = 1;
@@ -881,15 +909,32 @@ $config['discovery_modules']['graphs']                    = 1;
 $config['discovery_modules']['services']                  = 0;
 $config['discovery_modules']['raid']                      = 0;
 
+// Ports extension modules
+
+$config['port_descr_parser']                              = "includes/port-descr-parser.inc.php"; // Parse port descriptions into fields
+$config['enable_ports_etherlike']                      = 0; // Enable Polling EtherLike-MIB (doubles interface processing time)
+$config['enable_ports_junoseatmvp']                    = 0; // Enable JunOSe ATM VC Discovery/Poller
+$config['enable_ports_adsl']                           = 1; // Enable ADSL-LINE-MIB
+$config['enable_ports_vlan']                           = 1; // Enable Vlan collection
+$config['enable_ports_fdbcount']                       = 0; // Enable count of FDB per-port.
+$config['enable_ports_ipifstats']                      = 1; // Enable graphing of IP-MIB::ipIfStats.
+$config['enable_ports_jnx_cos_qstat']                  = 1; // Enable graphing of CoS queues per-port.
+$config['enable_ports_sros_egress_qstat']              = 1; // Enable graphing of egress queues per-port.
+$config['enable_ports_sros_ingress_qstat']             = 1; // Enable graphing of ingress queues per-port.
+$config['enable_ports_separate_walk']                  = 0; // Walk separate IF-MIB tables instead global ifEntry, ifXEntry
+
 // Observium WIP API Settings
 
 $config['api']['enable']                        = FALSE;        // Enable or disable the API
 
-//$config['api']['module']['inventory']            = 0;        // Enable or disable the inventory module for the API
-//$config['api']['module']['billing']              = 0;        // Enable or disable the billing module for the API
-//$config['api']['module']['packages']             = 0;        // Enable or disable the packages module for the API
-//$config['api']['module']['encryption']           = 0;        // Enable encryption of data (be aware that this can be very slow and cpu intensive!!!)
 //$config['api']['encryption']['key']              = "I_Need_To_Change_This_Key";        // Set a random encryption/decryption key
+
+// InfluxDB export
+
+$config['influxdb']['enabled']                    = FALSE;     // Enable or disable posting data to InfluxDB
+$config['influxdb']['debug']                      = FALSE;     // If true, just write updates to /tmp
+$config['influxdb']['server']                     = 'localhost:8086'; // Where is InfluxDB listening?
+$config['influxdb']['db']                         = 'observium'; // Which InfluxDB database?
 
 // Unsupported settings
 

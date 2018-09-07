@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -85,6 +85,7 @@ if (($vars['submit'] == 'save' || $vars['action'] == 'save') && request_token_va
   $deletes = array();
   $sets = array();
   $errors = array();
+  $set_attribs = array(); // set obs_attribs
 
   // Submit button pressed
   foreach ($vars as $varname => $value)
@@ -219,9 +220,23 @@ if (($vars['submit'] == 'save' || $vars['action'] == 'save') && request_token_va
         if ($ok)
         {
           $sets[dbEscape($sqlname)] = $content;
+
+          // Set an obs_attrib, example for syslog trigger
+          //r($config_variable[$sqlname]);
+          if (isset($config_variable[$sqlname]['set_attrib']) && strlen($config_variable[$sqlname]['set_attrib']))
+          {
+            $set_attribs[$config_variable[$sqlname]['set_attrib']] = $config['time']['now'];
+          }
         }
       } else {
         $deletes[] = "'".dbEscape($sqlname)."'";
+
+        // Set an obs_attrib, example for syslog trigger
+        //r($config_variable[$sqlname]);
+        if (isset($config_variable[$sqlname]['set_attrib']) && strlen($config_variable[$sqlname]['set_attrib']))
+        {
+          $set_attribs[$config_variable[$sqlname]['set_attrib']] = $config['time']['now'];
+        }
       }
     }
   }
@@ -269,6 +284,13 @@ if (($vars['submit'] == 'save' || $vars['action'] == 'save') && request_token_va
   foreach ($errors as $error)
   {
     print_error($error);
+  }
+
+  // Set obs attribs, example for syslog trigger
+  //r($set_attribs);
+  foreach ($set_attribs as $attrib => $value)
+  {
+    set_obs_attrib($attrib, $value);
   }
 
   if ($updates)

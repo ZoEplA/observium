@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -157,7 +157,9 @@ if (isset($entry['upsmgOutputInverterOff']))
   $oid_name = 'upsmgOutputInverterOff';
   $oid_num  = '.1.3.6.1.4.1.705.1.7.9.0';
   $value    = $entry[$oid_name];
-  if ($family_name == 'ex' || $family_name == '9sx') // Known Online UPSes
+
+  // FIXME - find a better way to do this. Currently it seems all things starting with 8 and "ex" are online.
+  if (in_array($family_name, array('ex', '9sx', '9135')) || $family_name[0] == 9) // Known Online UPSes
   {
     $type = 'mge-status-state';
     // This rename for old wrong indexes

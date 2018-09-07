@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -48,7 +48,7 @@ unset($navbar);
 arsort($device['state']['poller_mod_perf']);
 
 
-if($vars['view'] == poller)
+if ($vars['view'] == 'poller')
 {
 
   echo generate_box_open();
@@ -57,7 +57,7 @@ if($vars['view'] == poller)
   foreach ($device['state']['poller_mod_perf'] as $module => $time)
   {
 
-    echo '<tr><td><h3>'.$module.'</h3></td><td width=40>'.$time.'s</td></tr>';
+    echo '<tr><td><h3>'.$module.'</h3></td><td style="width: 40px">'.$time.'s</td></tr>';
     echo '<tr><td colspan=2>';
 
     $graph = array('type'   => 'device_pollermodule_perf',
@@ -109,6 +109,16 @@ foreach ($device['state']['poller_mod_perf'] as $module => $time)
       <td style="width: 80px;">'.number_format($time, 4).'s</td>
       <td style="width: 70px;">'.$perc.'%</td>
     </tr>');
+
+    // Separate sub-module perf (ie ports)
+    foreach ($device['state']['poller_'.$module.'_perf'] as $submodule => $subtime)
+    {
+      echo('    <tr>
+        <td>&nbsp;<i class="icon-share-alt icon-flip-vertical"></i><strong style="padding-left:1em"><i>'.$submodule.'</i></strong></td>
+        <td style="width: 80px;"><i>'.number_format($subtime, 4).'s</i></td>
+        <td style="width: 70px;"></td>
+      </tr>');
+    }
   }
 }
 
@@ -135,13 +145,12 @@ foreach ($device['state']['poller_mod_perf'] as $module => $time)
             <tbody>
 <?php
 
-$times = dbFetchRows("SELECT * FROM `devices_perftimes` WHERE `operation` = 'poll' AND `device_id` = ? ORDER BY `start` DESC LIMIT 30", array($device['device_id']));
-
-foreach ($times as $time)
+$times = array_slice($device['state']['poller_history'], 0, 30, TRUE);
+foreach ($times as $start => $duration)
 {
   echo('    <tr>
-      <td>'.format_unixtime($time['start']).'</td>
-      <td>'.$time['duration'].'s</td>
+      <td>'.format_unixtime($start).'</td>
+      <td>'.number_format($duration, 2).'s</td>
     </tr>');
 }
 
@@ -168,13 +177,12 @@ foreach ($times as $time)
             <tbody>
 <?php
 
-$times = dbFetchRows('SELECT * FROM `devices_perftimes` WHERE `operation` = "discover" AND `device_id` = ? ORDER BY `start` DESC LIMIT 30', array($device['device_id']));
-
-foreach ($times as $time)
+$times = array_slice($device['state']['discovery_history'], 0, 30, TRUE);
+foreach ($times as $start => $duration)
 {
   echo('    <tr>
-      <td>'.format_unixtime($time['start']).'</td>
-      <td>'.$time['duration'].'s</td>
+      <td>'.format_unixtime($start).'</td>
+      <td>'.number_format($duration, 2).'s</td>
     </tr>');
 }
 

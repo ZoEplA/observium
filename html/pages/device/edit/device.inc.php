@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -50,7 +50,7 @@ if ($vars['editing'])
       $updated = 2;
     }
 
-    if ($override_sysLocation_bool) { set_entity_attrib('device', $device, 'override_sysLocation_bool', '1'); }
+    if ($override_sysLocation_bool) { set_entity_attrib( 'device', $device, 'override_sysLocation_bool', '1', $device['device_id']); }
     else                            { del_entity_attrib('device', $device, 'override_sysLocation_bool'); }
     if (isset($override_sysLocation_string)) { set_entity_attrib('device', $device, 'override_sysLocation_string', $override_sysLocation_string); };
 

@@ -1,12 +1,14 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
+ * Observium
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage config
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -121,20 +123,6 @@ $config_variable[$setting]['subsection'] = 'General';
 $config_variable[$setting]['name']       = "Enable 'Overview' tab";
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = "Enable 'Overview' tab on device pages.";
-
-$setting = 'login_message';
-$config_variable[$setting]['section']    = $section;
-$config_variable[$setting]['subsection'] = 'Login';
-$config_variable[$setting]['name']       = 'Login message';
-$config_variable[$setting]['type']       = 'string';
-$config_variable[$setting]['shortdesc']  = 'Define the login message shown on the login page.';
-
-$setting = 'login_remember_me';
-$config_variable[$setting]['section']    = $section;
-$config_variable[$setting]['subsection'] = 'Login';
-$config_variable[$setting]['name']       = 'Remember me';
-$config_variable[$setting]['type']       = 'bool';
-$config_variable[$setting]['shortdesc']  = 'Enable or disable the remember me feature.';
 
 $setting = 'cache|enable';
 $config_variable[$setting]['section']    = $section;
@@ -260,6 +248,13 @@ $config_variable[$setting]['name']       = 'Alert Marker Size';
 $config_variable[$setting]['type']       = 'int';
 $config_variable[$setting]['shortdesc']  = 'Alert marker size in pixels for the map on the front page';
 
+$setting = 'short_hostname|length';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Cosmetics';
+$config_variable[$setting]['name']       = 'Short Hostname Length';
+$config_variable[$setting]['type']       = 'int';
+$config_variable[$setting]['shortdesc']  = 'Maximum length in characters of "shortened" hostnames used in UI tables.';
+
 
 $setting = 'rrdgraph_real_95th';
 $config_variable[$setting]['section']    = $section;
@@ -276,6 +271,14 @@ $config_variable[$setting]['type']       = 'enum';
 $config_variable[$setting]['params']['default'] = array('name' => 'Default');
 $config_variable[$setting]['params']['mrtg']    = array('name' => 'MRTG');
 $config_variable[$setting]['shortdesc']  = 'Use alternative graph style. NOTE: MRTG style currently works only for port bits graphs.';
+
+$setting = 'graphs|stacked_processors';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Graphs';
+$config_variable[$setting]['name']       = 'Enable Stacked Processor Graphs';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'Enable the use of stacked processor graphs for OS types with "processor_stacked" enabled.';
+
 
 $setting = 'graphs|ports_scale_default';
 $config_variable[$setting]['section']    = $section;
@@ -297,6 +300,15 @@ $config_variable[$setting]['subsection'] = 'Graphs';
 $config_variable[$setting]['name']       = 'Force graph scale';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Force scale also if real data more than selected scale.';
+
+
+$setting = 'graphs|always_draw_max';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Graphs';
+$config_variable[$setting]['name']       = 'Always draw "Max" area on graphs';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'Always draw the Max RRA on graphs. By default this is suppressed for graphs of one week or shorter.';
+
 
 /// POLLING /////////////////////////////////////////////////////////
 
@@ -369,6 +381,13 @@ $config_variable[$setting]['name']       = 'Enable Polling EtherLike-MIB';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Enable Polling extended EtherLike-MIB (doubles port processing time).';
 
+$setting = 'enable_ports_vlan';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Ports Modules';
+$config_variable[$setting]['name']       = 'Enable Polling VLAN information';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'Enable Polling basic information about VLANs for ports.';
+
 $setting = 'enable_ports_junoseatmvp';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Ports Modules';
@@ -383,12 +402,12 @@ $config_variable[$setting]['name']       = 'Enable Polling ADSL';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Enable Polling ADSL-LINE-MIB.';
 
-//$setting = 'enable_ports_poe';
-//$config_variable[$setting]['section']    = $section;
-//$config_variable[$setting]['subsection'] = 'Ports Modules';
-//$config_variable[$setting]['name']       = 'Enable Polling PoE';
-//$config_variable[$setting]['type']       = 'bool';
-//$config_variable[$setting]['shortdesc']  = 'Enable Polling PoE.';
+$setting = 'enable_ports_ipifstats';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Ports Modules';
+$config_variable[$setting]['name']       = 'Enable graphing of IP-MIB::ipIfStats';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'Enable graphing of IP-MIB::ipIfStats.';
 
 $setting = 'enable_ports_fdbcount';
 $config_variable[$setting]['section']    = $section;
@@ -405,10 +424,10 @@ $config_variable[$setting]['shortdesc']  = 'Enable Polling FDB count.';
 //$config_variable[$setting]['shortdesc']  = 'NOT ENABLED, do not use this globally! Walk separate IF-MIB tables instead global ifEntry, ifXEntry.';
 // FIXME when we have a toggle to not display it ever, make sure it's in the array for docs generation etc.
 
-/// Devices
+/// Entities
 
-$section = 'devices';
-$config_sections[$section]['text'] = 'Devices';
+$section = 'entities';
+$config_sections[$section]['text'] = 'Entities';
 
 $setting = 'devices|serverscheck|temp_f';
 $config_variable[$setting]['section']    = $section;
@@ -417,6 +436,12 @@ $config_variable[$setting]['name']       = 'ServersCheck Fahrenheit units';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Specifies that any ServersCheck devices will return temperature sensors in Fahrenheit.';
 
+$setting = 'sensors|port|power_to_dbm';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Ports';
+$config_variable[$setting]['name']       = 'Convert Port DOM power sensors to dBm';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'When device provide port DOM power sensors in Watts, set to TRUE for convert it to dBm sensors. NOTE: power DOM sensors in Watts will removed.';
 
 
 /// ALERTING /////////////////////////////////////////////////////////
@@ -478,18 +503,34 @@ $config_variable[$setting]['name']       = 'Trust Apache REMOTE_USER';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Disables built-in authentication and delegates this to Apache, for auth modules that support this. Make sure to read the documentation and handle with care!';
 
+$setting = 'login_message';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Login';
+$config_variable[$setting]['name']       = 'Login message';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'Define the login message shown on the login page.';
+
+$setting = 'login_remember_me';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Login';
+$config_variable[$setting]['name']       = 'Remember me';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'Enable or disable the remember me feature.';
+
 $setting = 'web_session_lifetime';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Sessions';
 $config_variable[$setting]['name']       = 'Session lifetime';
 $config_variable[$setting]['type']       = 'enum';
-$config_variable[$setting]['params']     = array(0     => array('name' => 'Until browser restart'),
-                                                 //600   => array('name' => '10 minutes'),
-                                                 1800  => array('name' => '30 minutes'),
-                                                 3600  => array('name' => '1 hour'),
-                                                 10800 => array('name' => '3 hours'),
-                                                 84600 => array('name' => '1 day'));
-$config_variable[$setting]['shortdesc']  = 'Default user sessions lifetime in seconds (0 - until browser restart).';
+$config_variable[$setting]['params']     = array(0      => array('name' => 'Until browser restart'),
+                                                 //60     => array('name' => '1 minute'),
+                                                 //600    => array('name' => '10 minutes'),
+                                                 1800   => array('name' => '30 minutes'),
+                                                 3600   => array('name' => '1 hour'),
+                                                 10800  => array('name' => '3 hours'),
+                                                 86400  => array('name' => '1 day'),
+                                                 604800 => array('name' => '1 week'));
+$config_variable[$setting]['shortdesc']  = 'Default user sessions lifetime in seconds (0 - until browser restart). This lifetime actual for sessions without "remember me" checkbox.';
 
 $setting = 'web_session_ip';
 $config_variable[$setting]['section']    = $section;
@@ -497,6 +538,20 @@ $config_variable[$setting]['subsection'] = 'Sessions';
 $config_variable[$setting]['name']       = 'Session bind to IP';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Bind user sessions to his IP address.';
+
+$setting = 'web_session_ip_by_header';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Sessions';
+$config_variable[$setting]['name']       = 'Use configured Remote Address HTTP header';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'DANGEROUS. Allow to use alternative Remote Address HTTP header for Session identification. Use at own risk, since address in HTTP header(s) can be spoofed.';
+
+$setting = 'web_remote_addr_header';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Sessions';
+$config_variable[$setting]['name']       = 'Remote Address HTTP header for Web session logging';
+$config_variable[$setting]['type']       = 'enum|default|CF-Connecting-IP|X-Real-IP|Client-IP|X-Forwarded-For';
+$config_variable[$setting]['shortdesc']  = 'This HTTP header will logged in user auth. Additionally it can used as Session identification address (not by default).';
 
 $setting = 'web_session_cidr';
 $config_variable[$setting]['section']    = $section;
@@ -660,6 +715,28 @@ $config_variable[$setting]['shortdesc']  = 'Ports whose ifType match values conf
 
 // Storage
 
+$setting = 'ignore_mount_removable';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Storage Discovery';
+$config_variable[$setting]['name']       = 'Ignore removable mounted storage';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = "This setting disables discovery of removable mounted storage (as indicated by the SNMP agent on the monitored device).";
+
+$setting = 'ignore_mount_optical';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Storage Discovery';
+$config_variable[$setting]['name']       = 'Ignore optical mounted storage';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = "This setting disables discovery of optical mounted storage (as indicated by the SNMP agent on the monitored device).";
+
+$setting = 'ignore_mount_network';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Storage Discovery';
+$config_variable[$setting]['name']       = 'Ignore network mounted storage';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = "This setting disables discovery of network mounted storage (as indicated by the SNMP agent on the monitored device).
+                                            In general, this will include or exclude NFS mounts.";
+
 $setting = 'ignore_mount';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Storage Discovery';
@@ -762,6 +839,17 @@ $config_variable[$setting]['type']       = 'enum-freeinput';
 $config_variable[$setting]['example']    = '/(OSR-7600|C6K)\ Clock\ FRU\ 2/';
 $config_variable[$setting]['shortdesc']  = 'Sensors whose names match regular expressions configured here will be ignored during discovery.';
 
+// IP addresses
+
+$setting = 'ip-address|ignore_type';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'IP addresses Discovery';
+$config_variable[$setting]['name']       = 'Ignore IP addresses by type';
+$config_variable[$setting]['type']       = 'enum-array';
+$config_variable[$setting]['params']     = $config['ip_types'];
+$config_variable[$setting]['shortdesc']  = 'IP addresses will be ignored during discovery if IP type detected as one of in this list.';
+
+
 // Printer Supplies
 
 $setting = 'ignore_toner';
@@ -788,6 +876,7 @@ $config_variable[$setting]['type']       = 'enum-freeinput';
 $config_variable[$setting]['example']    = '/^Fuchsia$/';
 $config_variable[$setting]['shortdesc']  = 'Printer Supplies whose names match regular expressions configured here will be ignored during discovery.';
 
+// Autodiscovery
 
 $setting = 'autodiscovery|xdp';
 $config_variable[$setting]['section']    = $section;
@@ -806,6 +895,22 @@ $config_variable[$setting]['type']       = "bool";
 $config_variable[$setting]['shortdesc']  = "This enables autodiscovery of neighbouring devices via neighbours seen through the BGP protocol
                                             (internal BGP only). Note that this doesn't enable or disable the BGP protocol tracking features,
                                             but controls whether Observium should try to auto-add devices it sees via those protocols.";
+
+$setting = 'autodiscovery|bgp_as_private';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = "Device Autodiscovery";
+$config_variable[$setting]['name']       = "Enable autodiscovery via eBGP Private ASN neighbours";
+$config_variable[$setting]['type']       = "bool";
+$config_variable[$setting]['shortdesc']  = "This enables autodiscovery of neighbouring devices via eBGP with a Private AS (64512 - 65535)";
+
+
+$setting = 'autodiscovery|bgp_as_whitelist';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = "Device Autodiscovery";
+$config_variable[$setting]['name']       = "Enable autodiscovery via eBGP with ASN whitelist";
+$config_variable[$setting]['type']       = "enum-freeinput";
+$config_variable[$setting]['shortdesc']  = "This enables autodiscovery of neighbouring devices via eBGP when the peer ASN matches the supplied whitelist.";
+
 
 $setting = 'autodiscovery|ospf';
 $config_variable[$setting]['section']    = $section;
@@ -842,6 +947,13 @@ $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = "This enables autodiscovery of virtual machines discovered through VMware integration. Note that
                                             this doesn't enable or disable the VMware virtual machine tracking features, but controls whether
                                             Observium should try to auto-add devices it sees via VMware.";
+
+$setting = 'mydomain';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Device Autodiscovery Options';
+$config_variable[$setting]['name']       = 'Domain name for add to autodiscovered hosts';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'If you wish to append "domain.com" FQDN to an autodiscovered host. Useful if you do not have domain names set in routers but want them in Observium.';
 
 $setting = 'autodiscovery|require_hostname';
 $config_variable[$setting]['section']    = $section;
@@ -903,7 +1015,7 @@ $setting = 'ping|retries';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Ping';
 $config_variable[$setting]['name']       = 'Ping request retries';
-$config_variable[$setting]['type']       = 'int';
+$config_variable[$setting]['type']       = 'enum|1|3|5|7|10';
 $config_variable[$setting]['shortdesc']  = 'Specifies the number of retries to be used in icmp ping requests. The default is 3.';
 
 $setting = 'ping|timeout';
@@ -945,7 +1057,7 @@ $setting = 'snmp|retries';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'SNMP';
 $config_variable[$setting]['name']       = 'SNMP request retries';
-$config_variable[$setting]['type']       = 'int';
+$config_variable[$setting]['type']       = 'enum|0|1|3|5|7';
 $config_variable[$setting]['shortdesc']  = 'Specifies the number of retries to be used in snmp requests. The default is 5.';
 
 $setting = 'snmp|timeout';
@@ -1099,6 +1211,7 @@ $config_variable[$setting]['subsection'] = 'General';
 $config_variable[$setting]['name']       = 'Enable Syslog';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Enable Syslog collector.';
+$config_variable[$setting]['set_attrib'] = 'syslog_config_changed'; //set_obs_attrib('syslog_config_changed', time()); // Trigger reload syslog script
 
 $setting = 'syslog|debug';
 $config_variable[$setting]['section']    = $section;
@@ -1106,6 +1219,7 @@ $config_variable[$setting]['subsection'] = 'General';
 $config_variable[$setting]['name']       = 'Enable Syslog DEBUG';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = "Enable store RAW syslog lines into logs/debug.log file. Make sure that logs dir and debug.log file have write permission for your syslog server user. For example in Ubuntu rsyslog uses user syslog, add write permission for it: `sudo chmod o+w ".$config['log_dir']."/debug.log`";
+$config_variable[$setting]['set_attrib'] = 'syslog_config_changed'; //set_obs_attrib('syslog_config_changed', time()); // Trigger reload syslog script
 
 $setting = 'syslog|fifo';
 $config_variable[$setting]['section']    = $section;
@@ -1113,6 +1227,7 @@ $config_variable[$setting]['subsection'] = 'General';
 $config_variable[$setting]['name']       = 'FIFO file';
 $config_variable[$setting]['type']       = 'string';
 $config_variable[$setting]['shortdesc']  = 'Set this to a FIFO to take input from FIFO. Default: php://stdin';
+$config_variable[$setting]['set_attrib'] = 'syslog_config_changed'; //set_obs_attrib('syslog_config_changed', time()); // Trigger reload syslog script
 
 $setting = 'syslog|unknown_hosts';
 $config_variable[$setting]['section']    = $section;
@@ -1120,6 +1235,7 @@ $config_variable[$setting]['subsection'] = 'Hosts & filters';
 $config_variable[$setting]['name']       = 'Collect syslog messages from unknown hosts';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = "Allow collect syslog messages from unknown hosts. This entries not displayed in any place, while you not link this hosts to specific devices on device editpage or map in \$config['syslog']['host_map']";
+$config_variable[$setting]['set_attrib'] = 'syslog_config_changed'; //set_obs_attrib('syslog_config_changed', time()); // Trigger reload syslog script
 
 $setting = 'syslog|filter';
 $config_variable[$setting]['section']    = $section;
@@ -1127,6 +1243,7 @@ $config_variable[$setting]['subsection'] = 'Hosts & filters';
 $config_variable[$setting]['name']       = 'Syslog messages filters';
 $config_variable[$setting]['type']       = 'enum-freeinput';
 $config_variable[$setting]['shortdesc']  = 'Filter (ignore) syslog entries containing these strings.';
+$config_variable[$setting]['set_attrib'] = 'syslog_config_changed'; //set_obs_attrib('syslog_config_changed', time()); // Trigger reload syslog script
 
 /// INTEGRATION //////////////////////////////////////////////////////
 
@@ -1152,8 +1269,22 @@ $setting = 'rancid_version';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'RANCID';
 $config_variable[$setting]['name']       = 'RANCID version used';
-$config_variable[$setting]['type']       = 'enum|2|3';
+$config_variable[$setting]['type']       = 'enum';
+$config_variable[$setting]['params']['2']   = array('name' => '2.0+');
+$config_variable[$setting]['params']['3']   = array('name' => '3.0+');
+$config_variable[$setting]['params']['3.2'] = array('name' => '3.2+');
+$config_variable[$setting]['params']['3.3'] = array('name' => '3.3+');
+$config_variable[$setting]['params']['3.4'] = array('name' => '3.4+');
+$config_variable[$setting]['params']['3.5'] = array('name' => '3.5+');
+$config_variable[$setting]['params']['3.7'] = array('name' => '3.7+');
 $config_variable[$setting]['shortdesc']  = 'Depending on the RANCID version, a different delimiter is used in the RANCID configuration files (: vs ;).';
+
+$setting = 'rancid_revisions';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'RANCID';
+$config_variable[$setting]['name']       = 'RANCID revisions';
+$config_variable[$setting]['type']       = 'enum|5|10|15|20|30';
+$config_variable[$setting]['shortdesc']  = 'Show such count of latest revisions for config changes.';
 
 $setting = 'rancid_suffix';
 $config_variable[$setting]['section']    = $section;
@@ -1264,6 +1395,14 @@ $config_variable[$setting]['name']       = 'EIGRP collection';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = 'Enable collection and display of EIGRP data.';
 
+
+$setting = 'web_show_bgp_asdot';
+$config_variable[$setting]['section']    = 'routing';
+$config_variable[$setting]['subsection'] = 'Display';
+$config_variable[$setting]['name']       = 'BGP 32bit ASN in asdot format';
+$config_variable[$setting]['type']       = 'bool';
+$config_variable[$setting]['shortdesc']  = 'Show BGP 32bit ASNs in asdot format (ie AS5.20 instead AS327700).';
+
 /// BILLING //////////////////////////////////////////////////////////
 
 $section = 'billing';
@@ -1366,13 +1505,6 @@ $config_variable[$setting]['subsection'] = 'Ports';
 $config_variable[$setting]['name']       = 'Remove Deleted Ports Age';
 $config_variable[$setting]['type']       = 'string';
 $config_variable[$setting]['shortdesc']  = 'Maximum age of deleted ports in seconds before automatically purging; 0 to disable (i.e. 30*86400 for 30 days.)';
-
-$setting = 'housekeeping|timing|age';
-$config_variable[$setting]['section']    = $section;
-$config_variable[$setting]['subsection'] = 'Performance Data';
-$config_variable[$setting]['name']       = 'Observium Performance Data Max Age';
-$config_variable[$setting]['type']       = 'string';
-$config_variable[$setting]['shortdesc']  = 'Maximum age of timing (discovery and poll time) entries in seconds; 0 to disable (i.e. 7*86400 for 7 days.)';
 
 /* Paths commented out
 /// PATHS ////////////////////////////////////////////////////////////

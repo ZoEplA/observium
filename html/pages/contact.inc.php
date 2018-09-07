@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2017 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -38,7 +38,7 @@ foreach (json_decode($contact['contact_endpoint']) as $field => $value)
   $contact['endpoint_parameters'][$field] = $value;
 }
 
-$data = $config['alerts']['transports'][$contact['contact_method']];
+$data = $config['transports'][$contact['contact_method']];
 if (!count($data['parameters']['global']))   { $data['parameters']['global'] = array(); } // Temporary until we separate "global" out.
 // Plan: add defaults for transport types to global settings, which we use by default, then be able to override the settings via this GUI
 // This needs supporting code in the transport to check for set variable and if not, use the global default

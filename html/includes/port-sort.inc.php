@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -61,7 +61,8 @@ switch ($vars['sort'])
     $ports = array_sort_by($ports, 'ifSpeed', $sort_neg, SORT_NUMERIC);
     break;
   case 'port':
-    $ports = array_sort_by($ports, 'ifDescr', $sort_order, SORT_STRING);
+    //$ports = array_sort_by($ports, 'ifDescr', $sort_order, SORT_STRING);
+    $ports = array_sort_by($ports, 'port_label', $sort_order, SORT_STRING);
     break;
   case 'media':
     $ports = array_sort_by($ports, 'ifType', $sort_order, SORT_STRING);

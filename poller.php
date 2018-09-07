@@ -9,7 +9,7 @@
  * @package    observium
  * @subpackage poller
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -177,7 +177,6 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 
 if ($polled_devices)
 {
-  dbInsert(array('type' => 'poll', 'doing' => $doing, 'start' => $poller_start, 'duration' => $poller_time, 'devices' => $polled_devices ), 'perf_times');
   if (is_numeric($doing)) { $doing = $device['hostname']; } // Single device ID convert to hostname for log
 } else {
   print_warning("WARNING: 0 devices polled. Did you specify a device that does not exist?");
@@ -233,6 +232,13 @@ if (!isset($options['q']))
 
   print_cli_data('SNMP Usage', implode(" ", $snmp_times) . ' ('.round($snmp_time, 3).'s '.round($snmp_time/$poller_time*100, 3).'%)', 0);
 
+  if ($GLOBALS['influxdb_stats'])
+  {
+    $s = $GLOBALS['influxdb_stats'];
+    $t = $s[ 'time' ];
+    print_cli_data('InfluxDB Usage', $s[ 'count' ] . ' data points ('.round($t, 3).'s '.round($t/$poller_time*100, 3).'%)', 0);
+  }
+
 }
 
 logfile($string);
@@ -243,6 +249,6 @@ unset($config); // Remove this for testing
 
 echo("\n");
 
-print_r($runtime_stats);
+print_debug_vars($snmp_stats);
 
 // EOF

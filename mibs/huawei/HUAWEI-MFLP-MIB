@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  HUAWEI mac flapping management MIB
 -- Reference:
--- Version: V2.16
+-- Version: V2.17
 -- History:
 -- ==================================================================
 
@@ -32,7 +32,7 @@ IMPORTS
         FROM SNMPv2-SMI;                         
         
     hwMFlpMIB MODULE-IDENTITY 
-            LAST-UPDATED "201507170000Z"
+            LAST-UPDATED "201604270000Z"
             ORGANIZATION
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -45,6 +45,8 @@ IMPORTS
                    "
             DESCRIPTION 
                   "Mac flapping management MIB."
+	        REVISION     "201604270000Z"
+            DESCRIPTION  "Add Objects to hwMflpBdCfgTable."
             REVISION     "201507170000Z"
             DESCRIPTION  "Fix the errors."
             REVISION     "201507140000Z"
@@ -342,7 +344,7 @@ IMPORTS
                 MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
-                        "The blocked time of the interface.
+                        "The blocked time of the interface .
                         When the value of hwMflpAction is 1, value of hwMflpBlockTime should be 
                         between 10 and 65535."
                 ::= { hwMflpVsiCfgEntry 6 }  
@@ -443,6 +445,131 @@ IMPORTS
                     DESCRIPTION
                         "The AC interface name, only used for trap."
                     ::= { hwMflpVsiCfgEntry 17 } 
+
+       hwMflpBdCfgTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF HwMflpBdCfgEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The mac flapping table .The table that 
+                        contains the mac flapping information 
+                        currently operating in Bd mode on this device."
+                ::= { hwMflpObjects 3 }
+        
+        hwMflpBdCfgEntry OBJECT-TYPE
+                SYNTAX HwMflpBdCfgEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Entries of The mac flapping table in Bd mode."
+                INDEX { hwMflpBdIndex }
+                ::= { hwMflpBdCfgTable 1 }			
+				
+        HwMflpBdCfgEntry ::=
+                SEQUENCE { 
+                        hwMflpBdIndex
+                                Unsigned32,
+                        hwMflpBdCfgBlockTime
+                                Unsigned32,
+                        hwMflpBdCfgAcName
+                                DisplayString,
+                        hwMflpBdCfgAlarmReason
+                                DisplayString, 
+                        hwMflpBdDetectMAC
+                                DisplayString,    
+                        hwMflpBdCfgAcNameEx1
+                                DisplayString,
+                        hwMflpBdCfgAcNameEx2
+                                DisplayString,
+                        hwMflpBdCfgVsiName
+                                OCTET STRING,     
+                        hwMflpBdCfgIpAddr
+                                IpAddress,
+                        hwMflpBdCfgPwId
+                                Unsigned32				                          
+                 }				
+				
+        hwMflpBdIndex OBJECT-TYPE
+                SYNTAX Unsigned32 
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "The Bd ID referring to the BD which is correlative to the hwMflpBdCfg table."
+                ::= { hwMflpBdCfgEntry 1 }
+                            
+        hwMflpBdCfgBlockTime OBJECT-TYPE
+                SYNTAX Unsigned32 (0..65535)
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The blocked time of the interface in units of seconds.
+                        When the value of hwMflpAction is 1, value of hwMflpBlockTime should be 
+                        between 10 and 65535."
+                ::= { hwMflpBdCfgEntry 2 }  
+                
+        hwMflpBdCfgAcName OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The AC interface name, only used for trap."
+                    ::= { hwMflpBdCfgEntry 3 } 
+                        
+        hwMflpBdCfgAlarmReason OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The alarm reason, only used for trap."
+                    ::= { hwMflpBdCfgEntry 4 }                                                                                                        
+
+        hwMflpBdDetectMAC OBJECT-TYPE
+		            SYNTAX      DisplayString
+		            MAX-ACCESS accessible-for-notify
+		            STATUS current
+		            DESCRIPTION
+		                "The detect MAC, only used for trap."
+		            ::= { hwMflpBdCfgEntry 5 }    
+					
+        hwMflpBdCfgAcNameEx1 OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The AC interface name, only used for trap."
+                    ::= { hwMflpBdCfgEntry 6 } 
+					
+        hwMflpBdCfgAcNameEx2 OBJECT-TYPE
+                    SYNTAX      DisplayString
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The AC interface name, only used for trap."
+                    ::= { hwMflpBdCfgEntry 7 } 
+		    
+        hwMflpBdCfgVsiName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (1..32))
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                        "The VSI name referring to the VSI which is correlative to the hwMflpBdCfgEntry table."
+                ::= { hwMflpBdCfgEntry 8 }	
+			    	    
+        hwMflpBdCfgIpAddr OBJECT-TYPE
+                    SYNTAX IpAddress
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The peer IP address, only used for trap."
+                    ::= { hwMflpBdCfgEntry 9}  
+                    
+        hwMflpBdCfgPwId OBJECT-TYPE
+                    SYNTAX Unsigned32
+                    MAX-ACCESS accessible-for-notify
+                    STATUS current
+                    DESCRIPTION
+                        "The PW ID, only used for trap."
+                    ::= { hwMflpBdCfgEntry 10 }    
 					
         hwMflpGeneralObjects OBJECT IDENTIFIER ::= { hwMFlpMIB 2 }        
                 
@@ -622,7 +749,42 @@ IMPORTS
             DESCRIPTION 
                 "This notification only for vlan mac flapping periodic send."
             ::= { hwMflpMIBTraps 20 }  
-                         
+
+        hwMflpBdAcBlock NOTIFICATION-TYPE
+            OBJECTS { hwMflpBdCfgAcName, hwMflpBdCfgBlockTime, hwMflpBdCfgAlarmReason, hwMflpBdDetectMAC }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface blocked."
+            ::= { hwMflpMIBTraps 21 }  
+            
+        hwMflpBdAcResume NOTIFICATION-TYPE
+            OBJECTS { hwMflpBdCfgAcName, hwMflpBdCfgBlockTime, hwMflpBdCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface resumed."
+            ::= { hwMflpMIBTraps 22 }      
+  
+        hwMflpBdPwBlock NOTIFICATION-TYPE
+            OBJECTS { hwMflpBdCfgVsiName, hwMflpBdCfgIpAddr, hwMflpBdCfgPwId, hwMflpBdCfgBlockTime, hwMflpBdCfgAlarmReason, hwMflpBdDetectMAC }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface blocked."
+            ::= { hwMflpMIBTraps 23 }  
+            
+        hwMflpBdPwResume NOTIFICATION-TYPE
+            OBJECTS { hwMflpBdCfgVsiName, hwMflpBdCfgIpAddr, hwMflpBdCfgPwId, hwMflpBdCfgBlockTime, hwMflpBdCfgAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the interface resumed."
+            ::= { hwMflpMIBTraps 24 }      
+
+        hwMflpBdAlarmOnly NOTIFICATION-TYPE
+            OBJECTS { hwMflpBdCfgAcName, hwMflpBdCfgAcNameEx1, hwMflpBdCfgAcNameEx2, hwMflpBdCfgAlarmReason, hwMflpBdDetectMAC}
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates alarm only when loop existed in BD."
+            ::= { hwMflpMIBTraps 25 }  			
+	
 -- IEEE 802.1Q MIB - Conformance Information
 
 hwMflpConformance OBJECT IDENTIFIER ::= { hwMFlpMIB 4 }
@@ -715,11 +877,36 @@ hwMflpTrapGroup NOTIFICATION-GROUP
         hwMflpBdAlarm,
         hwMflpBdAlarmResume,
         hwMflpBdPeriodicTrap,
-        hwMflpVlanLoopPeriodicTrap
+        hwMflpVlanLoopPeriodicTrap,
+        hwMflpBdAcBlock, 
+        hwMflpBdAcResume, 
+        hwMflpBdPwBlock, 
+        hwMflpBdPwResume,
+        hwMflpBdAlarmOnly
         }
         STATUS current
         DESCRIPTION 
             "Mflp Trap Group."
         ::= { hwMflpGroups 4 }      
+  
+hwMflpBdCfgGroup OBJECT-GROUP
+    OBJECTS {
+		hwMflpBdCfgBlockTime,                   
+		hwMflpBdCfgAcName,
+		hwMflpBdCfgAlarmReason,
+		hwMflpBdDetectMAC,
+		hwMflpBdCfgAcNameEx1,
+		hwMflpBdCfgAcNameEx2,
+    		hwMflpBdCfgVsiName,
+    		hwMflpBdCfgIpAddr,
+    		hwMflpBdCfgPwId,		
+    		hwMflpVsiCfgPwId
+
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about 
+        BD mac flapping table."
+    ::= { hwMflpGroups 5 }          
                 
 END

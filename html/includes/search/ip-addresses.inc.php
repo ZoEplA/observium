@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage search
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -57,7 +57,7 @@ if (count($results))
     $port = get_port_by_id_cache($result['port_id']);
     $device = device_by_id_cache($port['device_id']);
 
-    $descr = $device['hostname'].' | '.rewrite_ifname($port['port_label']);
+    $descr = $device['hostname'].' | '.escape_html($port['port_label']);
 
     $name = $result['ip_address'].'/'.$result['ip_prefixlen'];
     if (strlen($name) > 35) { $name = substr($name, 0, 35) . "..."; }

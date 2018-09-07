@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -51,7 +51,7 @@ include($config['html_dir']."/includes/alerting-navbar.inc.php");
 
         unset($vars['name'], $vars['descr'], $vars['regex']);
 
-        set_obs_attrib('syslog_rules_changed', time());
+        set_obs_attrib('syslog_rules_changed', time()); // Trigger reload syslog script
 
       } else {
         print_error('Failed to create new rule.');

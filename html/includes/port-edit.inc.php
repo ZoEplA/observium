@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -75,7 +75,7 @@ foreach (dbFetchRows("SELECT `port_id`, `ignore`, `disabled` FROM `ports` WHERE 
     if ($vars['ifSpeed_custom_' . $port_id] != $port['ifSpeed_custom'])
     {
       //r($vars['ifSpeed_custom_' . $port_id]); r($port['ifSpeed_custom']);
-      set_entity_attrib('port', $port_id, 'ifSpeed_custom', $vars['ifSpeed_custom_' . $port_id]);
+      set_entity_attrib('port', $port_id, 'ifSpeed_custom', $vars['ifSpeed_custom_' . $port_id], $device['device_id']);
       $updated = TRUE;
     }
   }
@@ -86,7 +86,7 @@ foreach (dbFetchRows("SELECT `port_id`, `ignore`, `disabled` FROM `ports` WHERE 
     {
       del_entity_attrib('port', $port_id, 'ifSpeed_custom');
     } else {
-      set_entity_attrib('port', $port_id, 'ifSpeed_custom', $vars['ifSpeed_custom_' . $port_id]);
+      set_entity_attrib('port', $port_id, 'ifSpeed_custom', $vars['ifSpeed_custom_' . $port_id], $device['device_id']);
     }
     $updated = TRUE;
   }

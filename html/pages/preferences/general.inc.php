@@ -1,13 +1,14 @@
 <?php
 
 /**
- * Observium Network Management and Monitoring System
- * Copyright (C) 2006-2015, Adam Armstrong - http://www.observium.org
+ * Observium
+ *
+ *   This file is part of Observium.
  *
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -82,10 +83,10 @@ humanize_user($user_data); // Get level_label, level_real, row_class, etc
     <tr>
       <td>RSS/Atom access key</td>
 <?php
-  // Warn about lack of mcrypt unless told not to.
-  if (!check_extension_exists('mcrypt'))
+  // Warn about lack of encrypt modules unless told not to.
+  if (!OBS_ENCRYPT)
   {
-    echo('<td colspan="2"><span class="text text-danger">To use RSS/Atom feeds the PHP mcrypt module is required.</span></td>');
+    echo('<td colspan="2"><span class="text text-danger">To use RSS/Atom feeds the PHP mcrypt or sodium (php >= 7.2) extension is required.</span></td>');
   }
   else if (!check_extension_exists('SimpleXML'))
   {

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -24,14 +24,30 @@ include($config['html_dir']."/includes/alerting-navbar.inc.php");
 
   echo generate_box_open();
 
-  foreach (dbFetchRows("SELECT * FROM `devices`") as $device)
-  {
-    $result = update_device_alert_table($device);
-    print_message($result['message'], $result['class']);
-    del_obs_attrib('alerts_require_rebuild');
-  }
 
-  echo generate_box_close();
+$checkers = cache_alert_rules();
+$assocs   = cache_alert_assoc();
+
+foreach($assocs as $assoc)
+{
+   $checkers[$assoc['alert_test_id']]['assocs'][] = $assoc;
+}
+
+foreach($checkers as $alert)
+{
+
+   echo '<h3>Updating Alert <b>' . $alert['alert_name'] . '</b></h3>';
+   echo '<br />';
+
+   //r($alert);
+
+   update_alert_table($alert);
+
+}
+
+del_obs_attrib('alerts_require_rebuild');
+
+echo generate_box_close();
 
 unset($vars['action']);
 

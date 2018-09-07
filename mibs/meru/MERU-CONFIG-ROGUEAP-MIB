@@ -34,10 +34,11 @@ IMPORTS
         FROM SNMPv2-TC
     mwConfiguration
         FROM MERU-SMI
+    MwlOnOffSwitch,
     MwlBlock,
     MwlArrayDataTypeAction,
-    MwlApType,
-    MwlOnOffSwitch
+    MwlSpectrumBandsBits,
+    MwlApType
         FROM MERU-TC;
 
   mwConfigRogueAp  MODULE-IDENTITY
@@ -54,7 +55,7 @@ IMPORTS
   
   mwRogueapVarsDetection  OBJECT-TYPE
     SYNTAX MwlOnOffSwitch
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Detection"
@@ -62,7 +63,7 @@ IMPORTS
 
   mwRogueapVarsBlock  OBJECT-TYPE
     SYNTAX MwlBlock
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Mitigation"
@@ -70,7 +71,7 @@ IMPORTS
 
   mwRogueapVarsAging  OBJECT-TYPE
     SYNTAX Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Rogue AP Aging (seconds)"
@@ -78,7 +79,7 @@ IMPORTS
 
   mwRogueapVarsMitigateAps  OBJECT-TYPE
     SYNTAX Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Number of Mitigating APs"
@@ -86,7 +87,7 @@ IMPORTS
 
   mwRogueapVarsScanningTime  OBJECT-TYPE
     SYNTAX Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Scanning time in ms"
@@ -94,7 +95,7 @@ IMPORTS
 
   mwRogueapVarsOperationalTime  OBJECT-TYPE
     SYNTAX Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Operational time in ms"
@@ -102,7 +103,7 @@ IMPORTS
 
   mwRogueapVarsMitigationFrames  OBJECT-TYPE
     SYNTAX Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Max mitigation frames sent per channel"
@@ -110,7 +111,7 @@ IMPORTS
 
   mwRogueapVarsScanChannelMask  OBJECT-TYPE
     SYNTAX DisplayString
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes Scanning Channels"
@@ -118,11 +119,19 @@ IMPORTS
 
   mwRogueapVarsMinRSSI  OBJECT-TYPE
     SYNTAX Integer32(-100..0)
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes RSSI Threshold for Mitigation"
     ::= { mwRogueapVars    9 }
+
+  mwRogueapVarsSpectrumBands  OBJECT-TYPE
+    SYNTAX MwlSpectrumBandsBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Spectrum Bands"
+    ::= { mwRogueapVars   10 }
 
   mwRogueapAclTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwRogueapAclEntry
@@ -265,7 +274,6 @@ IMPORTS
        mwRogueApListMeruAp2Id                                      Integer32,
        mwRogueApListMeruAp3Id                                      Integer32,
        mwRogueApListDeviceType                                     MwlApType,
-       mwRogueApListWiredRogue                                     MwlOnOffSwitch,
        mwRogueApListMeruAp1Rssi                                    Integer32,
        mwRogueApListMeruAp2Rssi                                    Integer32,
        mwRogueApListMeruAp3Rssi                                    Integer32,
@@ -289,7 +297,7 @@ IMPORTS
     MAX-ACCESS  read-only 
     STATUS     current
     DESCRIPTION
-         "This object describes Rogue AP mac"
+         "This object describes Rogue AP MAC"
     ::= { mwRogueApListEntry    2 }
 
   mwRogueApListEssid  OBJECT-TYPE
@@ -348,14 +356,6 @@ IMPORTS
          "This object describes Type"
     ::= { mwRogueApListEntry    9 }
 
-  mwRogueApListWiredRogue  OBJECT-TYPE
-    SYNTAX MwlOnOffSwitch
-    MAX-ACCESS  read-only 
-    STATUS     current
-    DESCRIPTION
-         "This object describes Rogue Detected on the wire"
-    ::= { mwRogueApListEntry   10 }
-
   mwRogueApListMeruAp1Rssi  OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS  read-only 
@@ -411,6 +411,54 @@ IMPORTS
     DESCRIPTION
          "This object describes AP3 Last Activity"
     ::= { mwRogueApListEntry   17 }
+
+  mwRogueDetectionApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwRogueDetectionApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Device Detecting APs "
+    ::= { mwConfigRogueAp 5 }
+
+  mwRogueDetectionApEntry  OBJECT-TYPE
+    SYNTAX MwRogueDetectionApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Device Detecting APs "
+    INDEX {  mwRogueDetectionApTableIndex  }
+    ::= { mwRogueDetectionApTable 1 }
+
+  MwRogueDetectionApEntry  ::=  SEQUENCE { 
+       mwRogueDetectionApTableIndex                                Integer32, 
+       mwRogueDetectionApNmsApNodeId                               Integer32,
+       mwRogueDetectionApRowStatus                                 RowStatus 
+  }
+   
+   
+  mwRogueDetectionApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwRogueDetectionApEntry 1 }
+
+  mwRogueDetectionApNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwRogueDetectionApEntry    2 }
+
+  mwRogueDetectionApRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwRogueDetectionApEntry 3 }
 
   
 END

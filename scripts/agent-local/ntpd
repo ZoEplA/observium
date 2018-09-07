@@ -15,7 +15,7 @@
     // START SETTINGS ///
 
 	$ntpq		= "ntpq";
-	$ntpdc		= "ntpdc";
+	$ntpdc		= "ntpq";
 
     // END SETTINGS ///
 

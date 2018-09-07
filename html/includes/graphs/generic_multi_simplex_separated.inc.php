@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -48,7 +48,7 @@ $rrd_multi = array();
 
 $count = count($rrd_list);
 
-if(isset($colours) && !strstr("mixed", $colours))
+if(isset($colours) && $colours != "mixed" && strpos("mixed", $colours) !== FALSE)
 {
   $config['graph_colours']['colours'] = generate_colour_gradient(reset($config['graph_colours'][$colours]), end($config['graph_colours'][$colours]), $count);
   $colours = 'colours';

@@ -25,7 +25,7 @@ IMPORTS
 		FROM SNMPv2-SMI;
 
 arbornetworks MODULE-IDENTITY
-	LAST-UPDATED "201308190000Z" -- August 19, 2013
+	LAST-UPDATED "201311140000Z" -- November 14, 2013
 	ORGANIZATION "Arbor Networks, Inc."
 	CONTACT-INFO	"	Arbor Networks, Inc.
 				Arbor Technical Assistance Center
@@ -43,6 +43,9 @@ arbornetworks MODULE-IDENTITY
 		Arbor Networks enterprise."
 
 	-- Revision log, reverse chrono
+	REVISION    "201311140000Z" -- November 14, 2013
+	DESCRIPTION "Add peakflowMobile product."
+
 	REVISION    "201308190000Z" -- August 19, 2013
 	DESCRIPTION "Updated contact information"
 
@@ -82,7 +85,7 @@ arborExperimental OBJECT-IDENTITY
 -- peakflowTmsMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 5 }
 -- pravailMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 6 }
 -- slsMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 9 }
--- nucleusMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 10 }
+-- peakflowMobileMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 10 }
 -- arbuxMIB OBJECT IDENTIFIER ::= { arbornetworksProducts 11 }
 
 END

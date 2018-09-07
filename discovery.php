@@ -9,7 +9,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -188,8 +188,8 @@ foreach (dbFetchRows("SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER 
   if ($options['h'] == 'new' || isSNMPable($device))
   {
     discover_device($device, $options);
-    if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_device_group_table')) { update_device_group_table($device); } // Not exist in CE
-    if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_device_alert_table')) { update_device_alert_table($device); }
+    if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_group_tables')) { update_group_tables(); } // Not exist in CE
+    if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_alert_tables')) { update_alert_tables(); }
   } else {
     $string = "Device '" . $device['hostname'] . "' skipped, because switched off during runtime discovery process.";
     print_debug($string);
@@ -204,7 +204,6 @@ $discovery_time = substr($run, 0, 5);
 
 if ($discovered_devices)
 {
-  dbInsert(array('type' => 'discover', 'doing' => $doing, 'start' => $start, 'duration' => $discovery_time, 'devices' => $discovered_devices), 'perf_times');
   if (is_numeric($doing)) { $doing = $device['hostname']; } // Single device ID convert to hostname for log
 }
 else if (!isset($options['q']) && !$options['u'])

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  HUAWEI Layer Two MAC management MIB
 -- Reference:
--- Version: V2.13
+-- Version: V2.15
 -- History:
 -- ==================================================================
 -- HUAWEI-MPLSOAM-MIB.mib
@@ -33,7 +33,7 @@
     
 -- April 27, 2005 at 17:24 GMT
         hwMplsOam MODULE-IDENTITY 
-            LAST-UPDATED "201408211052Z" 
+            LAST-UPDATED "201701101505Z" 
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -51,6 +51,12 @@
                 The MPLS OAM is used to administrate and maintain MPLS.  "        
           
 -- Revision history
+
+        REVISION    "201701101505Z"    
+        DESCRIPTION "V2.15,  add hwMplsApsPathMisMatch,  hwMplsApsPathMisMatchRecovery, hwMplsApsTypeMisMatch, hwMplsApsTypeMisMatchRecovery"
+
+        REVISION    "201701091728Z"    
+        DESCRIPTION "V2.14,  add hwMplsApsPathMisMatch,  hwMplsApsPathMisMatchRecovery, hwMplsApsTypeMisMatch, hwMplsApsTypeMisMatchRecovery" 
 
         REVISION    "201408211052Z"    
         DESCRIPTION "V2.13,  add hwMplsApsDegraded,  hwMplsApsDegradedRecovery, hwMplsApsSwitchFail, hwMplsApsSwitchFailRecovery" 
@@ -2429,6 +2435,41 @@
                 Tunnel protection group recovered from defect state.
                 "
             ::= { hwMplsPsNotifications 12 }
+			
+        hwMplsApsPathMisMatch NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection path mismatch are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 13 }
+
+        hwMplsApsPathMisMatchRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection path mismatch recovery are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 14 }
+        hwMplsApsTypeMisMatch NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection type mismatch are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 15 }
+
+        hwMplsApsTypeMisMatchRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection type mismatch recovery are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 16 }
         
         hwMplsOamPsConformance OBJECT IDENTIFIER ::= { hwMplsOamPs 100 }
 

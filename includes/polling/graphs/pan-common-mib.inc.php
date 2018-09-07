@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -27,7 +27,7 @@ if (!isset($graphs_db[$graph]) || $graphs_db[$graph] === TRUE)
 }
 
 $graph = 'panos_gptunnels';
-$graphs[$graph] = FALSE;
+//$graphs[$graph] = FALSE;
 
 if (!isset($graphs_db[$graph]) || $graphs_db[$graph] === TRUE)
 {

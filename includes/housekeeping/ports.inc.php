@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage housekeeping
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,7 +16,7 @@ $cutoff = age_to_unixtime($config['housekeeping']['deleted_ports']['age']);
 
 if ($cutoff)
 {
-  $where  = "`deleted` = 1 AND UNIX_TIMESTAMP(`ifLastChange`) < $cutoff";
+  $where = "`deleted` = 1 AND `ifLastChange` < FROM_UNIXTIME($cutoff)";
   $ports  = dbFetchRows("SELECT `port_id` FROM `ports` WHERE $where");
   $count  = count($ports);
   if ($count)

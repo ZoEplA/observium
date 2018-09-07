@@ -2,7 +2,7 @@
 -- HUAWEI-SWITCH-SRV-RES-TRAP-MIB.mib
 -- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved
 -- Thursday, Aug 6, 2014 at 19:22:20
--- Version: V1.00
+-- Version: V1.01
 
     HUAWEI-SWITCH-SRV-RES-TRAP-MIB DEFINITIONS ::= BEGIN
  
@@ -34,6 +34,11 @@
             REVISION "201408060858Z"        --  Aug  5, 2014 at 19:22GMT
             DESCRIPTION  
             " Version 1.00."
+
+           REVISION "201411131432Z"        --  Nov  13, 2014 at 14:32GMT
+            DESCRIPTION  
+            " Version 1.01."
+
 
             ::= { hwDatacomm 334 }       
     
@@ -78,6 +83,14 @@
                 "The recommended threshold."
             ::= { hwSrvResTrapObject 3 }
 
+        hwSrvServiceFailDescr OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE(0..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The description of service failed."
+            ::= { hwSrvResTrapObject 4 }
+
 
         hwSrvResTraps OBJECT IDENTIFIER ::= { hwSwitchSrvResTrapMIB 2 }
         
@@ -96,6 +109,13 @@
             DESCRIPTION 
                 "The service fall below the recommended threshold."
             ::= { hwSrvSeviceResTrap 2 }
+
+        hwSrvServiceConfigFailed NOTIFICATION-TYPE
+            OBJECTS { hwSrvServiceId, hwSrvServiceDescr, hwSrvServiceFailDescr }
+            STATUS current
+            DESCRIPTION 
+                "The service config failed."
+            ::= { hwSrvSeviceResTrap 3 }
 
 
         -- 1.3.6.1.4.1.2011.5.25.227.3
@@ -118,7 +138,7 @@
         
         -- 1.3.6.1.4.1.2011.5.25.227.3.2.1
         hwSrvResObjectGroup OBJECT-GROUP
-            OBJECTS { hwSrvServiceId, hwSrvServiceDescr, hwSrvRecommendThreshold }
+            OBJECTS { hwSrvServiceId, hwSrvServiceDescr, hwSrvRecommendThreshold, hwSrvServiceFailDescr }
             STATUS current
             DESCRIPTION 
                 "Group for base trap objects."
@@ -126,7 +146,7 @@
         
         -- 1.3.6.1.4.1.2011.5.25.227.3.2.2
         hwSrvResTrapGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwSrvServiceExceedThreshould, hwSrvServiceExceedThreshouldResume
+            NOTIFICATIONS { hwSrvServiceExceedThreshould, hwSrvServiceExceedThreshouldResume, hwSrvServiceConfigFailed
             }
             STATUS current
             DESCRIPTION 

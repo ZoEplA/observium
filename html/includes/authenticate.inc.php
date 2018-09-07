@@ -9,11 +9,9 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
-
-// FIXME. Need rewrite: do not save unencrypted passwords (in $_SESSION) <- fixed, or not? (@mike ans: partially)
 
 // All simple, OBS_API set to TRUE only in API index.php
 if (!defined('OBS_API'))
@@ -31,7 +29,7 @@ $debug_auth = FALSE; // Do not use this debug unless you Observium Developer ;)
 @ini_set('session.use_trans_sid', '0');    // Disable SID (no session id in url)
 
 $currenttime     = time();
-$lifetime        = 0;                          // Session lifetime (default until browser restart)
+$lifetime        = 60*60*24;                   // Session lifetime (default one day)
 $cookie_expire   = $currenttime + 60*60*24*14; // Cookies expire time (14 days)
 $cookie_path     = '/';                        // Cookie path
 $cookie_domain   = '';                         // RFC 6265, to have a "host-only" cookie is to NOT set the domain attribute.
@@ -45,7 +43,7 @@ if (is_numeric($GLOBALS['config']['web_session_lifetime']) && $GLOBALS['config']
   $lifetime = intval($GLOBALS['config']['web_session_lifetime']);
 }
 
-@ini_set('session.gc_maxlifetime',  $lifetime); // Session lifetime
+@ini_set('session.gc_maxlifetime',  $lifetime); // Session lifetime (for non "remember me" sessions)
 session_set_cookie_params($lifetime, $cookie_path, $cookie_domain, $cookie_https, $cookie_httponly);
 //session_cache_limiter('private');
 
@@ -135,14 +133,21 @@ if ($_SESSION['authenticated'] && str_starts(ltrim($_SERVER['REQUEST_URI'], '/')
   exit();
 }
 
-$mcrypt_exists = check_extension_exists('mcrypt');
 $user_unique_id = session_unique_id(); // Get unique user id and check if IP changed (if required by config)
+
+// Store logged remote IP with real proxied IP (if configured and avialable)
+$remote_addr = get_remote_addr();
+$remote_addr_header = get_remote_addr(TRUE); // Remote addr by http header
+if ($remote_addr_header && $remote_addr != $remote_addr_header)
+{
+  $remote_addr = $remote_addr_header . ' (' . $remote_addr . ')';
+}
 
 // Check if allowed auth by CIDR
 $auth_allow_cidr = TRUE;
 if (isset($config['web_session_cidr']) && count($config['web_session_cidr']))
 {
-  $auth_allow_cidr = match_network($_SERVER['REMOTE_ADDR'], $config['web_session_cidr']);
+  $auth_allow_cidr = match_network(get_remote_addr($config['web_session_ip_by_header']), $config['web_session_cidr']);
 }
 
 if (!$_SESSION['authenticated'] && isset($_GET['username']) && isset($_GET['password']))
@@ -160,7 +165,7 @@ else if (!$_SESSION['authenticated'] && isset($_SERVER['PHP_AUTH_USER']) && isse
   session_set_var('username', $_SERVER['PHP_AUTH_USER']);
   $auth_password        = $_SERVER['PHP_AUTH_PW'];
 }
-else if ($mcrypt_exists && !$_SESSION['authenticated'] && isset($_COOKIE['ckey']))
+else if (OBS_ENCRYPT && !$_SESSION['authenticated'] && isset($_COOKIE['ckey']))
 {
     ///DEBUG
     if ($debug_auth)
@@ -195,7 +200,7 @@ else if ($mcrypt_exists && !$_SESSION['authenticated'] && isset($_COOKIE['ckey']
       session_set_var('user_ckey_id', $ckey['user_ckey_id']);
       session_set_var('cookie_auth', TRUE);
       dbInsert(array('user'       => $_SESSION['username'],
-                     'address'    => $_SERVER['REMOTE_ADDR'],
+                     'address'    => $remote_addr,
                      'user_agent' => $_SERVER['HTTP_USER_AGENT'],
                      'result'     => 'Logged In (cookie)'), 'authlog');
 
@@ -252,11 +257,11 @@ if (isset($_SESSION['username']))
     session_set_var('authenticated', TRUE);
     $auth_success              = TRUE;
     dbInsert(array('user'       => $_SESSION['username'],
-                   'address'    => $_SERVER['REMOTE_ADDR'],
+                   'address'    => $remote_addr,
                    'user_agent' => $_SERVER['HTTP_USER_AGENT'],
                    'result'     => 'Logged In'), 'authlog');
     // Generate keys for cookie auth
-    if (isset($_POST['remember']) && $mcrypt_exists)
+    if (isset($_POST['remember']) && OBS_ENCRYPT)
     {
       $ckey = md5(strgen());
       $dkey = md5(strgen());
@@ -336,7 +341,7 @@ if (isset($_SESSION['username']))
     $permissions = permissions_cache($_SESSION['user_id']);
 
     // Add feeds & api keys after first auth
-    if ($mcrypt_exists && !get_user_pref($_SESSION['user_id'], 'atom_key'))
+    if (OBS_ENCRYPT && !get_user_pref($_SESSION['user_id'], 'atom_key'))
     {
       // Generate unique token
       do
@@ -403,12 +408,13 @@ function session_unique_id()
   
   if ($GLOBALS['config']['web_session_ip'])
   {
-    $id .= $_SERVER['REMOTE_ADDR'];   // User IP address
+    $remote_addr = get_remote_addr($config['web_session_ip_by_header']); // Remote address by header if configured
+    $id .= $remote_addr;   // User IP address
 
     // Force reauth if remote IP changed
     if ($_SESSION['authenticated'])
     {
-      if (isset($_SESSION['PREV_REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != $_SESSION['PREV_REMOTE_ADDR'])
+      if (isset($_SESSION['PREV_REMOTE_ADDR']) && $remote_addr != $_SESSION['PREV_REMOTE_ADDR'])
       {
         unset($_SESSION['authenticated'],
               $_SESSION['user_id'],
@@ -416,7 +422,7 @@ function session_unique_id()
               $_SESSION['user_encpass'], $_SESSION['password'],
               $_SESSION['userlevel']);
       }
-      session_set_var('PREV_REMOTE_ADDR', $_SERVER['REMOTE_ADDR']); // Store current remote IP
+      session_set_var('PREV_REMOTE_ADDR', $remote_addr); // Store current remote IP
     }
   }
 
@@ -425,7 +431,7 @@ function session_unique_id()
   // timezone   = new Date().getTimezoneOffset();
   if ($debug_auth)
   {
-    $debug_log_array = array(md5($id), $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'],
+    $debug_log_array = array(md5($id), $remote_addr, $_SERVER['HTTP_USER_AGENT'],
                              $_SERVER['HTTP_ACCEPT_ENCODING'], $_SERVER['HTTP_ACCEPT_LANGUAGE'],
                              $_COOKIE['OBSID']);
     logfile('debug_auth.log', json_encode($debug_log_array));
@@ -447,13 +453,17 @@ function session_encrypt_password($auth_password, $key)
   if ($GLOBALS['config']['auth_mechanism'] == 'ldap' &&
       !($GLOBALS['config']['auth_ldap_bindanonymous'] || strlen($GLOBALS['config']['auth_ldap_binddn'].$GLOBALS['config']['auth_ldap_bindpw'])))
   {
-    if (check_extension_exists('mcrypt'))
+    if (OBS_ENCRYPT)
     {
+      if (OBS_ENCRYPT_MODULE == 'mcrypt')
+      {
+        $key .= get_unique_id();
+      }
       // For some admin LDAP functions required store encrypted password in session (userslist)
-      session_set_var('user_encpass', encrypt($auth_password, $key . get_unique_id()));
+      session_set_var('user_encpass', encrypt($auth_password, $key));
     } else {
       //session_set_var('user_encpass', base64_encode($auth_password));
-      session_set_var('mcrypt_required', 1);
+      session_set_var('encrypt_required', 1);
     }
   }
 
@@ -486,8 +496,15 @@ function session_logout($relogin = FALSE, $message = NULL)
     file_put_contents($debug_log, var_export($_COOKIE,  TRUE), FILE_APPEND);
   }
 
+  // Store logged remote IP with real proxied IP (if configured and avialable)
+  $remote_addr = get_remote_addr();
+  $remote_addr_header = get_remote_addr(TRUE); // Remote addr by http header
+  if ($remote_addr_header && $remote_addr != $remote_addr_header)
+  {
+    $remote_addr = $remote_addr_header . ' (' . $remote_addr . ')';
+  }
   dbInsert(array('user'       => $_SESSION['username'],
-                 'address'    => $_SERVER['REMOTE_ADDR'],
+                 'address'    => $remote_addr,
                  'user_agent' => $_SERVER['HTTP_USER_AGENT'],
                  'result'     => $auth_log), 'authlog');
   if (isset($_COOKIE['ckey'])) dbDelete('users_ckeys', "`username` = ? AND `user_ckey` = ?", array($_SESSION['username'], $_COOKIE['ckey'])); // Remove old ckeys from DB

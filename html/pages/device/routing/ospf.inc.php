@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -33,9 +33,9 @@ foreach ($ospf_instances as $instance)
   $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = ?", array($device['device_id']));
   $nbr_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = ?", array($device['device_id']));
 
-  $query = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE ";
-  $query .= "(A.ipv4_address = ? AND I.port_id = A.port_id)";
-  $query .= " AND I.device_id = ?";
+  $query = "SELECT * FROM `ipv4_addresses` WHERE `ipv4_address` = ? AND `device_id` = ?";
+  //$query .= "(A.ipv4_address = ? AND I.port_id = A.port_id)";
+  //$query .= " AND I.device_id = ?";
   $ipv4_host = dbFetchRow($query, array($peer['bgpPeerIdentifier'], $device['device_id']));
 
   if ($instance['ospfAdminStat']        == "enabled") { $enabled = '<span class="green">enabled</span>';

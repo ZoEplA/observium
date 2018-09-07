@@ -152,23 +152,27 @@ try:
     import argparse
     parser = argparse.ArgumentParser(description='Process Wrapper for Observium')
     parser.add_argument('process', nargs='?', default='poller', help='Process name, one of \'poller\', \'discovery\', \'billing\'.')
+    #parser.add_argument('process', nargs='?', default='poller', choices=['poller', 'discovery', 'billing'], help='Process name, one of \'poller\', \'discovery\', \'billing\'.')
     parser.add_argument('-w', '--workers', nargs='?', type=int, default=0, help='Number of threads to spawn. Defauilt: CPUs x 2')
     parser.add_argument('-s', '--stats', action='store_true', help='Store total polling times to RRD.', default=False)
     parser.add_argument('-i', '--instances', nargs='?', type=int, default=-1, help='Process instances count.')
     parser.add_argument('-n', '--number', nargs='?', type=int, default=-1, help='Instance id (number), must start from 0 and to be less than instances count.')
+    parser.add_argument('-g', '--include-groups', nargs='*', type=int, help='List of device group IDs for polling/discovery this group ids only. List is separated by spaces (-g 3 4 5).')
+    parser.add_argument('-e', '--exclude-groups', nargs='*', type=int, help='List of device group IDs for exclude polling/discovery this group ids.')
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debug output. WARNING, do not use this option unless you know what it does. This generates a lot of very huge files in TEMP dir.', default=False)
     parser.add_argument('-t', '--test', action='store_true', help='Do not spawn processes, just test DB connection, config, etc.', default=False)
     parser.add_argument('--host', help='Process hostname wildcard.')
 
     # Parse passed arguments
     args = parser.parse_args()
+    #print(args)
 
     # for compatability with old passed argument with worker
     try:
         # poller-wrapper.py 16
         workers = int(args.process)
         process = 'poller'
-        print("Please replace your poller wrapper command line with:")
+        print("WARNING! Using number of threads without command argument (-w or --workers) is deprecated! \nPlease replace your poller wrapper command line with:")
         print("observium-wrapper poller -w %s" % workers)
     except ValueError:
         # observium-wrapper poller -w 16
@@ -271,6 +275,15 @@ alerter_path    = config['install_dir'] + '/alerter.php'
 billing_path    = config['install_dir'] + '/poll-billing.php'
 #temp_path       = config['temp_dir']
 temp_path       = '/tmp'
+
+# RRDcacheD & remote rrd
+try:
+    rrdcached_address = config['rrdcached']
+    remote_rrd = rrdcached_address.find('/') < 0 # unix:/file or /file
+except KeyError:
+    # rrdcached config not set, reset remote_rrd
+    remote_rrd = False
+
 try:
     rrd_path = config['rrd_dir']
 except KeyError:
@@ -296,6 +309,11 @@ if amount_of_workers < 1:
         # use threads count based on cpus count
         import multiprocessing
         amount_of_workers = multiprocessing.cpu_count() * 2
+        # Limit maximum amount of worker based on CPU count
+        if amount_of_workers > 256:
+            print("WARNING: Too many CPU count detected, threads limited to 128 (detected: %s). For more threads please use configuration option $config['poller-wrapper']['threads'] or pass as argument -w [THREADS]" % (amount_of_workers))
+            amount_of_workers = 256
+
     except (ImportError, NotImplementedError):
         amount_of_workers = 8
         print("WARNING: used default threads number %s. For change use configuration option or pass as argument -w [THREADS]" % (amount_of_workers))
@@ -305,7 +323,7 @@ if os.path.isfile(alerter_path):
 else:
     alerting = False
 
-if stats == False:
+if not stats:
     try:
         stats = bool(config['poller-wrapper']['stats'])
     except KeyError:
@@ -337,6 +355,7 @@ try:
     if process == 'discovery':
         mib_indexes  = glob.glob(config['mib_dir'] + '/.index')
         mib_indexes += glob.glob(config['mib_dir'] + '/*/.index')
+        #mib_indexes += glob.glob('/var/lib/snmp/mib_indexes/*') # not permitted for wrapper process
         #print(mib_indexes)
         for mib_index in mib_indexes:
             #print(mib_index)
@@ -360,7 +379,7 @@ per_device_duration = {}
 devices_list = []
 
 try:
-    if bool(db_socket) == False:
+    if not bool(db_socket):
         db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname, port=db_port)
     else:
         db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname, port=db_port, unix_socket=db_socket)
@@ -374,7 +393,7 @@ except:
 """ 
     This query specifically orders the results depending on the last_polled_timetaken variable
     Because this way, we put the devices likely to be slow, in the top of the queue
-    thus greatening our chances of completing _all_ the work in exactly the time it takes to 
+    thus greatening our chances of completing _all_ the work in exactly the time it takes to
     poll the slowest device! cool stuff he
     Additionally, if a hostname wildcard is passed, add it to the where clause.  This is
     important in cases where you have pollers distributed geographically and want to limit
@@ -382,6 +401,36 @@ except:
 """
 
 stop_script = False # trigger for stop execute script inside try
+
+where_devices = "WHERE disabled != 1" # Filter disabled devices by default
+
+# Use include device groups
+if args.include_groups != None:
+    # Fetch device_id from selected groups
+    query = "SELECT entity_id FROM group_table WHERE entity_type = 'device' AND entity_id > 0 AND group_id IN (%s)"
+    cursor.execute(query % ",".join(map(str, args.include_groups)))
+    include_devices = []
+    for row in cursor.fetchall():
+        include_devices.append(row[0])
+    #print(map(str, include_devices))
+    #print(query % ",".join(map(str, args.include_groups)))
+    where_devices += " AND device_id IN (%s)" % ",".join(map(str, include_devices))
+
+# Use exclude device groups
+if args.exclude_groups != None:
+    # Fetch device_id from selected groups
+    query = "SELECT entity_id FROM group_table WHERE entity_type = 'device' AND entity_id > 0 AND group_id IN (%s)"
+    cursor.execute(query % ",".join(map(str, args.exclude_groups)))
+    exclude_devices = []
+    for row in cursor.fetchall():
+        exclude_devices.append(row[0])
+    #print(map(str, exclude_devices))
+    #print(query % ",".join(map(str, args.include_groups)))
+    where_devices += " AND device_id NOT IN (%s)" % ",".join(map(str, exclude_devices))
+
+if test:
+    print(where_devices)
+
 
 if instances_count > 1 and instance_number >= 0 and (instance_number < instances_count):
     # Use distributed wrapper
@@ -393,18 +442,22 @@ if instances_count > 1 and instance_number >= 0 and (instance_number < instances
                       FROM bills
                       ORDER BY bill_id ASC
                   ) temp
-                WHERE MOD(temp.rownum, %s) = %s"""
+                WHERE MOD(temp.rownum, %s) = %s""" % (instances_count, instance_number)
     else:
         # poller or discovery
         query = """SELECT device_id FROM (SELECT @rownum :=0) r,
                    (
                       SELECT @rownum := @rownum +1 AS rownum, device_id
                       FROM devices
-                      WHERE disabled != 1
+                      %s
                       ORDER BY device_id ASC
                   ) temp
-                WHERE MOD(temp.rownum, %s) = %s"""
-    cursor.execute(query, (instances_count, instance_number))
+                WHERE MOD(temp.rownum, %s) = %s""" % (where_devices, instances_count, instance_number)
+
+    if test:
+        print(query)
+
+    cursor.execute(query)
 
     # Increase maximum allowed running wrapper processes by instances count
     max_running *= instances_count
@@ -419,13 +472,15 @@ else:
                    FROM     bills"""
         order =  " ORDER BY bill_id ASC"
         query = query + order
+        if test:
+            print(query)
         cursor.execute(query)
 
     else:
         # Normal poller/discovery
         query = """SELECT   device_id
                    FROM     devices
-                   WHERE    disabled != '1'"""
+                   %s""" % (where_devices,)
         if process == 'discovery':
             order =  " ORDER BY last_discovered_timetaken DESC"
         else:
@@ -436,6 +491,7 @@ else:
             query = query + " AND status = '1'"
 
         try:
+            # Query with hosts specified
             host_wildcard = args.host.replace('*', '%')
 
             # expand process name for do not calculate count inside main processes
@@ -443,7 +499,7 @@ else:
 
             # new devices discovery just pass ./discovery.php -h new, do not spawn processes
             if process == 'discovery' and host_wildcard == 'new':
-                if debug == True:
+                if debug:
                     command_options = '-d -h ' + host_wildcard
                 else:
                     command_options = '-q -h ' + host_wildcard
@@ -458,21 +514,25 @@ else:
             else:
                 wc_query = query + " AND hostname LIKE %s " + order
                 cursor.execute(wc_query, (host_wildcard,))
-            #print(wc_query)
+                if test:
+                    print(wc_query)
         except:
+            # Query without hosts specified
             query = query + order
-            #print(query)
+            if test:
+                print(query)
             cursor.execute(query)
 
 # stop script execute after try
-if stop_script == True:
+if stop_script:
     sys.exit(0)
 
 devices = cursor.fetchall()
 for row in devices:
     devices_list.append(int(row[0]))
 
-#print(devices_list)
+if test:
+    print(devices_list)
 #sys.exit(2)
 
 """
@@ -519,7 +579,7 @@ try:
       pass
 
     #print("Test: %s" % (test_running))
-    if test_running == False:
+    if not test_running:
       # process not exist, remove stale db entry
       try:
         cursor.execute("""DELETE FROM `observium_processes` WHERE `process_id` = %s""", (test_id,))
@@ -561,7 +621,7 @@ try:
 except:
   pass
 
-if test == True:
+if test:
   print("Already running %s processes: %s, load average (5min) %.2f" % (processname, ps_count, la[1]))
   #print(process_id)
   #time.sleep(30) # delays for 30 seconds
@@ -570,6 +630,8 @@ if test == True:
   db.commit()
   sys.exit(2)
 
+# Open dev null handle
+FNULL = open(os.devnull, 'w')
 
 """
     Since ./discovery -h all additionally do db schema update,
@@ -578,7 +640,7 @@ if test == True:
 """
 if process == 'discovery' and instance_number == 0 and 'host_wildcard' not in globals():
     #print("/usr/bin/env php %s -q -u >> /dev/null 2>&1" % (discovery_path))
-    if debug == True:
+    if debug:
         command_options = '-d -u'
     else:
         command_options = '-q -u'
@@ -623,40 +685,44 @@ def process_worker():
     }
     process_path = command_paths[process]
 
+    command_list = []
+    command_out  = FNULL # set non-debug output to /dev/null
     if process == 'billing':
         # billing use -b [bill_id]
-        command_options = '-b'
+        command_list.append('-b')
     else:
         # poller/discovery us -h [device_id]
-        command_options = '-h'
+        command_list.append('-h')
 
-    if debug == True:
-        command_options = '-d ' + command_options
+    if debug:
+        command_list.insert(0, '-d')
     else:
-        command_options = '-q ' + command_options
+        command_list.insert(0, '-q')
 
     while True:
         device_id = process_queue.get()
         try:
             start_time = time.time()
-            if debug == True:
-                debug_file = temp_path + '/observium_' + process + '_' + str(device_id) + '.debug'
-                command = "/usr/bin/env php %s %s %s >> %s 2>&1"        % (process_path, command_options, device_id, debug_file)
-            else:
-                command = "/usr/bin/env php %s %s %s >> /dev/null 2>&1" % (process_path, command_options, device_id)
-            print(command) #debug
-            subprocess.check_call(command, shell=True)
+            command_args = ['/usr/bin/env', 'php', process_path]
+            command_args.extend(command_list)
+            command_args.append(device_id)
+            if debug:
+                command_out = temp_path + '/observium_' + process + '_' + str(device_id) + '.debug'
+            #print(command_args) #debug
+            subprocess.check_call(map(str, command_args), stdout=command_out, stderr=subprocess.STDOUT)
 
             # additional alerter process only after poller process
-            if process == 'poller' and alerting == True:
+            if process == 'poller' and alerting:
                 print("INFO: starting alerter.php for %s" % device_id)
-                if debug == True:
-                    debug_file = temp_path + '/observium_alerter_' + str(device_id) + '.debug'
-                    command = "/usr/bin/env php %s -d -h %s >> %s 2>&1" % (alerter_path, device_id, debug_file)
-                else:
-                    command = "/usr/bin/env php %s -q -h %s >> /dev/null 2>&1" % (alerter_path, device_id)
+                command_args = ['/usr/bin/env', 'php', alerter_path]
+                command_args.extend(command_list)
+                command_args.append(device_id)
+                if debug:
+                    command_out = temp_path + '/observium_alerter_' + str(device_id) + '.debug'
+                #print(command_args) #debug
+                subprocess.check_call(map(str, command_args), stdout=FNULL, stderr=subprocess.STDOUT)
                 print("INFO: finished alerter.php for %s" % device_id)
-                subprocess.check_call(command, shell=True)
+
             elapsed_time = int(time.time() - start_time)
             print_queue.put([threading.current_thread().name, device_id, elapsed_time])
         except (KeyboardInterrupt, SystemExit):
@@ -669,7 +735,7 @@ process_queue = Queue.Queue()
 print_queue = Queue.Queue()
 
 print("INFO: starting the %s at %s with %s threads" % (process, time.strftime("%Y/%m/%d %H:%M:%S"), amount_of_workers))
-if debug == True:
+if debug:
     print("WARNING: DEBUG enabled, each %s %s store output to %s/observium_%s_id.debug (where id is %s_id)" % (entity, process, temp_path, process, entity))
 
 for device_id in devices_list:
@@ -707,16 +773,16 @@ if total_time > 300:
         if per_device_duration[device] > 300:
             print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
             show_stopper = True
-    if show_stopper == True:
+    if show_stopper:
         print("ERROR: Some devices are taking more than 300 seconds, the script cannot recommend you what to do.")
-    if show_stopper == False:
+    else:
         print("WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
     exit_code = 1
 
 """
     Get and update poller wrapper stats
 """
-if process == 'poller' and stats == True:
+if process == 'poller' and stats:
     import socket
     localhost = socket.getfqdn()
     if localhost.find('.') == 0:
@@ -795,52 +861,75 @@ if process == 'poller' and stats == True:
         db.commit()
 
     # Write poller statistics to RRD
-    rrd_path_total = rrd_path + '/poller-wrapper.rrd'
-    if os.path.isfile(rrd_path_total) == False:
+    rrd_path_total = 'poller-wrapper.rrd'
+    if not remote_rrd:
+        rrd_path_total = rrd_path  + '/' + rrd_path_total
+
+    if not os.path.isfile(rrd_path_total):
         # Create RRD
         rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
         cmd_create = config['rrdtool'] + ' create ' + rrd_path_total + ' DS:devices' + rrd_dst + ' DS:totaltime' + rrd_dst + ' DS:threads' + rrd_dst
         cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
+        if remote_rrd:
+            # --no-overwrite avialable since 1.4.3
+            cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
         os.system(cmd_create)
         logfile(cmd_create)
-        if debug == True:
+        if debug:
             print("DEBUG: " + cmd_create)
     cmd_update = config['rrdtool'] + ' update ' + rrd_path_total + ' N:%s:%s:%s' % (poller_stats['total_devices_count'], poller_stats['average_runtime'], amount_of_workers)
+    if remote_rrd:
+        cmd_update += ' --daemon ' + rrdcached_address
     os.system(cmd_update)
-    if debug == True:
+    if debug:
         print("DEBUG: " + cmd_update)
 
     # Write poller wrapper count statistics to RRD
-    rrd_path_count = rrd_path + '/poller-wrapper_count.rrd'
-    if os.path.isfile(rrd_path_count) == False:
+    rrd_path_count = 'poller-wrapper_count.rrd'
+    if not remote_rrd:
+        rrd_path_count = rrd_path  + '/' + rrd_path_count
+
+    if not os.path.isfile(rrd_path_count):
         # Create RRD
         rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
         cmd_create = config['rrdtool'] + ' create ' + rrd_path_count + ' DS:wrapper_count' + rrd_dst
         cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
+        if remote_rrd:
+            # --no-overwrite avialable since 1.4.3
+            cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
         os.system(cmd_create)
         logfile(cmd_create)
-        if debug == True:
+        if debug:
             print("DEBUG: " + cmd_create)
     cmd_update = config['rrdtool'] + ' update ' + rrd_path_count + ' N:%s' % (poller_stats['wrapper_count'])
+    if remote_rrd:
+        cmd_update += ' --daemon ' + rrdcached_address
     os.system(cmd_update)
-    if debug == True:
+    if debug:
         print("DEBUG: " + cmd_update)
 
     if instances_count > 1:
         # Per instance statistics
-        rrd_path_instance = rrd_path + '/poller-wrapper_' + str(instances_count) + '_' + str(instance_number) + '.rrd'
-        if os.path.isfile(rrd_path_instance) == False:
+        rrd_path_instance = 'poller-wrapper_' + str(instances_count) + '_' + str(instance_number) + '.rrd'
+        if not remote_rrd:
+            rrd_path_instance = rrd_path + '/' + rrd_path_instance
+        if not os.path.isfile(rrd_path_instance):
             # Create RRD
             rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
             cmd_create = config['rrdtool'] + ' create ' + rrd_path_instance + ' DS:devices' + rrd_dst + ' DS:totaltime' + rrd_dst + ' DS:threads' + rrd_dst
             cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
+            if remote_rrd:
+                # --no-overwrite avialable since 1.4.3
+                cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
             os.system(cmd_create)
             logfile(cmd_create)
-            if debug == True:
+            if debug:
                 print("DEBUG: " + cmd_create)
         cmd_update = config['rrdtool'] + ' update ' + rrd_path_instance + ' N:%s:%s:%s' % (instance_stats['devices_count'], instance_stats['last_runtime'], amount_of_workers)
+        if remote_rrd:
+            cmd_update += ' --daemon ' + rrdcached_address
         os.system(cmd_update)
-        if debug == True:
+        if debug:
             print("DEBUG: " + cmd_update)
 
 # Remove process info from DB
@@ -851,7 +940,9 @@ try:
 except:
   pass
 
+# Close opened handles
 db.close()
+FNULL.close()
 
 # Return exit code
 sys.exit(exit_code)

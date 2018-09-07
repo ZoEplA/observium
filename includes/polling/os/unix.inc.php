@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -134,6 +134,7 @@ switch ($device['os'])
 
   case 'freenas':
   case 'nas4free':
+  case 'xigmanas':
     preg_match('/Software: FreeBSD ([\d\.]+-[\w\d-]+)/i', $poll_device['sysDescr'], $matches);
     $version = $matches[1];
     $hardware = rewrite_unix_hardware($poll_device['sysDescr']);
@@ -153,7 +154,7 @@ switch ($device['os'])
       $version = $matches[1];
     }
 
-    $data = snmp_get_multi($device, 'ipsoChassisMBType.0 ipsoChassisMBRevNumber.0', '-OQUs', 'NOKIA-IPSO-SYSTEM-MIB');
+    $data = snmp_get_multi_oid($device, 'ipsoChassisMBType.0 ipsoChassisMBRevNumber.0', array(), 'NOKIA-IPSO-SYSTEM-MIB');
     if (isset($data[0]))
     {
       $hw = $data[0]['ipsoChassisMBType'] . ' rev ' . $data[0]['ipsoChassisMBRevNumber'];
@@ -166,7 +167,7 @@ switch ($device['os'])
     // EMBEDDED-NGX-MIB::swHardwareType.0 = "SBox-200-B"
     // EMBEDDED-NGX-MIB::swLicenseProductName.0 = "Safe@Office 500, 25 nodes"
     // EMBEDDED-NGX-MIB::swFirmwareRunning.0 = "8.2.26x"
-    $data = snmp_get_multi($device, 'swHardwareVersion.0 swHardwareType.0 swLicenseProductName.0 swFirmwareRunning.0', '-OQUs', 'EMBEDDED-NGX-MIB');
+    $data = snmp_get_multi_oid($device, 'swHardwareVersion.0 swHardwareType.0 swLicenseProductName.0 swFirmwareRunning.0', array(), 'EMBEDDED-NGX-MIB');
     if (isset($data[0]))
     {
       list($hw) = explode(',', $data[0]['swLicenseProductName']);
@@ -212,7 +213,13 @@ if (isset($agent_data['distro']) && isset($agent_data['distro']['SCRIPTVER']))
   {
     // distro version less than 1.2: "Linux|3.2.0-4-amd64|amd64|Debian|7.5"
     // distro version 1.2 and above: "Linux|4.4.0-53-generic|amd64|Ubuntu|16.04|kvm"
-    list($osname, $kernel, $arch, $distro, $distro_ver, $virt) = explode('|', $os_data);
+    // distro version 2.0 and above: "Linux|4.4.0-116-generic|amd64|Ubuntu|16.04|kvm|"
+    //                               "Linux|4.4.0|amd64|Ubuntu|16.04||openvz"
+    list($osname, $kernel, $arch, $distro, $distro_ver, $virt, $cont) = explode('|', $os_data);
+    if (empty($virt) && strlen($cont))
+    {
+      $virt = $cont;
+    }
   } else {
     // Old distro, not supported now: "Ubuntu 12.04"
     list($distro, $distro_ver) = explode(' ', $os_data);
@@ -234,7 +241,8 @@ if (isset($agent_data['virt']['what']))
   {
     if (isset($config['virt-what'][$virtwhat]))
     {
-      $hardware = $config['virt-what'][$virtwhat];
+      //$hardware = $config['virt-what'][$virtwhat];
+      $hardware = rewrite_unix_hardware($poll_device['sysDescr'], $config['virt-what'][$virtwhat]);
     }
   }
 }

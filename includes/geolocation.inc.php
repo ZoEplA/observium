@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage geolocation
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -96,7 +96,7 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
         try {
           $response = $resolver->query($geo_db['hostname'], 'LOC', 'IN');
         } catch(Net_DNS2_Exception $e) {
-          print_debug('  '.$e->getMessage().' ('.$geo_db['hostname'].')');
+          print_debug('  Resolver error: '.$e->getMessage().' (hostname: '.$geo_db['hostname'].')');
         }
       } else {
         $response = FALSE;

@@ -156,6 +156,14 @@ class Driver extends DriverAbstract
             if ($createTable == true) {
                 $this->initIndexing($PDO);
             }
+
+            // Improve write speed, see:
+            // http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
+            $PDO->exec('PRAGMA synchronous=OFF');
+            $PDO->exec('PRAGMA journal_mode=MEMORY');
+            $PDO->exec('PRAGMA temp_store=MEMORY');
+            //$PDO->exec('PRAGMA count_changes=false');
+
             $this->indexing = $PDO;
             unset($PDO);
 
@@ -234,6 +242,13 @@ class Driver extends DriverAbstract
                 $this->initDB($PDO);
             }
 
+            // Improve write speed, see:
+            // http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
+            $PDO->exec('PRAGMA synchronous=OFF');
+            $PDO->exec('PRAGMA journal_mode=MEMORY');
+            $PDO->exec('PRAGMA temp_store=MEMORY');
+            //$PDO->exec('PRAGMA count_changes=false');
+
             $this->instance[ $instant ] = $PDO;
             unset($PDO);
 
@@ -274,7 +289,7 @@ class Driver extends DriverAbstract
                     $stm->execute([
                       ':keyword' => $item->getKey(),
                       ':object' => $this->encode($this->driverPreWrap($item)),
-                      ':exp' => time() + $item->getTtl(),
+                      ':exp' => $item->getExpirationDate()->getTimestamp(),
                     ]);
 
                     return true;
@@ -286,7 +301,7 @@ class Driver extends DriverAbstract
                         $stm->execute([
                           ':keyword' => $item->getKey(),
                           ':object' => $this->encode($this->driverPreWrap($item)),
-                          ':exp' => time() + $item->getTtl(),
+                          ':exp' => $item->getExpirationDate()->getTimestamp(),
                         ]);
                     } catch (PDOException $e) {
                         return false;

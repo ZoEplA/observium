@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:   V2.68
+-- Version:   V2.98
 -- ============================================================================
 --
 -- HUAWEI-ENTITY-EXTENT-MIB.mib
@@ -13,7 +13,7 @@
     HUAWEI-ENTITY-EXTENT-MIB DEFINITIONS ::= BEGIN
  
         IMPORTS
-            entPhysicalIndex, entPhysicalVendorType, entPhysicalName, PhysicalClass, PhysicalIndex            
+            entPhysicalIndex, entPhysicalVendorType, entPhysicalName, entPhysicalClass, PhysicalClass, PhysicalIndex            
                 FROM ENTITY-MIB            
             hwDatacomm            
                 FROM HUAWEI-MIB            
@@ -25,7 +25,7 @@
                 FROM SNMP-FRAMEWORK-MIB            
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
                 FROM SNMPv2-CONF            
-            Integer32, Unsigned32, Counter64, BITS, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+            Integer32, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
                 FROM SNMPv2-SMI            
             DateAndTime, DisplayString, RowStatus, TEXTUAL-CONVENTION, AutonomousType            
                 FROM SNMPv2-TC;
@@ -33,7 +33,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.31
         hwEntityExtentMIB MODULE-IDENTITY 
-            LAST-UPDATED "201509180000Z"
+            LAST-UPDATED "201701140000Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -43,10 +43,93 @@
    People's Republic of China
    Website: http://www.huawei.com
    Email: support@huawei.com
- "
+ "            
             DESCRIPTION 
                 "The private mib file includes the general extent 
                 information of the device."
+            
+            REVISION         "201701140000Z"
+            DESCRIPTION  "V2.98, Add hwEntityModelName, hwEntityIssueNumber
+                          hwEntityModelName - The model for this entity. If there is no model string in elable of this entity or this entity does not support elabel, the invalid value(zero-string) will be returned.
+                          hwEntityIssueNumber - The IssueNumber for this entity. If there is no IssueNumber string in elable of this entity or this entity does not support elabel, the invalid value(zero-string) will be returned"
+            
+            REVISION         "201612240000Z"
+            DESCRIPTION  "V2.96, Add hwEntityElabelVersion"
+            
+            REVISION         "201612120000Z"
+            DESCRIPTION  "V2.95, Updated the hwEntityOpticalType, add cfp4(20) and qsfp28(21) to the list of hwEntityOpticalType values"
+
+           REVISION         "201612050000Z"
+           DESCRIPTION  "V2.94 Modify the description of hwHda1Error "
+
+		    REVISION         "201611260000Z"
+            DESCRIPTION  "V2.93, Updated the hwEntityOpticalType, add csfp(19) to the list of hwEntityOpticalType values"
+			
+            REVISION         "201610280000Z"
+            DESCRIPTION  "V2.92, Add hwEntityModel, hwEntityExInfo"
+        
+            REVISION         "201610210000Z"
+            DESCRIPTION  "V2.91, Add hwEntityExtCPUOverInterfaceDown"
+			
+            REVISION         "201610180000Z"
+            DESCRIPTION  "V2.90, Updated hwEntityExtCpuUsageSuddenChangeNotification, hwEntityExtMemoryUsageSuddenChangeNotification, hwEntitySlotID, hwEntityCpuID, hwEntityPreviousValue, hwEntityCurrentValue, hwEntityChangeValue, hwEntityChangeValueThreshold"
+
+            REVISION 	 "201610090000Z"
+            DESCRIPTION   "V2.89, Add hwCfcardStateInfo, hwHda1Error"
+				
+            REVISION 	 "201610090000Z"
+            DESCRIPTION  "V2.88, Updated the hwHardDiskStateTable, hwEntityExtHardDiskFull, hwEntityExtHardDiskFullResume, hwEntityExtHardDiskPlugIn, hwEntityExtHardDiskPlugOut, hwEntityExtHardDiskOnline, hwEntityExtHardDiskOffline, hwEntityExtLPUPlugIn, hwEntityExtLPUPlugOut"
+			
+            REVISION     "201609280000Z"
+            DESCRIPTION  "V2.87, Add hwCpuUsageMutationNotification, hwMemoryUsageMutationNotification, hwPreValue, hwCurValue, hwChangeValue, hwChangeValueThreshold, hwSamplingInterval"
+			
+            REVISION 	 "201609230000Z"
+            DESCRIPTION  "V2.86, Add hwHardDiskStateTable, hwEntityExtHardDiskFull, hwEntityExtHardDiskFullResume, hwEntityExtHardDiskPlugIn, hwEntityExtHardDiskPlugOut, hwEntityExtHardDiskOnline, hwEntityExtHardDiskOffline, hwEntityExtLPUPlugIn, hwEntityExtLPUPlugOut"
+	    
+            REVISION 	 "201608301020Z"		-- August 30, 2016 at 10:20 GMT
+            DESCRIPTION  "V2.85, Add hwBoardDropRuntPacketNotify"
+				
+            REVISION     "201607260000Z" 
+            DESCRIPTION  "V2.84, Add hwEntityOpticalWaveLengthExact"
+
+            REVISION     "201607260000Z"
+            DESCRIPTION  "V2.83, Add hwEntityExtEncryptionCardFail"
+			
+            REVISION     "201607160000Z"
+            DESCRIPTION  "V2.82, Add hwEntityHda1Usage, hwEntityHda1UsageThreshold, hwEntityHda1UsageResumeThreshold, hwEntityExtHda1UsageThresholdNotfication, hwEntityExtHda1UsageResumeThresholdNotfication"
+			
+            REVISION     "201605230000Z"
+            DESCRIPTION  "V2.80, Add hwDiskType"
+
+            REVISION     "201605100000Z"
+            DESCRIPTION  "V2.80, Add hwEntityExtDiskDamaged,hwEntityExtDiskFull"
+
+            REVISION     "201605050000Z"
+            DESCRIPTION  "V2.79, Add hwEntityRuntPacketCheckNotify"
+
+            REVISION     "201604210000Z"
+            DESCRIPTION  "V2.78, Add hwProcessStateInfo, hwProcessName, hwEntityExtProcessErrorNotification"
+
+            REVISION     "201604150000Z" 			
+            DESCRIPTION  "V2.77, Updated the hwEntityOpticalType, add gps(18) to the list of hwEntityOpticalType values"
+
+            REVISION     "201604050000Z" 
+            DESCRIPTION  "V2.76, Modify hwEntityHigErrorPacketThresholdAlarm"
+
+            REVISION     "201603280000Z" 
+            DESCRIPTION  "V2.75, Add hwEntityPositionMismatchNotify"
+            
+            REVISION     "201602010000Z" 
+            DESCRIPTION  "V2.74, Delete BITS from definitions"
+
+            REVISION     "201601110000Z" 
+            DESCRIPTION  "V2.73, Add hwEntityHigCrcErrorThresholdAlarm, hwEntityHigStateChangeNotify, hwEntityHigStateDownNotify"		
+		
+            REVISION     "201512210000Z" 
+            DESCRIPTION  "V2.71, Add hwEntityOpticalBandWidth"
+            
+            REVISION     "201511230000Z" 
+            DESCRIPTION  "V2.70, Add the hwEntityOpticalTransType, hwEntityOpticalConnectType, hwEntityOpticalOrderingName, hwEntityOpticalTransferDistance"
 
             REVISION     "201509180000Z" 
             DESCRIPTION  "V2.68, Add hwEntityPbufUsage, hwEntityTMUsage"
@@ -162,10 +245,14 @@
             REVISION  "201503250000Z"
             DESCRIPTION  "V2.59, Add hwEntityTransceiverType"
 
+            REVISION  "201511020000Z"
+            DESCRIPTION  "V2.60, Add hwEntityStatusChange"
 
+            REVISION  "201511230000Z"
+            DESCRIPTION  "V2.60, Add hwEntityExtCpuUsageThresholdNotficationClear and hwEntityExtMemUsageThresholdNotificationClear"
 
-
-
+            REVISION  "201612240000Z"
+            DESCRIPTION  "V2.97, Add hwUsbConfigInfoPara"
            
             ::= { hwDatacomm 31 }
 
@@ -230,7 +317,9 @@
                 connect(13),
                 protocolUp(15),
                 linkUp(16),
-                linkDown(17)
+                linkDown(17),
+                present(18),
+                absent(19)
                 }
 
         HwStandbyStatus ::= TEXTUAL-CONVENTION
@@ -443,17 +532,39 @@
                 hwEntityBoardDescription
                     OCTET STRING,
                 hwEntity5MinCpuUsage
-                     Integer32,
+                    Integer32,
                 hwEntityStartMode 
                     INTEGER,
                 hwEntitySplitAttribute
                     OCTET STRING,
                 hwEntityFaultLightKeepTime
-                     Integer32,	
+                    Integer32,	
                 hwEntityPbufUsage
-	Integer32,
-                hwEntityTMUsage
-	Integer32    
+					Integer32,
+				hwEntityTMUsage
+					Integer32,    
+				hwEntityHda1Usage
+					Integer32,    
+				hwEntityHda1UsageThreshold
+					Integer32,    
+				hwEntityHda1UsageResumeThreshold
+					Integer32,
+				hwEntitySlotID
+					Integer32,					
+				hwEntityCpuID
+					Integer32,					
+				hwEntityPreviousValue
+					Integer32,
+				hwEntityCurrentValue
+					Integer32,
+                hwEntityChangeValue
+                    Integer32,
+                hwEntityChangeValueThreshold
+                    Integer32,
+                hwEntityModelName
+                    OCTET STRING,
+                hwEntityIssueNumber
+                    OCTET STRING
              }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.1
@@ -1023,7 +1134,106 @@
             DESCRIPTION
                 " The TM usage for this entity.  "
            ::= { hwEntityStateEntry 50 }
-                    
+		   
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.51
+       hwEntityHda1Usage OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The Hda1 usage for this entity.  "
+           ::= { hwEntityStateEntry 51 }
+		   
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.52
+       hwEntityHda1UsageThreshold OBJECT-TYPE
+          SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The hda1 usage Threshold for this entity.  "
+           ::= { hwEntityStateEntry 52 }
+		   
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.53
+       hwEntityHda1UsageResumeThreshold OBJECT-TYPE
+          SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " The hda1 usage resume threshold for this entity.  "
+           ::= { hwEntityStateEntry 53 }		   	   
+	
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.54
+       hwEntitySlotID OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The identification of slot. "
+           ::= { hwEntityStateEntry 54 }	
+	
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.55
+       hwEntityCpuID OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The identification of cpu. "
+           ::= { hwEntityStateEntry 55 }
+	
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.56
+       hwEntityPreviousValue OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The previous value of the sudden change. "
+           ::= { hwEntityStateEntry 56 }
+	
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.57
+       hwEntityCurrentValue OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The current value of the sudden change. "
+           ::= { hwEntityStateEntry 57 }
+
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.58
+       hwEntityChangeValue OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The change of the sudden change. "
+           ::= { hwEntityStateEntry 58 }		   
+		   
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.59
+       hwEntityChangeValueThreshold OBJECT-TYPE
+          SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " The change threshold. "
+           ::= { hwEntityStateEntry 59 }	
+           
+       -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.60
+       hwEntityModelName OBJECT-TYPE
+          SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The model for this entity. If there is no model string in elable of this entity or this entity does not support elabel, the invalid value(zero-string) will be returned."
+           ::= { hwEntityStateEntry 60 }
+           
+       -- 1.3.6.1.4.1.2011.5.25.31.1.1.1.1.61
+       hwEntityIssueNumber OBJECT-TYPE
+          SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IssueNumber for this entity. If there is no IssueNumber string in elable of this entity or this entity does not support elabel, the invalid value(zero-string) will be returned."
+           ::= { hwEntityStateEntry 61 }
+		   
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.2
         hwRUModuleInfoTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwRUModuleInfoEntry
@@ -1074,6 +1284,12 @@
                 hwEntityIssueNum
                     SnmpAdminString,
                 hwEntityBoardType
+                    SnmpAdminString,
+                hwEntityExInfo
+                    SnmpAdminString,
+                hwEntityModel
+                    SnmpAdminString,
+                hwEntityElabelVersion
                     SnmpAdminString
              }
 
@@ -1198,6 +1414,32 @@
                 "The type code for entity."
             ::= { hwRUModuleInfoEntry 11 }
 
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.2.1.12
+        hwEntityExInfo OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Extra information, which satisfies the requirements of special components."
+            ::= { hwRUModuleInfoEntry 12 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.2.1.13
+        hwEntityModel OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "External type."
+            ::= { hwRUModuleInfoEntry 13 }
+			
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.2.1.14
+        hwEntityElabelVersion OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Electronic label version."
+            ::= { hwRUModuleInfoEntry 14 }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.3
         hwOpticalModuleInfoTable OBJECT-TYPE
@@ -1259,14 +1501,14 @@
                 hwEntityOpticalDirectionType
                     INTEGER,
                 hwEntityOpticalUserEeprom
-            DisplayString,
-        hwEntityOpticalRxLowWarnThreshold
-            Integer32,
-        hwEntityOpticalRxHighWarnThreshold
-            Integer32,
-        hwEntityOpticalTxLowWarnThreshold
-            Integer32,
-        hwEntityOpticalTxHighWarnThreshold
+                    DisplayString,
+                hwEntityOpticalRxLowWarnThreshold
+                    Integer32,
+                hwEntityOpticalRxHighWarnThreshold
+                    Integer32,
+                hwEntityOpticalTxLowWarnThreshold
+                    Integer32,
+                hwEntityOpticalTxHighWarnThreshold
                     Integer32,
                 hwEntityOpticalVenderName
                     DisplayString,
@@ -1303,7 +1545,19 @@
                hwEntityOpticalMaxTxPower
                     Integer32,
                hwEntityOpticalMinTxPower
-                    Integer32       
+                    Integer32,
+	           hwEntityOpticalTransType
+                    SnmpAdminString,
+               hwEntityOpticalConnectType
+                    SnmpAdminString,
+               hwEntityOpticalOrderingName
+                    SnmpAdminString,
+               hwEntityOpticalTransferDistance
+                    SnmpAdminString,
+                hwEntityOpticalBandWidth
+                    Integer32,
+                hwEntityOpticalWaveLengthExact
+                    DisplayString
      }
 
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.1
@@ -1314,7 +1568,8 @@
                 singleMode(2),
                 multiMode5(3),
                 multiMode6(4),
-                noValue(5)
+                noValue(5),
+                gpsMode(6)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -1425,7 +1680,11 @@
                 qsfpplus(14),
                 cfp2(15),
                 dwdmsfp(16),
-                msa100glh(17)
+                msa100glh(17),
+                gps(18),
+                csfp(19),
+                cfp4(20),
+                qsfp28(21)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -1783,6 +2042,60 @@
                 "The minimum transmit power of the optical module. Unit: dBm. the value is expanded 100 times,so the real value should be reduced 100 times."
             ::= { hwOpticalModuleInfoEntry 41 }
 			
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.42
+        hwEntityOpticalTransType OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..50))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Transceiver Type of the optical module."
+            ::= { hwOpticalModuleInfoEntry 42 }
+		
+       -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.43
+        hwEntityOpticalConnectType OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..50))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Connector Type of the optical module."
+            ::= { hwOpticalModuleInfoEntry 43 }		
+			
+	   -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.44
+        hwEntityOpticalOrderingName OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..50))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Ordering Name of the optical module."
+            ::= { hwOpticalModuleInfoEntry 44 }	
+	    
+	    -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.45
+        hwEntityOpticalTransferDistance OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Transfer Distance of the optical module."
+            ::= { hwOpticalModuleInfoEntry 45 }	
+			
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.46
+        hwEntityOpticalBandWidth OBJECT-TYPE
+            SYNTAX Integer32 (0..100000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Maximum bandwidth for an optical module, in Mbps. The value is 0 if the optical module is not present."
+            ::= { hwOpticalModuleInfoEntry 46 }
+	    
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.3.1.47
+        hwEntityOpticalWaveLengthExact OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The wave length of the optical module. Unit: nm."
+            ::= { hwOpticalModuleInfoEntry 47 }
+
         -- 1.3.6.1.4.1.2011.5.25.31.1.1.4
         hwMonitorInputTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwMonitorInputEntry
@@ -2960,14 +3273,14 @@
             ::= { hwStorageEntEntry 6 }
 
 		
-		-- 1.3.6.1.4.1.2011.5.25.31.1.1.14
-		hwSystemPowerTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwSystemPowerEntry
-			MAX-ACCESS not-accessible
-			STATUS current
-			DESCRIPTION
-				"System power infomation table."
-			::= { hwEntityState 14 }
+	-- 1.3.6.1.4.1.2011.5.25.31.1.1.14
+	hwSystemPowerTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwSystemPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"System power infomation table."
+	::= { hwEntityState 14 }
 
 		
 		-- 1.3.6.1.4.1.2011.5.25.31.1.1.14.1
@@ -3489,8 +3802,188 @@
             DESCRIPTION
                 "This object indicates the the index of memory usage history."
             ::= { hwEntityMemUsageHistoryEntry 3 }    
-                                                    
-                                            
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.21
+            hwProcessStateInfo OBJECT IDENTIFIER ::= { hwEntityState 21 }
+
+		
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.21.1
+        hwProcessName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..100))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the process name."
+        ::= { hwProcessStateInfo 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.22
+            hwDiskStateInfo OBJECT IDENTIFIER ::= { hwEntityState 22 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.22.1
+        hwDiskType OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..100))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the disk type."
+        ::= { hwDiskStateInfo 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.22.2
+        hwDiskSN OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..100))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the disk SN."
+        ::= { hwDiskStateInfo 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.22.3
+        hwDiskUsage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the disk usage rate."
+        ::= { hwDiskStateInfo 3 }
+
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.22.4
+        hwDiskUsageThreshold OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the disk usage rate alarm threshold."
+        ::= { hwDiskStateInfo 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.22.5
+        hwDiskSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the disk slot."
+        ::= { hwDiskStateInfo 5 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.23
+            hwLpuStateInfo OBJECT IDENTIFIER ::= { hwEntityState 23 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.23.1
+        hwLPUType OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..100))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the lpu type."
+        ::= { hwLpuStateInfo 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.23.2
+        hwLPUSlot OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the lpu slot."
+        ::= { hwLpuStateInfo 2 }
+		
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.24
+        hwHardDiskStateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwHardDiskStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists the status of hard disks. You can read the status of the hard disks on the device."
+            ::= { hwEntityState 24 }
+		
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1
+        hwHardDiskStateEntry OBJECT-TYPE
+            SYNTAX HwHardDiskStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Defines an entry in the hwHardDiskStateTable."
+            INDEX { hwHardDiskIndex }
+            ::= { hwHardDiskStateTable 1 }
+
+
+        HwHardDiskStateEntry ::=
+            SEQUENCE { 
+                hwHardDiskIndex
+                    Integer32,
+                hwHardDiskSN
+                    OCTET STRING,
+                hwHardDiskType
+                    OCTET STRING,
+                hwHardDiskCapacity
+                    Integer32,
+                hwHardDiskUsage
+                    Integer32,
+                hwHardDiskUsageThreshold
+                    Integer32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.1
+        hwHardDiskIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of a hard disk."
+            ::= { hwHardDiskStateEntry 1 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.2
+        hwHardDiskSN OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the serial number of the hard disk with a specified index."
+            ::= { hwHardDiskStateEntry 2 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.3
+        hwHardDiskType OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of the hard disk with a specified index."
+            ::= { hwHardDiskStateEntry 3 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.4
+        hwHardDiskCapacity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the capacity of the hard disk with a specified index."
+            ::= { hwHardDiskStateEntry 4 }
+
+			
+
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.5
+        hwHardDiskUsage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the usage of the hard disk with a specified index."
+            ::= { hwHardDiskStateEntry 5 }
+
+			
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.24.1.6
+        hwHardDiskUsageThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the usage threshold of the hard disk with a specified index."
+            ::= { hwHardDiskStateEntry 6 } 
+		
+	
         -- 1.3.6.1.4.1.2011.5.25.31.1.2
         hwEntityPhysicalSpecTable OBJECT IDENTIFIER ::= { hwEntityExtObjects 2 }
 
@@ -3603,6 +4096,7 @@
 			DESCRIPTION
 				"The battery coefficient used for calculating the index of the physical entity.  "
 			::= { hwEntityPhysicalSpecTable 11 }
+			
 
 		-- 1.3.6.1.4.1.2011.5.25.31.2
 		hwEntityExtTraps OBJECT IDENTIFIER ::= { hwEntityExtentMIB 2 }
@@ -3753,6 +4247,176 @@
                 value that most service work fine. "
             ::= { hwEntityExtTrapsPrefix 12 }
 
+        -- 1.3.6.1.4.1.2011.5.25.31.2.0.13
+        hwEntityExtCpuUsageThresholdNotficationClear NOTIFICATION-TYPE
+            OBJECTS { hwEntityCpuUsage, hwEntityCpuUsageThreshold, hwEntityTemperature, hwEntityTemperatureThreshold, hwEntityAdminStatus, 
+                hwEntityAlarmLight }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtCpuUsageThresholdNotficationClear indicates
+                  the entity CPU usage fell below the threshold. "
+            ::= { hwEntityExtTrapsPrefix 13 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.31.2.0.14
+        hwEntityExtMemUsageThresholdNotificationClear NOTIFICATION-TYPE
+            OBJECTS { hwEntityMemUsage, hwEntityMemUsageThreshold, hwEntityMemSize, hwEntityAdminStatus, hwEntityAlarmLight
+                 }
+            STATUS current
+            DESCRIPTION 
+                " The hwEntityExtMemUsageThresholdNotificationClear indicates
+                  the memory usage fell below the threshold. "
+            ::= { hwEntityExtTrapsPrefix 14 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.2.0.15
+	hwEntityExtProcessErrorNotification NOTIFICATION-TYPE
+	    OBJECTS { hwProcessName }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtProcessErrorNotification indicates
+		  some important process had exception. "
+	    ::= { hwEntityExtTrapsPrefix 15 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.2.0.16
+	hwEntityExtDiskDamaged NOTIFICATION-TYPE
+	    OBJECTS { hwDiskType }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtDiskDamaged indicates
+		  disk was damaged. "
+	    ::= { hwEntityExtTrapsPrefix 16 }
+
+        -- 1.3.6.1.4.1.2011.5.25.31.2.0.17
+	hwEntityExtDiskFull NOTIFICATION-TYPE
+	    OBJECTS { hwDiskType }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtDiskFull indicates
+		  disk was full. "
+	    ::= { hwEntityExtTrapsPrefix 17 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.18
+	hwEntityExtHda1UsageThresholdNotfication NOTIFICATION-TYPE
+	    OBJECTS { hwEntityHda1Usage,hwEntityHda1UsageThreshold }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtHda1UsageThresholdNotfication indicates
+		  the hda1 usage is overload. "
+	    ::= { hwEntityExtTrapsPrefix 18 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.19
+	hwEntityExtHda1UsageResumeThresholdNotfication NOTIFICATION-TYPE
+	    OBJECTS { hwEntityHda1Usage,hwEntityHda1UsageResumeThreshold }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtHda1UsageResumeThresholdNotfication indicates
+		  the hda1 usage fell below the resume threshold. "
+	    ::= { hwEntityExtTrapsPrefix 19 }
+            
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.20
+	hwEntityExtEncryptionCardFail NOTIFICATION-TYPE
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtEncryptionCardFail indicates
+		  the encryption card is faulty. "
+	    ::= { hwEntityExtTrapsPrefix 20 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.21
+		hwEntityExtHardDiskFull NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskUsage, hwDiskUsageThreshold }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtHardDiskFull indicates
+			that the hard disk's spare space is insufficient. "
+	    ::= { hwEntityExtTrapsPrefix 21 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.22
+		hwEntityExtHardDiskFullResume NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskUsage, hwDiskUsageThreshold }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtHardDiskFullResume indicates
+			that the hard disk's usage fell below the alarm clearing threshold. "
+	    ::= { hwEntityExtTrapsPrefix 22 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.23
+		hwEntityExtHardDiskPlugIn NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtHardDiskPlugIn indicates
+		    that the hard disk was plugged in. "
+	    ::= { hwEntityExtTrapsPrefix 23 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.24
+		hwEntityExtHardDiskPlugOut NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtHardDiskPlugOut indicates
+		    that the hard disk was pulled out. "
+	    ::= { hwEntityExtTrapsPrefix 24 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.25
+		hwEntityExtHardDiskOnline NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtHardDiskOnline indicates
+			that the hard disk went online successfully."
+	    ::= { hwEntityExtTrapsPrefix 25 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.26
+		hwEntityExtHardDiskOffline NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtHardDiskOffline indicates
+			that the hard disk went offline. "
+	    ::= { hwEntityExtTrapsPrefix 26 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.27
+		hwEntityExtLPUPlugIn NOTIFICATION-TYPE
+		OBJECTS { hwLPUSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtLPUPlugIn indicates
+			that the LPU was plugged in. "
+	    ::= { hwEntityExtTrapsPrefix 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.28
+		hwEntityExtLPUPlugOut NOTIFICATION-TYPE
+		OBJECTS { hwLPUSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " hwEntityExtLPUPlugOut indicates
+			that the LPU was pulled out. "
+	    ::= { hwEntityExtTrapsPrefix 28 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.29
+		hwEntityExtCpuUsageSuddenChangeNotification NOTIFICATION-TYPE
+		OBJECTS { hwEntitySlotID, hwEntityCpuID, hwEntityPreviousValue, hwEntityCurrentValue,hwEntityChangeValue, hwEntityChangeValueThreshold }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtCpuUsageSuddenChangeNotification indicates that the CPU usage suddenly changed. "
+	    ::= { hwEntityExtTrapsPrefix 29 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.30
+		hwEntityExtMemoryUsageSuddenChangeNotification NOTIFICATION-TYPE
+		OBJECTS { hwEntitySlotID, hwEntityCpuID, hwEntityPreviousValue, hwEntityCurrentValue, hwEntityChangeValue, hwEntityChangeValueThreshold }
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtMemoryUsageSuddenChangeNotification indicates that the memory usage suddenly changed. "
+	    ::= { hwEntityExtTrapsPrefix 30 }
+	    
+	  -- 1.3.6.1.4.1.2011.5.25.31.2.0.31
+		hwEntityExtCPUOverInterfaceDown NOTIFICATION-TYPE
+		OBJECTS { hwEntitySlotID, hwEntityCpuID }		
+	    STATUS current
+	    DESCRIPTION 
+	        " The hwEntityExtCPUOverInterfaceDown indicates that the cpu usage reached the threshold for interface management ,and the interface was shutdown. "
+	    ::= { hwEntityExtTrapsPrefix 31 }
+		
 		-- 1.3.6.1.4.1.2011.5.25.31.2.1
         hwEntityExtTrapObject OBJECT IDENTIFIER ::= { hwEntityExtTraps 1 }
 		
@@ -3845,7 +4509,57 @@
 	          "Slot ID of peer board."
 	          ::= { hwEntityExtTrapObject 9 }
 
+		    hwEntityExtTrapErrorPacketStatistics OBJECT-TYPE
+			      SYNTAX OCTET STRING
+	          MAX-ACCESS accessible-for-notify
+				    STATUS current
+			      DESCRIPTION
+	          "The statistics of CRC."
+	          ::= { hwEntityExtTrapObject 10 }
+
+		    hwEntityExtTrapErrorPacketThreshold OBJECT-TYPE
+			      SYNTAX OCTET STRING
+	          MAX-ACCESS accessible-for-notify
+				    STATUS current
+			      DESCRIPTION
+	          "The threshold of CRC."
+	          ::= { hwEntityExtTrapObject 11 }
+
+		    hwEntityExtTrapHigStateChangeTimes OBJECT-TYPE
+			      SYNTAX OCTET STRING
+	          MAX-ACCESS accessible-for-notify
+				    STATUS current
+			      DESCRIPTION
+	          "The state change times of HIG port."
+	          ::= { hwEntityExtTrapObject 12 }
+
+		    hwEntityExtTrapMonitorInterval OBJECT-TYPE
+			      SYNTAX OCTET STRING
+	          MAX-ACCESS accessible-for-notify
+				    STATUS current
+			      DESCRIPTION
+	          "The monitor interval."
+	          ::= { hwEntityExtTrapObject 13 }
+
 	
+		-- 1.3.6.1.4.1.2011.5.25.31.2.1.14
+		hwEntityExtTrapBoardDropRuntPktStatistics OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The statistic of dropped runt packets on the board."
+			::= { hwEntityExtTrapObject 14 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.1.15
+		hwEntityExtTrapBoardDropRuntPktTimeInterval OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The time interval."
+			::= { hwEntityExtTrapObject 15 }
 		-- 1.3.6.1.4.1.2011.5.25.31.2.2
         hwEntityExtTrap OBJECT IDENTIFIER ::= { hwEntityExtTraps 2 }		
 				
@@ -3892,6 +4606,55 @@
 	        "When the output usage of channel is less than the threshold of resume, send a SNMP trap to network manager."
 					::= { hwEntityExtTrap 6 }
 
+	    hwEntityStatusChange NOTIFICATION-TYPE
+          OBJECTS { entPhysicalIndex , entPhysicalName, entPhysicalClass, hwEntityOperStatus }
+          STATUS current
+          DESCRIPTION 
+	        "The entity status was changed."
+					::= { hwEntityExtTrap 7 }
+
+	    hwEntityHigErrorPacketThresholdAlarm NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapErrorPacketStatistics, hwEntityExtTrapErrorPacketThreshold, hwEntityExtTrapMonitorInterval }
+          STATUS current
+          DESCRIPTION 
+	        "When the CRC errors of HIG port are more than the threshold, send a SNMP trap to network manager."
+					::= { hwEntityExtTrap 8 }
+
+	    hwEntityHigStateChangeNotify NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapHigStateChangeTimes }
+          STATUS current
+          DESCRIPTION 
+	        "When the CRC errors of HIG port are more than the threshold, send a SNMP trap to network manager."
+					::= { hwEntityExtTrap 9 }
+
+	    hwEntityHigStateDownNotify NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapMonitorInterval }
+          STATUS current
+          DESCRIPTION 
+	        "When the state of HIG port is always down, send a SNMP trap to network manager."
+					::= { hwEntityExtTrap 10 }
+
+      hwEntityPositionMismatchNotify NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID }
+          STATUS current
+          DESCRIPTION 
+	        "When the board type and slotID is mismatch,send a SNMP notify to network manager."
+					::= { hwEntityExtTrap 11 }
+
+	    hwEntityRuntPacketCheckNotify NOTIFICATION-TYPE
+          OBJECTS { hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID }
+          STATUS current
+          DESCRIPTION 
+	        "When the statistics of runt packets is more than the threshold, send a SNMP trap to network manager."
+					::= { hwEntityExtTrap 12 }
+
+	  -- 1.3.6.1.4.1.2011.5.25.31.2.2.13
+	  hwBoardDropRuntPacketNotify NOTIFICATION-TYPE
+	  	OBJECTS { entPhysicalName, hwEntityExtTrapBoardDropRuntPktStatistics, hwEntityExtTrapBoardDropRuntPktTimeInterval }
+	  	STATUS current
+	  	DESCRIPTION 
+	  	"When the statistics of dropped runt packets on the board is more than the threshold, send a SNMP trap to network manager."
+	  	::= { hwEntityExtTrap 13 }
 
         -- 1.3.6.1.4.1.2011.5.25.31.3
         hwDevicePowerInfoObjects OBJECT IDENTIFIER ::= { hwEntityExtentMIB 3 }
@@ -3974,9 +4737,11 @@
                 hwEntitySupportFlexCard, hwEntityBoardClass, hwNseOpmStatus, hwEntityCpuMaxUsage, hwEntityServiceType, hwDeviceServiceType, 
                 hwEntityCPUType, hwEntityMemoryType, hwEntityFlashSize, hwEntityIfUpTimes, hwEntityIfDownTimes,
                 hwEntity5MinCpuUsage,hwEntityBoardDescription,hwEntityBoardName,  hwEntityStartMode , hwEntitySplitAttribute,
-                hwEntityCPUAvgUsage, hwEntityMemoryAvgUsage, hwEntityExtTrapBaseSoftwareVersion, hwEntityExtTrapBoardSoftwareVersion, hwPhysicalName,
-                hwGPSLongitude, hwGPSLatitude, hwGPSVelocity, hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID,
-                hwEntityExtTrapChannelCurUsage, hwEntityExtTrapChannelThreshold, hwEntityExtTrapPeerBoardSlotID}
+                hwEntityCPUAvgUsage, hwEntityMemoryAvgUsage, hwEntityExtTrapBaseSoftwareVersion, hwEntityExtTrapBoardSoftwareVersion, 
+                hwProcessName, hwPhysicalName, hwGPSLongitude, hwGPSLatitude, hwGPSVelocity, hwEntityExtTrapBoardSlotID, hwEntityExtTrapUnitID, hwEntityExtTrapHigPortID,
+                hwEntityExtTrapChannelCurUsage, hwEntityExtTrapChannelThreshold, hwEntityExtTrapPeerBoardSlotID, hwEntityExtTrapErrorPacketStatistics,
+                hwEntityExtTrapErrorPacketThreshold, hwEntityExtTrapHigStateChangeTimes, hwEntityExtTrapMonitorInterval,
+				hwEntitySlotID, hwEntityCpuID, hwEntityPreviousValue, hwEntityCurrentValue, hwEntityChangeValue, hwEntityChangeValueThreshold}
             STATUS current
             DESCRIPTION 
                 "Standard HUAWEI Entity Extent group."
@@ -3987,8 +4752,11 @@
         hwEntityExtNotificationGroup NOTIFICATION-GROUP
             NOTIFICATIONS { hwEntityExtTemperatureThresholdNotification, hwEntityExtVoltageLowThresholdNotification, hwEntityExtVoltageHighThresholdNotification, hwEntityExtCpuUsageThresholdNotfication, hwEntityExtMemUsageThresholdNotification, 
                 hwEntityExtOperEnabled, hwEntityExtOperDisabled, hwEntityExtMonitorBoardAbnormalNotification, hwEntityExtMonitorBoardNormalNotification, hwEntityExtMonitorPortAbnormalNotification, 
-                hwEntityExtMonitorPortNormalNotification, hwEntityExtCpuUsageLowThresholdNotfication,hwInsertDiffFromPreDisposed,hwPreDisposedChangeNotification,hwEntityHeartbeatTrap,hwHardwareCapaChangeNotification, hwAlarmPnPChangeNotification, hwBoardSoftwareVersionIncompatible, hwBoardSplitPorts,
-                hwEntityInputRateThresholdAlarm, hwEntityInputRateThresholdAlarmResume, hwEntityOutputRateThresholdAlarm, hwEntityOutputRateThresholdAlarmResume }
+                hwEntityExtMonitorPortNormalNotification, hwEntityExtCpuUsageLowThresholdNotfication,hwInsertDiffFromPreDisposed,hwPreDisposedChangeNotification,hwEntityHeartbeatTrap,
+                hwHardwareCapaChangeNotification, hwEntityExtProcessErrorNotification, hwAlarmPnPChangeNotification, hwBoardSoftwareVersionIncompatible, hwBoardSplitPorts,
+                hwEntityInputRateThresholdAlarm, hwEntityInputRateThresholdAlarmResume, hwEntityOutputRateThresholdAlarm, hwEntityOutputRateThresholdAlarmResume, hwEntityStatusChange,
+                hwEntityHigErrorPacketThresholdAlarm, hwEntityHigStateChangeNotify, hwEntityHigStateDownNotify,hwEntityPositionMismatchNotify,hwEntityRuntPacketCheckNotify,hwHda1Error,hwEntityExtCpuUsageSuddenChangeNotification,
+                hwEntityExtMemoryUsageSuddenChangeNotification,hwEntityExtCPUOverInterfaceDown }
             STATUS current
             DESCRIPTION 
                 "Standard HUAWEI Entity Extent Notification group."
@@ -3998,7 +4766,7 @@
         -- 1.3.6.1.4.1.2011.5.25.31.4.2.3
         hwRUModuleInfoGroup OBJECT-GROUP
             OBJECTS { hwEntityBomId, hwEntityBomEnDesc, hwEntityManufacturedDate, hwEntityCLEICode, hwEntityArchivesInfoVersion, 
-                hwEntityOpenBomId, hwEntityIssueNum, hwEntityBoardType }
+                hwEntityOpenBomId, hwEntityIssueNum, hwEntityBoardType, hwEntityExInfo, hwEntityModel, hwEntityElabelVersion }
             STATUS current
             DESCRIPTION 
                 "Standard HUAWEI Entity Extent group."
@@ -4020,7 +4788,8 @@
                 hwEntityOpticalVoltage, hwEntityOpticalBiasCurrent, hwEntityOpticalRxPower, hwEntityOpticalTxPower, hwEntityOpticalType, 
                 hwEntityOpticalTransBW, hwEntityOpticalFiberType, hwEntityOpticalRxLowThreshold, hwEntityOpticalRxHighThreshold, hwEntityOpticalTxLowThreshold, 
                 hwEntityOpticalTxHighThreshold, hwEntityOpticalPlug, hwEntityOpticalDirectionType, hwEntityOpticalUserEeprom, hwEntityOpticalLaneBiasCurrent, 
-				hwEntityOpticalLaneRxPower, hwEntityOpticalLaneTxPower, hwEntityOpticalVendorOUI, hwEntityOpticalVendorRev, hwEntityOpticalGponSN}
+				hwEntityOpticalLaneRxPower, hwEntityOpticalLaneTxPower, hwEntityOpticalVendorOUI, hwEntityOpticalVendorRev, hwEntityOpticalGponSN,
+                hwEntityOpticalTransType,hwEntityOpticalConnectType,hwEntityOpticalOrderingName,hwEntityOpticalTransferDistance,hwEntityOpticalBandWidth,hwEntityOpticalWaveLengthExact}
             STATUS current
             DESCRIPTION 
                 "Collection of objects that display the fiber module working information."
@@ -4530,7 +5299,9 @@
 
         -- 1.3.6.1.4.1.2011.5.25.31.7.2
         hwHeartbeatTrapPrefix OBJECT IDENTIFIER ::= { hwHeartbeatObjects 2 }
-
+       
+        --1.3.6.1.4.1.2011.5.25.31.1.1.25
+        hwCfcardStateInfo OBJECT IDENTIFIER ::= { hwEntityState 25 }
 
         -- 1.3.6.1.4.1.2011.5.25.31.7.2.1
         hwEntityHeartbeatTrap NOTIFICATION-TYPE
@@ -4538,7 +5309,53 @@
             DESCRIPTION 
                 "Heartbeat trap."
             ::= { hwHeartbeatTrapPrefix 1 }
-         
+ 
+       --1.3.6.1.4.1.2011.5.25.31.1.1.25.1
+       hwHda1Error NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "The file system in the hda1 directory has errors."
+            ::= { hwCfcardStateInfo 1 }             
+
+			
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.26
+        hwLedConfigInfoPara OBJECT IDENTIFIER ::= { hwEntityState 26 }
+
+		
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.26.1
+        hwLedConfigStatus OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Whether Led Off config enabled."
+                ::= { hwLedConfigInfoPara 1 }
+
+		
+        -- 1.3.6.1.4.1.2011.5.25.31.1.1.26.2
+        hwLedTimeRangeName OBJECT-TYPE
+                SYNTAX OCTET STRING (SIZE (0..32))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Led off time range name, if Led Off Time Range config enabled."
+                ::= { hwLedConfigInfoPara 2 }
+
+		
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.27
+        hwUsbConfigInfoPara OBJECT IDENTIFIER ::= { hwEntityState 27 }
+
+		
+        --  1.3.6.1.4.1.2011.5.25.31.1.1.27.1
+        hwUsbConfigStatus OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Whether Usb Enable config enabled."
+                ::= { hwUsbConfigInfoPara 1 }
+
+
         -- 1.3.6.1.4.1.2011.5.25.31.8
         hwPreDisposeObjects OBJECT IDENTIFIER ::= { hwEntityExtentMIB 8 }
 

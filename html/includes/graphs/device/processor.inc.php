@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -18,7 +18,7 @@ if (isset($vars['id']))
 }
 $procs = dbFetchRows($sql, array($device['device_id']));
 
-if ($config['os'][$device['os']]['processor_stacked'] == 1)
+if ($config['os'][$device['os']]['processor_stacked'] == 1 && $config['graphs']['stacked_processors'] == TRUE)
 {
   include($config['html_dir']."/includes/graphs/device/processor_stack.inc.php");
 } else {

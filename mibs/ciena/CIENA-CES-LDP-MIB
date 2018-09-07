@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-10-01-0027
+-- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-LDP-MIB.my
  --
@@ -19,7 +19,7 @@
 
 	
  cienaCesLdpMIB MODULE-IDENTITY
-	    LAST-UPDATED "201102020000Z"
+	    LAST-UPDATED "201607150000Z"
 	    ORGANIZATION "Ciena, Inc"
 	    CONTACT-INFO
 		    "   Mib Meister
@@ -28,8 +28,25 @@
 		        USA		 		
 		        Phone:  +1 509 242 9000
 			Email:  support@ciena.com"
+
 	    DESCRIPTION
-		    "This MIB module is for the Extension of the LDP MIB for CIENA Products"
+		"This MIB module is for the Extension of the LDP MIB for CIENA Products"
+
+	    REVISION
+	    	"201607150000Z"
+	    DESCRIPTION
+		"Modified attribute cienaCesLdpGROperStatus to cienaCesLdpGRMode
+		under cienaCesLdpObjects."
+
+	    REVISION
+	    	"201607110000Z"
+	    DESCRIPTION
+		"Added support for LDP Graceful Restart functionality."
+
+	    REVISION
+	    	"201304180000Z"
+	    DESCRIPTION
+		"Fixed miscellaneous typos and descriptions."
 
 	    REVISION
 	    	"201102020000Z"
@@ -57,7 +74,7 @@
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-         "Globally enable/disable LDP"
+         "Globally enable or disable LDP."
     ::= { cienaCesLdpObjects 1 }
 
  cienaCesLdpOperStatus OBJECT-TYPE
@@ -69,7 +86,7 @@
      MAX-ACCESS  read-only
      STATUS      current
      DESCRIPTION
-         "Current operational state of LDP"
+         "Current operational state of LDP."
     ::= { cienaCesLdpObjects 2 }
 
  cienaCesLdpHelloHoldTime OBJECT-TYPE
@@ -82,14 +99,14 @@
         global hello hold timer (in seconds) for LDP.
 
         An LSR maintains a record of Hellos received
-        from potential peers.  This object represents
+        from potential peers. This object represents
         the Hold Time in the Common Hello Parameters TLV of
         the Hello Message.
 
         A value of 65535 means infinite (i.e., wait forever).
 
         All other values represent the amount of time in
-        seconds to wait for a Hello Message.  Setting the
+        seconds to wait for a Hello Message. Setting the
         hold time to a value smaller than 15 is not
         recommended, although not forbidden according
         to RFC3036."
@@ -104,7 +121,102 @@
         "The 16-bit integer value which is the proposed global
         keep alive hold timer for LDP."
     ::= { cienaCesLdpObjects 4 }
-    
+
+ cienaCesLdpGRAdminStatus OBJECT-TYPE
+     SYNTAX      CienaGlobalState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "LDP Graceful restart Admin status (Enabled/Disabled)."
+    ::= { cienaCesLdpObjects 5 }
+
+ cienaCesLdpGRMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                    helpNeighbor(1),
+                    restartCapable(2),
+                    notApplicable(3)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "LDP Graceful restart Operational status."
+    ::= { cienaCesLdpObjects 6 }
+
+ cienaCesLdpReconnectTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The period of time that the local node takes to 
+        restart LDP and  bring up the LDP sessions.This is 
+        advertised to neighbors in the FT Session TLV
+        in Initialization messages.
+
+        The value chosen should be large enough for LDP to be
+        terminated and restarted.
+
+        For devices which only act as the Helper node, this timer 
+        is unused and will return value 0."
+     DEFVAL {60000}
+    ::= { cienaCesLdpObjects 7 }
+
+ cienaCesLdpRecoveryTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The period of time that the local node is willing to 
+        retain its MPLS forwarding state, if any,that it 
+        preserved across the restart.
+
+        This field is used to calculate the Recovery Time for both
+        Control Plane and Control Channel restarts.  It is used to
+        calculate the Recovery Time advertised in the FT Session
+        TLV in the Initialization message sent to the neighbor.
+
+        For devices which only act as the Helper node, this timer 
+        is unused and will return value 0."
+     DEFVAL {180000}
+    ::= { cienaCesLdpObjects 8 }
+
+ cienaCesLdpMaxPeerReconnect OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The maximum period of time that LDP should wait for a 
+        restart capable neighbor to restore an LDP session.
+
+        LDP waits for the minimum of this time and the Reconnect
+        Timeout advertised in the FT Session TLV in the
+        Initialization message from the neighbor."
+     DEFVAL {180000}
+    ::= { cienaCesLdpObjects 9 }
+
+ cienaCesLdpMaxPeerRecovery OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..600000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The maximum period of time that LDP should wait for a 
+        restart capable neighbor to refresh Label Mappings
+        previously received from that neighbor before deleting 
+        the stale bindings.
+
+        LDP waits for the minimum of this time and the Recovery
+        Time advertised in the FT Session TLV in the
+        Initialization message from the neighbor.
+
+        This value is not used to set the Recovery Time advertised
+        in the FT Session TLV in the Initialization message sent
+        to the neighbor."
+     DEFVAL {240000}
+    ::= { cienaCesLdpObjects 10 }
+  
 --
 -- The CIENA MPLS LDP Sessions Table. It augments MPLS LDP Sessions Table
 --
@@ -115,7 +227,7 @@ cienaCesLdpSessionTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table of Sessions between the LDP Entities
-        and LDP Peers.  Each row in this table
+        and LDP Peers. Each row in this table
         represents a single session."
     ::= {  cienaCesLdp 1 }
 
@@ -128,18 +240,18 @@ cienaCesLdpSessionEntry OBJECT-TYPE
         single session between an LDP Entity and LDP Peer.
         The information contained in a row is read-only.
 
-        Please note:  the Path Vector Limit for the
-        Session is the value which is configured in
+        Note: The Path Vector Limit for the
+        Session is the value that is configured in
         the corresponding mplsLdpEntityEntry. The
         Peer's Path Vector Limit is in the
         mplsLdpPeerPathVectorLimit object in the
         mplsLdpPeerTable.
 
-        Values which may differ from those configured are
+        Values that may differ from those configured are
         noted in the objects of this table, the
         mplsLdpAtmSessionTable and the
-        mplsLdpFrameRelaySessionTable. A value will
-        differ if it was negotiated between the
+        mplsLdpFrameRelaySessionTable. A value 
+        differs if it was negotiated between the
         Entity and the Peer.  Values may or may not
         be negotiated.  For example, if the values
         are the same then no negotiation takes place.
@@ -164,7 +276,7 @@ CienaCesLdpSessionEntry ::= SEQUENCE {
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-         "The LDP identifier.  The first four octets encode an IP
+         "The LDP identifier. The first four octets encode an IP
          address assigned to the LSR, and the last two octets
          identify a specific label space within the LSR."
     REFERENCE
@@ -180,11 +292,11 @@ CienaCesLdpSessionEntry ::= SEQUENCE {
         identify this row.  
 
         A secondary index (this object) is meaningful to some
-        but not all, LDP implementations.  For example
-        an LDP implementation which uses PPP would
+        but not all, LDP implementations. For example,
+        an LDP implementation that uses PPP would
         use this index to differentiate PPP sub-links.
 
-        Another way to use this index is to give this the
+        Another way to use this index is to assign it the
         value of ifIndex."
     ::= { cienaCesLdpSessionEntry 2 }
 
@@ -202,7 +314,7 @@ CienaCesLdpSessionEntry ::= SEQUENCE {
     STATUS      current
     DESCRIPTION
         "The locally configured keepalive hold time for this
-        session, in seconds.  Note that the value of this field
+        session, in seconds. Note that the value of this field
         reflects configuration at the time of session
         initialization; this may differ from the configuration
         that would apply to a new session, if configuration has
@@ -215,7 +327,7 @@ CienaCesLdpSessionEntry ::= SEQUENCE {
     STATUS      current
     DESCRIPTION
         "The peer's advertised keepalive hold time for this session
-        in seconds.  Note that the value of this field reflects
+        in seconds. Note that the value of this field reflects
         the peer's configuration at the time of session
         initialization; this may differ from the configuration
         that would apply to a new session, if the peer's

@@ -3,11 +3,11 @@
 --
 
 --  ==================================================================
--- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI L2VPN PW APS TRAP Management MIB
 -- Reference:
--- Version:     V1.0
+-- Version:     V2.13
 -- History:
 --              V1.0 houchengjie, 2011-04-21, publish
 -- ==================================================================
@@ -26,11 +26,13 @@
             RowStatus
                 FROM SNMPv2-TC
             hwPWInterfaceIndex
-                FROM HUAWEI-PWE3-MIB;
+                FROM HUAWEI-PWE3-MIB
+            hwL2vpnVcID,hwL2vpnVcType,hwL2vpnPeerAddr
+                FROM HUAWEI-L2VPN-OAM-MIB;
 
         -- 1.3.6.1.4.1.2011.5.25.119.10
     hwL2vpnPwAps MODULE-IDENTITY 
-        LAST-UPDATED "201305131250Z"        -- May 13, 2013 at 12:50 GMT
+        LAST-UPDATED "201607041400Z"        -- Jul 27, 2016 at 14:00GMT
         ORGANIZATION
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -45,6 +47,12 @@
             "The HUAWEI-L2VPN-PW-APS-MIB contains objects to
             manage PW APS."
         -- Revision history
+        REVISION "201607041400Z"
+             DESCRIPTION "V2.13, modify compile error"
+
+        REVISION "201511271400Z"
+             DESCRIPTION "V2.12, add hwPwApsTunnelNonSupport hwPwApsTunnelNonSupportResumed for router"
+
         REVISION "201305131250Z"
              DESCRIPTION "V2.11, add hwPwApsDegraded for PTN5900"
         ::= { hwL2Vpn 10 }
@@ -328,6 +336,22 @@
                 "APS reported the clearing of the PW degraded alarm."
             ::= { hwL2vpnPwApsTraps 17 }
 
+        -- 1.3.6.1.4.1.2011.5.25.119.10.2.18
+        hwPwApsTunnelNonSupport NOTIFICATION-TYPE
+            OBJECTS { hwL2vpnVcID, hwL2vpnVcType, hwL2vpnPeerAddr}
+            STATUS current
+            DESCRIPTION 
+                "PW APS does not support the current public tunnel."
+            ::= { hwL2vpnPwApsTraps 18 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.10.2.19
+        hwPwApsTunnelNonSupportResumed NOTIFICATION-TYPE
+            OBJECTS { hwL2vpnVcID, hwL2vpnVcType, hwL2vpnPeerAddr}
+            STATUS current
+            DESCRIPTION 
+                "The alarm that PW APS does not support the current public tunnel is resumed."
+            ::= { hwL2vpnPwApsTraps 19 }
+
 -- the mib object of hwL2vpnPwApsScalarsObject is reserved
 -- L2VPN PW APS Scalars Object Definitions
 --
@@ -373,7 +397,8 @@
                         NOTIFICATIONS { hwPwApsTypeMismatch, hwPwApsTypeMismatchClear, hwPwApsPathMismatch, hwPwApsPathMismatchClear, 
                                         hwPwApsSwitchFail, hwPwApsSwitchFailClear, hwPwApsLost, hwPwApsLostClear ,
                                         hwPwApsIdMismatch, hwPwApsIdMismatchClear, hwPwApsBypassPwMismatch, hwPwApsBypssPwMismatchClear,
-                                        hwPwApsSwitchEvent, hwPwApsOutAge, hwPwApsOutAgeClear, hwPwApsDegraded, hwPwApsDegradedClear }
+                                        hwPwApsSwitchEvent, hwPwApsOutAge, hwPwApsOutAgeClear, hwPwApsDegraded, hwPwApsDegradedClear,
+                                        hwPwApsTunnelNonSupport, hwPwApsTunnelNonSupportResumed}
                         STATUS current
                         DESCRIPTION 
                                 "The PW APS Notification group."

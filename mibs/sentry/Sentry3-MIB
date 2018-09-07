@@ -1,5 +1,5 @@
 --
---  Copyright(C) 2003-2014 Server Technology, Inc.
+--  Copyright(C) 2003-2016 Server Technology, Inc.
 --
 
     Sentry3-MIB DEFINITIONS ::= BEGIN
@@ -11,7 +11,7 @@
 
 
     sentry3 MODULE-IDENTITY
-        LAST-UPDATED "201406251200Z" -- 25 June 2014
+        LAST-UPDATED "201601251630Z" -- 25 January 2016
         ORGANIZATION "Server Technology, Inc."
         CONTACT-INFO
             "Server Technology, Inc.
@@ -27,6 +27,11 @@
              Sentry Environmental Monitor (EM), Sentry Smart and
              Switched Cabinet Distribution Unit (CDU), and Sentry
              Switched -48 VDC."
+        REVISION "201601251630Z" -- 25 January 2016
+        DESCRIPTION
+            "Adjusted the upper limit of infeedLoadValue to 60000.
+             Adjusted the upper limit of infeedLoadHighThresh to 600.
+             Adjusted the upper limit of infeedCapacity to 600."
         REVISION "201406251200Z" -- 25 June 2014
         DESCRIPTION
             "Adjusted the upper limit of tempHumidSensorTempRecDelta
@@ -696,7 +701,7 @@
         ::= { infeedEntry 6 }
 
     infeedLoadValue OBJECT-TYPE
-        SYNTAX      INTEGER(-1..30000)
+        SYNTAX      INTEGER(-1..60000)
         UNITS       "hundredth Amps"
         MAX-ACCESS  read-only
         STATUS      current
@@ -708,7 +713,7 @@
         ::= { infeedEntry 7 }
 
     infeedLoadHighThresh OBJECT-TYPE
-        SYNTAX      INTEGER(0..300)
+        SYNTAX      INTEGER(0..600)
         UNITS       "Amps"
         MAX-ACCESS  read-write
         STATUS      current
@@ -726,7 +731,7 @@
         ::= { infeedEntry 9 }
 
     infeedCapacity OBJECT-TYPE
-        SYNTAX      INTEGER(-1..300)
+        SYNTAX      INTEGER(-1..600)
         UNITS       "Amps"
         MAX-ACCESS  read-only
         STATUS      current

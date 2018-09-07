@@ -34,8 +34,7 @@ IMPORTS
         FROM SNMPv2-TC
     mwConfiguration
         FROM MERU-SMI
-    MwlAclEnvState
-        FROM MERU-TC;
+    ;
 
   mwConfigMacFiltering  MODULE-IDENTITY
     LAST-UPDATED "200506050000Z"
@@ -49,29 +48,13 @@ IMPORTS
     mwAcl                                    OBJECT IDENTIFIER ::= { mwConfigMacFiltering 1 }
     
   
-  mwAclEnvState  OBJECT-TYPE
-    SYNTAX MwlAclEnvState
+  mwAclCachingTimeout  OBJECT-TYPE
+    SYNTAX Unsigned32
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
-         "This object describes ACL Environment State"
-    ::= { mwAcl    1 }
-
-  mwAclRadiusProfileName  OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes RADIUS Profile Name"
-    ::= { mwAcl    2 }
-
-  mwAclSecondaryRadiusProfileName  OBJECT-TYPE
-    SYNTAX DisplayString
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-         "This object describes Secondary RADIUS Profile Name"
-    ::= { mwAcl    3 }
+         "This object describes Auto Authentication Expiry Period(Seconds)"
+    ::= { mwAcl    4 }
 
   mwAclAccessAllowTable  OBJECT-TYPE
     SYNTAX SEQUENCE OF MwAclAccessAllowEntry

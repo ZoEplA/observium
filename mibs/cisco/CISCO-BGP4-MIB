@@ -178,6 +178,7 @@ CbgpSafi ::= TEXTUAL-CONVENTION
                         unicast(1),
                         multicast(2),
                         unicastAndMulticast(3),
+                        evpn(70),
                         vpn(128)
                     }
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -224,7 +224,7 @@ function print_status($status)
         $string .= '    <td><span class="label label-warning" title="' . $bgpstates . '">BGP ' . nicecase($peer['bgpPeerState']) . '</span></td>' . PHP_EOL;
         $string .= '    <td class="entity" style="white-space: nowrap"><i class="'.$config['icon']['bgp'].'"></i> ' . $peer_ip . '</td>' . PHP_EOL;
         // $string .= '    <td style="white-space: nowrap">' . escape_html(truncate($peer['location'], 30)) . '</td>' . PHP_EOL;
-        $string .= '    <td><strong>AS' . $peer['bgpPeerRemoteAs'] . ' :</strong> ' . $peer['astext'] . '</td>' . PHP_EOL;
+        $string .= '    <td><strong>AS' . $peer['human_remote_as'] . ' :</strong> ' . $peer['astext'] . '</td>' . PHP_EOL;
         $string .= '  </tr>' . PHP_EOL;
       }
     }

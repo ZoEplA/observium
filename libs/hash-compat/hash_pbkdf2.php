@@ -1,12 +1,5 @@
 <?php
 
-/**
- * PHP 5.6.0 and newer have these function natively.
- */
-if (PHP_VERSION_ID >= 50600) {
-    return;
-}
-
 if (!function_exists('hash_pbkdf2')) {
     defined('USE_MB_STRING') or define('USE_MB_STRING', function_exists('mb_strlen'));
 

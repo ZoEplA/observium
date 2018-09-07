@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage geolocation
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -16,6 +16,12 @@
  * Here passed $data array with decoded first request response
  * At end returned main $location variables
  */
+
+  /// Achtung.
+  /// This GEO api not worked anymore (since ~2017)!!!
+
+  print_error("WARNING. The Yahoo Geolocation API no longer functions!
+               Please use any other supported GEO api, but with required API KEY. See docs.");
 
   // Use google data only with good status response
   if (isset($data['ResultSet']))

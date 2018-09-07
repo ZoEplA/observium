@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage config
  * @author     Tom Laermans <sid3windr@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -66,7 +66,7 @@ else if (!get_db_version() && !(isset($options['u']) || isset($options['V'])))
 } else {
   // Disable STRICT mode for DB session (we not fully support them)
   $db_modes = explode(',', dbFetchCell("SELECT @@SESSION.sql_mode;"));
-  $db_modes_exclude = array('STRICT_TRANS_TABLES', 'ONLY_FULL_GROUP_BY');
+  $db_modes_exclude = array('STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES', 'ONLY_FULL_GROUP_BY');
   $db_modes_update  = array();
   foreach ($db_modes_exclude as $db_mode_exclude)
   {
@@ -87,8 +87,12 @@ else if (!get_db_version() && !(isset($options['u']) || isset($options['V'])))
   $rev_old = @get_obs_attrib('current_rev');
   if ($rev_old < OBSERVIUM_REV || !is_numeric($rev_old))
   {
-    set_obs_attrib('current_rev', OBSERVIUM_REV);
-    log_event("Observium updated: $rev_old -> " . OBSERVIUM_REV); // FIXME log_event currently REQUIRES a device, the SQL query will fail.
+    // Version update detected, log it
+    $version_old = @get_obs_attrib('current_version');
+    log_event("Observium updated: $version_old -> " . OBSERVIUM_VERSION_LONG, NULL, NULL, NULL, 5);
+
+    set_obs_attrib('current_rev',     OBSERVIUM_REV);
+    set_obs_attrib('current_version', OBSERVIUM_VERSION_LONG);
   }
 
   // Clean
@@ -107,6 +111,16 @@ load_sqlconfig($config);
 include($config['install_dir']."/config.php");
 
 */
+
+// Init RRDcached
+
+if (isset($config['rrdcached']) && !preg_match('!^\s*(unix:)?/!i', $config['rrdcached']))
+{
+  // RRD files located on remote server
+  define('OBS_RRD_NOLOCAL', TRUE);
+} else {
+  define('OBS_RRD_NOLOCAL', FALSE);
+}
 
 // Init StatsD
 

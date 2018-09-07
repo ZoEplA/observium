@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-10-01-0027
+-- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-BFD-MIB.my
  --    
@@ -18,7 +18,7 @@
         FROM CIENA-SMI;
         
  cienaCesBfdMIB MODULE-IDENTITY
-	LAST-UPDATED "201107260000Z"
+	LAST-UPDATED "201404040000Z"
 	ORGANIZATION "Ciena, Inc"
 	CONTACT-INFO
                        "Mib Meister
@@ -30,16 +30,37 @@
 	DESCRIPTION
 	                    "This module defines the BFD SNMP objects."
 
-                        REVISION  "201107260000Z"
-                        DESCRIPTION
-                            "Intial creation."
+
+        REVISION        "201404040000Z"
+        DESCRIPTION     "Added Profile Index for BFD Session MIB object"  
+
+        REVISION        "201403190000Z"
+        DESCRIPTION     "Added BFD Profile MIB object"
+
+                    REVISION
+                        "201107260000Z"
+                    DESCRIPTION
+                        "Initial creation."
+
                         ::= { cienaCesConfig 22 }
+--
+ -- Textual convention
+ --
+ BfdRole ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "BFD Role"
+     SYNTAX       INTEGER {
+                    passive(1),
+                    active(2)
+                   }
+
 --
 -- Node Definitions
 -- 
 
  cienaCesBfdMIBObjects 			OBJECT IDENTIFIER ::= { cienaCesBfdMIB 1 } 
  cienaCesBfdSession 			        OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 2 }
+ cienaCesBfdProfile 			        OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 3 }
 
 -- Statistics
 
@@ -59,8 +80,9 @@
      MAX-ACCESS not-accessible
      STATUS current
      DESCRIPTION
-            "The (conceptual) table listing the config 
-            parameters for the Bfd Session Table."  
+            "The (conceptual) table listing the configuration 
+            parameters for the BFD session table."  
+
      ::= { cienaCesBfdSession 1 }
                 
  cienaCesBfdSessionEntry OBJECT-TYPE
@@ -68,7 +90,7 @@
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-           "An entry (conceptual row) in the cienaCesBfdSessionTable."
+           "An entry (conceptual row) in the BFD session table."
      INDEX {cienaCesBfdSessionIndex}
      ::= { cienaCesBfdSessionTable 1 }
         
@@ -76,7 +98,8 @@
      cienaCesBfdSessionIndex                             Unsigned32,
      cienaCesBfdSessionName                              DisplayString,
      cienaCesBfdSessionAdminState                        CienaGlobalState,     
-     cienaCesBfdSessionOperState                         CienaGlobalState
+     cienaCesBfdSessionOperState                         CienaGlobalState,
+     cienaCesBfdSessionProfileIndex                      Unsigned32
 }
 
 
@@ -114,6 +137,13 @@ cienaCesBfdSessionIndex OBJECT-TYPE
      ::= { cienaCesBfdSessionEntry 4 }
 
 
+ cienaCesBfdSessionProfileIndex OBJECT-TYPE
+     SYNTAX       Unsigned32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Profile Index for the Session."
+     ::= { cienaCesBfdSessionEntry 5 }         
 
 --
 -- BFD Session Statistics
@@ -133,7 +163,9 @@ cienaCesBfdSessionIndex OBJECT-TYPE
      MAX-ACCESS  not-accessible
      STATUS      current
      DESCRIPTION
-           "An entry (conceptual row) in the cienaCesBfdSessionStatsTable."
+
+           "An entry (conceptual row) in the BFD session statistics table."
+
      INDEX {cienaCesBfdSessionIndex}
      ::= { cienaCesBfdSessionStatsTable 1 }
 
@@ -150,7 +182,8 @@ cienaCesBfdSessionIndex OBJECT-TYPE
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the no: of Transmitted Packets in a BFD Session."
+             "This object indicates the number of transmitted packets in a BFD session."
+
      ::= { cienaCesBfdSessionStatsEntry 1 }
 
  cienaCesBfdSessionStatsTotalRx OBJECT-TYPE
@@ -158,7 +191,9 @@ cienaCesBfdSessionIndex OBJECT-TYPE
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION
-             "This object specifies the no: of Received Packets in a BFD Session."
+
+             "This object indicates the number of received packets in a BFD session."
+
      ::= { cienaCesBfdSessionStatsEntry 2 }   
      
   cienaCesBfdSessionUpTime OBJECT-TYPE
@@ -192,10 +227,112 @@ cienaCesBfdSessionIndex OBJECT-TYPE
        }
    STATUS      current
    DESCRIPTION
-      "A notification is sent whenever the Bfd Session Oper State has changed. To send this trap,the 
-       cienaCesBfdSessionOperTrapState object must be enabled (which is enabled by default)."
+
+      "A notification is sent whenever the BFD session operational state has changed. To enable this notification, the 
+       cienaCesBfdSessionOperTrapState object must be enabled (which is enabled by default). Variable bindings 
+       include: cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesBfdSessionName, cienaCesBfdSessionIndex, 
+       cienaCesBfdSessionAdminState, and cienaCesBfdSessionOperState."
+
    ::= { cienaCesBfdSessionMIBNotification 1 }
- 
+
+--
+-- BFD Profile Table
+--
+ cienaCesBfdProfileTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesBfdProfileEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+            "The BFD Profile Table."
+     ::= { cienaCesBfdProfile 1 }
+
+ cienaCesBfdProfileEntry OBJECT-TYPE
+     SYNTAX      CienaCesBfdProfileEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesBfdProfileTable."
+     INDEX {cienaCesBfdProfileIndex}
+     ::= { cienaCesBfdProfileTable 1 }
+
+ CienaCesBfdProfileEntry ::=  SEQUENCE {
+     cienaCesBfdProfileIndex                             Unsigned32,
+     cienaCesBfdProfileName                              DisplayString,
+     cienaCesBfdTransmitInterval                         Unsigned32,
+     cienaCesBfdReceiveInterval                          Unsigned32,
+     cienaCesBfdRole                                     BfdRole,
+     cienaCesBfdLspGachType                              Unsigned32,
+     cienaCesBfdDetectMultiplier                         Unsigned32,
+     cienaCesBfdUseCount                                 Unsigned32
+}
+
+
+cienaCesBfdProfileIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A unique identifier for BFD Profile entry."
+     ::= { cienaCesBfdProfileEntry 1 }
+
+
+cienaCesBfdProfileName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Profile name."
+     ::= { cienaCesBfdProfileEntry 2 }
+
+cienaCesBfdTransmitInterval OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Transmit Interval in msec."
+     ::= { cienaCesBfdProfileEntry 3 }
+
+cienaCesBfdReceiveInterval OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Receive Interval in msec."
+     ::= { cienaCesBfdProfileEntry 4 }
+
+cienaCesBfdRole OBJECT-TYPE
+     SYNTAX       BfdRole
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Role."
+     ::= { cienaCesBfdProfileEntry 5 }
+
+cienaCesBfdLspGachType OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD LSP Gach Type. Reference RFC 5586"
+     ::= { cienaCesBfdProfileEntry 6 }
+
+cienaCesBfdDetectMultiplier OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Detect Multiplier."
+     ::= { cienaCesBfdProfileEntry 7 }
+
+
+cienaCesBfdUseCount OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Number of sessions using BFD Profile."
+     ::= { cienaCesBfdProfileEntry 8 }
+
  END
 
 

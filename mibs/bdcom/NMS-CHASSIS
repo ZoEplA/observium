@@ -170,6 +170,10 @@
                        nmscardTemperature
                        		 INTEGER,      
                        nmscardVoltage
+                       		 INTEGER,
+                       nmscardPorts
+                       		 INTEGER,
+                       nmscardGenType
                        		 INTEGER 
                    }
 
@@ -278,18 +282,18 @@
 						pci-16FastEthernet-100M(254),
 						pci-8FastEthernet-100M(255),
 						pci-4FastEthernet-100M(256),
-						pci_1FastEthernet-100M(257),
-						pci_1GigaEthernet-100M(258),
-						pci_1FastEthernet-1000M(259),
-						pci_1GigaEthernet-1000M(260),
-						pci_1GBIC(261),
-						pci_1STACK(262),
-						pci_8Fiber(263),
-						pci_4GigaEthernet-Combo-1000M(264),
-						pci_4GigaEthernet-SFP-1000M(265),
-						pci_6508-MSU(266),
-						pci_2GigaEthernet-SFP-1000M(267),
-						pci_2GigaEthernet-1000M(268)
+						pci-1FastEthernet-100M(257),
+						pci-1GigaEthernet-100M(258),
+						pci-1FastEthernet-1000M(259),
+						pci-1GigaEthernet-1000M(260),
+						pci-1GBIC(261),
+						pci-1STACK(262),
+						pci-8Fiber(263),
+						pci-4GigaEthernet-Combo-1000M(264),
+						pci-4GigaEthernet-SFP-1000M(265),
+						pci-6508-MSU(266),
+						pci-2GigaEthernet-SFP-1000M(267),
+						pci-2GigaEthernet-1000M(268)
 					}
                    ACCESS  read-only
                    STATUS  mandatory
@@ -412,6 +416,27 @@
                    DESCRIPTION
                            "Voltage of Card. unit: V"
                    ::= { nmscardTableEntry 14 }
+                   nmscardPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "prots contained on the card"
+                   ::= { nmscardTableEntry 15 }
+                   nmscardGenType OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                   	controlBoard(1), 
+					geponBoard(2) ,
+					uplinkBoard(3)  ,
+					switchBoard(4) ,
+					other(5)   ,
+					vacant(6)
+					}
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "the card genenral type"
+                   ::= { nmscardTableEntry 16 }
 
 
                -- End of table
@@ -449,9 +474,11 @@
                            INTEGER,
                        nmscardIfPortNumber
                            INTEGER,
-                       nmscardIfCardIndex
+                       nmscardIfSlotNumber
                            INTEGER,
                        nmscardIfConnectorTypeEnabled
+                           INTEGER,
+                       nmscardIfCardIndex
                            INTEGER
                    }
 
@@ -472,7 +499,7 @@
                             given card if available."
                    ::= { nmscardIfIndexEntry 2 }
 
-               nmscardIfCardIndex OBJECT-TYPE
+               nmscardIfSlotNumber OBJECT-TYPE
                    SYNTAX  INTEGER
                    ACCESS  read-only
                    STATUS  mandatory
@@ -499,6 +526,14 @@
                            used, or 2 if none of this ports' interface
                            connectors are enabled."
                    ::= { nmscardIfIndexEntry 4 }
+                   nmscardIfCardIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "nmscardIndex of the card in the Chassis 
+			   				nmscardTable which contains this interface."
+                   ::= { nmscardIfIndexEntry 5 }
 
 	       -- End of table
 
@@ -588,7 +623,7 @@
                     DESCRIPTION
                         "The state of  an auxiliary device."
                     ::= {  nmsAuxEntry 5}        
-           ----------------------------------------------------------------------------add by huhao
+--           ----------------------------------------------------------------------------add by huhao
      nmssubcardTable OBJECT-TYPE
                    SYNTAX  SEQUENCE OF nmssubcardTableEntry
                    ACCESS  not-accessible
@@ -631,6 +666,8 @@
                        nmssubcardContainedByShelf
                        		 INTEGER,
                        nmssubcardSlotNumber
+                       		 INTEGER,
+						nmssubcardPorts
                        		 INTEGER                       
                    }
 
@@ -760,9 +797,53 @@
                    DESCRIPTION
                            ""
                    ::= { nmssubcardTableEntry 12 }
-
+                   nmssubcardPorts OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           ""
+                   ::= { nmssubcardTableEntry 13 }
   
-                       
+                  nmsHumidity OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of chassis humidity."
+                   ::= { nmschassis 17 }
+                  nmsSysErrorNum OBJECT-TYPE
+                   SYNTAX  INTEGER{
+        		sys-ok(0),
+        		TLB-modification-exception(1),
+        		load-or-instruction-fetch-TLB-miss-exception (2),
+        		store-TLB-miss-exception (3),
+        		load-instruction-fetch-address-error-exception (4),
+        		store-address-error-exception (5),
+        		for-instruction-fetch-bus-error (6),
+        		data-load-or-store-bus-error (7),
+        		arithmetic-overflow-exception(12),
+        		trap-exception(13),
+        		deadlock-software-exception(16)
+        		}
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of sys error number."
+                   ::= { nmschassis 18 }
+                  nmsElectricCurrent  OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of electric current."
+                   ::= { nmschassis 19 }
+                         nmsVoltageCurrent  OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of electric current."
+                   ::= { nmschassis 20 }
                -- End of table
-   
-                END
+END

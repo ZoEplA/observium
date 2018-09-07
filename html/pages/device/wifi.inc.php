@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,15 +17,15 @@ $link_array = array('page'    => 'device',
 
 $navbar = array('brand' => "WiFi", 'class' => "navbar-narrow");
 
-$navbar['options']['overview']['text']       = 'Overview';
-if ($device_ap_count > 0) { $navbar['options']['accesspoints']['text'] = 'Access Points'; }
+//$navbar['options']['overview']['text']       = 'Overview';
+if ($device_ap_count    > 0) { $navbar['options']['accesspoints']['text'] = 'Access Points'; }
 if ($device_radio_count > 0) { $navbar['options']['radios']['text']       = 'Radios'; }
-if ($device_wlan_count > 0) { $navbar['options']['wlans']['text']        = 'WLANs'; }
-$navbar['options']['clients']['text']      = 'Clients';
+if ($device_wlan_count  > 0) { $navbar['options']['wlans']['text']        = 'WLANs'; }
+//$navbar['options']['clients']['text']      = 'Clients';
 
 foreach ($navbar['options'] as $option => $array)
 {
-  if (!isset($vars['view'])) { $vars['view'] = "overview"; }
+  if (!isset($vars['view'])) { $vars['view'] = $option; }
   if ($vars['view'] == $option) { $navbar['options'][$option]['class'] .= " active"; }
   $navbar['options'][$option]['url'] = generate_url($link_array,array('view' => $option));
 }
@@ -37,12 +37,13 @@ unset($navbar);
 
 register_html_title("Wifi");
 
-print_warning("Please be aware that the WiFi section is currently under development and is subject to change and breakage.");
+print_message("Please be aware that the WiFi section is currently under development and is subject to intermittent changes and breakage.", 'info');
 
 switch ($vars['view'])
 {
   case 'overview':
   case 'accesspoints':
+  case 'accesspoint':
   case 'radios':
   case 'wlans':
   case 'clients':

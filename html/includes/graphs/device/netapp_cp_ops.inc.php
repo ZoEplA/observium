@@ -7,13 +7,11 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 global $config, $device;
-
-$i = 0;
 
 $cp_stats = array(
   'timer' => 'Timer',
@@ -40,7 +38,6 @@ foreach ($cp_stats as $stat => $descr)
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
     $rrd_list[$i]['ds'] = $stat;
-    $i++;
   }
 }
 
@@ -53,7 +50,6 @@ $colours = 'mixed';
 $scale_min = '0';
 #$scale_max = '100';
 
-$divider = $i;
 $text_orig = 1;
 $nototal = 1;
 

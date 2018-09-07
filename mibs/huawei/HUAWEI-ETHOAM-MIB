@@ -1,11 +1,20 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: HUAWEI-ETHOAM-MIB
 -- Reference:
--- Version:     V2.28
+-- Version:     V2.32
 -- History:
 -- Revision history
+--            REVISION     "201601120000Z"    
+--            DESCRIPTION  "V2.32, Delete BITS in IMPORTS."
+--            REVISION     "201512160000Z"    
+--            DESCRIPTION  "V2.31, Add hwY1731TestIdTwoDelayCurIndex, hwY1731TestIdSingleSynLossCurIndex, hwY1731SingleLossCurIndex, hwY1731TestIdSingleLossCurIndex."
+--            REVISION     "201511300000Z"    
+--            DESCRIPTION  "V2.30, Add hwDot3ahEfmNonThresholdCriticalEventTriggerErrDown, hwDot3ahEfmNonThresholdDyinggaspTriggerErrDown,
+--                                          hwDot3ahEfmNonThresholdLinkFaultTriggerErrDown,  hwDot3ahEfmNonThresholdTimeoutTriggerErrDown nodes in hwDot3ahEfmEventConfigTable."
+--            REVISION     "201511270000Z"    
+--            DESCRIPTION  "V2.29, Add hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed leaf node for vpls over gre."
 --            REVISION     "201504240000Z"    
 --            DESCRIPTION  "V2.28, Add hwDot1agCfmGmacTraceTable, hwDot1agCfmGmacTraceReplyTable, hwDot1agCfmGmacTraceEnabled leaf node for Gmac Trace."
 --            REVISION     "201503030000Z"    
@@ -104,7 +113,7 @@
                 FROM Q-BRIDGE-MIB
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
                 FROM SNMPv2-CONF
-            Integer32, Unsigned32, Counter32, BITS, OBJECT-TYPE, IpAddress,Counter64,
+            Integer32, Unsigned32, Counter32, OBJECT-TYPE, IpAddress,Counter64,
             MODULE-IDENTITY, NOTIFICATION-TYPE
                 FROM SNMPv2-SMI
             MacAddress, TruthValue, RowStatus, TimeInterval, TimeStamp, DateAndTime,
@@ -113,7 +122,7 @@
 
 
         hwEthOamMib MODULE-IDENTITY
-            LAST-UPDATED "201504240000Z"        
+            LAST-UPDATED "201601120000Z"        
             ORGANIZATION
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -126,6 +135,15 @@
                  "
             DESCRIPTION
                 "Ethernet OAM MIB"
+              REVISION     "201601120000Z"    
+              DESCRIPTION  "V2.32, Delete BITS in IMPORTS."
+              REVISION     "201512160000Z"    
+              DESCRIPTION  "V2.31, Add hwY1731TestIdTwoDelayCurIndex, hwY1731TestIdSingleSynLossCurIndex, hwY1731SingleLossCurIndex, hwY1731TestIdSingleLossCurIndex."
+              REVISION     "201511300000Z"    
+              DESCRIPTION  "V2.30, Add hwDot3ahEfmNonThresholdCriticalEventTriggerErrDown, hwDot3ahEfmNonThresholdDyinggaspTriggerErrDown,
+                                           hwDot3ahEfmNonThresholdLinkFaultTriggerErrDown,hwDot3ahEfmNonThresholdTimeoutTriggerErrDown nodes in hwDot3ahEfmEventConfigTable."
+              REVISION     "201511270000Z"    
+              DESCRIPTION  "V2.29, Add hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed leaf node for vpls over gre."
               REVISION     "201504240000Z"    
 	      DESCRIPTION  "V2.28, Add hwDot1agCfmGmacTraceTable, hwDot1agCfmGmacTraceReplyTable, hwDot1agCfmGmacTraceEnabled leaf node for Gmac Trace."
               REVISION     "201503030000Z"    
@@ -3865,6 +3883,14 @@
                 hwDot3ahEfmCriticalEventEnable
                     TruthValue,
                 hwDot3ahEfmThresholdTriggerErrDown
+                    EnabledStatus,
+                hwDot3ahEfmNonThresholdCriticalEventTriggerErrDown
+                    EnabledStatus,
+                hwDot3ahEfmNonThresholdDyinggaspTriggerErrDown
+                    EnabledStatus,
+                hwDot3ahEfmNonThresholdLinkFaultTriggerErrDown
+                    EnabledStatus,
+                hwDot3ahEfmNonThresholdTimeoutTriggerErrDown
                     EnabledStatus
              }
 
@@ -4247,6 +4273,60 @@
                 The default value is disabled(2).
                 "
             ::= { hwDot3ahEfmEventConfigEntry 17 }
+
+        hwDot3ahEfmNonThresholdCriticalEventTriggerErrDown OBJECT-TYPE
+            SYNTAX      EnabledStatus
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "This object indicates whether non-threshold critical event will trigger error-shutdown.
+                If it is enabled(1), after EFM checks that the non-threshold critical event happens,
+                the current interface will be set to administrative down.
+
+                The default value is disabled(2).
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 18 }
+
+       hwDot3ahEfmNonThresholdDyinggaspTriggerErrDown OBJECT-TYPE
+            SYNTAX      EnabledStatus
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "This object indicates whether non-threshold dying gasp event will trigger error-shutdown.
+                If it is enabled(1), after EFM checks that the non-threshold dying gasp event happens,
+                the current interface will be set to administrative down.
+
+                The default value is disabled(2).
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 19 }
+
+       hwDot3ahEfmNonThresholdLinkFaultTriggerErrDown OBJECT-TYPE
+            SYNTAX      EnabledStatus
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "This object indicates whether non-threshold link fault event will trigger error-shutdown.
+                If it is enabled(1), after EFM checks that the non-threshold link fault event happens,
+                the current interface will be set to administrative down.
+
+                The default value is disabled(2).
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 20 }
+
+       hwDot3ahEfmNonThresholdTimeoutTriggerErrDown OBJECT-TYPE
+            SYNTAX      EnabledStatus
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "This object indicates whether non-threshold time out event will trigger error-shutdown.
+                If it is enabled(1), after EFM checks that the non-threshold time out event happens,
+                the current interface will be set to administrative down.
+
+                The default value is disabled(2).
+                "
+            ::= { hwDot3ahEfmEventConfigEntry 21 }
+
+
 
 
 
@@ -5430,6 +5510,20 @@
                 "Indicates that the number of LCK packets transmitted in 1 second falls below the lower limit."
             ::= { hwEthOamTraps 55 }
 
+        hwY1731TunnelNonSupport NOTIFICATION-TYPE
+            OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
+            STATUS current
+            DESCRIPTION
+                "Y.1731 does not support the current public tunnel."
+            ::= { hwEthOamTraps 56 }
+
+        hwY1731TunnelNonSupportResumed NOTIFICATION-TYPE
+            OBJECTS { hwDot1agCfmMdName, hwDot1agCfmMaName, hwDot1agCfmMepIdentifier }
+            STATUS current
+            DESCRIPTION
+                "The alarm that Y.1731 does not support the current public tunnel is resumed."
+            ::= { hwEthOamTraps 57 }   
+
         hwEthOamConformance OBJECT IDENTIFIER ::= { hwEthOamMib 7 }
 
         hwEthOamCompliances OBJECT IDENTIFIER ::= { hwEthOamConformance 1 }
@@ -5617,7 +5711,7 @@
                             hwDot1agCfmUnexpectedPeriodCleared, hwDot1agCfmUnexpectedMAC, hwDot1agCfmUnexpectedMACCleared, hwDot1agCfmLOC, hwDot1agCfmLOCCleared, hwDot1agCfmExceptionalMACStatus, 
                             hwDot1agCfmExceptionalMACStatusCleared, hwDot1agCfmRDI, hwDot1agCfmRDICleared, hwDot3ahEfmLoopbackFailed, hwY1731AisDefectAlarm, hwY1731AisDefectAlarmRecovery, 
                             hwY1731AisExceedMaxPktNum, hwY1731AisExceedMaxPktNumCleared, hwY1731LckDefect, hwY1731LckDefectCleared, hwY1731Statistic, hwY1731StatisticClear,
-			    hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery}
+			    hwY1731LckExceedThreshold, hwY1731LckExceedThresholdRecovery, hwY1731TunnelNonSupport, hwY1731TunnelNonSupportResumed}
             STATUS current
             DESCRIPTION
                 "Objects for the Notifications group.
@@ -5737,7 +5831,8 @@
 
 
         hwDot3ahEfmFlagEventGroup OBJECT-GROUP
-            OBJECTS { hwDot3ahEfmDyingGaspEnable, hwDot3ahEfmCriticalEventEnable, hwDot3ahEfmThresholdTriggerErrDown }
+            OBJECTS { hwDot3ahEfmDyingGaspEnable, hwDot3ahEfmCriticalEventEnable, hwDot3ahEfmThresholdTriggerErrDown, hwDot3ahEfmNonThresholdCriticalEventTriggerErrDown, 
+                               hwDot3ahEfmNonThresholdDyinggaspTriggerErrDown, hwDot3ahEfmNonThresholdLinkFaultTriggerErrDown,hwDot3ahEfmNonThresholdTimeoutTriggerErrDown }
             STATUS current
             DESCRIPTION
                 "A collection of objects for configuring the sending OAMPDUs
@@ -5974,21 +6069,21 @@
             ::= { hwEthOamGroups 49 }
 
        hwY1731TestIdTwoDelaySummaryStatTableGroup OBJECT-GROUP
-            OBJECTS {hwY1731TestIdTwoDelayNbrSamples,hwY1731TestIdTwoDelayMax,hwY1731TestIdTwoDelayMin,hwY1731TestIdTwoDelayAve,hwY1731TestIdTwoDelayExceedUpLimitNum,hwY1731TestIdTwoDelayBelowLowLimitNum,hwY1731TestIdTwoDelayVariationNbrSamples,hwY1731TestIdTwoDelayVariationMax,hwY1731TestIdTwoDelayVariationMin,hwY1731TestIdTwoDelayVariationAve,hwY1731TestIdTwoDelayVarExceedUpLimitNum,hwY1731TestIdTwoDelayVarBelowLowLimitNum}
+            OBJECTS {hwY1731TestIdTwoDelayNbrSamples,hwY1731TestIdTwoDelayMax,hwY1731TestIdTwoDelayMin,hwY1731TestIdTwoDelayAve,hwY1731TestIdTwoDelayExceedUpLimitNum,hwY1731TestIdTwoDelayBelowLowLimitNum,hwY1731TestIdTwoDelayVariationNbrSamples,hwY1731TestIdTwoDelayVariationMax,hwY1731TestIdTwoDelayVariationMin,hwY1731TestIdTwoDelayVariationAve,hwY1731TestIdTwoDelayVarExceedUpLimitNum,hwY1731TestIdTwoDelayVarBelowLowLimitNum,hwY1731TestIdTwoDelayCurIndex}
             STATUS current
             DESCRIPTION
                 "A collection of objects for storing the statistics of two-way ETH-DM collected during the last period."
             ::= { hwEthOamGroups 50 }
             
         hwY1731TestIdSingleSynLossSummaryStatTableGroup OBJECT-GROUP
-            OBJECTS {hwY1731TestIdSingleSynLossNbrSamples,hwY1731TestIdSingleSynSendRemote,hwY1731TestIdSingleSynRecvLocal,hwY1731TestIdSingleSynLossLocal,hwY1731TestIdSingleSynExceedLocalUpLimitNum,hwY1731TestIdSingleSynBelowLocalLowLimitNum,hwY1731TestIdSingleSynSendLocal,hwY1731TestIdSingleSynRecvRemote,hwY1731TestIdSingleSynLossRemote,hwY1731TestIdSingleSynExceedRemoteUpLimitNum,hwY1731TestIdSingleSynBelowRemoteLowLimitNum}
+            OBJECTS {hwY1731TestIdSingleSynLossNbrSamples,hwY1731TestIdSingleSynSendRemote,hwY1731TestIdSingleSynRecvLocal,hwY1731TestIdSingleSynLossLocal,hwY1731TestIdSingleSynExceedLocalUpLimitNum,hwY1731TestIdSingleSynBelowLocalLowLimitNum,hwY1731TestIdSingleSynSendLocal,hwY1731TestIdSingleSynRecvRemote,hwY1731TestIdSingleSynLossRemote,hwY1731TestIdSingleSynExceedRemoteUpLimitNum,hwY1731TestIdSingleSynBelowRemoteLowLimitNum,hwY1731TestIdSingleSynLossCurIndex}
             STATUS current
             DESCRIPTION
                 "A collection of objects for storing the statistics of single-ended ETH-SLM collected during the last period."
             ::= { hwEthOamGroups 51 }
             
         hwY1731SingleLossSummaryStatTableGroup OBJECT-GROUP
-            OBJECTS {hwY1731SingleLossNbrSamples,hwY1731SingleLossSendRemote,hwY1731SingleLossRecvLocal,hwY1731SingleLossLossLocal,hwY1731SingleLossExceedLocalUpLimitNum,hwY1731SingleLossBelowLocallowLimitNum,hwY1731SingleLossSendLocal,hwY1731SingleLossRecvRemote,hwY1731SingleLossLossRemote,hwY1731SingleLossExceedRemoteUpLimitNum,hwY1731SingleLossBelowRemotelowLimitNum}
+            OBJECTS {hwY1731SingleLossNbrSamples,hwY1731SingleLossSendRemote,hwY1731SingleLossRecvLocal,hwY1731SingleLossLossLocal,hwY1731SingleLossExceedLocalUpLimitNum,hwY1731SingleLossBelowLocallowLimitNum,hwY1731SingleLossSendLocal,hwY1731SingleLossRecvRemote,hwY1731SingleLossLossRemote,hwY1731SingleLossExceedRemoteUpLimitNum,hwY1731SingleLossBelowRemotelowLimitNum,hwY1731SingleLossCurIndex}
             STATUS current
             DESCRIPTION
                 "A collection of objects for storing the statistics of single-ended ETH-LM collected during the last period."
@@ -6012,7 +6107,7 @@
             OBJECTS {hwY1731TestIdSingleLossNbrSamples ,hwY1731TestIdSingleLossSendRemote ,hwY1731TestIdSingleLossRecvLocal, 
 			hwY1731TestIdSingleLossLossLocal ,hwY1731TestIdSingleLossExceedLocalUpLimitNum ,hwY1731TestIdSingleLossBelowLocallowLimitNum ,
 			hwY1731TestIdSingleLossSendLocal ,hwY1731TestIdSingleLossRecvRemote ,hwY1731TestIdSingleLossLossRemote ,hwY1731TestIdSingleLossExceedRemoteUpLimitNum, 
-			hwY1731TestIdSingleLossBelowRemotelowLimitNum }
+			hwY1731TestIdSingleLossBelowRemotelowLimitNum ,hwY1731TestIdSingleLossCurIndex}
             STATUS current
             DESCRIPTION
                 "A collection of objects for configuring the information about the single-ended ETH-LM collected during the last period."
@@ -9626,6 +9721,8 @@
                 hwY1731TestIdTwoDelayVarExceedUpLimitNum
 	Unsigned32,
 	       hwY1731TestIdTwoDelayVarBelowLowLimitNum
+	Unsigned32,
+	       hwY1731TestIdTwoDelayCurIndex
 	Unsigned32
              }
 			 
@@ -9634,7 +9731,7 @@
             MAX-ACCESS  not-accessible
             STATUS      current
             DESCRIPTION
-              "This object indicates the sequence of the last period."
+              "This object indicates the sequence number of statistics. In order to obtain the latest set of data, you can use this node is set to 4294967295 and perform a GET operation."
             ::= { hwY1731TestIdTwoDelaySummaryStatEntry 1 }
             
             hwY1731TestIdTwoDelayNbrSamples OBJECT-TYPE
@@ -9732,6 +9829,14 @@
             DESCRIPTION
               "This object indicates the num of two-way delay variation samples fell below lower limit value of the threshold during the last period."
             ::= { hwY1731TestIdTwoDelaySummaryStatEntry 13 }
+
+            hwY1731TestIdTwoDelayCurIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+              "This object indicates the sequence number of the current statistics."
+            ::= { hwY1731TestIdTwoDelaySummaryStatEntry 14 }
             
         hwY1731TestIdSingleSynLossSummaryStatTable OBJECT-TYPE
            SYNTAX SEQUENCE OF HwY1731TestIdSingleSynLossSummaryStatEntry
@@ -9776,6 +9881,8 @@
                 hwY1731TestIdSingleSynExceedRemoteUpLimitNum
 	                Unsigned32,
                 hwY1731TestIdSingleSynBelowRemoteLowLimitNum
+	                Unsigned32,
+                hwY1731TestIdSingleSynLossCurIndex
 	                Unsigned32
              }
 			 
@@ -9784,7 +9891,7 @@
             MAX-ACCESS  not-accessible
             STATUS      current
             DESCRIPTION
-              "This object indicates the sequence of the last period."
+              "This object indicates the sequence number of statistics. In order to obtain the latest set of data, you can use this node is set to 4294967295 and perform a GET operation."
             ::= { hwY1731TestIdSingleSynLossSummaryStatEntry 1 }
             
             hwY1731TestIdSingleSynLossNbrSamples OBJECT-TYPE
@@ -9874,10 +9981,18 @@
             DESCRIPTION
               "This object indicates the number of remote loss ratio samples fell below lower limit value of the threshold during the last period."
             ::= { hwY1731TestIdSingleSynLossSummaryStatEntry 12 }
+
+            hwY1731TestIdSingleSynLossCurIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+              "This object indicates the sequence number of the current statistics."
+            ::= { hwY1731TestIdSingleSynLossSummaryStatEntry 13 }
             
         hwY1731SingleLossSummaryStatTable OBJECT-TYPE
            SYNTAX SEQUENCE OF HwY1731SingleLossSummaryStatEntry
-            MAX-ACCESS not-accessible
+            MAX-ACCESS  not-accessible
             STATUS current
             DESCRIPTION
                 "This table stores the statistics of single-ended ETH-LM collected during the last period.
@@ -9918,6 +10033,8 @@
 	        hwY1731SingleLossExceedRemoteUpLimitNum
 	                Unsigned32,
 	        hwY1731SingleLossBelowRemotelowLimitNum
+	                Unsigned32,
+	        hwY1731SingleLossCurIndex
 	                Unsigned32
              }
 			 
@@ -9926,7 +10043,7 @@
             MAX-ACCESS  not-accessible
             STATUS      current
             DESCRIPTION
-              "This object indicates the sequence of the last period."
+              "This object indicates the sequence number of statistics. In order to obtain the latest set of data, you can use this node is set to 4294967295 and perform a GET operation."
             ::= { hwY1731SingleLossSummaryStatEntry 1 }
             
             hwY1731SingleLossNbrSamples OBJECT-TYPE
@@ -10016,6 +10133,14 @@
             DESCRIPTION
               "This object indicates the number of remote loss ratio samples fell below lower limit value of the threshold during the last period."
             ::= { hwY1731SingleLossSummaryStatEntry 12 }
+
+            hwY1731SingleLossCurIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+              "This object indicates the sequence number of the current statistics."
+            ::= { hwY1731SingleLossSummaryStatEntry 13 }
 			
         hwY1731TestIdSingleLossSummaryStatTable OBJECT-TYPE
            SYNTAX SEQUENCE OF HwY1731TestIdSingleLossSummaryStatEntry
@@ -10060,6 +10185,8 @@
 	            hwY1731TestIdSingleLossExceedRemoteUpLimitNum
 	                Unsigned32,
 	            hwY1731TestIdSingleLossBelowRemotelowLimitNum
+	                Unsigned32,
+	            hwY1731TestIdSingleLossCurIndex
 	                Unsigned32
              }
 			 
@@ -10068,7 +10195,7 @@
             MAX-ACCESS  not-accessible
             STATUS      current
             DESCRIPTION
-              "This object indicates the sequence of the last period."
+              "This object indicates the sequence number of statistics. In order to obtain the latest set of data, you can use this node is set to 4294967295 and perform a GET operation."
             ::= { hwY1731TestIdSingleLossSummaryStatEntry 1 }
             
             hwY1731TestIdSingleLossNbrSamples OBJECT-TYPE
@@ -10157,7 +10284,15 @@
             STATUS      current
             DESCRIPTION
               "This object indicates the number of remote loss ratio samples fell below lower limit value of the threshold during the last period."
-            ::= { hwY1731TestIdSingleLossSummaryStatEntry 12 }			
+            ::= { hwY1731TestIdSingleLossSummaryStatEntry 12 }
+
+            hwY1731TestIdSingleLossCurIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+              "This object indicates the sequence number of the current statistics."
+            ::= { hwY1731TestIdSingleLossSummaryStatEntry 13 }			
         		
 		hwY1731TestIdSingleSynLossStatTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwY1731TestIdSingleSynLossStatEntry

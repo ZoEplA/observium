@@ -1,9 +1,9 @@
 -- ===========================================================
--- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-NAT-EXT-MIB
 -- Reference:     
--- Version: V2.03
+-- Version: V2.04
 -- History: 
 -- ===========================================================
 
@@ -26,7 +26,7 @@
 --  Jan 08, 2014 at 20:00 GMT
     
         hwNatExtMIB MODULE-IDENTITY 
-            LAST-UPDATED "201405062000Z"        --  Jan 08, 2014 at 20:00 GMT
+            LAST-UPDATED "201603281700Z"  
             ORGANIZATION 
 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -37,7 +37,12 @@
    Website: http://www.huawei.com
    Email: support@huawei.com
  "
-            DESCRIPTION 
+             DESCRIPTION 
+              "Modify hwNatAddrPoolTable and hwNatOutboundTable"
+
+            REVISION    "201603281700Z" 
+ 
+          DESCRIPTION 
               "The MIB contains objects of S9300 NAT features , referencing the RFC4004."
 
             REVISION    "201405062000Z" 
@@ -791,7 +796,7 @@
 
         hwNatAddrPoolIndex OBJECT-TYPE
             SYNTAX Unsigned32 (0..1023)
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Index of the NAT address pool."
@@ -801,7 +806,7 @@
 
         hwNatAddrPoolStartAddr OBJECT-TYPE
             SYNTAX IpAddress
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Start IP address of the NAT address pool."
@@ -811,7 +816,7 @@
 
         hwNatAddrPoolEndAddr OBJECT-TYPE
             SYNTAX IpAddress
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "End IP address of the NAT address pool."
@@ -821,7 +826,7 @@
 
         hwNatAddrPoolRefTimes OBJECT-TYPE
             SYNTAX Gauge32
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Number of times the NAT address pool is referenced."
@@ -829,7 +834,7 @@
             
         hwNatAddrPoolRefType OBJECT-TYPE
             SYNTAX NATBindType
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Mode of referencing the NAT address pool. It contains NOPAT(1) , PAT(2) and EasyIP(3)"
@@ -985,7 +990,7 @@
              
         hwNatOutboundIndex OBJECT-TYPE
             SYNTAX Unsigned32 (1..256)
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Index of the outbound NAT entry. "
@@ -996,7 +1001,7 @@
 
         hwNatOutboundInterface OBJECT-TYPE
             SYNTAX Unsigned32
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "IfIndex of the interface that configured with the outbound NAT. "
@@ -1006,7 +1011,7 @@
 
         hwNatOutboundAclNum OBJECT-TYPE
             SYNTAX Unsigned32 (2000..3999)
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Basic or advanced ACL that is in use."
@@ -1016,7 +1021,7 @@
 
         hwNatOutboundAddr OBJECT-TYPE
             SYNTAX OCTET STRING (SIZE(1..31))
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "IP address of the NAT address pool or interface."
@@ -1026,7 +1031,7 @@
 
         hwNatOutboundPat OBJECT-TYPE
             SYNTAX TruthValue
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "This object represents type of the translated IP, NOPAT(1) or PAT(2)."
@@ -1034,7 +1039,7 @@
             
         hwNatOutboundEasyIp OBJECT-TYPE
             SYNTAX TruthValue
-            MAX-ACCESS read-only
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "Whether type of the translated IP address is EasyIP."

@@ -676,7 +676,7 @@ fnFortiADCMib MODULE-IDENTITY
 			open new communications channels with other machines."
 		::=  {  fadcTraps  530  }
 
-	fadcTrapCERT_EXPIRE  NOTIFICATION-TYPE
+	fadcTrapCertExpire  NOTIFICATION-TYPE
 		OBJECTS       { fadcSysSerial }
 		STATUS        current
 		DESCRIPTION   "Trap sent if One of the SSL certificates configured on the
@@ -809,13 +809,13 @@ fnFortiADCMib MODULE-IDENTITY
 		DESCRIPTION     "Trap sent if OCSP response expires"
 		::=  {  fadcTraps  552  }
 
-	fadcTrapSysSslCertificateRevoked
+	fadcTrapSysSslCertificateRevoked NOTIFICATION-TYPE
 		OBJECTS       { fadcSysSerial }
 		STATUS        current
 		DESCRIPTION     "Trap sent if SSL certificate revoked"
 		::=  {  fadcTraps  553  }
 
-	fadcTrapSysCrlExpores
+	fadcTrapSysCrlExpores  NOTIFICATION-TYPE
 		OBJECTS       { fadcSysSerial }
 		STATUS        current
 		DESCRIPTION     "Trap sent if SYS CRL expires"
@@ -1301,7 +1301,7 @@ fnFortiADCMib MODULE-IDENTITY
 			"Concurrent connection rate for the specified virtual server."
 		::= { fadcVSEntry 6 }
 
-	fadcVSThroughput_Kbps OBJECT-TYPE
+	fadcVSThroughputKbps OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
 		MAX-ACCESS  read-only
 		STATUS      current
@@ -2251,7 +2251,7 @@ fnFortiADCMib MODULE-IDENTITY
 			"Concurrent connection rate for the specified virtual server."
 		::= { fadcVirturalServerEntry 6 }
 
-	fadcVirturalServerThroughput_Kbps OBJECT-TYPE
+	fadcVirturalServerThroughputKbps OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
 		MAX-ACCESS  read-only
 		STATUS      current

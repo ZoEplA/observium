@@ -42,7 +42,7 @@ IMPORTS
     CONTACT-INFO "support@merunetworks.com"
     DESCRIPTION
         "This MIB defines all the managed objects used to manage the Meru WLAN 
-         ICR Configuration infrastructure"
+         RAC Configuration infrastructure"
     ::= { mwConfiguration 18 } 
   
     
@@ -52,7 +52,7 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-         "This object describes Inter Controller Roaming "
+         "This object describes Roaming Across Controllers "
     ::= { mwConfigIcr 1 }
 
   mwIcrEntry  OBJECT-TYPE
@@ -60,13 +60,14 @@ IMPORTS
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-         "This object describes Inter Controller Roaming "
+         "This object describes Roaming Across Controllers "
     INDEX {  mwIcrTableIndex  }
     ::= { mwIcrTable 1 }
 
   MwIcrEntry  ::=  SEQUENCE { 
        mwIcrTableIndex                                             Integer32, 
        mwIcrEssId                                                  DisplayString(SIZE (0..31)),
+       mwIcrHomeDhcpIp                                             IpAddress,
        mwIcrControllerIp                                           IpAddress,
        mwIcrRowStatus                                              RowStatus 
   }
@@ -80,21 +81,29 @@ IMPORTS
          "The index value of the  table "
     ::= { mwIcrEntry 1 }
 
-  mwIcrControllerIp  OBJECT-TYPE
-    SYNTAX IpAddress
-    MAX-ACCESS read-create
-    STATUS     current
-    DESCRIPTION
-         "This object describes Controller IP"
-    ::= { mwIcrEntry    2 }
-
   mwIcrEssId  OBJECT-TYPE
     SYNTAX DisplayString(SIZE (0..31))
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
          "This object describes ESSID"
+    ::= { mwIcrEntry    2 }
+
+  mwIcrControllerIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller IP"
     ::= { mwIcrEntry    3 }
+
+  mwIcrHomeDhcpIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Home DHCP Controller IP"
+    ::= { mwIcrEntry    4 }
 
   mwIcrRowStatus  OBJECT-TYPE
     SYNTAX RowStatus
@@ -102,7 +111,7 @@ IMPORTS
     STATUS     current
     DESCRIPTION
          "This object is used to create and delete rows in the table"
-    ::= { mwIcrEntry 4 }
+    ::= { mwIcrEntry 5 }
 
   
 END

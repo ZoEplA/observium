@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -184,7 +184,7 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
       $device_state['ucd_mem']['mem_cached'] = $memCached;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* Moved to mib definition
 
     // Poll laLoadInt for load averages on UNIX-like hosts running UCD/Net-SNMPd
     #UCD-SNMP-MIB::laLoadInt.1 = INTEGER: 206
@@ -202,6 +202,7 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
 
       $device_state['ucd_load']  = $load_raw[2]['laLoadInt'];
     }
+    */
   }
 
   unset($ss, $load_rrd, $load_raw, $snmpdata);

@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -23,7 +23,7 @@ foreach (get_device_mibs($device) as $mib)
 {
   if (is_array($config['mibs'][$mib]['processor']))
   {
-    echo("$mib ");
+     print_cli_data_field("$mib ");
     foreach ($config['mibs'][$mib]['processor'] as $entry_name => $entry)
     {
       $entry['found'] = FALSE;
@@ -81,16 +81,33 @@ foreach (get_device_mibs($device) as $mib)
           if ($entry['oid_descr'] && $processor[$entry['oid_descr']])
           {
             $descr = $processor[$entry['oid_descr']];
+            if (isset($entry['descr']) && str_contains($entry['descr'], '%oid_descr%'))
+            {
+              // If descr definition have this magic key, use combination of static 'descr' and named 'descr' from oid
+              $descr = array_tag_replace(array('oid_descr' => $descr), $entry['descr']);
+            }
           }
           if (!$descr)
           {
             if (isset($entry['descr']))
             {
-              if (strpos($entry['descr'], '%i%') === FALSE)
+              if (!str_contains($entry['descr'], array('%i%', '%index')))
               {
                 $descr = $entry['descr'] . ' ' . $index;
               } else {
-                $descr = str_replace('%i%', $i, $entry['descr']);
+                $replace_array = array(
+                  'index' => $index,    // Index in descr
+                  'i'     => $i,        // i++ counter in descr
+                );
+                // Multipart index: Oid.0.1.2 -> %index0%, %index1%, %inde20%
+                if (preg_match('/%index\d+%/', $entry['descr']))
+                {
+                  foreach (explode('.', $index) as $k => $k_index)
+                  {
+                    $replace_array['index'.$k] = $k_index; // Multipart indexes
+                  }
+                }
+                $descr = array_tag_replace($replace_array, $entry['descr']);
               }
             } else {
               $descr = 'Processor ' . $index;

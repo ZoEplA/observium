@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -61,7 +61,13 @@ if (isset($sensors_db['measured']))
       foreach ($entry as $sensor)
       {
         // Remove port name from sensor description
-        $sensor['sensor_descr'] = trim(str_ireplace($entity_name, '', $sensor['sensor_descr']));
+        $rename_from = array($entity_name);
+        if ($measured_class == 'port')
+        {
+          // for port add full ifDescr, since it can differ from humanized name
+          array_unshift($rename_from, $entity['ifDescr']);
+        }
+        $sensor['sensor_descr'] = trim(str_ireplace($rename_from, '', $sensor['sensor_descr']));
         if (empty($sensor['sensor_descr']))
         {
           // Some time sensor descriptions equals to entity name

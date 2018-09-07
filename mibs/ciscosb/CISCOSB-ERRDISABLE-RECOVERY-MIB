@@ -44,7 +44,9 @@ RlErrdisableRecoveryCauseType::= TEXTUAL-CONVENTION
         stp-bpdu-guard(5),
         stp-loopback-guard(6),
         pcb-overheat(7),
-        udld(8)
+        udld(8),
+        storm-control(9),
+	link-flapping(10)
     }
 
 

@@ -1,10 +1,10 @@
 
 --  ===========================================================
--- Copyright (C)  2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C)  2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:    HUAWEI POE MIB Definition 
 -- Reference:      This mib was extracted from IEEE 802.3af
--- Version:        V1.07
+-- Version:        V1.11
 -- History:        Liuhui ,2009-08-24, Create
 -- ===========================================================
 
@@ -26,7 +26,7 @@
 	
 	
 		hwPoeMIB MODULE-IDENTITY 
-			LAST-UPDATED "201502250000Z"		-- February 25, 2015 at 15:30 GMT
+			LAST-UPDATED "201612020000Z"		-- February 25, 2015 at 15:30 GMT
 			ORGANIZATION 
 				 "Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -37,7 +37,16 @@
           Website: http://www.huawei.com
           Email: support@huawei.com
          "		DESCRIPTION 
-				"The HUAWEI-POE-MIB contains objects to manage POE."    
+				"The HUAWEI-POE-MIB contains objects to manage POE."
+                                                               REVISION     "201612020000Z"
+                                                               DESCRIPTION  "V1.11,  Add hwPoePortFail and hwPoePortFailResume"
+							       				    
+                                                               REVISION     "201609190000Z"
+                                                               DESCRIPTION  "V1.10,  Change hwPoePortPdClass properties"
+
+                                                               REVISION     "201509280000Z" 
+                                                               DESCRIPTION  "V1.09, Add hwPoePortLegacyDetect " 
+
                                                                REVISION     "201502250000Z" 
                                                                DESCRIPTION  "V1.06, Add hwPoePortMaxPowerThreshold,hwPoePortMinPowerThreshold " 
 
@@ -57,6 +66,8 @@
                                                                DESCRIPTION  "V1.01, Add hwPoeControlChipFail and hwPoeControlChipFailResume "                                                               
                                                                REVISION     "201504020000Z"
                                                                DESCRIPTION  "V1.02, Add hwPoeNotAvailable and hwPoeNotAvailableResume " 
+                                                               REVISION     "201508100000Z"
+                                                               DESCRIPTION  "V1.03, Add hwPoeCardAbsent "  														   
 
 			::= { hwDatacomm 195 }
 		
@@ -309,7 +320,9 @@
 				hwPoePortMaxPowerThreshold
 					Integer32,     
 				hwPoePortMinPowerThreshold
-					Integer32
+					Integer32,
+				hwPoePortLegacyDetect
+					EnabledStatus
 			 }
 
 		
@@ -386,7 +399,7 @@
 		
 		
 		hwPoePortPdClass OBJECT-TYPE
-			SYNTAX Integer32 (0..7)
+			SYNTAX Integer32 (0..255)
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -465,7 +478,7 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"This object indicates whether the time range of POE power off is confugred on the port."
+				"This object indicates whether the time range of POE power off is configured on the port."
 			::= { hwPoePortEntry 16 }
 
 		hwPoePortPoweroffTimeRangeName OBJECT-TYPE
@@ -495,6 +508,17 @@
 				"This object identifies the threshold of the available minimum power of an interface. The value is expressed in mW."
 			DEFVAL { '9088'h }
 			::= { hwPoePortEntry 19 }
+
+		hwPoePortLegacyDetect OBJECT-TYPE
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the compatibility detection of a non-standard device. (1:enable;  2:disable(default))"
+			DEFVAL { disabled }
+			::= { hwPoePortEntry 20 }
+
+
 		
 	  hwPoePortJudgeTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwPoePortJudgeEntry
@@ -708,6 +732,13 @@
 				"The probable cause of poe trap."
 			::= { hwPoeTrapObjects 8 }
 
+                hwPoeCardID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the poe card ID."
+			::= { hwPoeTrapObjects 9 }			
 		
 		hwPoeNotification OBJECT IDENTIFIER ::= { hwPoeMIB 40 }
 		
@@ -933,6 +964,26 @@
 			DESCRIPTION 
 				"PoE function is  available."
 			::= { hwPoeNotification 31 }
+                hwPoeCardAbsent  NOTIFICATION-TYPE
+		  OBJECTS {hwPoeSlotNum,hwPoeCardID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the poe card is absent."
+			::= { hwPoeNotification 32 }
+
+                hwPoePortFail  NOTIFICATION-TYPE
+		  OBJECTS {hwPoePortName}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the poe port is abnormal."
+			::= { hwPoeNotification 33 }
+
+                hwPoePortFailResume  NOTIFICATION-TYPE
+		  OBJECTS {hwPoePortName}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the poe port has recoverd."
+			::= { hwPoeNotification 34 }			
 		
 		hwPoeConformance OBJECT IDENTIFIER ::= { hwPoeMIB 100 }
     hwPoeCompliances OBJECT IDENTIFIER ::= { hwPoeConformance 1 }
@@ -968,7 +1019,7 @@
 				hwPoePortReferencePower, hwPoePortName, hwPoePortConsumingPower, hwPoePortPeakPower, hwPoePortAveragePower, 
 				hwPoePortCurrent, hwPoePortVoltage, hwPoePortManualOperation, hwPoePortPdClass,hwPoePortJudgeIsSupport,
 				hwPoePortPoweroffTimeRangeSwitch, hwPoePortPoweroffTimeRangeName,
-				hwPoePortMaxPowerThreshold, hwPoePortMinPowerThreshold}
+				hwPoePortMaxPowerThreshold, hwPoePortMinPowerThreshold, hwPoePortLegacyDetect}
 			STATUS current
 			DESCRIPTION 
 				"This object indicates the POE's port table group."
@@ -992,14 +1043,14 @@
 				hwPoeRpsPowerOutputAlarm, hwPoeRpsPowerOutputAlarmResume,
                                 hwPoeControlChipFail, hwPoeControlChipFailResume,
                                 hwPoePSEPowerCut,hwPoePSEPowerCutResume,hwPoeSlotPowerCut,hwPoeSlotPowerCutResume,
-                                hwPoeNotAvailable,hwPoeNotAvailableResume}
+                                hwPoeNotAvailable,hwPoeNotAvailableResume,hwPoeCardAbsent,hwPoePortFail,hwPoePortFailResume}
 			STATUS current
 			DESCRIPTION 
 				"This object indicates the POE's notification table group."
 			::= { hwPoeGroups 4 }
 		
 		hwPoeTrapObjectsGroup OBJECT-GROUP
-			OBJECTS { hwPoePdPriority, hwPoeSlotNum, hwPoeCurConsumPower,hwPoeConsumPowerThreshold,hwPoeDeviceID,hwFrameID,hwPoeChipID ,hwTrapProbableCause}
+			OBJECTS { hwPoePdPriority, hwPoeSlotNum, hwPoeCurConsumPower,hwPoeConsumPowerThreshold,hwPoeDeviceID,hwFrameID,hwPoeChipID ,hwTrapProbableCause,hwPoeCardID}
 			STATUS current
 			DESCRIPTION 
 				"Description."

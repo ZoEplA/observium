@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id: Shm.php 160 2012-07-18 03:57:32Z mike.pultz $
+ * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.1.0
  *
@@ -89,6 +89,14 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
         $this->cache_size       = $size;
         $this->cache_file       = $cache_file;
         $this->cache_serializer = $serializer;
+
+        //
+        // if we've already loaded the cache data, then just return right away
+        //
+        if ($this->cache_opened == true)
+        {
+            return;
+        }
 
         //
         // make sure the file exists first
@@ -161,6 +169,11 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                     // call clean to clean up old entries
                     //
                     $this->clean();
+
+                    //
+                    // mark the cache as loaded, so we don't load it more than once
+                    //
+                    $this->cache_opened = true;
                 }
             }
         }

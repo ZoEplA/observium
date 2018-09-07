@@ -4,11 +4,11 @@
 -- Tuesday, June 03, 2014 at 14:55:30
 --
 --  ==================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Hierarchy Quality Of Service MIB
 -- Reference:
--- Version: V2.24
+-- Version: V2.33
 -- History:
 -- <author>,  <date>,  <contents>
 -- CaiLi,LiuJun   2006-05-13
@@ -39,7 +39,7 @@
 	
 
 		hwHQOS MODULE-IDENTITY 
-                                                     LAST-UPDATED "201408041558Z"        -- Aug 4, 2014 at 15:58:30
+                                                     LAST-UPDATED "201610121400Z"        -- August 17, 2016 at 20:00:30
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -53,6 +53,30 @@
 			DESCRIPTION 
 				"mib of Hierarchy Quality Of Service module
 				the huawei-hqos-mib is only defined about statistic information now. "
+     REVISION "201610121400Z"
+      DESCRIPTION
+     "MOD hwHQoSPwifScheduleTreeCreateFailAlarm"
+     REVISION "201608171400Z"
+      DESCRIPTION
+     "MOD hwhqoSIfProfileUserQueueStatisticsInterval"
+     REVISION "201607221400Z"
+      DESCRIPTION
+     "MOD hwhqoSIfProfileUserQueueStatisticsIntervalTable"
+     REVISION "201607211400Z"
+      DESCRIPTION
+     "ADD hwhqoSIfProfileUserQueueStatisticsIntervalTable"
+      REVISION "201606071400Z"
+      DESCRIPTION
+      "MOD hwhqosBandwidthEntry"
+      REVISION "201605231400Z"
+      DESCRIPTION
+      "MOD hwhqosBandwidthEntry"
+      REVISION"201602021400Z"
+      DESCRIPTION
+      "ADD ALARM NODE"     
+      REVISION"201511281126Z"
+      DESCRIPTION
+      "ADD ALARM NODE"     
       REVISION "201408041558Z"
       DESCRIPTION
       "MOD hwhqosUserQueueShapeAllTrafficEntry"				
@@ -92,6 +116,10 @@
       REVISION"201412221558Z"
       DESCRIPTION
       "ADD ALARM NODE"
+      REVISION"201603021558Z"
+      DESCRIPTION
+      "MOD ALARM NODE"
+
 
 
 			::= { hwDatacomm 132 }
@@ -2978,7 +3006,7 @@
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.25.1.2
 		hwhqosBandwidthValue OBJECT-TYPE
-			SYNTAX Integer32 (0..10000)
+			SYNTAX Integer32 (0..2147483647)
 			UNITS "Mbps"
 			MAX-ACCESS read-create
 			STATUS current
@@ -5420,7 +5448,7 @@
 		HwhqosUseridStatEntry ::=
 			SEQUENCE { 
 				hwhqosUseridStatUserid
-					Integer32,
+					Unsigned32,
 				hwhqosUseridStatQueue
 					INTEGER,
 				hwhqosUseridStatDirection
@@ -5447,7 +5475,7 @@
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.1
 		hwhqosUseridStatUserid OBJECT-TYPE
-			SYNTAX Integer32 (1..164864)
+			SYNTAX Unsigned32
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -7259,7 +7287,53 @@
 			DESCRIPTION
 				"hwhqosUserGroupQueueInterfaceStatisticsDropBytesRate."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 15 }	
-					    	
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.72
+		hwhqosIfProfileUserQueueStatisticsIntervalTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwhqosIfProfileUserQueueStatisticsIntervalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the table of queue statistics intervals."
+			::= { hwhqosStat 72 }			
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.72.1
+		hwhqosIfProfileUserQueueStatisticsIntervalEntry OBJECT-TYPE
+			SYNTAX HwhqosIfProfileUserQueueStatisticsIntervalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the entry of queue statistics intervals. "
+			INDEX { hwhqosIfProfileUserQueueStatisticsInterfaceIndex}
+			::= { hwhqosIfProfileUserQueueStatisticsIntervalTable 1 }
+		
+		HwhqosIfProfileUserQueueStatisticsIntervalEntry::=
+			SEQUENCE { 
+				hwhqosIfProfileUserQueueStatisticsInterfaceIndex
+					InterfaceIndex,
+				hwhqosIfProfileUserQueueStatisticsInterval
+					INTEGER
+			         }	
+			    
+-- 1.3.6.1.4.1.2011.5.25.132.1.72.1.1
+		hwhqosIfProfileUserQueueStatisticsInterfaceIndex OBJECT-TYPE
+			SYNTAX InterfaceIndex
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the interface."
+			::= { hwhqosIfProfileUserQueueStatisticsIntervalEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.5.25.132.1.72.1.2
+		hwhqosIfProfileUserQueueStatisticsInterval OBJECT-TYPE
+			SYNTAX INTEGER { interval0(0), interval5(5), interval30(30), interval300(300) }
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"
+				The value of this object identifies the interval of queue statistics.
+				"
+			::= { hwhqosIfProfileUserQueueStatisticsIntervalEntry 2 }					    	
 -- ******************************************************************        
 -- 1.3.6.1.4.1.2011.5.25.132.2
 		hwhqosObjects OBJECT IDENTIFIER ::= { hwHQOS 2 }
@@ -7303,6 +7377,20 @@
 			DESCRIPTION
 				"The direction of alarmed HQoS which user applied."
 			::= { hwhqosObjects 4 }
+-- 1.3.6.1.4.1.2011.5.25.132.2.5 
+                                          hwhqosUserQueueApplyFailPool OBJECT-TYPE 
+                                          SYNTAX INTEGER 
+                                          { 
+                                          pool0(1), 
+                                          pool1(2) 
+                                          } 
+                                          MAX-ACCESS read-only 
+                                          STATUS current 
+                                          DESCRIPTION 
+                                          "The pool of alarmed HQoS which user applied." 
+                                          ::= { hwhqosObjects 5 } 
+
+
 		
 -- 1.3.6.1.4.1.2011.5.25.132.3
 		hwhqosTraps OBJECT IDENTIFIER ::= { hwHQOS 3 }
@@ -7328,7 +7416,7 @@
 			OBJECTS { entPhysicalIndex, entPhysicalName, hwhqosUserQueueApplyFailDirection }
 			STATUS current
 			DESCRIPTION 
-				"The user apply pir sucess alarm trap."
+				"The user apply pir success alarm trap."
 			::= { hwhqosTraps 3 }
 		
 --/*Begin Added by lishutian 00174417 for NP4_HQOS_RELEASE2 user-queue-apply-alarm 2013-4-20*/            
@@ -7360,8 +7448,41 @@
 				"The PortQueue Stat Discard Cancel alarm trap."
 			::= { hwhqosTraps 6 }
 		
---/*End Added by yuzongwen 90005638 for port queue alarm 2013-8-01*/       
--- 1.3.6.1.4.1.2011.5.25.132.4
+--/*End Added by yuzongwen 90005638 for port queue alarm 2013-8-01*/
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.7 
+		hwhqosUserQueueApplyPirFromPoolFailAlarmTrap NOTIFICATION-TYPE 
+			OBJECTS { entPhysicalIndex, entPhysicalName, hwhqosUserQueueApplyFailPool } 
+		                      STATUS current 
+		                      DESCRIPTION 
+		                                          "The user apply PIRs from pool fail alarm trap." 
+			::= { hwhqosTraps 7 } 
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.8 
+		hwhqosUserQueueApplyPirFromPoolSucessAlarmTrap NOTIFICATION-TYPE 
+		OBJECTS { entPhysicalIndex, entPhysicalName, hwhqosUserQueueApplyFailPool } 
+		STATUS current 
+		DESCRIPTION 
+		"The user apply PIRs sucess alarm trap." 
+		::= { hwhqosTraps 8 } 
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.9
+		hwHQoSPwifScheduleTreeCreateFailAlarm NOTIFICATION-TYPE 
+		OBJECTS { entPhysicalName, entPhysicalName } 
+		STATUS current 
+		DESCRIPTION 
+		"Failed to create scheduling tree alarm."
+		::= { hwhqosTraps 9 } 
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.10
+		hwHQoSPwifScheduleTreeCreateFailAlarmClear NOTIFICATION-TYPE 
+		OBJECTS { entPhysicalName, entPhysicalName } 
+		STATUS current 
+		DESCRIPTION 
+		"Failed to create scheduling tree clear alarm."
+		::= { hwhqosTraps 10 } 
+
+ -- 1.3.6.1.4.1.2011.5.25.132.4
 		hwhqosConformance OBJECT IDENTIFIER ::= { hwHQOS 4 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.4.1
@@ -7446,7 +7567,7 @@
 		
 -- 1.3.6.1.4.1.2011.5.25.132.4.2.8
 		hwhqosObjectsGroup OBJECT-GROUP
-			OBJECTS { hwhqosUserFrameId, hwhqosUserSlotId, hwhqosUserPortId, hwhqosUserQueueApplyFailDirection }
+			OBJECTS { hwhqosUserFrameId, hwhqosUserSlotId, hwhqosUserPortId, hwhqosUserQueueApplyFailDirection, hwhqosUserQueueApplyFailPool}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -7454,7 +7575,7 @@
 		
 -- 1.3.6.1.4.1.2011.5.25.132.4.2.9
 		hwhqosUserQueueStatTrapGroup NOTIFICATION-GROUP
-			NOTIFICATIONS { hwhqosUserQueueStatDiscardAlarmTrap, hwhqosUserQueueApplyPirFailAlarmTrap, hwhqosUserQueueApplyPirSucessAlarmTrap }
+			NOTIFICATIONS { hwhqosUserQueueStatDiscardAlarmTrap, hwhqosUserQueueApplyPirFailAlarmTrap, hwhqosUserQueueApplyPirSucessAlarmTrap, hwhqosUserQueueApplyPirFromPoolFailAlarmTrap, hwhqosUserQueueApplyPirFromPoolSucessAlarmTrap  }
 			STATUS current
 			DESCRIPTION 
 				"The notification group defined for discard packets of a user`s queue."

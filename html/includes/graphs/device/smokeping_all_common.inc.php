@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -22,9 +22,9 @@ include_once($config['html_dir']."/includes/graphs/common.inc.php");
 include("smokeping_common.inc.php");
 
 $i = 0;
-$pings = 20;
+$pings = $config['smokeping']['pings'];
 $iter = 0;
-$colourset = "mixed";
+$colourset = "mixed-10c";
 
 if($width > "500")
 {
@@ -39,6 +39,8 @@ if($width > "500")
 } else {
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
 }
+
+ksort($smokeping_files[$direction][$device['hostname']]);
 
 foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename)
 {

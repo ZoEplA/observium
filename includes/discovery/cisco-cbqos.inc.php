@@ -7,13 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
 // Check if QoS exists on the host
-
-echo 'Cisco Class-based QoS: ';
 
 $query  = 'SELECT * FROM `ports_cbqos`';
 $query .= ' WHERE `device_id` = ?';
@@ -28,6 +26,8 @@ $service_policies = snmpwalk_cache_oid($device, "cbQosIfType", $service_policies
 
 if (count($service_policies))
 {
+
+  $table_rows = array();
 
   // Continue populating service policies
   $service_policies = snmpwalk_cache_oid($device, "cbQosPolicyDirection", $service_policies, 'CISCO-CLASS-BASED-QOS-MIB');
@@ -81,20 +81,46 @@ if (count($service_policies))
       if (!isset($cbq_table[$policy_index][$object_index]))
       {
         dbInsert(array('device_id' => $device['device_id'], 'port_id' => $port['port_id'], 'policy_index' => $policy_index, 'object_index' => $object_index, 'direction' => $object_entry['direction'], 'object_name' => $object_entry['cm_name'], 'policy_name' => $object_entry['policy_name']), 'ports_cbqos');
-        echo("+");
+        //echo("+");
         $cbq_table[$policy_index][$object_index] = dbFetchRow("SELECT * FROM `ports_cbqos` WHERE `device_id` = ? AND `port_id` = ? AND `policy_index` = ? AND `object_index` = ?",
                                                                array($device['device_id'], $port['port_id'], $policy_index, $object_index));
-      } elseif ($cbq_table[$policy_index][$object_index]['policy_name'] != $object_entry['policy_name'] || $cbq_table[$policy_index][$object_index]['object_name'] != $object_entry['cm_name']) {
-        dbUpdate(array('object_name' => $object_entry['cm_name'], 'policy_name' => $object_entry['policy_name']), 'ports_cbqos', '`device_id` = ? AND `port_id` = ? AND `policy_index` = ? AND `object_index` = ?', array($device['device_id'], $port['port_id'], $policy_index, $object_index));
-        echo("U");
+      } else {
+        if ($cbq_table[$policy_index][$object_index]['policy_name'] != $object_entry['policy_name'] || $cbq_table[$policy_index][$object_index]['object_name'] != $object_entry['cm_name']) {
+          dbUpdate(array('object_name' => $object_entry['cm_name'], 'policy_name' => $object_entry['policy_name']), 'ports_cbqos', '`device_id` = ? AND `port_id` = ? AND `policy_index` = ? AND `object_index` = ?', array($device['device_id'], $port['port_id'], $policy_index, $object_index));
+          //echo("U");
+        }
+
+        unset($cbq_table[$policy_index][$object_index]);
+
       }
+
+      $table_row = array();
+      $table_row[] = $port['port_label_short'];
+      $table_row[] = $object_entry['policy_name'];
+      $table_row[] = $object_entry['cm_name'];
+      $table_row[] = $object_entry['direction'];
+      $table_rows[] = $table_row;
+      unset($table_row);
 
     }
   }
+
+  $headers = array('%WPort%n', '%WPolicy%n', '%WObject%n', '%WDir%n');
+  print_cli_table($table_rows, $headers);
+
 } // End check if QoS is enabled before we walk everything
 else
 {
   echo 'QoS not configured.', PHP_EOL;
 }
+
+foreach($cbq_table AS $policy => $objects)
+{
+  foreach($objects AS $object_name => $object)
+  {
+    dbDelete('ports_cbqos', '`cbqos_id` = ?', array($object['cbqos_id'])); echo '-';
+  }
+}
+
 
 // EOF

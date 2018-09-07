@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -23,11 +23,12 @@ print_versions();
   <div style="margin-bottom: 10px; margin-top: 10px;">
   <table style="width: 100%; background: transparent;">
     <tr>
-      <td style="width: 15%; text-align: center;"><a class="btn btn-small" target="_blank" href="<?php echo OBSERVIUM_URL; ?>"><i style="font-size: small;" class="icon-globe"></i>&nbsp;Web</a></td>
-      <td style="width: 22%; text-align: center;"><a class="btn btn-small" target="_blank" href="http://jira.observium.org/"><i style="font-size: small;" class="icon-bug"></i>&nbsp;Bugtracker</a></td>
-      <td style="width: 22%; text-align: center;"><a class="btn btn-small" target="_blank" href="<?php echo OBSERVIUM_URL; ?>/docs/mailinglists"><i class="icon-envelope"></i>&nbsp;Mailing&nbsp;List</a></td>
-      <td style="width: 18%; text-align: center;"><a class="btn btn-small" target="_blank" href="http://twitter.com/observium"><i style="font-size: small;" class="icon-twitter-sign"></i>&nbsp;Twitter</a></td>
-      <td style="width: 20%; text-align: center;"><a class="btn btn-small" target="_blank" href="http://www.facebook.com/pages/Observium/128354461353"><i style="font-size: small;" class="icon-facebook-sign"></i>&nbsp;Facebook</a></td>
+      <td style="width: 12%; text-align: center;"><a class="btn btn" target="_blank" href="<?php echo OBSERVIUM_URL; ?>"><i style="font-size: small;" class="icon-globe"></i>&nbsp; Web</a></td>
+      <td style="width: 12%; text-align: center;"><a class="btn btn" target="_blank" href="http://docs.observium.org/"><i style="font-size: small;" class="icon-info"></i>&nbsp; Docs</a></td>
+      <td style="width: 18%; text-align: center;"><a class="btn btn" target="_blank" href="http://jira.observium.org/"><i style="font-size: small;" class="icon-bug"></i>&nbsp; Bugtracker</a></td>
+      <td style="width: 19%; text-align: center;"><a class="btn btn" target="_blank" href="<?php echo OBSERVIUM_URL; ?>/docs/mailinglists"><i class="icon-envelope"></i>&nbsp; Mailing&nbsp;List</a></td>
+      <td style="width: 17%; text-align: center;"><a class="btn btn" target="_blank" href="http://twitter.com/observium"><i style="font-size: small;" class="icon-twitter-sign"></i>&nbsp; Twitter</a></td>
+      <td style="width: 16%; text-align: center;"><a class="btn btn" target="_blank" href="http://www.facebook.com/pages/Observium/128354461353"><i style="font-size: small;" class="icon-facebook-sign"></i>&nbsp; Facebook</a></td>
     </tr>
   </table>
   </div>
@@ -47,74 +48,73 @@ print_versions();
     <div class="box-header with-border"><h3 class="box-title">Acknowledgements</h3></div>
     <div class="box-body no-padding">
         <dl class="dl-horizontal" style="margin: 0px; padding:5px;">
-          <dt style="text-align: left;"><i class="icon-user"></i> Twitter</dt><dd>Bootstrap CSS Framework</dd>
-          <dt style="text-align: left;"><i class="icon-user"></i> <a href="mailto:p@yusukekamiyamane.com" data-alt="p@yusukekamiyamane.com">Yusuke Kamiyamane</a></dt><dd>Fugue Iconset</dd>
-          <dt style="text-align: left;"><i class="icon-user"></i> Mark James</dt><dd>Silk Iconset</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> Jonathan De Graeve</dt><dd>SNMP code improvements</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> Xiaochi Jin</dt><dd>Logo design</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> Akichi Ren</dt><dd>Post-steampunk observational hamster</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> Bruno Pramont</dt><dd>Collectd code</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> <a href="mailto:DavidPFarrell@gmail.com" data-alt="DavidPFarrell@gmail.com">David Farrell</a></dt><dd>Help with parsing net-SNMP output in PHP</dd>
-          <dt style="text-align: left;"><i class="icon-user"></i> Job Snijders</dt><dd>Python-based multi-instance poller wrapper</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> Dennis de Houx</dt><dd>Code contributions</dd>
           <dt style="text-align: left;"><i class="icon-user"></i> Geert Hauwaerts</dt><dd>Code contributions</dd>
         </dl>
         </div>
       </div>
 
+<?php
+
+if (!$_SESSION['user_limited'])
+{
+
+  $cache_item = get_cache_item('stats');
+
+  if (!ishit_cache_item($cache_item))
+  {
+    $stats = array();
+    $stats['devices']            = dbFetchCell('SELECT COUNT(*) FROM `devices`');
+    $stats['ports']              = dbFetchCell('SELECT COUNT(*) FROM `ports`');
+    $stats['syslog']             = dbFetchCell('SELECT COUNT(*) FROM `syslog`');
+    $stats['events']             = dbFetchCell('SELECT COUNT(*) FROM `eventlog`');
+    $stats['applications']       = dbFetchCell('SELECT COUNT(*) FROM `applications`');
+    $stats['services']           = dbFetchCell('SELECT COUNT(*) FROM `services`');
+    $stats['storage']            = dbFetchCell('SELECT COUNT(*) FROM `storage`');
+    $stats['diskio']             = dbFetchCell('SELECT COUNT(*) FROM `ucd_diskio`');
+    $stats['processors']         = dbFetchCell('SELECT COUNT(*) FROM `processors`');
+    $stats['memory']             = dbFetchCell('SELECT COUNT(*) FROM `mempools`');
+    $stats['sensors']            = dbFetchCell('SELECT COUNT(*) FROM `sensors`');
+    $stats['sensors']           += dbFetchCell('SELECT COUNT(*) FROM `status`');
+    $stats['printersupplies']    = dbFetchCell('SELECT COUNT(*) FROM `printersupplies`');
+    $stats['hrdevice']           = dbFetchCell('SELECT COUNT(*) FROM `hrDevice`');
+    $stats['entphysical']        = dbFetchCell('SELECT COUNT(*) FROM `entPhysical`');
+
+    $stats['ipv4_addresses']     = dbFetchCell('SELECT COUNT(*) FROM `ipv4_addresses`');
+    $stats['ipv4_networks']      = dbFetchCell('SELECT COUNT(*) FROM `ipv4_networks`');
+    $stats['ipv6_addresses']     = dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses`');
+    $stats['ipv6_networks']      = dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks`');
+
+    $stats['pseudowires']        = dbFetchCell('SELECT COUNT(*) FROM `pseudowires`');
+    $stats['vrfs']               = dbFetchCell('SELECT COUNT(*) FROM `vrfs`');
+    $stats['vlans']              = dbFetchCell('SELECT COUNT(*) FROM `vlans`');
+
+    $stats['netscaler_vservers'] = dbFetchCell('SELECT COUNT(*) FROM `netscaler_vservers`');
+    $stats['netscaler_services'] = dbFetchCell('SELECT COUNT(*) FROM `netscaler_services`');
+
+    $stats['vms']                = dbFetchCell('SELECT COUNT(*) FROM `vminfo`');
+    $stats['slas']               = dbFetchCell('SELECT COUNT(*) FROM `slas`');
+
+    $stats['db']                 = get_db_size();
+    $stats['rrd']                = get_dir_size($config['rrd_dir']);
+
+    set_cache_item($cache_item, $stats, array('ttl' => 300));
+  } else {
+    $stats = get_cache_data($cache_item);
+  }
+  // Clean cache item
+  unset($cache_item);
+
+?>
   <div class="box box-solid">
     <div class="box-header"><h3 class="box-title">Statistics</h3></div>
     <div class="box-body no-padding">
 
-<?php
-
-$cache_item = get_cache_item('stats');
-
-if (!ishit_cache_item($cache_item))
-{
-  $stats = array();
-  $stats['devices']            = dbFetchCell('SELECT COUNT(*) FROM `devices`');
-  $stats['ports']              = dbFetchCell('SELECT COUNT(*) FROM `ports`');
-  $stats['syslog']             = dbFetchCell('SELECT COUNT(*) FROM `syslog`');
-  $stats['events']             = dbFetchCell('SELECT COUNT(*) FROM `eventlog`');
-  $stats['applications']       = dbFetchCell('SELECT COUNT(*) FROM `applications`');
-  $stats['services']           = dbFetchCell('SELECT COUNT(*) FROM `services`');
-  $stats['storage']            = dbFetchCell('SELECT COUNT(*) FROM `storage`');
-  $stats['diskio']             = dbFetchCell('SELECT COUNT(*) FROM `ucd_diskio`');
-  $stats['processors']         = dbFetchCell('SELECT COUNT(*) FROM `processors`');
-  $stats['memory']             = dbFetchCell('SELECT COUNT(*) FROM `mempools`');
-  $stats['sensors']            = dbFetchCell('SELECT COUNT(*) FROM `sensors`');
-  $stats['sensors']           += dbFetchCell('SELECT COUNT(*) FROM `status`');
-  $stats['printersupplies']    = dbFetchCell('SELECT COUNT(*) FROM `printersupplies`');
-  $stats['hrdevice']           = dbFetchCell('SELECT COUNT(*) FROM `hrDevice`');
-  $stats['entphysical']        = dbFetchCell('SELECT COUNT(*) FROM `entPhysical`');
-
-  $stats['ipv4_addresses']     = dbFetchCell('SELECT COUNT(*) FROM `ipv4_addresses`');
-  $stats['ipv4_networks']      = dbFetchCell('SELECT COUNT(*) FROM `ipv4_networks`');
-  $stats['ipv6_addresses']     = dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses`');
-  $stats['ipv6_networks']      = dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks`');
-
-  $stats['pseudowires']        = dbFetchCell('SELECT COUNT(*) FROM `pseudowires`');
-  $stats['vrfs']               = dbFetchCell('SELECT COUNT(*) FROM `vrfs`');
-  $stats['vlans']              = dbFetchCell('SELECT COUNT(*) FROM `vlans`');
-
-  $stats['netscaler_vservers'] = dbFetchCell('SELECT COUNT(*) FROM `netscaler_vservers`');
-  $stats['netscaler_services'] = dbFetchCell('SELECT COUNT(*) FROM `netscaler_services`');
-
-  $stats['vms']                = dbFetchCell('SELECT COUNT(*) FROM `vminfo`');
-  $stats['slas']               = dbFetchCell('SELECT COUNT(*) FROM `slas`');
-
-  $stats['db']                 = get_db_size();
-  $stats['rrd']                = get_dir_size($config['rrd_dir']);
-
-  set_cache_item($cache_item, $stats, array('ttl' => 300));
-} else {
-  $stats = get_cache_data($cache_item);
-}
-// Clean cache item
-unset($cache_item);
-
-?>
       <table class="table table-striped table-condensed">
         <tbody>
           <tr>
@@ -170,6 +170,12 @@ unset($cache_item);
 
       </div>
     </div>
+
+<?php
+
+} // End statistics for not limited users
+
+?>
   </div>
   <div class="col-md-6">
 

@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-10-01-0027
+-- This file was included in WWP MIB release 04-16-00-0047
 --
  -- CIENA-CES-MGMT-INTERFACE-MIB.my
  --
@@ -11,8 +11,6 @@
         FROM SNMPv2-SMI         
    DisplayString            
         FROM SNMPv2-TC      
-   MODULE-COMPLIANCE, OBJECT-GROUP
-        FROM SNMPv2-CONF
    InetAddressType, InetAddress ,InetAddressPrefixLength  
         FROM INET-ADDRESS-MIB  
    cienaGlobalSeverity, cienaGlobalMacAddress
@@ -23,7 +21,7 @@
        FROM CIENA-SMI;                      
     
  cienaCesMgmtInterfaceMIB MODULE-IDENTITY
-        LAST-UPDATED "201204040000Z"
+        LAST-UPDATED "201505150000Z"
         ORGANIZATION "Ciena, Inc"
         CONTACT-INFO
             "       Mib Meister
@@ -36,6 +34,28 @@
             "This module defines the management interface details and the 
              associated notifications."
 
+        REVISION  "201505150000Z"
+        DESCRIPTION
+            "Added cienaCesInetIcmpPortUnreachable."
+        REVISION  "201504230000Z"
+        DESCRIPTION
+            "Defined cienaCesInetMgmtPort OBJECT IDENTIFIER at cienaCesMgmtInterface 5.
+             Defined cienaCesInetMgmtPortInterface at cienaCesInetMgmtPort 1."
+        REVISION  "201504060000Z"
+        DESCRIPTION
+            "Added new object, cienaCesInetMgmtInterfaceIngressAclProfId, to the cienaCesInetMgmtInterfaceTable
+             in order to display the ID of the ingress ACL profile attached to the management interface."
+        REVISION  "201411180000Z"
+        DESCRIPTION
+            "Defined cienaCesInetTcpStack OBJECT IDENTIFIER at cienaCesMgmtInterface 4.
+             Defined cienaCesInetTcpTimestamps at cienaCesInetTcpStack 1."
+        REVISION  "201410070000Z"
+        DESCRIPTION
+            "Added cienaCesInetIcmpAcceptRedirects and cienaCesInetIcmpEchoIgnoreBroadcasts."
+        REVISION  "201306170000Z"
+        DESCRIPTION
+            "Added cienaCesInetMgmtInterfaceDomainVsName to allow a correlation of the
+             remote interface and the virtual switch being used."
         REVISION  "201204040000Z"
         DESCRIPTION
             "Initial creation."  
@@ -103,7 +123,9 @@
       cienaCesInetMgmtInterfaceMtu                 Unsigned32,
       cienaCesInetMgmtInterfaceNotifIndex          Integer32,
       cienaCesInetMgmtInterfaceNotifAddrType       InetAddressType,
-      cienaCesInetMgmtInterfaceNotifAddr           InetAddress
+      cienaCesInetMgmtInterfaceNotifAddr           InetAddress,
+      cienaCesInetMgmtInterfaceDomainVsName        DisplayString,
+      cienaCesInetMgmtInterfaceIngressAclProfId    Unsigned32
  }
   
   cienaCesInetMgmtInterfaceIndex OBJECT-TYPE
@@ -243,6 +265,27 @@
          This value should be compliant with RFC 4001 InetAddressType."
      ::= { cienaCesInetMgmtInterfaceEntry 14 }
 
+ cienaCesInetMgmtInterfaceDomainVsName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (1..31))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The virtual switch name associated with the cienaCesInetMgmtInterfaceDomainId when
+          the cienaCesInetMgmtInterfaceDomain is vs."
+     ::= { cienaCesInetMgmtInterfaceEntry 15 }
+
+ cienaCesInetMgmtInterfaceIngressAclProfId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The ID of the ingress ACL profile attached to the management interface.
+          A non-zero value refers to the ACL profile as defined by the cienaCesAclProfileId object
+          in the cienaCesAccessListMIB module.         
+          A value of 0 means no ingress ACL profile is attached to this interface."
+     ::= { cienaCesInetMgmtInterfaceEntry 16 }
+ 
+
 --
 -- Gateway
 --  
@@ -373,7 +416,10 @@ cienaCesInetGatewayTable OBJECT-TYPE
  CienaCesInetStackEntry ::=  SEQUENCE { 
       cienaCesInetAddrType           InetAddressType,
       cienaCesInetForwardingState    INTEGER,
-      cienaCesInetDefaultDscp        Unsigned32      
+      cienaCesInetDefaultDscp        Unsigned32,
+      cienaCesInetIcmpAcceptRedirects       INTEGER,
+      cienaCesInetIcmpEchoIgnoreBroadcasts  INTEGER,
+      cienaCesInetIcmpPortUnreachable       INTEGER
  }
 
  cienaCesInetAddrType OBJECT-TYPE
@@ -406,6 +452,85 @@ cienaCesInetGatewayTable OBJECT-TYPE
           represented by cienaCesInetAddrType."
      ::= { cienaCesInetStackEntry  3 }
   
+  cienaCesInetIcmpAcceptRedirects OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the ICMP accept-redirects setting associated with this address
+          type represented by cienaCesInetAddrType.  When on, the corresponding IP stack will
+          act upon received ICMP redirect messages.  When off, the corresponding IP stack
+          will not act upon received ICMP redirect messages."
+     ::= { cienaCesInetStackEntry 4 }
+
+  cienaCesInetIcmpEchoIgnoreBroadcasts OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the ICMP echo-ignore-broadcasts setting associated with this address
+          type represented by cienaCesInetAddrType.  This setting refers to whether the device will
+          ignore ICMP Echo Request messages which are directed toward a multicast or broadcast
+          destination address."
+     ::= { cienaCesInetStackEntry 5 }
+
+  cienaCesInetIcmpPortUnreachable OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the ICMP port-unreachable setting associated with this address
+          type represented by cienaCesInetAddrType.  When on, the corresponding IP stack will
+          send ICMP port-unreachable messages when appropriate to do so.  When off, the
+          corresponding IP stack will not send ICMP port-unreachable messages."
+     ::= { cienaCesInetStackEntry 6 }
+
+--
+-- TCP stack settings
+--
+  cienaCesInetTcpStack OBJECT IDENTIFIER ::= { cienaCesMgmtInterface 4 }
+
+  cienaCesInetTcpTimestamps OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        on(1),
+     		        off(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the current setting of the TCP timestamps option used by
+          the TCP stack of the device."
+     ::= { cienaCesInetTcpStack 1 }
+
+--
+-- MGMT port settings
+--
+  cienaCesInetMgmtPort OBJECT IDENTIFIER ::= { cienaCesMgmtInterface 5 }
+
+  cienaCesInetMgmtPortInterface OBJECT-TYPE
+     SYNTAX       INTEGER
+     		      {
+     		        local(1),
+     		        remote(2)
+     		      }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the way in which traffic at the MGMT port is used."
+     ::= { cienaCesInetMgmtPort 1 }
 
  --
  -- notifications

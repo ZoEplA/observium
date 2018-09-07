@@ -19,15 +19,15 @@ IMPORTS
 
 rlVrrp  MODULE-IDENTITY
         LAST-UPDATED "201012090000Z"         -- June 9, 2010
-		ORGANIZATION "Cisco Small Business"
+		ORGANIZATION "Cisco Systems, Inc."
 
 		CONTACT-INFO
 		"Postal: 170 West Tasman Drive
 		San Jose , CA 95134-1706
 		USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
 		DESCRIPTION
 		"The private MIB module definition for VRRPv3 MIB."
@@ -67,7 +67,11 @@ RlVrrpv3OperationsEntry ::= SEQUENCE {
         rlVrrpv3OperationsMasterPriority            Unsigned32,
         rlVrrpv3OperationsMasterAdvInterval         TimeInterval,
         rlVrrpv3OperationsMasterDownInterval        TimeInterval,
-        rlVrrpv3OperationsSkewTime                  TimeInterval
+        rlVrrpv3OperationsSkewTime                  TimeInterval,
+        rlVrrpv3OperationsTrackObject               Unsigned32,
+        rlVrrpv3OperationsTrackStatus               INTEGER,
+        rlVrrpv3OperationsTrackDecrementPriority    Unsigned32,
+        rlVrrpv3OperationsTrackOperPriority         Unsigned32
     }
 
 rlVrrpv3OperationsDefaultPrimaryIpAddr OBJECT-TYPE
@@ -171,6 +175,44 @@ rlVrrpv3OperationsSkewTime OBJECT-TYPE
         "Time to skew Master_Down_Interval in milliseconds."
     ::= { rlVrrpv3OperationsEntry 9 }
 
+rlVrrpv3OperationsTrackObject OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Number of associates a track object with this VRRP router.
+        0 - no association"
+    DEFVAL { 0 }
+    ::= { rlVrrpv3OperationsEntry 10 }
+
+rlVrrpv3OperationsTrackStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up(0),
+                     down(1)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Track status"
+    ::= { rlVrrpv3OperationsEntry 11 }
+
+rlVrrpv3OperationsTrackDecrementPriority OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..253)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Amount by which the priority for the router is decremented (or incremented)
+        when the tracked object goes down (or comes back up)."
+    DEFVAL { 10 }
+    ::= { rlVrrpv3OperationsEntry 12 }
+
+rlVrrpv3OperationsTrackOperPriority OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..255)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Operational priority"
+    ::= { rlVrrpv3OperationsEntry 13 }
 
 -- rlVrrpv3AssociatedIpAddrTable --
 

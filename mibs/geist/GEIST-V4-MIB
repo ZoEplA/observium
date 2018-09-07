@@ -17,7 +17,7 @@ geist MODULE-IDENTITY
 
 blackbird OBJECT IDENTIFIER
 	::= { geist 5 }
-bb100 OBJECT IDENTIFIER
+watchdog100 OBJECT IDENTIFIER
 	::= { blackbird 1 }
 
 --###########################################################################################--
@@ -25,7 +25,7 @@ bb100 OBJECT IDENTIFIER
 --###########################################################################################--
 
 deviceInfo OBJECT IDENTIFIER
-	::= { bb100 1 }
+	::= { watchdog100 1 }
 
 productTitle OBJECT-TYPE
 	SYNTAX DisplayString
@@ -85,7 +85,7 @@ internalTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Internal sensors for units"
-	::= { bb100 2 }
+	::= { watchdog100 2 }
 
 internalEntry OBJECT-TYPE
 	SYNTAX InternalEntry
@@ -135,7 +135,7 @@ internalAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { internalEntry 4 }
 
 internalTemp OBJECT-TYPE
@@ -206,7 +206,7 @@ tempSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote Temperature Sensor"
-	::= { bb100 4 }
+	::= { watchdog100 4 }
 
 tempSensorEntry OBJECT-TYPE
 	SYNTAX TempSensorEntry
@@ -249,7 +249,7 @@ tempSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { tempSensorEntry 4 }
 
 tempSensorTemp OBJECT-TYPE
@@ -269,7 +269,7 @@ airFlowSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote Airflow, Humidity, Temperature and Dewpoint Sensor "
-	::= { bb100 5 }
+	::= { watchdog100 5 }
 
 airFlowSensorEntry OBJECT-TYPE
 	SYNTAX AirFlowSensorEntry
@@ -315,7 +315,7 @@ airFlowSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { airFlowSensorEntry 4 }
 
 airFlowSensorTemp OBJECT-TYPE
@@ -358,7 +358,7 @@ dewPointSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote Dew Point sensor"
-	::= { bb100 6 }
+	::= { watchdog100 6 }
 
 dewPointSensorEntry OBJECT-TYPE
 	SYNTAX DewPointSensorEntry
@@ -403,7 +403,7 @@ dewPointSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { dewPointSensorEntry 4 }
 
 dewPointSensorTemp OBJECT-TYPE
@@ -439,7 +439,7 @@ ccatSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote CCAT sensor"
-	::= { bb100 7 }
+	::= { watchdog100 7 }
 
 ccatSensorEntry OBJECT-TYPE
 	SYNTAX CcatSensorEntry
@@ -484,7 +484,7 @@ ccatSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { ccatSensorEntry 4 }
 
 ccatSensorValue OBJECT-TYPE
@@ -517,7 +517,7 @@ t3hdSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote Temperature x 3, Humidity and Dewpoint Sensor"
-	::= { bb100 8 }
+	::= { watchdog100 8 }
 
 t3hdSensorEntry OBJECT-TYPE
 	SYNTAX T3hdSensorEntry
@@ -569,7 +569,7 @@ t3hdSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { t3hdSensorEntry 4 }
 
 t3hdSensorIntName OBJECT-TYPE
@@ -607,7 +607,7 @@ t3hdSensorExtAAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "T3HD External A status: 0 = unplugged, 1 = normal operation, 2 = device error"
+	DESCRIPTION "T3HD External A status: 0 = Unavailable, 1 = Available"
 	::= { t3hdSensorEntry 9 }
 
 t3hdSensorExtAName OBJECT-TYPE
@@ -629,7 +629,7 @@ t3hdSensorExtBAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "T3HD External B status: 0 = unplugged, 1 = normal operation, 2 = device error"
+	DESCRIPTION "T3HD External B status: 0 = Unavailable, 1 = Available"
 	::= { t3hdSensorEntry 12 }
 
 t3hdSensorExtBName OBJECT-TYPE
@@ -656,7 +656,7 @@ thdSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote Temperature, Humidity and Dewpoint Sensor"
-	::= { bb100 9 }
+	::= { watchdog100 9 }
 
 thdSensorEntry OBJECT-TYPE
 	SYNTAX ThdSensorEntry
@@ -701,7 +701,7 @@ thdSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { thdSensorEntry 4 }
 
 thdSensorTemp OBJECT-TYPE
@@ -737,7 +737,7 @@ rpmSensorTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION "Remote Power Manager Sensor"
-	::= { bb100 10 }
+	::= { watchdog100 10 }
 
 rpmSensorEntry OBJECT-TYPE
 	SYNTAX RpmSensorEntry
@@ -790,7 +790,7 @@ rpmSensorAvail OBJECT-TYPE
 	SYNTAX Gauge32
 	MAX-ACCESS read-only
 	STATUS current
-	DESCRIPTION "Is device currently plugged in?"
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
 	::= { rpmSensorEntry 4 }
 
 rpmSensorEnergy OBJECT-TYPE
@@ -880,10 +880,72 @@ rpmSensorOutlet2 OBJECT-TYPE
 	::= { rpmSensorEntry 15 }
 
 --###########################################################################################--
+--a2dSensorTable--
+--###########################################################################################--
+
+a2dSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF A2DSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Analog Measurement Sensor (Voltage, Current, or Dry Contact)"
+	::= { watchdog100 11 }
+
+a2DSensorEntry OBJECT-TYPE
+	SYNTAX A2DSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the a2dSensorTable table: each entry contains an index and other sensor details"
+	INDEX { a2dSensorIndex }
+	::= { a2dSensorTable 1 }
+
+A2DSensorEntry ::= SEQUENCE {
+	a2dSensorIndex				Integer32,
+	a2dSensorSerial				DisplayString,
+	a2dSensorName				DisplayString,
+	a2dSensorAvail				Gauge32,
+	a2dSensorValue				Integer32
+}
+
+a2dSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { a2DSensorEntry 1 }
+
+a2dSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { a2DSensorEntry 2 }
+
+a2dSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { a2DSensorEntry 3 }
+
+a2dSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { a2DSensorEntry 4 }
+
+a2dSensorValue OBJECT-TYPE
+	SYNTAX Integer32(-1000000..1000000)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current analog measurement reading within either a user defined or preset range depending on device mode."
+	::= { a2DSensorEntry 5 }
+
+--###########################################################################################--
 --Notifications--
 --###########################################################################################--
 
-trap OBJECT IDENTIFIER ::= { bb100 32767 }
+trap OBJECT IDENTIFIER ::= { watchdog100 32767 }
 trapPrefix OBJECT IDENTIFIER ::= { trap 0 }
 
 internalTestNOTIFY NOTIFICATION-TYPE
@@ -894,6 +956,18 @@ internalTestNOTIFY NOTIFICATION-TYPE
 --#####deviceInfo#####--
 
 --#####internalTable#####--
+
+internalAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { internalAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10204 }
+
+internalAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { internalAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20204 }
 
 internalTempNOTIFY NOTIFICATION-TYPE
 	OBJECTS { internalTemp, temperatureUnits }
@@ -981,6 +1055,18 @@ internalIO4CLEAR NOTIFICATION-TYPE
 
 --#####tempSensorTable#####--
 
+tempSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { tempSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10404 }
+
+tempSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { tempSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20404 }
+
 tempSensorTempNOTIFY NOTIFICATION-TYPE
 	OBJECTS { tempSensorTemp, temperatureUnits }
 	STATUS current
@@ -994,6 +1080,18 @@ tempSensorTempCLEAR NOTIFICATION-TYPE
 	::= { trapPrefix 20405 }
 
 --#####airFlowSensorTable#####--
+
+airFlowSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10504 }
+
+airFlowSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20504 }
 
 airFlowSensorTempNOTIFY NOTIFICATION-TYPE
 	OBJECTS { airFlowSensorTemp, temperatureUnits }
@@ -1045,6 +1143,18 @@ airFlowSensorDewPointCLEAR NOTIFICATION-TYPE
 
 --#####dewPointSensorTable#####--
 
+dewPointSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10604 }
+
+dewPointSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20604 }
+
 dewPointSensorTempNOTIFY NOTIFICATION-TYPE
 	OBJECTS { dewPointSensorTemp, temperatureUnits }
 	STATUS current
@@ -1083,6 +1193,18 @@ dewPointSensorDewPointCLEAR NOTIFICATION-TYPE
 
 --#####ccatSensorTable#####--
 
+ccatSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { ccatSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10704 }
+
+ccatSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { ccatSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20704 }
+
 ccatSensorValueNOTIFY NOTIFICATION-TYPE
 	OBJECTS { ccatSensorValue, ccatSensorType }
 	STATUS current
@@ -1096,6 +1218,18 @@ ccatSensorValueCLEAR NOTIFICATION-TYPE
 	::= { trapPrefix 20705 }
 
 --#####t3hdSensorTable#####--
+
+t3hdSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10804 }
+
+t3hdSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20804 }
 
 t3hdSensorIntTempNOTIFY NOTIFICATION-TYPE
 	OBJECTS { t3hdSensorIntTemp, temperatureUnits }
@@ -1159,6 +1293,18 @@ t3hdSensorExtBTempCLEAR NOTIFICATION-TYPE
 
 --#####thdSensorTable#####--
 
+thdSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { thdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10904 }
+
+thdSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { thdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20904 }
+
 thdSensorTempNOTIFY NOTIFICATION-TYPE
 	OBJECTS { thdSensorTemp, temperatureUnits }
 	STATUS current
@@ -1196,6 +1342,18 @@ thdSensorDewPointCLEAR NOTIFICATION-TYPE
 	::= { trapPrefix 20907 }
 
 --#####rpmSensorTable#####--
+
+rpmSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 11004 }
+
+rpmSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 21004 }
 
 rpmSensorEnergyNOTIFY NOTIFICATION-TYPE
 	OBJECTS { rpmSensorEnergy }
@@ -1304,5 +1462,31 @@ rpmSensorPowerFactorCLEAR NOTIFICATION-TYPE
 	STATUS current
 	DESCRIPTION "RPM Sensor Power Factor Clear Trap"
 	::= { trapPrefix 21013 }
+
+--#####a2dSensorTable#####--
+
+a2dSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { a2dSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 11104 }
+
+a2dSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { a2dSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 21104 }
+
+a2dSensorValueNOTIFY NOTIFICATION-TYPE
+	OBJECTS { a2dSensorValue }
+	STATUS current
+	DESCRIPTION "A2D Analog Sensor Measurement Trap"
+	::= { trapPrefix 11105 }
+
+a2dSensorValueCLEAR NOTIFICATION-TYPE
+	OBJECTS { a2dSensorValue }
+	STATUS current
+	DESCRIPTION "A2D Analog Sensor Measurement Clear Trap"
+	::= { trapPrefix 21105 }
 
 END

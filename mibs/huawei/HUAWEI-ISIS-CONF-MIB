@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-ISIS-CONF-MIB provides information about ISIS
 -- Reference:
--- Version: V2.18
+-- Version: V2.24
 -- History:
 -- <author>,   <date>,  <contents>
 --  HUAWEI   2009-08-03  ISIS private MIB
@@ -33,7 +33,7 @@
     
         -- 1.3.6.1.4.1.2011.5.25.24
         hwISIS MODULE-IDENTITY 
-            LAST-UPDATED "201510151100Z"        -- Oct  15, 2015 at 11:00 GMT
+            LAST-UPDATED "201611071720Z"        -- Nov 7, 2016 at 17:20 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -49,6 +49,18 @@
                 The HUAWEI PRIVATE MIB contains objects belonging to processes of the IS-IS protocol existing on the system. 
                 It defines the model used to represent data that exists elsewhere in the system and on peripheral devices. 
                 There are no constraints on this MIB."
+            REVISION "201611071720Z"
+            DESCRIPTION  "revision 2.2.4"
+            REVISION "201609261500Z"
+            DESCRIPTION  "revision 2.2.3"
+            REVISION "201607231600Z"
+            DESCRIPTION  "revision 2.2.2"
+            REVISION "201606131600Z"
+            DESCRIPTION  "revision 2.2.1"
+            REVISION "201602041100Z"
+            DESCRIPTION  "revision 2.2.0"
+            REVISION "201511301100Z"
+            DESCRIPTION  "revision 2.1.9"
             REVISION "201510151100Z"
             DESCRIPTION  "revision 2.1.8"
             REVISION "201508271900Z"
@@ -3451,7 +3463,203 @@
             DESCRIPTION
                 "Neighbor IP address."
             ::= { hwIsisTrapsObjects 11 }
-	    
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.12
+        hwIsisPeerFlappingSuppressStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                holddown(2),
+                holdmaxcost(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The suppress status of peer flapping."
+            ::= { hwIsisTrapsObjects 12 }   
+
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.13
+        hwIsisRemainingLifetime OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "seconds"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The remaining-lifetime of LSP."
+            DEFVAL { 1200 }
+            ::= { hwIsisTrapsObjects 13 }
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.14
+		hwIsisHostName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 14 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.15
+        hwIsisHostIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 15 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.16				
+		hwIsisPurgeLspNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IS-IS device purge the lsp number."
+			::= { hwIsisTrapsObjects 16 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.17		
+		hwIsisAffectedNodeNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IS-IS device affect the lsp number."
+			::= { hwIsisTrapsObjects 17 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.18		
+		hwIsisTotalNodeNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IS-IS total node number."
+			::= { hwIsisTrapsObjects 18 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.19		
+		hwIsisInterval OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The statistic interval."
+			::= { hwIsisTrapsObjects 19 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.20		
+		hwIsisRuledOutDeviceNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The rule out device number."
+			::= { hwIsisTrapsObjects 20 }
+	-- 1.3.6.1.4.1.2011.5.25.24.2.2.21		
+		hwIsisSystemID OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..8))
+                                                       MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The IS-IS System ID."
+			::= { hwIsisTrapsObjects 21 }
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.22
+		hwIsisHostName1 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 22 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.23
+        hwIsisHostIpAddress1 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 23 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.24		
+		hwIsisSystemID1 OBJECT-TYPE
+			SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ID for this instance of the Integrated IS-IS
+             protocol. This value is appended to each of the
+             area addresses to form the Network Entity Titles.
+             The derivation of a value for this object is
+             implementation-specific.  Some implementations may
+             automatically assign values and not permit an
+             SNMP write, while others may require the value
+             to be set manually."
+			::= { hwIsisTrapsObjects 24 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.25
+		hwIsisHostName2 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 25 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.26
+        hwIsisHostIpAddress2 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 26 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.27		
+		hwIsisSystemID2 OBJECT-TYPE
+			SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ID for this instance of the Integrated IS-IS
+             protocol. This value is appended to each of the
+             area addresses to form the Network Entity Titles.
+             The derivation of a value for this object is
+             implementation-specific.  Some implementations may
+             automatically assign values and not permit an
+             SNMP write, while others may require the value
+             to be set manually."
+			::= { hwIsisTrapsObjects 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.28
+		hwIsisHostName3 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 28 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.29
+        hwIsisHostIpAddress3 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 29 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.30		
+		hwIsisSystemID3 OBJECT-TYPE
+			SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ID for this instance of the Integrated IS-IS
+             protocol. This value is appended to each of the
+             area addresses to form the Network Entity Titles.
+             The derivation of a value for this object is
+             implementation-specific.  Some implementations may
+             automatically assign values and not permit an
+             SNMP write, while others may require the value
+             to be set manually."
+			::= { hwIsisTrapsObjects 30 }
+		
         -- 1.3.6.1.4.1.2011.5.25.24.2.3
         hwIsisConfConformance OBJECT IDENTIFIER ::= { hwIsisConf 3 }
         
@@ -3626,8 +3834,25 @@ hwIsisProcL2LowerRedistThreshold, hwIsisProcL1TotalRedist, hwIsisProcL2TotalRedi
                  hwIsisLsdbThresholdReach,
                  hwIsisLsdbThresholdReachClear,
                  hwIsisSystemIdAutoRecover,
-                 hwIsisAdjacencyChangeClear,
-                 hwIsisSeqNumExceedThreshold	
+                 hwIsisSeqNumExceedThreshold,
+                 hwIsisSeqNumExceedThresholdClear,
+                 hwIsisAttemptToExceedMaxSequenceClear,
+                 hwIsisPeerFlapSuppStatusChange,
+		 hwIsisDeleteRouteByPurge,
+		 hwIsisDeleteRouteByPurgeClear,
+		 hwIsisRouteBeDeletedByPurgeExact,
+		 hwIsisRouteBeDeletedByPurgeExactClear,
+		 hwIsisRouteBeDeletedByPurgeInexact,
+		 hwIsisRouteBeDeletedByPurgeInexactClear,
+		 hwIsisRouteBeDeletedByPurge,
+		 hwIsisRouteBeDeletedByPurgeClear,
+		 hwIsisThirdPartRouteBeDeletedByPurgeExact,
+		 hwIsisThirdPartRouteBeDeletedByPurgeExactClear,
+		 hwIsisThirdPartRouteBeDeletedByPurgeInexact,
+		 hwIsisThirdPartRouteBeDeletedByPurgeInexactClear,
+		 hwIsisThirdPartRouteBeDeletedByPurge,
+                 hwIsisThirdPartRouteBeDeletedByPurgeClear
+				 
             }
         STATUS current
         DESCRIPTION
@@ -3780,7 +4005,171 @@ hwIsisProcL2LowerRedistThreshold, hwIsisProcL1TotalRedist, hwIsisProcL2TotalRedi
 			STATUS current
 			DESCRIPTION 
 				"The LSP sequence number has exceeded the upper threshold value."
-			::= { hwIsisTraps 14 }
+			::= { hwIsisTraps 14 }		
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.15
+		hwIsisSeqNumExceedThresholdClear NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisPduLspId }
+			STATUS current
+			DESCRIPTION 
+				"The LSP sequence number has been less than the upper threshold value."
+			::= { hwIsisTraps 15 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.16
+		hwIsisAttemptToExceedMaxSequenceClear NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisPduLspId }
+			STATUS current
+			DESCRIPTION 
+				"The LSP sequence number has been less than the maximum value."
+			::= { hwIsisTraps 16 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.17
+		hwIsisPeerFlapSuppStatusChange NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisCircIfIndex, ifName, hwIsisPeerFlappingSuppressStatus }
+			STATUS current
+			DESCRIPTION 
+				"The object is used to monitor the peer flapping-suppress status of interface in ISIS."
+			::= { hwIsisTraps 17 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.18
+		hwIsisLspRemainingLifetimeRefresh NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisCircIfIndex, ifName, hwIsisAdjSysID, 
+				isisPduLspId, hwIsisRemainingLifetime }
+			STATUS current
+			DESCRIPTION 
+				"The object is used to monitor the receiving of LSP with small remaining lifetime."
+			::= { hwIsisTraps 18 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.19
+		hwIsisDeleteRouteByPurge NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval }
+			STATUS current
+			DESCRIPTION 
+				"The local device deleted IS-IS routes advertised by other devices."
+			::= { hwIsisTraps 19 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.20
+		hwIsisDeleteRouteByPurgeClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex}
+			STATUS current
+			DESCRIPTION 
+				"The local device did not delete IS-IS routes advertised by other devices."
+			::= { hwIsisTraps 20 }	
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.21
+		hwIsisRouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were deleted by another device."
+			::= { hwIsisTraps 21 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.22
+		hwIsisRouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex}
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were not deleted by another device."
+			::= { hwIsisTraps 22 }	
+		
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.23
+		hwIsisRouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval, hwIsisRuledOutDeviceNum }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were deleted by another device, and the possibly faulty device did not 
+				support IS-IS purge LSP source tracing. Log in to the possibly faulty device. If the device is deleting routes, 
+				reset or isolate it from the network. Otherwise, check other devices. Neither of the devices displayed in the 
+				display isis purge-source-trace analysis-report command output is the faulty device."
+			::= { hwIsisTraps 23 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.24
+		hwIsisRouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex}
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were not deleted by another device."
+			::= { hwIsisTraps 24 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.25
+		hwIsisRouteBeDeletedByPurge NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisTotalNodeNum,
+                      hwIsisHostName1, hwIsisHostIpAddress1, hwIsisSystemID1, hwIsisHostName2, hwIsisHostIpAddress2, hwIsisSystemID2,
+                      hwIsisHostName3, hwIsisHostIpAddress3, hwIsisSystemID3 } 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were not deleted by another device."
+			::= { hwIsisTraps 25 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.26
+		hwIsisRouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex} 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were deleted by another device. Log in to the possibly faulty device. 
+				 If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices."
+			::= { hwIsisTraps 26 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.27
+		hwIsisThirdPartRouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were deleted. Reset or isolate the faulty device from the network."
+			::= { hwIsisTraps 27 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.28
+		hwIsisThirdPartRouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex}
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were not deleted."
+			::= { hwIsisTraps 28 }	
+		
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.29
+		hwIsisThirdPartRouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval, hwIsisRuledOutDeviceNum }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were deleted, and the possibly faulty device did not support 
+				 IS-IS purge LSP source tracing. Log in to the possibly faulty device. If the device is deleting routes, 
+				 reset or isolate it from the network. Otherwise, check other devices. Neither of the devices displayed 
+				 in the display isis purge-source-trace analysis-report command output is the faulty device."
+			::= { hwIsisTraps 29 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.30
+		hwIsisThirdPartRouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex}
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were not deleted."
+			::= { hwIsisTraps 30 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.31
+		hwIsisThirdPartRouteBeDeletedByPurge NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisTotalNodeNum,
+                      hwIsisHostName1, hwIsisHostIpAddress1, hwIsisSystemID1, hwIsisHostName2, hwIsisHostIpAddress2, hwIsisSystemID2,
+                      hwIsisHostName3, hwIsisHostIpAddress3, hwIsisSystemID3 } 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were deleted. Log in to the possibly faulty device. 
+				 If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices."
+			::= { hwIsisTraps 31 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.32
+		hwIsisThirdPartRouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex} 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were not deleted."
+			::= { hwIsisTraps 32 }
     END
 --   
 

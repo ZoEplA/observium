@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: HUAWEI Private Extended SNMP MIB
 -- 
 -- Reference:
--- Version:     V2.04
+-- Version:     V2.05
 -- History:
 -- 
 -- =================================================================
@@ -29,7 +29,7 @@
 
     
         hwSnmpExtMIB MODULE-IDENTITY 
-            LAST-UPDATED "201302280000Z"        -- 28 February 2013
+            LAST-UPDATED "201612071056Z"          --Dec. 07, 2016 at 10:56 GMT
             ORGANIZATION
                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -44,6 +44,8 @@
                 "
                 Some attribute of SNMP extended content.
                 "
+           REVISION    "201612071056Z"          --Dec. 07, 2016 at 10:56 GMT 
+           DESCRIPTION  "revision 2.0.5"  
            REVISION     "201302280000Z"         -- 28 February 2013
            DESCRIPTION
            "Registration point for protocols used in Huawei 
@@ -70,7 +72,7 @@
             
         hwSnmpRemoteIpAddressType OBJECT-TYPE
             SYNTAX InetAddressType
-            MAX-ACCESS not-accessible
+            MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
                 "The type of the remote netmanager IP address."
@@ -78,7 +80,7 @@
             
         hwSnmpRemoteIpAddress OBJECT-TYPE
             SYNTAX InetAddress (SIZE (0|4|8|16|20))
-            MAX-ACCESS not-accessible
+            MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
                 "The Ip address of the remote netmanager."
@@ -234,7 +236,7 @@
             ::= { hwSnmpExtGroups 1 }
 			          
         hwSnmpExtTrapGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwSNMPLockThreshold, hwSNMPLockThresholdResume }
+            NOTIFICATIONS { hwSNMPLockThreshold, hwSNMPLockThresholdResume, hwSNMPReset }
             STATUS current
             DESCRIPTION 
                 "SNMP extend trap nodes."
@@ -281,7 +283,14 @@ hwSnmpAlarmGroups OBJECT IDENTIFIER ::= { hwSnmpNotification 3 }
                 "The trap will be triggered when the number of unauthorized users falls back to the lower threshold of the lock queue."
             ::= { hwSnmpExtNotifications 2 }
 
+        hwSNMPReset NOTIFICATION-TYPE
+            STATUS current    
+            DESCRIPTION 
+                "After the SNMP process is restarted or a master/slave main control board switchover is performed on a device, this trap is sent to notify the NMS of SNMP entity restart, enabling the NMS to synchronize alarms from the device."
+            ::= { hwSnmpExtNotifications 3 }	
+
         END
 			--
 			-- HUAWEI-SNMP-EXT-MIB.mib
 			--
+			

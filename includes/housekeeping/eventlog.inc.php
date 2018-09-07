@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage housekeeping
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -17,7 +17,7 @@ $cutoff = age_to_unixtime($config['housekeeping']['eventlog']['age'], age_to_sec
 
 if ($cutoff)
 {
-  $where = "UNIX_TIMESTAMP(`timestamp`) < $cutoff";
+  $where = "`timestamp` < FROM_UNIXTIME($cutoff)";
   $count = dbFetchCell("SELECT COUNT(*) FROM `eventlog` WHERE $where");
   if ($count)
   {

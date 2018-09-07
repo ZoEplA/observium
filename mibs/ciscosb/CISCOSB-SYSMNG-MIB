@@ -13,7 +13,7 @@ IMPORTS
 
 
 rlSysmngMib MODULE-IDENTITY
-        LAST-UPDATED "201010310000Z"
+        LAST-UPDATED "201010310000a"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -26,7 +26,7 @@ rlSysmngMib MODULE-IDENTITY
 
         DESCRIPTION
              "The private MIB module definition for System Manager pool."
-        REVISION "201010310000Z"
+        REVISION "201010310000a"
         DESCRIPTION
              "Initial revision."
         ::= { switch001 204 }
@@ -40,8 +40,10 @@ SysmngResourceRouteType ::= TEXTUAL-CONVENTION
         ipv6(2),
         ipmv4(3),
         ipmv6(4),
-        nonIp(5)
-
+        nonIp(5),
+        ipv4Policy(6),
+        ipv6Policy(7),
+	vlanMapping(8)
 }
 
 SysmngResourceRouteUsageType ::= TEXTUAL-CONVENTION
@@ -59,7 +61,10 @@ SysmngResourceRouteUsageType ::= TEXTUAL-CONVENTION
         ipmv4Route(8),
         ipmv4RouteStarG(9),
         ipmv6Route(10),
-        ipmv6RouteStarG(11)
+        ipmv6RouteStarG(11),
+        ipv4PolicyRoute(12),
+        ipv6PolicyRoute(13),
+	vlanMapping(14)
 }
 
 SysmngPoolType ::= TEXTUAL-CONVENTION

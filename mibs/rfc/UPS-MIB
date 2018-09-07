@@ -5,10 +5,11 @@ IMPORTS
     OBJECT-IDENTITY, Counter32, Gauge32, Integer32, mib-2
         FROM SNMPv2-SMI
     DisplayString, TimeStamp, TimeInterval, TestAndIncr,
-      AutonomousType
+      AutonomousType, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF;
+
 
 upsMIB MODULE-IDENTITY
     LAST-UPDATED "9402230000Z"
@@ -43,8 +44,8 @@ NonNegativeInteger ::= TEXTUAL-CONVENTION
     DESCRIPTION
             "This data type is a non-negative value."
     SYNTAX       INTEGER (0..2147483647)
-
 upsObjects            OBJECT IDENTIFIER ::= { upsMIB 1 }
+
 
 --
 -- The Device Identification group.
@@ -109,6 +110,7 @@ upsIdentAttachedDevices OBJECT-TYPE
             output(s) of the UPS.  This object should be set by
             the administrator."
     ::= { upsIdent 6 }
+
 
 --
 -- Battery Group
@@ -202,6 +204,7 @@ upsBatteryTemperature OBJECT-TYPE
             casing."
     ::= { upsBattery 7 }
 
+
 --
 -- Input Group
 --
@@ -219,6 +222,7 @@ upsInputLineBads OBJECT-TYPE
             time the input transitions from zero out-of-tolerance
             lines to one or more input lines out-of-tolerance."
     ::= { upsInput 1 }
+
 
 upsInputNumLines OBJECT-TYPE
     SYNTAX     NonNegativeInteger
@@ -300,6 +304,7 @@ upsInputTruePower OBJECT-TYPE
     DESCRIPTION
             "The magnitude of the present input true power."
     ::= { upsInputEntry 5 }
+
 
 --
 -- The Output group.
@@ -505,6 +510,7 @@ upsBypassPower OBJECT-TYPE
             "The present true power conveyed by the bypass."
     ::= { upsBypassEntry 4 }
 
+
 --
 -- The Alarm group.
 --
@@ -562,7 +568,6 @@ upsAlarmEntry OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "An entry containing information applicable to a
-
             particular alarm."
     INDEX { upsAlarmId }
     ::= { upsAlarmTable 1 }
@@ -605,6 +610,7 @@ upsAlarmTime OBJECT-TYPE
             0."
     ::= { upsAlarmEntry 3 }
 
+
 --
 -- Well known alarm conditions.
 --
@@ -630,6 +636,7 @@ upsAlarmLowBattery OBJECT-IDENTITY
             "The remaining battery run-time is less than or equal
             to upsConfigLowBattTime."
     ::= { upsWellKnownAlarms  3 }
+
 
 upsAlarmDepletedBattery OBJECT-IDENTITY
     STATUS     current
@@ -773,6 +780,7 @@ upsAlarmTestInProgress OBJECT-IDENTITY
             outside the scope of this OBJECT-IDENTITY."
     ::= { upsWellKnownAlarms 24 }
 
+
 --
 -- The Test Group
 --
@@ -802,7 +810,6 @@ upsTestId OBJECT-TYPE
             the current or last test is maintained in
             upsTestResultsSummary. Tests in progress may be
             aborted by setting the upsTestId variable to
-
             upsTestAbortTestInProgress.
 
             Read operations return the value of the name of the
@@ -851,7 +858,6 @@ upsTestSpinLock OBJECT-TYPE
                   }
                   /* test started ok */
                   /* wait for test completion by polling
-
             upsTestResultsSummary */
                   get (upsTestSpinLock, upsTestResultsSummary,
             upsTestResultsDetail)
@@ -938,6 +944,7 @@ upsTestElapsedTime OBJECT-TYPE
 
 upsWellKnownTests     OBJECT IDENTIFIER ::= { upsTest 7 }
 
+
 upsTestNoTestsInitiated OBJECT-IDENTITY
     STATUS     current
     DESCRIPTION
@@ -978,6 +985,7 @@ upsTestDeepBatteryCalibration OBJECT-IDENTITY
             normal battery duration for the protected load."
     ::= { upsWellKnownTests  5 }
 
+
 --
 -- The Control group.
 --
@@ -994,7 +1002,6 @@ upsShutdownType OBJECT-TYPE
     DESCRIPTION
             "This object determines the nature of the action to be
             taken at the time when the countdown of the
-
             upsShutdownAfterDelay and upsRebootWithDuration
             objects reaches zero.
 
@@ -1043,7 +1050,6 @@ upsStartupAfterDelay OBJECT-TYPE
             indicated number of seconds, including starting the
             UPS, if necessary.  Setting this object to 0 will
             cause the startup to occur immediately.  Setting this
-
             object to -1 will abort the countdown.  If the output
             is already on at the time the countdown reaches 0,
             then nothing will happen.  Sets to this object
@@ -1103,6 +1109,7 @@ upsAutoRestart OBJECT-TYPE
             then the UPS will not restart until that delay has
             been satisfied."
     ::= { upsControl 5 }
+
 
 --
 -- The Configuration group.
@@ -1244,6 +1251,7 @@ upsConfigHighVoltageTransferPoint OBJECT-TYPE
             system transfers to battery backup."
     ::= { upsConfig 10 }
 
+
 --
 -- notifications, i.e., traps
 --
@@ -1282,7 +1290,6 @@ upsTrapAlarmEntryAdded NOTIFICATION-TYPE
     DESCRIPTION
             "This trap is sent each time an alarm is inserted into
             to the alarm table.  It is sent on the insertion of
-
             all alarms except for upsAlarmOnBattery and
             upsAlarmTestInProgress."
   ::= { upsTraps 3 }
@@ -1296,12 +1303,14 @@ upsTrapAlarmEntryRemoved NOTIFICATION-TYPE
             alarms except for upsAlarmTestInProgress."
   ::= { upsTraps 4 }
 
+
 --
 -- conformance information
 --
 upsConformance        OBJECT IDENTIFIER ::= { upsMIB 3 }
 
 upsCompliances        OBJECT IDENTIFIER ::= { upsConformance 1 }
+
 
 --
 -- compliance statements
@@ -1310,6 +1319,7 @@ upsCompliances        OBJECT IDENTIFIER ::= { upsConformance 1 }
 upsSubsetCompliance MODULE-COMPLIANCE
     STATUS     current
     DESCRIPTION
+
             "The compliance statement for UPSs that only support
             the two-contact communication protocol."
     MODULE -- this module
@@ -1380,6 +1390,7 @@ upsSubsetCompliance MODULE-COMPLIANCE
 upsBasicCompliance MODULE-COMPLIANCE
     STATUS     current
     DESCRIPTION
+
             "The compliance statement for UPSs that support
             full-featured functions, such as control."
     MODULE -- this module
@@ -1388,6 +1399,7 @@ upsBasicCompliance MODULE-COMPLIANCE
                   upsBasicOutputGroup, upsBasicAlarmGroup,
                   upsBasicTestGroup, upsBasicControlGroup,
                   upsBasicConfigGroup }
+
 
     OBJECT     upsAlarmDescr
     DESCRIPTION
@@ -1463,6 +1475,7 @@ upsBasicCompliance MODULE-COMPLIANCE
             values must be supported.  However, at least two
             different manufacturer-selected values must be
             supported."
+
     ::= { upsCompliances 2 }
 
 upsFullCompliance MODULE-COMPLIANCE
@@ -1516,7 +1529,6 @@ upsFullCompliance MODULE-COMPLIANCE
     MIN-ACCESS read-only
     DESCRIPTION
             "Read-write access is not required, i.e., compliant
-
             systems need not support more than one shutdown type."
 
     OBJECT     upsAutoRestart
@@ -1552,7 +1564,9 @@ upsFullCompliance MODULE-COMPLIANCE
             values must be supported.  However, at least two
             different manufacturer-selected values must be
             supported."
+
     ::= { upsCompliances 3 }
+
 
 --
 -- units of conformance
@@ -1629,6 +1643,7 @@ upsFullCompliance MODULE-COMPLIANCE
 --upsConfigLowVoltageTransferPoint
 --upsConfigHighVoltageTransferPoint
 
+
 -- units of conformance
 upsGroups             OBJECT IDENTIFIER ::= { upsConformance 2 }
 
@@ -1660,7 +1675,6 @@ upsSubsetBatteryGroup OBJECT-GROUP
     ::= { upsSubsetGroups 2 }
 
 upsSubsetInputGroup OBJECT-GROUP
-
     OBJECTS { upsInputLineBads }
     STATUS  current
     DESCRIPTION
@@ -1675,6 +1689,7 @@ upsSubsetOutputGroup OBJECT-GROUP
             "The upsSubsetOutputGroup defines the objects that are
             common to the Output groups of two-contact UPSs."
     ::= { upsSubsetGroups 4 }
+
 
 -- { upsSubsetGroups 5 } is reserved for
 -- future use (upsSubsetBypassGroup)
@@ -1708,7 +1723,6 @@ upsSubsetConfigGroup OBJECT-GROUP
             "The upsSubsetConfigGroup defines the objects that are
             common to the Config groups of two-contact UPSs."
     ::= { upsSubsetGroups 9 }
-
 upsBasicGroups        OBJECT IDENTIFIER ::= { upsGroups 2 }
 
 upsBasicIdentGroup OBJECT-GROUP
@@ -1757,7 +1771,6 @@ upsBasicBypassGroup OBJECT-GROUP
     STATUS  current
     DESCRIPTION
             "The upsBasicBypassGroup defines the objects that are
-
             common to the Bypass groups of compliant UPSs which
             support basic functions."
     ::= { upsBasicGroups 5 }
@@ -1766,6 +1779,7 @@ upsBasicAlarmGroup OBJECT-GROUP
     OBJECTS { upsAlarmsPresent, upsAlarmDescr, upsAlarmTime }
     STATUS  current
     DESCRIPTION
+
             "The upsBasicAlarmGroup defines the objects that are
             common to the Alarm  groups of compliant UPSs which
             support basic functions."
@@ -1804,7 +1818,6 @@ upsBasicConfigGroup OBJECT-GROUP
             common to the Config groups of UPSs which support
             basic functions."
     ::= { upsBasicGroups 9 }
-
 upsFullGroups         OBJECT IDENTIFIER ::= { upsGroups 3 }
 
 upsFullIdentGroup OBJECT-GROUP
@@ -1861,6 +1874,7 @@ upsFullAlarmGroup OBJECT-GROUP
     OBJECTS { upsAlarmsPresent, upsAlarmDescr, upsAlarmTime }
     STATUS  current
     DESCRIPTION
+
             "The upsFullAlarmGroup defines the objects that are
             common to the Alarm  groups of fully compliant UPSs."
     ::= { upsFullGroups 6 }

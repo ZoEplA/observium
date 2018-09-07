@@ -8,12 +8,24 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
-$lldp_array = snmpwalk_cache_threepart_oid($device, "lldpRemoteSystemsData", array(), "LLDP-MIB", NULL, OBS_SNMP_ALL | OBS_SNMP_CONCAT);
-print_debug_vars($lldp_array);
+// lldpRemoteSystemsData: lldpRemTable + lldpRemManAddrTable + lldpRemUnknownTLVTable + lldpRemOrgDefInfoTable
+$lldpRemTable_oids = array('lldpRemChassisIdSubtype', 'lldpRemChassisId',
+                           'lldpRemPortIdSubtype', 'lldpRemPortId', 'lldpRemPortDesc',
+                           'lldpRemSysName', 'lldpRemSysDesc');
+//$lldp_array = snmpwalk_cache_threepart_oid($device, "lldpRemoteSystemsData", array(), "LLDP-MIB", NULL, OBS_SNMP_ALL | OBS_SNMP_CONCAT);
+$lldp_array = array();
+foreach ($lldpRemTable_oids as $oid)
+{
+  $lldp_array = snmpwalk_cache_threepart_oid($device, $oid, $lldp_array, "LLDP-MIB", NULL, OBS_SNMP_ALL | OBS_SNMP_CONCAT);
+
+  if (empty($lldp_array)) { break; } // Stop walk if no data
+}
+
+print_debug_vars($lldp_array, 1);
 
 if ($lldp_array)
 {
@@ -21,36 +33,70 @@ if ($lldp_array)
   //$lldp_local_array = snmpwalk_cache_oid($device, "lldpLocalSystemData", array(), "LLDP-MIB");
   $lldp_local_array = snmpwalk_cache_oid($device, "lldpLocPortEntry", array(), "LLDP-MIB");
 
-  foreach ($lldp_array as $key => $lldp_if_array)
+  foreach ($lldp_array as $lldpRemTimeMark => $lldp_if_array)
   {
-    foreach ($lldp_if_array as $entry_key => $lldp_instance)
+    foreach ($lldp_if_array as $lldpRemLocalPortNum => $lldp_instance)
     {
-      if (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex']) && $device['os'] != "junos") // FIXME why the junos exclude?
+      // Detect local device port
+      unset($port);
+      if (is_numeric($dot1d_array[$lldpRemLocalPortNum]['dot1dBasePortIfIndex']) && $device['os'] != "junos") // FIXME why the junos exclude?
       {
-        $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
-      } else {
-        $ifIndex = $entry_key;
-      }
+        // Get the port using BRIDGE-MIB
+        $ifIndex = $dot1d_array[$lldpRemLocalPortNum]['dot1dBasePortIfIndex'];
 
-      // Get the port using BRIDGE-MIB
-      $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? AND `ifDescr` NOT LIKE 'Vlan%'", array($device['device_id'], $ifIndex));
+        $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? AND `ifDescr` NOT LIKE 'Vlan%'", array($device['device_id'], $ifIndex));
+      }
 
       // If BRIDGE-MIB failed, get the port using pure LLDP-MIB
-      if (!$port)
+      if (!$port && !empty($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortDesc']))
       {
-        $ifName = $lldp_local_array[$entry_key]['lldpLocPortDesc'];
+        //lldpLocPortIdSubtype.15 = interfaceName
+        //lldpLocPortIdSubtype.16 = interfaceName
+        //lldpLocPortId.15 = "Te1/15"
+        //lldpLocPortId.16 = "Te1/16"
+        //lldpLocPortDesc.15 = TenGigabitEthernet1/15
+        //lldpLocPortDesc.16 = TenGigabitEthernet1/16
+        $ifName = $lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortDesc'];
         $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND (`ifName`= ? OR `ifDescr` = ?)", array($device['device_id'], $ifName, $ifName));
       }
-      /*
-      // last try by lldpLocPortId
+
+      // last try by lldpLocPortId, also see below for remote port
       if (!$port)
       {
-        if ($lldp['lldpLocPortIdSubtype'] != 'macAddress')
+        switch ($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortIdSubtype'])
         {
-          $lldp['lldpLocPortId'] = snmp_hexstring($lldp['lldpLocPortId']);
+          case 'interfaceName':
+            $ifName = snmp_hexstring($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortId']);
+            $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND (`ifName` = ? OR `ifDescr` = ? OR `port_label_short` = ?)", array($device['device_id'], $ifName, $ifName, $ifName));
+            break;
+          case 'interfaceAlias':
+            $ifAlias = snmp_hexstring($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortId']);
+            $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifAlias` = ?", array($device['device_id'], $ifAlias));
+            break;
+          case 'macAddress':
+            $ifPhysAddress = strtolower(str_replace(' ', '', $lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortId']));
+            $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifPhysAddress` = ?", array($device['device_id'], $ifPhysAddress));
+            break;
+          case 'networkAddress':
+            $id = snmp_hexstring($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortId']);
+            $ip_version = get_ip_version($id);
+            if ($ip_version)
+            {
+              $ip = ($ip_version === 6 ? Net_IPv6::uncompress($id, TRUE) : $id);
+              $port = dbFetchRow("SELECT * FROM `ipv".$ip_version."_addresses` LEFT JOIN `ports` USING (`port_id`) WHERE `ipv".$ip_version."_address` = ? AND `device_id` = ?", array($ip, $device['device_id']));
+            }
+            unset($id, $ip);
+            break;
         }
       }
-      */
+
+      // Ohh still unknown port? this is not should happen, but this derp LLDP implementatioun on your device
+      if (!$port)
+      {
+        print_debug('WARNING. Local port for neighbour not found, used incorrect lldpRemLocalPortNum as ifIndex.');
+        $ifIndex = $lldpRemLocalPortNum; // This is incorrect, not really ifIndex, but seems sometime this numbers same
+        $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? AND `ifDescr` NOT LIKE 'Vlan%'", array($device['device_id'], $ifIndex));
+      }
 
       foreach ($lldp_instance as $entry_instance => $lldp)
       {
@@ -65,7 +111,14 @@ if ($lldp_array)
         // lldpRemPortId can be hex string
         if ($lldp['lldpRemPortIdSubtype'] != 'macAddress')
         {
-          $lldp['lldpRemPortId'] = snmp_hexstring($lldp['lldpRemPortId']);
+          // On Extreme platforms, they remove the leading 1: from ports. Put it back if there isn't a :.
+          if (preg_match ('/^ExtremeXOS.*$/',$lldp['lldpRemSysDesc'])) {
+            if (!preg_match ('/\:/',$lldp['lldpRemPortId'])) {
+              $lldp['lldpRemPortId'] = '1:'.$lldp['lldpRemPortId'];
+            }
+          } else {
+            $lldp['lldpRemPortId'] = snmp_hexstring($lldp['lldpRemPortId']);
+          }
         }
 
         if (is_valid_hostname($lldp['lldpRemSysName']))

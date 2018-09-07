@@ -7,11 +7,9 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
-
-echo("Wifi: ");
 
 // Build array of radios in the database
 
@@ -25,6 +23,13 @@ foreach (dbFetchRows("SELECT * FROM `wifi_wlans` WHERE `device_id` = ?", array($
   $GLOBALS['cache']['wifi_wlans'][$wlan['wlan_index']] = $wlan;
 }
 
+foreach (dbFetchRows("SELECT * FROM `wifi_aps` WHERE `device_id` = ?", array($device['device_id'])) as $ap)
+{
+    $GLOBALS['cache']['wifi_aps'][$ap['ap_index']] = $ap;
+}
+
+
+
 // Include all discovery modules
 
 $include_dir = 'includes/discovery/wifi';
@@ -33,6 +38,7 @@ include($config['install_dir'] . '/includes/include-dir-mib.inc.php');
 // Remove non-valid things
 
 // FIXME - Actually write this code :)
+// FIXME - No for real write this code. :D
 
 echo(PHP_EOL);
 

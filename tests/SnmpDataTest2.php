@@ -4,18 +4,18 @@
 //define('OBS_QUIET', TRUE); // Disable any additional output from tests
 ini_set('opcache.enable', 0);
 
-include(dirname(__FILE__) . '/../includes/defaults.inc.php');
-include(dirname(__FILE__) . '/../config.php');
-//include(dirname(__FILE__) . '/data/test_definitions.inc.php'); // Fake definitions for testing
-include(dirname(__FILE__) . '/../includes/definitions.inc.php');
-include(dirname(__FILE__) . '/../includes/functions.inc.php');
+include(dirname(__FILE__) . '/../includes/sql-config.inc.php');
+//include(dirname(__FILE__) . '/../includes/defaults.inc.php');
+//include(dirname(__FILE__) . '/../config.php');
+//include(dirname(__FILE__) . '/../includes/definitions.inc.php');
+//include(dirname(__FILE__) . '/../includes/functions.inc.php');
 
 /**
  * How install snmpsim:
  *   sudo pip install snmpsim
  *
  * How to record basic (system) data for oses:
- *   snmprec.py --agent-udpv4-endpoint=x.x.x.x --community=<community> --start-oid=1.3.6.1.2.1 --stop-oid=1.3.6.1.2.1.1 --output-file=osname-y.snmprec
+ *   snmprec.py --agent-udpv4-endpoint=x.x.x.x --community=<community> --start-oid=1.3.6.1.2.1 --stop-oid=1.3.6.1.2.1.2 --output-file=osname-y.snmprec
  *
  * where: x.x.x.x - your device ip or hostname,
  *        osname  - os name, same as in observium definitions
@@ -44,6 +44,10 @@ class IncludesSnmpTest2 extends \PHPUnit\Framework\TestCase
     {
       $this->markTestSkipped('SNMPsimd unavailable or daemon not started, test skipped.');
     }
+
+    // Just get first snmp request, for alive snmpsimd
+    $device = build_initial_device_array($snmpsimd_ip, 'ios-1', 'v2c', $snmpsimd_port, 'udp');
+    snmp_get_oid($device, '.1.3.6.1.2.1.1.2.0');
   }
 
   /**
@@ -177,6 +181,53 @@ class IncludesSnmpTest2 extends \PHPUnit\Framework\TestCase
       //NET-SNMP-EXTEND-MIB::nsExtendOutLine."distro".1 = STRING: Linux|4.4.0-77-generic|amd64|Ubuntu|16.04|kvm
       array($community_ubuntu,               OBS_QUOTES_TRIM, 'nsExtendOutLine."distro".1', 'NET-SNMP-EXTEND-MIB', 'Linux|4.4.0-77-generic|amd64|Ubuntu|16.04|kvm'),
       array($community_ubuntu,              OBS_SNMP_ALL_HEX, 'nsExtendOutLine."distro".1', 'NET-SNMP-EXTEND-MIB', $distro_ubuntu_hex),
+    );
+  }
+
+  /**
+  * @dataProvider providerSnmp_UTF8
+  * @group snmpfix
+  */
+  public function testSnmp_UTF8($community, $oid, $mib, $result)
+  {
+    global $snmpsimd_ip, $snmpsimd_port;
+
+    $device = build_initial_device_array($snmpsimd_ip, 'utf8-test', 'v2c', $snmpsimd_port, 'udp');
+    $device['snmp_timeout'] = 2;
+    $device['snmp_retries'] = 1;
+    //var_dump($device);
+
+    $test = snmp_get_oid($device, 'sysLocation.0', 'SNMPv2-MIB');
+    if ($test === 'Rue de la M..tallurgie, 4530 Villers-le-Bouillet, Belgi..')
+    {
+      $this->markTestSkipped('On this system used NET-SNMP with UTF8 issue. See: https://sourceforge.net/p/net-snmp/bugs/2815/');
+    }
+
+    $device['snmp_community'] = $community;
+    $test = snmp_get_oid($device, $oid, $mib);
+    //var_dump($test);
+    $this->assertSame($result, snmp_fix_string($test));
+  }
+
+  public function providerSnmp_UTF8()
+  {
+    $sysDescr = 'D-Link £¨India£© Limited Internetwork Operating System Software
+1705 Series Software, Version 1.0.7F (BASE), RELEASE SOFTWARE
+Copyright (c) 2007 by D-Link £¨India£© Limited
+Compiled: 2008-01-31 14:25:20 by system, Image text-base: 0x10000
+ROM: System Bootstrap, Version 0.8.2
+Serial num:000H682000022, ID num:009675
+System image file is "Router.bin"
+DI-1705 (RISC)
+32768K bytes of memory,3584K bytes of flash';
+    $sysLocation = 'Rue de la Métallurgie, 4530 Villers-le-Bouillet, België';
+    $sysContact  = '"Майк Ступалов" <mike@observium.ru>';
+    return array(
+      array('utf8-test',  'sysDescr.0',    'SNMPv2-MIB', $sysDescr),
+      array('utf8-test',  'sysLocation.0', 'SNMPv2-MIB', $sysLocation),
+      array('utf8-test',  'sysContact.0',  'SNMPv2-MIB', $sysContact),
+      array('utf8-test2', 'ifAlias.556',   'IF-MIB',     'Cust: Priva De-Lier AZURE SID00829 {XC.1001.2015036}â'),
+      array('utf8-test3', 'ifAlias.521',   'IF-MIB',     'Tránsito Cogent (AS174): IPv4 1-182344586, IPv6 1-182344646;'),
     );
   }
 

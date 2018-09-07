@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -34,7 +34,7 @@ if (auth_usermanagement())
         print_error('Error deleting user "' . escape_html($delete_username) . '"!');
       }
     } else {
-      print_error('You have requested deletion of the user "' . escape_html($delete_username) . '". This action can not be reversed.<br /><a href="edituser/action=deleteuser/user_id=' . $vars['user_id'] . '/confirm=yes/">Click to confirm</a>');
+      print_error('You have requested deletion of the user "' . escape_html($delete_username) . '". This action can not be reversed.<br /><a href="edituser/action=deleteuser/user_id=' . $vars['user_id'] . '/confirm=yes/requesttoken=' . $_SESSION['requesttoken'] . '/">Click to confirm</a>');
     }
   }
 } else {

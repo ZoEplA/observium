@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -26,7 +26,7 @@
 // CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamRegistrationDone.1 = INTEGER: false(2)
 // CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamRegistrationSuppressed.1 = INTEGER: false(2)
 
-$data = snmp_get_multi($device, 'rlPhdUnitGenParamModelName.1 rlPhdUnitGenParamServiceTag.1 rlPhdUnitGenParamSoftwareVersion.1', '-OQUs', 'CISCOSB-Physicaldescription-MIB');
+$data = snmp_get_multi_oid($device, 'rlPhdUnitGenParamModelName.1 rlPhdUnitGenParamServiceTag.1 rlPhdUnitGenParamSoftwareVersion.1', array(), 'CISCOSB-Physicaldescription-MIB');
 $data = $data[1];
 
 $hardware  = $data['rlPhdUnitGenParamModelName'];

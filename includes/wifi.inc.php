@@ -7,9 +7,143 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
+
+// Discover an entity by populating/updating a database table and returning an id
+
+function discover_entity($device_id, $entity_type, $data)
+{
+
+    if (is_array($GLOBALS['config']['entities'][$entity_type])) {
+
+        $def = $GLOBALS['config']['entities'][$entity_type];
+        $index = $data[$def['table_fields']['index']];
+        $params = $def['params'];
+
+        if (isset($params['table_fields']['index']) && is_array())
+        {
+
+
+
+        } elseif (isset($params['table_fields']['index'])) {
+
+        } else {
+
+        }
+
+
+
+        if (is_array($GLOBALS['cache'][$def['table']][$index])) {
+            echo 'Exists';
+
+            $db = $GLOBALS['cache'][$def['table']][$index];
+            $id = $db[$def['table_fields']['id']];
+
+            echo 'exists:'.$id.PHP_EOL;
+
+            $update = array();
+            foreach ($params as $param)
+            {
+                if ($data[$param] != $db[$param]) { $update[$param] = $data[$param]; }
+            }
+            if (count($update))
+            {
+                dbUpdate($update, $def['table'], '`'.$def['table_fields']['id'].'` = ?', array($id));
+                echo('U');
+            } else {
+                echo('.');
+            }
+
+        } else {
+
+            echo 'Doesnt Exist';
+
+            $insert = array();
+            $insert['device_id'] = $device_id;
+            foreach ($params as $param)
+            {
+                $insert[$param] = $data[$param];
+                if ($data[$param] == NULL) { $insert[$param] = array('NULL'); }
+            }
+            $id = dbInsert($insert, $def['table']);
+            echo("+");
+
+            $params[$def['table_fields']['id']] = $id;
+
+            // Populate cache with this entry. Maybe we need it.
+            $GLOBALS['cache'][$def['table']][$index] = $params;
+
+        }
+
+    } else {
+
+        print_error("Entity Type does not exist. This is a relatively serious error.");
+
+        return FALSE;
+
+    }
+
+    return $id;
+
+}
+
+
+// Discover WIFI Access Point. Returns ap_id.
+
+function discover_wifi_ap($device_id, $ap)
+{
+
+    $params = array('ap_index', 'ap_number', 'ap_name', 'ap_serial', 'ap_model', 'ap_location', 'ap_fingerprint', 'ap_status');
+
+    if (is_array($GLOBALS['cache']['wifi_aps'][$ap['ap_index']]))
+    {
+        // Database entry exists. Lets update it!
+
+        $ap_db = $GLOBALS['cache']['wifi_aps'][$ap['ap_index']];
+        $ap_id = $ap_db['wifi_ap_id'];
+
+        echo 'exists:'.$ap_id.PHP_EOL;
+
+        $update = array();
+        foreach ($params as $param)
+        {
+            if ($ap[$param] != $ap_db[$param]) { $update[$param] = $ap[$param]; }
+        }
+        if (count($update))
+        {
+            dbUpdate($update, 'wifi_aps', '`wifi_ap_id` = ?', array($ap_db['wifi_ap_id']));
+            echo('U');
+        } else {
+            echo('.');
+        }
+
+    } else {
+
+        // Database entry doesn't exist. Lets create it!
+
+        $insert = array();
+        $insert['device_id'] = $device_id;
+        foreach ($params as $param)
+        {
+            $insert[$param] = $ap[$param];
+            if ($ap[$param] == NULL) { $insert[$param] = array('NULL'); }
+        }
+        $ap_id = dbInsert($insert, 'wifi_aps');
+        echo("+");
+
+        $params['ap_wifi_id'] = $ap_id;
+
+        // Populate cache with this entry. Maybe we need it.
+        $GLOBALS['cache']['wifi_aps'][$ap['ap_index']] = $params;
+
+    }
+
+    return $ap_id;
+
+}
+
 
 function discover_wifi_wlan($device_id, $wlan)
 {
@@ -22,6 +156,7 @@ function discover_wifi_wlan($device_id, $wlan)
   {
     // Database entry exists. Lets update it!
     $wlan_db = $GLOBALS['cache']['wifi_wlans'][$wlan['wlan_index']];
+    $wlan_id = $wlan_db['wlan_id'];
 
     $update = array();
     foreach ($params as $param)
@@ -51,11 +186,13 @@ function discover_wifi_wlan($device_id, $wlan)
 
   }
 
+  return $wlan_id;
+
 }
 
 function discover_wifi_radio($device_id, $radio)
 {
-  $params  = array('radio_ap', 'radio_mib','radio_number', 'radio_type', 'radio_status', 'radio_clients', 'radio_txpower', 'radio_channel', 'radio_mac', 'radio_protection', 'radio_bsstype');
+  $params  = array('radio_ap', 'radio_mib','radio_number', 'radio_util', 'radio_type', 'radio_status', 'radio_clients', 'radio_txpower', 'radio_channel', 'radio_mac', 'radio_protection', 'radio_bsstype');
 
   if (is_array($GLOBALS['cache']['wifi_radios'][$radio['radio_ap']][$radio['radio_number']])) { $radio_db = $GLOBALS['cache']['wifi_radios'][$radio['radio_ap']][$radio['radio_number']]; }
 

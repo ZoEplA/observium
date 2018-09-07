@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -22,7 +22,7 @@
  RUCKUS-SWINFO-MIB::ruckusSwRevStatus.1 = INTEGER: active(2)
  */
 
-$data = snmp_get_multi($device, 'ruckusHwInfoModelNumber.0 ruckusHwInfoSerialNumber.0 ruckusHwInfoCustomerID.0 ruckusHwInfoHWMajorRevision.0 ruckusHwInfoHWMinorRevision.0', '-OQUs', 'RUCKUS-HWINFO-MIB');
+$data = snmp_get_multi_oid($device, 'ruckusHwInfoModelNumber.0 ruckusHwInfoSerialNumber.0 ruckusHwInfoCustomerID.0 ruckusHwInfoHWMajorRevision.0 ruckusHwInfoHWMinorRevision.0', array(), 'RUCKUS-HWINFO-MIB');
 $data = $data[0];
 
 $hw_ver       = $data['ruckusHwInfoHWMajorRevision'] .'.'. $data['ruckusHwInfoHWMinorRevision'];

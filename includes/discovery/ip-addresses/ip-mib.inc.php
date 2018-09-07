@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -73,8 +73,7 @@ foreach ($oid_data as $ip_address => $entry)
 
   $ip_data[$ip_version][$ifIndex][$ip_address] = array('ifIndex' => $ifIndex,
                                                        'ip'      => $ip_address,
-                                                       'mask'    => $entry['ipAdEntNetMask'],
-                                                       'type'    => 'unicast');
+                                                       'mask'    => $entry['ipAdEntNetMask']);
 }
 
 // Get IP addresses from IP-MIB (new table, both IPv4/IPv6)
@@ -83,7 +82,7 @@ $oid_data = array();
 foreach (array('ipAddressIfIndex', 'ipAddressType', 'ipAddressPrefix', 'ipAddressOrigin') as $oid)
 {
   $oid_data = snmpwalk_cache_twopart_oid($device, $oid, $oid_data, 'IP-MIB', NULL, $flags);
-  if ($oid == 'ipAddressIfIndex' && $GLOBALS['snmp_status'] === FALSE)
+  if ($oid == 'ipAddressIfIndex' && snmp_status() === FALSE)
   {
     break; // Stop walk, not exist table
   }
@@ -97,10 +96,16 @@ if (!count($ip_data[$ip_version]))
   //IP-MIB::ipAddressOrigin.ipv4."198.237.180.2" = manual
   //Origins: 1:other, 2:manual, 4:dhcp, 5:linklayer, 6:random
 
+  // IPv4z (not sure, never seen)
+  if (isset($oid_data[$ip_version . 'z']))
+  {
+    $oid_data[$ip_version] = array_merge((array)$oid_data[$ip_version], $oid_data[$ip_version . 'z']);
+  }
+
   // Rewrite IP-MIB array
   foreach ($oid_data[$ip_version] as $ip_address => $entry)
   {
-    if ($entry['ipAddressType'] == 'broadcast') { continue; } // Skip broadcasts
+    if (in_array($entry['ipAddressType'], $GLOBALS['config']['ip-address']['ignore_type'])) { continue; } // Skip broadcasts
     //$ip_address = str_replace($ip_version.'.', '', $key);
     $ifIndex = $entry['ipAddressIfIndex'];
     $tmp_prefix = explode('.', $entry['ipAddressPrefix']);
@@ -122,6 +127,12 @@ $ip_version = 'ipv6';
 //ipAddressPrefix.ipv6."00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:01" = ipAddressPrefixOrigin.1.ipv6."00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:01".128
 //ipAddressOrigin.ipv6."00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:01" = manual
 //Origins: 1:other, 2:manual, 4:dhcp, 5:linklayer, 6:random
+
+// IPv6z
+if (isset($oid_data[$ip_version . 'z']))
+{
+  $oid_data[$ip_version] = array_merge((array)$oid_data[$ip_version], $oid_data[$ip_version . 'z']);
+}
 
 // Rewrite IP-MIB array
 $check_ipv6_mib = FALSE; // Flag for additionally check IPv6-MIB

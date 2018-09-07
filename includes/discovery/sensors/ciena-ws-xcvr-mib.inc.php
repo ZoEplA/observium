@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
  *
  */
 
@@ -48,7 +48,7 @@ foreach ($oids as $index => $entry)
   list($ifIndex,$lane,) = explode(".", $index, 3);
 
   // if 2nd element is greater than 0, it's the lane number (1-4 for LR4)
-  if ($lane >0)
+  if ($lane > 0)
   {
     $laneDescr = " Lane " . $lane;
   }
@@ -80,7 +80,13 @@ foreach ($oids as $index => $entry)
   $oid_name = 'cwsXcvrTemperatureActual';
   $oid_num  = '.1.3.6.1.4.1.1271.3.4.15.13.1.2.'.$index;
   $type     = 'cwsXcvrTemperatureActual'; // $mib . '-' . $oid_name;
-  $scale    = 1;
+  if (version_compare($device['version'], '1.6', '>='))
+  {
+    // See: http://jira.observium.org/browse/OBS-2753
+    $scale  = 0.001;
+  } else {
+    $scale  = 1;
+  }
   $value    = $entry[$oid_name];
 
   $limits   = array('limit_high'       => $entry['cwsXcvrTemperatureThresholdHighAlarmThreshold'],

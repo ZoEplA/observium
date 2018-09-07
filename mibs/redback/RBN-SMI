@@ -1,7 +1,7 @@
 -- *****************************************************************
--- RBN-SMI.my:	RedBack Networks Structure of Management Information
+-- RBN-SMI.my:	  Structure of Management Information
 --
--- Copyright (c) 1998, 2001-2002 RedBack Networks, Inc.
+-- Copyright (c) 1998, 2001-2002, 2011 Ericsson AB.
 -- All rights reserved.
 -- 
 -- *****************************************************************
@@ -14,23 +14,26 @@ IMPORTS
 	enterprises
 		FROM SNMPv2-SMI;
 
-redBackNetworks MODULE-IDENTITY
-	LAST-UPDATED	"200106270000Z" -- June 27, 2001
-	ORGANIZATION	"RedBack Networks, Inc."
+rbnSMI MODULE-IDENTITY
+        LAST-UPDATED    "201101191800Z" -- Jan 19, 2011
+        ORGANIZATION    "Ericsson AB."
         CONTACT-INFO
-		"	RedBack Networks, Inc.
+                "       Ericsson AB.
 
-		Postal:	300 Holger Way
+                Postal: 100 Headquarters Dr
                         San Jose, CA  95134
                         USA
 
-		 Phone:	+1 408 570-5000
-		   Fax: +1 408 570-5599
-
-		E-mail:	mib-info@redback.com"
-        DESCRIPTION
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
 		"The Structure of Management Information for
-		RedBack Networks"
+		the enterprise."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
 
         REVISION    "200206060000Z" -- June 6, 2002
         DESCRIPTION
@@ -49,42 +52,42 @@ rbnProducts OBJECT-IDENTITY
 	STATUS	current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 1 }
+	::= { rbnSMI 1 }
 
 rbnMgmt OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 2 }
+	::= { rbnSMI 2 }
 
 rbnExperiment OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 3 }
+	::= { rbnSMI 3 }
 
 rbnCapabilities OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 4 }
+	::= { rbnSMI 4 }
 
 rbnModules OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 5 }
+	::= { rbnSMI 5 }
 
 rbnEntities OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 6 }
+	::= { rbnSMI 6 }
 
 rbnInternal OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		""
-	::= { redBackNetworks 7 }
+	::= { rbnSMI 7 }
 
 END
