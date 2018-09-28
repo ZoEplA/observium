@@ -110,7 +110,7 @@ if (!empty($agent_data['app']['mysql']))
   $values = array();
   foreach ($mapping as $key => $value)
   {
-    $values[$key] = $map[$value];
+    $values[$key] = ($map[$value] >= 0) ? $map[$value] : 'U';
   }
 
   rrdtool_update_ng($device, 'mysql', $values, $app_id);
@@ -141,7 +141,7 @@ if (!empty($agent_data['app']['mysql']))
   $valuesb = array();
   foreach ($mapping_status as $key => $value)
   {
-    $valuesb[$value] = $map[$value];
+    $valuesb[$value] = ($map[$value] >= 0) ? $map[$value] : 'U';
   }
 
   update_application($app_id, array_merge($values, $valuesb));
