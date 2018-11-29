@@ -44,7 +44,9 @@ if ($agent_data['raspberrypi'] != ':')
         case 'temp':
           $sensorindex = ++$tempcount;
           $sensortype = 'temperature';
-          $info = 'Raspberry Pi';
+        case 'hddtemp':
+          $sensorindex = ++$tempcount;
+          $sensortype = 'temperature';
           break;
         default:
           unset($sensortype);

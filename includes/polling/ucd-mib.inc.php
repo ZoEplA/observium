@@ -61,13 +61,13 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
     // This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
     // and because it is per-host and no big performance hit. See new format below
     // FIXME REMOVE
-    
+
     // If ssCpuRawSteal is not available then create a dummy one with zero value
     if (is_null($ss['ssCpuRawSteal']))
     {
       $ss['ssCpuRawSteal'] = 0;
     }
-    
+
     if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawSteal']) && is_numeric($ss['ssCpuRawIdle']))
     {
       rrdtool_create($device, $cpu_rrd, $cpu_rrd_create);

@@ -48,6 +48,11 @@ if ($agent_data['orangepi'] != ':')
           $sensortype = 'temperature';
           $scale = 0.001;
           break;
+        case 'hddtemp':
+          $sensorindex = ++$tempcount;
+          $sensortype = 'temperature';
+          $scale = 1;
+          break;
         default:
           unset($sensortype);
           break;
