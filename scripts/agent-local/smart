@@ -1,0 +1,82 @@
+#!/usr/bin/perl -w
+# Copyright (C) 2009  Glen Pitt-Pladdy
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See: http://www.pitt-pladdy.com/blog/_20091031-144604%2B0000%20SMART%20stats%20on%20Cacti%20%28via%20SNMP%29/
+#
+# 2014-03-27: updated for usage with Observium's Unix-Agent (http://geek.be/observium-unix-agent-and-smart-attributes/)
+#
+
+my $smartexec = '/usr/sbin/smartctl';
+my $smartargs = '-a';
+my @smartdevices = ('/dev/sda', '/dev/sdb');  # Add device type & id if needed (e.g. '-d megaraid,0 /dev/sda', or even '-d ata /dev/disk/by-id/ata-MB0500EAMZD_9WJ06C0K')
+my @smartids = (5, 10, 184, 187, 188, 194, 196, 197, 198, 201);
+my $useraw = 1;   # use raw SMART values (0/1)
+
+$CACHETIME = 1800;
+$CACHEFILE = '/tmp/observium-agent-smart';
+
+# check for cache file newer CACHETIME seconds ago
+if ( -f $CACHEFILE && time - (stat( $CACHEFILE ))[9] < $CACHETIME) {
+    # use cached data
+    # print "Using cached data from file $CACHEFILE.\n";
+} else {
+    # grab fresh data
+
+    # write file
+    $tmpfile = "$CACHEFILE.TMP";
+    open (OUTFILE, ">$tmpfile")
+            or die "File open failure: $tmpfile\n";
+
+    foreach $drive (sort @smartdevices) {
+        open DR, "$smartexec $smartargs $drive 2>&1 |"
+            or die "FATAL - can't execute \"$smartexec $smartargs $drive\": $!\n";
+        $drive = (split '/', $drive)[-1];
+        print OUTFILE "0:$drive";
+        while ( defined ( $line = <DR> )
+            and $line !~ /^ID#\s+ATTRIBUTE_NAME\s+FLAG\s+VALUE\s+WORST\s+THRESH/ )
+            {}
+        while ( defined ( $line = <DR> ) ) {
+            chomp $line;
+            if ( $line eq '' ) { last; }
+            $line =~ s/^\s*//;
+            @fields = split /\s+/, $line;
+            if ( $fields[0] ~~ @smartids ) {
+                if ($useraw) {
+                    print OUTFILE " " . "$fields[0]:" . int($fields[9]);
+                } else {
+                    print OUTFILE " " . "$fields[0]:" . int($fields[3]);
+                }
+            }
+        }
+        print OUTFILE "\n";
+        close DR;
+    }
+
+    close OUTFILE;
+    rename ( $tmpfile, $CACHEFILE );
+}
+
+print "<<<app-smart>>>\n";
+
+open (INFILE, "<$CACHEFILE" )
+        or die "File open failure: $CACHEFILE\n";
+while (my $line = <INFILE>) {
+    chomp $line;
+    print "$line\n";
+}
+
+close INFILE;
