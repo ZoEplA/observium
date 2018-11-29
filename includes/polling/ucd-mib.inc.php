@@ -65,7 +65,7 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
     // If ssCpuRawSteal is not available then create a dummy one with zero value
     if (is_null($ss['ssCpuRawSteal']))
     {
-      $ss['ssCpuRawSteal']) = 0;
+      $ss['ssCpuRawSteal'] = 0;
     }
     
     if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawSteal']) && is_numeric($ss['ssCpuRawIdle']))
