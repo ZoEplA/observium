@@ -36,6 +36,7 @@ if (!empty($agent_data['app']['nfsd']))
   );
 
   $nfsLabel['proc3'] = array(
+    "unused",
     "null", "getattr", "setattr", "lookup", "access", "readlink",
     "read", "write", "create", "mkdir", "symlink", "mknod",
     "remove", "rmdir", "rename", "link", "readdr", "readdirplus",
@@ -50,7 +51,6 @@ if (!empty($agent_data['app']['nfsd']))
     if (isset($tokens[0]) && isset($nfsLabel[strtolower($tokens[0])]))
     {
       $base = strtolower($tokens[0]);
-      array_shift($tokens);
       array_shift($tokens);
       foreach ($tokens as $k => $v)
       {
