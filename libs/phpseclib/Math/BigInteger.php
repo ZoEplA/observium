@@ -3305,6 +3305,57 @@ class BigInteger
     }
 
     /**
+     * Checks a numer to see if it's odd
+     *
+     * @return bool
+     * @access public
+     */
+    function isOdd()
+    {
+        switch (MATH_BIGINTEGER_MODE) {
+            case self::MODE_GMP:
+                return gmp_testbit($this->value, 0);
+                break;
+            case self::MODE_BCMATH:
+                return $this->value[strlen($this->value) - 1] % 2 == 1;
+                break;
+            default:
+                return (bool) ($this->value[0] & 1);
+        }
+    }
+
+    /**
+     * Checks a numer to see if $x bit is set
+     *
+     * @return bool
+     * @access public
+     */
+    function testBit($x)
+    {
+        switch (MATH_BIGINTEGER_MODE) {
+            case self::MODE_GMP:
+                return gmp_testbit($this->value, $x);
+                break;
+            case self::MODE_BCMATH:
+                return bccomp(
+                    bcmod($this->value, bcpow('2', $x + 1, 0), 0),
+                    bcpow('2', $x, 0),
+                    0
+                ) >= 0;
+                break;
+            default:
+                $digit = floor($x / self::$base);
+                $bit = $x % self::$base;
+
+                if (!isset($this->value[$digit])) {
+                    return false;
+                }
+
+                return (bool) ($this->value[$digit] & (1 << $bit));
+        }
+    }
+
+    /**
      * Checks a numer to see if it's prime
      *
      * Assuming the $t parameter is not set, this function has an error rate of 2**-80.  The main motivation for the
