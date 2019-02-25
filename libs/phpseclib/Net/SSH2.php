@@ -4424,7 +4424,12 @@ class SSH2
                 }
 
                 // Validate ECDSA public key
-                if ($q[0]->equals($zero) || $q[1]->equals($zero)) {
+                if ($q[0]->equals($zero) || $q[0]->compare($m) >= 0) {
+                    user_error('Bad server signature');
+                    return $this->_disconnect(NET_SSH2_DISCONNECT_KEY_EXCHANGE_FAILED);
+                }
+
+                if ($q[1]->equals($zero) || $q[1]->compare($m) >= 0) {
                     user_error('Bad server signature');
                     return $this->_disconnect(NET_SSH2_DISCONNECT_KEY_EXCHANGE_FAILED);
                 }
