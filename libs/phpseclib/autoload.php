@@ -20,6 +20,7 @@ spl_autoload_register(
                 'phpseclib\\crypt\\rc4' => '/Crypt/RC4.php',
                 'phpseclib\\crypt\\rijndael' => '/Crypt/Rijndael.php',
                 'phpseclib\\crypt\\rsa' => '/Crypt/RSA.php',
+                'phpseclib\\crypt\\ecdsa' => '/Crypt/ECDSA.php',
                 'phpseclib\\crypt\\tripledes' => '/Crypt/TripleDES.php',
                 'phpseclib\\crypt\\twofish' => '/Crypt/Twofish.php',
                 'phpseclib\\file\\ansi' => '/File/ANSI.php',

@@ -38,6 +38,8 @@ if ($device['os_group'] == "unix")
   // Try SSH Connect inspired by http://ispire.me/polling-observium-unix-agent-with-ssh
   $agent_start = utime();
 
+  // RSA signature verification is much faster than ECDSA signature verification
+  // Use RSA keys for SSH authentication with private keys
   $key1 = new phpseclib\Crypt\RSA();
   if (file_exists("/opt/observium/ssh/id_rsa")) {
     $key1->loadKey(file_get_contents("/opt/observium/ssh/id_rsa"));
