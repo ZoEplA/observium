@@ -4400,6 +4400,12 @@ class SSH2
                     return $this->_disconnect(NET_SSH2_DISCONNECT_HOST_KEY_NOT_VERIFIABLE);
                 }
 
+                $ecdsa_public_key = pack(
+                    'H*a*',
+                    $pem_header,
+                    $server_public_host_key
+                );
+
                 $q = array(
                     new BigInteger($this->_string_shift($server_public_host_key, $size), 256),
                     new BigInteger($this->_string_shift($server_public_host_key, $size), 256),
@@ -4466,13 +4472,6 @@ class SSH2
                 }
 
                 if (defined('MATH_BIGINTEGER_OPENSSL_ENABLED')) {
-                    $ecdsa_public_key = pack(
-                        'H*a*a*',
-                        $pem_header,
-                        $q[0]->toBytes(),
-                        $q[1]->toBytes()
-                    );
-
                     $encapsulated_key = "-----BEGIN PUBLIC KEY-----\r\n" .
                                         chunk_split(base64_encode($ecdsa_public_key)) .
                                         "-----END PUBLIC KEY-----";
