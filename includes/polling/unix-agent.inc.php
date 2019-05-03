@@ -15,8 +15,8 @@
 // Also uses check_valid_virtual_machines(). We (should) do a lot more discovery through the agent, IMO we should do away with the distinction. --tom
 include_once("includes/discovery/functions.inc.php");
 
-//define("NET_SSH2_LOGGING", 4);
-//define("LOG_REALTIME_FILENAME", "/opt/observium/logs/debugssh.".$device['hostname'].".log");
+//define("NET_SSH2_LOGGING", 2);
+//define("LOG_REALTIME_FILENAME", "/opt/observium/logs/sshdebug.".$device['hostname'].".log");
 
 global $valid, $agent_sensors;
 
@@ -40,37 +40,66 @@ if ($device['os_group'] == "unix")
 
   // RSA signature verification is much faster than ECDSA signature verification
   // Use RSA keys for SSH authentication with private keys
-  $key1 = new phpseclib\Crypt\RSA();
+  $identity_key = new phpseclib\Crypt\RSA();
   if (file_exists("/opt/observium/ssh/id_rsa")) {
-    $key1->loadKey(file_get_contents("/opt/observium/ssh/id_rsa"));
-  }
-
-  $key2 = new phpseclib\Crypt\RSA();
-  if (file_exists("/opt/observium/ssh/le_rsa")) {
-    $key2->loadKey(file_get_contents("/opt/observium/ssh/le_rsa"));
+    $identity_key->loadKey(file_get_contents("/opt/observium/ssh/id_rsa"));
   }
 
   $connection = new phpseclib\Net\SSH2($device['hostname'], $device['ssh_port'], 10);
 
   $connection->enableQuietMode();
 
-  if ($connection->login("root", $key1)) {
-    $agent_raw = $connection->exec("/usr/bin/observium_agent");
-  // This is for LibreElec
-  } elseif ($connection->login("root", $key2)) {
-    $agent_raw = $connection->exec("/storage/observium/observium_agent");
-  // Else try official port
-  } else {
-    if ($connection->isConnected())
-    {
-        print_warning("SSH connection to UNIX agent failed: Bad username or password. Fallback to xinetd connection.");
-        logfile("UNIX-AGENT: SSH connection failed: Bad username or password. Fallback to xinetd connection.");
+  $host_key = $connection->getServerPublicHostKey();
+
+  if ($connection->signature_validated) {
+    echo("Host key: ".$host_key."\r\n");
+
+    $stored_host_key = get_entity_attrib('device', $device, 'host_public_key');
+
+    if (empty($stored_host_key)) {
+      // Store host public key on first connection attempt
+      set_entity_attrib('device', $device, 'host_public_key', $host_key);
+      // Delete attribute if it was set
+      del_entity_attrib('device', $device, 'host_id_changed');
     } else {
-        print_warning("SSH connection to UNIX agent failed: Unable to establish a connection. Fallback to xinetd connection.");
-        logfile("UNIX-AGENT: SSH connection failed: Unable to establish a connection. Fallback to xinetd connection.");
+      echo("Stored key: ".$stored_host_key."\r\n");
+
+      if (strcmp($host_key, $stored_host_key)) {
+        print_warning("SSH connection to UNIX agent: Remote host identification has changed!");
+        logfile("SSH connection to UNIX agent: Remote host identification has changed!");
+
+        if (get_entity_attrib('device', $device, 'host_id_changed') === NULL) {
+          set_entity_attrib('device', $device, 'host_id_changed', $config['time']['now']);
+          log_event('Host identification has changed.', $device, 'device', $device['device_id'], 3);
+        }
+      } else {
+        del_entity_attrib('device', $device, 'host_id_changed');
+      }
     }
 
-    // Fallback to xinetd connection
+    if ($connection->login("root", $identity_key)) {
+      $agent_raw = $connection->exec("/usr/bin/observium_agent");
+
+      if (strpos($agent_raw, '<<<Observium>>>') === false) {
+        // This is for LibreElec
+        $agent_raw = $connection->exec("/storage/observium/observium_agent");
+      }
+    }
+  }
+
+  if (defined('NET_SSH2_LOGGING') && defined('LOG_REALTIME_FILENAME')) {
+    $ssh_connection_log = $connection->getLog();
+
+    $fp = fopen(LOG_REALTIME_FILENAME, 'w');
+    fputs($fp, $ssh_connection_log);
+    fclose($fp);
+  }
+
+  // Fallback to xinetd connection
+  if (strpos($agent_raw, '<<<Observium>>>') === false) {
+    print_warning("SSH connection to UNIX agent failed: Unable to establish a connection. Fallback to xinetd connection.");
+    logfile("UNIX-AGENT: SSH connection failed: Unable to establish a connection. Fallback to xinetd connection.");
+
     $agent_socket = "tcp://".$device['hostname'].":".$agent_port;
     $agent = @stream_socket_client($agent_socket, $errno, $errstr, 10);
 
@@ -85,9 +114,10 @@ if ($device['os_group'] == "unix")
 
   $agent_end = utime(); $agent_time = round(($agent_end - $agent_start) * 1000);
 
-  if (!empty($agent_raw))
+  echo("execution time: ".$agent_time."ms\r\n");
+
+  if (strpos($agent_raw, '<<<Observium>>>') !== false)
   {
-    echo("execution time: ".$agent_time."ms");
     rrdtool_update_ng($device, 'agent', array('time' => $agent_time));
     $graphs['agent'] = TRUE;
 

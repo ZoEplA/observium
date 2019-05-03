@@ -69,6 +69,25 @@ function print_status($status)
       $string .= '    <td style="white-space: nowrap">' . deviceUptime($device, 'short') . '</td>' . PHP_EOL;
       $string .= '  </tr>' . PHP_EOL;
     }
+
+    $query = 'SELECT * FROM `devices` AS D';
+    $query .= ' WHERE D.`status` = 1' . $query_device_permitted;
+    $query .= ' ORDER BY D.`hostname` ASC';
+    $entries = dbFetchRows($query);
+    foreach ($entries as $device)
+    {
+      $since = get_entity_attrib('device', $device, 'host_id_changed');
+      if ($since) {
+        $string .= '  <tr>' . PHP_EOL;
+        $string .= '    <td class="entity">' . generate_device_link($device, short_hostname($device['hostname'])) . '</td>' . PHP_EOL;
+        // $string .= '    <td><span class="badge badge-inverse">Device</span></td>' . PHP_EOL;
+        $string .= '    <td><span class="label label-important">Host identification changed</span></td>' . PHP_EOL;
+        $string .= '    <td class="entity"><i class="'.$config['icon']['devices'].'"></i> ' . generate_device_link($device, short_hostname($device['hostname'])) . '</td>' . PHP_EOL;
+        // $string .= '    <td style="white-space: nowrap">' . escape_html(truncate($device['location'], 30)) . '</td>' . PHP_EOL;
+        $string .= '    <td style="white-space: nowrap">' . format_unixtime($since) . '</td>' . PHP_EOL;
+        $string .= '  </tr>' . PHP_EOL;
+      }
+    }
   }
 
   // Uptime

@@ -3,7 +3,7 @@
 /**
  * Pure-PHP implementation of SSHv2.
  *
- * PHP version 5
+ * PHP version 7
  *
  * Here are some examples of how to use this library:
  * <code>
@@ -1283,9 +1283,15 @@ class SSH2
         );
 
         $compression_algorithms = array(
+            'zlib@openssh.com', // OPTIONAL        ZLIB (LZ77) delayed compression
             'none'   // REQUIRED        no compression
-            //'zlib' // OPTIONAL        ZLIB (LZ77) compression
         );
+        if (!function_exists('deflate_init')) {
+            $compression_algorithms = array_diff(
+                $compression_algorithms,
+                array('zlib@openssh.com')
+            );
+        }
 
         // some SSH servers have buggy implementations of some of the above algorithms
         switch ($this->server_identifier) {
@@ -1763,14 +1769,22 @@ class SSH2
             user_error('No compatible server to client compression algorithms found');
             return $this->_disconnect(NET_SSH2_DISCONNECT_KEY_EXCHANGE_FAILED);
         }
-        $this->decompress = $compression_algorithm == 'zlib';
+        $this->decompress = $compression_algorithm == 'zlib@openssh.com';
+
+        if ($this->decompress) {
+            $this->decompress_ctx = inflate_init(ZLIB_ENCODING_DEFLATE);
+        }
 
         $compression_algorithm = $this->_array_intersect_first($compression_algorithms, $this->compression_algorithms_client_to_server);
         if ($compression_algorithm === false) {
             user_error('No compatible client to server compression algorithms found');
             return $this->_disconnect(NET_SSH2_DISCONNECT_KEY_EXCHANGE_FAILED);
         }
-        $this->compress = $compression_algorithm == 'zlib';
+        $this->compress = $compression_algorithm == 'zlib@openssh.com';
+
+        if ($this->compress) {
+            $this->compress_ctx = deflate_init(ZLIB_ENCODING_DEFLATE);
+        }
 
         return true;
     }
@@ -3188,22 +3202,25 @@ class SSH2
             }
         }
 
-        //if ($this->decompress) {
-        //    $payload = gzinflate(substr($payload, 2));
-        //}
+        if (($this->bitmap & self::MASK_LOGIN) && ($this->decompress)) {
+            $data = inflate_add($this->decompress_ctx, $payload, ZLIB_SYNC_FLUSH);
+        } else {
+            $data = $payload;
+        }
 
         $this->get_seq_no++;
 
         if (defined('NET_SSH2_LOGGING')) {
             $current = microtime(true);
-            $message_number = isset($this->message_numbers[ord($payload[0])]) ? $this->message_numbers[ord($payload[0])] : 'UNKNOWN (' . ord($payload[0]) . ')';
+            $message_number = isset($this->message_numbers[ord($data[0])]) ? $this->message_numbers[ord($data[0])] : 'UNKNOWN (' . ord($data[0]) . ')';
             $message_number = '<- ' . $message_number .
-                              ' (since last: ' . round($current - $this->last_packet, 4) . ', network: ' . round($stop - $start, 4) . 's)';
-            $this->_append_log($message_number, $payload);
+                              ' (since last: ' . round($current - $this->last_packet, 4) . ', network: ' . round($stop - $start, 4) . 's,' .
+                              ' zlib: ' . strlen($payload) . ':' . strlen($data) . ')';
+            $this->_append_log($message_number, $data);
             $this->last_packet = $current;
         }
 
-        return $this->_filter($payload);
+        return $this->_filter($data);
     }
 
     /**
@@ -3640,22 +3657,22 @@ class SSH2
             return false;
         }
 
-        //if ($this->compress) {
-        //    // the -4 removes the checksum:
-        //    // http://php.net/function.gzcompress#57710
-        //    $data = substr(gzcompress($data), 0, -4);
-        //}
+        if (($this->bitmap & self::MASK_LOGIN) && ($this->compress)) {
+            $payload = deflate_add($this->compress_ctx, $data, ZLIB_SYNC_FLUSH);
+        } else {
+            $payload = $data;
+        }
 
         // 4 (packet length) + 1 (padding length) + 4 (minimal padding amount) == 9
-        $packet_length = strlen($data) + 9;
+        $packet_length = strlen($payload) + 9;
         // round up to the nearest $this->encrypt_block_size
         $packet_length+= (($this->encrypt_block_size - 1) * $packet_length) % $this->encrypt_block_size;
-        // subtracting strlen($data) is obvious - subtracting 5 is necessary because of packet_length and padding_length
-        $padding_length = $packet_length - strlen($data) - 5;
+        // subtracting strlen($payload) is obvious - subtracting 5 is necessary because of packet_length and padding_length
+        $padding_length = $packet_length - strlen($payload) - 5;
         $padding = Random::string($padding_length);
 
         // we subtract 4 from packet_length because the packet_length field isn't supposed to include itself
-        $packet = pack('NCa*', $packet_length - 4, $padding_length, $data . $padding);
+        $packet = pack('NCa*', $packet_length - 4, $padding_length, $payload . $padding);
 
         $hmac = $this->hmac_create !== false ? $this->hmac_create->hash(pack('Na*', $this->send_seq_no, $packet)) : '';
         $this->send_seq_no++;
@@ -3674,7 +3691,8 @@ class SSH2
             $current = microtime(true);
             $message_number = isset($this->message_numbers[ord($data[0])]) ? $this->message_numbers[ord($data[0])] : 'UNKNOWN (' . ord($data[0]) . ')';
             $message_number = '-> ' . $message_number .
-                              ' (since last: ' . round($current - $this->last_packet, 4) . ', network: ' . round($stop - $start, 4) . 's)';
+                              ' (since last: ' . round($current - $this->last_packet, 4) . ', network: ' . round($stop - $start, 4) . 's,' .
+                              ' zlib: ' . strlen($payload) . ':' . strlen($data) . ')';
             $this->_append_log($message_number, isset($logged) ? $logged : $data);
             $this->last_packet = $current;
         }
