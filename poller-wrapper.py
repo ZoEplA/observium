@@ -603,7 +603,7 @@ except:
     pass
 
 # This prevents race and too high LA on server. Default is 4 processes and 10 load average. More than 4 already running poller-wrapper it's big trouble!
-if ps_count > max_running and la[1] >= max_la:
+if ps_count >= max_running or la[1] >= max_la:
   print("URGENT: %s not started because already running %s processes, load average (5min) %.2f" % (processname, ps_count, la[1]))
   logfile("URGENT: %s not started because already running %s processes, load average (5min) %.2f" % (processname, ps_count, la[1]))
   sys.exit(2)
