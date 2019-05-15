@@ -15,6 +15,6 @@
 
 // Application graph definitions
 
-$config['app']['hls']['top']               = array('multi_video');
-$config['app']['smart']['top']             = array('multi_stats');
+// $config['app']['hls']['top']               = array('multi_video');
+// $config['app']['smart']['top']             = array('multi_stats');
 // EOF
