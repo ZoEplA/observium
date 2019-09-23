@@ -9,7 +9,7 @@
                IMPORTS
                	    llidIfIndex
 			FROM NMS-EPON-LLID
-                    Counter, IpAddress, Counter
+                    Counter, IpAddress, Counters,TimeTicks
 			FROM RFC1155-SMI
 		    OBJECT-TYPE
 			FROM RFC-1212
@@ -202,7 +202,9 @@
                        onuPeerPONMAC
                            PhysAddress,
                        onuConfigurablePortDiid
-                           INTEGER
+                           INTEGER,
+                       onuAliveTime
+                           TimeTicks
 		}
 
                onuVendorID OBJECT-TYPE
@@ -420,12 +422,14 @@
                           registered(1),
                           deregistered(2),
                           auto_config(3),
-                          lost(4)
+                          lost(4),
+                          standby(5)
+                          
                    }
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
-                           "ONU Status. 0-authenticated, 1-registered,  2-deregistered."
+                           "ONU Status. 0-authenticated, 1-registered,  2-deregistered, auto_config(3), lost(4), standby(5)."
                    ::= { nmsEponOnuEntry 26 } 
 
                onuDistance OBJECT-TYPE
@@ -901,6 +905,22 @@
                    DESCRIPTION
                            "ONU configurabale PON DIid value. This node is noly use for D-PSG."
                    ::= { nmsEponOnuEntry 79 } 
+                   
+               onuConfigurablePortDiid OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU configurabale PON DIid value. This node is noly use for D-PSG."
+                   ::= { nmsEponOnuEntry 79 } 
+                   
+               onuAliveTime OBJECT-TYPE
+                   SYNTAX  TimeTicks
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU Alive time, Unit is second."
+                   ::= { nmsEponOnuEntry 80 } 
                    
 
                  
@@ -1492,9 +1512,288 @@
                            "Onu management vlan priority. The range is 0-7."
                    ::= { onuIPParamGetEntry 11 } 
 	
- 
+-- onuCTCIPParamConfigTable
+
+                -- 29
+                onuCTCIPParamConfigTable OBJECT-TYPE
+                	SYNTAX SEQUENCE OF OnuCTCIPParamConfigEntry
+                	MAX-ACCESS not-accessible
+                	STATUS current
+                	DESCRIPTION
+                		"onuCTCIPParamConfigTable."
+                	::= {nmsEponOnu  29 }
+                 
+                -- 29.1                                
+                onuCTCIPParamConfigEntry OBJECT-TYPE   
+                	SYNTAX OnuCTCIPParamConfigEntry
+                	MAX-ACCESS not-accessible      	
+                	STATUS current                	
+                	DESCRIPTION                    
+                		"Table of onuCTCIPParamConfig."         
+	                INDEX { ifIndex }
+	                ::= { onuCTCIPParamConfigTable 1 }
+                		
+		OnuCTCIPParamConfigEntry ::=
+			SEQUENCE { 
+				ifIndex
+					INTEGER,
+				ipVersion
+					INTEGER,
+				ipv4Address
+					IpAddress,
+				ipv4Mask
+					IpAddress,
+				ipv4GateWay
+					IpAddress,
+				ipv6Address
+					InetAddressIPv6,
+				ipv6Prefix
+					INTEGER,
+				ipv6GateWay
+					InetAddressIPv6,
+				cVLAN
+					INTEGER,
+				sVLAN
+					INTEGER,
+				priority
+					INTEGER,
+				onuIPConfigRowStatus
+					RowStatus
+			 }
+
+                		
+                -- 29.1.1
+                ifIndex OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Index of LLID interface."
+                        ::= { onuCTCIPParamConfigEntry 1 }
+                        
+                        
+                          
+                -- 29.1.2
+                ipVersion OBJECT-TYPE
+                	SYNTAX INTEGER{
+                	            ipv4(1),
+                	            ipv6(2)
+                	}
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ip version. 1 means ipv4, 2 means ipv6."
+                	::= { onuCTCIPParamConfigEntry 2 }
+                
+                
+                -- 29.1.3
+                ipv4Address OBJECT-TYPE
+                	SYNTAX IpAddress
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv4 address. Valid only ipVersion is 1(ipv4)."
+                	::= { onuCTCIPParamConfigEntry 3 }
+                
+                
+                -- 29.1.4
+                ipv4Mask OBJECT-TYPE
+                	SYNTAX IpAddress
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv4 mask. Valid only ipVersion is 1(ipv4)."
+                	::= { onuCTCIPParamConfigEntry 4 }
+                
+                
+                -- 29.1.5
+                ipv4GateWay OBJECT-TYPE
+                	SYNTAX IpAddress
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv4 gateway. Valid only ipVersion is 1(ipv4)."
+                	::= { onuCTCIPParamConfigEntry 5 }
+                
+                
+                -- 29.1.6
+                ipv6Address OBJECT-TYPE
+                	SYNTAX InetAddressIPv6
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv6 address. Valid only ipVersion is 2(ipv6)."
+                	::= { onuCTCIPParamConfigEntry 6 }
+                
+                
+                -- 29.1.7
+                ipv6Prefix OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv6 prefix. Valid only ipVersion is 2(ipv6)."
+                	::= { onuCTCIPParamConfigEntry 7 }
+                
+                
+                -- 29.1.8
+                ipv6GateWay OBJECT-TYPE
+                	SYNTAX InetAddressIPv6
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management ipv6 gateway. Valid only ipVersion is 2(ipv6)."
+                	::= { onuCTCIPParamConfigEntry 8 }
+                
+                
+                -- 29.1.9
+                cVLAN OBJECT-TYPE
+                	SYNTAX INTEGER (1..4094)
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management cvlan. If Packet has two tags, This is inner tag. The range is 1-4094."
+                	::= { onuCTCIPParamConfigEntry 9 }
+                
+                
+                -- 29.1.10
+                sVLAN OBJECT-TYPE
+                	SYNTAX INTEGER (0..4094)
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management svlan. The range is 0-4094. 0 means packet has only one tag, vlanid is cvlan. 
+                		Nonzero means packet has two tags, and vlanid of ounter tag is svlan."
+                	::= { onuCTCIPParamConfigEntry 10 }
+                
+                
+                -- 29.1.11
+                priority OBJECT-TYPE
+                	SYNTAX INTEGER (0..7)
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu management vlan priority. The range is 0-7."
+                	::= { onuCTCIPParamConfigEntry 11 }
+                
+                
+                -- 29.1.12
+                onuIPConfigRowStatus OBJECT-TYPE
+                	SYNTAX RowStatus
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"CTC ONU ip address configuration row status. These ten items: ipVersion,ipv4Address, 
+                		ipv4Mask,ipv4GateWay, ipv6Address, ipv6Prefix, ipv6GateWay, CVLAN, SVLAN, Priority, are added together."
+                	::= { onuCTCIPParamConfigEntry 12 }
+                
 
 
 
-	
-END		
+-- onuCATVConfigTable
+
+                -- 30
+                onuCATVConfigTable OBJECT-TYPE
+                	SYNTAX SEQUENCE OF OnuCATVConfigEntry
+                	MAX-ACCESS not-accessible
+                	STATUS current
+                	DESCRIPTION
+                		"onuCATVConfigTable."
+                	::= {nmsEponOnu  30 }
+                 
+                -- 30.1                                
+                onuCATVConfigEntry OBJECT-TYPE   
+                	SYNTAX OnuCATVConfigEntry
+                	MAX-ACCESS not-accessible      	
+                	STATUS current                	
+                	DESCRIPTION                    
+                		"Table of onuCATVConfig."         
+	                INDEX { ifCATVIndex }
+	                ::= { onuCATVConfigTable 1 }
+                		
+		OnuCATVConfigEntry ::=
+			SEQUENCE { 
+				ifCATVIndex
+					INTEGER,
+				ifCATVAdminStatus
+					INTEGER
+			 }
+
+
+                -- 30.1.1
+                ifCATVIndex OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Index of LLID interface."
+                        ::= { onuCATVConfigEntry 1 }
+                        
+                -- 30.1.2
+                ifCATVAdminStatus OBJECT-TYPE
+                	SYNTAX INTEGER{
+                	            up(1),
+                	            down(2)
+                	}
+                	MAX-ACCESS read-write
+                	STATUS current
+                	DESCRIPTION
+                		"Onu CATV module admin status. 1 means admin up, 2 means admin down. Default is 1(admin up)."
+                        ::= { onuCATVConfigEntry 2 }
+                        
+                
+-- onuCATVRxPowerTable
+
+                -- 30
+                onuCATVRxPowerTable OBJECT-TYPE
+                	SYNTAX SEQUENCE OF OnuCATVRxPowerEntry
+                	MAX-ACCESS not-accessible
+                	STATUS current
+                	DESCRIPTION
+                		"onuCATVRxPowerTable."
+                	::= {nmsEponOnu  31 }
+                 
+                -- 30.1                                
+                onuCATVRxPowerEntry OBJECT-TYPE   
+                	SYNTAX OnuCATVRxPowerEntry
+                	MAX-ACCESS not-accessible      	
+                	STATUS current                	
+                	DESCRIPTION                    
+                		"Table of onuCATVRxPower."         
+	                INDEX { ifCATVRxIndex }
+	                ::= { onuCATVRxPowerTable 1 }
+                		
+		OnuCATVRxPowerEntry ::=
+			SEQUENCE { 
+				ifCATVRxIndex
+					INTEGER,
+				rxPower
+					INTEGER
+			 }
+
+
+                -- 30.1.1
+                ifCATVRxIndex OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Index of LLID interface."
+                        ::= { onuCATVRxPowerEntry 1 }
+                        
+                -- 30.1.2
+                rxPower OBJECT-TYPE
+                	SYNTAX INTEGER
+                	MAX-ACCESS read-only
+                	STATUS current
+                	DESCRIPTION
+                		"Onu CATV module rx power. Unit is 0.1 DBm."
+                        ::= { onuCATVRxPowerEntry 2 }
+                        
+                
+
+                		
+                		
+                		
+ END	
+                		

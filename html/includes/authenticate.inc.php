@@ -9,7 +9,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,7 +21,13 @@ if (!defined('OBS_API'))
 
 $debug_auth = FALSE; // Do not use this debug unless you Observium Developer ;)
 
-@ini_set('session.hash_function', '1');    // Use sha1 to generate the session ID
+if (version_compare(PHP_VERSION, '7.1.0', '<'))
+{
+  // Use sha1 to generate the session ID (option removed in php 7.1)
+  // session.sid_length (Number of session ID characters - 22 to 256.
+  // session.sid_bits_per_character (Bits used per character - 4 to 6.
+  @ini_set('session.hash_function', '1');
+}
 @ini_set('session.referer_check', '');     // This config was causing so much trouble with Chrome
 @ini_set('session.name', 'OBSID');         // Session name
 @ini_set('session.use_cookies', '1');      // Use cookies to store the session id on the client side
@@ -96,10 +102,8 @@ if (is_file($auth_file))
   if (isset($_SESSION['auth_mechanism']) && $_SESSION['auth_mechanism'] != $config['auth_mechanism'])
   {
     // Logout if AUTH mechanism changed
-    session_set_var('auth_message', 'Authentication mechanism changed, please log in again!');
     session_logout();
-    header('Location: '.$config['base_url']);
-    exit();
+    reauth_with_message('Authentication mechanism changed, please log in again!');
   } else {
     session_set_var('auth_mechanism', $config['auth_mechanism']);
   }
@@ -113,10 +117,8 @@ if (is_file($auth_file))
   // Include base auth functions calls
   include($config['html_dir'].'/includes/authenticate-functions.inc.php');
 } else {
-  session_set_var('auth_message', 'Invalid auth_mechanism defined, please correct your configuration!');
   session_logout();
-  header('Location: '.$config['base_url']);
-  exit();
+  reauth_with_message('Invalid auth_mechanism defined, please correct your configuration!');
 }
 
 // Check logout
@@ -128,8 +130,15 @@ if ($_SESSION['authenticated'] && str_starts(ltrim($_SERVER['REQUEST_URI'], '/')
   {
     // No need for a feedback message if user requested a logout
     session_logout(function_exists('auth_require_login'));
+
+    $redirect = auth_logout_url();
+    if ($redirect)
+    {
+      redirect_to_url($redirect);
+      exit();
+    }
   }
-  header('Location: '.$config['base_url']);
+  redirect_to_url($config['base_url']);
   exit();
 }
 
@@ -191,10 +200,8 @@ else if (OBS_ENCRYPT && !$_SESSION['authenticated'] && isset($_COOKIE['ckey']))
       // If userlevel == 0 - user disabled an can not be logon
       if (auth_user_level($ckey['username']) < 1)
       {
-        session_set_var('auth_message', 'User login disabled');
         session_logout(FALSE, 'User disabled');
-        header('Location: '.$config['base_url']);
-        exit();
+	reauth_with_message('User login disabled');
       }
 
       session_set_var('user_ckey_id', $ckey['user_ckey_id']);
@@ -219,10 +226,8 @@ if (isset($_SESSION['username']))
   // Check for allowed by CIDR range
   if (!$auth_allow_cidr)
   {
-    session_set_var('auth_message', 'Remote IP not allowed in CIDR ranges');
     session_logout(FALSE, 'Remote IP not allowed in CIDR ranges');
-    header('Location: '.$config['base_url']);
-    exit();
+    reauth_with_message('Remote IP not allowed in CIDR ranges');
   }
 
   // Auth from COOKIEs
@@ -248,9 +253,8 @@ if (isset($_SESSION['username']))
     // If userlevel == 0 - user disabled and can not log in
     if (auth_user_level($_SESSION['username']) < 1)
     {
-      session_set_var('auth_message', 'User login disabled');
       session_logout(FALSE, 'User disabled');
-      header('Location: '.$config['base_url']);
+      reauth_with_message('User login disabled');
       exit();
     }
 
@@ -298,9 +302,8 @@ if (isset($_SESSION['username']))
     // If userlevel == 0 - user disabled an can not be logon
     if (!$level_permissions['permission_access'])
     {
-      $_SESSION['auth_message'] = 'User login disabled';
       session_logout(FALSE, 'User disabled');
-      header('Location: '.$config['base_url']);
+      reauth_with_message('User login disabled');
       exit();
     }
     else if (!isset($_SESSION['user_limited']) || $_SESSION['user_limited'] != $level_permissions['limited'])
@@ -338,7 +341,10 @@ if (isset($_SESSION['username']))
       }
     }
 
+    //$a = utime();
     $permissions = permissions_cache($_SESSION['user_id']);
+    //echo utime() - $a . 's for permissions cache';
+
 
     // Add feeds & api keys after first auth
     if (OBS_ENCRYPT && !get_user_pref($_SESSION['user_id'], 'atom_key'))
@@ -348,7 +354,8 @@ if (isset($_SESSION['username']))
       {
         $atom_key = md5(strgen());
       }
-      while (dbFetchCell("SELECT COUNT(*) FROM `users_prefs` WHERE `pref` = ? AND `value` = ?;", array('atom_key', $atom_key)) > 0);
+      //while (dbFetchCell("SELECT COUNT(*) FROM `users_prefs` WHERE `pref` = ? AND `value` = ?;", array('atom_key', $atom_key)) > 0);
+      while (dbExist('users_prefs', '`pref` = ? AND `value` = ?', array('atom_key', $atom_key)));
       set_user_pref($_SESSION['user_id'], 'atom_key', $atom_key);
     }
   }
@@ -359,7 +366,7 @@ if (isset($_SESSION['username']))
     // in which case we want to see authentication module output first.
     if (!OBS_DEBUG)
     {
-      header("Location: ".$_SERVER['REQUEST_URI']);
+      redirect_to_url($_SERVER['REQUEST_URI']);
     } else {
       print_message("Debugging mode has disabled redirect to front page; please click <a href=\"" . $_SERVER['REQUEST_URI'] . "\">here</a> to continue.");
     }
@@ -621,6 +628,28 @@ function session_set_var($var, $value)
 function session_unset_var($var)
 {
   session_set_var($var, NULL);
+}
+
+/**
+ * Redirects to the front page with the specified authentication failure message.
+ * In the case of 'remote', no redirect is performed (as this would create an infinite loop,
+ * as there is no way to logout), so the message is simply printed.
+ *
+ * @param string $message Message to display to the user
+ */
+
+function reauth_with_message($message)
+{
+  global $config;
+
+  if ($config['auth_mechanism'] == 'remote')
+  {
+    print('<h1>' . $message . '</h1>');
+  } else {
+    session_set_var('auth_message', $message);
+    redirect_to_url($config['base_url']);
+  }
+  exit();
 }
 
 // EOF

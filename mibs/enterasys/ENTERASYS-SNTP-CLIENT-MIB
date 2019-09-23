@@ -3,7 +3,7 @@ ENTERASYS-SNTP-CLIENT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, RowStatus, DateAndTime
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime, TruthValue
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -13,12 +13,12 @@ IMPORTS
         FROM ENTERASYS-MIB-NAMES;
 
 etsysSntpClientMIB MODULE-IDENTITY
-    LAST-UPDATED "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    LAST-UPDATED "201103091556Z"  -- Wed Mar  9 15:56 UTC 2011
     ORGANIZATION "Enterasys Networks, Inc"
     CONTACT-INFO
         "Postal:  Enterasys Networks
                   50 Minuteman Rd.
-                  Andover, MA 01810-1008
+                  Andover, MA 01801-1008
                   USA
          Phone:   +1 978 684 1000
          E-mail:  support@enterasys.com
@@ -29,8 +29,8 @@ etsysSntpClientMIB MODULE-IDENTITY
          the Enterasys Networks enterprise OID pertaining to 
          SNTP client configuration and statistical collection."
 
-    REVISION    "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
-    DESCRIPTION "Corrected the postal code in the CONTACT-INFO clause."
+    REVISION    "201103091556Z"  -- Wed Mar  9 15:56 UTC 2011
+    DESCRIPTION "Added support for SNTP authentication."
 
     REVISION    "200306131809Z"  -- Fri Jun 13 18:09 GMT 2003
     DESCRIPTION "Initial version of this MIB module."
@@ -250,6 +250,24 @@ etsysSntpClientLastAttemptStatus OBJECT-TYPE
     DEFVAL { other }
     ::= { etsysSntpClientDevice 6 }
 
+etsysSntpClientAuthenticationEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A flag indicating if SNTP authentication is enabled
+        for the client device."
+    DEFVAL { false }
+    ::= { etsysSntpClientDevice 7 }
+
+etsysSntpClientMaxAuthenticationKeys OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of authentication key entries."
+    ::= { etsysSntpClientDevice 8 }
+
 -- -------------------------------------------------------------
 -- SNTP Client Unicast Group
 -- -------------------------------------------------------------
@@ -355,7 +373,9 @@ EtsysSntpClientUServerEntry ::=
         etsysSntpClientUServerNumFailedRequests
             Counter32,
         etsysSntpClientUServerStatus
-            RowStatus
+            RowStatus,
+        etsysSntpClientUServerAuthKey
+            Unsigned32
     }
 
 etsysSntpClientUServerAddrType OBJECT-TYPE
@@ -494,6 +514,116 @@ etsysSntpClientUServerStatus OBJECT-TYPE
           Maintaining active(1) entries across agent reboots is 
           REQUIRED."
     ::= { etsysSntpClientUServerEntry 9 }
+
+etsysSntpClientUServerAuthKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The key ID number which is used by the server for
+        SNTP authentication"
+    DEFVAL { 0 }
+    ::= { etsysSntpClientUServerEntry 10 }
+
+etsysSntpClientUAuthKeyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysSntpClientUAuthKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration information for trusted
+        and untrusted SNTP authentication keys."
+    ::= { etsysSntpClientUnicast 7 }
+
+etsysSntpClientUAuthKeyEntry OBJECT-TYPE
+    SYNTAX      EtsysSntpClientUAuthKeyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information for a particular SNTP authentication key."
+    INDEX { etsysSntpClientUAuthKey }
+    ::= { etsysSntpClientUAuthKeyTable 1 }
+
+EtsysSntpClientUAuthKeyEntry ::=
+    SEQUENCE {
+        etsysSntpClientUAuthKey
+            Unsigned32,
+        etsysSntpClientUAuthType
+            INTEGER,
+        etsysSntpClientUAuthValue
+            OCTET STRING,
+        etsysSntpClientUKeyTrusted
+            TruthValue,
+        etsysSntpClientUAuthKeyStatus
+            RowStatus
+    }
+
+etsysSntpClientUAuthKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the authentication key number
+        of the authentication key entry."
+    ::= { etsysSntpClientUAuthKeyEntry 1 }
+ 
+etsysSntpClientUAuthType OBJECT-TYPE
+    SYNTAX      INTEGER {
+         md5(1),
+         sha-1(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the encryption algorithm
+        used for SNTP authentication."
+    DEFVAL { md5 }
+    ::= { etsysSntpClientUAuthKeyEntry 2 }
+
+etsysSntpClientUAuthValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object specifies the authentication password
+        which is used by the encryption algorithm for
+        authentication."
+    DEFVAL { ''H }
+    ::= { etsysSntpClientUAuthKeyEntry 3 }
+
+etsysSntpClientUKeyTrusted OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A flag indicating if this key is a trusted key."
+    DEFVAL { false }
+    ::= { etsysSntpClientUAuthKeyEntry 4 }
+
+
+etsysSntpClientUAuthKeyStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status of this conceptual row in the table. 
+
+         createAndGo
+            - This is the preferred mechanism for creating conceptual 
+              rows in this table. All value contain a default value.
+              If configured to use an etsysSntpClientUAuthKeyTable for
+              authentication, etsysSntpClientUAuthValue must contain a
+              OCTET STRING with a length greater than zero.
+
+         destroy
+            - This will remove the conceptual row from the table and 
+              make it unavailable for SNTP client operations.  This MUST
+              also cause any persistent data related to this row to be 
+              removed from the system.
+
+          Maintaining active(1) entries across agent reboots is 
+          REQUIRED."
+    DEFVAL { createAndGo }
+    ::= { etsysSntpClientUAuthKeyEntry 5 }
 
 -- -------------------------------------------------------------
 -- SNTP Client Multicast Group
@@ -760,6 +890,24 @@ etsysSntpClientAnycastGroup OBJECT-GROUP
          a SNTP client capable of operating in anycast mode."
     ::= { etsysSntpClientGroups 5 }
 
+etsysSntpClientUnicastAuthenticationGroup OBJECT-GROUP
+    OBJECTS {
+        etsysSntpClientAuthenticationEnable,
+        etsysSntpClientMaxAuthenticationKeys,
+        etsysSntpClientUServerAuthKey,
+        etsysSntpClientUAuthKey,
+        etsysSntpClientUAuthType,
+        etsysSntpClientUAuthValue,
+        etsysSntpClientUKeyTrusted,
+        etsysSntpClientUAuthKeyStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing control and statistics for
+         a SNTP client capable of operating in unicast mode with
+         authentication."
+    ::= { etsysSntpClientGroups 6 }
+
 -- -------------------------------------------------------------
 -- Compliance statements
 -- -------------------------------------------------------------
@@ -792,6 +940,11 @@ etsysSntpClientCompliance MODULE-COMPLIANCE
         DESCRIPTION
             "This group is REQUIRED for devices supporting operation
              of a SNTP client in anycast mode."
+
+        GROUP       etsysSntpClientUnicastAuthenticationGroup
+        DESCRIPTION
+            "This group is REQUIRED for devices supporting operation
+             of a SNTP client authentication in unicast mode."
     
     ::= { etsysSntpClientCompliances 1 }
 

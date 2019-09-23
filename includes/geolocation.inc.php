@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage geolocation
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -22,47 +22,33 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
   global $config;
 
   $ok       = FALSE;
+  $address  = trim($address);
   $location = array('location' => $address); // Init location array
   $location['location_geoapi'] = strtolower(trim($config['geocoding']['api']));
   if (!isset($config['geo_api'][$location['location_geoapi']]))
   {
     // Use default if unknown api
-    $location['location_geoapi'] = 'openstreetmap';
+    $location['location_geoapi'] = 'geocodefarm';
   }
 
-  $api_params = &$config['geo_api'][$location['location_geoapi']]; // Link to api specific params
-  $params     = $api_params['params'];                             // Init base request params
+  // v3 of geo definitions :D
+  $geo_def = $config['geo_api'][$location['location_geoapi']];
 
-  // GEO API KEY and rate limits
+  // API Rate limit
   $ratelimit = FALSE;
-  if (strlen($config['geocoding']['api_key']) && isset($api_params['request_params']['key']))
+  if (strlen($config['geocoding']['api_key']) && isset($geo_def['ratelimit_key']))
   {
-    $param = $api_params['request_params']['key'];
-    $params[$param] = escape_html($config['geocoding']['api_key']); // KEYs is never used special characters
-    if (isset($api_params['ratelimit_key']))
-    {
-      $ratelimit = $api_params['ratelimit_key'];
-    }
-  } else {
-    if (isset($api_params['ratelimit']))
-    {
-      $ratelimit = $api_params['ratelimit'];
-    }
+    // Ratelimit if used api key
+    $ratelimit = $geo_def['ratelimit_key'];
   }
-
-  if (isset($api_params['request_params']['id']))
+  elseif (isset($geo_def['ratelimit']))
   {
-    $params[$api_params['request_params']['id']] = OBSERVIUM_PRODUCT . '-' . substr(get_unique_id(), 0, 8);
-  }
-
-  if (isset($api_params['request_params']['uuid']))
-  {
-    $params[$api_params['request_params']['uuid']] = get_unique_id();
+    $ratelimit = $geo_def['ratelimit'];
   }
 
   if (isset($config['geocoding']['enable']) && $config['geocoding']['enable'])
   {
-    $reverse = FALSE; // by default forward geocoding
+    $geo_type = 'forward'; // by default forward geocoding
     $debug_msg = "Geocoding ENABLED, try detect device coordinates:".PHP_EOL;
 
     // If device coordinates set manually, use Reverse Geocoding.
@@ -70,11 +56,11 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
     {
       $location['location_lat'] = $geo_db['location_lat'];
       $location['location_lon'] = $geo_db['location_lon'];
-      $reverse = TRUE;
+      $geo_type = 'reverse';
       $debug_msg .= '  MANUAL coordinates - SET'.PHP_EOL;
     }
     // If DNS LOC support is enabled and DNS LOC record is set, use Reverse Geocoding.
-    else if ($config['geocoding']['dns'])
+    elseif ($config['geocoding']['dns'])
     {
       /**
        * Ack! dns_get_record not only cannot retrieve LOC records, but it also actively filters them when using
@@ -96,6 +82,7 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
         try {
           $response = $resolver->query($geo_db['hostname'], 'LOC', 'IN');
         } catch(Net_DNS2_Exception $e) {
+          $response = FALSE;
           print_debug('  Resolver error: '.$e->getMessage().' (hostname: '.$geo_db['hostname'].')');
         }
       } else {
@@ -104,14 +91,14 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
       }
       if ($response)
       {
-        if (OBS_DEBUG > 1) { var_dump($response->answer); }
+        print_debug_vars($response->answer);
         foreach ($response->answer as $answer)
         {
           if (is_numeric($answer->latitude) && is_numeric($answer->longitude))
           {
             $location['location_lat'] = $answer->latitude;
             $location['location_lon'] = $answer->longitude;
-            $reverse = TRUE;
+            $geo_type = 'reverse';
             break;
           }
           else if (is_numeric($answer->degree_latitude) && is_numeric($answer->degree_longitude))
@@ -121,7 +108,7 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
 
             $location['location_lat'] = round($answer->degree_latitude + $answer->min_latitude/60 + $answer->sec_latitude/3600,7) * $ns_multiplier;
             $location['location_lon'] = round($answer->degree_longitude + $answer->min_longitude/60 + $answer->sec_longitude/3600,7) * $ew_multiplier;
-            $reverse = TRUE;
+            $geo_type = 'reverse';
             break;
           }
         }
@@ -140,181 +127,183 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
       }
     }
 
-    if ($reverse || !preg_match('/^<?(unknown|none)>?$/i', $address))
+    /**
+     * If location string contains coordinates use Reverse Geocoding.
+     * Valid strings:
+     *   Some location [33.234, -56.22]
+     *   Some location (33.234 -56.22)
+     *   Some location [33.234;-56.22]
+     *   33.234,-56.22
+     */
+    $pattern = '/(?:^|[\[(])\s*(?<lat>[+-]?\d+(?:\.\d+)*)\s*[,:; ]\s*(?<lon>[+-]?\d+(?:\.\d+)*)\s*(?:[\])]|$)/';
+    if ($geo_type == 'forward' && preg_match($pattern, $address, $matches))
     {
-      /**
-       * If location string contains coordinates use Reverse Geocoding.
-       * Valid strings:
-       *   Some location [33.234, -56.22]
-       *   Some location (33.234 -56.22)
-       *   Some location [33.234;-56.22]
-       *   33.234,-56.22
-       */
-      $pattern = '/(?:^|[\[(])\s*(?<lat>[+-]?\d+(?:\.\d+)*)\s*[,; ]\s*(?<lon>[+-]?\d+(?:\.\d+)*)\s*(?:[\])]|$)/';
-      if (!$reverse && preg_match($pattern, $address, $matches))
+      if ($matches['lat'] >= -90  && $matches['lat'] <= 90 &&
+          $matches['lon'] >= -180 && $matches['lon'] <= 180)
       {
-        if ($matches['lat'] >= -90 && $matches['lat'] <= 90 &&
-            $matches['lon'] >= -180 && $matches['lon'] <= 180)
-        {
-          $location['location_lat'] = $matches['lat'];
-          $location['location_lon'] = $matches['lon'];
-          $reverse = TRUE;
-        }
+        $location['location_lat'] = $matches['lat'];
+        $location['location_lon'] = $matches['lon'];
+        $geo_type = 'reverse';
       }
+    }
 
-      if ($reverse)
+    // Excluded bad location strings like <none>, Unknown, ''
+    $valid_address = strlen($address) > 4 && !preg_match('/^[<\\\(]?(unknown|private|none|office|location|snmplocation)[>\\\)]?$/i', $address);
+    if ($geo_type == 'reverse' || $valid_address)
+    {
+      // We have correct non empty address or reverse coordinates
+
+      // Have api specific file include and definition?
+      $is_geo_def = isset($geo_def[$geo_type]);
+      $is_geo_file = is_file($config['install_dir'] . '/includes/geolocation/' . $location['location_geoapi'] . '.inc.php');
+
+      if ($geo_type == 'reverse')
       {
         $debug_msg .= '  by REVERSE query (API: '.strtoupper($config['geocoding']['api']).', LAT: '.$location['location_lat'].', LON: '.$location['location_lon'].') - ';
-
-        $url = $api_params['reverse_url'];
-        if (isset($api_params['reverse_params']))
-        {
-          // Additional params for reverse query
-          $params = array_merge($params, $api_params['reverse_params']);
-        }
-
-        if (!is_numeric($location['location_lat']) || !is_numeric($location['location_lat']))
-        {
-          // Do nothing for empty, skip requests for empty coordinates
-        } else {
-          if (isset($api_params['request_params']['lat']) && isset($api_params['request_params']['lon']))
-          {
-            $ok = TRUE;
-            $param = $api_params['request_params']['lat'];
-            $params[$param] = $location['location_lat'];
-            $param = $api_params['request_params']['lon'];
-            $params[$param] = $location['location_lon'];
-          }
-          else if (isset($api_params['request_params']['latlon']))
-          {
-            $ok = TRUE;
-            $param = $api_params['request_params']['latlon'];
-            $params[$param] = $location['location_lat'] . ',' . $location['location_lon'];
-          }
-        }
       } else {
-        $debug_msg .= '  by PARSING sysLocation (API: '.strtoupper($config['geocoding']['api']).') - ';
-
-        $url = $api_params['direct_url'];
-        if (isset($api_params['direct_params']))
-        {
-          // Additional params for reverse query
-          $params = array_merge($params, $api_params['direct_params']);
-        }
-
-        if ($address != '')
-        {
-          $ok = TRUE;
-          $param = $api_params['request_params']['address'];
-          $params[$param] = urlencode($address);
-          //$request = $url . urlencode($address);
-        }
-      }
-      if (OBS_DEBUG > 1)
-      {
-        print_vars($api_params);
-        print_vars($params);
+        $debug_msg .= '  by FORWARD query (API: '.strtoupper($config['geocoding']['api']).', sysLocation: ' . $address . ') - ';
       }
 
-      if ($ok)
+      if ($is_geo_def)
       {
-        // Build request query
-        $request = build_request_url($url, $params, $api_params['method']);
+        // Generate geolocation tags, used for rewrites in definition
+        $tags = generate_geolocation_tags($location['location_geoapi'], $location);
+
+        // Generate context/options with encoded data and geo specific api headers
+        $options = generate_http_context($geo_def[$geo_type], $tags);
+
+        // API URL to POST to
+        $url = generate_http_url($geo_def[$geo_type], $tags);
 
         // First request
-        $mapresponse = get_http_request($request, NULL, $ratelimit);
-        switch ($GLOBALS['response_headers']['code'][0])
+        $mapresponse = get_http_request($url, $options, $ratelimit);
+
+        // Send out API call and parse response
+        if (!test_http_request($geo_def[$geo_type], $mapresponse))
         {
-          case '4': // 4xx (timeout, rate limit, forbidden)
-          case '5': // 5xx (server error)
-            $geo_status = strtoupper($GLOBALS['response_headers']['status']);
-            $debug_msg .= $geo_status . PHP_EOL;
-            if (OBS_DEBUG < 2)
-            {
-              // Hide API KEY from output
-              $request  = str_replace($api_params['request_params']['key'] . '=' . escape_html($config['geocoding']['api_key']), $api_params['request_params']['key'] . '=' . '***', $request);
-            }
-            $debug_msg .= '  GEO API REQUEST: ' . $request;
-            print_debug($debug_msg);
-            // Return old array with new status (for later recheck)
-            unset($geo_db['hostname'], $geo_db['location_updated']);
-            $location['location_status']  = $debug_msg;
-            $location['location_updated'] = format_unixtime($config['time']['now'], 'Y-m-d G:i:s');
-            //print_vars($location);
-            //print_vars($geo_db);
-            return array_merge($geo_db, $location);
-        }
-
-        $data        = json_decode($mapresponse, TRUE);
-        //print_vars($data);
-        $geo_status  = 'NOT FOUND';
-
-        $api_specific = is_file($config['install_dir'] . '/includes/geolocation/' . $location['location_geoapi'] . '.inc.php');
-        if ($api_specific)
-        {
-          // API specific parser
-          require_once($config['install_dir'] . '/includes/geolocation/' . $location['location_geoapi'] . '.inc.php');
-
-          if ($data === FALSE)
+          // False response
+          $geo_status = strtoupper($GLOBALS['response_headers']['status']);
+          $debug_msg .= $geo_status . PHP_EOL;
+          if (OBS_DEBUG < 2 && strlen($tags['key']))
           {
-            // Return old array with new status (for later recheck)
-            unset($geo_db['hostname'], $geo_db['location_updated']);
-            //$location['location_status']  = $debug_msg;
-            $location['location_updated'] = format_unixtime($config['time']['now'], 'Y-m-d G:i:s');
-            //print_vars($location);
-            //print_vars($geo_db);
-            return array_merge($geo_db, $location);
+            // Hide API KEY from output
+            $url = str_replace('=' . $tags['key'], '=***', $url);
           }
+          $debug_msg .= '  GEO API REQUEST: ' . $url;
+          print_debug($debug_msg);
+          // Return old array with new status (for later recheck)
+          unset($geo_db['hostname'], $geo_db['location_updated']);
+          $location['location_status']  = $debug_msg;
+          $location['location_updated'] = format_unixtime($config['time']['now'], 'Y-m-d G:i:s');
+          //print_vars($location);
+          //print_vars($geo_db);
+          return array_merge($geo_db, $location);
         }
-        else if (!isset($location['location_lat']))
+
+        switch ($geo_def[$geo_type]['response_format'])
         {
-          $data = $data[0];
-          if (!count($data) && strpos($address, ','))
+          case 'xml':
+            // Hrm, currently unused
+            break;
+          case 'json':
+          default:
+            $data = json_decode($mapresponse, TRUE);
+        }
+
+        if ($geo_type == 'forward')
+        {
+          // We seem to have hit a snag geocoding. It might be that the first element of the address is a business name.
+          // Lets drop the first element and see if we get anything better! This works more often than one might expect.
+          if (str_contains($address, ' - '))
           {
-            // We seem to have hit a snag geocoding. It might be that the first element of the address is a business name.
-            // Lets drop the first element and see if we get anything better! This works more often than one might expect.
-            list(, $address_new) = explode(',', $address, 2);
-            //$request_new = $url.urlencode($address);
-            $param = $api_params['request_params']['address'];
-            $params[$param] = urlencode($address_new);
-            $request_new = build_request_url($url, $params, $api_params['method']);
-            $mapresponse = get_http_request($request_new, NULL, $ratelimit);
-            $data_new = json_decode($mapresponse, TRUE);
-            if (count($data_new[0]))
+            // Rack: NK-76 - Nikhef, Amsterdam, NL
+            list(, $address_second) = explode(' - ', $address, 2);
+            $address_second = trim($address_second);
+          }
+          elseif (str_contains($address, ','))
+          {
+            // ZRH2, Badenerstrasse 569, Zurich, Switzerland
+            list(, $address_second) = explode(',', $address, 2);
+            $address_second = trim($address_second);
+          } else {
+            $address_second = NULL;
+          }
+
+          // Coordinates not found, try second request
+          if (isset($geo_def[$geo_type]['location_lat']) &&
+              !strlen(array_get_nested($data, $geo_def[$geo_type]['location_lat'])) &&
+              strlen($address_second) > 4)
+          {
+
+            // Re-Generate geolocation tags, override location
+            $tags['location'] = $address_second;
+
+            // Generate context/options with encoded data and geo specific api headers
+            $options_new = generate_http_context($geo_def[$geo_type], $tags);
+
+            // API URL to POST to
+            $url_new = generate_http_url($geo_def[$geo_type], $tags);
+
+            // Second request
+            $mapresponse = get_http_request($url_new, $options_new, $ratelimit);
+            if (test_http_request($geo_def[$geo_type], $mapresponse))
             {
-              // We only want the first entry in the returned data.
-              $data = $data_new[0];
-              $request = $request_new;
+              // Valid response
+              $data_new = json_decode($mapresponse, TRUE);
+              if (strlen(array_get_nested($data, $geo_def[$geo_type]['location_lat'])))
+              {
+                $data = $data_new;
+                $url = $url_new;
+              }
             }
           }
-        }
-        if (OBS_DEBUG > 1 && count($data)) { var_dump($data); }
-      } else {
-        $geo_status  = 'NOT REQUESTED';
+        } // End second forward request
+
       }
-    }
-  }
 
-  if (!$api_specific)
-  {
-    // Nominatum
-    if (!$reverse)
-    {
-      // If using reverse queries, do not change lat/lon
-      $location['location_lat'] = $data['lat'];
-      $location['location_lon'] = $data['lon'];
-    }
-    foreach (array('town', 'city', 'hamlet', 'village') as $param)
-    {
-      if (isset($data['address'][$param]))
+      //print_vars($data);
+      $geo_status  = 'NOT FOUND';
+
+      if ($is_geo_file)
       {
-        $location['location_city'] = $data['address'][$param];
-        break;
+        // API specific parser
+        require($config['install_dir'] . '/includes/geolocation/' . $location['location_geoapi'] . '.inc.php');
+
+        if ($data === FALSE)
+        {
+          // Return old array with new status (for later recheck)
+          unset($geo_db['hostname'], $geo_db['location_updated']);
+          //$location['location_status']  = $debug_msg;
+          $location['location_updated'] = format_unixtime($config['time']['now'], 'Y-m-d G:i:s');
+          //print_vars($location);
+          //print_vars($geo_db);
+          return array_merge($geo_db, $location);
+        }
+
       }
+      elseif ($is_geo_def)
+      {
+        // Set lat/lon and others by definitions
+        if ($geo_type == 'forward')
+        {
+          $location['location_lat'] = array_get_nested($data, $geo_def[$geo_type]['location_lat']);
+          $location['location_lon'] = array_get_nested($data, $geo_def[$geo_type]['location_lon']);
+        }
+        foreach (['city', 'county', 'state', 'country'] as $entry)
+        {
+          $param = 'location_' . $entry;
+          foreach ((array)$geo_def[$geo_type][$param] as $field)
+          {
+            // Possible to use multiple fields, use first not empty
+            if ($location[$param] = array_get_nested($data, $field)) { break; }
+          }
+        }
+      }
+
+      print_debug_vars($data);
+    } else {
+      $geo_status  = 'NOT REQUESTED';
     }
-    $location['location_state']   = $data['address']['state'];
-    $location['location_county']  = isset($data['address']['county']) ? $data['address']['county'] : $data['address']['state_district'];
-    $location['location_country'] = $data['address']['country_code'];
   }
 
   // Use defaults if empty values
@@ -335,32 +324,34 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
     $location['location_lon'] = round($location['location_lon'], 7);
   }
 
+  // Remove duplicate County/State words
   foreach (array('city', 'county', 'state') as $entry)
   {
-    // Remove duplicate County/State words
     $param = 'location_' . $entry;
     $location[$param] = strlen($location[$param]) ? str_ireplace(' '.$entry, '', $location[$param]) : 'Unknown';
   }
+  // Unificate Country name
   if (strlen($location['location_country']))
   {
-    $location['location_country'] = strtolower($location['location_country']);
+    $location['location_country'] = country_from_code($location['location_country']);
     $geo_status = 'FOUND';
   } else {
     $location['location_country'] = 'Unknown';
   }
 
-  // Print some debug informations
+  // Print some debug information
   $debug_msg .= $geo_status . PHP_EOL;
-  if (OBS_DEBUG < 2)
+  if (OBS_DEBUG < 2 && strlen($tags['key']))
   {
     // Hide API KEY from output
-    $request  = str_replace($api_params['request_params']['key'] . '=' . escape_html($config['geocoding']['api_key']), $api_params['request_params']['key'] . '=' . '***', $request);
+    $url = str_replace('=' . $tags['key'], '=***', $url);
   }
-  $debug_msg .= '  GEO API REQUEST: ' . $request;
+  $debug_msg .= '  GEO API REQUEST: ' . $url;
+
   if ($geo_status == 'FOUND')
   {
     $debug_msg .= PHP_EOL . '  GEO LOCATION: ';
-    $debug_msg .= country_from_code($location['location_country']).' (Country), '.$location['location_state'].' (State), ';
+    $debug_msg .= $location['location_country'].' (Country), '.$location['location_state'].' (State), ';
     $debug_msg .= $location['location_county'] .' (County), ' .$location['location_city'] .' (City)';
     $debug_msg .= PHP_EOL . '  GEO COORDINATES: ';
     $debug_msg .= $location['location_lat'] .' (Latitude), ' .$location['location_lon'] .' (Longitude)';
@@ -371,6 +362,56 @@ function get_geolocation($address, $geo_db = array(), $dns_only = FALSE)
   $location['location_status'] = $debug_msg;
 
   return $location;
+}
+
+/**
+ * Generate geolocation tags, used for transform any other parts of geo api definition.
+ *
+ * @global array $config
+ * @param string $api      GEO api key (see geo definitions)
+ * @param array  $tags     (optional) Location array and other tags
+ * @param array  $params   (optional) Array of requested params with key => value entries (used with request method POST)
+ * @param string $location (optional) Location string, if passed override location tag
+ * @return array           HTTP Context which can used in get_http_request_test() or get_http_request()
+ */
+function generate_geolocation_tags($api, $tags = array(), $params = array(), $location = NULL)
+{
+  global $config;
+
+  $tags = array_merge($tags, $params);
+
+  // Override location tag if passed as argument
+  if (strlen($location))
+  {
+    $tags['location'] = $location;
+  }
+  // Add lat/lon tags
+  if (isset($tags['location_lon']))
+  {
+    $tags['lon'] = $tags['location_lon'];
+  }
+  if (isset($tags['location_lon']))
+  {
+    $tags['lat'] = $tags['location_lat'];
+  }
+
+  // Common used params for geo apis
+  $tags['id'] = OBSERVIUM_PRODUCT . '-' . substr(get_unique_id(), 0, 8);
+  $tags['uuid'] = get_unique_id();
+
+  // API key if not empty
+  if (isset($config['geo_api'][$api]['key']) && strlen($config['geo_api'][$api]['key']))
+  {
+    // Ability to store API keys for each GEO API separately
+    $tags['key'] = escape_html($config['geo_api'][$api]['key']); // KEYs is never used special characters
+  }
+  elseif (strlen($config['geocoding']['api_key']))
+  {
+    $tags['key'] = escape_html($config['geocoding']['api_key']); // KEYs is never used special characters
+  }
+
+  //print_vars($tags);
+  return $tags;
 }
 
 // EOF

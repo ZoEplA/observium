@@ -160,6 +160,33 @@
                       "The rate limitation of cpu port. Unit is 64kbps. The range is 1-1562. 0 means disable. Default is 0."
               ::= { switchHALGlobal 16 }
                         
+          l2TblHashAlgo OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			crc32upper(1),
+              			crc32lower(2),
+              			lsb(3),
+              			crc14lower(4),
+              			crc16upper(5)
+              		      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The hash algorithm of MAC address table. The range is 1-5. 1 means CRC32 upper,2 means CRC32 lower,
+                      3 means LSB,4 means CRC16 lower,5 means CRC16 upper. Default is 2."
+              ::= { switchHALGlobal 17 }
+                        
+          cutThrough OBJECT-TYPE
+              SYNTAX  INTEGER{
+              			disable(0),
+              			enable(1)
+              		      }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The cut-through of switching function. The range is disable/enable. 0 means disable£¬1 means enable. 
+                      Default is 0."
+              ::= { switchHALGlobal 18 }
+                        
                
 END               
 

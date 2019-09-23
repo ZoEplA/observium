@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,10 +21,12 @@ foreach ($oids as $index => $entry)
   {
     $descr      = "PSU ".$entry['cpqHeFltTolPowerSupplyBay'];
     $oid        = ".1.3.6.1.4.1.232.6.2.9.3.1.7.$index";
+    $oid_name   = 'cpqHeFltTolPowerSupplyCapacityUsed';
     $value      = $entry['cpqHeFltTolPowerSupplyCapacityUsed'];
-    $limits     = array('limit_high' => $entry['cpqHeFltTolPowerSupplyCapacityMaximum']);
+    $options     = array('limit_high' => $entry['cpqHeFltTolPowerSupplyCapacityMaximum']);
 
-    discover_sensor($valid['sensor'], 'power', $device, $oid, 'cpqHeFltTolPwrSupply.'.$index, 'cpqhlth', $descr, 1, $value, $limits);
+    $options['rename_rrd'] = "cpqhlth-cpqHeFltTolPwrSupply.$index";
+    discover_sensor_ng($device, 'power', $mib, $oid_name, $oid, $index, NULL, $descr, 1, $value, $options);
   }
 
   if (isset($entry['cpqHeFltTolPowerSupplyCondition']))
@@ -33,38 +35,9 @@ foreach ($oids as $index => $entry)
     $oid        = ".1.3.6.1.4.1.232.6.2.9.3.1.4.$index";
     $value      = $entry['cpqHeFltTolPowerSupplyCondition'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'cpqHeFltTolPwrSupply.'.$index, 'cpqhlth-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+    $options['rename_rrd'] = 'cpqhlth-state-cpqHeFltTolPwrSupply.'.$index;
+    discover_status_ng($device, $mib, 'cpqHeFltTolPowerSupplyCondition', $oid, $index, 'cpqhlth-state', $descr, $value, array('entPhysicalClass' => 'powersupply'));
   }
-}
-
-// Overal System Thermal Status
-
-$thermal_status    = snmp_get($device, 'cpqHeThermalCondition.0',       '-Ovq', 'CPQHLTH-MIB');
-$system_fan_status = snmp_get($device, 'cpqHeThermalSystemFanStatus.0', '-Ovq', 'CPQHLTH-MIB');
-$cpu_fan_status    = snmp_get($device, 'cpqHeThermalCpuFanStatus.0',    '-Ovq', 'CPQHLTH-MIB');
-
-if ($thermal_status)
-{
-  $descr = 'Thermal Status';
-  $oid   = '.1.3.6.1.4.1.232.6.2.6.1.0';
-  $value = $thermal_status;
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'cpqHeThermalCondition.0', 'cpqhlth-state', $descr, NULL, $value, array('entPhysicalClass' => 'temperature'));
-}
-
-if ($system_fan_status)
-{
-  $descr = 'System Fan Status';
-  $oid   = '.1.3.6.1.4.1.232.6.2.6.4.0';
-  $value = $system_fan_status;
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'cpqHeThermalSystemFanStatus.0', 'cpqhlth-state', $descr, NULL, $value, array('entPhysicalClass' => 'fan'));
-}
-
-if ($cpu_fan_status)
-{
-  $descr = 'CPU Fan Status';
-  $oid   = '.1.3.6.1.4.1.232.6.2.6.5.0';
-  $value = $cpu_fan_status;
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'cpqHeThermalCpuFanStatus.0', 'cpqhlth-state', $descr, NULL, $value, array('entPhysicalClass' => 'fan'));
 }
 
 // Temperatures
@@ -89,10 +62,12 @@ foreach ($oids as $index => $entry)
     }
 
     $oid        = ".1.3.6.1.4.1.232.6.2.6.8.1.4.$index";
+    $oid_name   = 'cpqHeTemperatureCelsius';
     $value      = $entry['cpqHeTemperatureCelsius'];
-    $limits     = array('limit_high' =>$entry['cpqHeTemperatureThreshold']);
+    $options     = array('limit_high' =>$entry['cpqHeTemperatureThreshold']);
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'CpqHeTemperatureEntry.'.$index, 'cpqhlth', $descr, 1, $value, $limits);
+    $options['rename_rrd'] = "cpqhlth-CpqHeTemperatureEntry.$index";
+    discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid, $index, NULL, $descr, 1, $value, $options);
   }
 }
 
@@ -124,11 +99,11 @@ foreach ($oids as $index => $entry)
     $oid        = ".1.3.6.1.4.1.232.6.2.14.13.1.19.".$index;
     $status     = $entry['cpqHeResMem2ModuleStatus'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'cpqHeResMem2ModuleStatus.'.$index, 'cpqHeResMem2ModuleStatus', $descr.' Status', NULL, $status, array('entPhysicalClass' => 'other'));
+    discover_status_ng($device, $mib, 'cpqHeResMem2ModuleStatus', $oid, $index, 'cpqHeResMem2ModuleStatus', $descr.' Status', $status, array('entPhysicalClass' => 'other'));
 
     $oid        = ".1.3.6.1.4.1.232.6.2.14.13.1.20.".$index;
     $status     = $entry['cpqHeResMem2ModuleCondition'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'cpqHeResMem2ModuleCondition.'.$index, 'cpqHeResMem2ModuleCondition', $descr.' Condition', NULL, $status, array('entPhysicalClass' => 'other'));
+    discover_status_ng($device, $mib, 'cpqHeResMem2ModuleCondition', $oid, $index, 'cpqHeResMem2ModuleCondition', $descr.' Condition', $status, array('entPhysicalClass' => 'other'));
   }
 }
 

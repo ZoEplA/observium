@@ -80,6 +80,82 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
   }
 
   /**
+  * @dataProvider providerRewriteVendor
+  * @group vendor
+  */
+  public function testRewriteVendor($string, $result)
+  {
+    $this->assertSame($result, rewrite_vendor($string));
+  }
+
+  public function providerRewriteVendor()
+  {
+    return array(
+      // Simple rewrites
+      array('Brocade Communications Systems, Inc.',   'Brocade'),
+      array('Cisco Systems Inc',                      'Cisco'),
+      array('Cisco Systems Inc.',                     'Cisco'),
+      array('Cisco Systems, Inc.',                    'Cisco'),
+      array('Juniper Networks, Inc.',                 'Juniper'),
+      array('Juniper Networks',                       'Juniper'),
+      array('Dell Inc.',                              'Dell'),
+      array('Enterasys Networks, Inc.',               'Enterasys'),
+      array('FIBERXON INC.',                          'Fiberxon'),
+      array('Netgear Inc',                            'Netgear'),
+      array('Volex Inc.',                             'Volex'),
+      array('Broadcom Corp.',                         'Broadcom'),
+      array('FINISAR CORP.',                          'Finisar'),
+      array('Oracle Corporation',                     'Oracle'),
+      array('Methode Elec.',                          'Methode'),
+      array('Deell Computer Corporation',             'Deell'),
+      array('Liebert Corporation Liebert',            'Liebert'),
+      // Keep MultiCase as is
+      array('OneAccess',                              'OneAccess'),
+      array('3Y Power',                               '3Y Power'),
+      array('Alcatel-Lucent',                         'Alcatel-Lucent'),
+      array('CAS-systems',                            'CAS-systems'),
+      array('VMware',                                 'VMware'),
+      array('VMware, Inc.',                           'VMware'),
+      array('EfficientIP',                            'EfficientIP'),
+      // Small name also keep as is
+      array('NHR',                                    'NHR'),
+      array('OEM',                                    'OEM'),
+      array('JDSU',                                   'JDSU'),
+      array('TI',                                     'TI'),
+      array('HP',                                     'HP'),
+      // Search in definitions
+      array('Hewlett-Packard',                        'HP'),
+      array('Hewlett Packard',                        'HP'),
+      array('Hewlett-Packard Company',                'HP'),
+      array('HP Enterprise',                          'HPE'),
+      array('H3C Comware',                            'HPE'),
+      array('Hangzhou H3C Comware',                   'HPE'),
+      array('HP Comware',                             'HPE'),
+      array('Comware',                                'HPE'),
+      array('Huawei Technologies Co., Ltd.',          'Huawei'),
+      array('Huawei Technologies',                    'Huawei'),
+      array('Huawei-3Com',                            'H3C'),
+      array('3Com',                                   'H3C'),
+      array('HUAWEI-3COM CORP.',                      'H3C'),
+      array('Hangzhou H3C Tech. Co.',                 'H3C'),
+      array('EC',                                     'Edgecore'),
+      array('Edge-Core',                              'Edgecore'),
+      array('CISCO-OPNEXT,INC',                       'Cisco'),
+      array('Dell Computer Corporation',              'Dell'),
+      array('MRV COMM, INC.',                         'MRV'),
+      array('CASA-systems',                           'Casa Systems'),
+      array('COMET SYSTEM, s.r.o.',                   'Comet System'),
+      array('COMET SYSTEM, sro',                      'Comet System'),
+      // This must keep Systems in name
+      array('Open Systems',                           'Open Systems'),
+      array('Open Systems AG',                        'Open Systems'),
+      // Some intersects
+      array('Geist',                                  'Geist'),
+      array('GE',                                     'GE'),
+    );
+  }
+
+  /**
    * @dataProvider providerTrimQuotes
    * @group string
    */
@@ -112,6 +188,31 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
       array('  \'\"\"sdfslfkm s\'fdsf"
             a;lm aamjn \"\"\' ', 'sdfslfkm s\'fdsf"
             a;lm aamjn '),
+    );
+  }
+
+  /**
+   * @dataProvider providerCountryFromCode
+   * @group countries
+   */
+  public function testCountryFromCode($string, $result)
+  {
+    $this->assertEquals($result, country_from_code($string));
+  }
+
+  public function providerCountryFromCode()
+  {
+    return array(
+      array('gb',                 'United Kingdom'),
+      array('gbr',                'United Kingdom'),
+      array('United Kingdom',     'United Kingdom'),
+      array('us',                 'United States'),
+      array('usa',                'United States'),
+      array('United States',      'United States'),
+      array('ru',                 'Russian Federation'),
+      array('rus',                'Russian Federation'),
+      array('Russian Federation', 'Russian Federation'),
+      array('russia',             'Russian Federation'),
     );
   }
 
@@ -266,6 +367,24 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
 
   public function providerArrayTagReplace()
   {
+    // recursive from array
+    $rfrom = array(
+      'somekey' => array(
+        'somekey3' => 'port-%INDEX%-%index%.rrd',
+        'somekey4' => 'port-%descr%-%index%-% %.rrd',
+      ),
+      'somekey2' => 'port-%descr%-%index%-%.rrd',
+      'perf-pollermodule-%index%.rrd'
+    );
+    $rto = array(
+      'somekey' => array(
+        'somekey3' => 'port--0.rrd',
+        'somekey4' => 'port--0-% %.rrd',
+      ),
+      'somekey2' => 'port--0-%.rrd',
+      'perf-pollermodule-0.rrd'
+    );
+
     return array(
       // empty/not exist keys
       array('%some_key%',                            array(),                                     ''),
@@ -280,6 +399,17 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
 
       array('%url%%routing_key%',                    array('url' => 'https://alert.victorops.com/integrations/generic/20131114/alert/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/', 'routing_key' => 'everyone'),
                                                      'https://alert.victorops.com/integrations/generic/20131114/alert/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/everyone'),
+
+      // Tags is case-sensitive!
+      array('port-%INDEX%-%index%.rrd',              array('index' => 0), 'port--0.rrd'),
+      array(1000000000,                              array('index' => 0), '1000000000'), // integer to string
+      // Keep not tagged percent signs
+      array('port-%descr%-%index%-%.rrd',            array('index' => 0), 'port--0-%.rrd'),
+      array('port-%descr%-%index%-%%.rrd',           array('index' => 0), 'port--0-%%.rrd'),
+      array('port-%descr%-%index%-% %.rrd',          array('index' => 0), 'port--0-% %.rrd'),
+
+      // recursive arrays with string
+      array($rfrom,                                  array('index' => 0), $rto),
     );
   }
 
@@ -350,7 +480,7 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
     {
       $test_array[$oid] = $port[$oid];
     }
-    // Adiitionally test processing ifAlias on some entries
+    // Additionally test processing ifAlias on some entries
     if (isset($result['ifAlias']))
     {
       $test_array['ifAlias'] = $port['ifAlias'];
@@ -371,10 +501,29 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
       array('ios',          array('ifDescr' => 'Vlan1', 'ifName' => 'Vl1', 'ifAlias' => ''),
                             array('port_label' => 'Vlan1', 'port_label_num' => '1', 'port_label_base' => 'Vlan', 'port_label_short' => 'Vlan1')),
 
+      array('iosxe',        array('ifDescr' => 'TwentyFiveGigE1/0/14', 'ifName' => 'Twe1/0/14', 'ifAlias' => ''),
+                            array('port_label' => 'TwentyFiveGigE1/0/14', 'port_label_num' => '1/0/14', 'port_label_base' => 'TwentyFiveGigE', 'port_label_short' => 'Twe1/0/14')),
+      array('iosxe',        array('ifDescr' => 'HundredGigE1/0/52', 'ifName' => 'Hu1/0/52', 'ifAlias' => ''),
+                            array('port_label' => 'HundredGigE1/0/52', 'port_label_num' => '1/0/52', 'port_label_base' => 'HundredGigE', 'port_label_short' => 'Hu1/0/52')),
+
       array('iosxr',        array('ifDescr' => 'Bundle-Ether670.1793', 'ifName' => 'Bundle-Ether670.1793', 'ifAlias' => ''),
                             array('port_label' => 'Bundle-Ether670.1793', 'port_label_num' => '670.1793', 'port_label_base' => 'Bundle-Ether', 'port_label_short' => 'BE670.1793')),
       array('iosxr',        array('ifDescr' => 'ControlEthernet0/RSP0/CPU0/S0/10', 'ifName' => 'ControlEthernet0/RSP0/CPU0/S0/10', 'ifAlias' => ''),
                             array('port_label' => 'ControlEthernet0/RSP0/CPU0/S0/10', 'port_label_num' => '0/RSP0/CPU0/S0/10', 'port_label_base' => 'ControlEthernet', 'port_label_short' => 'CE0/RSP0/CPU0/S0/10')),
+      array('iosxr',        array('ifDescr' => 'MgmtEth0/RP0/CPU0/0', 'ifName' => 'MgmtEth0/RP0/CPU0/0', 'ifAlias' => ''),
+                            array('port_label' => 'MgmtEth0/RP0/CPU0/0', 'port_label_num' => '0/RP0/CPU0/0', 'port_label_base' => 'MgmtEth', 'port_label_short' => 'Mgmt0/RP0/CPU0/0')),
+      array('iosxr',        array('ifDescr' => 'Optics0/0/0/5', 'ifName' => 'Optics0/0/0/5', 'ifAlias' => ''),
+                            array('port_label' => 'Optics0/0/0/5', 'port_label_num' => '0/0/0/5', 'port_label_base' => 'Optics', 'port_label_short' => 'Optics0/0/0/5')),
+      array('iosxr',        array('ifDescr' => 'HundredGigE0/0/0/19', 'ifName' => 'HundredGigE0/0/0/19', 'ifAlias' => ''),
+                            array('port_label' => 'HundredGigE0/0/0/19', 'port_label_num' => '0/0/0/19', 'port_label_base' => 'HundredGigE', 'port_label_short' => 'Hu0/0/0/19')),
+
+      array('cisco-fxos',   array('ifDescr' => 'Adaptive Security Appliance \'Ethernet1/13', 'ifName' => 'Adaptive Security Appliance \'Ethernet1/13\' interface', 'ifAlias' => ''),
+                            array('port_label' => 'Ethernet1/13', 'port_label_num' => '1/13', 'port_label_base' => 'Ethernet', 'port_label_short' => 'Et1/13')),
+      array('cisco-fxos',   array('ifDescr' => 'Adaptive Security Appliance \'Port-Channel13\' interface', 'ifName' => 'Adaptive Security Appliance \'Port-Channel13\' interface', 'ifAlias' => ''),
+                            array('port_label' => 'Port-Channel13', 'port_label_num' => '13', 'port_label_base' => 'Port-Channel', 'port_label_short' => 'Po13')),
+
+      array('nxos',         array('ifDescr' => '', 'ifName' => 'Ethernet1/49.2', 'ifAlias' => ''),
+                            array('port_label' => 'Ethernet1/49.2', 'port_label_num' => '1/49.2', 'port_label_base' => 'Ethernet', 'port_label_short' => 'Et1/49.2')),
 
       array('junos',        array('ifDescr' => 'ge-4/1/0.29', 'ifName' => 'ge-4/1/0.29', 'ifAlias' => 'Cust: Europool DIA'),
                             array('port_label' => 'ge-4/1/0.29', 'port_label_num' => '4/1/0.29', 'port_label_base' => 'ge-', 'port_label_short' => 'ge-4/1/0.29')),
@@ -387,7 +536,7 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
                             array('port_label' => 'FortyGigabitEthernet 122/0/49', 'port_label_num' => '122/0/49', 'port_label_base' => 'FortyGigabitEthernet ', 'port_label_short' => 'Fo 122/0/49')),
 
       array('dnos',         array('ifDescr' => 'fortyGigE 0/37', 'ifName' => 'fortyGigE 0/37', 'ifAlias' => ''),
-                            array('port_label' => 'fortyGigE 0/37', 'port_label_num' => '0/37', 'port_label_base' => 'fortyGigE ', 'port_label_short' => 'Fo 0/37')),
+                            array('port_label' => 'FortyGigE 0/37', 'port_label_num' => '0/37', 'port_label_base' => 'FortyGigE ', 'port_label_short' => 'Fo 0/37')),
       array('dnos',         array('ifDescr' => 'ManagementEthernet 0/0', 'ifName' => 'ManagementEthernet 0/0', 'ifAlias' => ''),
                             array('port_label' => 'ManagementEthernet 0/0', 'port_label_num' => '0/0', 'port_label_base' => 'ManagementEthernet ', 'port_label_short' => 'Mgmt 0/0')),
 
@@ -395,6 +544,9 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
                             array('port_label' => '40GE4/0/6', 'port_label_num' => '4/0/6', 'port_label_base' => '40GE', 'port_label_short' => '40GE4/0/6')),
       array('vrp',          array('ifDescr' => 'XGigabitEthernet5/0/14', 'ifName' => 'XGigabitEthernet5/0/14', 'ifAlias' => ''),
                             array('port_label' => 'XGigabitEthernet5/0/14', 'port_label_num' => '5/0/14', 'port_label_base' => 'XGigabitEthernet', 'port_label_short' => 'XGi5/0/14')),
+
+      array('routeros',     array('ifDescr' => 'Core: sfp-sfpplus1- Trunk to 6509', 'ifName' => 'Core: sfp-sfpplus1- Trunk to 6509', 'ifAlias' => ''),
+                            array('port_label' => 'Core: sfp-sfpplus1- Trunk to 6509', 'port_label_num' => '', 'port_label_base' => 'Core: sfp-sfpplus1- Trunk to 6509', 'port_label_short' => 'Core: sfp-sfpplus1- Trunk to 6509')),
 
       array('linux',        array('ifDescr' => 'lo', 'ifName' => 'lo', 'ifAlias' => ''),
                             array('port_label' => 'lo', 'port_label_num' => '', 'port_label_base' => 'lo', 'port_label_short' => 'lo')),
@@ -440,6 +592,17 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
       array('timos',        array('ifDescr' => 'lag-13, LAG Group, LAG to 7750 port 1/2/3', 'ifName' => 'lag-13', 'ifAlias' => ''),
                             array('port_label' => 'lag-13', 'port_label_num' => '13', 'port_label_base' => 'lag-', 'port_label_short' => 'lag-13', 'ifAlias' => 'LAG to 7750 port 1/2/3')),
 
+      array('ekinops-360',  array('ifDescr' => 'EKINOPS/C200/6/PM10010MP/Line(ROV-VOR-194,2)', 'ifName' => 'EKINOPS/C200/6/PM10010MP/Line(ROV-VOR-194,2)', 'ifAlias' => ''),
+                            array('port_label' => '6/PM10010MP/Line', 'port_label_num' => '', 'port_label_base' => '6/PM10010MP/Line', 'port_label_short' => '6/PM10010MP/Line', 'ifAlias' => 'ROV-VOR-194,2')),
+      array('ekinops-360',  array('ifDescr' => 'EKINOPS/C200HC/1/PM_10010MP/S1-Client1(PORT_Number 1   )', 'ifName' => 'EKINOPS/C200HC/1/PM_10010MP/S1-Client1(PORT_Number 1   )', 'ifAlias' => ''),
+                            array('port_label' => '1/PM_10010MP/S1-Client1', 'port_label_num' => '1-Client1', 'port_label_base' => '1/PM_10010MP/S', 'port_label_short' => '1/PM_10010MP/S1-Client1', 'ifAlias' => 'PORT_Number 1')),
+      array('ekinops-360',  array('ifDescr' => 'EKINOPS/C200/6/PM10010MP/S4-Client4()', 'ifName' => 'EKINOPS/C200/6/PM10010MP/S4-Client4()', 'ifAlias' => ''),
+                            array('port_label' => '6/PM10010MP/S4-Client4', 'port_label_num' => '4-Client4', 'port_label_base' => '6/PM10010MP/S', 'port_label_short' => '6/PM10010MP/S4-Client4', 'ifAlias' => '')),
+      array('ekinops-360',  array('ifDescr' => 'EKINOPS/C200/1/MGNT/FE_3', 'ifName' => 'EKINOPS/C200/1/MGNT/FE_3', 'ifAlias' => ''),
+                            array('port_label' => '1/MGNT/FE_3', 'port_label_num' => '3', 'port_label_base' => '1/MGNT/FE_', 'port_label_short' => '1/MGNT/FE_3', 'ifAlias' => '')),
+      array('ekinops-360',  array('ifDescr' => 'EKINOPS/C200/1/MGNT/GbE_RJ45#1', 'ifName' => 'EKINOPS/C200/1/MGNT/GbE_RJ45#1', 'ifAlias' => ''),
+                            array('port_label' => '1/MGNT/GbE_RJ45#1', 'port_label_num' => '1', 'port_label_base' => '1/MGNT/GbE_RJ45#', 'port_label_short' => '1/MGNT/GbE_RJ45#1', 'ifAlias' => '')),
+
       // ifType_ifDescr
       array('liebert',      array('ifDescr' => '', 'ifType' => 'softwareLoopback'), // ++ ifType, ifIndex
                             array('port_label' => 'Loopback 5', 'port_label_num' => '5', 'port_label_base' => 'Loopback ', 'port_label_short' => 'Lo 5')),
@@ -459,6 +622,16 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
       array('aosw',         array('ifDescr' => 'SWITCH IP INTERFACE', 'ifName' => 'loop', 'ifAlias' => ''),
                             array('port_label' => 'loop', 'port_label_num' => NULL, 'port_label_base' => 'loop', 'port_label_short' => 'loop')),
 
+      array('xos',          array('ifDescr' => 'X690-48x-2q-4c Port 10', 'ifName' => '1:10', 'ifAlias' => ''),
+                            array('port_label' => '1:10', 'port_label_num' => '1:10', 'port_label_base' => '', 'port_label_short' => '1:10')),
+
+      array('hirschmann-switch', array('ifDescr' => 'Module: 1 Port: 3 - 10/100 Mbit TX', 'ifName' => '1/1/3', 'ifAlias' => ''),
+                            array('port_label' => '1/1/3', 'port_label_num' => '1/1/3', 'port_label_base' => '', 'port_label_short' => '1/1/3')),
+      array('hirschmann-switch', array('ifDescr' => 'Module: 1 Port: 3 - 10/100 Mbit TX', 'ifName' => '', 'ifAlias' => ''),
+                            array('port_label' => 'Module: 1 Port: 3', 'port_label_num' => '1 Port: 3', 'port_label_base' => 'Module: ', 'port_label_short' => 'Module: 1 Port: 3')),
+      array('hirschmann-switch', array('ifDescr' => 'CPU Interface for Module: 4 Port: 1', 'ifName' => 'CPU Interface:  1/4/1', 'ifAlias' => ''),
+                            array('port_label' => 'CPU Interface: 1/4/1', 'port_label_num' => '1/4/1', 'port_label_base' => 'CPU Interface: ', 'port_label_short' => 'CPU Interface: 1/4/1')),
+
       // hard coded rewrites
       array('ciscosb',      array('ifDescr' => '1', 'ifName' => '1', 'ifType' => 'propVirtual'), // ++ ifType
                             array('port_label' => 'Vlan1', 'port_label_num' => '1', 'port_label_base' => 'Vlan', 'port_label_short' => 'Vlan1')),
@@ -467,7 +640,7 @@ class IncludesRewritesTest extends \PHPUnit\Framework\TestCase
       array('generic',      array('ifDescr' => 'GigaVUE-212 Port  8/48 (Network Port)'),
                             array('port_label' => 'GigaVUE-212 Port 8/48', 'port_label_num' => '8/48', 'port_label_base' => 'GigaVUE-212 Port ', 'port_label_short' => 'Port 8/48')),
       array('generic',      array('ifDescr' => 'rtif(172.20.30.46/28)'),
-                            array('port_label' => 'rtif(172.20.30.46/28)', 'port_label_num' => NULL, 'port_label_base' => 'rtif', 'port_label_short' => 'rtif(172.20.30.46/28)')),
+                            array('port_label' => 'rtif(172.20.30.46/28)', 'port_label_num' => '', 'port_label_base' => 'rtif(172.20.30.46/28)', 'port_label_short' => 'rtif(172.20.30.46/28)')),
       array('generic',      array('ifDescr' => '10/100 MBit Ethernet Switch Interface 6'),
                             array('port_label' => 'Ethernet 6', 'port_label_num' => '6', 'port_label_base' => 'Ethernet ', 'port_label_short' => 'Et 6')),
       array('generic',      array('ifDescr' => '1/1/1'),

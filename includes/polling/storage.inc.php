@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $table_rows = array();
 
-if (!isset($cache_storage)) { $cache_storage = array(); } // This cache used also in mempool module
+if (!isset($cache_storage)) { $cache_storage = array(); } // This cache used also in storage module
 
 $sql  = "SELECT `storage`.*";
 $sql .= " FROM  `storage`";
@@ -23,12 +23,64 @@ $sql .= " WHERE `device_id` = ?";
 foreach (dbFetchRows($sql, array($device['device_id'])) as $storage)
 {
   $storage_size = $storage['storage_size']; // Memo old size
-  $file = $config['install_dir']."/includes/polling/storage/".$storage['storage_mib'].".inc.php";
+  $file = $config['install_dir']."/includes/polling/storage/".strtolower($storage['storage_mib']).".inc.php";
   if (is_file($file))
   {
     include($file);
   } else {
-    continue;
+     // Check if we can poll the device ourselves with generic code using definitions.
+     // Table is always set when defintions add storages.
+     if ($storage['storage_type'] != '' && is_array($config['mibs'][$storage['storage_mib']]['storage'][$storage['storage_type']]))
+     {
+        $table_def = $config['mibs'][$storage['storage_mib']]['storage'][$storage['storage_type']];
+
+        print_r($config['mibs'][$storage['storage_mib']]['storage']);
+
+        if ($table_def['type'] == 'static')
+        {
+
+           if      (isset($table_def['oid_perc_num']))  { $storage['perc'] = snmp_get_oid($device, $table_def['oid_perc_num']); }
+           else if (isset($table_def['oid_perc']))      { $storage['perc'] = snmp_get_oid($device, $table_def['oid_perc'], $storage['storage_mib']); }
+
+           if      (isset($table_def['oid_free_num']))  { $storage['free'] = snmp_get_oid($device, $table_def['oid_free_num']); }
+           else if (isset($table_def['oid_free']))      { $storage['free'] = snmp_get_oid($device, $table_def['oid_free'], $storage['storage_mib']); }
+
+           if      (isset($table_def['oid_used_num']))  { $storage['used'] = snmp_get_oid($device, $table_def['oid_used_num']); }
+           else if (isset($table_def['oid_used']))      { $storage['used'] = snmp_get_oid($device, $table_def['oid_used'], $storage['storage_mib']); }
+
+           if      (isset($table_def['total']))         { $storage['total'] = $table_def['total']; }
+           else if (isset($table_def['oid_total_num'])) { $storage['total'] = snmp_get_oid($device, $table_def['oid_total_num']); }
+           else if (isset($table_def['oid_total']))     { $storage['total'] = snmp_get_oid($device, $table_def['oid_total'], $storage['storage_mib']); }
+
+        } else {
+
+           if      (isset($table_def['oid_perc_num']))  { $storage['perc'] = snmp_get_oid($device, $table_def['oid_perc_num'].'.'.$storage['storage_index']); }
+           else if (isset($table_def['oid_perc']))      { $storage['perc'] = snmp_get_oid($device, $table_def['oid_perc'].'.'.$storage['storage_index'], $storage['storage_mib']); }
+
+           if      (isset($table_def['oid_free_num']))  { $storage['free'] = snmp_get_oid($device, $table_def['oid_free_num'].'.'.$storage['storage_index']); }
+           else if (isset($table_def['oid_free']))      { $storage['free'] = snmp_get_oid($device, $table_def['oid_free'].'.'.$storage['storage_index'], $storage['storage_mib']); }
+
+           if      (isset($table_def['oid_used_num']))  { $storage['used'] = snmp_get_oid($device, $table_def['oid_used_num'].'.'.$storage['storage_index']); }
+           else if (isset($table_def['oid_used']))      { $storage['used'] = snmp_get_oid($device, $table_def['oid_used'].'.'.$storage['storage_index'], $storage['storage_mib']); }
+
+           if      (isset($table_def['total']))         { $storage['total'] = $table_def['total']; }
+           else if (isset($table_def['oid_total_num'])) { $storage['total'] = snmp_get_oid($device, $table_def['oid_total_num'].'.'.$storage['storage_index']); }
+           else if (isset($table_def['oid_total']))     { $storage['total'] = snmp_get_oid($device, $table_def['oid_total'].'.'.$storage['storage_index'], $storage['storage_mib']); }
+
+        }
+        // Clean not numeric symbols from snmp output
+        foreach (array('perc', 'free', 'used', 'total') as $param)
+        {
+          if (isset($storage[$param])) { $storage[$param] = snmp_fix_numeric($storage[$param]); }
+        }
+
+        // Merge calculated used/total/free/perc array keys into $storage variable (with additional options)
+        $storage = array_merge($storage, calculate_mempool_properties($storage['storage_multiplier'], $storage['used'], $storage['total'], $storage['free'], $storage['perc'], $table_def));
+        $storage['size'] = $storage['total'];
+     } else {
+        // Unknown, so force rediscovery as there's a broken storage
+        force_discovery($device, 'storage');
+     }
   }
 
   if (OBS_DEBUG && count($storage)) { print_vars($storage); }
@@ -50,7 +102,9 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $storage)
   }
 
   // Update RRD
-  rrdtool_update_ng($device, 'storage', array('used' => $storage['used'], 'free' => $storage['free']), $storage['storage_mib'] . "-" . $storage['storage_descr']);
+
+
+  rrdtool_update_ng($device, 'storage', array('used' => $storage['used'], 'free' => $storage['free']), strtolower($storage['storage_mib']) . "-" . $storage['storage_descr']);
 
   //if (!is_numeric($storage['storage_polled']))
   //{
@@ -68,8 +122,8 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $storage)
                              'storage_size'   => $storage['size'],
                              'storage_units'  => $storage['units'],
                              'storage_perc'   => $percent), 'storage', '`storage_id` = ?', array($storage['storage_id']));
-    if ($storage_size != $storage['size'] &&
-        (abs($storage_size - $storage['size']) / max($storage_size, $storage['size'])) > 0.0001 ) // Log only if size diff more than 0.01%
+    if (formatStorage($storage_size) != formatStorage($storage['size']))
+        //&& (abs($storage_size - $storage['size']) / max($storage_size, $storage['size'])) > 0.0001 ) // Log only if size diff more than 0.01%
     {
       log_event('Storage size changed: '.formatStorage($storage_size).' -> '.formatStorage($storage['size']).' ('.$storage['storage_descr'].')', $device, 'storage', $storage['storage_id']);
     }

@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -120,7 +120,11 @@ function print_oid_table($vars)
       if (!is_numeric($entry['value'])) {
         $entry['human_value'] = 'NaN';
       } else {
-        $entry['human_value'] = format_value($entry['value'], 'si') . $entry['oid_symbol'];
+        if($entry['oid_kibi'] == 1) {
+          $entry['human_value'] = format_value($entry['value'], 'bi') . $entry['oid_symbol'];
+        } else {
+          $entry['human_value'] = format_value($entry['value'], 'si') . $entry['oid_symbol'];
+        }
       }
 
       $graph_array = array();

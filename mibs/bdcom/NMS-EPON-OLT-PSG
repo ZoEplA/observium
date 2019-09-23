@@ -153,7 +153,7 @@
                    DESCRIPTION
                             "A collection of additional objects in the
                             epon olt PSG port create table."
-                   INDEX { psgDiid }
+                   INDEX { psgPortSlotNo,psgPortSeqencelNo }
                ::= { nmsEponOltPsgCreateTable 1 }
               
 
@@ -202,7 +202,7 @@
                             delete(2),
                             switch(3)
                                   }
-                   ACCESS  read-only
+                   ACCESS  read-write
                    STATUS  mandatory
                    DESCRIPTION
                            "PSG port operation, 1-ceate a new psg port, 2-delete a current psg port, 3-switch between active port and standby port."

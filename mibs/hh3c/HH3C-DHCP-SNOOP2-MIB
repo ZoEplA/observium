@@ -1,13 +1,14 @@
 -- =========================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: DHCP Snooping MIB 2
 -- Reference:
--- Version:     V1.2
+-- Version:     V1.3
 -- History:
 -- V1.0 The initial version, created by lilin, 2012.05.15
 -- V1.1 Modified the mib description by lilin, 2013.04.15
 -- V1.2 Modified hh3cDhcpSnoop2IfMaxLearnNum by yuguoqing, 2014.03.20
+-- V1.3 Modified hh3cDhcpSnoop2IfOpt82CIDMode by heminhong, 2017.01.13
 -- =========================================================================
 HH3C-DHCP-SNOOP2-MIB DEFINITIONS ::= BEGIN
 
@@ -30,16 +31,20 @@ IMPORTS
 -- Module identity
 -- =========================================================================
 hh3cDhcpSnoop2 MODULE-IDENTITY
-    LAST-UPDATED "201304150000Z"
+    LAST-UPDATED "201701130000Z"
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085
         "
     DESCRIPTION "DHCP SNOOPING MIB 2"
+    REVISION
+        "201701130000Z"
+    DESCRIPTION
+        "Modified to add 'hh3cDhcpSnoop2IfOpt82CIDMode' mode."
     REVISION
          "201304150000Z"
     DESCRIPTION
@@ -377,7 +382,8 @@ hh3cDhcpSnoop2IfOpt82CIDMode OBJECT-TYPE
     {
         normal(1),
         verbose(2),
-        userDefine(3)
+        userDefine(3),
+        bas(4)
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -390,6 +396,8 @@ hh3cDhcpSnoop2IfOpt82CIDMode OBJECT-TYPE
          'verbose' is the detailed mode.
 
          'userDefine' is the user-defined mode.
+
+         'bas' is the bas mode.
 
          If the value of this object is set to 'userDefine',
          hh3cDhcpSnoop2IfOpt82CIDStr must also be set."

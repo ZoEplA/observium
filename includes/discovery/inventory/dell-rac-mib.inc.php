@@ -13,13 +13,10 @@
 
 // Only run this mib for chassis systems
 // DELL-RAC-MIB::drsProductType.0 = INTEGER: cmc(8)
-$type = snmp_get($device, "drsProductType.0", "-Oqv", "DELL-RAC-MIB");
+$type = snmp_get_oid($device, "drsProductType.0", "DELL-RAC-MIB");
 if ( strstr($type, "cmc") || strstr($type, "CMC") )
 {
-  if (!isset($cache_discovery['dell-rac-mib']))
-  {
-    $cache_discovery['dell-rac-mib'] = snmpwalk_cache_oid($device, 'drsChassisServerGroup', NULL, 'DELL-RAC-MIB');
-  }
+  $oids = snmp_cache_table($device, 'drsChassisServerGroup', NULL, 'DELL-RAC-MIB'); // This table also used in statuses
 
   $index = 1;
   $inventory[$index] = array(
@@ -36,9 +33,9 @@ if ( strstr($type, "cmc") || strstr($type, "CMC") )
       'entPhysicalParentRelPos' => -1,
       'entPhysicalMfgName'      => 'Dell'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'dell-rac-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
 
-  foreach ($cache_discovery['dell-rac-mib'] as $tmp => $entry)
+  foreach ($oids as $tmp => $entry)
   {
     if ($entry['drsServerSlotNumber'] === "N/A") { continue; }
     $index += 2;
@@ -69,14 +66,14 @@ if ( strstr($type, "cmc") || strstr($type, "CMC") )
         'entPhysicalParentRelPos' => 1,
         'entPhysicalMfgName'      => 'Dell'
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'dell-rac-mib');
-      discover_inventory($valid['inventory'], $device, $index+1, $inventory[$index+1], 'dell-rac-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
+      discover_inventory($device, $index+1, $inventory[$index+1], $mib);
       unset($serial, $model);
 
     } else {
       $i = $index-2;
       $inventory[$i]['entPhysicalName'] = $inventory[$i]['entPhysicalName'] . '+' . $entry['drsServerSlotNumber'];
-      discover_inventory($valid['inventory'], $device, $i, $inventory[$i], 'dell-rac-mib');
+      discover_inventory($device, $i, $inventory[$i], $mib);
     }
   }
 }

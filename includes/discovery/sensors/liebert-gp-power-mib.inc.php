@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -90,7 +90,7 @@ foreach ($oids as $id => $entry1)
 
     if (isset($entry[$oid_name]))
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+      discover_sensor('apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
     }
 
     $scale    = 1;
@@ -101,7 +101,7 @@ foreach ($oids as $id => $entry1)
 
     if (isset($entry[$oid_name]))
     {
-      discover_sensor($valid['sensor'], 'rpower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+      discover_sensor('rpower', $device, $oid_num, $index, $type, $descr, $scale, $value);
     }
 
     $scale    = 0.1;
@@ -112,7 +112,7 @@ foreach ($oids as $id => $entry1)
 
     if (isset($entry[$oid_name]))
     {
-      discover_sensor($valid['sensor'], 'crestfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+      discover_sensor('crestfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
     }
 
     $scale    = 0.01;
@@ -123,7 +123,7 @@ foreach ($oids as $id => $entry1)
 
     if (isset($entry[$oid_name]))
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+      discover_sensor('powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
     }
   }
 }

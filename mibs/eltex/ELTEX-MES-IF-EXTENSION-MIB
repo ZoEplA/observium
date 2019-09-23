@@ -71,37 +71,6 @@ eltIfDot1qCustomEgressEtherType OBJECT-TYPE
                         is connected to any third party vendor device."
     ::= { eltIfDot1qCustomEgressEtherTypeEntry 1 }
 
-
-eltIfDot1qIngressCvlanTable OBJECT-TYPE
-    SYNTAX          SEQUENCE OF EltIfDot1qIngressCvlanEntry
-    MAX-ACCESS      not-accessible
-    STATUS          current
-    DESCRIPTION        "A list of the interfaces ingress C-VLAN settings."
-    ::= { eltMesIfExtDot1q 1 }
-
-eltIfDot1qIngressCvlanEntry OBJECT-TYPE
-    SYNTAX          EltIfDot1qIngressCvlanEntry
-    MAX-ACCESS      not-accessible
-    STATUS          current
-    DESCRIPTION        "An entry containing ingress C-VLAN assignment
-    					for the interface."
-    INDEX           { ifIndex }
-    ::= { eltIfDot1qIngressCvlanTable 1 }
-
-EltIfDot1qIngressCvlanEntry ::= SEQUENCE {
-        eltIfDot1qIngressCvlanTag Integer32
-}
-
-eltIfDot1qIngressCvlanTag OBJECT-TYPE
-    SYNTAX          Integer32 (0..4095 )
-    MAX-ACCESS      read-write
-    STATUS          current
-    DESCRIPTION        "C-VLAN tag for the interface assigned
-    					in ingress pipe. 0 means no C-VLAN assignment."
-    ::= { eltIfDot1qIngressCvlanEntry 1 }
-
-
-
 eltIfDot1qCustomIngressEtherTypeTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF EltIfDot1qCustomIngressEtherTypeEntry
     MAX-ACCESS      not-accessible
@@ -207,5 +176,36 @@ eltIfDot1qCustomIngressEtherType7 OBJECT-TYPE
                     to identify 802.1q-tagged frames."
     DEFVAL          { 0 }
     ::= { eltIfDot1qCustomIngressEtherTypeEntry 7 }
+
+
+eltIfDot1qIngressCvlanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EltIfDot1qIngressCvlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION        "A list of the interfaces ingress C-VLAN settings."
+    ::= { eltMesIfExtDot1q 1 }
+
+eltIfDot1qIngressCvlanEntry OBJECT-TYPE
+    SYNTAX          EltIfDot1qIngressCvlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION        "An entry containing ingress C-VLAN assignment
+    					for the interface."
+    INDEX           { ifIndex }
+    ::= { eltIfDot1qIngressCvlanTable 1 }
+
+EltIfDot1qIngressCvlanEntry ::= SEQUENCE {
+        eltIfDot1qIngressCvlanTag Integer32
+}
+
+eltIfDot1qIngressCvlanTag OBJECT-TYPE
+    SYNTAX          Integer32 (0..4095 )
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION        "C-VLAN tag for the interface assigned
+    					in ingress pipe. 0 means no C-VLAN assignment."
+    ::= { eltIfDot1qIngressCvlanEntry 1 }
+
+
 
 END

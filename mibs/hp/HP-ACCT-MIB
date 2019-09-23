@@ -1,19 +1,11 @@
---**MOD+***********************************************************************
---* Module:    hpicfAcct.mib
---*
--- Copyright (C) 2000-2014 Hewlett Packard Enterprise Development LP
--- * All Rights Reserved.
+-- Copyright (C) 2000-2014, 2016-2017 Hewlett-Packard Enterprise Development LP
 
 -- **************************************************************************
--- * The contents of this software are proprietary and confidential
--- * to the Hewlett Packard Enterprise Development LP.  No part of this
--- * program may be photocopied, reproduced, or translated into another
--- * programming language without prior written consent of the
--- * Hewlett Packard Enterprise Development LP.
---*
---* Purpose: This file contains MIB definition of HP-ACCT-MIB
---*
---**MOD-***********************************************************************
+-- The contents of this software are proprietary and confidential to the
+-- Hewlett-Packard Development Company, L.P.  No part of this program may be 
+-- photocopied, reproduced, or translated into another programming language
+-- without prior written consent of the Hewlett-Packard Development Co., L.P. 
+-- **************************************************************************
 
 HP-ACCT-MIB DEFINITIONS ::= BEGIN
 
@@ -28,7 +20,7 @@ HP-ACCT-MIB DEFINITIONS ::= BEGIN
             FROM HP-ICF-OID;
 
     hpSwitchAccountingMIB MODULE-IDENTITY
-        LAST-UPDATED "201408040000Z"  --   August 04, 2014
+        LAST-UPDATED "201711220000Z"  --   Nov 22, 2017
         ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett Packard Company
                       8000 Foothills Blvd.
@@ -36,6 +28,10 @@ HP-ACCT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION  "This MIB module describes objects for managing
                      the Accounting service features of devices in the HP
                      Integrated Communication Facility product line."
+
+        REVISION     "201711220000Z"  --   Nov 22, 2017
+        DESCRIPTION  "Updated 'hpSwitchAcctServiceIndex' object
+                     with 'restUri' value."
 
         REVISION     "201408040000Z"  --   August 04, 2014
         DESCRIPTION  "Updated 'hpSwitchAcctServiceMethod' object
@@ -136,7 +132,8 @@ HP-ACCT-MIB DEFINITIONS ::= BEGIN
                         network(1),
                         exec(2),
                         system(3),
-                        commands(4)
+                        commands(4),
+                        restUri(5)
                     }
         MAX-ACCESS  not-accessible
         STATUS      current

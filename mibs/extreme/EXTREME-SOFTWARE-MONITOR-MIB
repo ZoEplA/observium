@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 EXTREME-SOFTWARE-MONITOR-MIB DEFINITIONS ::= BEGIN
@@ -13,15 +7,13 @@ EXTREME-SOFTWARE-MONITOR-MIB DEFINITIONS ::= BEGIN
         NOTIFICATION-TYPE FROM SNMPv2-SMI
         OBJECT-TYPE     FROM SNMPv2-SMI
                 Unsigned32    FROM SNMPv2-SMI
-                TruthValue      FROM SNMPv2-TC
-        DisplayString   FROM RFC1213-MIB
+        DisplayString   FROM SNMPv2-TC
                 extremeAgent   FROM EXTREME-BASE-MIB
         extremeImageDescription FROM EXTREME-SYSTEM-MIB	
-        PortList    FROM EXTREME-BASE-MIB
-                IpAddress       FROM SNMPv2-SMI;
+        PortList    FROM EXTREME-BASE-MIB;
 
         extremeSwMonitor MODULE-IDENTITY
-                LAST-UPDATED "200402140000Z"
+                LAST-UPDATED "201309201006Z"
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme Software Monitor objects: objects common to all platforms"
@@ -609,7 +601,7 @@ EXTREME-SOFTWARE-MONITOR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS accessible-for-notify
         STATUS current
         DESCRIPTION
-        "Cpu utilization value reported in extremeSwMonitorCpuUtilization trap."
+        "Percentage of the amount of time recorded in seconds that the process spends occupying CPU resources.  This value is reported in extremeSwMonitorCpuUtilization and extremeSwMonitorCpuUtilizationNormal trap."
    ::= { extremeSwMonitorCpu 6 }
 
 
@@ -684,5 +676,16 @@ EXTREME-SOFTWARE-MONITOR-MIB DEFINITIONS ::= BEGIN
             DESCRIPTION
             "Trial license expiry notification is generated every day."
         ::= { extremeSwMonitorNotificationsPrefix 3 }
+
+
+    extremeSwMonitorCpuUtilizationNormal NOTIFICATION-TYPE
+            OBJECTS { extremeCpuMonitorSlotId,
+                      extremeCpuMonitorProcessName,
+                      extremeCpuMonitorCurrentUtilization,
+                      extremeCpuMonitorThreshold }
+            STATUS   current
+            DESCRIPTION
+            "Notification of process CPU utilization falling below threshold.  The generation of this notification corresponds with the extremeSwMonitorCpuUtilization (CPU excessed threshold) notification.  When the CPU utilization of the process that triggered the extremeSwMonitorCpuUtilization notification falls back below the configured threshold, this (return to normal) notification will be generated."
+        ::= { extremeSwMonitorNotificationsPrefix 4 }
 
 END

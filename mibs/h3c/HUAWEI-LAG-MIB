@@ -47,9 +47,10 @@ HUAWEI-LAG-MIB DEFINITIONS ::= BEGIN
             "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
             "Platform Team Hangzhou H3C Tech. Co., Ltd.
-             Hai-Dian District Beijing P.R. China
-             http://www.h3c.com
-             Zip:100085"
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             "LACP extend MIB."
         ::= { huaweiDatacomm 25 }

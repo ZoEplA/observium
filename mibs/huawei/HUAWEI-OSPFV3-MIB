@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-OSPFV3-MIB.mib, The HUAWEI-OSPFV3-MIB provides information about OSPFv3
 -- Reference: draft-ietf-ospf-ospfv3-mib-11
--- Version:    V2.18
+-- Version:    V2.19
 -- History:
 -- ==================================================================
 
@@ -29,7 +29,7 @@
                     FROM OSPF-MIB; 
     
     hwOspfv3 MODULE-IDENTITY 
-            LAST-UPDATED "201608041521Z" 
+            LAST-UPDATED "201708172015Z" 
         ORGANIZATION 
                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -47,6 +47,10 @@
                   RFC draft-ietf-ospf-ospfv3-mib-11;  
                   see the RFC itself for full legal 
                   notices." 
+
+
+            REVISION "201708172015Z"
+            DESCRIPTION "modify hwOspfv3PeerFlappingSuppressStatus discription"
 
             REVISION "201608041521Z"
             DESCRIPTION "Added 		            
@@ -2555,8 +2559,12 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "The suppress status of peer flapping."
-            ::= { hwOspfv3NotificationEntry 10 }
+                "his object indicates the mode of the OSPFv3 neighbor relationship flapping suppression.
+none(1): OSPFv3 neighbor relationship flapping suppression is not started yet.
+holddown(2): OSPFv3 neighbor relationship flapping suppression works in Hold-down mode.
+holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-max-cost mode.
+"
+     ::= { hwOspfv3NotificationEntry 10 }
 
      hwOspfv3PeerFlappingSuppressReason OBJECT-TYPE
             SYNTAX INTEGER

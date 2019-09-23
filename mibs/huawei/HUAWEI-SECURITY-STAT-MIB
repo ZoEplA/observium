@@ -10,11 +10,11 @@
 -- 
 --  
 -- =================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:
 -- Reference:
--- Version: V1.21
+-- Version: V1.35
 -- History:
 -- shaoyu,2009-03-12,<contents>
 -- =================================================================
@@ -30,12 +30,13 @@
 			NOTIFICATION-TYPE			
 				FROM SNMPv2-SMI			
 			TruthValue			
-				FROM SNMPv2-TC;
-	
+				FROM SNMPv2-TC
+			huaweiUtility
+				FROM HUAWEI-MIB;	
 	
 		-- 1.3.6.1.4.1.2011.6.122.15.1
 		hwSecStatGlobal MODULE-IDENTITY 
-			LAST-UPDATED "201611082300Z"		-- Sem 08, 2016 at 23:00 GMT
+			LAST-UPDATED "201807241728Z"		-- Jul 24, 2018 at 17:28 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO
@@ -50,8 +51,37 @@
 				V1.20
 				The HUAWEI-SECSTAT-MIB contains objects to manage the security statistics for firewall product.
 				"
-			--  Revision history
-                                                                   REVISION   "201611082300Z"
+			--  Revision history 
+								REVISION   "201807241728Z"       
+                                DESCRIPTION "V1.35 add hwSecStatSessFastMemoryAgingOverThreshold and hwSecStatSessFastMemoryAgingBelowThreshold node."   
+			                    REVISION   "201807111222Z"       
+                                DESCRIPTION "V1.34 add hwSecStatPerfTrapOverProductCarThreshold and hwSecStatPerfTrapBelowProductCarThreshold node."   
+                                REVISION   "201806282045Z"       
+                                DESCRIPTION "V1.33 add hwSecStatPerfTrapBelowCpuCarThreshold node."         
+	             REVISION   "201802240945Z"       
+                                DESCRIPTION "V1.32 add hwSecStatEmergencyDefendTimeoutWarning and hwSecStatEmergencyDefendTimeout node."                     
+                                REVISION   "201802081149Z"       
+                                DESCRIPTION "V1.31 add hwSecStatEmergencyFwdTimeoutWarning and hwSecStatEmergencyFwdTimeout node."                     
+	             REVISION   "201801311149Z"       
+                                DESCRIPTION "V1.30 add hwSecStatSessCreateFailDropPkts node."
+                                REVISION   "201801251120Z"
+                                DESCRIPTION "V1.29 add SYNTAX of the hwSecStatSessFastAgingOverThreshold, hwSecStatSessFastAgingBelowThreshold, hwSecStatIPv6SessFastAgingOverThreshold and hwSecStatIPv6SessFastAgingBelowThreshold node."
+                                REVISION   "201712281120Z"
+                                DESCRIPTION "V1.28 modify the SYNTAX error ."
+                                REVISION   "201708101920Z"
+                                DESCRIPTION "V1.27 modify the hwSecStatTrapSlot and the hwSecStatPerfTrapCpuThreshold."
+                                REVISION   "201707111920Z"
+                                DESCRIPTION "V1.26 add the SYNTAX of the hwSecStatFastSessOverThreshold and hwSecStatFastSessBelowThreshold node."
+                                REVISION   "201706291920Z"
+                                DESCRIPTION "V1.24 modify trap node hwSecStatFragStaSessBelowThreshold ."
+
+                                REVISION   "201705091920Z"
+                                DESCRIPTION "V1.23 modify the SYNTAX of the hwSecStatPerfMemUsage and hwSecStatPerfTotalMemUsage node."
+                                REVISION   "201704101920Z"
+                                DESCRIPTION "V1.22 modify trap node."
+                                                                   REVISION   "201702141920Z"
+                                DESCRIPTION "V1.22 modify trap node."
+			   REVISION   "201611082300Z"
 	           DESCRIPTION "V1.21 modify trap node."
 			   REVISION   "201611042314Z"
 	           DESCRIPTION "V1.20 modify trap node."
@@ -73,43 +103,42 @@
                                  DESCRIPTION "V1.12, modify the MAX-ACCESS of the hwSecStatSecHittedVsysName and hwSecStatSecHittedRuleName node ."
 				 REVISION   "201512111400Z"
                                  DESCRIPTION "V1.11, modify the syntax type of the hwSecStatFragRate node from octet string to Integer32 ."
-				 REVISION    "201010090900Z"
-                                 DESCRIPTION "V1.00, completed the first draft."
-				 REVISION   "201408300900Z"
-                                 DESCRIPTION "V1.01, modifiy the MODULE-IDENTITY."
-				 REVISION   "201409280900Z"
-                                 DESCRIPTION "V1.02, add a table node."
-				 REVISION   "201412160900Z"
-                                 DESCRIPTION "V1.03, add a table node."
-				 REVISION   "201502110900Z"
-                                 DESCRIPTION "V1.04, add a table node."
-				 REVISION   "201502250900Z"
-                                 DESCRIPTION "V1.05, modify the description of the service-quality statistic node ."
-				 REVISION   "201503030900Z"
-                                 DESCRIPTION "V1.06, modify the description of the service-quality statistic node ."
-				 REVISION   "201503031700Z"
-                                 DESCRIPTION "V1.07, modify the MAX-ACCESS of the hwSecStatInterzoneSessTable node ."
-				 REVISION   "201505071500Z"
-                                 DESCRIPTION "V1.08, modify the type of the service-quality node ."
-                 		 REVISION   "201509152000Z"
+                                 REVISION   "201510101600Z"
+                                 DESCRIPTION "V1.10, modify the node of the hwSecStatPktRateObjects node ."    
+                                 REVISION   "201509152000Z"
                                  DESCRIPTION "V1.09, modify the node of the hwSecStatPktRateObjects node ."  
-                 		 REVISION   "201510101600Z"
-                                 DESCRIPTION "V1.10, modify the node of the hwSecStatPktRateObjects node ."          
-                 			     ::= { hwSecStatMibObjects 1 }
+                                 REVISION   "201505071500Z"
+                                 DESCRIPTION "V1.08, modify the type of the service-quality node ."
+                                 REVISION   "201503031700Z"
+                                 DESCRIPTION "V1.07, modify the MAX-ACCESS of the hwSecStatInterzoneSessTable node ."
+                                 REVISION   "201503030900Z"
+                                 DESCRIPTION "V1.06, modify the description of the service-quality statistic node ."
+                                 REVISION   "201502250900Z"
+                                 DESCRIPTION "V1.05, modify the description of the service-quality statistic node ."
+                                 REVISION   "201502110900Z"
+                                 DESCRIPTION "V1.04, add a table node."
+                                 REVISION   "201412160900Z"
+                                 DESCRIPTION "V1.03, add a table node."
+                                 REVISION   "201409280900Z"
+                                 DESCRIPTION "V1.02, add a table node."
+                                 REVISION   "201408300900Z"
+                                 DESCRIPTION "V1.01, modifiy the MODULE-IDENTITY."
+                                 REVISION    "201401090900Z"                                 
+                                 DESCRIPTION "V1.00, completed the first draft."
+                                   ::= { hwSecStatMibObjects 1 }
               
-		
-	
+
 	
 --
 -- Node definitions
 --
 	
 		-- 1.3.6.1.4.1.2011
-		huawei OBJECT IDENTIFIER ::= { enterprises 2011 }
+		-- huawei OBJECT IDENTIFIER ::= { enterprises 2011 }
 
 		
 		-- 1.3.6.1.4.1.2011.6
-		huaweiUtility OBJECT IDENTIFIER ::= { huawei 6 }
+		-- huaweiUtility OBJECT IDENTIFIER ::= { huawei 6 }
 
 		
 		-- 1.3.6.1.4.1.2011.6.122
@@ -1668,7 +1697,15 @@
 				"
 			::= { hwSecStatMonitorGlobalDrop 41 }
 
-		
+		-- 1.3.6.1.4.1.2011.6.122.15.1.2.3.42
+		hwSecStatSessCreateFailDropPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of packets dropped due to session establishment failures."
+			::= { hwSecStatMonitorGlobalDrop 42 }
+
 		-- 1.3.6.1.4.1.2011.6.122.15.1.3
 		hwSecStatConformance OBJECT IDENTIFIER ::= { hwSecStatGlobal 3 }
 
@@ -1706,7 +1743,7 @@
 				hwSecStatIcmpFloodDropOcts, hwSecStatUdpFloodDropPkts, hwSecStatUdpFloodDropOcts, hwSecStatAlgDropPkts, hwSecStatAlgDropOcts, 
 				hwSecStatIPVerErrDropPkts, hwSecStatIpCrcDropPkts, hwSecStatIpTTLDropPkts, hwSecStatMonCurSessSpeed, hwSecStatMonPeakSessSpeed, 
 				hwSecStatMonTotalBootConnNum, hwSecStatProtoErrDropPkts, hwSecStatAclDenyNonIcmpPkts, hwSecStatAclDenyNonIcmpOcts, hwSecStatAclDenyIcmpPkts, 
-				hwSecStatAclDenyIcmpOcts, hwSecStatBlsDenyPkts, hwSecStatClearGlobalDropInfo, hwSecStatClearGlobalAppInfo, hwSecStatClearGlobalSessFlowInfo, 
+				hwSecStatAclDenyIcmpOcts, hwSecStatBlsDenyPkts, hwSecStatClearGlobalDropInfo, hwSecStatSessCreateFailDropPkts, hwSecStatClearGlobalAppInfo, hwSecStatClearGlobalSessFlowInfo, 
 				hwSecStatBlsDenyOcts, hwSecStatMonTcpSess, hwSecStatMonUdpSess, hwSecStatMonIcmpSess, hwSecStatMonSvrMapTblNum, 
 				hwSecStatFragTblNum, hwSecStatMonAllPkts, hwSecStatMonAllOcts }
 			STATUS current
@@ -1757,9 +1794,9 @@
 				hwSecStatPerfCpuUsage
 					OCTET STRING,
 				hwSecStatPerfMemUsage
-					OCTET STRING,
+					Gauge32,
 				hwSecStatPerfTotalMemUsage
-					OCTET STRING
+					Gauge32
 			 }
 
 		-- 1.3.6.1.4.1.2011.6.122.15.2.1.1
@@ -1854,7 +1891,7 @@
 		
 		-- 1.3.6.1.4.1.2011.6.122.15.2.1.10
 		hwSecStatPerfMemUsage OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (0..65535))
+			SYNTAX Gauge32  (0..100)
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -1864,7 +1901,7 @@
 			
 		-- 1.3.6.1.4.1.2011.6.122.15.2.1.11
 		hwSecStatPerfTotalMemUsage OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (0..65535))
+			SYNTAX Gauge32 (0..100)
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -1890,7 +1927,7 @@
 
 		-- 1.3.6.1.4.1.2011.6.122.15.3.1.2
 		hwSecStatTrapSlot OBJECT-TYPE
-			SYNTAX Integer32 (1..16)
+			SYNTAX Integer32 (1..128)
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
@@ -1980,7 +2017,7 @@
 		
 		-- 1.3.6.1.4.1.2011.6.122.15.3.1.11
 		hwSecStatPerfTrapCpuThreshold OBJECT-TYPE
-			SYNTAX Integer32 (10..100)
+			SYNTAX Integer32 (0..100)
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
@@ -2114,7 +2151,138 @@
 			DESCRIPTION
 				"Number of suddenly changed sessions in the last period."
 			::= { hwSecStatObjests 25 }
-				
+		-- 1.3.6.1.4.1.2011.6.122.15.3.1.26
+		hwSecStatCreateLimitCpuUsage OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Current CPU usage."
+			::= { hwSecStatObjests 26 }
+		-- 1.3.6.1.4.1.2011.6.122.15.3.1.27
+		hwSecStatCreateLimitPassPacketNum OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Number of passing packets during new session suppression."
+			::= { hwSecStatObjests 27 }
+		-- 1.3.6.1.4.1.2011.6.122.15.3.1.28
+		hwSecStatCreateLimitBlockPacketNum OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Number of blocked packets during new session suppression."
+			::= { hwSecStatObjests 28 }		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.1.29
+		hwSecStatFragSessCount OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Number of used frag session entries."
+			::= { hwSecStatObjests 29 } 
+			
+	                   -- 1.3.6.1.4.1.2011.6.122.15.3.1.30
+		hwSecStatFragSessThreshold OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Alarm threshold of dynamic frag session entries."
+			::= { hwSecStatObjests 30 }  
+		-- 1.3.6.1.4.1.2011.6.122.15.3.1.31
+		hwSecStatFrag6SessCount OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Number of used IPv6 frag session entries."
+			::= { hwSecStatObjests 31 } 
+			
+	                    -- 1.3.6.1.4.1.2011.6.122.15.3.1.32
+		hwSecStatFrag6SessThreshold OBJECT-TYPE
+			SYNTAX Gauge32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Alarm threshold of dynamic IPv6 frag session entries."
+			::= { hwSecStatObjests 32 }  
+
+                                      -- 1.3.6.1.4.1.2011.6.122.15.3.1.33
+		hwSecStatEmeFwdWarningTime OBJECT-TYPE
+			SYNTAX Integer32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Alarm-threshold execution time of the emergency forwarding function."
+			::= { hwSecStatObjests 33 }  
+
+                                     -- 1.3.6.1.4.1.2011.6.122.15.3.1.34
+		hwSecStatEmeFwdTotalTime OBJECT-TYPE
+			SYNTAX Integer32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Total execution time of the emergency forwarding function."
+			::= { hwSecStatObjests 34}  
+                                      
+                                      -- 1.3.6.1.4.1.2011.6.122.15.3.1.35
+		hwSecStatEmeDefendWarningTime OBJECT-TYPE
+			SYNTAX Integer32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Alarm-threshold execution time of the emergency auto-defense function."
+			::= { hwSecStatObjests 35 }  
+
+                                     -- 1.3.6.1.4.1.2011.6.122.15.3.1.36
+		hwSecStatEmeDefendTotalTime OBJECT-TYPE
+			SYNTAX Integer32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Total execution time of the emergency auto-defense function."
+			::= { hwSecStatObjests 36}  
+			
+        -- 1.3.6.1.4.1.2011.6.122.15.3.1.37
+		hwSecStatPerfTrapProductcarThreshold OBJECT-TYPE
+			SYNTAX Integer32 (1..100)
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The CAR threshold of the device."
+			::= { hwSecStatObjests 37 }
+
+        -- 1.3.6.1.4.1.2011.6.122.15.3.1.38
+		hwSecStatPerfPerformanceProductCurSecond OBJECT-TYPE
+			SYNTAX Integer32 
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The performance of the device."
+			::= { hwSecStatObjests 38 }
+			
+		-- 1.3.6.1.4.1.2011.6.122.15.2.1.39
+		hwSecStatFastAgingMemUsage OBJECT-TYPE
+			SYNTAX Gauge32  (0..100)
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The usage of the memory."
+			::= { hwSecStatObjests 39 }
+			
+			
+		-- 1.3.6.1.4.1.2011.6.122.15.2.1.40
+		hwSecStatFastAgingMemThreshold OBJECT-TYPE
+			SYNTAX Gauge32 (0..100)
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The  threshold of the memory."
+			::= { hwSecStatObjests 40 }		
+			
 		-- 1.3.6.1.4.1.2011.6.122.15.3.2
 		hwSecStatSessTraps OBJECT IDENTIFIER ::= { hwSecStatTraps 2 }
 
@@ -2154,7 +2322,77 @@
 				"The rate of creating sessions restores to be lower than the threshold corresponding to the upper limit of the threshold."
 			::= { hwSecStatSessTraps 4 }
 
+
+        -- 1.3.6.1.4.1.2011.6.122.15.3.2.5
+		hwSecStatFastSessOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatSessTrapCount, hwSecStatSessTrapThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The fast-forwarding session count of the LPU exceeds the upper limit of the threshold."
+			::= { hwSecStatSessTraps 5 }
+
 		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.2.6
+		hwSecStatFastSessBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatSessTrapCount, hwSecStatSessTrapThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The fast-forwarding session count of the LPU restores to be lower than the threshold corresponding to the upper limit of the threshold."
+			::= { hwSecStatSessTraps 6 }     
+		
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.2.7
+		hwSecStatSessFastAgingOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatSessTrapCount, hwSecStatSessTrapThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The session count of the CPU exceeds the upper limit of the threshold. Session fast aging begins."
+			::= { hwSecStatSessTraps 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.2.8
+		hwSecStatSessFastAgingBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatSessTrapCount, hwSecStatSessTrapThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The session count of the CPU falls below the threshold corresponding to the upper limit of the threshold. Session fast aging ends."
+			::= { hwSecStatSessTraps 8 }     
+			
+			
+        -- 1.3.6.1.4.1.2011.6.122.15.3.2.9
+		hwSecStatIPv6SessFastAgingOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatSessTrapCount, hwSecStatSessTrapThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The IPv6 session count of the CPU exceeds the upper limit of the threshold. IPv6 session fast aging begins."
+			::= { hwSecStatSessTraps 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.2.10		
+		hwSecStatIPv6SessFastAgingBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatSessTrapCount, hwSecStatSessTrapThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The IPv6 session count of the CPU falls below the threshold corresponding to the upper limit of the threshold. IPv6 session fast aging ends."
+			::= { hwSecStatSessTraps 10 }
+
+		 -- 1.3.6.1.4.1.2011.6.122.15.3.2.11
+		hwSecStatSessFastMemoryAgingOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatFastAgingMemUsage, hwSecStatFastAgingMemThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The memory usage of the CPU exceeds  the threshold. IPv4 and IPv6 session fast aging begins."
+			::= { hwSecStatSessTraps 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.2.12		
+		hwSecStatSessFastMemoryAgingBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatFastAgingMemUsage, hwSecStatFastAgingMemThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The memory usage of the CPU falls below the threshold. IPv4 and IPV6 session fast aging ends."
+			::= { hwSecStatSessTraps 12 }
+	
 		-- 1.3.6.1.4.1.2011.6.122.15.3.3
 		hwSecStatPerfTraps OBJECT IDENTIFIER ::= { hwSecStatTraps 3 }
 
@@ -2206,6 +2444,33 @@
 			DESCRIPTION 
 				"The usage of cpu car exceeds the upper limit of the threshold."
 			::= { hwSecStatPerfTraps 5 }
+			
+	    -- 1.3.6.1.4.1.2011.6.122.15.3.3.6
+		hwSecStatPerfTrapBelowCpuCarThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatPerfTrapCpucarThreshold, hwSecStatPerfPerformanceCurSecond
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The usage of cpu car fell below the upper limit of the threshold."
+			::= { hwSecStatPerfTraps 6 }
+			
+		-- 1.3.6.1.4.1.2011.6.122.15.3.3.7
+		hwSecStatPerfTrapOverProductCarThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatPerfTrapProductcarThreshold, hwSecStatPerfPerformanceProductCurSecond
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The performance usage of the device exceeded the threshold."
+			::= { hwSecStatPerfTraps 7 }
+			
+		-- 1.3.6.1.4.1.2011.6.122.15.3.3.8
+		hwSecStatPerfTrapBelowProductCarThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatPerfTrapProductcarThreshold, hwSecStatPerfPerformanceProductCurSecond
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The performance usage of the device fell below the threshold."
+			::= { hwSecStatPerfTraps 8 }
 
 		-- 1.3.6.1.4.1.2011.6.122.15.3.4
 		hwSecStatDynamicRourceTraps OBJECT IDENTIFIER ::= { hwSecStatTraps 4 }
@@ -2272,6 +2537,94 @@
 			DESCRIPTION 
 				"The ratio of suddenly changed sessions exceeded the threshold."
 			::= { hwSecStatDynamicRourceTraps 7 }
+		-- 1.3.6.1.4.1.2011.6.122.15.3.4.8
+		hwSecStatSessionCreateLimitTrapOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatCreateLimitCpuUsage
+ 				}
+			STATUS current
+			DESCRIPTION 
+				"New session suppression is triggered after the value exceeds the threshold."
+			::= { hwSecStatDynamicRourceTraps 8 }
+		-- 1.3.6.1.4.1.2011.6.122.15.3.4.9
+		hwSecStatSessionCreateLimitTrapBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatCreateLimitCpuUsage, hwSecStatCreateLimitPassPacketNum, hwSecStatCreateLimitBlockPacketNum
+ 				}
+			STATUS current
+			DESCRIPTION 
+				"New session suppression is canceled after the value falls below the threshold."
+			::= { hwSecStatDynamicRourceTraps 9 }
+                                       -- 1.3.6.1.4.1.2011.6.122.15.3.4.10
+		hwSecStatFragSessOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatFragSessCount, hwSecStatFragSessThreshold
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The number of used frag sessions exceeded the threshold."
+			::= { hwSecStatDynamicRourceTraps 10 }
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.4.11
+		hwSecStatFragSessBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatFragSessCount, hwSecStatFragSessThreshold
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The number of used of frag sessions fell below the threshold."
+			::= { hwSecStatDynamicRourceTraps 11 }    
+			
+ 	                    -- 1.3.6.1.4.1.2011.6.122.15.3.4.12
+		hwSecStatFrag6SessOverThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatFrag6SessCount, hwSecStatFrag6SessThreshold
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The number of used IPv6 frag sessions exceeded the threshold."
+			::= { hwSecStatDynamicRourceTraps 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.4.13
+		hwSecStatFrag6SessBelowThreshold NOTIFICATION-TYPE
+			OBJECTS { hwSecStatTrapSlot, hwSecStatTrapCPU, hwSecStatFrag6SessCount, hwSecStatFrag6SessThreshold
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The number of used of IPv6 frag sessions fell below the threshold."
+			::= { hwSecStatDynamicRourceTraps 13 }
+  
+		-- 1.3.6.1.4.1.2011.6.122.15.3.5
+		hwSecStatEmergencyForwardTraps OBJECT IDENTIFIER ::= { hwSecStatTraps 5}
+
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.5.1
+		hwSecStatEmergencyFwdTimeoutWarning NOTIFICATION-TYPE
+			OBJECTS { hwSecStatEmeFwdWarningTime, hwSecStatEmeFwdTotalTime }
+			STATUS current
+			DESCRIPTION 
+				"The execution time of emergency forwarding reachs 80% of the maximum execution time."
+			::= { hwSecStatEmergencyForwardTraps 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.5.2
+		hwSecStatEmergencyFwdTimeout NOTIFICATION-TYPE
+			OBJECTS { hwSecStatEmeFwdTotalTime }
+			STATUS current
+			DESCRIPTION 
+				"The emergency forwarding function has been disabled."
+			::= { hwSecStatEmergencyForwardTraps 2 }
+
+		-- 1.3.6.1.4.1.2011.6.122.15.3.5.3
+		hwSecStatEmergencyDefendTimeoutWarning NOTIFICATION-TYPE
+			OBJECTS { hwSecStatEmeDefendWarningTime, hwSecStatEmeDefendTotalTime }
+			STATUS current
+			DESCRIPTION 
+				"The execution time of emergency auto-defense reachs 80% of the maximum execution time."
+			::= { hwSecStatEmergencyForwardTraps 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.122.15.3.5.4
+		hwSecStatEmergencyDefendTimeout NOTIFICATION-TYPE
+			OBJECTS { hwSecStatEmeDefendTotalTime }
+			STATUS current
+			DESCRIPTION 
+				"The emergency auto-defense function has been disabled."
+			::= { hwSecStatEmergencyForwardTraps 4 }
+
 				
 --      AQ4D79760
 		-- 1.3.6.1.4.1.2011.6.122.15.4
@@ -3124,7 +3477,3 @@
 			::= { hwSecStatSecPolicyRateEntry 6 }
 								
 	END
-
---
--- HUAWEI-SECURITY-STAT-MIB.mib
---

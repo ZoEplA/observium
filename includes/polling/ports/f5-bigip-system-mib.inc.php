@@ -7,12 +7,12 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 // F5-BIGIP-SYSTEM-MIB
-
+/*
 $mib = 'F5-BIGIP-SYSTEM-MIB';
 
 if (count($port_stats) && $has_ifXEntry === FALSE)
@@ -58,5 +58,5 @@ if (count($port_stats) && $has_ifXEntry === FALSE)
   // Clean
   unset($f5_stats, $f5_port, $f5_oid, $flags, $ifIndex, $mib_config);
 }
-
+*/
 // EOF

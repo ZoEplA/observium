@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -57,7 +57,7 @@ if ($cdp_array)
           $if = $cdp_entry['cdpCacheDevicePort'];
           $remote_port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?", array($if, $if, $remote_device_id));
         } else {
-          $remote_port_id = "0";
+          $remote_port_id = NULL;
         }
 
         if (!is_bad_xdp($cdp_entry['cdpCacheDeviceId']) && $port['port_id'] && $cdp_entry['cdpCacheDeviceId'] && $cdp_entry['cdpCacheDevicePort'])
@@ -65,7 +65,7 @@ if ($cdp_array)
           $remote_address = hex2ip($cdp_entry['cdpCacheAddress']);
           if (!get_ip_version($remote_address)) { $remote_address = NULL; }
 
-          discover_link($valid_link, $port['port_id'], 'cdp', $remote_port_id, $cdp_entry['cdpCacheDeviceId'], $cdp_entry['cdpCacheDevicePort'], $cdp_entry['cdpCachePlatform'], $cdp_entry['cdpCacheVersion'], $remote_address);
+          discover_link($port, 'cdp', $remote_port_id, $cdp_entry['cdpCacheDeviceId'], $cdp_entry['cdpCacheDevicePort'], $cdp_entry['cdpCachePlatform'], $cdp_entry['cdpCacheVersion'], $remote_address);
         }
       } else {
         echo("X");

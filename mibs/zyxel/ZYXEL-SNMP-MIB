@@ -5,6 +5,18 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-SNMP-MIB.mib $ 
+-- Revision 1.17  2016/03/07 02:40:49  neng 
+-- add rip and ospf. 
+-- Revision 1.16  2015/05/27 07:23:31  Shinge 
+-- add power source trap and add login information trap 
+-- Revision 1.15  2015/03/09 08:14:56  neng 
+-- add storm control log enable status. 
+-- Revision 1.14  2015/02/16 07:10:54  Kevin 
+-- clear warning, renaming identifier name for SMI.V2 
+-- Revision 1.13  2015/02/09 09:12:45  Bruno 
+-- add storm-control 
+-- Revision 1.12  2015/02/09 08:14:50  Bruno 
+-- support zuld 
 -- Revision 1.11  2014/05/30 06:17:43  yuru 
 -- add lack items in trap group "system"  
 -- Revision 1.10  2014/05/29 10:06:14  yuru 
@@ -324,6 +336,8 @@ ZYXEL-SNMP-MIB DEFINITIONS ::= BEGIN
 			poe(16),
 			fanairflow(17),
 			stacking(18),
+			powerSource(19),
+			loginRecord(20)
 		}
         MAX-ACCESS  read-write
         STATUS  current
@@ -337,7 +351,10 @@ ZYXEL-SNMP-MIB DEFINITIONS ::= BEGIN
 			linkdown(1),
 			autonegotiation(2),
 			lldp(3),
-			transceiverDdm(4)
+			transceiverDdm(4),
+			module(5),
+			stormControl(6),
+			zuld(7)
 		}
         MAX-ACCESS  read-write
         STATUS  current
@@ -374,7 +391,9 @@ ZYXEL-SNMP-MIB DEFINITIONS ::= BEGIN
 			mactable(1),
 			rmon(2),
 			cfm(3),
-			classifier(4)
+			classifier(4),
+			rip(5),
+			ospf(6)
 		}
         MAX-ACCESS  read-write
         STATUS  current
@@ -410,7 +429,10 @@ ZYXEL-SNMP-MIB DEFINITIONS ::= BEGIN
         	zySnmpTrapPortLinkdownState			EnabledStatus,
         	zySnmpTrapPortAutonegotiationState  EnabledStatus,
         	zySnmpTrapPortLldpState				EnabledStatus,
-        	zySnmpTrapPortTransceiverDdmState	EnabledStatus
+        	zySnmpTrapPortTransceiverDdmState	EnabledStatus,
+			zySnmpTrapPortStormControlState		EnabledStatus,
+        	zySnmpTrapPortZuldState				EnabledStatus
+
            }
 		   
         zySnmpTrapPortIntrusionlockState OBJECT-TYPE
@@ -484,5 +506,21 @@ ZYXEL-SNMP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION	
 						"Enabled/Disabled SNMP Transceiver-ddm trap on the sepcified port."
         ::= { zyxelSnmpTrapPortEntry 9 }
+
+		zySnmpTrapPortStormControlState OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION	
+						"Enabled/Disabled SNMP storm-control trap on the sepcified port."
+        ::= { zyxelSnmpTrapPortEntry 10 }
+
+        zySnmpTrapPortZuldState OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION	
+						"Enabled/Disabled SNMP ZULD trap on the sepcified port."
+        ::= { zyxelSnmpTrapPortEntry 11 }
 
 END         

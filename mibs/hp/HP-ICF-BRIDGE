@@ -1,14 +1,14 @@
 --**MOD+***********************************************************************
 --* Module:    hpicfBridge.mib
 --*
---* Copyright (C) 2000-2014 Hewlett Packard Enterprise Development LP
--- * All Rights Reserved.
--- * 
--- * The contents of this software are proprietary and confidential
--- * to the Hewlett Packard Enterprise Development LP.  No part of this
--- * program may be photocopied, reproduced, or translated into another
--- * programming language without prior written consent of the
--- * Hewlett Packard Enterprise Development LP.
+--* Copyright (C) 2000-2013, 2018 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett Packard Enterprise Development LP.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett Packard Enterprise Development LP.
 --*
 --* Purpose: This file contains MIB definition of HP-ICF-BRIDGE  MIB
 --*
@@ -43,7 +43,7 @@ HP-ICF-BRIDGE DEFINITIONS ::= BEGIN
 
 
     hpicfBridge MODULE-IDENTITY
-        LAST-UPDATED "201404270000Z"  -- April 27, 2014
+        LAST-UPDATED "201310110000Z"  -- October 11, 2013
         ORGANIZATION  "HP Networking"
         CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd.
@@ -51,11 +51,9 @@ HP-ICF-BRIDGE DEFINITIONS ::= BEGIN
         DESCRIPTION  "This MIB module contains HP proprietary
                       extensions to the standard Bridge MIBs."
         
-        REVISION     "201404270000Z"  -- April 27, 2014
-        DESCRIPTION  "Added hpicfBridgeStpBpduThrottleStatus, 
-                      hpicfBridgeStpBpduThrottleValue,
-		      hpicfBridgeStpBpduThrottleConfigGroup and 
-                      hpicfBridgeStpBpduThrottleConfigCompliance"	
+        REVISION     "201811220000Z"  -- November 22, 2018
+        DESCRIPTION  "The range of the MIB object hpicfBridgeRstpPortPathCost
+                      is modified from 1..200000000 to 0..200000000."
 
         REVISION     "201310110000Z"  -- October 11, 2013
         DESCRIPTION  "The description of selected MIB objects is modified for  
@@ -475,12 +473,19 @@ HP-ICF-BRIDGE DEFINITIONS ::= BEGIN
         ::= { hpicfBridgeRstpPortEntry 5 }
 
     hpicfBridgeRstpPortPathCost OBJECT-TYPE
-        SYNTAX      Integer32 (1..200000000)
+        SYNTAX      Integer32 (0..200000000)
         MAX-ACCESS  read-write
         STATUS      current
-        DESCRIPTION "Rapid Reconfiguration Port Path Cost - 32 bit values"
+        DESCRIPTION "The administratively assigned value for the contribution
+                     of this port to the path cost of paths toward the spanning
+                     tree root.
+
+                     Writing a value of '0' assigns the automatically calculated
+                     default Path Cost value to the port.  If the default Path
+                     Cost is being used, this object returns '0' when read."
         REFERENCE
-             "IEEE 802.1w"
+                     "IEEE 802.1D-1998: Section 8.5.5.3"
+        DEFVAL      { 0 }
         ::= { hpicfBridgeRstpPortEntry 6 }
 
     hpicfBridgeRstpForceBpduMigrationCheck OBJECT-TYPE

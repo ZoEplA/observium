@@ -9,9 +9,11 @@
  * @package        observium
  * @subpackage     cli
  * @author         Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+/// FIXME. This is mostly DERP arguments parsing, new cmd will be soon
 
 chdir(dirname($argv[0]));
 $scriptname = basename($argv[0]);
@@ -89,6 +91,7 @@ if (!empty($argv[1]))
         'cryptoalgo' => "AES"
       );
 
+      $add_context = FALSE; // Derp, last arg after transport is context
       if ($snmp_v3_seclevel == "nanp" || $snmp_v3_seclevel == "any" || $snmp_v3_seclevel == "noAuthNoPriv")
       {
         $snmp_v3_auth['authlevel'] = "noAuthNoPriv";
@@ -104,6 +107,12 @@ if (!empty($argv[1]))
           else if (preg_match('/^(' . implode("|", $config['snmp']['transports']) . ')$/', $arg))
           {
             $snmp_transport = $arg;
+            $add_context = TRUE; // Derp, last arg after transport is context
+          }
+          elseif ($add_context && strlen($arg))
+          {
+            $snmp_context = $arg;
+            break;
           } else {
             // FIXME: should add a sanity check of chars allowed in user
             $user = $arg;
@@ -112,7 +121,6 @@ if (!empty($argv[1]))
 
         if ($snmp_v3_seclevel != "any")
         {
-          array_pop($config['snmp']['v3']);
           array_push($config['snmp']['v3'], $snmp_v3_auth);
         }
       }
@@ -120,7 +128,7 @@ if (!empty($argv[1]))
       {
 
         $snmp_v3_auth['authlevel'] = "authNoPriv";
-        $snmp_v3_args = array_slice($add, 3);
+        $snmp_v3_args = array_slice($argv, 4);
         $snmp_v3_auth['authname'] = array_shift($snmp_v3_args);
         $snmp_v3_auth['authpass'] = array_shift($snmp_v3_args);
 
@@ -134,20 +142,25 @@ if (!empty($argv[1]))
           else if (preg_match('/^(' . implode("|", $config['snmp']['transports']) . ')$/i', $arg))
           {
             $snmp_transport = $arg;
+            $add_context = TRUE; // Derp, last arg after transport is context
           }
           else if (preg_match('/^(sha|md5)$/i', $arg))
           {
             $snmp_v3_auth['authalgo'] = $arg;
           }
+          elseif ($add_context && strlen($arg))
+          {
+            $snmp_context = $arg;
+            break;
+          }
         }
 
-        array_pop($config['snmp']['v3']);
         array_push($config['snmp']['v3'], $snmp_v3_auth);
       }
       else if ($snmp_v3_seclevel == "ap" || $snmp_v3_seclevel == "authPriv")
       {
         $snmp_v3_auth['authlevel'] = "authPriv";
-        $snmp_v3_args = array_slice($add, 3);
+        $snmp_v3_args = array_slice($argv, 4);
         $snmp_v3_auth['authname'] = array_shift($snmp_v3_args);
         $snmp_v3_auth['authpass'] = array_shift($snmp_v3_args);
         $snmp_v3_auth['cryptopass'] = array_shift($snmp_v3_args);
@@ -162,6 +175,7 @@ if (!empty($argv[1]))
           elseif (preg_match('/^(' . implode("|", $config['snmp']['transports']) . ')$/i', $arg))
           {
             $snmp_transport = $arg;
+            $add_context = TRUE; // Derp, last arg after transport is context
           }
           elseif (preg_match('/^(sha|md5)$/i', $arg))
           {
@@ -171,15 +185,20 @@ if (!empty($argv[1]))
           {
             $snmp_v3_auth['cryptoalgo'] = $arg;
           }
+          elseif ($add_context && strlen($arg))
+          {
+            $snmp_context = $arg;
+            break;
+          }
         }
 
-        array_pop($config['snmp']['v3']);
         array_push($config['snmp']['v3'], $snmp_v3_auth);
       }
     } else {
       // v1 or v2c
-      $snmp_v2_args = array_slice($add, 2);
+      $snmp_v2_args = array_slice($argv, 2);
 
+      $add_context = FALSE; // Derp, last arg after transport is context
       while ($arg = array_shift($snmp_v2_args))
       {
         // parse all remaining args
@@ -190,14 +209,27 @@ if (!empty($argv[1]))
         elseif (preg_match('/(' . implode("|", $config['snmp']['transports']) . ')/i', $arg))
         {
           $snmp_transport = $arg;
+          $add_context = TRUE; // Derp, last arg after transport is context
         }
         elseif (preg_match('/^(v1|v2c)$/i', $arg))
         {
           $snmp_version = $arg;
         }
+        elseif ($add_context && strlen($arg))
+        {
+          $snmp_context = $arg;
+          break;
+        }
       }
 
       $config['snmp']['community'] = ($snmp_community ? array($snmp_community) : $snmp_config_community);
+    }
+
+    // Add snmp context to params
+    if (isset($snmp_context))
+    {
+      $snmp_options['snmp_context'] = $snmp_context;
+      unset($snmp_context);
     }
 
     print_message("Try to add $hostname:");
@@ -250,11 +282,11 @@ $scriptname <hostname> [any|nanp|anp|ap] [v3] [user] [password] [enckey] [md5|sh
 $scriptname <filename>
 
 EXAMPLE:
-%WSNMPv1/2c%n:                    $scriptname <%Whostname%n> [community] [v1|v2c] [port] [" . implode("|", $config['snmp']['transports']) . "]
-%WSNMPv3%n   :         Defaults : $scriptname <%Whostname%n> any v3 [user] [port] [" . implode("|", $config['snmp']['transports']) . "]
-           No Auth, No Priv : $scriptname <%Whostname%n> nanp v3 [user] [port] [" . implode("|", $config['snmp']['transports']) . "]
-              Auth, No Priv : $scriptname <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] [" . implode("|", $config['snmp']['transports']) . "]
-              Auth,    Priv : $scriptname <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|des] [port] [" . implode("|", $config['snmp']['transports']) . "]
+%WSNMPv1/2c%n:                    $scriptname <%Whostname%n> [community] [v1|v2c] [port] [" . implode("|", $config['snmp']['transports']) . "] [context]
+%WSNMPv3%n   :         Defaults : $scriptname <%Whostname%n> any v3 [user] [port] [" . implode("|", $config['snmp']['transports']) . "] [context]
+           No Auth, No Priv : $scriptname <%Whostname%n> nanp v3 [user] [port] [" . implode("|", $config['snmp']['transports']) . "] [context]
+              Auth, No Priv : $scriptname <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] [" . implode("|", $config['snmp']['transports']) . "] [context]
+              Auth,    Priv : $scriptname <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|des] [port] [" . implode("|", $config['snmp']['transports']) . "] [context]
 %WFILE%n     :                    $scriptname <%Wfilename%n>
 
 ADD FROM FILE:

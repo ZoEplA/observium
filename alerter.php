@@ -9,7 +9,7 @@
  * @package    observium
  * @subpackage poller
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -51,7 +51,7 @@ elseif ($options['h'])
   {
     $where = "AND `device_id` = ?";
     $doing = $options['h'];
-    $params[] = $options['h'];    
+    $params[] = $options['h'];
   }
   else
   {

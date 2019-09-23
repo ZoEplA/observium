@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: The definition of Entity Vendortype OID
 -- Reference:
--- Version: V4.65
+-- Version: V4.68
 -- History:
 -- V1.0 2004.05.13  Created by lvzhenfeng, modified by gaolong.
 -- V1.1 2004.05.22  Adjusted by gaolong and lvzhenfeng.
@@ -358,6 +358,142 @@
 --                  modify description of 1010 under hh3cevtModuleSwitchType by chenke
 --                  modify name of 1320 to 1325, 1332 to 1371 under hh3cevtModuleSwitchType by jiangyongjiang
 --                  add subidentifier 8 to 35 under hh3cevtPowerSupply, 3 to 23 under hh3cevtFan by jiangyongjiang
+-- V4.66 2015-04-18 add subidentifier 435 under hh3cevtModuleRouterType by zhaowenbin
+--                  add subidentifier 841 to 854 under hh3cevtModuleRouterType by qianjialin
+--                  add subidentifier 855 to 858 under hh3cevtModuleRouterType by zhaohonghai
+--                  add subidentifier 745 to 747 hh3cevtModuleSwitchType by tanxiaopeng
+--                  add subidentifier 748 hh3cevtModuleSwitchType by wangshunli
+--                  add subidentifier 1120 to 1125, 1127 to 1128, 1390 to 1397,
+--                                    1647 to 1649, 1667 to 1673 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1126 under hh3cevtModuleSwitchType by chenke
+--                  add subidentifier 1129 to 1144 under hh3cevtPortSwitchType by youhua
+--                  add subidentifier 1398, 1399, 1600 to 1605, 1623 to 1646,
+--                                    1650 to 1652, 1660 to 1666, 1674 to 1685
+--                                    under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1606 to 1622 under hh3cevtModuleSwitchType by sunzhenxing
+--                  add subidentifier 1653 to 1659 under hh3cevtModuleSwitchType by zhaiwanqing
+--                  add subidentifier 233 to 237, 239 to 253 under hh3cevtPortSwitchType by pantao
+--                  add subidentifier 238 under hh3cevtPortSwitchType by chenke
+--                  modify name of 1315 and 1316 under hh3cevtModuleSwitchType by lihaijun
+-- V4.67 2016-04-02 add subidentifier 436 to 437, 448 to 449 under hh3cevtModuleRouterType by zhaowenbin
+--                  add subidentifier 438 to 439 and 616 to 618 under hh3cevtModuleRouterType by sunqingyan
+--                  add subidentifier 440 under hh3cevtModuleRouterType by chengaishuang
+--                  add subidentifier 441 to 446 under hh3cevtModuleRouterType by yaoshuo
+--                  add subidentifier 447 under hh3cevtModuleRouterType by dongchanghai
+--                  modify name of 856 to 858 under hh3cevtModuleSwitchType by zhaohonghai
+--                  add subidentifier 859 to 862 under hh3cevtModuleRouterType by zhaohonghai
+--                  add subidentifier 863 under hh3cevtModuleRouterType by qianjialin
+--                  add subidentifier 864 to 878 under hh3cevtModuleRouterType by chenfeihu
+--                  add subidentifier 879 to 884 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 749 under hh3cevtModuleSwitchType by wangshunli
+--                  add subidentifier 750 under hh3cevtModuleSwitchType by yangjianlin
+--                  add subidentifier 751 to 752 hh3cevtModuleSwitchType by mengfanhua
+--                  add subidentifier 753 to 756 under hh3cevtModuleSwitchType by songkeke
+--                  add subidentifier 1145, 1149 under hh3cevtPortSwitchType by youhua
+--                  add subidentifier 1146 to 1148, 1150 to 1154 under hh3cevtPortSwitchType by chenke
+--                  add subidentifier 1686 to 1694, 1710 to 1722, 1742 to 1760, 1767 to 1784, 1789 to 1793
+--                                    under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1695 to 1696 under hh3cevtModuleSwitchType by zhaiwanqing
+--                  add subidentifier 1697 to 1709, 1723 to 1741, 1761 to 1766, 1785 to 1788, 1794 to 1805
+--                                    under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 53 to 54 under hh3cevtPortRouterType by chenfeihu
+--                  add subidentifier 55 under hh3cevtPortRouterType by fujuan
+--                  add subidentifier 56 under hh3cevtPortRouterType by qianjialin
+--                  modify name of 1128 under hh3cevtModuleSwitchType by lihaijun
+--                  modify description of 1673 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 254 to 262, 264 to 265 under hh3cevtPortSwitchType by guolei
+--                  add subidentifier 263 under hh3cevtPortSwitchType by zhanghuimin
+-- V4.68 2018-04-13 add subidentifier 1806 to 1829 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 266 under hh3cevtPortSwitchType by guolei
+--                  add subidentifier 1830 to 1841 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 757 to 758 under hh3cevtModuleSwitchType by wangshunli
+--                  add subidentifier 1842 under hh3cevtModuleSwitchType by zhaoshihong
+--                  add subidentifier 1843 to 1846 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 759 under hh3cevtModuleSwitchType by mengfanhua
+--                  add subidentifier 1847 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 619 to 620 under hh3cevtModuleRouterType by songyanqing
+--                  add subidentifier 1848 to 1849 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 885 to 886 under hh3cevtModuleRouterType by zhaohonghai
+--                  add subidentifier 1850 to 1852 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1853 to 1857 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1858 to 1862 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1863 to 1893 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1155 to 1170 under hh3cevtModuleSwitchType by chenke
+--                  add subidentifier 1894 to 1895 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1896 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 267 under hh3cevtPortSwitchType by guolei
+--                  add subidentifier 887 to 889 under hh3cevtModuleRouterType by mazheng
+--                  add subidentifier 1171 to 1176 under hh3cevtModuleSwitchType by chenke
+--                  add subidentifier 1897 to 1904 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1905 hh3cevtModuleSwitchType by liuyanpeng
+--                  add subidentifier 450 to 454 hh3cevtModuleRouterType by dongchanghai
+--                  add subidentifier 1906 to 1907 hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1908 hh3cevtModuleSwitchType by liuyanpeng
+--                  add subidentifier 1177 to 1181 under hh3cevtModuleSwitchType by chenke
+--                  add subidentifier 760 to 762 hh3cevtModuleSwitchType by mengfanhua
+--                  add subidentifier 890 to 894 under hh3cevtModuleRouterType by fujuan
+--                  modify name of subidentifier 872 and 873 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 1909 to 1910 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 455 to 456 hh3cevtModuleRouterType by yaoshuo
+--                  add subidentifier 1911 to 1935 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 457 under hh3cevtModuleRouterType by lizhifeng
+--                  add subidentifier 895 to 899 under hh3cevtModuleRouterType by zhaohonghai
+--                  add subidentifier 1936 to 1938 under hh3cevtModuleSwitchType by zhangkun
+--                  add subidentifier 1939 to 1941 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 6 to 8 under hh3cevtOther by chenke
+--                  add subidentifier 458 to 462 under hh3cevtModuleRouterType by wangchunlei
+--                  add subidentifier 900 to 906 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 1182 under hh3cevtModuleSwitchType by youhua
+--                  add subidentifier 1942 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1943 to 1953 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 463 to 468 under hh3cevtModuleRouterType by dongchanghai
+--                  add subidentifier 1183 to 1196 under hh3cevtModuleSwitchType by chenke
+--                  add subidentifier 907 to 921 under hh3cevtModuleRouterType by zhongchao
+--                  add subidentifier 763 to 764 under hh3cevtModuleSwitchType by sunfang
+--                  add subidentifier 1954 to 1957 under hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1958 to 1972 under hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 1973 to 1979 hh3cevtModuleSwitchType by lihaijun
+--                  add subidentifier 1980 to 1981 hh3cevtModuleSwitchType by jiangyongjiang
+--                  add subidentifier 274 to 279 under hh3cevtModuleSwitchType by guolei
+--                  add subidentifier 469 under hh3cevtModuleRouterType by maxiaojie
+--                  add subidentifier 470 to 473 under hh3cevtModuleSwitchType by fuzhanfeng
+--                  add subidentifier 765 under hh3cevtModuleSwitchType by mengfanhua
+--                  add subidentifier 1982 to 1985 hh3cevtModuleSwitchType by  lihaijun
+--                  add subidentifier 1986 to 2003 hh3cevtModuleSwitchType by  jiangyongjiang
+--                  add subidentifier 922 under hh3cevtModuleRouterType by mazheng
+--                  add subidentifier 58 under hh3cevtPortRouterType by liuhua
+--                  add subidentifier 474 to 477 under hh3cevtModuleSwitchType by tanyan
+--                  add subidentifier 2004 to 2005 hh3cevtModuleSwitchType by  lihaijun
+--                  add subidentifier 2006 to 2008 hh3cevtModuleSwitchType by  jiangyongjiang
+--                  add subidentifier 2009 to 2015 hh3cevtModuleSwitchType by  lihaijun
+--                  add subidentifier 1401 to 1424 under hh3cevtModuleSwitchType by chenke
+--                  add subidentifier 923 under hh3cevtModuleRouterType by zhongchao
+--                  add subidentifier 924 to 933 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 766 to 768 under hh3cevtModuleSwitchType by wangshunli
+--                  add subidentifier 482 to 483 under hh3cevtModuleSwitchType by cuipeilei
+--                  add subidentifier 35 to 37 under hh3cevtPowerSupply by wangchunlei
+--                  add subidentifier 24 to 25 under  hh3cevtFan by wangchunlei
+--                  add subidentifier 484 to 489 under hh3cevtModuleSwitchType by wangchunlei
+--                  add subidentifier 938 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 491 to 492 under hh3cevtModuleSwitchType by fuzhanfeng
+--                  add subidentifier 939 under hh3cevtModuleRouterType by zhongchao
+--                  add subidentifier 769 under hh3cevtModuleSwitchType by yangjianlin
+--                  add subidentifier 940 to 945 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 946 to 953 under hh3cevtModuleRouterType by zhaochao
+--                  add subidentifier 493 under hh3cevtModuleSwitchType by liyujun
+--                  add subidentifier 2016 to 2017 hh3cevtModuleSwitchType by  jiangyongjiang
+--                  add subidentifier 769 to 770 under hh3cevtModuleSwitchType by yangjianlin
+--                  add subidentifier 494 to 497 under hh3cevtModuleSwitchType by yangyuan
+--                  add subidentifier 2018 to 2021 hh3cevtModuleSwitchType by  lihaijun
+--                  add subidentifier 280 under hh3cevtPortSwitchType by yuanzhi
+--                  add subidentifier 2022 to 2033 hh3cevtModuleSwitchType by  jiangyongjiang
+--                  add subidentifier 281 to 283 under hh3cevtPortSw by wangshunli
+--                  add subidentifier 954 to 958 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 959 to 960 under hh3cevtModuleRouterType by zhongchao
+--                  add subidentifier 284 to 285 under hh3cevtPortSwitchType by guolei
+--                  add subidentifier 771 to 775 under hh3cevtModuleSwitchType by wangshunli
+--                  add subidentifier 961 to 962 under hh3cevtModuleRouterType by fujuan
+--                  add subidentifier 963 to 965 under hh3cevtModuleRouterType by zhongchao
 -- =================================================================
 HH3C-ENTITY-VENDORTYPE-OID-MIB DEFINITIONS ::= BEGIN
 
@@ -372,9 +508,9 @@ hh3cEntityVendorTypeOID MODULE-IDENTITY
 
         LAST-UPDATED "200903310000Z"
         ORGANIZATION
-            "Hangzhou H3C Technologies Co., Ltd."
+            "New H3C Technologies Co., Ltd."
         CONTACT-INFO
-            "Platform Team H3C Technologies Co., Ltd.
+            "Platform Team New H3C Technologies Co., Ltd.
             Hai-Dian District Beijing P.R. China
             Zip:100085
             http://www.h3c.com"
@@ -384,7 +520,6 @@ hh3cEntityVendorTypeOID MODULE-IDENTITY
             entPhysicalTable of the ENTITY-MIB to uniquely identify the
             type of each physical entry."
         ::= { hh3c 3 }
-
 
 hh3cEntityVendortypeObjects   OBJECT IDENTIFIER ::= { hh3cEntityVendorTypeOID 1 }
 
@@ -423,6 +558,7 @@ hh3cevtCPU               OBJECT IDENTIFIER ::= { hh3cevtOther 2 }
 hh3cevtDOM               OBJECT IDENTIFIER ::= { hh3cevtOther 3 }  -- Disk on Module
 hh3cevtCFCard            OBJECT IDENTIFIER ::= { hh3cevtOther 4 }  -- Compact Flash Card
 hh3cevtHardDisk          OBJECT IDENTIFIER ::= { hh3cevtOther 5 }  -- Hard Disk
+hh3cevtSDCard            OBJECT IDENTIFIER ::= { hh3cevtOther 6 }  -- Secure Digital Memory Card
 
 -- hh3cevtGeneralCPU is a general vendor type of CPU.  It is used only for
 -- general purpose.  It is strongly recommended that this object should not
@@ -494,7 +630,8 @@ hh3cevtPowerSupplyLSQM7AC300    OBJECT IDENTIFIER ::= { hh3cevtPowerSupply 32 }
 hh3cevtPowerSupplyLSQM7AC650    OBJECT IDENTIFIER ::= { hh3cevtPowerSupply 33 }
 hh3cevtPowerSupplyLSQM7DC650    OBJECT IDENTIFIER ::= { hh3cevtPowerSupply 34 }
 hh3cevtPowerSupplyLSWM2RPS800   OBJECT IDENTIFIER ::= { hh3cevtPowerSupply 35 }
-
+hh3cevtPowerSupplySecPathAC     OBJECT IDENTIFIER ::= { hh3cevtPowerSupply 36 }    -- F5000-NSUM1AC650-650W
+hh3cevtPowerSupplySecPathDC     OBJECT IDENTIFIER ::= { hh3cevtPowerSupply 37}     -- F5000-NSUM1DC650-650W
 --
 -- hh3cevtFan section:
 --
@@ -522,7 +659,8 @@ hh3cevtFanLSQM57503     OBJECT IDENTIFIER ::=  { hh3cevtFan 20 }
 hh3cevtFanLSQM57502     OBJECT IDENTIFIER ::=  { hh3cevtFan 21 }
 hh3cevtFanLSQM57506     OBJECT IDENTIFIER ::=  { hh3cevtFan 22 }
 hh3cevtFanLSQM57510     OBJECT IDENTIFIER ::=  { hh3cevtFan 23 }
-
+hh3cevtHotSwapFan-NSUM1BFANSC         OBJECT IDENTIFIER ::=  { hh3cevtFan 24 }   -- F5000-NSUM1BFANSC
+hh3cevtHotSwapFan-NSUM1BFANSCB        OBJECT IDENTIFIER ::=  { hh3cevtFan 25 }   -- F5000-NSUM1BFANSCB
 --
 -- hh3cevtSensor section:
 --
@@ -691,7 +829,7 @@ hh3cevtModuleRt-ima-4e1120                  OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleRt-ima-8t1                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 137 }
 hh3cevtModuleRt-ima-4t1                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 138 }
 hh3cevtModuleRt-sic-1t1f                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 139 }
-hh3cevtModuleRt-sic-1e1f                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 140 }
+hh3cevtModuleRT-SIC-1E1F                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 140 }
 hh3cevtModuleRt-VG-16fxs                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 141 }
 hh3cevtModuleRt-VG-32fxs                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 142 }
 hh3cevtModuleRt-VG-8fxo                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 143 }
@@ -961,15 +1099,75 @@ hh3cevtModuleRt-NSQ1TGS8EA0                 OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleRt-NSQ1FAB04B0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 428 } -- Switch Module
 hh3cevtModuleRt-NSQ1FAB12D0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 429 } -- Switch Module
 hh3cevtModuleRt-NSQ1SUPB0                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 430 } -- Main Control Module
-hh3cevtModuleRt-VFW1000                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 431 } -- Virtual Firwall Gateway module
+hh3cevtModuleRt-VFW1000                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 431 } -- Virtual Firwall Gateway module over virtual machine
 hh3cevtModuleRt-NSQ1CGC2SE0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 432 } -- 2 Port 100GBASE Ethernet Optical Interface Board(CFP)(SE)
-hh3cevtModuleRt-VLB1000                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 433 } -- Virtual LB module
+hh3cevtModuleRt-VLB1000                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 433 } -- Virtual LB module over virtual machine
 hh3cevtModuleRt-NSQM1GT4PFC                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 434 } -- 4 Port GigabitEthernet Interface
+hh3cevtModuleRt-NSQM1FWDFG0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 435 } -- Firewall Module
+hh3cevtModuleRt-NSQM1NATDFGA0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 436 } -- NAT A module
+hh3cevtModuleRt-NSQM1NATDFGB0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 437 } -- NAT B module
+hh3cevtModuleRt-VFW2000                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 438 } -- Virtual Firwall Gateway module over physical machine
+hh3cevtModuleRt-VLB2000                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 439 } -- Virtual LB module ver physical machine
+hh3cevtModuleRt-NSQM1IPSDFG0                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 440 } -- NSQM1IPSDFG0
+hh3cevtModuleRt-NSQM1FWDFGB0                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 441 } -- NSQM1FWDFGB0-SecBlade IV
+hh3cevtModuleRt-NSQM1FWDFGC0                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 442 } -- NSQM1FWDFGC0-SecBlade IV
+hh3cevtModuleRt-NSQM1FWDFGA1                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 443 } -- NSQM1FWDFGA1-SecBlade IV
+hh3cevtModuleRt-NSQM1FWDFGB1                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 444 } -- NSQM1FWDFGB1-SecBlade IV
+hh3cevtModuleRt-NSQM1FWDFGC1                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 445 } -- NSQM1FWDFGC1-SecBlade IV
+hh3cevtModuleRt-NSQM1FWDFGD1                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 446 } -- NSQM1FWDFGD1-SecBlade IV
+hh3cevtModuleRt-NSQM1SUPC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 447 } -- SecPath T9000-NSQM1SUPC0
+hh3cevtModuleRt-NSQM1TG4FBA                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 448 } -- SecPath F1000-NSQM1TG4FBA
+hh3cevtModuleRt-NSQM1GP4FBA                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 449 } -- SecPath F1000-NSQM1GP4FBA
+hh3cevtModuleRt-NSQM2MPUC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 450 } -- H3C M9008-S FW  NSQM2MPUC0
+hh3cevtModuleRt-NSQM2TGS16SF0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 451 } -- H3C M9008-S FW  NSQM2TGS16SF0
+hh3cevtModuleRt-NSQM2QGS4SC0                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 452 } -- H3C M9008-S FW  NSQM2QGS4SC0
+hh3cevtModuleRt-NSQM2GP24TSSC0              OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 453 } -- H3C M9008-S FW  NSQM2GP24TSSC0
+hh3cevtModuleRt-NSQM2FWDSC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 454 } -- H3C M9008-S FW  NSQM2FWDSC0
+hh3cevtModuleRt-NSQM1ADEDFGA0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 455 } -- NSQM1ADEDFGA0-SecBlade IV ADE A module
+hh3cevtModuleRt-NSQM2FWDSCA0                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 456 } -- H3C M9000-S FW NSQM2FWDSCA0-SecBlade IV
+hh3cevtModuleRt-NSQM1TGS32QSSG0             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 457 } -- SecPath M9000-NSQM1TGS32QSSG0
+hh3cevtModuleRt-NSQM1GT4PFCA                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 458 } -- 4 Port GigabitEthernet Interface Module
+hh3cevtModuleRt-NSQM1TG8A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 459 } -- 8 Port Ten-GigabitEthernet Interface Module
+hh3cevtModuleRt-NSQM1QG2A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 460 } -- 2 Port Forty-GigabitEthernet Interface Module
+hh3cevtModuleRt-NSQM1GT8A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 461 } -- 8-Port Gigabit Ethernet interface Module
+hh3cevtModuleRt-NSQM1GP8A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 462 } -- 8 Port Fabric GigabitEthernet Interface Module
+hh3cevtModuleRt-NSQM1MBFE0                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 463 } -- H3C SecPath M9008-S  NSQM1MBFE0
+hh3cevtModuleRt-NSQM2MBFD0                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 464 } -- H3C SecPath M9008-S NSQM2MBFD0
+hh3cevtModuleRt-NSQM2QG2TG8GP40             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 465 } -- H3C  SecPath M9008-S  NSQM2QG2TG8GP40
+hh3cevtModuleRt-NSQM2QG4GP40                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 466 } -- H3C  SecPath M9008-S  NSQM2QG4GP40
+hh3cevtModuleRt-NSQM2TG16GP40               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 467 } -- H3C SecPath M9008-S  NSQM2TG16GP40
+hh3cevtModuleRt-NSQM1CGQ20                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 468 } -- H3C SecPath M9008-S  NSQM1CGQ20
+hh3cevtModuleRt-NSQM2FWDFG0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 469 } -- H3C M9000-S FW NSQM2FWDFG0-SecBlade IV
+hh3cevtModuleRt-NSQM2TMPUC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 470 } -- H3C SecPath T9000-S-NSQM2TMPUC0
+hh3cevtModuleRt-NSQM2IPSDSCA0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 471 } -- H3C SecPath T9000-S-NSQM2IPSDSCA0-SecBlade IV
+hh3cevtModuleRt-NSQM2AC1400                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 472 } -- H3C SecPath M9000-S-NSQM2AC1400
+hh3cevtModuleRt-NSQM2DC1400                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 473 } -- H3C SecPath M9000-S-NSQM2DC1400
+hh3cevtModuleRt-NSQM1F1KGM0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 474} -- F1000 GM Crypto Module
+hh3cevtModuleRt-NSQM1F1KGM0-context         OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 475} -- F1000 GM Crypto Module
+hh3cevtModuleRt-NSQM1F5KGM0                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 476} -- F5000 GM Crypto Module
+hh3cevtModuleRt-NSQM1F5KGM0-context         OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 477} -- F5000 GM Crypto Module
+hh3cevtModuleRt-NSQM2QG2GP40                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 478 } -- H3C SecPath M9000-NSQM2QG2GP40
+hh3cevtModuleRt-NSQM2TG8GP40                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 479 } -- H3C SecPath M9000-NSQM2TG8GP40
 
+hh3cevtModuleRt-NSQM2ADEDSCA0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 482 } -- H3C M9000-S FW NSQM2ADEDSCA0-SecBlade IV
+hh3cevtModuleRt-NSQM2IPSDSCB0               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 483 } -- H3C M9000-S FW NSQM2IPSDSCB0-SecBlade IV
+hh3cevtModuleRt-NSQM1G4XS4                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 484 } -- 4-GE Fabric,4-XGE Fabric Interface Module
+hh3cevtModuleRt-NSUM1GT4PFCA                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 485 } -- 4 Port GigabitEthernet Interface Module
+hh3cevtModuleRt-NSUM1TG8A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 486 } -- 8 Port Ten-GigabitEthernet Interface Module
+hh3cevtModuleRt-NSUM1QG2A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 487 } -- 2 Port Forty-GigabitEthernet Interface Module
+hh3cevtModuleRt-NSUM1GT8A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 488 } -- 8-Port Gigabit Ethernet interface Module
+hh3cevtModuleRt-NSUM1GP8A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 489 } -- 8 Port Fabric GigabitEthernet Interface Module
 
---
--- 600 to 799 reserved for voice routers
---
+hh3cevtModuleRt-NSQM2MPUD0                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 491 } -- H3C SecPath M9000-S- NSQM2MPUD0
+hh3cevtModuleRt-NSQM1GMDSCA1                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 492 } -- H3C SecPath M9000-GM- NSQM1GMDSCA1
+hh3cevtModuleRt-NSQM1MPULA                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 493} -- SecPath F50X0-D NSQM1MPULA
+hh3cevtModuleRt-NSQM1MPULA2                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 494} -- SecPath F5000-AK515 NSQM1MPULA2
+hh3cevtModuleRt-NSQM1GT8A2                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 495} -- SecPath F5000-AK515 NSQM1GT8A2
+hh3cevtModuleRt-NSQM1GP4TG4A2               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 496} -- SecPath F5000-AK515 NSQM1GP4TG4A2
+hh3cevtModuleRt-NSQM1GP2TG6A2               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 497} -- SecPath F5000-AK515 NSQM1GP2TG6A2
+hh3cevtModuleRt-NSQM1TG4FBA7                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 498} -- SecPath F1000-AK-NSQM1TG4FBA7
+
+-- 600 to 799 reserved for voice router--
 hh3cevtModuleRt-VG-8fxs                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 600 } -- 8 Port Foreign Exchange Station module
 hh3cevtModuleRt-VG-24fxs                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 601 } -- 24 Port Foreign Exchange Station module
 hh3cevtModuleRt-VG-24fxs24fxo               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 602 } -- 24 Port Foreign Exchange Station and 24 Port Foreign Exchange Office module
@@ -986,6 +1184,11 @@ hh3cevtModuleRt-IXGBE-2XGE                  OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleRt-TG3-4GE                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 613 } -- 4 Port Gigabit Ethernet interface TG3 module
 hh3cevtModuleRt-MPUV16                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 614 } -- Main Processing Unit over virtual machine
 hh3cevtModuleRt-MPUP6                       OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 615 } -- Main Processing Unit over physical machine
+hh3cevtModuleRt-IGB-1GE                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 616 } -- 1 Port Gigabit Ethernet interface IGB module
+hh3cevtModuleRt-IGB-2GE                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 617 } -- 2 Port Gigabit Ethernet interface IGB module
+hh3cevtModuleRt-IGB-4GE                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 618 } -- 4 Port Gigabit Ethernet interface IGB module
+hh3cevtModuleRt-VLNS1000                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 619 } -- Virtual L2TP Network Server over virtual machine
+hh3cevtModuleRt-VLNS2000                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 620 } -- Virtual L2TP Network Server over physical machine
 
 
 --
@@ -1032,6 +1235,134 @@ hh3cevtModuleRt-SAP-20GE2XP                 OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleRt-SFE-L1                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 838 } -- Switch Fabric Engine L1
 hh3cevtModuleRt-FIP-640                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 839 } -- Flexible Interface Platform 640
 hh3cevtModuleRt-HMIM-8GSWF                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 840 } -- 8-Port 1000M Base-F Optical Ethernet L2 Switch Interface HMIM_Module, including 4 Combo Ports
+hh3cevtModuleRt-HMIM-8E1T1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 841 } -- 8-port E1/CE1/T1/CT1/PRI HMIM Module
+hh3cevtModuleRt-HMIM-4E1T1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 842 } -- 4-port E1/CE1/T1/CT1/PRI HMIM Module
+hh3cevtModuleRt-HMIM-2E1T1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 843 } -- 2-port E1/CE1/T1/CT1/PRI HMIM Module
+hh3cevtModuleRt-HMIM-8E1T1-F                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 844 } -- 8-port E1/T1/Fractional E1/T1 HMIM Module
+hh3cevtModuleRt-HMIM-4E1T1-F                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 845 } -- 4-port E1/T1/Fractional E1/T1 HMIM Module
+hh3cevtModuleRt-HMIM-2E1T1-F                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 846 } -- 2-port E1/T1/Fractional E1/T1 HMIM Module
+hh3cevtModuleRt-SIC-3G-HSPA-V2              OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 847 } -- 1 Port HSPA-Cellular Interface SIC-Module V2
+hh3cevtModuleRt-SIC-4GSWF                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 848 } -- 4-Port 1000M Base-F Optical Ethernet L2 Switch Interface SIC-Module
+hh3cevtModuleRt-SIC-4G-LTE-G-V2             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 849 } -- 1 Port 4G-LTE-G-V2 Cellular Interface SIC-Module
+hh3cevtModuleRt-SIC-4G-LTE-A-V2             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 850 } -- 1 Port 4G-LTE-A-V2 Cellular Interface SIC-Module
+hh3cevtModuleRt-SIC-4G-LTE-V-V2             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 851 } -- 1 Port 4G-LTE-V-V2 Cellular Interface SIC-Module
+hh3cevtModuleRt-MPU60                       OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 852 } -- Main Processing Unit 60
+hh3cevtModuleRt-SPU                         OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 853 } -- Service Processing Unit
+hh3cevtModuleRt-SIC-1VE1T1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 854 } -- 1-Port E1/T1 Voice SIC Module,Domestic&Overseas Version
+hh3cevtModuleRt-CFIP-700                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 855 } -- Carrier Flexible Interface Platform 700
+hh3cevtModuleRt-HIM-20GBP-H3                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 856 } -- 20-Port Gigabit Ethernet Optical Interface Module(SFP)
+hh3cevtModuleRt-HIM-4EXP-H3                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 857 } -- 4-Port 10GBASE-R/W Ethernet Optical Interface Module(SFP+)
+hh3cevtModuleRt-HIM-2EXP-H3                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 858 } -- 2-Port 10GBASE-R/W Ethernet Optical Interface Module(SFP+)
+hh3cevtModuleRt-HIM-8GBE-V3                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 859 } -- 8-port GigaBit Ethernet Electrical Interface Module
+hh3cevtModuleRt-HIM-4GBE-V3                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 860 } -- 4-port GigaBit Ethernet Electrical Interface Module
+hh3cevtModuleRt-HIM-8GBP-V3                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 861 } -- 8-Port GigaBit Ethernet Optical Interface Module(SFP)
+hh3cevtModuleRt-HIM-4GBP-V3                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 862 } -- 4-Port GigaBit Ethernet Optical Interface Module(SFP)
+hh3cevtModuleRt-SIC-AP                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 863 } -- 1-Port AP SIC Module,Domestic&Overseas Version
+hh3cevtModuleRt-MPU-04B                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 864 } -- CR Main Processing Unit B for 04 Chassis
+hh3cevtModuleRt-MPU-16B                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 865 } -- CR Main Processing Unit B for 08 and 16 Chassis
+hh3cevtModuleRt-MPU-16E                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 866 } -- CR Main Processing Unit E for 08 and 16 Chassis
+hh3cevtModuleRt-SFU-04D-H                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 867 } -- CR Switching Fabric Unit(HD) for 04 Chassis
+hh3cevtModuleRt-SFU-08C-H                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 868 } -- CR Switching Fabric Unit(HC) for 08 Chassis
+hh3cevtModuleRt-SFU-08D-H                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 869 } -- CR Switching Fabric Unit(HD) for 08 Chassis
+hh3cevtModuleRt-SFU-16B-H                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 870 } -- CR Switching Fabric Unit(HB) for 16 Chassis
+hh3cevtModuleRt-SFU-16C-H                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 871 } -- CR Switching Fabric Unit(HC) for 16 Chassis
+hh3cevtModuleRt-LPU-CQ12                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 872 } -- CR 12-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-4004                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 873 } -- CR Flexible Interface Module 4004
+hh3cevtModuleRt-HIC-PU02                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 874 } -- CR 2-Port 10G POS Optical Interface Card
+hh3cevtModuleRt-HIC-XP12                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 875 } -- CR 12-Port 10G Ethernet Optical Interface Card
+hh3cevtModuleRt-HIC-GP12                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 876 } -- CR 12-Port Gigabit Ethernet Optical Interface Card
+hh3cevtModuleRt-HIC-QQ03                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 877 } -- CR 3-Port 40G Ethernet Optical Interface Card(QSFP+)
+hh3cevtModuleRt-HIC-CC01                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 878 } -- CR 1-Port 100G Ethernet Optical Interface Card(CFP2)
+hh3cevtModuleRt-HIC-CP01                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 879 } -- CR 1-Port 100G Ethernet Optical Interface Card(CFP)
+hh3cevtModuleRt-MPU-16C                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 880 } -- CR Main Processing Unit C for 08 and 16 Chassis
+hh3cevtModuleRt-MPU-100-X1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 881 } -- Main Processing Unit 100-X1
+hh3cevtModuleRt-SPU-100-X1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 882 } -- Service Processing Unit 100-X1
+hh3cevtModuleRt-SPU-200-X1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 883 } -- Service Processing Unit 200-X1
+hh3cevtModuleRt-SPU-400-X1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 884 } -- Service Processing Unit 400-X1
+hh3cevtModuleRt-HIM-10GB2EXP-H3             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 885 } -- 10-port 1000BASE-X Ethernet Optical Interface(SFP)+2-port 10GBASE-R/W Ethernet Optical Interface Card(SFP+)
+hh3cevtModuleRt-HIM-11GB1EXP-H3             OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 886 } -- 11-port 1000BASE-X Ethernet Optical Interface(SFP)+1-port 10GBASE-R/W Ethernet Optical Interface Card(SFP+)
+hh3cevtModuleRt-HMIM-1E3T3                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 887 } -- 1-port T3 HMIM-Module
+hh3cevtModuleRt-SIC-4G-CNDE                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 888 } -- 1-port 4G LTE and CNDE SIC Module
+hh3cevtModuleRt-SIC-D4G-CNDE                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 889 } -- 2-port 4G LTE and CNDE SIC Module
+hh3cevtModuleRt-LPU-CC08                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 890 } -- CR 8-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-2002                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 891 } -- CR Flexible Interface Module 2002
+hh3cevtModuleRt-LPU-XP20CC02                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 892 } -- CR 20-Port 10G Ethernet Optical Interface Module and 2-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-XP40                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 893 } -- CR 40-Port 10G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-CC04                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 894 } -- CR 4-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-FIP-680                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 895 } -- Service Processing Unit(680)
+hh3cevtModuleRt-MIC-XP4L                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 896 } -- 4-port 10GBASE-R/W Ethernet Optical Interface Card(SFP+,LC)
+hh3cevtModuleRt-MIM-1T3-V2                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 897 } -- 1-port T3 Interface Card
+hh3cevtModuleRt-MIC-GP4L                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 898 } -- 4-Port 1000BASE-X COMBO Interface Card,(SFP,LC)
+hh3cevtModuleRt-MIC-GP8L                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 899 } -- 8-Port 1000BASE-X Optical Interface Card,(SFP,LC)
+hh3cevtModuleRt-MPU-19A                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 900 } -- CR Main Processing Unit A for 19 Chassis
+hh3cevtModuleRt-MPU-19B                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 901 } -- CR Main Processing Unit B for 19 Chassis
+hh3cevtModuleRt-SFU-20C                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 902 } -- CR Switching Fabric Unit(HC) for 20 Chassis
+hh3cevtModuleRt-MSFU-20B                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 903 } -- CR Multi-Switching Fabric Unit(HB) for 20 Chassis
+hh3cevtModuleRt-MSFU-20C                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 904 } -- CR Multi-Switching Fabric Unit(HC) for 20 Chassis
+hh3cevtModuleRt-MCCU-24A                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 905 } -- CR Multi-Control Connection A Unit for 24 Chassis
+hh3cevtModuleRt-MFCU-24A                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 906 } -- CR Multi-Fabric Connection A Unit for 24 Chassis
+hh3cevtModuleRt-RIC-8E1                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 907 } -- 8-Port E1/CE1/PRI Interface RIC-Module
+hh3cevtModuleRt-RIC-1XGEF4GEF               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 908 } -- 1-Port 10M/100M/1000M/10000MBASE-F and 4-Port 10M/100M/1000MBASE-F Ethernet Interface 1XGEF4GEFModule
+hh3cevtModuleRt-RIC-TU01A                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 909 } -- 1-Port 10M/100M/1000M/10000MBASE-F and 4-Port 10M/100M/1000MBASE-F Ethernet Interface TU01AModule
+hh3cevtModuleRt-SPE-S1                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 910 } -- Service Processing Engine S1
+hh3cevtModuleRt-SPE-S3                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 911 } -- Service Processing Engine S3
+hh3cevtModuleRt-SPU-600-X1                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 912 } -- Service Processing Unit 600-X1
+hh3cevtModuleRt-RIC-CP08                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 913 } -- 8-Port E1/CE1/PRI Interface RIC-Module
+hh3cevtModuleRt-MIC-SP4L                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 914 } -- 4-Port OC-3/STM-1 POS/CPOS/ATM or 1-Port OC-12/STM-4 POS/ATM Optical Interface Card,(SFP,LC)
+hh3cevtModuleRt-MIC-ET16L                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 915 } -- 16-Port E1/T1 Electrical Interface Card
+hh3cevtModuleRt-MIC-CLP4L                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 916 } -- 4-Port OC-3/STM-1 CPOS/POS Optical Interface Card,(SFP,LC)
+hh3cevtModuleRt-MIC-CLP2L                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 917 } -- 2-Port OC-3/STM-1 CPOS/POS Optical Interface Card,(SFP,LC)
+hh3cevtModuleRt-MIC-SP8L                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 918 } -- 8-Port OC-3c/STM-1c POS Optical Interface Card
+hh3cevtModuleRt-HMIM-8EM                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 919 } -- 8-Port E&M Interface HMIM-Module
+hh3cevtModuleRt-SFU                         OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 920 } -- Switching Fabric Unit
+hh3cevtModuleRt-SFE-L2                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 921 } -- Switching Fabric Engine L2
+hh3cevtModuleRt-SFU-UNFIXED                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 922 } -- Unfixed Switching Fabric Unit
+hh3cevtModuleRt-FIP-380                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 923 } -- Flexible Interface Platform-380
+hh3cevtModuleRt-19K-MPU-08A                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 924 } -- CR Main Processing Unit A for 08 Chassis
+hh3cevtModuleRt-19K-MPU-16A                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 925 } -- CR Main Processing Unit A for 16 Chassis
+hh3cevtModuleRt-19K-SFU-08C                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 926 } -- CR Switching Fabric Unit(HC) for 08 Chassis
+hh3cevtModuleRt-19K-SFU-16C                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 927 } -- CR Switching Fabric Unit(HC) for 16 Chassis
+hh3cevtModuleRt-19K-LPU-CC08                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 928 } -- CR 8-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-19K-LPU-2002                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 929 } -- CR Flexible Interface Module 2002
+hh3cevtModuleRt-19K-LPU-XP20CC02            OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 930 } -- CR 20-Port 10G Ethernet Optical Interface Module and 2-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-19K-LPU-XP40                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 931 } -- CR 40-Port 10G Ethernet Optical Interface Module
+hh3cevtModuleRt-19K-LPU-CC04                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 932 } -- CR 4-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-19K-LPU-CQ12                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 933 } -- CR 12-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-MIC-X-GT8                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 934 } -- 8-Port 10/100/1000BASE-T Electronic Multi-functional Interface Card
+hh3cevtModuleRt-MIC-X-GP4GT4                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 935 } -- 4-Port 10/100/1000BASE-T Electronic + 4-Port 1000BASE-X Optical Multi-functional Interface Card
+hh3cevtModuleRt-MIC-X-GP10                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 936 } -- 10-Port 1000BASE-X Optical Multi-functional Interface Card
+hh3cevtModuleRt-MIC-X-GP8                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 937 } -- 8-Port 1000BASE-X Optical Multi-functional Interface Card
+hh3cevtModuleRt-19K-LPU-4004                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 938 } -- CR Flexible Interface Module 4004
+hh3cevtModuleRt-FIP-260                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 939 } -- Flexible Interface Platform-260
+hh3cevtModuleRt-LPU-XP72                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 940 } -- CR 72-Port 10G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-XP48                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 941 } -- CR 48-Port 10G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-CC04B                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 942 } -- CR 4-Port 100G Ethernet Optical Interface Module
+hh3cevtModuleRt-LPU-2002B                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 943 } -- CR Flexible Interface Module 2002B
+hh3cevtModuleRt-LPU-1001B                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 944 } -- CR Flexible Interface Module 1001B
+hh3cevtModuleRt-19K-MSFU-08A                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 945 } -- CR Multi-Switching Fabric Unit for 8 Chassis
+hh3cevtModuleRt-Sic-AP220                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 946 } -- SIC-AP220 External Antennas 3 Streams Dual Radio
+hh3cevtModuleRt-FIP-660                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 947 } -- Flexible Interface Platform 660
+hh3cevtModuleRT-MIC-X-ET16                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 948 } -- 16-Port E1/T1 Electrical Interface Card,(RJ45)
+hh3cevtModuleRT-MIC-X-SP4                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 949 } -- 4-Port OC-3/STM-1 POS or 1-Port OC-12/STM-4 POS Optical Interface Card,(SFP)
+hh3cevtModuleRT-MIC-X-SP8                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 950 } -- 8-Port OC-3c/STM-1c POS Optical Interface Card,(SFP)
+hh3cevtModuleRT-MIC-X-CLP2                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 951 } -- 2-Port OC-3/STM-1 CPOS Optical Interface Card,(SFP)
+hh3cevtModuleRT-MIC-X-CLP4                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 952 } -- 4-Port OC-3/STM-1 CPOS Optical Interface Card,(SFP)
+hh3cevtModuleRt-SPU-300                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 953 } -- ICG Service Processing Unit 300(10GE Combo)
+hh3cevtModuleRt-19K-LPU-XP72                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 954 } -- 72-Port 10G Ethernet Optical Interface Module for 19 chassis
+hh3cevtModuleRt-19K-LPU-XP48                OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 955 } -- 48-Port 10G Ethernet Optical Interface Module for 19 chassis
+hh3cevtModuleRt-19K-LPU-2002B               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 956 } -- Flexible Interface Module 2002B for 19 chassis
+hh3cevtModuleRt-19K-LPU-CC04B               OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 957 } -- 4-Port 100G Ethernet Optical Interface Module for 19 chassis
+hh3cevtModuleRt-19K-MPU-16B                 OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 958 } -- Main Processing Unit B for 19016 Chassis
+hh3cevtModuleRT-RPE-X5                      OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 959 } -- Route Processing Engine X5
+hh3cevtModuleRT-RPE-X5E                     OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 960 } -- Route Processing Engine X5E
+hh3cevtModuleRt-HIC-PS04                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 961 } -- CR 4-Port non-channelized POS(155M/622M/2.5G) Interface Card,Sub Module
+hh3cevtModuleRt-HIC-PL08                    OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 962 } -- CR 8-Port non-channelized POS(155M) Interface Card,Sub Module
+hh3cevtModuleRT-MIC-X-XP2                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 963 } -- 2-Port 1000BASE-R-SFP+ Optical Multi-functional Interface Card
+hh3cevtModuleRT-MIC-X-XP4                   OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 964 } -- 4-Port 1000BASE-R-SFP+ Optical Multi-functional Interface Card
+hh3cevtModuleRT-MIC-X-XP4W                  OBJECT IDENTIFIER ::= { hh3cevtModuleRouterType 965 } -- 4-Port 1000BASE-R-SFP+ Optical Multi-functional Interface Card(Support LAN/WAN mode)
+
+-- 1000 to 4999 for united assignment
+--
 
 
 --
@@ -1594,7 +1925,7 @@ hh3cevtModuleSw-LSD1XP2ES0                  OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleSw-LSD1GP48ES0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 551 } -- 48-Port 1000BASE-X Ethernet SFP Interface Card
 hh3cevtModuleSw-LSQ1MPUA0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 552 } -- Master Process Board
 hh3cevtModuleSw-LSQ1MPUA1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 553 } -- Master Process Unit
-hh3cevtModuleSw-LSQ1FWBSC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 554 } -- Gigabit Firewall Card£¬4 Gigabit Port for Management
+hh3cevtModuleSw-LSQ1FWBSC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 554 } -- Gigabit Firewall Card, 4 Gigabit Port for Management
 hh3cevtModuleSw-LSQ1PT8PSC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 555 } -- 8-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
 hh3cevtModuleSw-LSQ1PT16PSC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 556 } -- 16-Port 1000Base-PX Optical Line Terminal(EPON OLT SFP,SC)+8-Port 1000BASE-X Optical Interface Board(SFP,LC)
 hh3cevtModuleSw-SA11MPUA0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 557 } -- SmartEngine I-Lite
@@ -1786,6 +2117,37 @@ hh3cevtModuleSw-LSWM124XG2Q                 OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleSw-LSWM124XGT2Q                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 742 } -- 24-Port 10G BASE-T and 2-Port QSFP+ Module
 hh3cevtModuleSw-LSWM124XG2QL                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 743 } -- 24-Port SFP+ and 2-Port QSFP+ Module
 hh3cevtModuleSw-LSWM124XG2QFC               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 744 } -- 24-Port 8G Fibre Channel Interface and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSWM18QC0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 745 } -- 8-Port QSFP+ Module
+hh3cevtModuleSw-LSWM124XGT2Q0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 746 } -- 24-Port 10G BASE-T and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSWM124XG2QL0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 747 } -- 24-Port SFP+ and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSP6G4T6P                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 748 } -- 6-Port SFP and 2-port 10/100/1000BASE-T COMBO and 2 port 10/100/1000BASE-T Interface Module
+hh3cevtModuleSw-LSPM6QP2PS                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 749 } -- 2-Port QSFP+ Stack Interface Module
+hh3cevtModuleSw-LSWM12H2Q                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 750 } -- 2-Port QSFP28 and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSWM18CQ                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 751 } -- 8-Port QSFP28 Module
+hh3cevtModuleSw-LSWM116Q                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 752 } -- 16-Port QSFP+ Module
+hh3cevtModuleSw-LSPM6FWD                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 753 } -- Next Generation Firewall Module
+hh3cevtModuleSw-DS-3E-2XT-H                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 754 } -- 2-Port 10G Ethernet Copper Interface Module with MACsec
+hh3cevtModuleSw-DS-3E-2XF-H                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 755 } -- 2-Port SFP+ Interface Module with MACsec
+hh3cevtModuleSw-DS-3E-2QX-H                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 756 } -- 2-Port QSFP+ Stack Interface Module
+hh3cevtModuleSw-LSPM4G4T6P                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 757 } -- 6-Port SFP and 2-port 10/100/1000BASE-T COMBO and 2 port 10/100/1000BASE-T Interface Module
+hh3cevtModuleSw-LSWM4SP8PM                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 758 } -- 8-Port SFP+ Interface Module with MACsec
+hh3cevtModuleSw-LSWM124TG2H                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 759 } -- 24-Port SFP28 and 2-Port QSFP28 Module
+hh3cevtModuleSw-LSWM18CQ0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 760 } -- 8-Port QSFP28 Module
+hh3cevtModuleSw-LSWM116Q0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 761 } -- 16-Port QSFP+ Module
+hh3cevtModuleSw-LSWM124TG2H0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 762 } -- 24-Port SFP28 and 2-Port QSFP28 Module
+hh3cevtModuleSw-LSWM2ZQP2P                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 763 } -- 2-Port QSFP28 Module
+hh3cevtModuleSw-LSWM2ZSP8P                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 764 } -- 8-Port SFP28 Module
+hh3cevtModuleSw-LSWM18CQMSEC                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 765 } -- 8-Port QSFP28 MACSEC Module
+hh3cevtModuleSw-LSWM2MGT8P                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 766 } -- 8-Port SmartGE (5/2.5/1G) Interface Module
+hh3cevtModuleSw-LSWM2XMGT8P                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 767 } -- 8-Port SmartGE (10/5/2.5/1G) Interface Module
+hh3cevtModuleSw-LSWM2ZSP2P                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 768 } -- 2-Port SFP28 Interface Module
+hh3cevtModuleSw-LSWM116FC                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 769 } -- 16-Ports SFP28 Ethernet Optical Interface Module with 16G/32G FC
+hh3cevtModuleSw-LSWM216FC                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 770 } -- 16-Ports SFP28 Ethernet Optical Interface Module with 16G/32G FC
+hh3cevtModuleSw-LSWM2SP2PB                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 771 } -- 2-Port SFP+ Interface Module
+hh3cevtModuleSw-LSWM2SP4PB                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 772 } -- 4-Port SFP+ Interface Module
+hh3cevtModuleSw-LSWM2SP24P                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 773 } -- 24-Port SFP+ Interface Module
+hh3cevtModuleSw-LSWM2SP12P2Q                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 774 } -- 12-Port SFP+ and 2-Port QSFP+ Interface Module
+hh3cevtModuleSw-LSWM2SP12P2QA               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 775 } -- 12-Port SFP+ and 2-Port QSFP+ Interface Module with wider size
 
 --
 -- 800 to 899 reserved for WLAN products
@@ -2031,6 +2393,83 @@ hh3cevtModuleSw-PIC-CSP1L                   OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleSw-PIC-PH2G6L                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1117 } -- 2-Port 622M POS Optical Interface(SFP,LC)+6-Port 1000BASE-X Optical Interface Card(SFP,LC)
 hh3cevtModuleSw-LSXM1CGP12FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1118 } -- 12-Port 100GBASE Ethernet Optical Interface Module(CFP2)(FX)
 hh3cevtModuleSw-LSXM1CGP8FX1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1119 } -- 8-Port 100GBASE Ethernet Optical Interface Module(CFP2)(FX)
+hh3cevtModuleSw-LSXM1GT48FX1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1120 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)
+hh3cevtModuleSw-LSXM1GT48FX0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1121 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)
+hh3cevtModuleSw-LSXM1GP48FX1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1122 } -- 48-Port 1000BASE Ethernet SFP Optical Interface Board
+hh3cevtModuleSw-LSXM1GP48FX0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1123 } -- 48-Port 1000BASE Ethernet SFP Optical Interface Board
+hh3cevtModuleSw-LSXM1TGS24FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1124 } -- 24-Port 10GBASE Ethernet SFP+ Optical Interface Board
+hh3cevtModuleSw-LSXM1TGS24FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1125 } -- 24-Port 10GBASE Ethernet SFP+ Optical Interface Board
+hh3cevtModuleSw-MIC-SP8L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1126 } -- 8-Port OC-3c/STM-1c POS Optical Interface Card
+hh3cevtModuleSw-LSXM1TGS48FE1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1127 } -- 48-Port 10GBASE Ethernet SFP+ Optical Interface Board(FE)
+hh3cevtModuleSw-LSXM1QGS24FE1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1128 } -- 24-Port 40GBASE Ethernet Optical Interface Board(QSFP+)
+hh3cevtModuleSw-CSPEX-1504S                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1129 } -- Multi-Service Processing Board
+hh3cevtModuleSw-CSPEX-1504X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1130 } -- Multi-Service Processing Board
+hh3cevtModuleSw-CSPEX-1404S                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1131 } -- Multi-Service Processing Board
+hh3cevtModuleSw-CSPEX-1304S                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1132 } -- Multi-Service Processing Board
+hh3cevtModuleSw-CSPEX-1404X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1133 } -- Multi-Service Processing Board
+hh3cevtModuleSw-CSPEX-1304X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1134 } -- Multi-Service Processing Board
+hh3cevtModuleSw-MIC-XP5L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1135 } -- 5-Port 10GBASE-R/W Ethernet Optical Interface Card,(SFP+,LC)
+hh3cevtModuleSw-MIC-XP2L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1136 } -- 2-Port 10GBASE-R/W Ethernet Optical Interface Card,(SFP+,LC)
+hh3cevtModuleSw-MIC-CP1L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1137 } -- 1-Port 100G Optical Interface Card,(CFP,LC)
+hh3cevtModuleSw-MIC-GP20L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1138 } -- 20-Port 1000BASE-X Ethernet Optical Interface Card,(SFP,LC),Monolithic
+hh3cevtModuleSw-MIC-GT20L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1139 } -- 20-Port 1000BASE-X Ethernet Electrical Interface Card,(RJ45,LC),Monolithic
+hh3cevtModuleSw-CEPC-XP48RX                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1140 } -- 48-Port 10GBASE-R/W Interface Module,(SFP+,LC)
+hh3cevtModuleSw-CEPC-CP4RX                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1141 } -- 4-Port 100GBASE Ethernet Optical Interface Board(CFP2)
+hh3cevtModuleSw-MIC-GP10L-V2                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1142 } -- 10-Port 1000BASE-X Optical Interface Card,(SFP,LC)
+hh3cevtModuleSw-CSR07SRPUD3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1143 } -- Management and Route Process Board(UD3)
+hh3cevtModuleSw-MIC-XP1L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1144 } -- 1-Port 10GBASE-R/W Ethernet Optical Interface Card,(SFP+,LC)
+hh3cevtModuleSw-CSFC-12E                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1145 } -- Switch Fabric Board
+hh3cevtModuleSw-CEPC-XP24LX                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1146 } -- 24-Port 10GBASE-R/W Interface Module,(SFP+,LC)
+hh3cevtModuleSw-IM-MSUX                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1147 } -- Multi-Service Processing Board,Monolithic
+hh3cevtModuleSw-CSFC-12F                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1148 } -- Switch Fabric Board, Monolithic
+hh3cevtModuleSw-CSR05SRP1N3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1149 } -- Main Processing Unit(1N3)
+hh3cevtModuleSw-CSPEX-1602X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1150 } -- Service Processing Unit(1602X)
+hh3cevtModuleSw-MIC-XP20L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1151 } -- 20-port 10GBASE-R/W Ethernet Optical Interface Card(SFP+,LC)
+hh3cevtModuleSw-MIC-CP2L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1152 } -- 2-port 100G Ethernet Optical Interface Card(CFP2,LC)
+hh3cevtModuleSw-IM-NGFWX-IV                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1153 } -- Next Generation Firewall Module
+hh3cevtModuleSw-SFC-12E                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1154 } -- Switch Fabric Board
+
+hh3cevtModuleSw-SPEX-1602X-E                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1155 } -- Service Processing Unit(1602X)-E
+hh3cevtModuleSw-SPEX-1602X-L                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1156 } -- Service Processing Unit(1602X)-L
+hh3cevtModuleSw-EPC-XP24LX-E                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1157 } -- 24-Port 10GBASE-R/W Ethernet Optical Interface Line Processing Unit (SFP+,LC)-E
+hh3cevtModuleSw-EPC-XP24LX-L                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1158 } -- 24-Port 10GBASE-R/W Ethernet Optical Interface Line Processing Unit (SFP+,LC)-L
+hh3cevtModuleSw-EPC-CP4RX-L                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1159 } -- 4-Port 100GBASE Ethernet Optical Interface Line Processing Unit (CFP2)-L
+hh3cevtModuleSw-SPEX-1504X-E                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1160 } -- Service Processing Unit(1504X)-E
+hh3cevtModuleSw-SPEX-1504X-L                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1161 } -- Service Processing Unit(1504X)-L
+hh3cevtModuleSw-CSPEX-1602X-L               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1162 } -- Service Processing Unit(1602X)-L
+hh3cevtModuleSw-CEPC-XP24LX-L               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1163 } -- 24-Port 10GBASE-R/W Ethernet Optical Interface Line Processing Unit (SFP+,LC)-L
+hh3cevtModuleSw-CEPC-CP4RX-L                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1164 } -- 4-Port 100GBASE Ethernet Optical Interface Line Processing Unit(CFP2)-L
+hh3cevtModuleSw-MIC-CP1L-E                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1165 } -- 1-port 100G Ethernet Optical Interface Card(CFP,LC)-E
+hh3cevtModuleSw-MIC-XP4L-E                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1166 } -- 4-Port 10GBASE-R/W Ethernet Optical Interface Card,(SFP+,LC)-E
+hh3cevtModuleSw-MIC-XP16L-E                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1167 } -- 16-port 10GBASE-R/W Ethernet Optical Interface Card(SFP+,LC)-E
+hh3cevtModuleSw-MIC-GP20L-E                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1168 } -- 20-Port 1000BASE-X Ethernet Optical Interface Card,(SFP,LC)-E
+hh3cevtModuleSw-MIC-GP10L-V2-E              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1169 } -- 10-Port 1000BASE-X Ethernet Optical Interface Card(SFP,LC)-E
+hh3cevtModuleSw-MIC-GT20L-E                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1170 } -- 20-Port 1000BASE-X Ethernet Electrical Interface Card,(RJ45,LC)-E
+hh3cevtModuleSw-CSR05SRP1P3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1171 } -- H3C CR16018-F Main Processing Unit(1P3)
+hh3cevtModuleSw-SR05SRP1P3                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1172 } -- H3C SR8816-X Main Processing Unit(1P3)
+hh3cevtModuleSw-CSFC-16E                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1173 } -- CR16018-F Fabric Module(E Type)
+hh3cevtModuleSw-SFC-16E                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1174 } -- SR8816-X Fabric Module(E Type)
+hh3cevtModuleSw-CSFC-08E                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1175 } -- CR16010-F Fabric Module(E Type)
+hh3cevtModuleSw-SFC-08E                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1176 } -- SR8808-X Fabric Module(E Type)
+hh3cevtModuleSw-IM-SMUX                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1177 } -- Security Monitor Unit (IM-SMUX)
+hh3cevtModuleSw-IM-IPSX-IV                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1178 } -- Intrusion Prevention System Module
+hh3cevtModuleSw-IM-ACGX-IV                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1179 } -- Application Control Gateway Module
+hh3cevtModuleSw-SFC-08E1                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1180 } -- SR8808H-X Fabric Module(E Type)
+hh3cevtModuleSw-CSFC-08E1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1181 } -- CR16010H-F Fabric Module(E Type)
+hh3cevtModuleSw-IM-ACG1000X-IV              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1182 } -- H3C SecPath ACG1000-Blade-X Application Control Module(SR88-X SecBladeIV)
+hh3cevtModuleSw-MIC-QP1L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1183 } -- 1-port 40G Ethernet Optical Interface Card(QSFP+,LC)
+hh3cevtModuleSw-CSPEX-1804X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1184 } -- Service Processing Unit(1804X)
+hh3cevtModuleSw-MIC-CP2L-V2                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1185 } -- 2-port 100G Ethernet Optical Interface Card(QSFP28)
+hh3cevtModuleSw-MIC-XP4L1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1186 } -- 4-port 10GBASE-R/W Ethernet Optical Interface Card 1(SFP+,LC)
+hh3cevtModuleSw-SFC-16T                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1187 } -- SR8816-X Fabric Module(T Type)
+hh3cevtModuleSw-CSFC-16T                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1188 } -- CR16018-F Fabric Module(T Type)
+hh3cevtModuleSw-SFC-08T                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1189 } -- SR8808H-X Fabric Module(T Type)
+hh3cevtModuleSw-CSFC-08T                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1190 } -- CR16010H-F Fabric Module(T Type)
+hh3cevtModuleSw-MIC-XP2L-LAN                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1191 } -- 2-port 10GBASE-R Ethernet Optical Interface Card(SFP+,LC)-LAN
+hh3cevtModuleSw-MIC-XP5L1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1192 } -- 5-port 10GBASE-R/W Ethernet Optical Interface Card(SFP+,LC)
+hh3cevtModuleSw-MIC-CP1L-V2                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1193 } -- 1-port 100G Ethernet Optical Interface Card(CFP2,LC)
+hh3cevtModuleSw-CEPC-XP40LX                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1194 } -- 40-port 10GBASE-R/W Ethernet Optical Interface Line Processing Unit Module(SFP+,LC)
+hh3cevtModuleSw-CEPC-CQ4LX                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1195 } -- 4-port 100G Ethernet Optical Interface Line Processing Unit Module(QSFP28,LC)
 
 
 --
@@ -2150,8 +2589,8 @@ hh3cevtModuleSw-LSU1P24XGSE3                OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleSw-LSU1GP24TSE3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1312 } -- 16-Port 1000BASE-X Gigabit Ethernet Optical(SFP,LC) And 8-Port 10/100/1000BASE-T RJ45/1000BASE-X SFP Combo Interface Board
 hh3cevtModuleSw-LSU1GT40PSE3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1313 } -- 40-Port 10/100/1000BASE-T Electrical(RJ45) And 8-Port 1000BASE-X Optical Ethernet Interface Board(SFP,LC),PoE
 hh3cevtModuleSw-LSV1TGS24SA1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1314 } -- 24-Port 10G BASE Ethernet Optical Interface Board(SFP+)
-hh3cevtModuleSw-LSV1SRPA1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1315 } -- Switching Fabric Module
-hh3cevtModuleSw-LSV1SRPC1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1316 } -- Switching Fabric Module
+hh3cevtModuleSw-LSVM1SRPA1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1315 } -- Switching Fabric Module
+hh3cevtModuleSw-LSVM1SRPC1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1316 } -- Switching Fabric Module
 hh3cevtModuleSw-LSX1FAB16S0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1317 } -- Switch Fabric Board,For 16 Slots Chassis
 hh3cevtModuleSw-LSU1WCME0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1318 } -- Access Controller Service Board
 hh3cevtModuleSw-EWPX1WCME0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1319 } -- Access Controller Service Board
@@ -2216,7 +2655,7 @@ hh3cevtModuleSw-LSXM1TGS4GPEB1              OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleSw-LSXM1TGS16EA1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1378 } -- 16-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(EA)
 hh3cevtModuleSw-LSXM1TGS8EA1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1379 } -- 8-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(EA)
 hh3cevtModuleSw-LSXM1QGS36FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1380 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
-hh3cevtModuleSw-LSXM1SFF16C1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1381 } -- Switching Fabric Module For S12516X-AF,Type C
+hh3cevtModuleSw-LSXM1SFF16C1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1381 } -- Switching Fabric Module
 hh3cevtModuleSw-LSQM3MPUB0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1382 } -- Supervisor Engine Board
 hh3cevtModuleSw-LSQM3MPUB3                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1383 } -- Supervisor Engine Board
 hh3cevtModuleSw-LSQM2MPUC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1384 } -- Supervisor Engine Board
@@ -2225,27 +2664,494 @@ hh3cevtModuleSw-LST1FW3B1                   OBJECT IDENTIFIER ::= { hh3cevtModul
 hh3cevtModuleSw-LSX1NSCEA1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1387 } -- NetStream Service Board
 hh3cevtModuleSw-LSX1FWCEA1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1388 } -- Firewall Service Board
 hh3cevtModuleSw-LSXM1ADECEA1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1389 } -- Application Dilevery Engine Module,Domestic&Overseas Version
-
+hh3cevtModuleSw-LSXM1SFF16A1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1390 } -- Switching Fabric Module
+hh3cevtModuleSw-LSV1MPUA0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1391 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSVM1SRPA0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1392 } -- Switching Fabric Module
+hh3cevtModuleSw-LSVM1SRPC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1393 } -- Switching Fabric Module
+hh3cevtModuleSw-LSV1QGS12SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1394 } -- 12-Port 40G BASE Ethernet Optical Interface Board(QSFP+)
+hh3cevtModuleSw-LSVM1QGS12FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1395 } -- 12-Port 40G BASE Ethernet Optical Interface Module(QSFP+,MPO/LC)
+hh3cevtModuleSw-LSVM1TGS24FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1396 } -- 24-Port 10G BASE Ethernet Optical Interface Module(SFP+,LC)
+hh3cevtModuleSw-LSVM1QGS6C2FX0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1397 } -- 2-Port 100GBASE Ethernet Optical Interface(CXP,MPO)+6-Port 40GBASE Ethernet Optical Interface(QSFP+,MPO/LC)+4-Port 10G BASE Ethernet Optical Interface Module(SFP+,LC)
+hh3cevtModuleSw-LSQ2FWBSC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1398 } -- Gigabit Firewall Card, 4 Gigabit Port for Management
+hh3cevtModuleSw-LSQM1SRP8X2QE0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1399 } -- Supervisor Engine Board With 8-Port 10GBASE Ethernet SFP+ Optical Interfaces+2-Port 40GBASE-R Ethernet QSFP+ Optical Interfaces
 
 --
 -- 1400 to 1599 reserved for switche RPU logical modules
 --
 hh3cevtModulesw-PEX-Common                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1400 } -- The general logical module type for PEX
+hh3cevtModuleSw-CSPEX-1812X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1401 } -- Service Processing Unit Module(1812X)
+hh3cevtModuleSw-CSPEX-1612X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1402 } -- Service Processing Unit Module(1612X)
+hh3cevtModuleSw-CSPEX-1512X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1403 } -- Service Processing Unit Module(1512X)
+hh3cevtModuleSw-NIC-XP20L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1404 } -- 20-port 10GBASE-R/W Ethernet Optical Interface Card Module(SFP+,LC)(NIC)
+hh3cevtModuleSw-NIC-XP10L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1405 } -- 10-port 10GBASE-R/W Ethernet Optical Interface Card Module(SFP+,LC)(NIC)
+hh3cevtModuleSw-NIC-CC2L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1406 } -- 2-port 100G Ethernet Optical Interface Card Module(CFP2,LC)(NIC)
+hh3cevtModuleSw-NIC-CC1L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1407 } -- 1-port 100G Ethernet Optical Interface Card Module(CFP2,LC)(NIC)
+hh3cevtModuleSw-NIC-XP5L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1408 } -- 5-port 10GBASE-R/W Ethernet Optical Interface Card Module(SFP+,LC)(NIC)
+hh3cevtModuleSw-NIC-GP20L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1409 } -- 20-port 1000BASE-X Ethernet Optical Interface Card Module(SFP,LC)(NIC)
+hh3cevtModuleSw-NIC-GT20L                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1410 } -- 20-port 1000BASE-T Ethernet Copper Interface Card Module(RJ45)(NIC)
+hh3cevtModuleSw-MIC-CQ1L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1411 } -- 1-port 100G Ethernet Optical Interface Card Module(QSFP28,LC)
+hh3cevtModuleSw-MIC-XP10CQ1L                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1412 } -- 10-port 10GBASE-R/W Ethernet Optical Interface(SFP+,LC)+1-port 100G Ethernet Optical Interface Card Module(QSFP28,LC)
+hh3cevtModuleSw-CSPEX-1502X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1413 } -- Service Processing Unit(1502X)
+hh3cevtModuleSw-EPC-CP4RX                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1414 } -- 4-port 100GBASE Ethernet Optical Line Processing Unit(CFP2)
+hh3cevtModuleSw-EPC-CQ4LX                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1415 } -- 4-port 100GBASE Ethernet Optical Line Processing Unit(QSFP28)
+hh3cevtModuleSw-MIC-XP4L1-E                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1416 } -- 4-port 10GBASE-R/W Ethernet Optical Interface Card 1(SFP+,LC)
+hh3cevtModuleSw-MIC-CQ1L-E                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1417 } -- 1-port 100G Ethernet Optical Interface Card 1(QSFP28)
+hh3cevtModuleSw-MIC-XP8L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1418 } -- 8-port 10GBASE-R/W Ethernet Optical Interface Card (SFP+,LC)
+hh3cevtModuleSw-IM-OAPX                     OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1419 } -- Universal Open Platform(IM-OAPX)
+hh3cevtModuleSw-MIC-GP20L1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1420 } -- 20-port 1000BASE-X Ethernet Optical Interface Card(SFP,LC)
+hh3cevtModuleSw-CSPEX-1802X                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1421 } -- Service Processing Unit(1802X)
+hh3cevtModuleSw-MIC-CQ2L                    OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1422 } -- 2-port 100G Ethernet Optical Interface Card(QSFP28,LC)
+hh3cevtModuleSw-IMMSUX                      OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1423 } -- Universal Line Processing Unit(IM-MSUX)(China Telecom)
+hh3cevtModuleSw-CSPEX-1104-E                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1424 } -- Service Processing Unit(1104E)
+--
+-- 1600 to 1799 reserved for secondary switches part III
+--
+hh3cevtModuleSw-LSUM2GP44TSSE9              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1600 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSUM2GP24TSSE9              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1601 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSUM2GT24TSSE9              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1602 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSUM2GT48SE9                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1603 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SE)
+hh3cevtModuleSw-LSUM1SUPD0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1604 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM1SUPD9                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1605 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1TGT48FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1606 } -- 48-Port 10GBASE-T Ethernet Electrical Interface Module(RJ45)(FX)
+hh3cevtModuleSw-LSXM1TGS48FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1607 } -- 48-Port 10GBASE-T Ethernet Electrical Interface Module(RJ45)(FX)
+hh3cevtModuleSw-LSXM1TGS48FE0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1608 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FE)
+hh3cevtModuleSw-LSXM1QGS36FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1609 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM1QGS24FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1610 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM1QGS24FE0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1611 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FE)
+hh3cevtModuleSw-LSXM1CGX8FX0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1612 } -- 8-Port 100GBASE Ethernet Optical Interface Module(CXP)(FX)
+hh3cevtModuleSw-LSXM1CGP12FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1613 } -- 12-Port 100GBASE Ethernet Optical Interface Module(CFP2)(FX)
+hh3cevtModuleSw-LSXM1SUPB0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1614 } -- Supervisor Engine Module
+hh3cevtModuleSw-LSXM1SFF16C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1615 } -- Switching Fabric Module,Type F(Class C)
+hh3cevtModuleSw-LSXM1SFF16A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1616 } -- Switching Fabric Module,Type F(Class A)
+hh3cevtModuleSw-LSXM1SFF08B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1617 } -- Switching Fabric Module,Type F(Class B)
+hh3cevtModuleSw-LSQM6GV48SC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1618 } -- 48-Port 10/100/1000BASE-T Ethernet Interface Module(RJ45),Upgradeable to PoE
+hh3cevtModuleSw-LSXM1SUP04B1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1619 } -- Supervisor Engine Module
+hh3cevtModuleSw-LSXM1SFF04B1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1620 } -- Switching Fabric Module,Type F(Class B)
+hh3cevtModuleSw-LSXM1SUP04B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1621 } -- Supervisor Engine Module
+hh3cevtModuleSw-LSXM1SFF04B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1622 } -- Switching Fabric Module,Type F(Class B)
+hh3cevtModuleSw-LSU1ADECEA0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1623 } -- Application Dilevery Engine Module,Domestic&Overseas Version
+hh3cevtModuleSw-LSU1NSCEA0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1624 } -- NetStream Service Board
+hh3cevtModuleSw-LSU3FWCEA0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1625 } -- Firewall Service Board
+hh3cevtModuleSw-LSXM1MPU06B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1626 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1MPU10C3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1627 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1SUPD3                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1628 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1FAB06C3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1629 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1FAB10C3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1630 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1FAB12D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1631 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1FAB04D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1632 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1FAB08D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1633 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1GP44TSSE3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1634 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSXM1GP24TSSE3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1635 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSXM1GT24PTSSE3             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1636 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+20-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSXM1GT48SE3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1637 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SE)
+hh3cevtModuleSw-LSXM1TGS24EC3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1638 } -- 24-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(EC)
+hh3cevtModuleSw-LSXM1CGC2EC3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1639 } -- 2-Port 100GBASE-R Ethernet CFP Optical Interface Board(EC)
+hh3cevtModuleSw-LSXM1TGT24SF3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1640 } -- 24-Port 10GBASE-T Ethernet Electrical Interface Board(RJ45)(SF)
+hh3cevtModuleSw-LSXM1TGS16SF3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1641 } -- 16-Port 10GE Optical Interface Board(SFP+,LC)(SF)
+hh3cevtModuleSw-LSXM1QGS12SG3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1642 } -- 12-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM1TGS48SG3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1643 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM1FAB04B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1644 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM1FAB08B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1645 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM1FAB12B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1646 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1SFF08A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1647 } -- Switching Fabric Board
+hh3cevtModuleSw-LSXM1SFF08A1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1648 } -- Switching Fabric Board
+hh3cevtModuleSw-LSXM1FWDF1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1649 } -- FW IV Next Generation Firewall Module
+hh3cevtModuleSw-LSQM1PT8TSSC0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1650 } -- 8-Port 1G EPON OLT Optical Interface(SFP,SC)+2-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSQM1PT24TSSC0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1651 } -- 24-Port 1G EPON OLT Optical Interface(SFP,SC)+2-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSQM1TGS12EC0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1652 } -- 12-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(EC)
+hh3cevtModuleSw-LSX1M1CGQ32TB1              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1653 } -- 32-Port 100GBASE Ethernet Optical Interface Board(QSFP28),Monolithic,LF
+hh3cevtModuleSw-LSX1M1CGQ48TB1              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1654 } -- 48-Port 100GBASE Ethernet Optical Interface Board(QSFP28),Monolithic
+hh3cevtModuleSw-LSXM1QGS48TB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1655 } -- 48-Port 40GBASE Ethernet Optical Interface Board(QSFP+),Monolithic
+hh3cevtModuleSw-LSXM1SRT08E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1656 } -- Switch Fabric Board
+hh3cevtModuleSw-LSXM1SRT16E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1657 } -- Switch Fabric Board
+hh3cevtModuleSw-LSXM1SRT02E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1658 } -- Switch Fabric Board
+hh3cevtModuleSw-LSXM1SUP02B1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1659 } -- Supervisor Engine Module
+hh3cevtModuleSw-LSUM1SUPC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1660 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM1SUPC3                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1661 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1SUPC3                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1662 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1GP44TSSE0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1663 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSQM1GP24TSSE0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1664 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSQM1GT48SE0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1665 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SC)
+hh3cevtModuleSw-LSQM1GV48SE0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1666 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SC)-POE
+hh3cevtModuleSw-LSXM1QGS12FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1667 } -- 12-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM3QGS24FE1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1668 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FE)
+hh3cevtModuleSw-LSXM3QGS24FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1669 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM3QGS36FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1670 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM3TGS48FE1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1671 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSXM3TGS48FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1672 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSXM2TGS48FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1673 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSQM1MPU06B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1674 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1MPU10C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1675 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1FAB06C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1676 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM1FAB10C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1677 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM1QGS12SG0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1678 } -- 12-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM1TGS48SG0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1679 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM1TGT24SF0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1680 } -- 24-Port 10GBASE-T Ethernet Electrical Interface Board(RJ45)(SF)
+hh3cevtModuleSw-LSQM1QGS8A0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1681 } -- 8-Port QSFP+ Module
+hh3cevtModuleSw-LSQM1TGS24QSM0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1682 } -- 24-Port SFP+ and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSQM1TGT24QSM0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1683 } -- 24-Port 10G BASE-T and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSQM1TGS24QSA0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1684 } -- 24-Port SFP+ and 2-Port QSFP+ Module
+hh3cevtModuleSw-LSUM1FWCEAB0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1685 } -- Firewall Board
+hh3cevtModuleSw-LSQM2GP24TSSA0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1686 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SA)
+hh3cevtModuleSw-LSQM2GT48SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1687 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)
+hh3cevtModuleSw-LSQM2GP48SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1688 } -- 48-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(SA)
+hh3cevtModuleSw-LSQM2GP24TSSA3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1689 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SA)
+hh3cevtModuleSw-LSQM2GT48SA3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1690 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)
+hh3cevtModuleSw-LSQM2GP48SA3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1691 } -- 48-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(SA)
+hh3cevtModuleSw-LSUM2GP24TSSA0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1692 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SA)
+hh3cevtModuleSw-LSUM2GT48SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1693 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)
+hh3cevtModuleSw-LSUM2GP48SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1694 } -- 48-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(SA)
+hh3cevtModuleSw-LSXM1SUPT1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1695 } -- Supervisor Engine Module
+hh3cevtModuleSw-LSXM1SUP02T1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1696 } -- Supervisor Engine Module
+hh3cevtModuleSw-LSXM1SFF16B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1697 } -- Switch Fabric Board
+hh3cevtModuleSw-LSXM4TGS48FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1698 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSXM4QGS24FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1699 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM1TGS48FD1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1700 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FD)
+hh3cevtModuleSw-LSXM1QGS24FD1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1701 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FD)
+hh3cevtModuleSw-LSXM2QGS24FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1702 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM1TGS48FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1703 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)
+hh3cevtModuleSw-LSXM1QGS24FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1704 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FD)
+hh3cevtModuleSw-LSXM2TGS48FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1705 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSXM2QGS24FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1706 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM4TGS48FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1707 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSXM4QGS24FX0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1708 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(FX)
+hh3cevtModuleSw-LSXM1TGW48FX1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1709 } -- 48-Port 10GBASE Ethernet WAN Optical Interface Module(SFP+,LC)(FX)
+hh3cevtModuleSw-LSUM1MPU10A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1710 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM1FAB10A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1711 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2TGS32QSSG0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1712 } -- 32-Port 10GBASE-R Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE-R Ethernet Optical Interface Board(QSFP+,LC)(SG)
+hh3cevtModuleSw-LSUM2QGS12SG0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1713 } -- 12-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSUM2TGS48SG0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1714 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM2QGS12SG3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1715 } -- 12-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM2TGS48SG3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1716 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSUM1FWDEC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1717 } -- Firewall Service Board
+hh3cevtModuleSw-LSQM1FWDSC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1718 } -- Firewall Service Board
+hh3cevtModuleSw-LSQM1TGS48RSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1719 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM2TGS48XSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1720 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM2QGS12XSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1721 } -- 12-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM3GP44TSSC0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1722 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSXM1CGQ36HB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1723 } -- 36-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HB)
+hh3cevtModuleSw-LSXM1CGQ36HC1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1724 } -- 36-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HC)
+hh3cevtModuleSw-LSXM1CGQ18QGHB1             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1725 } -- 18-Port 100GBASE (QSFP28) + 18-Port 40GBASE Ethernet Optical Interface Module (QSFP+)(HB)
+hh3cevtModuleSw-LSXM1CGQ18QGHC1             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1726 } -- 18-Port 100GBASE (QSFP28) + 18-Port 40GBASE Ethernet Optical Interface Module (QSFP+)(HC)
+hh3cevtModuleSw-LSXM1QGS48HB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1727 } -- 48-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1QGS48HC1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1728 } -- 48-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HC)
+hh3cevtModuleSw-LSXM1TGS48C2HB1             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1729 } -- 48-Port 10G BASE Ethernet Optical Interface(SFP+,LC)+2-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HB)
+hh3cevtModuleSw-LSXM1SFH04D1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1730 } -- Switch Fabric Board,Type H(Class D)
+hh3cevtModuleSw-LSXM1SFH08D1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1731 } -- Switch Fabric Board For S12508X-AF,Type D(F2)
+hh3cevtModuleSw-LSXM1SFH12D1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1732 } -- Fabric Module,Type H(Class D)
+hh3cevtModuleSw-LSXM1SFH16C1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1733 } -- Switch Fabric Board,Type H(Class C)
+hh3cevtModuleSw-LSXM1GP48FD0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1737 } -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface Module(SFP,LC)(FD)
+hh3cevtModuleSw-LSXM1GP48FD1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1738 } -- 48-Port 1000BASE-X Gigabit Ethernet Optical Interface Module(SFP,LC)(FD)
+hh3cevtModuleSw-LSXM1GT48FD0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1739 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Module(RJ45)(FD)
+hh3cevtModuleSw-LSXM1GT48FD1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1740 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Module(RJ45)(FD)
+hh3cevtModuleSw-LSXM1FAB10B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1741 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM1MPU10A3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1742 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM1FAB10A3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1743 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM1MPU10A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1744 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1FAB10A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1745 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM2TGS32QSXSG0            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1746 } -- 32-Port 10GBASE-R Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE-R Ethernet Optical Interface Board(QSFP+,LC)(SG)
+hh3cevtModuleSw-LSQM1TGS48RSG3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1747 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM2TGS32QSSG3             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1748 } -- 32-Port 10GBASE-R Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE-R Ethernet Optical Interface Board(QSFP+,LC)(SG)
+hh3cevtModuleSw-LSUM1NSDEC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1749 } -- NetStream Service Board
+hh3cevtModuleSw-LSQM1NSDSC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1750 } -- NetStream Service Board
+hh3cevtModuleSw-LSQM1QGS4SC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1751 } -- 4-Port 40G BASE Ethernet Optical Interface Board(QSFP+,MPO)(SC)
+hh3cevtModuleSw-LLSQM2MPUD3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1752 } -- Supervisor Engine Board
+hh3cevtModuleSw-LLSQM3MPUB3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1753 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM3MPUB4                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1754 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM2MPUDS0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1755 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM4GV48SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1756 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)-POE
+hh3cevtModuleSw-LSQM1WCMX20                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1757 } -- Access Controller Service Board
+hh3cevtModuleSw-LSQM1WCMX40                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1758 } -- Access Controller Service Board
+hh3cevtModuleSw-LSUM1WCMX20RT               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1759 } -- Access Controller Service Board
+hh3cevtModuleSw-LSUM1WCMX40RT               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1760 } -- Access Controller Service Board
+hh3cevtModuleSw-LSXM1CGQ18QGHB0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1761 } -- 18-PORT 100GBASE Ethernet Optical Interface (QSFP28)/36-PORT 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1SFH08C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1762 } -- Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSXM1SFH08C1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1763 } -- Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSXM2SFH16C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1764 } -- Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSXM2SFH16C1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1765 } -- Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSXM1NSDF1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1766 } -- SecBlade IV NetStream Module
+hh3cevtModuleSw-LSUM2TGS48SG3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1767 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-DS-3E7602-MPU               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1768 } -- Supervisor Engine Board
+hh3cevtModuleSw-DS-3E7606-MPU               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1769 } -- Supervisor Engine Board
+hh3cevtModuleSw-DS-3E7600-24T4X-SC          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1770 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-DS-3E7600-24F4X-SA          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1771 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SA)
+hh3cevtModuleSw-DS-3E7600-48T-SA            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1772 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)
+hh3cevtModuleSw-DS-3E7600-48F-SA            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1773 } -- 48-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(SA)
+hh3cevtModuleSw-DS-3E7600-24F4X-SC          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1774 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-DS-3E7600-44F4X-SC          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1775 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-DS-3E7600-48T-SC            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1776 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SC)
+hh3cevtModuleSw-DS-3E7600-16X-SC            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1777 } -- 16-Port 10GE Optical Interface Board(SFP+,LC)(SF)
+hh3cevtModuleSw-S7602-MPU                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1778 } -- Supervisor Engine Board
+hh3cevtModuleSw-S7606-MPU                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1779 } -- Supervisor Engine Board
+hh3cevtModuleSw-S76-24GT4XFSC               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1780 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-S76-24GF4XFSA               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1781 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SA)
+hh3cevtModuleSw-S76-48GTSA                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1782 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)
+hh3cevtModuleSw-S76-48GFSA                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1783 } -- 48-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(SA)
+hh3cevtModuleSw-S76-24GT20GF4XFSC           OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1784 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+20-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSXM1TGS48C2HB0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1785 } -- 48-PORT 10GBASE Ethernet Optical Interface (SFP+,LC)+2-PORT 100GBASE Ethernet Optical Interface Module(QSFP28)(HB)
+hh3cevtModuleSw-LSXM1CGQ18QGHC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1786 } -- 18-PORT 100GBASE Ethernet Optical Interface (QSFP28)/36-PORT 40GBASE Ethernet Optical Interface Module(QSFP+)(HC)
+hh3cevtModuleSw-LSXM1TGS48HB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1787 } -- 48-Port 10G BASE Ethernet Optical Interface Module(SFP+,LC)(HB)
+hh3cevtModuleSw-LSXM1TGS48HB0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1788 } -- 48-Port 10G BASE Ethernet Optical Interface Module(SFP+,LC)(HB)
+hh3cevtModuleSw-LSQM1CGP24TSSC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1789 } -- Supervisor Engine Board With 24-Port 1000BASE-X Ethernet SFP Optical Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM1CGP24TSSA0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1790 } -- Supervisor Engine Board With 24-Port 1000BASE-X Ethernet SFP Optical Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM1CGT24TSSC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1791 } -- Supervisor Engine Board With 24-Port 10/100/1000BASE-T Ethernet Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM1CGT24TSSA0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1792 } -- Supervisor Engine Board With 24-Port 10/100/1000BASE-T Ethernet Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM2GP24SA0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1793 } -- 24-Port GE Optical Interface(SFP,LC)(SA)
+hh3cevtModuleSw-LSX1SUPH1                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1794 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSX1SUPH0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1795 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSX1SUP04H1                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1796 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSX1SUP04H0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1797 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1SFH08D0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1798 } -- Fabric Module,Type H(Class D)
+hh3cevtModuleSw-LSXM1SFH04D0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1799 } -- Fabric Module,Type H(Class D)
+--
+-- 1800 for united assignment
+--
+hh3cevtModuleSw-LSXM1SFH16C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1800 } -- Fabric Module,Type H(Class C+)
+hh3cevtModuleSw-LSXM1SFH12D0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1801 } -- Fabric Module,Type H(Class D)
+hh3cevtModuleSw-LSXM1QGS48HB0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1802 } -- 48-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1QGS48HC0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1803 } -- 48-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HC)
+hh3cevtModuleSw-LSXM1CGQ36HB0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1804 } -- 36-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HB)
+hh3cevtModuleSw-LSXM1TGS48C2HC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1805 } -- 48-PORT 10GBASE Ethernet Optical Interface (SFP+,LC)+2-PORT 100GBASE Ethernet Optical Interface Module(QSFP28)(HC)
+hh3cevtModuleSw-LSQM2GP44TSSE0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1806 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-LSQM2GP24TSSA8              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1807 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SA)
+hh3cevtModuleSw-LSQM2GT48SA8                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1808 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SA)
+hh3cevtModuleSw-LSQM2GP48SA8                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1809 } -- 48-Port 1000BASE-X Ethernet Optical Interface Board(SFP,LC)(SA)
+hh3cevtModuleSw-EWPXM1CGP24TSSC0            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1810 } -- Supervisor Engine Board With 24-Port 1000BASE-X Ethernet SFP Optical Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-EWPXM3MPUB0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1811 } -- Supervisor Engine Board
+hh3cevtModuleSw-EWPXM2MPUDS0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1812 } -- Supervisor Engine Board
+hh3cevtModuleSw-EWPXM2TGS16SF0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1813 } -- 16-Port 10GE Optical Interface Board(SFP+,LC)(SF)
+hh3cevtModuleSw-EWPXM2GP44TSSC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1814 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-EWPXM2GP24TSSC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1815 } -- 24-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-EWPXM1MAC0F                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1816 } -- Access Controller Service Board
+hh3cevtModuleSw-LSQM1CGP24TSSA8             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1817 } -- Supervisor Engine Board With 24-Port 1000BASE-X Ethernet SFP Optical Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM1CGT24TSSA8             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1818 } -- Supervisor Engine Board With 24-Port 10/100/1000BASE-T Ethernet Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSWM1FWD0                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1819 } -- Firewall Service Board
+hh3cevtModuleSw-LSUM2MPU10C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1820 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM2MPU10C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1821 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM2MPU10C3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1822 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM2FAB10C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1823 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM2FAB10C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1824 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM2FAB10C3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1825 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2CQGS12SG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1826 } -- 12-Port 40GBASE-R QSFP+ or 4-Port 100GBASE-R QSFP28 Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM2CQGS12SG3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1827 } -- 12-Port 40GBASE-R QSFP+ or 4-Port 100GBASE-R QSFP28 Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM2CQGS12XSG0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1828 } -- 12-Port 40GBASE-R QSFP+ or 4-Port 100GBASE-R QSFP28 Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM1CQGS12SG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1829 } -- 12-Port 40GBASE-R QSFP+ or 4-Port 100GBASE-R QSFP28 Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM1CGQ6QGHB0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1830 } -- 6-Port 100GBASE Ethernet Optical Interface(QSFP28)/12-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1CGQ6QGHB1              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1831 } -- 6-Port 100GBASE Ethernet Optical Interface(QSFP28)/12-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1CGQ6QGHC0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1832 } -- 6-Port 100GBASE Ethernet Optical Interface(QSFP28)/12-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HC)
+hh3cevtModuleSw-LSXM1QGS36HB0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1833 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1QGS36HB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1834 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1QGS36HC0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1835 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HC)
+hh3cevtModuleSw-LSXM1SUPC0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1836 } -- Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1SUPC1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1837 } -- Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1SUP04H0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1838 } -- Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1SUP04H1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1839 } -- Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1SUPH0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1840 } -- Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1SUPH1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1841 } -- Supervisor Engine Unit
+hh3cevtModuleSw-EWPXM2WCMD0F                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1842 } -- 20G Access Controller Module
+hh3cevtModuleSw-LSUM2QGS24RSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1843 } -- 24-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM1QGS24RSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1844 } -- 24-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM2QGS24RSG3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1845 } -- 24-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM2QGS24RXSG0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1846 } -- 24-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM2TGS48RSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1847 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM1X86SUPE0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1848 } -- Cloud Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1X86SUPE1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1849 } -- Cloud Supervisor Engine Unit
+hh3cevtModuleSw-LSQM1CGS2QSA0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1850 } -- 2-Port 100G Ethernet Optical Interface(QSFP28)+2-Port 40G Ethernet Optical Interface Module(QSFP+)
+hh3cevtModuleSw-LSUM1ACGDEC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1851 } -- SecBlade IV Application Control Module
+hh3cevtModuleSw-LSQM1ACGDSC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1852 } -- SecBlade IV Application Control Module
+hh3cevtModuleSw-LSXM1CGQ36HF1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1853 } -- 36-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HF)
+hh3cevtModuleSw-LSXM1QGS48HF1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1854 } -- 48-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1CGQ18QGHF1             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1855 } -- 18-PORT 100GBASE Ethernet Optical Interface(QSFP28)/36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1QGS36HF1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1856 } -- 36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1CGQ6QGHF1              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1857 } -- 6-Port 100GBASE Ethernet Optical Interface(QSFP28)/12-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1QGS48HF0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1858 } -- 48-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1CGQ18QGHF0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1859 } -- 18-PORT 100GBASE Ethernet Optical Interface(QSFP28)/36-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1CGQ6QGHF0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1860 } -- 6-Port 100GBASE Ethernet Optical Interface(QSFP28)/12-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HF)
+hh3cevtModuleSw-LSXM1TGS48HF0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1861 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(HF)
+hh3cevtModuleSw-LSXM1TGS48HF1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1862 } -- 48-Port 10GBASE Ethernet Optical Interface Module(SFP+,LC)(HF)
+hh3cevtModuleSw-LSQM1GP24FC3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1863 } -- 24-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSQM1GP24FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1864 } -- 24-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSQM1GP24TSFC3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1865 } -- 24-Port 1000BASE-X Optical Interface(SFP,LC)+4-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1GP24TSFD3              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1866 } -- 24-Port 1000BASE-X Optical Interface(SFP,LC)+4-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1GP40TS8FD0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1867 } -- 40-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1GP48FC3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1868 } -- 48-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSQM1GP48FD0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1869 } -- 48-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSQM1GP48FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1870 } -- 48-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSQM1GT48FC3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1871 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)
+hh3cevtModuleSw-LSQM1GT48FD0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1872 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)
+hh3cevtModuleSw-LSQM1GT48FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1873 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)
+hh3cevtModuleSw-LSQM1TGS24FC3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1874 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1TGS24FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1875 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1TGS24FD3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1876 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1TGS24XFD0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1877 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1TGS48RFE0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1878 } -- 48-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1TGS8FC3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1879 } -- 8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1TGS8FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1880 } -- 8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSUM1GP40TS8FD0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1881 } -- 40-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSUM1GP48FD0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1882 } -- 48-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSUM1GP48FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1883 } -- 48-Port 1000BASE-X Optical Interface Board(SFP,LC)
+hh3cevtModuleSw-LSUM1GT48FD0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1884 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)
+hh3cevtModuleSw-LSUM1GT48FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1885 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)
+hh3cevtModuleSw-LSUM1TGS24FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1886 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSUM1TGS24FD3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1887 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSXM1GP40TS8FD0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1888 } -- 40-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSXM1GT48FD3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1889 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)
+hh3cevtModuleSw-LSXM1TGS24FD3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1890 } -- 24-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1MPUS10C3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1891 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1MPUSA3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1892 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM2SUPA3                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1893 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1SFH16E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1894 } -- S12516X-AF Fabric Module,Type H(Class E)
+hh3cevtModuleSw-LSXM1SFH16E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1895 } -- S12516X-AF Fabric Module,Type H(Class E)
+hh3cevtModuleSw-LSXM1GP40TS8FD3             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1896 } -- 40-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSQM1MPUS10C0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1897 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1MPUSA0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1898 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM2SUPA0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1899 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1TGS16FC3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1900 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FC)
+hh3cevtModuleSw-LSQM1TGS16FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1901 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSQM1TGS16FD3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1902 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSQM2TGS48SG0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1903 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM2TGS48SG3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1904 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSXM1CGQ48HB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1905 } -- 48-Port 100GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSQM1MPUS06A8               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1906 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1TGS16FD8               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1907 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSXM1SFH08E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1908 } -- Fabric Module,Type H(Class E)
 
---
--- 1600 to 1999 reserved for secondary switches part III
---
-
---
--- 2000 to 2399 reserved for advanced switches part III
---
-
+hh3cevtModuleSw-LSXM1SFH08CC0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1909 } -- S12508M-AF Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSXM1SUP08C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1910 } -- S12508M-AF Supervisor Engine Unit
+hh3cevtModuleSw-LSUM2FAB04D0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1911 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB04D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1912 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM2FAB04D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1913 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB04B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1914 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB04B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1915 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB08D0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1916 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB08D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1917 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM2FAB08D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1918 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB08B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1919 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB08B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1920 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB12D0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1921 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB12D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1922 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM2FAB12D3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1923 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB12B0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1924 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM2FAB12B3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1925 } -- Switching Fabric Module
+hh3cevtModuleSw-LSQM1CGS2FE0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1926 } -- 2-Port 100GBASE-R Ethernet QSFP28 Optical Interface Board(FE)
+hh3cevtModuleSw-LSQM1CGS2FE3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1927 } -- 2-Port 100GBASE-R Ethernet QSFP28 Optical Interface Board(FE)
+hh3cevtModuleSw-LSQM1CGS2XFE0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1928 } -- 2-Port 100GBASE-R Ethernet QSFP28 Optical Interface Board(FE)
+hh3cevtModuleSw-LSUM1CGS2FE0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1929 } -- 2-Port 100GBASE-R Ethernet QSFP28 Optical Interface Board(FE)
+hh3cevtModuleSw-LSUM1CGS2FE3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1930 } -- 2-Port 100GBASE-R Ethernet QSFP28 Optical Interface Board(FE)
+hh3cevtModuleSw-LSXM1CGS2FE3                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1931 } -- 2-Port 100GBASE-R Ethernet QSFP28 Optical Interface Board(FE)
+hh3cevtModuleSw-LSUM1TGS16FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1932 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSUM1TGS16FD3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1933 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSQM1TGS16XFD0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1934 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSQM1GP40TS8FC3             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1935 } -- 40-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-S76-16XFSF                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1936 } -- 16-Port 10GE Optical Interface Board(SFP+,LC)(SF)
+hh3cevtModuleSw-S76-24EP2XFSC-OLT           OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1937 } -- 24-Port 1G EPON OLT Optical Interface(SFP,SC)+2-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-DS-3E7600-24T20F4X-SC       OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1938 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+20-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSUM1FAB04E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1939 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM1FAB08E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1940 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM1FAB12E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1941 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1CGQ8FX1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1942 } -- 8-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(FX)
+hh3cevtModuleSw-LSQM1IPSDSC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1943 } -- SecBlade IV Intrusion Prevention System Module
+hh3cevtModuleSw-LSQM2ACGDSC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1944 } -- SecBlade IV Application Control Module
+hh3cevtModuleSw-LSQM1ADEDSC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1945 } -- SecBlade IV Load Balancing Module
+hh3cevtModuleSw-LSWM1ADED0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1946 } -- SecBlade IV Load Balancing Card
+hh3cevtModuleSw-LSWM1IPSD0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1947 } -- SecBlade IV Intrusion Prevention System Card
+hh3cevtModuleSw-LSQM1GP40TS8FD3             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1948 } -- 40-Port 1000BASE-X Optical Interface(SFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSUM1SUPXD0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1949 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM1CQGS32SF0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1950 } -- 32-Port 40GBASE-R QSFP+ or 16-Port 100GBASE-R QSFP28 Optical Interface Board(SF)
+hh3cevtModuleSw-LSUM1TGS48XSG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1951 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-LSUM1FAB08XE0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1952 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM1FAB16XD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1953 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1SFH02E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1954 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1SFH02E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1955 } -- Switching Fabric Module
+hh3cevtModuleSw-LSXM1SFH12C0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1956 } -- Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSXM1SFH12C1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1957 } -- Fabric Module,Type H(Class C)
+hh3cevtModuleSw-LSUM1CQGS12XSG0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1958 } -- 12-Port 40GBASE-R QSFP+ or 4-Port 100GBASE-R QSFP28 Optical Interface Board(SG)
+hh3cevtModuleSw-LSQM1CTGS24QSFD0            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1959 } -- Supervisor Engine Board With 24-Port 10GBASE-R SFP+ Optical Interface+2-Port 40GBASE-R QSFP+ Optical Interfaces or 1-Port 100GBASE-R QSFP28 Optical Interfaces
+hh3cevtModuleSw-LSQM1TGS24QSFD0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1960 } -- 24-Port 10GBASE-R Optical Interface(SFP+,LC)+2-Port 40GBASE-R Optical Interface Board(QSFP+) or 1-Port 100GBASE-R Optical Interface Board(QSFP28)
+hh3cevtModuleSw-LSUM1WBCZ720RT              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1961 } -- Access Controller Service Board
+hh3cevtModuleSw-LSQM1WBCZ720                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1962 } -- Access Controller Service Board
+hh3cevtModuleSw-DS-3E7610-X-MPU             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1963 } -- Supervisor Engine Board
+hh3cevtModuleSw-DS-3E7610-X-CLOS            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1964 } -- Switching Fabric Module
+hh3cevtModuleSw-DS-3E7610-X-32X4QX-SF       OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1965 } -- 32-Port 10GBASE-R Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE-R Ethernet Optical Interface Board(QSFP+,LC)(SF)
+hh3cevtModuleSw-DS-3E7610-X-16X-SF          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1966 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical
+hh3cevtModuleSw-DS-3E7610-X-44F4X-SE        OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1967 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-DS-3E7610-X-48T-SE          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1968 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SE)
+hh3cevtModuleSw-LSQM2GT24PTSSC8             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1969 } -- 24-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)+20-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSQM1CGP24TSSC8             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1970 } -- Supervisor Engine Board With 24-Port 1000BASE-X Ethernet SFP Optical Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM1CGT24TSSC8             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1971 } -- Supervisor Engine Board With 24-Port 10/100/1000BASE-T Ethernet Interface+4-Port 10GBASE-R Ethernet SFP+ Optical Interfaces
+hh3cevtModuleSw-LSQM1MPUS06B8               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1972 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSVM1MPUB1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1973 } -- Supervisor Engine Unit
+hh3cevtModuleSw-LSXM1TGS24QGMODHB0          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1974 } -- 24-Port 10GBASE Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB),With 1 Expansion Slot
+hh3cevtModuleSw-LSXM1TGS24QGMODHB1          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1975 } -- 24-Port 10GBASE Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB),With 1 Expansion Slot
+hh3cevtModuleSw-LSXM1TGS48QGHA0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1976 } -- 48-Port 10GBASE Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HA)
+hh3cevtModuleSw-LSXM1TGS48QGHA1             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1977 } -- 48-Port 10GBASE Ethernet Optical Interface(SFP+,LC)+4-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HA)
+hh3cevtModuleSw-LSXM1CGC2A0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1978 } -- 2-Ports 100G CFP Ethernet Optical Interface Module(CFP)
+hh3cevtModuleSw-LSXM1CGC2A1                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1979 } -- 2-Ports 100G CFP Ethernet Optical Interface Module(CFP)
+hh3cevtModuleSw-LSQM2FWDSC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1980 } -- Firewall Service Board
+hh3cevtModuleSw-LSQM1XPT12TSFD0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1981 } -- 12-Port 10/1GBASE EPON OLT Optical Interface(XFP,LC)+8-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-LSXM1QGS24HB0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1982 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1QGS24HB1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1983 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HB)
+hh3cevtModuleSw-LSXM1QGS24HC0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1984 } -- 24-Port 40GBASE Ethernet Optical Interface Module(QSFP+)(HC)
+hh3cevtModuleSw-LSXM1SUP01B1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1985 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSCM1SUP03A0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1986 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSCM1SUP03A0-Z              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1987 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSCM1MPUS06A0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1988 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSCM1MPUS06A0-Z             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1989 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSCM1GT48SC0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1990 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)(SC)
+hh3cevtModuleSw-LSCM1GT48SC0-Z              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1991 } -- 48-Port 10/100/1000BASE-T Electrical Interface Board(RJ45)(SC)
+hh3cevtModuleSw-LSCM1TGS48SE0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1992 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SE)
+hh3cevtModuleSw-LSCM1TGS48SE0-Z             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1993 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SE)
+hh3cevtModuleSw-LSCM1QGS8CSSE0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1994 } -- 8-Port 40GBASE-R QSFP+ + 4-Port 100GBASE-R QSFP28 Optical Interface Board(SE)
+hh3cevtModuleSw-LSCM1QGS8CSSE0-Z            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1995 } -- 8-Port 40GBASE-R QSFP+ + 4-Port 100GBASE-R QSFP28 Optical Interface Board(SE)
+hh3cevtModuleSw-LSWM2SP4P                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1996 } -- 4-Port 10GBASE-R Ethernet SFP+ Optical Interface Module
+hh3cevtModuleSw-LSWM2SP4P-Z                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1997 } -- 4-Port 10GBASE-R Ethernet SFP+ Optical Interface Module
+hh3cevtModuleSw-LSQM1MPUS10B0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1998 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1MPUS10B3               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 1999 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1MPUSC0                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2000 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM1MPUSC3                 OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2001 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSQM2GP24TSSC8              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2002 } -- 24-Port 1000BASE-X Optical Interface(SFP,LC)+4-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSQM2GT24TSSC8              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2003 } -- 24-Port 10/100/1000BASE-T Electrical Interface(RJ45)+4-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)(SC)
+hh3cevtModuleSw-LSXM1TGS24CGMODHD0          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2004 } -- 24-Port 10GBASE Ethernet Optical Interface(SFP+,LC)+4-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HD),With 1 Expansion Slot
+hh3cevtModuleSw-LSXM1TGS24CGMODHD1          OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2005 } -- 24-Port 10GBASE Ethernet Optical Interface(SFP+,LC)+4-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HD),With 1 Expansion Slot
+hh3cevtModuleSw-LSQM1TGS16GPSA0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2006 } -- 24-Port 1000BASE-R Ethernet Optical Interface(SFP,LC)+16-Port 10GBASE-R Ethernet Optical Interface Board(SFP+,LC)
+hh3cevtModuleSw-EWPXM2TGS48SG0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2007 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-EWPXM1TGS16FD0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2008 } -- 16-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(FD)
+hh3cevtModuleSw-LSXM1CGQ36HF0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2009 } -- 36-Port 100GBASE Ethernet Optical Interface Module(QSFP28)(HF)
+hh3cevtModuleSw-LSXM2SUPT0                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2010 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM2SUPT1                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2011 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSXM1SFT16E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2012 } -- Switch Fabric Board
+hh3cevtModuleSw-LSXM1SFT16E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2013 } -- Switch Fabric Board
+hh3cevtModuleSw-lsxM1CGQ36TD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2014 } -- 36-Port 100GBASE Ethernet Optical Interface Board(QSFP28)
+hh3cevtModuleSw-lsxM1CGQ36TD1               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2015 } -- 36-Port 100GBASE Ethernet Optical Interface Board(QSFP28)
+hh3cevtModuleSw-LSQM1TGT24FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2016 } -- 24-Port 10GBASE-T Ethernet Copper Interface Module(RJ45)(FD)
+hh3cevtModuleSw-LSUM1TGT24FD0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2017 } -- 24-Port 10GBASE-T Ethernet Copper Interface Module(RJ45)(FD)
+hh3cevtModuleSw-LSXM2SFT08E0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2018 } -- S12508F-AF Fabric Module,Type T(Class E)
+hh3cevtModuleSw-LSXM2SFT08E1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2019 } -- S12508F-AF Fabric Module,Type T(Class E)
+hh3cevtModuleSw-LSXM1CCP8HF0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2020 } -- 8-Port 200GBASE Ethernet Optical Interface Module(CFP2)(HF)
+hh3cevtModuleSw-LSXM1CCP8HF1                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2021 } -- 8-Port 200GBASE Ethernet Optical Interface Module(CFP2)(HF)
+hh3cevtModuleSw-LSUM1MPUS06XEC0             OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2022 } -- Supervisor Engine Board
+hh3cevtModuleSw-LSUM1FAB06XEC0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2023 } -- Switching Fabric Module
+hh3cevtModuleSw-LSUM1TGS48SH0               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2024 } -- 48-Port 10G Ethernet Optical Interface Module(SFP+,LC)(SH)
+hh3cevtModuleSw-LSUM1CGS8SH0                OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2025 } -- 8-Port 100G Ethernet Optical Interface Module(QSFP28)(SH)
+hh3cevtModuleSw-LSUM1TFGS24CSSH0            OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2026 } -- 24-Port 25G Ethernet Optical Interface(SFP28)+4-Port 100G Ethernet Optical Interface Module(QSFP28)(SH)
+hh3cevtModuleSw-LSUM1CGS20XSH0              OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2027 } -- 20-Port 100G Ethernet Optical Interface Module(QSFP28)(SH)
+hh3cevtModuleSw-S8610-MPU                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2028 } -- Supervisor Engine Board
+hh3cevtModuleSw-S8610-NET                   OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2029 } -- Switching Fabric Module
+hh3cevtModuleSw-S86-44GF4XFSE               OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2030 } -- 44-Port GE Optical Interface(SFP,LC)+4-Port 10GE Optical Interface Board(SFP+,LC)(SE)
+hh3cevtModuleSw-S86-48GTSE                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2031 } -- 48-Port 1000Base-T Gigabit Ethernet Interface Board(RJ45)(SE)
+hh3cevtModuleSw-S86-12QFSG                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2032 } -- 12-Port 40GBASE-R Ethernet QSFP+ Optical Interface Board(SG)
+hh3cevtModuleSw-S86-48XFSG                  OBJECT IDENTIFIER ::= { hh3cevtModuleSwitchType 2033 } -- 48-Port 10GBASE-R Ethernet SFP+ Optical Interface Board(SG)
 -- Here define submodule for routers
 hh3cevtSubModuleRouter       OBJECT IDENTIFIER ::= { hh3cevtModule 5 }
 
 
 -- Here define submodule for switches
 hh3cevtSubModuleSwitch       OBJECT IDENTIFIER ::= { hh3cevtModule 6 }
+-- Here define Compact Flash
+hh3cevtModuleCFCard          OBJECT IDENTIFIER ::= { hh3cevtModule 7 }
+
+-- Here define Secure Digital Memory Card
+hh3cevtModuleSDCard          OBJECT IDENTIFIER ::= { hh3cevtModule 8 }
 
 --
 -- hh3cevtPort section:
@@ -2311,7 +3217,12 @@ hh3cevtPortRt-VXGe           OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 49 } 
 hh3cevtPortRt-Xpos           OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 50 } -- 10G POS port
 hh3cevtPortRt-Fge            OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 51 } -- 40G Ethernet port
 hh3cevtPortRt-XGe            OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 52 } -- 10G Ethernet port
-
+hh3cevtPortRt-HgeQsfp28Lc    OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 53 } -- 100G Ethernet Port with QSFP28 Form Factor and LC Connector
+hh3cevtPortRt-HgeCfp2Lc      OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 54 } -- 100G Ethernet Port with CFP2 Form Factor and LC Connector
+hh3cevtPortRt-HgeCfpLc       OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 55 } -- 100G Ethernet Port with CFP Form Factor and LC Connector
+hh3cevtPortRt-GeM12          OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 56 } -- Gigabit Ethernet Port with M12 Form Connector
+hh3cevtPortRt-VMEth          OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 57 } -- Virtual Machine Ethernet Port
+hh3cevtPortRt-FiberGe        OBJECT IDENTIFIER ::= { hh3cevtPortRouterType 58 } -- 1G Fiber Ethernet port
 
 -- Below are ports used to switches
 --hh3cevtPortSw-Unknown              OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 0 }
@@ -2549,8 +3460,59 @@ hh3cevtPortSw-SFP-8GFC-LW                OBJECT IDENTIFIER ::= { hh3cevtPortSwit
 hh3cevtPortSw-CXP-100GBASE-AOC           OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 230 }  -- 100GBASE CXP Active Optical Cable
 hh3cevtPortSw-QSFP-PLUS-ACTIVE-STACK-CONNECTOR  OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 231 }  -- QSFP+ Active STACK Transceiver
 hh3cevtPortSw-QSFP-PLUS-TO-4SFP-PLUS-ACTIVE-STACK-CONNECTOR  OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 232 }  -- QSFP+ to 4 SFP+ Active STACK Transceiver
-
-
+hh3cevtPortSw-CFP2-100GBASE-LR4          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 233 }  -- 100GBASE-LR4 CFP2 Optical Transceiver
+hh3cevtPortSw-CFP2-100GBASE-SR10         OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 234 }  -- 100GBASE-SR10 CFP2 Optical Transceiver
+hh3cevtPortSw-QSFP-PLUS-ACTIVE-OPTICAL-CABLE  OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 235 }  -- QSFP+ AOC
+hh3cevtPortSw-QSFP-PLUS-TO-4SFP-PLUS-ACTIVE-OPTICAL-CABLE OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 236 }  -- QSFP+ to 4 SFP+ AOC
+hh3cevtPortSw-SFP-PLUS-ACTIVE-OPTICAL-CABLE   OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 237 }  -- SFP+ AOC
+hh3cevtPortSw-CFP2-NO-CONNECTOR         OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 238 }  -- CFP2 No Connector
+hh3cevtPortSw-QSFP28-NO-CONNECTOR       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 239 }  -- QSFP28 No Connector
+hh3cevtPortSw-QSFP28-100GBASE-SR4       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 240 }  -- 100BASE-SR4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-LR4       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 241 }  -- 100GBASE-LR4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-ER4       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 242 }  -- 100GBASE-ER4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-PSM4      OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 243 }  -- 100GBASE-PSM4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-CWDM4     OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 244 }  -- 100GBASE-CWDM4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-STACK-CONNECTOR    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 245 }  -- QSFP28 STACK Transceiver
+hh3cevtPortSw-QSFP28-TO-4SFP28-STACK-CONNECTOR  OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 246 }  -- QSFP28 to 4 SFP28 STACK Transceiver
+hh3cevtPortSw-QSFP28-ACTIVE-STACK-CONNECTOR     OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 247 }  -- QSFP28 Active STACK Transceiver
+hh3cevtPortSw-QSFP28-TO-4SFP28-ACTIVE-STACK-CONNECTOR   OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 248 }  -- QSFP28 to 4 SFP28 Active STACK Transceiver
+hh3cevtPortSw-QSFP28-ACTIVE-OPTICAL-CABLE       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 249 }  -- QSFP28 AOC
+hh3cevtPortSw-QSFP28-TO-4SFP28-ACTIVE-OPTICAL-CABLE OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 250 }  -- QSFP28 to 4 SFP28 AOC
+hh3cevtPortSw-QSFP-PLUS-40GBASE-LM4     OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 251 }  -- 40BASE-LM4 QSFP+ Optical Transceiver
+hh3cevtPortSw-QSFP-PLUS-40GBASE-SWDM4   OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 252 }  -- 40BASE-SWDM4 QSFP+ Optical Transceiver
+hh3cevtPortSw-CFP-100GBASE-ER4          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 253 }  -- 100GBASE-ER4 CFP Transceiver
+hh3cevtPortSw-QSFP-PLUS-40GBASE-ER4     OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 254 }  -- 40BASE-ER4 QSFP+ Optical Transceiver
+hh3cevtPortSw-QSFP-PLUS-40GBASE-ER4L    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 255 }  -- 40BASE-ER4L QSFP+ Optical Transceiver
+hh3cevtPortSw-QSFP-PLUS-40GBASE-BIDI    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 256 }  -- 40BASE-BIDI QSFP+ Optical Transceiver
+hh3cevtPortSw-QSFP-PLUS-40GBASE-LR4L    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 257 }  -- 40BASE-LR4L QSFP+ Optical Transceiver
+hh3cevtPortSw-CFP2-100GBASE-eSR10       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 258 }  -- 100GBASE-eSR10 CFP2 Optical Transceiver
+hh3cevtPortSw-TUNABLE-SFP-PLUS-10GBASE-ZR-DWDM  OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 259 }  -- 10GBase-ZR Tunable SFP+ DWDM Optical Transceiver
+hh3cevtPortSw-SFP28-25GBASE-SR          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 260 }  -- 25GBASE-SR SFP28 Optical Transceiver
+hh3cevtPortSw-SFP28-ACTIVE-OPTICAL-CABLE    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 261 }  -- SFP28 AOC
+hh3cevtPortSw-SFP28-STACK-CONNECTOR     OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 262 }  -- SFP28 STACK Transceiver
+hh3cevtPortSw-2DOT5GBASE-T              OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 263 }  -- 2dot5G Base-T Port
+hh3cevtPortSw-QSFP28-100GBASE-SWDM4     OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 264 }  -- 100GBASE-SWDM4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-eSWDM4    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 265 }  -- 100GBASE-eSWDM4 QSFP28 Optical Transceiver
+hh3cevtPortSw-SFP-PLUS-10GBASE-T        OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 266 }  -- 10GBase-T SFP+ Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-eSR4       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 267 }  -- 100BASE-eSR4 QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-BIDI       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 268 }  -- 100GBASE-BIDI QSFP28 Optical Transceiver
+hh3cevtPortSw-QSFP28-100GBASE-WDM2       OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 269 }  -- 100GBASE-WDM2 QSFP28 Optical Transceiver
+hh3cevtPortSw-SFP28-25GBASE-LR           OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 270 }  -- 25GBASE-LR SFP28 Optical Transceiver
+hh3cevtPortSw-CFP2-100GBASE-ER4          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 271 }  -- 100GBASE-ER4 CFP2 Optical Transceiver
+hh3cevtPortSw-CFP2-DCO-200GBASE-ZR          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 272 }  -- 200GBASE-ZR CFP2-DCO Optical Transceiver
+hh3cevtPortSw-CFP2-100GBASE-ER4L          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 273 }  -- 100GBASE-ER4L CFP2 Optical Transceiver
+hh3cevtPortSw-SFP-16GFC-SW                OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 274 }  -- SFP 16G FC Optical Transceiver short wave
+hh3cevtPortSw-SFP-16GFC-LW                OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 275 }  -- SFP 16G FC Optical Transceiver long wave
+hh3cevtPortSw-SFP-32GFC-SW                OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 276 }  -- SFP 32G FC Optical Transceiver short wave
+hh3cevtPortSw-SFP-32GFC-LW                OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 277 }  -- SFP 32G FC Optical Transceiver long wave
+hh3cevtPortSw-XFP-10GBASE-PR-D3               OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 278 }  -- XFP 10GBase PR-D3 Optical Transceiver
+hh3cevtPortSw-XFP-10GBASE-PRX-D3               OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 279 }  -- XFP 10GBase PRX-D3 Optical Transceiver
+hh3cevtPortSw-5GBASE-T                    OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 280 }  -- 5G Base-T Port
+hh3cevtPortSw-QSFP28-UNKNOWN              OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 281 }  -- Unknown QSFP28 Transceiver
+hh3cevtPortSw-SFP28-UNKNOWN               OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 282 }  -- Unknown SFP28 Transceiver
+hh3cevtPortSw-SFP28-NO-CONNECTOR          OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 283 }  -- SFP28 No Connector
+hh3cevtPortSw-SFP-PLUS-9-8GCRPI-IR        OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 284 }  -- 9.8GCRPI-IR SFP+ Transceiver
+hh3cevtPortSw-SFP-PLUS-9-8GCRPI-LR        OBJECT IDENTIFIER ::= { hh3cevtPortSwitchType 285 }  -- 9.8GCRPI-LR SFP+ Transceiver
 --
 -- hh3cevtStack section:
 --

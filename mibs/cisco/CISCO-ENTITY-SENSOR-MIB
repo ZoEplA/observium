@@ -944,4 +944,27 @@ entitySensorNotificationGroup NOTIFICATION-GROUP
 END
 
 
+-- %DNP%  MLC -Compiled MLC
+
+-- %DNP%  MRS -with reviewer MRS
+
+-- %DNP%  MRC - ciscoEntitySensorMIB~1~ - 2017011904:47 PST - linche -18.0 -ACK
+-- %DNP%  - < ^^ Copyright (c) 1998-2017 by cisco Systems Inc. 
+-- %DNP%^^- 
+-- %DNP%> ^^ Copyright (c) 1998-2003-2006, 2013, 2015, 2017 by cisco Systems 
+-- %DNP%Inc. 
+-- %DNP%35c35 
+-- %DNP%<     LAST-UPDATED    "201701190000Z" 
+-- %DNP%^^- 
+-- %DNP%>     LAST-UPDATED    "201612210000Z" 
+-- %DNP%50c50 
+-- %DNP%<     REVISION        "201701190000Z" 
+-- %DNP%^^- 
+-- %DNP%>     REVISION        "201612210000Z" 
+-- %DNP%52c52 
+-- %DNP%<         "Added enumerated value dB(15) to SensorDataType." 
+-- %DNP%^^- 
+-- %DNP%>         "[1] Add dB(15) in SensorDataType."
+-- %DNP%
+-- %DNP% -0 MRC 
 

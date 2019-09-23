@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -40,7 +40,8 @@ foreach ($oids as $index => $entry)
     $oid   = ".1.3.6.1.4.1.2544.1.11.2.6.2.156.1.1.$index";
     $value = $entry['currentPmSnapshotOutputPower'];
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'adva-output-power', $descr, $scale, $value, $options);
+    $options['rename_rrd'] = "adva-output-power-$index";
+    discover_sensor_ng($device,'dbm', $mib, 'currentPmSnapshotOutputPower' , $oid, $index, NULL, $descr, $scale, $value, $options);
   }
 
   // Input Power
@@ -52,7 +53,9 @@ foreach ($oids as $index => $entry)
     $descr = $ifDescr . ' Input Power';
     $oid   = ".1.3.6.1.4.1.2544.1.11.2.6.2.156.1.2.$index";
     $value = $entry['currentPmSnapshotInputPower'];
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'adva-input-power', $descr, $scale, $value, $options);
+
+    $options['rename_rrd'] = "adva-input-power-$index";
+    discover_sensor_ng($device,'dbm', $mib, 'currentPmSnapshotInputPower', $oid, $index, NULL, $descr, $scale, $value, $options);
   }
 
   // Rx Line Attenuation
@@ -64,7 +67,8 @@ foreach ($oids as $index => $entry)
     $oid   = ".1.3.6.1.4.1.2544.1.11.2.6.2.156.1.11.$index";
     $value = $entry['currentPmSnapshotRxLineAttenuation'];
 
-    discover_sensor($valid['sensor'], 'snr', $device, $oid, $index, 'adva-rx-attenuation', $descr, $scale, $value, $options);
+    $options['rename_rrd'] = "adva-rx-attenuation-$index";
+    discover_sensor_ng($device,'snr', $mib, 'currentPmSnapshotRxLineAttenuation', $oid, $index, NULL, $descr, $scale, $value, $options);
   }
 
   // Tx Line Attenuation
@@ -76,7 +80,8 @@ foreach ($oids as $index => $entry)
     $oid   = ".1.3.6.1.4.1.2544.1.11.2.6.2.156.1.10.$index";
     $value = $entry['currentPmSnapshotTxLineAttenuation'];
 
-    discover_sensor($valid['sensor'], 'snr', $device, $oid, $index, 'adva-tx-attenuation', $descr, $scale, $value, $options);
+    $options['rename_rrd'] = "adva-tx-attenuation-$index";
+    discover_sensor_ng($device,'snr', $mib, 'currentPmSnapshotTxLineAttenuation', $oid, $index, NULL, $descr, $scale, $value, $options);
   }
 }
 

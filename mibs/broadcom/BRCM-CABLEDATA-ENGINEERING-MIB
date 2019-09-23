@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2006 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -27,6 +27,7 @@
 --
 --**************************************************************************
 
+
 BRCM-CABLEDATA-ENGINEERING-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -44,7 +45,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-PRIVATE-MIB;
                 
 cableDataEngineering MODULE-IDENTITY
-    LAST-UPDATED "200611170000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -60,16 +61,22 @@ cableDataEngineering MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata factory MIB"
-    REVISION      "200206040000Z"
+        "Broadcom proprietary MIB for management and configuration of objects
+         used by engineering and development."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected.
+         - Range restriction was added to objects cdEngrEJTAGDBChannel and 
+           cdEngrEJTAGDBChannel."
     REVISION      "200611170000Z"
     DESCRIPTION
-            "Added EJTAG objects."
-    
+        "Added EJTAG objects."
+    REVISION      "200206040000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataPrivateMIBObjects 3 }
-
 
 -- Administrative assignments
 
@@ -186,7 +193,7 @@ cdEngrEJTAGInstrBrkTable OBJECT-TYPE
     ::= { cableDataEngineeringEjtag 3 } 
     
 cdEngrEJTAGInstrBrkEntry OBJECT-TYPE
-    SYNTAX      CdEngrEJTAGInstrBrkEntry
+    SYNTAX      CdEngrEJTAGInstrBrkEntry 
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -205,7 +212,7 @@ CdEngrEJTAGInstrBrkEntry ::=
              }
     
 cdEngrEJTAGIBChannel  OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -258,8 +265,7 @@ cdEngrEJTAGIBControl OBJECT-TYPE
     DESCRIPTION
         "This object represents the Control field for the Instruction Break."
     ::= { cdEngrEJTAGInstrBrkEntry 5 }   
-    
-                     
+
 --  The data_break Table
 -- 
                     
@@ -308,7 +314,7 @@ CdEngrEJTAGDataBrkEntry ::=
              }
     
 cdEngrEJTAGDBChannel  OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

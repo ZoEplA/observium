@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V3.3
+-- Version: V3.4
 -- History:
 -- V1.0 created by yuhui.
 -- V2.0 2004-10-12 updated by gaolong
@@ -131,6 +131,16 @@
 --     Add hh3cAclIPAclAdvancedDestSuffix to object hh3cAclIPAclAdvancedTable
 --     Add hh3cAclIPAclNamedAdvSrcSuffix to object hh3cAclIPAclNamedAdvTable
 --     Add hh3cAclIPAclNamedAdvDstSuffix to object hh3cAclIPAclNamedAdvTable
+-- V3.4 2014-10-20 updated by gaoyu
+--     Add hh3cAclMib2ResourceThreshold to object hh3cAclMib2NodesGroup
+--     Add hh3cAclMib2ResourceLogInterval to object hh3cAclMib2NodesGroup
+--     Add hh3cAclResourceTypeName to object hh3cAclTrapObjects
+--     Add hh3cAclResourceUsage to object hh3cAclTrapObjects
+--     Add hh3cAclResourceUsedEntries to object hh3cAclTrapObjects
+--     Add hh3cAclResourceTotalEntries to object hh3cAclTrapObjects
+--     Add hh3cAclResourceChassisID to object hh3cAclTrapObjects
+--     Add hh3cAclResourceSlotID to object hh3cAclTrapObjects
+--     Add hh3cAclResourceTrap to object hh3cAclTrapPrefix
 -- ============================================================================
 HH3C-ACL-MIB DEFINITIONS ::= BEGIN
 
@@ -150,11 +160,11 @@ HH3C-ACL-MIB DEFINITIONS ::= BEGIN
 --
 
         hh3cAcl MODULE-IDENTITY
-            LAST-UPDATED "201407221000Z"        -- Jul 22, 2014 at 10:00 GMT
+            LAST-UPDATED "201410201000Z"        -- Oct 20, 2014 at 10:00 GMT
             ORGANIZATION
-                "Hangzhou H3C Technologies Co., Ltd."
+                "New H3C Technologies Co., Ltd."
             CONTACT-INFO
-                "Platform Team Hangzhou H3C Technologies Co., Ltd.
+                "Platform Team New H3C Technologies Co., Ltd.
                 Hai-Dian District Beijing P.R. China
                 http://www.h3c.com
                 Zip:100085
@@ -163,9 +173,9 @@ HH3C-ACL-MIB DEFINITIONS ::= BEGIN
                 "ACL management information base for managing devices
                 that support access control list and packet filtering.
                 "
-            REVISION "201407221000Z"            -- Jul 22, 2014 at 10:00 GMT
+            REVISION "201410201000Z"            -- Oct 22, 2014 at 10:00 GMT
             DESCRIPTION
-                "Added four nodes for configuring an IPv6 suffix length."
+                "Added 2 ndoes to configure TCAM function and 6 nodes to show trap info."
             ::= { hh3cCommon 8 }
 
 -- Rule action value
@@ -2141,6 +2151,24 @@ HH3C-ACL-MIB DEFINITIONS ::= BEGIN
             DESCRIPTION
                 "The processing status of ACL operation."
             ::= { hh3cAclMib2NodesGroup 4 }
+
+        hh3cAclMib2ResourceThreshold OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The threshold of TCAM resources.
+                 The value 0 indicates that cancelling the TCAM resource notification function."
+            ::= { hh3cAclMib2NodesGroup 5 }
+
+        hh3cAclMib2ResourceLogInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..60)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of interval.  It must be in the range of 1 to 60.
+                 Default value is 5."
+            ::= { hh3cAclMib2NodesGroup 6 }
 
         hh3cAclMib2CapabilityTable OBJECT-TYPE
             SYNTAX SEQUENCE OF Hh3cAclMib2CapabilityEntry
@@ -7227,5 +7255,86 @@ HH3C-ACL-MIB DEFINITIONS ::= BEGIN
                 of the matched flow won't be captured.
                 "
             ::= { hh3cPfilterTrapPrefix 5 }
+
+--
+-- Nodes of hh3cAclTrapObjects
+--
+
+        hh3cAclTrapObjects OBJECT IDENTIFIER ::= { hh3cAcl 6 }
+
+        hh3cAclResourceTypeName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..255))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The name of TCAM resources."
+            ::= { hh3cAclTrapObjects 1 }
+
+        hh3cAclResourceUsage OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The current usage of TCAM resources."
+            ::= { hh3cAclTrapObjects 2 }
+
+        hh3cAclResourceUsedEntries OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The used number of entries on TCAM."
+            ::= { hh3cAclTrapObjects 3 }
+
+        hh3cAclResourceTotalEntries OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The total number of entries on TCAM."
+            ::= { hh3cAclTrapObjects 4 }
+
+        hh3cAclResourceChassisID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The chassis number.  On a centralized or distributed device,
+                 the value for this node is always zero."
+            ::= { hh3cAclTrapObjects 5 }
+
+       hh3cAclResourceSlotID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The slot number.  On a centralized device, the value for
+                 this node is always zero."
+            ::= { hh3cAclTrapObjects 6 }
+
+--
+-- Nodes of hh3cAclResourceTrap
+--
+
+        hh3cAclTrap OBJECT IDENTIFIER ::= { hh3cAcl 7 }
+
+        hh3cAclTrapPrefix OBJECT IDENTIFIER ::= { hh3cAclTrap 0 }
+
+        hh3cAclResourceTrap NOTIFICATION-TYPE
+            OBJECTS
+            {
+                hh3cAclResourceTypeName,
+                hh3cAclResourceUsage,
+                hh3cAclResourceUsedEntries,
+                hh3cAclResourceTotalEntries,
+                hh3cAclMib2ResourceThreshold,
+                hh3cAclResourceChassisID,
+                hh3cAclResourceSlotID
+            }
+            STATUS current
+            DESCRIPTION
+                "This notification is generated when the number of entries on TCAM
+                 becomes equal to or greater than a preset threshold level"
+            ::= { hh3cAclTrapPrefix 1 }
 
 END

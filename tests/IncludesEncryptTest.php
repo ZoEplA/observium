@@ -8,7 +8,7 @@ include(dirname(__FILE__) . '/../includes/sql-config.inc.php');
 //include(dirname(__FILE__) . '/../includes/definitions.inc.php');
 //include(dirname(__FILE__) . '/../includes/functions.inc.php');
 
-class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
+class IncludesEncryptTest extends \PHPUnit\Framework\TestCase
 {
 
   /**

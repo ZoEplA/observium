@@ -4,9 +4,9 @@
 -- MIB representation of the Cisco Unified Computing System
 -- NETWORK management information model package
 -- 
--- Created January 2016 by Charles Bullis
+-- Created July 2018 by Charles Bullis
 -- 
--- Copyright (c) 2005-2016 Cisco Systems, Inc. All rights reserved.
+-- Copyright (c) 2005-2018 Cisco Systems, Inc. All rights reserved.
 -- 
 -- *********************************************************************
 
@@ -50,16 +50,17 @@ IMPORTS
     CucsEquipmentEvacState,
     CucsEquipmentSensorThresholdStatus,
     CucsMgmtAdminState,
+    CucsNetworkCountStatus,
     CucsNetworkElementOperability,
     CucsNetworkIfStatsType,
     CucsNetworkIfStatsUnits,
     CucsNetworkInventoryStatus,
-    CucsNetworkSwitchId,
-    CucsNetworkVlanCountStatus
+    CucsNetworkLimitType,
+    CucsNetworkSwitchId
         FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
 
 cucsNetworkObjects MODULE-IDENTITY
-    LAST-UPDATED    "201601180000Z"
+    LAST-UPDATED    "201807260000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
         "Cisco Systems
@@ -98,7 +99,7 @@ CucsNetworkElementEntry ::= SEQUENCE {
     cucsNetworkElementInstanceId                                     CucsManagedObjectId,
     cucsNetworkElementDn                                             CucsManagedObjectDn,
     cucsNetworkElementRn                                             SnmpAdminString,
-    cucsNetworkElementAdminInbandIfState                             CucsMgmtAdminState,
+    cucsNetworkElementAdminInbandIfState                             CucsNetworkNetworkAdminState,
     cucsNetworkElementFltAggr                                        Unsigned64,
     cucsNetworkElementId                                             CucsNetworkSwitchId,
     cucsNetworkElementInbandIfGw                                     InetAddressIPv4,
@@ -115,12 +116,12 @@ CucsNetworkElementEntry ::= SEQUENCE {
     cucsNetworkElementTotalMemory                                    Gauge32,
     cucsNetworkElementVendor                                         SnmpAdminString,
     cucsNetworkElementInventoryStatus                                CucsNetworkInventoryStatus,
-    cucsNetworkElementThermal                                        CucsEquipmentSensorThresholdStatus,
+    cucsNetworkElementThermal                                        CucsNetworkSensorThresholdStatus,
     cucsNetworkElementDiffMemory                                     Gauge32,
     cucsNetworkElementExpectedMemory                                 Gauge32,
-    cucsNetworkElementAdminEvacState                                 CucsEquipmentEvacState,
+    cucsNetworkElementAdminEvacState                                 CucsNetworkEvacState,
     cucsNetworkElementForceEvac                                      TruthValue,
-    cucsNetworkElementOperEvacState                                  CucsEquipmentEvacState,
+    cucsNetworkElementOperEvacState                                  CucsNetworkEvacState,
     cucsNetworkElementOobIfMac                                       MacAddress,
     cucsNetworkElementMinActiveFan                                   Gauge32,
     cucsNetworkElementShutdownFanRemoveal                            TruthValue
@@ -151,7 +152,7 @@ cucsNetworkElementRn OBJECT-TYPE
     ::= { cucsNetworkElementEntry 3 }
 
 cucsNetworkElementAdminInbandIfState OBJECT-TYPE
-    SYNTAX       CucsMgmtAdminState
+    SYNTAX       CucsNetworkNetworkAdminState
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -289,7 +290,7 @@ cucsNetworkElementInventoryStatus OBJECT-TYPE
     ::= { cucsNetworkElementEntry 20 }
 
 cucsNetworkElementThermal OBJECT-TYPE
-    SYNTAX       CucsEquipmentSensorThresholdStatus
+    SYNTAX       CucsNetworkSensorThresholdStatus
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -313,7 +314,7 @@ cucsNetworkElementExpectedMemory OBJECT-TYPE
     ::= { cucsNetworkElementEntry 23 }
 
 cucsNetworkElementAdminEvacState OBJECT-TYPE
-    SYNTAX       CucsEquipmentEvacState
+    SYNTAX       CucsNetworkEvacState
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -329,7 +330,7 @@ cucsNetworkElementForceEvac OBJECT-TYPE
     ::= { cucsNetworkElementEntry 25 }
 
 cucsNetworkElementOperEvacState OBJECT-TYPE
-    SYNTAX       CucsEquipmentEvacState
+    SYNTAX       CucsNetworkEvacState
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -382,10 +383,10 @@ CucsNetworkIfStatsEntry ::= SEQUENCE {
     cucsNetworkIfStatsInstanceId                                     CucsManagedObjectId,
     cucsNetworkIfStatsDn                                             CucsManagedObjectDn,
     cucsNetworkIfStatsRn                                             SnmpAdminString,
+    cucsNetworkIfStatsRin                                            Unsigned64,
     cucsNetworkIfStatsOut                                            Unsigned64,
     cucsNetworkIfStatsType                                           CucsNetworkIfStatsType,
-    cucsNetworkIfStatsUnits                                          CucsNetworkIfStatsUnits,
-    cucsNetworkIfStatsRin                                            Unsigned64
+    cucsNetworkIfStatsUnits                                          CucsNetworkIfStatsUnits
 }
 
 cucsNetworkIfStatsInstanceId OBJECT-TYPE
@@ -412,6 +413,14 @@ cucsNetworkIfStatsRn OBJECT-TYPE
         "Cisco UCS network:IfStats:rn managed object property"
     ::= { cucsNetworkIfStatsEntry 3 }
 
+cucsNetworkIfStatsRin OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:IfStats:rin managed object property"
+    ::= { cucsNetworkIfStatsEntry 4 }
+
 cucsNetworkIfStatsOut OBJECT-TYPE
     SYNTAX       Unsigned64
     MAX-ACCESS   read-only
@@ -435,14 +444,6 @@ cucsNetworkIfStatsUnits OBJECT-TYPE
     DESCRIPTION
         "Cisco UCS network:IfStats:units managed object property"
     ::= { cucsNetworkIfStatsEntry 7 }
-
-cucsNetworkIfStatsRin OBJECT-TYPE
-    SYNTAX       Unsigned64
-    MAX-ACCESS   read-only
-    STATUS       current
-    DESCRIPTION
-        "Cisco UCS network:IfStats:rin managed object property"
-    ::= { cucsNetworkIfStatsEntry 8 }
 
 cucsNetworkLanNeighborEntryTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsNetworkLanNeighborEntryEntry
@@ -647,6 +648,134 @@ cucsNetworkLanNeighborsRn OBJECT-TYPE
     DESCRIPTION
         "Cisco UCS network:LanNeighbors:rn managed object property"
     ::= { cucsNetworkLanNeighborsEntry 3 }
+
+cucsNetworkLimitTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsNetworkLimitEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS network:Limit managed object table"
+    ::= { cucsNetworkObjects 14 }
+
+cucsNetworkLimitEntry OBJECT-TYPE
+    SYNTAX           CucsNetworkLimitEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsNetworkLimitTable table."
+    INDEX { cucsNetworkLimitInstanceId }
+    ::= { cucsNetworkLimitTable 1 }
+
+CucsNetworkLimitEntry ::= SEQUENCE {
+    cucsNetworkLimitInstanceId                                       CucsManagedObjectId,
+    cucsNetworkLimitDn                                               CucsManagedObjectDn,
+    cucsNetworkLimitRn                                               SnmpAdminString,
+    cucsNetworkLimitActualCount                                      Gauge32,
+    cucsNetworkLimitAsicNumber                                       Gauge32,
+    cucsNetworkLimitEndPortNumber                                    Gauge32,
+    cucsNetworkLimitLimitStatus                                      CucsNetworkCountStatus,
+    cucsNetworkLimitLowerLimit                                       Gauge32,
+    cucsNetworkLimitSlotNumber                                       Gauge32,
+    cucsNetworkLimitStartPortNumber                                  Gauge32,
+    cucsNetworkLimitType                                             CucsNetworkLimitType,
+    cucsNetworkLimitUpperLimit                                       Gauge32
+}
+
+cucsNetworkLimitInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsNetworkLimitEntry 1 }
+
+cucsNetworkLimitDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:dn managed object property"
+    ::= { cucsNetworkLimitEntry 2 }
+
+cucsNetworkLimitRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:rn managed object property"
+    ::= { cucsNetworkLimitEntry 3 }
+
+cucsNetworkLimitActualCount OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:actualCount managed object property"
+    ::= { cucsNetworkLimitEntry 4 }
+
+cucsNetworkLimitAsicNumber OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:asicNumber managed object property"
+    ::= { cucsNetworkLimitEntry 5 }
+
+cucsNetworkLimitEndPortNumber OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:endPortNumber managed object property"
+    ::= { cucsNetworkLimitEntry 6 }
+
+cucsNetworkLimitLimitStatus OBJECT-TYPE
+    SYNTAX       CucsNetworkCountStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:limitStatus managed object property"
+    ::= { cucsNetworkLimitEntry 7 }
+
+cucsNetworkLimitLowerLimit OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:lowerLimit managed object property"
+    ::= { cucsNetworkLimitEntry 8 }
+
+cucsNetworkLimitSlotNumber OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:slotNumber managed object property"
+    ::= { cucsNetworkLimitEntry 9 }
+
+cucsNetworkLimitStartPortNumber OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:startPortNumber managed object property"
+    ::= { cucsNetworkLimitEntry 10 }
+
+cucsNetworkLimitType OBJECT-TYPE
+    SYNTAX       CucsNetworkLimitType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:type managed object property"
+    ::= { cucsNetworkLimitEntry 11 }
+
+cucsNetworkLimitUpperLimit OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS network:Limit:upperLimit managed object property"
+    ::= { cucsNetworkLimitEntry 12 }
 
 cucsNetworkLldpNeighborEntryTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsNetworkLldpNeighborEntryEntry
@@ -876,14 +1005,14 @@ CucsNetworkOperLevelEntry ::= SEQUENCE {
     cucsNetworkOperLevelId                                           CucsNetworkSwitchId,
     cucsNetworkOperLevelMaxPrimaryVlanCount                          Gauge32,
     cucsNetworkOperLevelPrimaryVlanCount                             Gauge32,
-    cucsNetworkOperLevelPrimaryVlanCountStatus                       CucsNetworkVlanCountStatus,
+    cucsNetworkOperLevelPrimaryVlanCountStatus                       CucsNetworkCountStatus,
     cucsNetworkOperLevelMaxSecVlanPerPrimaryVlanCount                Gauge32,
     cucsNetworkOperLevelMaxSecondaryVlanCount                        Gauge32,
     cucsNetworkOperLevelSecondaryVlanCount                           Gauge32,
-    cucsNetworkOperLevelSecondaryVlanCountStatus                     CucsNetworkVlanCountStatus,
+    cucsNetworkOperLevelSecondaryVlanCountStatus                     CucsNetworkCountStatus,
     cucsNetworkOperLevelMaxVifCount                                  Gauge32,
     cucsNetworkOperLevelVifCount                                     Gauge32,
-    cucsNetworkOperLevelVifCountStatus                               CucsNetworkVlanCountStatus
+    cucsNetworkOperLevelVifCountStatus                               CucsNetworkCountStatus
 }
 
 cucsNetworkOperLevelInstanceId OBJECT-TYPE
@@ -937,7 +1066,7 @@ cucsNetworkOperLevelPrimaryVlanCount OBJECT-TYPE
     ::= { cucsNetworkOperLevelEntry 9 }
 
 cucsNetworkOperLevelPrimaryVlanCountStatus OBJECT-TYPE
-    SYNTAX       CucsNetworkVlanCountStatus
+    SYNTAX       CucsNetworkCountStatus
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -973,7 +1102,7 @@ cucsNetworkOperLevelSecondaryVlanCount OBJECT-TYPE
     ::= { cucsNetworkOperLevelEntry 13 }
 
 cucsNetworkOperLevelSecondaryVlanCountStatus OBJECT-TYPE
-    SYNTAX       CucsNetworkVlanCountStatus
+    SYNTAX       CucsNetworkCountStatus
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -998,7 +1127,7 @@ cucsNetworkOperLevelVifCount OBJECT-TYPE
     ::= { cucsNetworkOperLevelEntry 16 }
 
 cucsNetworkOperLevelVifCountStatus OBJECT-TYPE
-    SYNTAX       CucsNetworkVlanCountStatus
+    SYNTAX       CucsNetworkCountStatus
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION

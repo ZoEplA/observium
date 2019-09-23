@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -54,7 +54,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'internalTemp.'.$index, 'geist-v4-mib', $descr, $scale, $value, $temp_options);
+      discover_sensor('temperature', $device, $oid, 'internalTemp.'.$index, 'geist-v4-mib', $descr, $scale, $value, $temp_options);
     }
 
     $descr = $entry['internalName'] . ' Dew Point';
@@ -68,7 +68,7 @@ foreach ($oids as $index => $entry)
       rename_rrd_entity($device, 'sensor', $old_rrd_array, array('class' => 'dewpoint'));
       unset($old_rrd_array);
 
-      discover_sensor($valid['sensor'], 'dewpoint', $device, $oid, 'internalDewPoint.'.$index, 'geist-v4-mib', $descr, $scale, $value, $temp_options);
+      discover_sensor('dewpoint', $device, $oid, 'internalDewPoint.'.$index, 'geist-v4-mib', $descr, $scale, $value, $temp_options);
     }
 
     $descr = $entry['internalName'] . ' Humidity';
@@ -77,7 +77,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, 'internalHumidity.'.$index, 'geist-v4-mib', $descr, 1, $value);
+      discover_sensor('humidity', $device, $oid, 'internalHumidity.'.$index, 'geist-v4-mib', $descr, 1, $value);
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 1';
@@ -86,7 +86,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'internalIO1.'.$index, 'geist-v4-mib-io-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'internalIO1.'.$index, 'geist-v4-mib-io-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 2';
@@ -95,7 +95,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'internalIO2.'.$index, 'geist-v4-mib-io-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'internalIO2.'.$index, 'geist-v4-mib-io-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 3';
@@ -104,7 +104,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'internalIO3.'.$index, 'geist-v4-mib-io-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'internalIO3.'.$index, 'geist-v4-mib-io-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 4';
@@ -113,7 +113,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'internalIO4.'.$index, 'geist-v4-mib-io-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'internalIO4.'.$index, 'geist-v4-mib-io-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
   }
 }
@@ -133,7 +133,7 @@ foreach ($oids as $index => $entry)
     $scale    = 0.1;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, $temp_options);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, $temp_options);
   }
 }
 

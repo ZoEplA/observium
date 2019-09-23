@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-OSPFV2-MIB provides information about OSPFv2
 -- Reference:
--- Version: V2.13
+-- Version: V2.16
 -- History:
 -- <author>,   <date>,  <contents>
 --  HUAWEI   2008-1-05  OSPF private MIB
@@ -23,7 +23,7 @@
                 FROM OSPF-MIB        
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
                 FROM SNMPv2-CONF            
-            TimeTicks, IpAddress, Integer32, Unsigned32, Gauge32, 
+            TimeTicks, IpAddress, Integer32, Unsigned32, Gauge32, Counter32,
             OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
                 FROM SNMPv2-SMI            
             DisplayString, TruthValue, RowStatus            
@@ -32,7 +32,7 @@
     
 
         hwOspfv2MIB MODULE-IDENTITY 
-            LAST-UPDATED "201608041521Z"      
+            LAST-UPDATED "201708172002Z"      
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -48,6 +48,38 @@
                 It defines the model used to represent configuration data that exists elsewhere 
                 in the system and on peripheral devices. The MIB is proper for system configuration.
                 There are no constraints on this MIB."
+
+            REVISION "201708172002Z"
+            DESCRIPTION "modify hwospfv2ProcessFullPeerNumber,hwospfv2ProcessPeerUpCount,hwospfv2ProcessPeerDownCount,hwospfv2InterfacePeerUpCount,hwospfv2InterfacePeerDownCount,hwOspfv2ImportNssaRouteExceed,hwOspfv2ImportNssaRouteExceedClear,hwOspfv2LsdbApproachingOverflow,hwOspfv2LsdbApproachingOverflowClear,hwOspfv2LsdbOverflow,hwOspfv2LsdbOverflowClear discription.	"	
+
+
+            REVISION "201703251659Z"
+            DESCRIPTION "Added 		            
+	                hwOspfv2ProcessStatisticTable,
+		            hwospfv2ProcessPeerNumber,
+		            hwospfv2ProcessFullPeerNumber,
+		            hwospfv2ProcessPeerUpCount,
+		            hwospfv2ProcessPeerDownCount,
+		            hwospfv2ProcessSendLsaNumber,
+		            hwospfv2ProcessReceiveLsaNumber,
+	                hwOspfv2InterfaceStatisticTable,
+		            hwospfv2InterfacePeerUpCount,
+		            hwospfv2InterfacePeerDownCount,
+	                hwOspfv2GlobalStatistic,
+		            hwospfv2SendLsaNumber,
+		            hwospfv2ReceiveLsaNumber " 
+
+
+            REVISION "201702251236Z"
+            DESCRIPTION "Change the value of hwOspfv2LsaArriveMaxIntvl from (1.10000) to (1.120000),
+                                          Change the value of hwOspfv2LsaArriveStartIntvl from (0.1000) to (0.60000),
+                                          Change the value of hwOspfv2LsaArriveHoldIntvl from (1.5000) to (1.60000),
+                                          Change the value of hwOspfv2LsaOrigMaxIntvl from (1.10000) to (1.120000),
+                                          Change the value of hwOspfv2LsaOrigStartIntvl from (0.1000) to (0.60000),
+                                          Change the value of hwOspfv2LsaOrigHoldIntvl from (1.5000) to (1.60000),
+                                          Change the value of hwOspfv2SpfSchMaxIntvl from (1.20000) to (1.120000),
+                                          Change the value of hwOspfv2SpfSchStartIntvl from (1.1000) to (1.60000),
+                                          Change the value of hwOspfv2SpfSchHoldIntvl from (1.5000) to (1.60000),"
 
             REVISION "201608041521Z"
             DESCRIPTION "Added 		            
@@ -337,7 +369,7 @@
             ::= { hwOspfv2ProcessEntry 7 }
         
         hwOspfv2LsaArriveMaxIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..10000)
+            SYNTAX Integer32 (-1 | 1..120000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -352,7 +384,7 @@
             ::= { hwOspfv2ProcessEntry 8 }
         
         hwOspfv2LsaArriveStartIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 0..1000)
+            SYNTAX Integer32 (-1 | 0..60000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -367,7 +399,7 @@
             ::= { hwOspfv2ProcessEntry 9 }
         
         hwOspfv2LsaArriveHoldIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..5000)
+            SYNTAX Integer32 (-1 | 1..60000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -408,7 +440,7 @@
             ::= { hwOspfv2ProcessEntry 11 }
         
         hwOspfv2LsaOrigMaxIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..10000)
+            SYNTAX Integer32 (-1 | 1..120000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -423,7 +455,7 @@
             ::= { hwOspfv2ProcessEntry 12 }
         
         hwOspfv2LsaOrigStartIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 0..1000)
+            SYNTAX Integer32 (-1 | 0..60000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -438,7 +470,7 @@
             ::= { hwOspfv2ProcessEntry 13 }
         
         hwOspfv2LsaOrigHoldIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..5000)
+            SYNTAX Integer32 (-1 | 1..60000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -585,7 +617,7 @@
             ::= { hwOspfv2ProcessEntry 25 }
         
         hwOspfv2SpfSchMaxIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..20000)
+            SYNTAX Integer32 (-1 | 1..120000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -600,7 +632,7 @@
             ::= { hwOspfv2ProcessEntry 26 }
         
         hwOspfv2SpfSchStartIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..1000)
+            SYNTAX Integer32 (-1 | 1..60000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -615,7 +647,7 @@
             ::= { hwOspfv2ProcessEntry 27 }
         
         hwOspfv2SpfSchHoldIntvl OBJECT-TYPE
-            SYNTAX Integer32 (-1 | 1..5000)
+            SYNTAX Integer32 (-1 | 1..60000)
             UNITS "millionSecond"
             MAX-ACCESS read-create
             STATUS current
@@ -1772,42 +1804,48 @@
             OBJECTS { hwOspfv2ProcessIdIndex, hwOspfv2AreaId }
             STATUS current
             DESCRIPTION
-                "This object indicates that the number of NSSA LSAs generated when an OSPF process imports external routes exceeds the configured maximum number."
+                "This object indicates that the number of NSSA LSAs generated when an OSPF process imports external routes falls below the lower threshold.
+"
             ::= { hwOspfv2Traps 13 }
             
         hwOspfv2ImportNssaRouteExceedClear NOTIFICATION-TYPE
             OBJECTS { hwOspfv2ProcessIdIndex, hwOspfv2AreaId }
             STATUS current
             DESCRIPTION
-                "This object indicates that the number of NSSA LSAs generated when an OSPF process imports external routes has been less than the configured maximum number."
+                "This object indicates that the number of NSSA LSAs generated when an OSPF process imports external routes reaches or exceeds the configured maximum number.
+"
             ::= { hwOspfv2Traps 14 }
             
         hwOspfv2LsdbApproachingOverflow NOTIFICATION-TYPE
             OBJECTS { hwOspfv2ProcessIdIndex }
             STATUS current
             DESCRIPTION
-                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process is approaching the configured maximum number."
+                "This object indicates that the number of NSSA LSAs generated when an OSPF process imports external routes falls below the configured maximum number.
+"
             ::= { hwOspfv2Traps 15 }
             
         hwOspfv2LsdbApproachingOverflowClear NOTIFICATION-TYPE
             OBJECTS { hwOspfv2ProcessIdIndex }
             STATUS current
             DESCRIPTION
-                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process is leaving the configured maximum number."
+                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process is approaching the configured maximum number.
+"
             ::= { hwOspfv2Traps 16 }
             
         hwOspfv2LsdbOverflow NOTIFICATION-TYPE
             OBJECTS { hwOspfv2ProcessIdIndex }
             STATUS current
             DESCRIPTION
-                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process reaches the configured maximum number."
+                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process falls far below the configured maximum number.
+"
             ::= { hwOspfv2Traps 17 }
             
         hwOspfv2LsdbOverflowClear NOTIFICATION-TYPE
             OBJECTS { hwOspfv2ProcessIdIndex }
             STATUS current
             DESCRIPTION
-                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process has been less than the configured maximum number."
+                "This object indicates that the number of AS-external LSAs in the LSDB of an OSPF process has reached the configured maximum number.
+"
             ::= { hwOspfv2Traps 18 }
             
         hwOspfv2GreaterAgeLsaRecived NOTIFICATION-TYPE
@@ -1943,8 +1981,9 @@
         
         hwOspfv2Compliances OBJECT IDENTIFIER ::= { hwOspfv2Conformance 1 }  
         
-        hwOspfv2Statistic  OBJECT IDENTIFIER ::= { hwOspfv2MIB 33 }      
-        
+        hwOspfv2Statistic  OBJECT IDENTIFIER ::= { hwOspfv2MIB 33 }
+	      
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1       
         hwOspfv2ProcessStatisticTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwOspfv2ProcessStatisticEntry
             MAX-ACCESS not-accessible
@@ -1953,6 +1992,7 @@
                 "Information describes the statistics of the router's attached OSPF processes."
             ::= { hwOspfv2Statistic 1 }  
             
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1
         hwOspfv2ProcessStatisticEntry OBJECT-TYPE
             SYNTAX HwOspfv2ProcessStatisticEntry
             MAX-ACCESS not-accessible
@@ -1965,9 +2005,20 @@
         HwOspfv2ProcessStatisticEntry ::=
             SEQUENCE { 
                 hwospfv2ProcessPeerNumber
-                    Integer32
+                    Integer32,
+	            hwospfv2ProcessFullPeerNumber
+                    Integer32,
+	            hwospfv2ProcessPeerUpCount
+                    Counter32,
+	            hwospfv2ProcessPeerDownCount
+                    Counter32,
+	            hwospfv2ProcessSendLsaNumber
+                    Counter32,
+	            hwospfv2ProcessReceiveLsaNumber 
+                    Counter32
              }
 
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1.1
         hwospfv2ProcessPeerNumber OBJECT-TYPE
             SYNTAX Integer32
             MAX-ACCESS read-only
@@ -1976,6 +2027,122 @@
                 "The peer number of OSPF process."
             ::= { hwOspfv2ProcessStatisticEntry 1 }
         
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1.2
+        hwospfv2ProcessFullPeerNumber OBJECT-TYPE
+		    SYNTAX Integer32
+		    MAX-ACCESS read-only
+		    STATUS current
+		    DESCRIPTION			 
+		        "The value of this object identifies the number of neighbors in full state in the OSPF process.
+"
+		    ::= { hwOspfv2ProcessStatisticEntry 2 }
+	
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1.3
+        hwospfv2ProcessPeerUpCount OBJECT-TYPE
+		    SYNTAX Counter32
+		    MAX-ACCESS read-only
+		    STATUS current
+		    DESCRIPTION			 
+		        "The value of this object identifies the number of neighbors in Up state in the OSPF process.
+"
+		    ::= { hwOspfv2ProcessStatisticEntry 3 }
+	
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1.4
+        hwospfv2ProcessPeerDownCount OBJECT-TYPE
+		    SYNTAX Counter32
+		    MAX-ACCESS read-only
+		    STATUS current
+		    DESCRIPTION			 
+		        "The value of this object identifies the number of neighbors in Down state in the OSPF process.
+"
+		    ::= { hwOspfv2ProcessStatisticEntry 4 }
+	
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1.5
+        hwospfv2ProcessSendLsaNumber OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION			 
+                 "The lsa send number of OSPF process."
+            ::= { hwOspfv2ProcessStatisticEntry 5 }
+	
+        -- 1.3.6.1.4.1.2011.5.25.155.33.1.1.6
+        hwospfv2ProcessReceiveLsaNumber OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION			 
+                "The lsa receive number of OSPF process."
+            ::= { hwOspfv2ProcessStatisticEntry 6 }
+
+	
+    -- 1.3.6.1.4.1.2011.5.25.155.33.2
+    hwOspfv2InterfaceStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwOspfv2InterfaceStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION			 
+            "Information describes the statistics of the router's attached OSPF interfaces."
+        ::= { hwOspfv2Statistic 2 }
+	
+    -- 1.3.6.1.4.1.2011.5.25.155.33.2.1
+    hwOspfv2InterfaceStatisticEntry OBJECT-TYPE
+        SYNTAX HwOspfv2InterfaceStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information describes the statistics of the router's attached OSPF interfaces."
+    INDEX { hwOspfv2ProcessIdIndex, hwOspfv2AreaIdIndex, hwOspfv2InterfaceIndex }
+    ::= { hwOspfv2InterfaceStatisticTable 1 }
+	
+    HwOspfv2InterfaceStatisticEntry ::=
+    SEQUENCE { 
+        hwospfv2InterfacePeerUpCount
+            Counter32,
+        hwospfv2InterfacePeerDownCount
+            Counter32
+         }
+
+        -- 1.3.6.1.4.1.2011.5.25.155.33.2.1.1
+        hwospfv2InterfacePeerUpCount OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION			 
+                "The value of this object identifies the number of neighbors in Up state on the OSPF interface.
+"
+            ::= { hwOspfv2InterfaceStatisticEntry 1 }
+	
+        -- 1.3.6.1.4.1.2011.5.25.155.33.2.1.2
+        hwospfv2InterfacePeerDownCount OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION			 
+                "The value of this object identifies the number of neighbors in Down state on the OSPF interface.
+"
+            ::= { hwOspfv2InterfaceStatisticEntry 2 }
+	
+    -- 1.3.6.1.4.1.2011.5.25.155.33.3
+    hwOspfv2GlobalStatistic OBJECT IDENTIFIER ::= { hwOspfv2Statistic 3 }
+        -- 1.3.6.1.4.1.2011.5.25.155.33.3.1
+        hwospfv2SendLsaNumber OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION			 
+                "The lsa send number of OSPF router."
+            ::= { hwOspfv2GlobalStatistic 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.155.33.3.2
+        hwospfv2ReceiveLsaNumber OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION			 
+                "The lsa receive number of OSPF router."
+            ::= { hwOspfv2GlobalStatistic 2 }
+	
 -- this module
         hwOspfv2ModuleFullCompliance MODULE-COMPLIANCE
             STATUS current
@@ -2099,7 +2266,8 @@
             ::= { hwOspfv2Groups 10 }
 
         hwOspfv2ProcessStatisticGroup OBJECT-GROUP
-            OBJECTS { hwospfv2ProcessPeerNumber }
+	    OBJECTS { hwospfv2ProcessPeerNumber, hwospfv2ProcessFullPeerNumber, hwospfv2ProcessPeerUpCount, hwospfv2ProcessPeerDownCount, hwospfv2ProcessSendLsaNumber, 
+			hwospfv2ProcessReceiveLsaNumber }
             STATUS current
             DESCRIPTION 
                 "The statistics information group of OSPF process."
@@ -2112,6 +2280,21 @@
                 "These objects are used to monitor/manage changed OSPF peer flapping suppress status."
             ::= { hwOspfv2Groups 12 }
 
+	-- 1.3.6.1.4.1.2011.5.25.155.32.2.13
+	hwOspfv2InterfaceStatisticGroup OBJECT-GROUP
+		OBJECTS { hwospfv2InterfacePeerUpCount, hwospfv2InterfacePeerDownCount }
+		STATUS current
+		DESCRIPTION 
+		"The statistics information group of OSPF interface."
+		::= { hwOspfv2Groups 13 }
+	
+	-- 1.3.6.1.4.1.2011.5.25.155.32.2.14
+	hwOspfv2GlobalStatisticGroup OBJECT-GROUP
+		OBJECTS { hwospfv2SendLsaNumber, hwospfv2ReceiveLsaNumber }
+		STATUS current
+		DESCRIPTION 
+		"The statistics information group of OSPF router."
+		::= { hwOspfv2Groups 14 }
     END
 
 --

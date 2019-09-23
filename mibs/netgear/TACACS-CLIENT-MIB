@@ -1,11 +1,11 @@
-TACACS-CLIENT-MIB DEFINITIONS ::= BEGIN
+NG7000-TACACS-CLIENT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32         FROM SNMPv2-SMI
     InetAddress, InetAddressType               FROM INET-ADDRESS-MIB
     TEXTUAL-CONVENTION, RowStatus              FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP            FROM SNMPv2-CONF
-    ng7000managedswitch                        FROM BROADCOM-REF-MIB;
+    ng7000managedswitch                        FROM NETGEAR-REF-MIB;
 
 agentTacacsClientMIB MODULE-IDENTITY
     LAST-UPDATED "200705230000Z" -- 23 May 2007 12:00:00 GMT

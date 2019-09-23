@@ -1,31 +1,59 @@
---**************************************************************************
---                                                                          
---    Copyright 2002 Broadcom Corporation                                   
---    All Rights Reserved                                                   
---    No portions of this material may be reproduced in any form without the
---    written permission of:                                                
---             Broadcom Corporation                                         
---             16251 Laguna Canyon Road                                     
---             Irvine, California  92618                                    
---    All information contained in this document is Broadcom Corporation    
---    company private, proprietary, and trade secret.                       
---                                                                          
---                                                                          
---                                                                          
---**************************************************************************
+--****************************************************************************
+--
+-- Copyright (c) 2002-2011 Broadcom Corporation
+--
+-- This program is the proprietary software of Broadcom Corporation and/or
+-- its licensors, and may only be used, duplicated, modified or distributed
+-- pursuant to the terms and conditions of a separate, written license
+-- agreement executed between you and Broadcom (an "Authorized License").
+-- Except as set forth in an Authorized License, Broadcom grants no license
+-- (express or implied), right to use, or waiver of any kind with respect to
+-- the Software, and Broadcom expressly reserves all rights in and to the
+-- Software and all intellectual property rights therein.  IF YOU HAVE NO
+-- AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE IN ANY WAY,
+-- AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE ALL USE OF THE
+-- SOFTWARE.  
+--
+-- Except as expressly set forth in the Authorized License,
+--
+-- 1.     This program, including its structure, sequence and organization,
+-- constitutes the valuable trade secrets of Broadcom, and you shall use all
+-- reasonable efforts to protect the confidentiality thereof, and to use this
+-- information only in connection with your use of Broadcom integrated circuit
+-- products.
+--
+-- 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED
+-- "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES, REPRESENTATIONS
+-- OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+-- RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY DISCLAIMS ANY AND ALL
+-- IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR
+-- A PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+-- ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. YOU ASSUME
+-- THE ENTIRE RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+--
+-- 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL BROADCOM
+-- OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL, INCIDENTAL, SPECIAL,
+-- INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER ARISING OUT OF OR IN ANY WAY
+-- RELATING TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE EVEN IF BROADCOM
+-- HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN
+-- EXCESS OF THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR U.S. $1,
+-- WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING ANY
+-- FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.
+--
+--****************************************************************************
 --    Filename: brcm-cabledata-factory.mib
 --    Author:   Kevin O'Neal
 --    Creation Date: 19-june-2002
 --
---**************************************************************************
+--****************************************************************************
 --    Description:
 --
 --		factory MIB for cablemodem factory
 --		
---**************************************************************************
+--****************************************************************************
 --    Revision History:
 --
---**************************************************************************
+--****************************************************************************
 
 BRCM-CABLEDATA-FACTORY-MIB DEFINITIONS ::= BEGIN
 
@@ -44,7 +72,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-PRIVATE-MIB;
                 
 cableDataFactory MODULE-IDENTITY
-    LAST-UPDATED "200206190000Z"
+    LAST-UPDATED "201105120000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -60,10 +88,20 @@ cableDataFactory MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata factory MIB"
-    REVISION      "200206040000Z"
+        "Broadcom proprietary MIB for factory configuration and management
+         of objects common to many cableData products."
+    REVISION      "201105120000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
+        "Added object cdFactNonVolOperStatus."
+    REVISION      "200702050000Z"
+    DESCRIPTION
+        "Module description was updated. 
+         Compilability issues were cleaned up.
+         - Range restriction was added to objects cdSerialNumIndex and 
+           cdMacAddrIndex."
+    REVISION      "200206190000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataPrivateMIBObjects 2 }
 
 cableDataFactoryBase OBJECT IDENTIFIER ::= { cableDataFactory 1 }
@@ -117,7 +155,7 @@ CdFactSerialNumberEntry ::=
     }
     
 cdSerialNumIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..4)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -168,7 +206,7 @@ CdFactMacAddressEntry ::=
     }
     
 cdMacAddrIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..8)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -282,7 +320,58 @@ cdIpStaticGateway  OBJECT-TYPE
         "Specifies the default gateway that will be assigned to this IP
          stack if cmIpProvMethod is set to static(0)."
     ::= { cdFactIpSettingsEntry 5 }
+
+cdFactNonVolOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                idle(0),
+                readPending(1),
+                reading(2),
+                writePending(3),
+                writing(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object reports the current state of the non volatile storage on
+        this device.  If no read or write operation is currently pending or in
+        progress, then the object will return a value of idle(0).  If a read or 
+        write operation is currently pending or in progress, the appropriate
+        value will be returned.  This object may be polled to determine when
+        a write operation initiated by cdFactCommitSettings is complete."
+    ::= { cableDataFactoryBase 6 }
+
+--
+-- List of nodes under the factory node.
+--
+-- As new nodes are added they should be added to this MIB to provide a central
+-- repository of nodes which have been allocated.
+--
     
+
+-- BRCM-CM-FACTORY-MIB
+-- cablemodemFactory  MODULE-IDENTITY ::= { cableDataFactory 2 }
+
+-- BRCM-CABLEHOME-FACTORY-MIB
+-- cableHomeFactory  MODULE-IDENTITY ::= { cableDataFactory 3 }
+
+-- BRCM-V2-FACTORY-MIB
+-- v2Factory MODULE-IDENTITY ::= { cableDataFactory 4 }
+
+-- BRCM-80211-MGMT-MIB
+-- homeplugFactory MODULE-IDENTITY ::= { cableDataFactory 9 }
+
+-- BRCM-EMTA-FACTORY-MIB
+-- emtaFactory MODULE-IDENTITY ::= { cableDataFactory 6 }
+
+-- BRCM-RG-FACTORY-MIB
+-- residentialGatewayFactory MODULE-IDENTITY ::= { cableDataFactory 7 }
+
+-- BRCM-USB-FACTORY-MIB
+-- usbFactory MODULE-IDENTITY ::= { cableDataFactory 8 }
+
+-- BRCM-HOMEPLUG-FACTORY-MIB
+-- homeplugFactory MODULE-IDENTITY ::= { cableDataFactory 9 }
+
 
 -- This node is provided for vendor extensions to the cableDataFactory MIB.
 -- Each vendor may request any objects under a node which is located at

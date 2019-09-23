@@ -1,10 +1,12 @@
 -- ****************************************************************************
--- * NEXANS-MIB   ( January 29, 2014, HUBERT THEISSEN)
--- * Copyright (c) 2003-2014 Nexans Advanced Networking Solutions
+-- * NEXANS-MIB   ( January  24, 2017, HUBERT THEISSEN)
+-- * Copyright (c) 2003-2016 Nexans Advanced Networking Solutions
 -- * 
 -- * MIB for Nexans Products
--- * Release version = 4.01
+-- * Release version = 4.14N
 -- *
+-- * Changes in version 4.14N
+-- * - bmSwitch: products {bmSwitch 72, 85} added
 -- * Changes in version 4.01
 -- * - bmSwitch: products {bmSwitch 40,41,42, 62,63,64,66,67,70,71} added
 -- * Changes in version 4.00
@@ -113,5 +115,7 @@ fiberSwitch1000BmV3			OBJECT IDENTIFIER ::= { bmSwitch 66 }
 fiberSwitch100BmV3			OBJECT IDENTIFIER ::= { bmSwitch 67 }
 gigaSwitch641DeskSfpTp			OBJECT IDENTIFIER ::= { bmSwitch 70 }
 gigaSwitch642DeskSfpSfp			OBJECT IDENTIFIER ::= { bmSwitch 71 }
+gigaSwitchV3d3SfpTpSfp			OBJECT IDENTIFIER ::= { bmSwitch 72 }
+iGigaSwitch1002				OBJECT IDENTIFIER ::= { bmSwitch 85 }
 
 END

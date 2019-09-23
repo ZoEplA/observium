@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -41,6 +41,22 @@ function auth_can_logout()
     return call_user_func($config['auth_mechanism'] . '_auth_can_logout');
   } else {
     return call_user_func('mysql_auth_can_logout');
+  }
+}
+
+/**
+ * Returns the URL redirection required for logout, or null if internal logout is sufficient.
+ * @return string logout url
+ */
+function auth_logout_url()
+{
+  global $config;
+
+  if (function_exists($config['auth_mechanism'] . '_auth_logout_url'))
+  {
+    return call_user_func($config['auth_mechanism'] . '_auth_logout_url');
+  } else {
+    return null;
   }
 }
 

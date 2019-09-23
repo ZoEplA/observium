@@ -7,11 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$mtxrSerialNumber = snmp_get($device, 'mtxrSerialNumber.0', '-Oqvn', 'MIKROTIK-MIB');
+$mtxrSerialNumber = snmp_get_oid($device, 'mtxrSerialNumber.0', 'MIKROTIK-MIB');
 
 $system_index = 1;
 if ($mtxrSerialNumber)
@@ -27,9 +27,9 @@ if ($mtxrSerialNumber)
     'entPhysicalParentRelPos' => 0,
     'entPhysicalMfgName'      => 'MikroTik'
   );
-  discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], "MIKROTIK-MIB");
+  discover_inventory($device, $system_index, $inventory[$system_index], "MIKROTIK-MIB");
 
-  if (OBS_DEBUG > 1 && count($inventory)) { print_vars($inventory); }
+  print_debug_vars($inventory);
 }
 
 // EOF

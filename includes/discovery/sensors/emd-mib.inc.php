@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -185,7 +185,7 @@ foreach ($oids as $index => $entry)
       $options['sensor_unit'] = $unit['unit'];
     }
 
-    discover_sensor($valid['sensor'], $unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor_ng($device, $unit['type'], $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
   }
 }
 

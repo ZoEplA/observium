@@ -37,7 +37,7 @@ IMPORTS
         FROM SNMPv2-CONF
     TEXTUAL-CONVENTION
         FROM SNMPv2-TC
-    dot1dBasePortEntry
+    dot1dBasePort
         FROM BRIDGE-MIB
     EnabledStatus
         FROM P-BRIDGE-MIB
@@ -154,7 +154,7 @@ etsysVlanAuthorizationEntry OBJECT-TYPE
         "A list of extensions that support the management of
          proprietary features for each port of a transparent
          bridge.  This is indexed by dot1dBasePort."
-    AUGMENTS { dot1dBasePortEntry }
+    INDEX { dot1dBasePort }
     ::= { etsysVlanAuthorizationTable 1 }
 
 EtsysVlanAuthorizationEntry ::=

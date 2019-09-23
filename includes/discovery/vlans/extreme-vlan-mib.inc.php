@@ -7,10 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
+$vtp_domain_index = '1'; // Yep, always use domain index 1
 
 //EXTREME-VLAN-MIB::extremeVlanIfDescr.1000004 = STRING: "Default"
 //EXTREME-VLAN-MIB::extremeVlanIfDescr.1000005 = STRING: "Mgmt"
@@ -29,6 +30,45 @@ $vlan_oids = snmpwalk_cache_oid($device, 'extremeVlanIfDescr', array(), 'EXTREME
 
 if (!snmp_status())
 {
+  // New Extreme SLX devices have very limited VLANs information
+
+  // EXTREME-VLAN-MIB::extremeStatsPortIfIndex.201334784."99" = INTEGER: 201334784
+  // EXTREME-VLAN-MIB::extremeStatsVlanNameIndex.201334784."99" = STRING: 99
+  $vlan_stats = snmpwalk_cache_twopart_oid($device, 'extremeStatsVlanNameIndex', array(), 'EXTREME-VLAN-MIB');
+  if (!snmp_status())
+  {
+    return;
+  }
+
+  foreach ($vlan_stats as $ifIndex => $tmp)
+  {
+    foreach ($tmp as $vlan_num => $vlan)
+    {
+      // I'm not sure if this string is always vlan number string
+      if (!is_numeric($vlan_num)) { continue; }
+
+      // Now find port from ifDescr
+      // IF-MIB::ifDescr.201334784 = STRING: Ethernet 0/1
+      // IF-MIB::ifDescr.1207959651 = STRING: Ve 99
+      $vlan_name = 'Ve '.$vlan_num;
+      $vlan_index = dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `device_id` = ? AND `ifDescr` = ? AND `deleted` = ? LIMIT 1", array($device['device_id'], $vlan_name, 0));
+
+      $vlan_array = array('ifIndex'     => $vlan_index,
+                          'vlan_domain' => $vtp_domain_index,
+                          'vlan_vlan'   => $vlan_num,
+                          'vlan_name'   => $vlan_name,
+                          //'vlan_mtu'    => $vlan[''],
+                          'vlan_type'   => 'ethernet',
+                          'vlan_status' => 'operational');
+      // Device Vlans
+      $discovery_vlans[$vtp_domain_index][$vlan_num] = $vlan_array;
+
+      // Port Vlans
+      $discovery_ports_vlans[$ifIndex][$vlan_num] = array('vlan' => $vlan_num);
+    }
+  }
+
+  // End new SLX devices
   return;
 }
 
@@ -37,8 +77,6 @@ $vlan_oids = snmpwalk_cache_oid($device, 'extremeVlanIfStatus',      $vlan_oids,
 $vlan_oids = snmpwalk_cache_oid($device, 'extremeVlanIfType',        $vlan_oids, 'EXTREME-VLAN-MIB');
 $vlan_oids = snmpwalk_cache_oid($device, 'extremeVlanIfAdminStatus', $vlan_oids, 'EXTREME-VLAN-MIB');
 print_debug_vars($vlan_oids);
-
-$vtp_domain_index = '1'; // Yep, always use domain index 1
 
 foreach ($vlan_oids as $index => $vlan)
 {

@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage geolocation
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,28 +18,43 @@
  */
 
   // Use google data only with good status response
-  if ($data['status'] == 'OK')
+  if (in_array($data['status'], ['OK', 'ZERO_RESULTS', 'UNKNOWN_ERROR']))
   {
     $data       = $data['results'][0];
-    if ($data['geometry']['location_type'] == 'APPROXIMATE' && strpos($address, ','))
+    // Detect if required second request
+    $try_second = FALSE;
+    if ($geo_type == 'forward')
     {
-      // It might be that the first element of the address is a business name.
-      // Lets drop the first element and see if we get anything better!
-      list(, $address_new) = explode(',', $address, 2);
-      //$request_new = $url.urlencode($address);
-      $param = $api_params['request_params']['address'];
-      $params[$param] = urlencode($address_new);
-      $request_new = build_request_url($url, $params, $api_params['method']);
-      $mapresponse = get_http_request($request_new, NULL, $ratelimit);
-      $data_new = json_decode($mapresponse, TRUE);
-      if ($data_new['status'] == 'OK' && $data_new['results'][0]['geometry']['location_type'] != 'APPROXIMATE')
+      $try_second = !isset($data['geometry']['location_type']) || $data['geometry']['location_type'] == 'APPROXIMATE';
+    }
+
+    // Make second request (address_second passed from main function get_geolocation()
+    if ($try_second && strlen($address_second) > 4)
+    {
+      // Re-Generate geolocation tags, override location
+      $tags['location'] = $address_second;
+
+      // Generate context/options with encoded data and geo specific api headers
+      $options_new = generate_http_context($geo_def[$geo_type], $tags);
+
+      // API URL to POST to
+      $url_new = generate_http_url($geo_def[$geo_type], $tags);
+
+      // Second request
+      $mapresponse = get_http_request($url_new, $options_new, $ratelimit);
+      if (test_http_request($geo_def[$geo_type], $mapresponse))
       {
-        $request = $request_new;
-        $data    = $data_new['results'][0];
+        // Valid response
+        $data_new = json_decode($mapresponse, TRUE);
+        if ($data_new['status'] == 'OK' && $data_new['results'][0]['geometry']['location_type'] != 'APPROXIMATE')
+        {
+          $url  = $url_new;
+          $data = $data_new['results'][0];
+        }
       }
     }
 
-    if (!$reverse)
+    if ($geo_type == 'forward')
     {
       // If using reverse queries, do not change lat/lon
       $location['location_lat'] = $data['geometry']['location']['lat'];

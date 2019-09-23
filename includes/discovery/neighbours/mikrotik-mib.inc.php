@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -42,7 +42,7 @@ if ($mtxr_array)
     $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? AND `ifDescr` NOT LIKE 'Vlan%'", array($device['device_id'], $ifIndex));
 
     $remote_device_id = FALSE;
-    $remote_port_id   = 0;
+    $remote_port_id   = NULL;
 
     if (is_valid_hostname($entry['mtxrNeighborIdentity']))
     {
@@ -70,7 +70,26 @@ if ($mtxr_array)
       if (!$remote_device_id)
       {
         // We can also use IP address from mtxrNeighborIpAddress to find remote device.
-        $remote_device_id = dbFetchCell("SELECT `device_id` FROM `ports` LEFT JOIN `ipv4_addresses` on `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `deleted` = '0' AND `ipv4_address` = ? LIMIT 1;", array($entry['mtxrNeighborIpAddress']));
+        //$remote_device_id = dbFetchCell("SELECT `device_id` FROM `ports` LEFT JOIN `ipv4_addresses` on `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `deleted` = '0' AND `ipv4_address` = ? LIMIT 1;", array($entry['mtxrNeighborIpAddress']));
+        $peer_where = generate_query_values($device['device_id'], 'device_id', '!='); // Additional filter for exclude self IPs
+        // Fetch all devices with peer IP and filter by UP
+        if ($ids = get_entity_ids_ip_by_network('device', $entry['mtxrNeighborIpAddress'], $peer_where))
+        {
+          $remote_device = $ids[0];
+          if (count($ids) > 1)
+          {
+            // If multiple same IPs found, get first NOT disabled or down
+            foreach ($ids as $id)
+            {
+              $tmp_device = device_by_id_cache($id);
+              if (!$tmp_device['disabled'] && $tmp_device['status'])
+              {
+                $remote_device = $id;
+                break;
+              }
+            }
+          }
+        }
       }
     }
 
@@ -93,7 +112,7 @@ if ($mtxr_array)
     if (!is_bad_xdp($entry['mtxrNeighborIdentity']) && is_numeric($port['port_id']) && !empty($entry['mtxrNeighborIdentity']))
     {
       // We format the remote MAC just like lldpRemPortId macAddress (I think) (00 11 22 33 44 55) - we don't have an actual remote port name or ifIndex or anything in this MIB.
-      discover_link($valid_link, $port['port_id'], 'mndp', $remote_port_id, $entry['mtxrNeighborIdentity'], strtoupper(str_replace(':', ' ',$entry['mtxrNeighborMacAddress'])), $entry['mtxrNeighborPlatform'], $entry['mtxrNeighborVersion']);
+      discover_link($port, 'mndp', $remote_port_id, $entry['mtxrNeighborIdentity'], strtoupper(str_replace(':', ' ',$entry['mtxrNeighborMacAddress'])), $entry['mtxrNeighborPlatform'], $entry['mtxrNeighborVersion']);
     }
   }
 }

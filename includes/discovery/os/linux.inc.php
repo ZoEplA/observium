@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -26,20 +26,64 @@ if ($os == 'linux')
 {
   // Now network based checks
   if (str_starts($sysObjectId, array('.1.3.6.1.4.1.10002.1', '.1.3.6.1.4.1.41112.1.4')) ||
-           str_contains(snmp_get($device, 'dot11manufacturerName.5', '-Osqnv', 'IEEE802dot11-MIB'), 'Ubiquiti'))
+      str_contains(snmp_getnext_oid($device, 'dot11manufacturerName', 'IEEE802dot11-MIB'), 'Ubiquiti'))
   {
     $os = 'airos';
-    $data = snmpwalk_cache_oid($device, 'dot11manufacturerProductName', array(), 'IEEE802dot11-MIB');
-    if ($data)
+    $data = snmp_getnext_oid($device, 'dot11manufacturerProductName', 'IEEE802dot11-MIB');
+    if (str_contains($data, 'UAP'))
     {
-      $data = current($data);
-      if (str_contains($data['dot11manufacturerProductName'], 'UAP')) { $os = 'unifi'; }
+      $os = 'unifi';
     }
-    else if (snmp_get($device, 'fwVersion.1', '-OQv', 'UBNT-AirFIBER-MIB') != '') { $os = 'airos-af'; }
+    // $data = snmpwalk_cache_oid($device, 'dot11manufacturerProductName', array(), 'IEEE802dot11-MIB');
+    // if ($data)
+    // {
+    //   $data = current($data);
+    //   if (str_contains($data['dot11manufacturerProductName'], 'UAP'))
+    //   {
+    //     $os = 'unifi';
+    //   }
+    // }
+    elseif (snmp_get_oid($device, 'fwVersion.1', 'UBNT-AirFIBER-MIB') != '')
+    {
+      $os = 'airos-af';
+    }
   }
-  // FIXME, this checks incorrect! Carel too hard for detect
-  else if (is_numeric(trim(snmp_get($device, 'temp-mand.0', '-OqvU', 'UNCDZ-MIB'))))                { $os = 'pcoweb-chiller'; }
-  else if (is_numeric(trim(snmp_get($device, 'roomTemp.0', '-OqvU', 'CAREL-ug40cdz-MIB'))))         { $os = 'pcoweb-crac'; }
+  elseif ($sysObjectID == '.1.3.6.1.4.1.8072.3.2.10' &&
+          snmp_get_oid($device, '.1.3.6.1.4.1.9839.1.2.0') > 0)
+  {
+    // NOTE! This is very hard hack for detect some devices connected to Carel pCOweb
+    // carel-denco.snmprec:1.3.6.1.4.1.9839.2.1.2.6.0|2|0
+    // carel-dimplex.snmprec:1.3.6.1.4.1.9839.2.1.2.6.0|2|-9999
+    // carel-crac1.snmprec:1.3.6.1.4.1.9839.2.1.2.6.0|2|425
+    // carel-crac2.snmprec:1.3.6.1.4.1.9839.2.1.2.6.0|2|462
+    $carel_test = snmp_get_oid($device, '.1.3.6.1.4.1.9839.2.1.2.6.0');
+    if ($carel_test > 0 && strlen($carel_test) > 1)
+    {
+      $os = 'pcoweb-crac';
+      return;
+    }
+
+    // carel-denco.snmprec:1.3.6.1.4.1.9839.2.1.2.16.0|2|500
+    // carel-dimplex.snmprec:1.3.6.1.4.1.9839.2.1.2.16.0|2|0
+    // carel-crac1.snmprec:1.3.6.1.4.1.9839.2.1.2.16.0|2|0
+    // carel-crac2.snmprec:1.3.6.1.4.1.9839.2.1.2.16.0|2|0
+    $carel_test = snmp_get_oid($device, '.1.3.6.1.4.1.9839.2.1.2.16.0');
+    if ($carel_test > 0 && strlen($carel_test) > 1)
+    {
+      $os = 'pcoweb-denco';
+      return;
+    }
+
+    // FIXME. This is also incorrect, but we not have other test units
+    // carel-denco.snmprec:1.3.6.1.4.1.9839.2.1.2.3.0|2|180
+    // carel-dimplex.snmprec:1.3.6.1.4.1.9839.2.1.2.3.0|2|529
+    // carel-crac1.snmprec:1.3.6.1.4.1.9839.2.1.2.3.0|2|0
+    // carel-crac2.snmprec:1.3.6.1.4.1.9839.2.1.2.3.0|2|0
+    $os = 'pcoweb-chiller';
+  }
+  // OLD incorrect test
+  //elseif (is_numeric(trim(snmp_get($device, 'temp-mand.0', '-OqvU', 'UNCDZ-MIB'))))                { $os = 'pcoweb-chiller'; }
+  //elseif (is_numeric(trim(snmp_get($device, 'roomTemp.0', '-OqvU', 'CAREL-ug40cdz-MIB'))))         { $os = 'pcoweb-crac'; }
 }
 
 // EOF

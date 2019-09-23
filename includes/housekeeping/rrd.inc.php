@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage housekeeping
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -39,9 +39,9 @@ if ($answer)
 {
   $count_notvalid = 0;
   $count_notmodified = 0;
-  foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($config['rrd_dir'])) as $file)
+  foreach (get_recursive_directory_iterator($config['rrd_dir']) as $file => $info)
   {
-    if (basename($file) != "." && basename($file) != ".." && substr($file, -4) == ".rrd")
+    if ($info->getExtension() == 'rrd')
     {
       print_debug("Found file ending in '.rrd': " . $file);
 

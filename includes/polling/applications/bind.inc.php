@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -79,7 +79,7 @@ if (!empty($agent_data['app']['bind']['global']))
   );
 
   $ns_stats_fields = array_values($ns_stats_field_mapping);
-  array_sort($ns_stats_fields);
+  array_sort($ns_stats_fields, 'Requestv4');
 
   $ns_stats = array();
   foreach ($ns_stats_fields as $field)
@@ -105,7 +105,7 @@ if (!empty($agent_data['app']['bind']['global']))
   );
 
   $zone_maint_fields = array_values($zone_maint_field_mapping);
-  array_sort($zone_maint_fields);
+  array_sort($zone_maint_fields, 'NotifyOutv4');
 
   $zone_maint = array();
   foreach ($zone_maint_fields as $field)
@@ -148,7 +148,7 @@ if (!empty($agent_data['app']['bind']['global']))
   );
 
   $resolver_fields = array_values($resolver_field_mapping);
-  array_sort($resolver_fields);
+  array_sort($resolver_fields, 'Queryv4');
 
   $resolver = array();
 

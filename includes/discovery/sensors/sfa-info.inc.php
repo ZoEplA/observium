@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -28,7 +28,7 @@ foreach ($cache['ddn']['physicalDiskTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'physicalDisk.'.$index, 'sfa-disk-state', $descr,  NULL,$value, array('entPhysicalClass' => 'hrDeviceDiskStorage'));
+    discover_status($device, $oid, 'physicalDisk.'.$index, 'sfa-disk-state', $descr, $value, array('entPhysicalClass' => 'hrDeviceDiskStorage'));
   }
 }
 
@@ -47,7 +47,7 @@ foreach ($cache['ddn']['tempTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'temp.'.$index, 'sfa-temp-state', $descr,  NULL,$value, array('entPhysicalClass' => 'temperature'));
+    discover_status($device, $oid, 'temp.'.$index, 'sfa-temp-state', $descr, $value, array('entPhysicalClass' => 'temperature'));
   }
 }
 
@@ -66,7 +66,7 @@ foreach ($cache['ddn']['powerTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'power.'.$index, 'sfa-power-state', $descr,  NULL,$value, array('entPhysicalClass' => 'powerSupply'));
+    discover_status($device, $oid, 'power.'.$index, 'sfa-power-state', $descr, $value, array('entPhysicalClass' => 'powerSupply'));
   }
 }
 
@@ -85,7 +85,7 @@ foreach ($cache['ddn']['fanTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'fan.'.$index, 'sfa-fan-state', $descr,  NULL,$value, array('entPhysicalClass' => 'fan'));
+    discover_status($device, $oid, 'fan.'.$index, 'sfa-fan-state', $descr, $value, array('entPhysicalClass' => 'fan'));
   }
 }
 

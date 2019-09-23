@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:  DHCP Server MIB
 -- Reference:
--- Version:     V1.4
+-- Version: V1.7
 -- History:
 -- V1.0 Initial version Created by y04444
 -- V1.1 2009-09-07 Modify by xuyufei
@@ -21,6 +21,17 @@
 --      h3cDHCPSrvGlbPoolACKTimes
 -- V1.4 2011-11-23 Modify by zhangshuai06624
 --      Add h3cDHCPServerTrapObjects and h3cDHCPServerFirstTrapTime
+-- V1.5 2012-08-10 Modify by xuyufei03122
+--      modify h3cDHCPSrvGlbPoolOptHexString
+-- V1.6 2013-08-28 Modify by ganchanghua06076
+--      Add h3cDHCPSvrOptionGroupTable, h3cDHCPSvrOptionTable,
+--      h3cDHCPSvrVerifyMacTable and h3cDHCPSvrPoolMacTable.
+--      2013-10-17 Modify by xuyufei03122
+--      Add h3cDHCPSrvGlbPoolTotalIpNum and h3cDHCPSrvGlbPoolInUsedIpNum
+-- V1.7 2014-04-17 Modify by cuixiaohui03029
+--      Add h3cDHCPSrvGlobalPoolAllocObject
+--      Add h3cDHCPSrvGlbPoolLeaseTimeSec
+--      Add h3cDHCPSrvGlbPoolCliGWIPAddr
 -- =================================================================
 H3C-DHCP-SERVER-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -82,7 +93,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "Threshold of average IP useage of a DHCP server pool in 5 minutes."
+            "Threshold of average IP usage of a DHCP server pool in 5 minutes."
         ::= { h3cDHCPServerObjects 4 }
 
     h3cDHCPServerMaxIpUseThreshold OBJECT-TYPE
@@ -90,7 +101,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "Threshold of maximum IP useage of a DHCP server pool in 5 minutes."
+            "Threshold of maximum IP usage of a DHCP server pool in 5 minutes."
         ::= { h3cDHCPServerObjects 5 }
 
     h3cDHCPServerAllocateThreshold OBJECT-TYPE
@@ -155,7 +166,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "RowStatus. Three actions are used: active,
+            "RowStatus.  Three actions are used: active,
             createAndGo, destroy."
         ::= { h3cDHCPSrvGlobalPoolEntry 2 }
 
@@ -193,7 +204,8 @@ h3cDHCPServer MODULE-IDENTITY
                 h3cDHCPSrvGlobalPoolHostHAddr         MacAddress,
                 h3cDHCPSrvGlobalPoolCfgUndoFlag       INTEGER,
                 h3cDHCPSrvGlobalPoolStartAddr         IpAddress,
-                h3cDHCPSrvGlobalPoolEndAddr           IpAddress
+                h3cDHCPSrvGlobalPoolEndAddr           IpAddress,
+                h3cDHCPSrvGlobalPoolAllocObject       INTEGER
             }
 
     h3cDHCPSrvGlobalPoolType OBJECT-TYPE
@@ -206,7 +218,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "Type of a DHCP global pool. Any operations of
+            "Type of a DHCP global pool.  Any operations of
             this object will be bound with the operations
             of h3cDHCPSrvGlobalPoolNetwork, h3cDHCPSrvGlobalPoolHostIPAddr,
             or h3cDHCPSrvGlobalPoolHostHAddr.
@@ -294,7 +306,7 @@ h3cDHCPServer MODULE-IDENTITY
         DESCRIPTION
             "Start IP of a DHCP global pool.
             To delete a configured start IP, please set
-            h3cDHCPSrvGlobalPoolStartAddr to 0. It takes
+            h3cDHCPSrvGlobalPoolStartAddr to 0.  It takes
             effect only when h3cDHCPSrvGlobalPoolNetwork is set."
         ::= { h3cDHCPSrvGlobalPoolConfigEntry 8 }
 
@@ -305,6 +317,21 @@ h3cDHCPServer MODULE-IDENTITY
         DESCRIPTION
             "End ip of a DHCP global pool."
         ::= { h3cDHCPSrvGlobalPoolConfigEntry 9 }
+
+    h3cDHCPSrvGlobalPoolAllocObject OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                user(0),
+                admin(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A DHCP global pool type for object allocated address.
+            User: the DHCP global pool allocates address for user.
+            Admin: the DHCP global pool allocates address for route
+            or switch.  The default value is 0."
+        ::= { h3cDHCPSrvGlobalPoolConfigEntry 10 }
 -- =================================================================
 -- 3rd Table of h3cDHCPServerTables: h3cDHCPSrvGlobalPoolParaTable
 -- =================================================================
@@ -347,7 +374,9 @@ h3cDHCPServer MODULE-IDENTITY
                 h3cDHCPSrvGlbPoolLeaseTime                TimeTicks,
                 h3cDHCPSrvGlbPoolPrimaryDNSIP             IpAddress,
                 h3cDHCPSrvGlbPoolSecondaryDNSIP           IpAddress,
-                h3cDHCPSrvGlbPoolLeaseSecond              Integer32
+                h3cDHCPSrvGlbPoolLeaseSecond              Integer32,
+                h3cDHCPSrvGlbPoolLeaseTimeSec             Integer32,
+                h3cDHCPSrvGlbPoolCliGWIPAddr              IpAddress
             }
 
     h3cDHCPSrvGlbPoolLeaseDay OBJECT-TYPE
@@ -414,7 +443,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "A gateway ip address to delete. This object is
+            "A gateway ip address to delete.  This object is
             only for deleting a given ip of gateway router."
         ::= { h3cDHCPSrvGlobalPoolParaEntry 7 }
 
@@ -434,7 +463,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "A DNS server ip address to delete. This object
+            "A DNS server ip address to delete.  This object
             is only for deleting a given ip of DNS server."
         ::= { h3cDHCPSrvGlobalPoolParaEntry 9 }
 
@@ -460,7 +489,7 @@ h3cDHCPServer MODULE-IDENTITY
         STATUS      current
         DESCRIPTION
             "String of NetBios server ip addresses for DHCP
-            clients. Since mostly 8 ip can be configured for
+            clients.  Since mostly 8 ip can be configured for
             a pool totally, so a string is defined to get or
             configure 8 ip at a time."
         ::= { h3cDHCPSrvGlobalPoolParaEntry 11 }
@@ -470,7 +499,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "A NetBios server ip address to delete. This
+            "A NetBios server ip address to delete.  This
             object is only for deleting a given ip of NetBios
             server."
         ::= { h3cDHCPSrvGlobalPoolParaEntry 12 }
@@ -542,6 +571,24 @@ h3cDHCPServer MODULE-IDENTITY
         DEFVAL { 0 }
         ::= { h3cDHCPSrvGlobalPoolParaEntry 18 }
 
+    h3cDHCPSrvGlbPoolLeaseTimeSec OBJECT-TYPE
+        SYNTAX      Integer32 (5..31622399)
+        UNITS      "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds of the lease.  The default
+             value is 86400"
+        ::= { h3cDHCPSrvGlobalPoolParaEntry 19 }
+
+    h3cDHCPSrvGlbPoolCliGWIPAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip addresses of gateway for DHCP clients."
+        ::= { h3cDHCPSrvGlobalPoolParaEntry 20 }
+
 -- =================================================================
 -- 4th Table of h3cDHCPServerTables: h3cDHCPSrvGlobalPoolOptionTable
 -- =================================================================
@@ -604,11 +651,11 @@ h3cDHCPServer MODULE-IDENTITY
         ::= { h3cDHCPSrvGlobalPoolOptionEntry 3 }
 
     h3cDHCPSrvGlbPoolOptHexString OBJECT-TYPE
-        SYNTAX      OCTET STRING(SIZE(0..143))
+        SYNTAX      OCTET STRING(SIZE(0..573))
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "Hex string of an option. 1st to 16th hex strings,
+            "Hex string of an option.  1st to 16th hex strings,
             which are 2 bytes, 4 bytes, 6 bytes or 8 bytes,
             can be configured at most simultaneously.
             That means the format of each string
@@ -620,7 +667,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "Ip string of an option. 1 to 8 ip addresses  can
+            "IP string of an option.  1 to 8 ip addresses  can
             be configured at most simultaneously."
         ::= { h3cDHCPSrvGlobalPoolOptionEntry 5 }
 
@@ -629,7 +676,7 @@ h3cDHCPServer MODULE-IDENTITY
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "RowStatus. Three actions are used: active,
+            "RowStatus.  Three actions are used: active,
             createAndGo, destroy."
         ::= { h3cDHCPSrvGlobalPoolOptionEntry 6 }
 
@@ -661,7 +708,9 @@ h3cDHCPServer MODULE-IDENTITY
                 h3cDHCPSrvGlbPoolSuccessTimes    Counter32,
                 h3cDHCPSrvGlbPoolDiscoverTimes   Counter32,
                 h3cDHCPSrvGlbPoolOfferTimes      Counter32,
-                h3cDHCPSrvGlbPoolACKTimes        Counter32
+                h3cDHCPSrvGlbPoolACKTimes        Counter32,
+                h3cDHCPSrvGlbPoolTotalIpNum      Counter32,
+                h3cDHCPSrvGlbPoolInUsedIpNum     Counter32
              }
 
     h3cDHCPSrvGlbPoolIPPoolUsage OBJECT-TYPE
@@ -714,6 +763,264 @@ h3cDHCPServer MODULE-IDENTITY
             "Number of ACK packets sent by each DHCP address pool."
         ::= { h3cDHCPSrvGlobalPoolStatEntry 6 }
 
+    h3cDHCPSrvGlbPoolTotalIpNum OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of IP addresses in each DHCP address pool."
+        ::= { h3cDHCPSrvGlobalPoolStatEntry 7 }
+
+    h3cDHCPSrvGlbPoolInUsedIpNum OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of allocated IP addresses in each DHCP address pool."
+        ::= { h3cDHCPSrvGlobalPoolStatEntry 8 }
+
+-- =================================================================
+-- 6th Table of h3cDHCPServerTables: h3cDHCPSvrOptionGroupTable
+-- =================================================================
+    h3cDHCPSvrOptionGroupTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cDHCPSvrOptionGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for creating DHCP server global option groups."
+        ::= { h3cDHCPServerTables 7 }
+
+    h3cDHCPSvrOptionGroupEntry OBJECT-TYPE
+        SYNTAX      H3cDHCPSvrOptionGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing objects for creating or
+            deleting a global option group."
+        INDEX { h3cDHCPSvrOptionGroupIndex }
+        ::= { h3cDHCPSvrOptionGroupTable 1 }
+
+    H3cDHCPSvrOptionGroupEntry ::=
+        SEQUENCE
+            {   h3cDHCPSvrOptionGroupIndex      Integer32,
+                h3cDHCPSvrOptionGroupRowstatus  RowStatus
+            }
+
+    h3cDHCPSvrOptionGroupIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The global option group index."
+        ::= { h3cDHCPSvrOptionGroupEntry 1 }
+
+    h3cDHCPSvrOptionGroupRowstatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RowStatus.  Three actions are used: active,
+            createAndGo, destroy."
+        ::= { h3cDHCPSvrOptionGroupEntry 2 }
+
+-- =================================================================
+-- 7th Table of h3cDHCPServerTables: h3cDHCPSvrOptionTable
+-- =================================================================
+    h3cDHCPSvrOptionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cDHCPSvrOptionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring options in a global option group."
+        ::= { h3cDHCPServerTables 8 }
+
+    h3cDHCPSvrOptionEntry OBJECT-TYPE
+        SYNTAX      H3cDHCPSvrOptionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing objects for configuring
+             an option in a global option group."
+        INDEX {h3cDHCPSvrOptionGroupIndex , h3cDHCPSvrOptionCode }
+        ::= { h3cDHCPSvrOptionTable 1 }
+
+    H3cDHCPSvrOptionEntry ::=
+        SEQUENCE
+            {   h3cDHCPSvrOptionCode         Integer32,
+                h3cDHCPSvrOptionType         INTEGER,
+                h3cDHCPSvrOptionAsciiString  OCTET STRING,
+                h3cDHCPSvrOptionHexString    OCTET STRING,
+                h3cDHCPSvrOptionIPString     OCTET STRING,
+                h3cDHCPSvrOptionRowstatus    RowStatus
+            }
+
+
+    h3cDHCPSvrOptionCode OBJECT-TYPE
+        SYNTAX      Integer32 (1..254)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Option code."
+        ::= { h3cDHCPSvrOptionEntry 1 }
+
+    h3cDHCPSvrOptionType OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                ascii(1),
+                hex(2),
+                ip(3)
+            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Option type."
+        ::= { h3cDHCPSvrOptionEntry 2 }
+
+    h3cDHCPSvrOptionAsciiString OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..255))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Ascii string of an option."
+        DEFVAL { "" }
+        ::= { h3cDHCPSvrOptionEntry 3 }
+
+    h3cDHCPSvrOptionHexString OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..573))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Hex string of an option.  1 to 16 hex strings,
+            which are 2 bytes, 4 bytes, 6 bytes or 8 bytes,
+            can be configured at most simultaneously.
+            That means the format of each string
+            must be '12', '1234', '123456' or '12345678'."
+        DEFVAL { "" }
+        ::= { h3cDHCPSvrOptionEntry 4 }
+
+    h3cDHCPSvrOptionIPString OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..129))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Ip string of an option.  1 to 8 ip addresses can
+            be configured at most simultaneously."
+        DEFVAL { "" }
+        ::= { h3cDHCPSvrOptionEntry 5 }
+
+    h3cDHCPSvrOptionRowstatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RowStatus.  Three actions are used: active,
+            createAndGo, destroy."
+        ::= { h3cDHCPSvrOptionEntry 6 }
+
+-- =================================================================
+-- 8th Table of h3cDHCPServerTables: h3cDHCPSvrVerifyMacTable
+-- =================================================================
+    h3cDHCPSvrVerifyMacTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cDHCPSvrVerifyMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table containing the verifying switches status for pools."
+        ::= { h3cDHCPServerTables 9 }
+
+    h3cDHCPSvrVerifyMacEntry OBJECT-TYPE
+        SYNTAX      H3cDHCPSvrVerifyMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing the switch status for a pool."
+        INDEX { h3cDHCPSrvGlobalPoolName }
+        ::= { h3cDHCPSvrVerifyMacTable 1 }
+
+    H3cDHCPSvrVerifyMacEntry ::=
+        SEQUENCE
+            {
+                h3cDHCPSvrVerifyMacSwitch    INTEGER
+            }
+
+    h3cDHCPSvrVerifyMacSwitch OBJECT-TYPE
+        SYNTAX  INTEGER
+            {
+                enabled(1),
+                disabled(2)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The switch status for this pool.
+             It has two defined values: enabled and disabled.
+             If the value is enabled, the DHCP server only allocates IP address
+             to host in the MAC list.  The default value is disabled."
+        DEFVAL { disabled }
+        ::= { h3cDHCPSvrVerifyMacEntry 1 }
+
+-- =================================================================
+-- 9th Table of h3cDHCPServerTables: h3cDHCPSvrPoolMacTable
+-- =================================================================
+    h3cDHCPSvrPoolMacTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cDHCPSvrPoolMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table containing the MAC addresses list for pools."
+        ::= { h3cDHCPServerTables 10 }
+
+    h3cDHCPSvrPoolMacEntry OBJECT-TYPE
+        SYNTAX      H3cDHCPSvrPoolMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing a MAC address and a mask."
+        INDEX { h3cDHCPSrvGlobalPoolName, h3cDHCPSvrPoolMac, h3cDHCPSvrPoolMacMask }
+        ::= { h3cDHCPSvrPoolMacTable 1 }
+
+    H3cDHCPSvrPoolMacEntry ::=
+        SEQUENCE
+            {   h3cDHCPSvrPoolMac               MacAddress,
+                h3cDHCPSvrPoolMacMask           MacAddress,
+                h3cDHCPSvrPoolMacOptIndex       Integer32,
+                h3cDHCPSvrPoolMacRowstatus      RowStatus
+            }
+
+    h3cDHCPSvrPoolMac OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "MAC address."
+        ::= { h3cDHCPSvrPoolMacEntry 1 }
+
+    h3cDHCPSvrPoolMacMask OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Mask for MAC address."
+        ::= { h3cDHCPSvrPoolMacEntry 2 }
+
+    h3cDHCPSvrPoolMacOptIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Option group index binding for the MAC address."
+        DEFVAL { 0 }
+        ::= { h3cDHCPSvrPoolMacEntry 3 }
+
+    h3cDHCPSvrPoolMacRowstatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RowStatus.  Three actions are used: active,
+            createAndGo, destroy."
+        ::= { h3cDHCPSvrPoolMacEntry 4 }
+
 --
 -- Define the DHCP Server Traps.
 --
@@ -763,7 +1070,7 @@ h3cDHCPServer MODULE-IDENTITY
         }
         STATUS      current
         DESCRIPTION
-            "This trap is generated when the maximun IP address usage
+            "This trap is generated when the maximum IP address usage
             of DHCP server pool in 5 minutes overflows."
         ::= { h3cDHCPServerTrapPrefix 4 }
 

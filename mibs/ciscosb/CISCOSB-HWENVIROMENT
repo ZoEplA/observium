@@ -60,7 +60,8 @@ RlEnvMonState ::= TEXTUAL-CONVENTION
                         notPresent(5),
                         notFunctioning(6),
                         notAvailable(7),
-                        backingUp(8)
+                        backingUp(8),
+                        readingFailed(9)
                 }
 
 

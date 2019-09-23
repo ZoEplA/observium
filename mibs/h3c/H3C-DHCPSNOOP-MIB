@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2004 by  HUAWEI 3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2004-2014 by H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: HUAWEI-3COM Lan Switch DHCP Snooping MIB
+-- Description: DHCP Snooping MIB
 -- Reference:
--- Version: V1.2
+-- Version: V1.3
 -- History:
 -- V1.0 The initial version, created by FuJiajia, 2004.12.29
 -- V1.1 2006-03-08 updated by HeHangjun
@@ -12,6 +12,10 @@
 --      Added h3cDhcpSnoopSpoofServerDetected
 --            h3cDhcpSnoopSpoofServerMac
 --            h3cDhcpSnoopSpoofServerIP
+-- V1.3 2013-10-16 updated by xuyufei
+--      Added h3cDhcpSnoopNewBinding
+--            h3cDhcpSnoopBindingIP
+--            h3cDhcpSnoopBindingMac
 -- ==================================================================
 -- ==================================================================
 --
@@ -22,14 +26,14 @@ H3C-DHCPSNOOP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
-    RowStatus, MacAddress
+    MacAddress
         FROM SNMPv2-TC
 
-    MODULE-IDENTITY,OBJECT-TYPE,IpAddress,Integer32
+    MODULE-IDENTITY,OBJECT-TYPE,NOTIFICATION-TYPE,IpAddress,Integer32
         FROM SNMPv2-SMI
 
     ifIndex
-        FROM RFC1213-MIB
+        FROM IF-MIB
 
     hwdot1qVlanIndex
         FROM HUAWEI-LswVLAN-MIB
@@ -50,13 +54,16 @@ IMPORTS
 -- ==================================================================
 h3cDhcpSnoop MODULE-IDENTITY
         LAST-UPDATED "200501140000Z"
-        ORGANIZATION "Huawei-3com Technologies Co.,Ltd."
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-        "Platform Team Beijing Institute Huawei-3com Tech, Inc.
-                Http:\\www.huawei-3com.com
-                E-mail:support@huawei-3com.com"
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
-            "The private mib file includes the DHCP Snooping profile."
+            "The private MIB file includes the DHCP Snooping profile."
         ::= { h3cCommon  36 }
 
     h3cDhcpSnoopMibObject OBJECT IDENTIFIER ::= {  h3cDhcpSnoop 1  }
@@ -89,7 +96,7 @@ h3cDhcpSnoop MODULE-IDENTITY
         STATUS current
         DESCRIPTION "An entry containing information of DHCP clients."
         INDEX   { h3cDhcpSnoopClientIpAddressType, h3cDhcpSnoopClientIpAddress }
-        ::= { h3cDhcpSnoopTable 1}
+        ::= { h3cDhcpSnoopTable 1 }
 
     H3cDhcpSnoopEntry   ::=
     SEQUENCE {
@@ -97,7 +104,7 @@ h3cDhcpSnoop MODULE-IDENTITY
         h3cDhcpSnoopClientIpAddress   InetAddress,
         h3cDhcpSnoopClientMacAddress  MacAddress,
         h3cDhcpSnoopClientProperty    INTEGER ,
-        h3cDhcpSnoopClientUnitNum     INTEGER
+        h3cDhcpSnoopClientUnitNum     Integer32
         }
 
     h3cDhcpSnoopClientIpAddressType OBJECT-TYPE
@@ -134,7 +141,7 @@ h3cDhcpSnoop MODULE-IDENTITY
         ::= { h3cDhcpSnoopEntry 4 }
 
     h3cDhcpSnoopClientUnitNum OBJECT-TYPE
-        SYNTAX  INTEGER
+        SYNTAX  Integer32
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION "IRF (Intelligent Resilient Fabric) unit number via whom the clients
@@ -154,7 +161,7 @@ h3cDhcpSnoop MODULE-IDENTITY
         STATUS current
         DESCRIPTION "An entry containing information about trusted status of ports."
         INDEX   { ifIndex }
-        ::= { h3cDhcpSnoopTrustTable 1}
+        ::= { h3cDhcpSnoopTrustTable 1 }
 
     H3cDhcpSnoopTrustEntry  ::=
     SEQUENCE {
@@ -244,6 +251,22 @@ h3cDhcpSnoop MODULE-IDENTITY
           "
       ::= { h3cDhcpSnoopTrapsObject 2 }
 
+    h3cDhcpSnoopBindingIP OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "IP address of a new binding. "
+      ::= { h3cDhcpSnoopTrapsObject 3 }
+
+
+    h3cDhcpSnoopBindingMac OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "MAC address of a new binding. "
+      ::= { h3cDhcpSnoopTrapsObject 4 }
+
+
     h3cDhcpSnoopSpoofServerDetected NOTIFICATION-TYPE
         OBJECTS
         {
@@ -267,5 +290,16 @@ h3cDhcpSnoop MODULE-IDENTITY
            If this interface receives a DHCP-OFFER  message,  the DHCP server which
            sent it is considered unauthorized. "
     ::= { h3cDhcpSnoopTrapsPrefix 1 }
+
+    h3cDhcpSnoopNewBinding NOTIFICATION-TYPE
+        OBJECTS
+        {
+            h3cDhcpSnoopBindingIP,
+            h3cDhcpSnoopBindingMac
+        }
+        STATUS current
+        DESCRIPTION
+           "The device sends a trap when adding a new binding."
+    ::= { h3cDhcpSnoopTrapsPrefix 2 }
 
 END

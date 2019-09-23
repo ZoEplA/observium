@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -423,7 +423,8 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
 
                foreach($ids as $tmp_id)
                {
-                  if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? AND `bgpPeerRemoteAs` = ?', array($tmp_id, $bgpLocalAs)))
+                  //if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = ? AND `bgpPeerRemoteAs` = ?', array($tmp_id, $bgpLocalAs)))
+                  if (dbExist('bgpPeers', '`device_id` = ? AND `bgpPeerRemoteAs` = ?', array($tmp_id, $bgpLocalAs)))
                   {
                      // Validate if bgpLocalAs also present on remote device
                      $peer_device_id = $tmp_id;
@@ -560,7 +561,8 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
                   $peer_id                        = $peer_ids[$peer_ip];
                   $af_list[$peer_id][$afi][$safi] = 1;
 
-                  if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND `bgpPeer_id` = ? AND `afi` = ? AND `safi` = ?', array($device['device_id'], $peer_id, $afi, $safi)) == 0)
+                  //if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND `bgpPeer_id` = ? AND `afi` = ? AND `safi` = ?', array($device['device_id'], $peer_id, $afi, $safi)) == 0)
+                  if (!dbExist('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeer_id` = ? AND `afi` = ? AND `safi` = ?', array($device['device_id'], $peer_id, $afi, $safi)))
                   {
                      $params = array('bgpPeer_id' => $peer_id, 'device_id' => $device['device_id'], 'bgpPeer_id' => $peer_id, 'afi' => $afi, 'safi' => $safi);
                      dbInsert($params, 'bgpPeers_cbgp');
@@ -625,7 +627,8 @@ if ($config['enable_bgp'] && is_device_mib($device, 'BGP4-MIB')) // Note, BGP4-M
                      }
                      $table_rows[$peer_ip][4] .= $afi . '.' . $safi;
 
-                     if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND `bgpPeer_id` = ? AND `afi` = ? AND `safi` = ?', array($device['device_id'], $peer_id, $afi, $safi)) == 0)
+                     //if (dbFetchCell('SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND `bgpPeer_id` = ? AND `afi` = ? AND `safi` = ?', array($device['device_id'], $peer_id, $afi, $safi)) == 0)
+                     if (!dbExist('bgpPeers_cbgp', '`device_id` = ? AND `bgpPeer_id` = ? AND `afi` = ? AND `safi` = ?', array($device['device_id'], $peer_id, $afi, $safi)))
                      {
                         $params = array('bgpPeer_id' => $peer_id, 'device_id' => $device['device_id'], 'bgpPeerIndex' => $index, 'afi' => $afi, 'safi' => $safi);
                         dbInsert($params, 'bgpPeers_cbgp');

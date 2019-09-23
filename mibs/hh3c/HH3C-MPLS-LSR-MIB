@@ -1,5 +1,5 @@
 -- =========================================================================
--- Copyright (C) 2001,2002 by  H3C TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2001,2002 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:This file describes the MIB implementation of mpls lsr.
 -- Reference:
@@ -38,9 +38,9 @@ IMPORTS
 hh3cMplsLsr MODULE-IDENTITY
    LAST-UPDATED "200007121200Z"  -- 12 July 2000 12:00:00 EST
    ORGANIZATION
-       "Hangzhou H3C Tech. Co., Ltd."
+       "New H3C Tech. Co., Ltd."
    CONTACT-INFO
-       "Platform Team Hangzhou H3C Tech. Co., Ltd.
+       "Platform Team New H3C Tech. Co., Ltd.
        Hai-Dian District Beijing P.R. China
        http://www.h3c.com
        Zip:100085

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -136,7 +136,7 @@ unset($limits_reset_array);
 <?php } ?>
       <th style="width: 60px;">Max</th>
 <?php if (OBS_DEBUG) { echo('      <th style="width: 60px;">Scale</th>'); } ?>
-      <th style="width: 50px; white-space: nowrap;">Custom Limits</th>
+      <th style="width: 50px;">Custom</th>
       <th style="width: 50px; white-space: nowrap;">Reset Limits</th>
       <th style="width: 50px;">Alerts</th>
     </tr>
@@ -178,15 +178,77 @@ foreach ($sensors as $sensor)
   {
     echo('<td>'.$sensor['sensor_multiplier'].'</td>');
   }
-  echo('<td><div class="'.$limit_switch_class.'">
-               <input type=checkbox data-toggle="switch-mini" id="sensor_custom_limit_'.$sensor['sensor_id'].'" name="sensors['.$sensor['sensor_id'].'][sensor_custom_limit]"'.($sensor['sensor_custom_limit'] ? "checked" : "").'>
-             </div></td>');
-  echo('<td><div class="'.$limit_switch_class.'">
-               <input type=checkbox data-toggle="switch-mini" id="sensor_reset_limit_'.$sensor['sensor_id'].'" name="sensors['.$sensor['sensor_id'].'][sensor_reset_limit]">
-             </div></td>');
-  echo('<td>
-          <input type=checkbox data-toggle="switch-revert" id="sensor_ignore_'.$sensor['sensor_id'].'" name="sensors['.$sensor['sensor_id'].'][sensor_ignore]"'.($sensor['sensor_ignore'] ? "checked" : "").'>
-        </td>');
+  $item = array(
+    //'id'            => 'sensor_custom_limit_'.$sensor['sensor_id'],
+    'id'            => 'sensors['.$sensor['sensor_id'].'][sensor_custom_limit]',
+    //'type'          => 'switch',
+    'type'          => 'switch-ng',
+    'on-text'       => 'Custom',
+    //'on-color'      => 'danger',
+    //'on-icon'       => 'icon-trash',
+    'off-text'      => 'No',
+    //'off-icon'      => 'icon-sitemap',
+    //'grid'          => 1,
+    'size'          => 'mini',
+    'width'         => '58px',
+    //'title'         => 'Use custom limits',
+    //'placeholder'   => 'Removed',
+    'readonly'      => $readonly,
+    //'disabled'      => TRUE,
+    //'submit_by_key' => TRUE,
+    'value'         => $sensor['sensor_custom_limit']);
+  echo('<td class="text-center">'.generate_form_element($item).'</td>');
+  //echo('<td><div class="'.$limit_switch_class.'">
+  //             <input type=checkbox data-toggle="switch-mini" id="sensor_custom_limit_'.$sensor['sensor_id'].'" name="sensors['.$sensor['sensor_id'].'][sensor_custom_limit]"'.($sensor['sensor_custom_limit'] ? "checked" : "").'>
+  //           </div></td>');
+  $item = array(
+    //'id'            => 'sensor_reset_limit_'.$sensor['sensor_id'],
+    'id'            => 'sensors['.$sensor['sensor_id'].'][sensor_reset_limit]',
+    //'type'          => 'switch',
+    'type'          => 'switch-ng',
+    'on-text'       => 'Reset',
+    //'on-color'      => 'danger',
+    //'on-icon'       => 'icon-trash',
+    'off-text'      => 'No',
+    //'off-icon'      => 'icon-sitemap',
+    //'grid'          => 1,
+    'size'          => 'mini',
+    //'class'         => 'text-center',
+    'width'         => '58px',
+    //'title'         => 'Reset limits to auto',
+    //'placeholder'   => 'Removed',
+    'readonly'      => $readonly,
+    //'disabled'      => TRUE,
+    //'submit_by_key' => TRUE,
+    'value'         => $sensor['sensor_reset_limit']);
+  echo('<td class="text-center">'.generate_form_element($item).'</td>');
+  //echo('<td><div class="'.$limit_switch_class.'">
+  //             <input type=checkbox data-toggle="switch-mini" id="sensor_reset_limit_'.$sensor['sensor_id'].'" name="sensors['.$sensor['sensor_id'].'][sensor_reset_limit]">
+  //           </div></td>');
+  $item = array(
+    //'id'            => 'sensor_ignore_'.$sensor['sensor_id'],
+    'id'            => 'sensors['.$sensor['sensor_id'].'][sensor_ignore]',
+    //'type'          => 'switch',
+    'type'          => 'switch-ng',
+    'off-text'      => 'Yes',
+    'off-color'     => 'success',
+    'on-color'      => 'danger',
+    //'on-icon'       => 'icon-trash',
+    'on-text'       => 'No',
+    //'off-icon'      => 'icon-sitemap',
+    //'grid'          => 1,
+    'size'          => 'mini',
+    //'height'        => '15px',
+    //'title'         => 'Show/Hide Removed',
+    //'placeholder'   => 'Removed',
+    'readonly'      => $readonly,
+    //'disabled'      => TRUE,
+    //'submit_by_key' => TRUE,
+    'value'         => $sensor['sensor_ignore']);
+  echo('<td class="text-center">'.generate_form_element($item).'</td>');
+  //echo('<td>
+  //        <input type=checkbox data-toggle="switch-revert" id="sensor_ignore_'.$sensor['sensor_id'].'" name="sensors['.$sensor['sensor_id'].'][sensor_ignore]"'.($sensor['sensor_ignore'] ? "checked" : "").'>
+  //      </td>');
   echo('</tr>');
 }
 

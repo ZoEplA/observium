@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -75,7 +75,7 @@ foreach ($cache['megaraid']['pd'] as $index => $pd)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "pdTemperature.$index", 'lsi-megaraid-sas-mib', $descr, 1, $value);
+    discover_sensor('temperature', $device, $oid, "pdTemperature.$index", 'lsi-megaraid-sas-mib', $descr, 1, $value);
   }
 
   $value = $pd['pdState'];
@@ -83,7 +83,7 @@ foreach ($cache['megaraid']['pd'] as $index => $pd)
 
   if ($value !== '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "pdState.$index", 'lsi-megaraid-sas-pd-state', $descr, 1, $value);
+    discover_status($device, $oid, "pdState.$index", 'lsi-megaraid-sas-pd-state', $descr,  $value);
   }
 }
 
@@ -113,7 +113,7 @@ foreach ($cache['megaraid']['psu'] as $index => $psu)
   $value = $psu['powerSupplyStatus'];
   $oid   = ".1.3.6.1.4.1.3582.4.1.5.5.1.3.$index";
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "powerSupplyStatus.$index", 'lsi-megaraid-sas-sensor-state', $descr, 1, $value);
+  discover_status($device, $oid, "powerSupplyStatus.$index", 'lsi-megaraid-sas-sensor-state', $descr,  $value);
 }
 
 // Enclosure temperature sensors
@@ -148,14 +148,14 @@ foreach ($cache['megaraid']['temp'] as $index => $temp)
   $value = $temp['tempSensorStatus'];
   $oid   = ".1.3.6.1.4.1.3582.4.1.5.6.1.3.$index";
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "tempSensorStatus.$index", 'lsi-megaraid-sas-sensor-state', $descr, 1, $value);
+  discover_status($device, $oid, "tempSensorStatus.$index", 'lsi-megaraid-sas-sensor-state', $descr,  $value);
 
   $value = $temp['enclosureTemperature'];
   $oid   = ".1.3.6.1.4.1.3582.4.1.5.6.1.4.$index";
 
   if ($value < 200) // Filter out some silly values, possibly *10'd?
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "enclosureTemperature.$index", 'lsi-megaraid-sas-mib', $descr, 1, $value);
+    discover_sensor('temperature', $device, $oid, "enclosureTemperature.$index", 'lsi-megaraid-sas-mib', $descr, 1, $value);
   }
 }
 
@@ -180,7 +180,7 @@ foreach ($cache['megaraid']['fan'] as $index => $fan)
   $value = $fan['fanStatus'];
   $oid   = ".1.3.6.1.4.1.3582.4.1.5.3.1.3.$index";
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "fanStatus.$index", 'lsi-megaraid-sas-sensor-state', $descr, 1, $value);
+  discover_status($device, $oid, "fanStatus.$index", 'lsi-megaraid-sas-sensor-state', $descr,  $value);
 }
 
 /*

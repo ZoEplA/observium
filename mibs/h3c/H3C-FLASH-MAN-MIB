@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: flash management mib
 -- Reference:
--- Version: V3.0
+-- Version: V3.3
 -- History:
 --     V1.0 initial version 2002-12-20
 --     V1.1 2004-6-15 add delete(4) to h3cFlhOperType
@@ -41,7 +41,20 @@
 --                     added enum in H3cFlashOperationStatus,
 --                     added h3cFlhOperSrvAddrType, h3cFlhOperSrvAddrRev and
 --                     h3cFlhOperSrvVPNName by songhao.
---     V3.0 2011-10-13 Modify syntax of h3cFlhName and h3cFlhPartName by shuaixiaojuan.
+--     V3.0 2011-10-13 Modify syntax of h3cFlhName and h3cFlhPartName
+--                     by shuaixiaojuan.
+--     V3.1 2012-06-26 Add h3cFlhPartBootable and h3cFlhPartPathForGlobalOpt
+--                     by lisong.
+--     V3.2 2013-05-23 Add h3cFlhHCSize, h3cFlhPartHCSpace,
+--                     h3cFlhPartHCSpaceFree and h3cFlhFileHCSize to replace
+--                     h3cFlhSize, h3cFlhPartSpace, h3cFlhPartSpaceFree
+--                     and h3cFlhFileSize by lisong.
+--     V3.3 2014-08-11 Added mkdir(6), rmdir(7) to h3cFlhOperType, added h3cFlhFileType
+--                     to h3cFlhFileEntry, modified description of
+--                     h3cFlhFileName, h3cFlhOperProtocol, h3cFlhOperSourceFile
+--                     and H3cFlashOperationStatus to support directory operation
+--                     by SongHao.
+--          2015-01-20 Added copy(8) to h3cFlhOperType by SongHao.
 -- =================================================================
 H3C-FLASH-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -56,17 +69,19 @@ IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     InetAddressType, InetAddress
-        FROM INET-ADDRESS-MIB   
+        FROM INET-ADDRESS-MIB
     DisplayString, TimeStamp, TruthValue, RowStatus, TEXTUAL-CONVENTION
-        FROM SNMPv2-TC;
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC;
 
 
 h3cFlash MODULE-IDENTITY
-    LAST-UPDATED "201006050000Z"        -- July 01, 2002 at 00:00 GMT
+    LAST-UPDATED "201501200808Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
@@ -74,6 +89,82 @@ h3cFlash MODULE-IDENTITY
         "This MIB contains objects to manage flash cards and flash
         card operations.
         There are no constraints on this MIB."
+    REVISION "201501200808Z"
+    DESCRIPTION
+        "Added copy(8) to h3cFlhOperType."
+    REVISION "201408110303Z"
+    DESCRIPTION
+        "Added mkdir(6), rmdir(7) to h3cFlhOperType, added h3cFlhFileType
+        to h3cFlhFileEntry, modified description of
+        h3cFlhFileName, h3cFlhOperProtocol, h3cFlhOperSourceFile
+        and H3cFlashOperationStatus to support directory operation."
+    REVISION "201305230000Z"
+    DESCRIPTION
+        "Add h3cFlhHCSize, h3cFlhPartHCSpace, h3cFlhPartHCSpaceFree and
+        h3cFlhFileHCSize to replace h3cFlhSize, h3cFlhPartSpace,
+        h3cFlhPartSpaceFree and h3cFlhFileSize."
+    REVISION "201206260000Z"
+    DESCRIPTION
+        "Add h3cFlhPartBootable and h3cFlhPartPathForGlobalOpt."
+    REVISION "201110130000Z"
+    DESCRIPTION
+        "Modify syntax of h3cFlhName and h3cFlhPartName."
+    REVISION "201010300000Z"
+    DESCRIPTION
+        "Deprecated h3cFlhOperServerAddress, added enum in
+        H3cFlashOperationStatus, added h3cFlhOperSrvAddrType,
+        h3cFlhOperSrvAddrRev and h3cFlhOperSrvVPNName."
+    REVISION "201006050000Z"
+    DESCRIPTION
+        "Add h3cFlhOperFailReason and h3cFlhKbyteSize."
+    REVISION "200905050000Z"
+    DESCRIPTION
+        "Add h3cFlhOperServerPort."
+    REVISION "200603030000Z"
+    DESCRIPTION
+        "Correct some error words which are obvious clerical error."
+    REVISION "200508180000Z"
+    DESCRIPTION
+        "Change the value range of h3cFlhFileIndex from (1..32)
+        to (1..2147483647)."
+    REVISION "200506060000Z"
+    DESCRIPTION
+        "Add enum value in SYNTAX of h3cFlhOperProtocol.
+         Adjust file format."
+    REVISION "200501110800Z"
+    DESCRIPTION
+        "Add 'rename' operation type for h3cFlhOperType."
+    REVISION "200501110000Z"
+    DESCRIPTION
+        "File description updated."
+    REVISION "200411220000Z"
+    DESCRIPTION
+        "Modify the SYNTAX of h3cFlhSupportNum and h3cFlhIndex."
+    REVISION "200410120000Z"
+    DESCRIPTION
+        "Fix h3cFlhMIBCompliance MODULE name to H3C-FLASH-MAN-MIB."
+    REVISION "200408190000Z"
+    DESCRIPTION
+        "Modify the DESCRIPTION of h3cFlhMinPartitionSize."
+    REVISION "200407150000Z"
+    DESCRIPTION
+        "Add some H3cFlashOperationStatus types:
+        opAuthFail(17),
+        opTimeout(18),
+        opDeleteFileOpenError(20),
+        opDeleteInvalidDevice(21),
+        opDeleteInvalidFunction(22),
+        opDeleteOperationError(23),
+        opDeleteInvalidFileName(24),
+        opDeleteDeviceBusy(25),
+        opDeleteParaError(26),
+        opDeleteInvalidPath(27)"
+    REVISION "200406150000Z"
+    DESCRIPTION
+        "add delete(4) to h3cFlhOperType."
+    REVISION "200212200000Z"
+    DESCRIPTION
+        "Initial version."
     ::= { h3cCommon 5 }
 
 
@@ -92,7 +183,7 @@ H3cFlashOperationStatus ::= TEXTUAL-CONVENTION
         opInvalid : The command is invalid or command-protocol-device
                     combination is unsupported by the system.
         opInvalidProtocol : Invalid protocol is specified.
-        opInvalidSourceName : Invalid source file name is specified.
+        opInvalidSourceName : Invalid source name is specified.
         opInvalidDestName : Invalid target name is specified.
         opInvalidServerAddress : Invalid server address is specified.
         opDeviceBusy : The device is in use and locked by another process.
@@ -101,26 +192,27 @@ H3cFlashOperationStatus ::= TEXTUAL-CONVENTION
         opDeviceNotProgrammable : Device is read-only but a write or
                                   erase operation was specified.
         opDeviceFull : Device is filled to capacity.
-        opFileOpenError : Invalid file name; file not found in partition.
+        opFileOpenError : Invalid file/directory name,
+                          file/directory not found in partition.
         opFileTransferError : File transfer was unsuccessful.
         opFileChecksumError : File checksum in Flash is invalid.
         opNoMemory : System is running in low on memory.
-        opUnknownFailure : Failure which is  unknown.
-        opDeleteFileOpenError : File is in used by another process.
+        opUnknownFailure : Failure which is unknown.
+        opDeleteFileOpenError : File/Directory is in used by another process.
         opDeleteInvalidDevice : Invalid device name is specified.
         opDeleteInvalidFunction : Deleted operation is unsupported
                                   by the device.
         opDeleteOperationError : Operation is in a low error.
-        opDeleteInvalidFileName : Invalid file name is specified.
-        pDeleteDeviceBusy : The device is in use and locked
+        opDeleteInvalidFileName : Invalid name is specified.
+        opDeleteDeviceBusy : The device is in use and locked
                             by another process.
         opDeleteParaError : The parameters are invalid.
-        opDeleteInvalidPath : The file path is invalid.
+        opDeleteInvalidPath : The path is invalid.
         opDeleteFileNotExistInSlave : Failed to delete file, because the file
-                                      is not exist in the slave.
-        opDeleteFileFailedInSlave : Operation is fail when delete file in the slave.
-        opSlaveFull : Operation is fail for the slave don't have enough space.
-        opCopyToSlaveFailure : Operation is fail when copy file to the slave.
+                                      does not exist in the slave.
+        opDeleteFileFailedInSlave : Operation failed when deleting file in the slave.
+        opSlaveFull : Operation failed because the slave doesn't have enough space.
+        opCopyToSlaveFailure : Operation failed when copying file to the slave.
         "
     SYNTAX INTEGER
         {
@@ -164,23 +256,23 @@ H3cFlashPartitionUpgradeMode ::= TEXTUAL-CONVENTION
         Flash partition upgrade method, i.e., method by which
         new files can be downloaded into the partition.
         FLH stands for Flash Load Helper, a feature provided
-        on run-from-Flash systems for upgrading Flash. This
+        on run-from-Flash systems for upgrading Flash.  This
         feature uses the bootstrap code in ROMs to help in
         automatic download.
         This object should be retrieved if the partition
         status is runFromFlash(2).
         If the partition status is readOnly(1), the upgrade
         method would depend on the reason for the readOnly
-        status. For example, it may simply be a matter of installing
+        status.  For example, it may simply be a matter of installing
         the programming jumper, or it may require execution of a
         later version of software that supports the Flash chips.
 
         unknown      -  the current system image does not know
-                how Flash can be programmed. A possible
+                how Flash can be programmed.  A possible
                 method would be to reload the ROM image
                 and perform the upgrade manually.
         rxbootFLH    -  the Flash Load Helper is available to
-                download files to Flash. A copy-to-flash
+                download files to Flash.  A copy-to-flash
                 command can be used and this system image
                 will automatically reload the Rxboot image
                 in ROM and direct it to carry out the
@@ -272,7 +364,8 @@ H3cFlashEntry ::=
         h3cFlhMinPartitionSize      Integer32,
         h3cFlhMaxPartitions         Integer32,
         h3cFlhPartitionNum          Integer32,
-        h3cFlhKbyteSize             Integer32
+        h3cFlhKbyteSize             Integer32,
+        h3cFlhHCSize                CounterBasedGauge64
      }
 
 h3cFlhIndex OBJECT-TYPE
@@ -291,7 +384,7 @@ h3cFlhIndex OBJECT-TYPE
 
         From bit0 to bit15 (two bytes), it has a minimum value of 1, and
         maximum value of the same as the value of h3cFlhSupportNum.
-        
+
         From bit16 to bit31 (two bytes), it is the physical index the same as the
         entPhysicalIndex specified in ENTITY-MIB.
         "
@@ -302,12 +395,14 @@ h3cFlhSize OBJECT-TYPE
     SYNTAX Integer32
     UNITS "bytes"
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "
-        Specifies the total size of the flash device indexed
-        by h3cFlhIndex. The value should be zero if the flash is
-        removed for a removable device.
+        Specifies the total size of the flash indexed by h3cFlhIndex.
+        The value should be zero if the flash is removed for a removable
+        device.
+        If the total size of the flash exceeds 2,147,483,647 bytes,
+        h3cFlhHCSize specifies the actual size.
         "
     ::= { h3cFlashEntry 2 }
 
@@ -318,7 +413,7 @@ h3cFlhPos OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        The position of the flash device in system. This object is
+        The position of the flash device in system.  This object is
         an index of entPhysicalTable in ENTITY-MIB.
         If the value of this object is 0,
         the main processor is indicated.
@@ -360,8 +455,8 @@ h3cFlhInitTime OBJECT-TYPE
     DESCRIPTION
         "
         The initialization time for the flash component or partition,
-        recorded using the system time. This will be the boot time for
-        a fixed device. For a removable component or a partition,
+        recorded using the system time.  This will be the boot time for
+        a fixed device.  For a removable component or a partition,
         it will be the initialization time.
         "
     ::= { h3cFlashEntry 8 }
@@ -414,7 +509,7 @@ h3cFlhMaxPartitions OBJECT-TYPE
     DESCRIPTION
         "
         The maximum count of partitions which the system supports
-        for this flash. If h3cFlhPartitionBool is false,
+        for this flash.  If h3cFlhPartitionBool is false,
         the object value is 1.
         "
     ::= { h3cFlashEntry 13 }
@@ -427,7 +522,7 @@ h3cFlhPartitionNum OBJECT-TYPE
     DESCRIPTION
         "
         The actual number of partitions supported by the system for
-        this flash. If h3cFlhPartitionBool is false, this value is 1.
+        this flash.  If h3cFlhPartitionBool is false, this value is 1.
         "
     ::= { h3cFlashEntry 14 }
 
@@ -439,10 +534,22 @@ h3cFlhKbyteSize OBJECT-TYPE
     DESCRIPTION
         "
         Specifies the total size of the flash device indexed
-        by h3cFlhIndex. The value should be zero if the flash is
+        by h3cFlhIndex.  The value should be zero if the flash is
         removed for a removable device.
         "
     ::= { h3cFlashEntry 15 }
+
+h3cFlhHCSize OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Specifies the total size of the flash indexed by h3cFlhIndex.
+        This node is a 64-bit substitute for h3cFlhSize.
+        "
+    ::= { h3cFlashEntry 16 }
 
 h3cFlashChips OBJECT IDENTIFIER ::= { h3cFlashDevice 3 }
 
@@ -520,7 +627,7 @@ h3cFlhChipWriteTimesLimit OBJECT-TYPE
     DESCRIPTION
         "
         The limit for the number of write times (retries)
-        for a flash chip. If the limit
+        for a flash chip.  If the limit
         is exceeded an error should be reported by the management
         station.
         "
@@ -582,7 +689,7 @@ h3cFlhPartitionTable OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        Properties for the flash partitions. Minimum of one entry in
+        Properties for the flash partitions.  Minimum of one entry in
         this table.
         "
     ::= { h3cFlashPartitions 1 }
@@ -614,7 +721,11 @@ SEQUENCE {
     h3cFlhPartUpgradeMode           H3cFlashPartitionUpgradeMode,
     h3cFlhPartName                  DisplayString,
     h3cFlhPartRequireErase          TruthValue,
-    h3cFlhPartFileNameLen           Integer32
+    h3cFlhPartFileNameLen           Integer32,
+    h3cFlhPartBootable              TruthValue,
+    h3cFlhPartPathForGlobalOpt      TruthValue,
+    h3cFlhPartHCSpace               CounterBasedGauge64,
+    h3cFlhPartHCSpaceFree           CounterBasedGauge64
  }
 
 h3cFlhPartIndex OBJECT-TYPE
@@ -658,12 +769,14 @@ h3cFlhPartSpace OBJECT-TYPE
     SYNTAX Integer32
     UNITS "bytes"
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "
         The total space of the flash partition.
         The following should be satisfied:
         h3cFlhPartSpace = n*h3cFlhMinPartitionSize
+        If the total size of the flash partition exceeds 2,147,483,647 bytes,
+        h3cFlhPartHCSpace specifies the actual size.
         "
     ::= { h3cFlhPartitionEntry 4 }
 
@@ -672,9 +785,13 @@ h3cFlhPartSpaceFree OBJECT-TYPE
     SYNTAX Gauge32
     UNITS "bytes"
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
-        "The flash partition's free space."
+        "
+        The flash partition's free space.
+        If the free space of the flash partition exceeds 2,147,483,647 bytes,
+        h3cFlhPartHCSpaceFree specifies the actual free space.
+        "
     ::= { h3cFlhPartitionEntry 5 }
 
 
@@ -748,6 +865,56 @@ h3cFlhPartFileNameLen OBJECT-TYPE
         "The maximum length of file name supported in the system."
     ::= { h3cFlhPartitionEntry 12 }
 
+h3cFlhPartBootable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value indicates whether the partition is a bootable partition.
+         The true(1) value indicates a bootable partition.
+        "
+    ::= { h3cFlhPartitionEntry 13 }
+
+h3cFlhPartPathForGlobalOpt OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value indicates whether the partition is used in a global file
+         operation.  The true(1) value indicates that in one global file
+         operation files will be copied to or deleted from this partition.
+         When h3cFlhPartPathForGlobalOpt in one entry is set to true(1),
+         h3cFlhPartPathForGlobalOpt in other entries with the same entity
+         index will be set to false(0).
+        "
+    ::= { h3cFlhPartitionEntry 14 }
+
+h3cFlhPartHCSpace OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total space of the flash partition.
+        This node is a 64-bit substitute for h3cFlhPartSpace.
+        "
+    ::= { h3cFlhPartitionEntry 15 }
+
+
+h3cFlhPartHCSpaceFree OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The flash partition's free space.
+        This node is a 64-bit substitue for h3cFlhPartSpace.
+        "
+    ::= { h3cFlhPartitionEntry 16 }
+
+
 
 h3cFlhFiles OBJECT IDENTIFIER ::= { h3cFlashPartitions 2 }
 
@@ -767,7 +934,7 @@ h3cFlhFileEntry OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        An entry representing a file. Indexed using flash number,
+        An entry representing a file.  Indexed using flash number,
         partition number, and file number.
         "
     INDEX { h3cFlhIndex, h3cFlhPartIndex, h3cFlhFileIndex }
@@ -780,7 +947,9 @@ H3cFlhFileEntry ::=
         h3cFlhFileName          DisplayString,
         h3cFlhFileSize          Integer32,
         h3cFlhFileStatus        INTEGER,
-        h3cFlhFileChecksum      OCTET STRING
+        h3cFlhFileChecksum      OCTET STRING,
+        h3cFlhFileHCSize        CounterBasedGauge64,
+        h3cFlhFileType          INTEGER
         }
 
 h3cFlhFileIndex OBJECT-TYPE
@@ -797,18 +966,20 @@ h3cFlhFileName OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "A valid file name supported by the file system."
+        "A valid file/directory name supported by the file system."
     ::= { h3cFlhFileEntry 2 }
 
 
 h3cFlhFileSize OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "
         The file size in bytes excluding the file
-        header of file system. The value should be greater than zero.
+        header of file system.  The value should be greater than zero.
+        If the file size exceeds 2,147,483,647 bytes, h3cFlhFileHCSize
+        specifies the actual size.
         "
     ::= { h3cFlhFileEntry 3 }
 
@@ -841,6 +1012,31 @@ h3cFlhFileChecksum OBJECT-TYPE
     ::= { h3cFlhFileEntry 5 }
 
 
+h3cFlhFileHCSize OBJECT-TYPE
+    SYNTAX CounterBasedGauge64
+    UNITS "bytes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The file size in bytes.
+        This node is a 64-bit substitue for h3cFlhFileSize.
+        "
+    ::= { h3cFlhFileEntry 6 }
+
+h3cFlhFileType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            file(1),
+            directory(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates whether it is a file or directory."
+    ::= { h3cFlhFileEntry 7 }
+
+
 -- The operation on the flash.
 h3cFlashOperate OBJECT IDENTIFIER ::= { h3cFlashManMIBObjects 2 }
 
@@ -860,7 +1056,7 @@ h3cFlhOpEntry OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        Note an operation can not be stopped until it is finished.
+        Note an operation cannot be stopped until it is finished.
 
         If notification is configured, NMS will receive a notification
         at the end of the operation.
@@ -899,7 +1095,7 @@ h3cFlhOperIndex OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        Specifies the index of an entry. It is a
+        Specifies the index of an entry.  It is a
         random value when creating an entry.
         "
     ::= { h3cFlhOpEntry 1 }
@@ -912,7 +1108,10 @@ h3cFlhOperType OBJECT-TYPE
             net2FlashWithoutErase(2),
             flash2Net(3),
             delete(4),
-            rename(5)
+            rename(5),
+            mkdir(6),
+            rmdir(7),
+            copy(8)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -920,18 +1119,18 @@ h3cFlhOperType OBJECT-TYPE
         "
         Specifies the operation to be executed.
 
-        net2FlashWithErase  Copy a file to flash; erase
-                    flash beforehand.
-
+        net2FlashWithErase  Copy a file to flash; erase flash beforehand.
         net2FlashWithoutErase   Copy a file to flash; do not erase flash
-        beforehand.
-
-        flash2Net           Copy a file from flash.
-
-        delete          Delete a file from flash, the file name is
-        specified by h3cFlhOperSourceFile;
-
+                                  beforehand.
+        flash2Net       Copy a file from flash.
+        delete          Delete a file that is specified by
+                          h3cFlhOperSourceFile.
         rename          Change a file's name.
+        mkdir           Create a directory that is specified by
+                          h3cFlhOperSourceFile.
+        rmdir           Delete a directory that is specified by
+                          h3cFlhOperSourceFile.
+        copy            Copy a file.
         "
     ::= { h3cFlhOpEntry 2 }
 
@@ -942,14 +1141,17 @@ h3cFlhOperProtocol OBJECT-TYPE
             ftp(1),
             tftp(2),
             clusterftp(3),
-            clustertftp(4)
+            clustertftp(4),
+            sftp(5)
         }
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
         "
-        Specifies the protocol used to transfer file.
+        Specifies the protocol used to transfer a file.
         The default protocol is ftp.
+
+        A directory cannot be transferred.
 
         when 'clusterftp' or 'clustertftp' is selected,
         the h3cFlhOperServerAddress needn't be set,
@@ -971,7 +1173,7 @@ h3cFlhOperServerAddress OBJECT-TYPE
         The address of remote host acting as server for operation.
 
         The default value is 255.255.255.255
-        
+
         This object is replaced by h3cFlhOperSrvAddrRev for it only support IPv4.
         "
     DEFVAL { 'FFFFFFFF'h }
@@ -996,7 +1198,7 @@ h3cFlhOperPassword OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        Remote user password for copying via ftp protocol. Optionally,
+        Remote user password for copying via ftp protocol.  Optionally,
         This object may be ignored for protocols other than ftp. "
     ::= { h3cFlhOpEntry 6 }
 
@@ -1007,7 +1209,9 @@ h3cFlhOperSourceFile OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "
-        Specifies the source file name to be transferred.
+        Specifies the source file/directory name for this operation
+        that is specified by h3cFlhOperType.
+
         It may be located on flash or remote server.
         It may include the file path if it is applicable.
         It must be specified.
@@ -1178,7 +1382,8 @@ h3cFlhPartitionGroup OBJECT-GROUP
         h3cFlhPartSpaceFree, h3cFlhPartFileNum,
         h3cFlhPartChecksumMethod, h3cFlhPartStatus,
         h3cFlhPartUpgradeMode, h3cFlhPartName, h3cFlhPartRequireErase,
-        h3cFlhPartFileNameLen }
+        h3cFlhPartFileNameLen, h3cFlhPartBootable,
+        h3cFlhPartPathForGlobalOpt}
     STATUS current
     DESCRIPTION
         "A collection of objects providing on partition

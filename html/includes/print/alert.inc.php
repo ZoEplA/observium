@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -255,7 +255,6 @@ function print_alert_table($vars)
       if(isset($entity_type['parent_type']))
       {
         echo '  <i class="' . $config['entities'][$entity_type['parent_type']]['icon'] . '"></i> '.generate_entity_link($entity_type['parent_type'], $entity[$entity_type['parent_id_field']]).'</span> - ';
-
       }
       echo '  <i class="' . $config['entities'][$alert['entity_type']]['icon'] . '"></i> '.generate_entity_link($alert['entity_type'], $alert['entity_id'],NULL, NULL, TRUE, $short).'</span>';
       echo '</td>';

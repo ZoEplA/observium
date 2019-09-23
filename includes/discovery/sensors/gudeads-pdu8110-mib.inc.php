@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -27,7 +27,7 @@ foreach ($cache['pdu8110x'] as $index => $entry)
 
   if ($value != '' && $value != -9999)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'pdu8110TempSensor.'.$index, 'pdu8110', $descr, $scale, $value);
+    discover_sensor('temperature', $device, $oid, 'pdu8110TempSensor.'.$index, 'pdu8110', $descr, $scale, $value);
   }
 
   $oid   = ".1.3.6.1.4.1.28507.23.1.6.1.1.3.$index";
@@ -36,7 +36,7 @@ foreach ($cache['pdu8110x'] as $index => $entry)
 
   if ($value != '' && $value != -9999)
   {
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, 'pdu8110HygroSensor.'.$index, 'pdu8110', $descr, $scale, $value);
+    discover_sensor('humidity', $device, $oid, 'pdu8110HygroSensor.'.$index, 'pdu8110', $descr, $scale, $value);
   }
 }
 
@@ -53,7 +53,7 @@ for ($index = 1;$index <= $channels;$index++)
 
   if ($value != '' && $value != -9999)
   {
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "pdu8110Current.$index", 'pdu8110', $descr, $scale, $value);
+    discover_sensor('current', $device, $oid, "pdu8110Current.$index", 'pdu8110', $descr, $scale, $value);
   }
 }
 

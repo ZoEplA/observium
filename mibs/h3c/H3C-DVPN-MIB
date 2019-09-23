@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (C) 2005 by  HUAWEI 3Com TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2005 by  H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: DVPN MIB
 -- Reference:
@@ -33,11 +33,11 @@ H3C-DVPN-MIB DEFINITIONS ::= BEGIN
     h3cDvpn MODULE-IDENTITY
         LAST-UPDATED "200507011936Z"        -- July 1, 2005 at 19:36 GMT
         ORGANIZATION
-            "Huawei 3Com Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Huawei 3Com Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
+            http://www.h3c.com
             Zip:100085
             "
         DESCRIPTION
@@ -498,7 +498,7 @@ H3C-DVPN-MIB DEFINITIONS ::= BEGIN
 
     H3cDvpnPolicyEntry ::=
         SEQUENCE {
-            h3cDvpnPolicyName                          OCTET STRING,
+            h3cDvpnPolicyName                            OCTET STRING,
             h3cDvpnPoAuthenClientType                    INTEGER,
             h3cDvpnPoSessionAlgorithmSuite               DvpnAlgorithmSuite,
             h3cDvpnPoSessionIdleTime                     Integer32,

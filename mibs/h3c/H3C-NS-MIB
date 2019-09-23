@@ -1,11 +1,12 @@
 -- ============================================================================
--- Copyright (C) 2003 by  HUAWEI-3COM TECHNOLOGIES.  All rights reserved.
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V1.00
+-- Version: V1.1
 -- History:
--- V1.00 Created by Zhouzhihua, 2004.11.12
+-- V1.0 Created by Zhouzhihua, 2004.11.12
+-- V1.1 Bug fixed by songhao, 2015.04.30
 -- ============================================================================
 H3C-NS-MIB DEFINITIONS ::= BEGIN
 
@@ -20,12 +21,12 @@ H3C-NS-MIB DEFINITIONS ::= BEGIN
     h3cNS MODULE-IDENTITY
         LAST-UPDATED "200411071353Z"        -- November 07, 2004 at 13:53 GMT
         ORGANIZATION
-            "Huawei-3Com Technologies Co.,Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "L3+ Team Huawei-3Com Technologies Co.,Ltd.
-            Bing-jiang District Hangzhou P.R.China
-            http://www.huawei-3com.com
-            Zip:310053
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
             "
         DESCRIPTION
             "This MIB contains objects to manage the configuration and status
@@ -599,7 +600,7 @@ H3C-NS-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Reset all streams.  The default value is disabled,
              and set this value to enabled when resetting."
-        DEFVAL { disable }
+        DEFVAL { disabled }
         ::= { h3cNSStatusEntry 10 }
 
     h3cNSResetTime OBJECT-TYPE

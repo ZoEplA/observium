@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 -- * Module:    hpicfGppcv2.mib
 -- *
--- * Copyright (C) 1996-2015 Hewlett Packard Enterprise Development LP
+-- * Copyright (C) 1996-2016 Hewlett Packard Enterprise Development LP
 -- * All Rights Reserved.
 -- * 
 -- * The contents of this software are proprietary and confidential
@@ -30,7 +30,7 @@ HP-ICF-GPPCV2-MIB DEFINITIONS ::= BEGIN
             FROM HP-ICF-OID;
 
     hpicfGppcv2MIB MODULE-IDENTITY
-        LAST-UPDATED "201506230000Z" -- June 23, 2015
+        LAST-UPDATED "201601150000Z" -- January 15, 2016
         ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett Packard Company
                       8000 Foothills Blvd.
@@ -38,6 +38,9 @@ HP-ICF-GPPCV2-MIB DEFINITIONS ::= BEGIN
 
         DESCRIPTION  "This MIB module is for HP proprietary
                      General Purpose Packet Control Version 2 (Gppcv2)"
+
+        REVISION     "201601150000Z" -- January 15, 2016
+        DESCRIPTION  "Added policyUser to hpicfGppcv2NpSubType"
 
         REVISION     "201506230000Z" -- June 23, 2015
         DESCRIPTION  "Added hpicfGppcv2AcSharedFlag
@@ -556,7 +559,7 @@ hpicfGppcv2AcIngressTunnelList OBJECT-TYPE
         DESCRIPTION "Name of the policy.  The name of a policy is its
                     unique identification.  It is a printable string
                     in ASCII characters.  It can be up to 64 characters
-                    in length and it case sensitive"
+                    in length and is case sensitive."
         ::= { hpicfGppcv2NamedPolicyEntry 1 }
 
     hpicfGppcv2NpPolicyType OBJECT-TYPE
@@ -564,7 +567,7 @@ hpicfGppcv2AcIngressTunnelList OBJECT-TYPE
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Type of the policy as defined in the 
-                     TEXTUAL-CONVENTION"
+                     TEXTUAL-CONVENTION."
         ::= { hpicfGppcv2NamedPolicyEntry 2 }
 
     hpicfGppcv2NpSubType OBJECT-TYPE
@@ -579,7 +582,8 @@ hpicfGppcv2AcIngressTunnelList OBJECT-TYPE
                               policyPbr(9),
                               policyIpsec(10),
                               aclMacStandard(11),
-                              aclMacExtended(12)}
+                              aclMacExtended(12),
+                              policyUser(13)}
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Subtype of the policy.
@@ -635,7 +639,11 @@ hpicfGppcv2AcIngressTunnelList OBJECT-TYPE
                     A subtype of 'aclMacExtended' indicates that the
                     policy is an extended MAC ACL.  This ACL filters
                     packets based on source MAC address, destination
-                    MAC address, ethertype, CoS and VLAN."
+                    MAC address, ethertype, CoS and VLAN.
+
+                    A subtype of 'policyUser' indicates that the
+                    policy will perform per user actions on packets
+                    that match statements in the policy's classes."
 
         ::= { hpicfGppcv2NamedPolicyEntry 3 }
 
@@ -657,7 +665,8 @@ hpicfGppcv2AcIngressTunnelList OBJECT-TYPE
         SYNTAX      Integer32 (0..2147483647)
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "Contains the highest valid sequence number for this policy                      entry at any point of time."
+        DESCRIPTION "Contains the highest valid sequence number for this policy
+                    entry at any point of time."
         ::= { hpicfGppcv2NamedPolicyEntry 6 }
 
     hpicfGppcv2NpLastErrorCode OBJECT-TYPE

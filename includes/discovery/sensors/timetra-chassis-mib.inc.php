@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -38,7 +38,7 @@ foreach ($cache_discovery['timetra-chassis-mib'] as $chassis => $entries)
       $oid     = ".1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.$chassis.$index";
       $options = array('limit_high' => $entry['tmnxHwTempThreshold']);
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$chassis.$index", 'timetra-chassis-temp', $descr, 1, $entry['tmnxHwTemperature'], $options);
+      discover_sensor('temperature', $device, $oid, "$chassis.$index", 'timetra-chassis-temp', $descr, 1, $entry['tmnxHwTemperature'], $options);
     }
   }
 }
@@ -108,7 +108,7 @@ foreach ($cache_discovery['timetra-chassis-state'] as $chassis => $entries)
         $oid     = $timetra_entity[$oid_name]['oid'].".$chassis.$tray";
         $options = array('entPhysicalClass' => $timetra_entity[$oid_name]['class']);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, 'timetra-chassis-state', $descr, NULL, $value, $options);
+        discover_status($device, $oid, $index, 'timetra-chassis-state', $descr, $value, $options);
       }
     }
   }

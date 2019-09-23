@@ -7,7 +7,7 @@ IMPORTS
     TruthValue, TEXTUAL-CONVENTION,
     DisplayString, RowStatus                        FROM SNMPv2-TC
     InetAddressType,InetAddress                     FROM INET-ADDRESS-MIB
-    rlQosApps                                       FROM CISCOSB-MIB
+    switch001, rlQosApps                            FROM CISCOSB-MIB
     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32        FROM SNMPv2-SMI;
 
 	
@@ -28,7 +28,7 @@ rlQosApps MODULE-IDENTITY
         REVISION "201606020000Z"
         DESCRIPTION
                 "Added this MODULE-IDENTITY clause."
-        ::= { switch001 231 }
+        ::= { switch001 232 }
 
 rlIscsiQos OBJECT IDENTIFIER ::= { rlQosApps 1 }
 

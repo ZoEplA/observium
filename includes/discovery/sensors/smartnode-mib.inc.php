@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -25,7 +25,7 @@ foreach ($sensor_array as $index => $entry)
     $type    = 'temperature';
     $value   = $entry['currentDegreesCelsius'];
 
-    discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'smartnode-temp', $descr, 1, $value);
+    discover_sensor($type, $device, $oid, $index, 'smartnode-temp', $descr, 1, $value);
   }
 }
 
@@ -47,8 +47,8 @@ foreach ($sensor_array as $index => $entry)
     $valueOng= $entry['gwCurrentOngoingCalls'];
     $valueCon= $entry['gwCurrentConnectedCalls'];
 
-    discover_sensor($valid['sensor'], $type, $device, $oidOng, $index, 'smartnode-gw-ongoing', $descr . " Ongoing Calls", 1, $valueOng);
-    discover_sensor($valid['sensor'], $type, $device, $oidCon, $index, 'smartnode-gw-connected', $descr . " Connected Calls", 1, $valueCon);
+    discover_sensor($type, $device, $oidOng, $index, 'smartnode-gw-ongoing', $descr . " Ongoing Calls", 1, $valueOng);
+    discover_sensor($type, $device, $oidCon, $index, 'smartnode-gw-connected', $descr . " Connected Calls", 1, $valueCon);
   }
 }
 */

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,7 +21,7 @@ function custom_port_parser($port)
   print_debug($port['ifAlias']);
 
   // Pull out Type and Description or abort
-  if (!preg_match('/^([^:]+):([^\[\]\(\)\{\}]+)/', $port['ifAlias'], $matches))
+  if (!preg_match('/^([^:]+)[:_]([^\[\]\(\)\{\}]+)/', $port['ifAlias'], $matches))
   {
     return array();
   }

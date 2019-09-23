@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -207,10 +207,25 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
 
     $navbar['options']['graphs'] = array('text' => 'Graphs', 'icon' => $config['icon']['graphs']);
 
-    $health =  dbFetchCell('SELECT COUNT(*) FROM `storage` WHERE device_id = ?', array($device['device_id'])) +
-               dbFetchCell('SELECT COUNT(*) FROM `sensors` WHERE device_id = ?', array($device['device_id'])) +
-               dbFetchCell('SELECT COUNT(*) FROM `mempools` WHERE device_id = ?', array($device['device_id'])) +
-               dbFetchCell('SELECT COUNT(*) FROM `processors` WHERE device_id = ?', array($device['device_id']));
+    //$health = dbFetchCell('SELECT COUNT(*) FROM `storage`    WHERE device_id = ?', array($device['device_id'])) +
+    //          dbFetchCell('SELECT COUNT(*) FROM `sensors`    WHERE device_id = ?', array($device['device_id'])) +
+    //          dbFetchCell('SELECT COUNT(*) FROM `mempools`   WHERE device_id = ?', array($device['device_id'])) +
+    //          dbFetchCell('SELECT COUNT(*) FROM `status`     WHERE device_id = ?', array($device['device_id'])) +
+    //          dbFetchCell('SELECT COUNT(*) FROM `processors` WHERE device_id = ?', array($device['device_id']));
+    $health_exist = [
+      'storage'    => dbExist('storage',    '`device_id` = ?', array($device['device_id'])),
+      'diskio'     => dbExist('ucd_diskio', '`device_id` = ?', array($device['device_id'])),
+      'mempools'   => dbExist('mempools',   '`device_id` = ?', array($device['device_id'])),
+      'processors' => dbExist('processors', '`device_id` = ?', array($device['device_id'])),
+      'sensors'    => dbExist('sensors',    '`device_id` = ? AND `sensor_deleted` = ?', array($device['device_id'], 0)),
+      'status'     => dbExist('status',     '`device_id` = ? AND `status_deleted` = ?', array($device['device_id'], 0)),
+      'counter'    => dbExist('counters',   '`device_id` = ? AND `counter_deleted` = ?', array($device['device_id'], 0)),
+    ];
+    //r($health_exist);
+
+    $health = $health_exist['storage'] || $health_exist['diskio'] ||
+              $health_exist['sensors'] || $health_exist['status'] || $health_exist['counter'] ||
+              $health_exist['mempools'] || $health_exist['processors'];
 
     if ($health)
     {
@@ -218,11 +233,12 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
     }
 
     // Print applications tab if there are matching entries in `applications` table
-    if (dbFetchCell('SELECT COUNT(app_id) FROM applications WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(app_id) FROM applications WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('applications', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['apps'] = array('text' => 'Apps', 'icon' => $config['icon']['apps']);
     }
-
+    
     // Print the collectd tab if there is a matching directory
     if (isset($config['collectd_dir']) && is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/"))
     {
@@ -230,42 +246,56 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
     }
 
     // Print the munin tab if there are matchng entries in the munin_plugins table
-    if (dbFetchCell('SELECT COUNT(mplug_id) FROM munin_plugins WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(mplug_id) FROM munin_plugins WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('munin_plugins', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['munin'] = array('text' => 'Munin', 'icon' => $config['icon']['munin']);
     }
 
     // Print the port tab if there are matching entries in the ports table
-    if (dbFetchCell('SELECT COUNT(port_id) FROM ports WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(port_id) FROM ports WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('ports', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['ports'] = array('text' => 'Ports', 'icon' => $config['icon']['port']);
     }
 
+    // Juniper Firewall MIB. Some day generify this stuff.
+    if(isset($attribs['juniper-firewall-mib']))
+    {
+      $navbar['options']['juniper-firewall'] = array('text' => 'Firewall', 'icon' => $config['icon']['firewall']);
+    }
+
     // Print the SLAs tab if there are matching entries in the slas table
-    if (dbFetchCell('SELECT COUNT(*) FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(*) FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', array($device['device_id'])) > '0')
+    if (dbExist('slas', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['slas'] = array('text' => 'SLAs', 'icon' => $config['icon']['sla']);
     }
 
     // Print the p2p radios tab if there are matching entries in the p2p radios
-    if (dbFetchCell('SELECT COUNT(radio_id) FROM p2p_radios WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(radio_id) FROM p2p_radios WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('p2p_radios', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['p2pradios'] = array('text' => 'Radios', 'icon' => $config['icon']['p2pradio']);
     }
 
     // Print the access points tab if there are matching entries in the accesspoints table (Aruba Legacy)
-    if (dbFetchCell('SELECT COUNT(accesspoint_id) FROM accesspoints WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(accesspoint_id) FROM accesspoints WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('accesspoints', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['accesspoints'] = array('text' => 'APs (Legacy)', 'icon' => $config['icon']['wifi']);
     }
 
     // Print the wifi tab if wifi things exist
 
-    $device_ap_count    = dbFetchCell('SELECT COUNT(wifi_ap_id)          FROM `wifi_aps`          WHERE `device_id` = ?', array($device['device_id']));
-    $device_radio_count = dbFetchCell('SELECT COUNT(wifi_radio_id)       FROM `wifi_radios`       WHERE `device_id` = ?', array($device['device_id']));
-    $device_wlan_count  = dbFetchCell('SELECT COUNT(wlan_id)             FROM `wifi_wlans`        WHERE `device_id` = ?', array($device['device_id']));
+    //$device_ap_exist    = dbFetchCell('SELECT COUNT(wifi_ap_id)          FROM `wifi_aps`          WHERE `device_id` = ?', array($device['device_id']));
+    //$device_radio_exist = dbFetchCell('SELECT COUNT(wifi_radio_id)       FROM `wifi_radios`       WHERE `device_id` = ?', array($device['device_id']));
+    //$device_wlan_exist  = dbFetchCell('SELECT COUNT(wlan_id)             FROM `wifi_wlans`        WHERE `device_id` = ?', array($device['device_id']));
+    $device_ap_exist    = dbExist('wifi_aps',    '`device_id` = ?', array($device['device_id']));
+    $device_radio_exist = dbExist('wifi_radios', '`device_id` = ?', array($device['device_id']));
+    $device_wlan_exist  = dbExist('wifi_wlans',  '`device_id` = ?', array($device['device_id']));
 
-    if ($device_ap_count > 0 || $device_radio_count > 0)
+    if ($device_ap_exist || $device_radio_exist || $device_wlan_exist)
     {
       $navbar['options']['wifi'] = array('text' => 'WiFi', 'icon' => $config['icon']['wifi']);
     }
@@ -283,13 +313,15 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
     }
 
     // Print vlans tab if there are matching entries in the vlans table
-    if (dbFetchCell('SELECT COUNT(vlan_id) FROM vlans WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(vlan_id) FROM vlans WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('vlans', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['vlans'] = array('text' => 'VLANs', 'icon' => $config['icon']['vlan']);
     }
 
     // Pring Virtual Machines tab if there are matching entries in the vminfo table
-    if (dbFetchCell('SELECT COUNT(vm_id) FROM vminfo WHERE device_id = ?', array($device['device_id'])) > '0')
+    //if (dbFetchCell('SELECT COUNT(vm_id) FROM vminfo WHERE device_id = ?', array($device['device_id'])) > '0')
+    if (dbExist('vminfo', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['vm'] = array('text' => 'VMs', 'icon' => $config['icon']['virtual-machine']);
     }
@@ -387,23 +419,27 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
     }
 
     // Print the pseudowire tab if any of the routing tables contain matching entries
-    if (dbFetchCell("SELECT COUNT(*) FROM `pseudowires` WHERE `device_id` = ?", array($device['device_id'])))
+    //if (dbFetchCell("SELECT COUNT(*) FROM `pseudowires` WHERE `device_id` = ?", array($device['device_id'])))
+    if (dbExist('pseudowires', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['pseudowires'] = array('text' => 'Pseudowires', 'icon' => $config['icon']['pseudowire']);
     }
 
     // Print the packages tab if there are matching entries in the packages table
-    if (dbFetchCell('SELECT COUNT(*) FROM `packages` WHERE `device_id` = ?', array($device['device_id'])) > 0)
+    //if (dbFetchCell('SELECT COUNT(*) FROM `packages` WHERE `device_id` = ?', array($device['device_id'])) > 0)
+    if (dbExist('packages', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['packages'] = array('text' => 'Pkgs', 'icon' => $config['icon']['packages']);
     }
 
     // Print the inventory tab if inventory is enabled and either entphysical or hrdevice tables have entries
-    if (dbFetchCell('SELECT COUNT(*) FROM `entPhysical` WHERE `device_id` = ?', array($device['device_id'])) > 0)
+    //if (dbFetchCell('SELECT COUNT(*) FROM `entPhysical` WHERE `device_id` = ?', array($device['device_id'])) > 0)
+    if (dbExist('entPhysical', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['entphysical'] = array('text' => 'Inventory', 'icon' => $config['icon']['inventory']);
     }
-    elseif (dbFetchCell('SELECT COUNT(*) FROM `hrDevice` WHERE `device_id` = ?', array($device['device_id'])) > 0)
+    //elseif (dbFetchCell('SELECT COUNT(*) FROM `hrDevice` WHERE `device_id` = ?', array($device['device_id'])) > 0)
+    else if (dbExist('hrDevice', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['hrdevice'] = array('text' => 'Inventory', 'icon' => $config['icon']['inventory']);
     }
@@ -415,13 +451,16 @@ if (isset($cache['devices']['id'][$vars['device']]) || count($permit_tabs))
 
     // Print service tab if show_services enabled and there are entries in the services table
     ## DEPRECATED
-    if ($config['show_services'] && dbFetchCell('SELECT COUNT(*) FROM services WHERE device_id = ?', array($device['device_id'])) > 0)
+    if ($config['show_services'] &&
+        //dbFetchCell('SELECT COUNT(*) FROM services WHERE device_id = ?', array($device['device_id'])) > 0)
+        dbExist('services', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['services'] = array('text' => 'Services', 'icon' => $config['icon']['service']);
     }
 
     // Print printing tab if there are entries in the printersupplies table
-    if (dbFetchCell('SELECT COUNT(*) FROM `printersupplies` WHERE device_id = ?', array($device['device_id'])) > 0)
+    //if (dbFetchCell('SELECT COUNT(*) FROM `printersupplies` WHERE device_id = ?', array($device['device_id'])) > 0)
+    if (dbExist('printersupplies', '`device_id` = ?', array($device['device_id'])))
     {
       $navbar['options']['printing'] = array('text' => 'Printing', 'icon' => $config['icon']['printersupply']);
 
@@ -662,7 +701,7 @@ Please wait 5-10 minutes for graphs to draw correctly.');
         if ($poller_start)
         {
           print_success('<h4>Device poller in progress</h4>
-  This device is polling now. Poller started '.format_unixtime($poller_start).' ('.formatUptime(time() - $poller_start).' ago).');
+  This device is polling now. Poller started '.format_unixtime($poller_start).' ('.format_uptime(time() - $poller_start).' ago).');
         }
       }
     }
@@ -681,7 +720,7 @@ This device should be automatically discovered within 10 minutes.');
       if ($discovery_start)
       {
         print_success('<h4>Device discovery in progress</h4>
-This device is discover now. Discovery started '.format_unixtime($discovery_start).' ('.formatUptime(time() - $discovery_start).' ago).');
+This device is discover now. Discovery started '.format_unixtime($discovery_start).' ('.format_uptime(time() - $discovery_start).' ago).');
       }
     }
 

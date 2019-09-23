@@ -18,7 +18,7 @@ IMPORTS
             FROM HP-ICF-TC;
 
     hpicfRpvstMIB MODULE-IDENTITY
-            LAST-UPDATED "201303210028Z"
+            LAST-UPDATED "201708080000Z"
             ORGANIZATION " HP Networking"
             CONTACT-INFO "Hewlett-Packard Company
                           8000 Foothills Blvd.
@@ -26,6 +26,14 @@ IMPORTS
             DESCRIPTION
                 "The MIB module Rapid Per VLAN Spanning Tree(RPVST)."
      
+            REVISION "201708080000Z"   -- August 08, 2017
+            DESCRIPTION
+            "Added object hpicfRpvstPortIeeeRstBpdu.
+            Deprecated compliance hpicfRpvstCompliance1.
+            Added compliance hpicfRpvstCompliance3.
+            Deprecated group hpicfRpvstPortGroup.
+            Added hpicfRpvstPortGroup1."
+
             REVISION "201303210028Z"
             DESCRIPTION
             "Added objects 
@@ -465,7 +473,8 @@ hpicfRpvstPortTable OBJECT-TYPE
             hpicfRpvstPortRestrictedTcn        TruthValue,
             hpicfRpvstPortRootGuard            TruthValue,
             hpicfRpvstPortLoopGuard            TruthValue,
-            hpicfRpvstPortBpduProtection       TruthValue
+            hpicfRpvstPortBpduProtection       TruthValue,
+            hpicfRpvstPortIeeeRstBpdu          TruthValue
           }
     hpicfRpvstPortIndex OBJECT-TYPE
             SYNTAX         Integer32 ( 1..65535)
@@ -570,6 +579,20 @@ hpicfRpvstPortTable OBJECT-TYPE
             DEFVAL         { false }
             ::= { hpicfRpvstPortEntry 9 }
 
+    hpicfRpvstPortIeeeRstBpdu OBJECT-TYPE
+            SYNTAX          TruthValue
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION
+               "The hpicfRpvstPortIeeeRstBpdu controls, on a per
+                port basis, whether or not IEEE RST BPDUs will be
+                transmitted and received on VLANs that the port is
+                an untagged member of. The value true(1) means that
+                the port will allow transmission and reception of
+                IEEE RST BPDUs on ports untagged to a VLAN while
+                false(2) means it will not."
+            DEFVAL         { false }
+            ::= { hpicfRpvstPortEntry 10 }
  hpicfRpvstPortVlanTable OBJECT-TYPE
             SYNTAX          SEQUENCE OF HpicfRpvstPortVlanEntry
             MAX-ACCESS      not-accessible
@@ -1612,7 +1635,7 @@ hpicfRpvstPortTable OBJECT-TYPE
     -- Compliance Statements 
 
     hpicfRpvstCompliance1 MODULE-COMPLIANCE
-            STATUS          current
+            STATUS          deprecated
             DESCRIPTION     "The compliance statement"
             MODULE          -- this module
             MANDATORY-GROUPS {
@@ -1640,6 +1663,22 @@ hpicfRpvstPortTable OBJECT-TYPE
                             hpicfRpvstPortRoleChangeGroup
                            }
             ::= { hpicfRpvstCompliances 2 }
+
+    hpicfRpvstCompliance3 MODULE-COMPLIANCE
+            STATUS          current
+            DESCRIPTION     "The compliance statement"
+            MODULE          -- this module
+            MANDATORY-GROUPS {
+                            hpicfRpvstGroup,
+                            hpicfRpvstVlanGroup,
+                            hpicfRpvstPortVlanGroup,
+                            hpicfRpvstPortGroup1,
+                            hpicfRpvstPortVlanCounterGroup,
+                            hpicfRpvstRootHistoryGroup,
+                            hpicfRpvstNotificationObjectGrp,
+                            hpicfRpvstNotificationGroup
+                            }
+            ::= { hpicfRpvstCompliances 3 }
 
     -- units of conformance
 
@@ -1708,7 +1747,7 @@ hpicfRpvstPortTable OBJECT-TYPE
                            hpicfRpvstPortLoopGuard,            
                            hpicfRpvstPortBpduProtection
                             }
-            STATUS          current
+            STATUS          deprecated
             DESCRIPTION
                 "These objects are used for managing/monitoring
                 RPVST port parameters"
@@ -1862,5 +1901,24 @@ hpicfRpvstPortTable OBJECT-TYPE
             DESCRIPTION   "Group of objects required for 
                            port role change."
             ::= { hpicfRpvstGroups 14 }      
+
+    hpicfRpvstPortGroup1 OBJECT-GROUP
+            OBJECTS       {
+                           hpicfRpvstPortAdminEdge,
+                           hpicfRpvstPortAdminPointToPoint,
+                           hpicfRpvstPortAutoEdge,
+                           hpicfRpvstPortBpduFiltering,
+                           hpicfRpvstPortRestrictedTcn,
+                           hpicfRpvstPortRootGuard,
+                           hpicfRpvstPortLoopGuard,
+                           hpicfRpvstPortBpduProtection,
+                           hpicfRpvstPortIeeeRstBpdu
+                            }
+            STATUS          current
+            DESCRIPTION
+                "These objects are used for managing/monitoring
+                RPVST port parameters"
+            ::= { hpicfRpvstGroups 15 }
+
             
 END

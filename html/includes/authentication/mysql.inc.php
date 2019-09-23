@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -23,23 +23,30 @@ function mysql_authenticate($username, $password)
 {
   global $config;
 
-  $encrypted_old = md5($password);
-  $row = dbFetchRow("SELECT `username`, `password` FROM `users` WHERE `username`= ?", array($username));
+  $row = dbFetchRow("SELECT `username`, `password` FROM `users` WHERE `username` = ?", array($username));
   if ($row['username'] && $row['username'] == $username)
   {
-    // Migrate from old, unhashed password
-    // CLEANME remove this at r8000 but not before CE late 2015
-    if ($row['password'] == $encrypted_old)
+    if ($config['auth']['remote_user']) { return 1; }
+
+    if (str_starts($row['password'], '$1$'))
     {
-      $row = dbFetchRow("DESCRIBE `users` `password`");
-      if ($row['Type'] == 'varchar(34)')
+      // Old MD5 hashes, need rehash/change passwords
+      if ($row['password'] == crypt($password, $row['password']))
       {
+        // Rehash password
+        mysql_auth_change_password($username, $password);
+        return 1;
+      }
+    }
+    elseif (password_verify($password, $row['password']))
+    {
+      // New password hash verified
+      if (password_needs_rehash($row['password'], PASSWORD_DEFAULT))
+      {
+        // Required password rehash
+        //$hash = password_hash($password, PASSWORD_DEFAULT);
         mysql_auth_change_password($username, $password);
       }
-      return 1;
-    }
-    if ($config['auth']['remote_user'] || $row['password'] == crypt($password, $row['password']))
-    {
       return 1;
     }
   }
@@ -88,8 +95,11 @@ function mysql_auth_can_change_password($username = "")
  */
 function mysql_auth_change_password($username,$password)
 {
-  $encrypted = crypt($password,'$1$' . strgen(8).'$');
-  return dbUpdate(array('password' => $encrypted), 'users', '`username` = ?', array($username)); // FIXME should return BOOL
+  if (get_db_version() < 414) { return 0; } // Do not update if DB schema old, new hashes require longer field
+
+  // $hash = crypt($password, '$1$' . strgen(8).'$'); // This is old hash, do not used anymore (keep for history)
+  $hash = password_hash($password, PASSWORD_DEFAULT);
+  return dbUpdate(array('password' => $hash), 'users', '`username` = ?', array($username)); // FIXME should return BOOL
 }
 
 /**
@@ -118,8 +128,9 @@ function mysql_adduser($username, $password, $level, $email = "", $realname = ""
 {
   if (!mysql_auth_user_exists($username))
   {
-    $encrypted = crypt($password,'$1$' . strgen(8).'$');
-    return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
+    // $hash = crypt($password, '$1$' . strgen(8).'$'); // This is old hash, do not used anymore (keep for history)
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    return dbInsert(array('username' => $username, 'password' => $hash, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
   } else {
     return FALSE;
   }
@@ -133,7 +144,8 @@ function mysql_adduser($username, $password, $level, $email = "", $realname = ""
  */
 function mysql_auth_user_exists($username)
 {
-  return @dbFetchCell("SELECT COUNT(*) FROM `users` WHERE `username` = ?", array($username)); // FIXME should return BOOL
+  //return @dbFetchCell("SELECT COUNT(*) FROM `users` WHERE `username` = ?", array($username)); // FIXME should return BOOL
+  return dbExist('users', '`username` = ?', array($username));
 }
 
 /**

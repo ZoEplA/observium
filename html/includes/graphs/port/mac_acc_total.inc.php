@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -88,7 +88,8 @@ foreach ($mas as $ma)
         $name = $peer['hostname'] . " " . short_ifname($port['ifDescr'], NULL, FALSE) . " (".$mac.")";
       }
 
-      if (dbFetchCell("SELECT COUNT(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($ma['device_id'], $addy['ipv4_address'])))
+      //if (dbFetchCell("SELECT COUNT(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($ma['device_id'], $addy['ipv4_address'])))
+      if (dbExist('bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', array($ma['device_id'], $addy['ipv4_address'])))
       {
         $peer_info = dbFetchRow("SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?", array($ma['device_id'], $addy['ipv4_address']));
         $name .= " - AS".$peer_info['bgpPeerRemoteAs'];

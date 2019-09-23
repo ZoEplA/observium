@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -72,9 +72,9 @@ if ($vars['ignoreport'])
       <td><!-- <button class="btn btn-xs btn-danger" type="submit" value="Reset" id="form-reset" title="Reset form to previously-saved settings"><i class="icon-remove icon-white"></i> Reset</button> --></td>
       <td><button class="btn btn-xs btn-danger" style="margin: 3px;" type="submit" value="Alerted"  id="alerted-toggle" title="Toggle alerting on all currently-alerted ports">Enabled & Down</button>
           <button class="btn btn-xs" type="submit" value="Disabled" id="down-select"    title="Disable alerting on all currently-down ports">Disabled</button></td>
-      <td><button class="btn btn-xs btn-primary" type="submit" value="Toggle"   id="disable-toggle" title="Toggle polling for all ports">Toggle</button>
+      <td class="text-center"><button class="btn btn-xs btn-primary" type="submit" value="Toggle"   id="disable-toggle" title="Toggle polling for all ports">Toggle</button>
           <button class="btn btn-xs btn-default" type="submit" value="Select"   id="disable-select" title="Disable polling on all ports">All</button></td>
-      <td><button class="btn btn-xs btn-primary" type="submit" value="Toggle"   id="ignore-toggle"  title="Toggle alerting for all ports">Toggle</button>
+      <td class="text-center"><button class="btn btn-xs btn-primary" type="submit" value="Toggle"   id="ignore-toggle"  title="Toggle alerting for all ports">Toggle</button>
           <button class="btn btn-xs btn-default" type="submit" value="Select"   id="ignore-select"  title="Disable alerting on all ports">All</button></td>
       <td></td>
       <td></td>
@@ -107,32 +107,34 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
 
   echo(($port['admin_status'] == 'enabled' ? '<span class="'.$port['row_class'].'">' : '<span class="">').$port['admin_status'].'</span> / <span data-name="operstatus_'.$port['port_id'].'" class="'.$port['row_class'].'">'. escape_html($port['ifOperStatus']) .'</span></td>');
 
-  echo('<td>');
-  $item = array('id'          => 'port[]',
-                'readonly'    => $readonly,
-                'value'       => $port['port_id']);
+  echo('<td class="text-center">');
+  $item = array('id'            => 'port[]',
+                'readonly'      => $readonly,
+                'value'         => $port['port_id']);
   echo(generate_form_element($item, 'hidden'));
-  $item = array('id'          => 'disabled_'.$port['port_id'],
-                'size'        => 'mini',
-                'on-text'     => 'No',
-                'on-color'    => 'danger',
-                'off-text'    => 'Yes',
-                'off-color'   => 'primary',
-                'readonly'    => $readonly,
-                'value'       => $port['disabled']);
-  echo(generate_form_element($item, 'switch'));
+  $item = array('id'            => 'disabled_'.$port['port_id'],
+                'size'          => 'mini',
+                'on-text'       => 'Disable',
+                'on-color'      => 'danger',
+                'off-text'      => 'Yes',
+                'off-color'     => 'success',
+                'width'         => '58px',
+                'readonly'      => $readonly,
+                'value'         => $port['disabled']);
+  echo(generate_form_element($item, 'switch-ng'));
   echo("</td>");
 
-  echo('<td>');
-  $item = array('id'          => 'ignore_'.$port['port_id'],
-                'size'        => 'mini',
-                'on-text'     => 'No',
-                'on-color'    => 'danger',
-                'off-text'    => 'Yes',
-                'off-color'   => 'primary',
-                'readonly'    => $readonly,
-                'value'       => $port['ignore']);
-  echo(generate_form_element($item, 'switch'));
+  echo('<td class="text-center">');
+  $item = array('id'            => 'ignore_'.$port['port_id'],
+                'size'          => 'mini',
+                'on-text'       => 'Ignore',
+                'on-color'      => 'danger',
+                'off-text'      => 'Yes',
+                'off-color'     => 'success',
+                'width'         => '58px',
+                'readonly'      => $readonly,
+                'value'         => $port['ignore']);
+  echo(generate_form_element($item, 'switch-ng'));
   echo("</td>");
 
 #  echo('<td>  <input class="input-mini" name="threshold_perc_in-'.$port['port_id'].'" size="3" value="'.$port['threshold_perc_in'].'"></input>');
@@ -216,7 +218,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
       // get the interface number from the object name
       var port_id = id.split('_')[1];
       // find its corresponding checkbox and toggle it
-      $('[id="disabled_' + port_id + '"]').bootstrapSwitch('toggleState');
+      //$('[id="disabled_' + port_id + '"]').bootstrapSwitch('toggleState');
+      $('[id="disabled_' + port_id + '"]').bootstrapToggle('toggle');
     });
   });
   $('#ignore-toggle').click(function(event) {
@@ -227,7 +230,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
       // get the interface number from the object name
       var port_id = id.split('_')[1];
       // find its corresponding checkbox and toggle it
-      $('[id="ignore_' + port_id + '"]').bootstrapSwitch('toggleState');
+      //$('[id="ignore_' + port_id + '"]').bootstrapSwitch('toggleState');
+      $('[id="ignore_' + port_id + '"]').bootstrapToggle('toggle');
     });
   });
   $('#alerted-toggle').click(function(event) {
@@ -239,7 +243,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
         // get the interface number from the object name
         var port_id = name.split('_')[1];
         // find its corresponding checkbox and toggle it
-        $('[id="ignore_' + port_id + '"]').bootstrapSwitch('state', true);
+        //$('[id="ignore_' + port_id + '"]').bootstrapSwitch('state', true);
+        $('[id="ignore_' + port_id + '"]').bootstrapToggle('on');
       }
     });
   });
@@ -247,12 +252,14 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
   $('#disable-select').click(function(event) {
     // select all disable buttons
     event.preventDefault();
-    $('[id^="disabled_"]').bootstrapSwitch('state', true);
+    //$('[id^="disabled_"]').bootstrapSwitch('state', true);
+    $('[id^="disabled_"]').bootstrapToggle('on');
   });
   $('#ignore-select').click(function(event) {
     // select all ignore buttons
     event.preventDefault();
-    $('[id^="ignore_"]').bootstrapSwitch('state', true);
+    //$('[id^="ignore_"]').bootstrapSwitch('state', true);
+    $('[id^="ignore_"]').bootstrapToggle('on');
   });
   $('#down-select').click(function(event) {
     // select ignore buttons for all ports which are down
@@ -264,7 +271,8 @@ foreach (dbFetchRows("SELECT * FROM `ports` WHERE `deleted` = '0' AND `device_id
         // get the interface number from the object name
         var port_id = name.split('_')[1];
         // find its corresponding checkbox and toggle it
-        $('[id="ignore_' + port_id + '"]').bootstrapSwitch('state', true);
+        //$('[id="ignore_' + port_id + '"]').bootstrapSwitch('state', true);
+        $('[id="ignore_' + port_id + '"]').bootstrapToggle('on');
       }
     });
   });

@@ -9,13 +9,13 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Unsigned32,
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, TruthValue, RowStatus
+    TEXTUAL-CONVENTION, TruthValue, RowStatus, MacAddress
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
         FROM SNMPv2-CONF
     switch001, rndNotifications
         FROM CISCOSB-MIB
-    LldpPortList, LldpPortNumber, LldpManAddress
+    LldpPortList, LldpPortNumber, LldpManAddress, lldpRemEntry, lldpPortConfigEntry
         FROM LLDP-MIB
     PortList
         FROM Q-BRIDGE-MIB
@@ -30,7 +30,9 @@ IMPORTS
     rndErrorDesc, rndErrorSeverity
         FROM CISCOSB-DEVICEPARAMS-MIB
     lldpV2LocPortIfIndex, lldpV2RemLocalIfIndex
-        FROM LLDP-V2-MIB;
+        FROM LLDP-V2-MIB
+	InetAddressType, InetAddress, InetVersion            
+		FROM INET-ADDRESS-MIB;
 
 rlLldp MODULE-IDENTITY
          LAST-UPDATED "200506200000Z"
@@ -290,8 +292,7 @@ rlLldpAutoAdvPortsStatus OBJECT-TYPE
     DESCRIPTION
        "The row status variable, used according to
        row installation and removal conventions."
-    ::= { rlLldpAutoAdvLocPortManAddrEntry 6 }
-
+    ::= { rlLldpAutoAdvLocPortManAddrEntry 6 }	
 
 rlLldpChassisIdSubtype OBJECT-TYPE
     SYNTAX      INTEGER {

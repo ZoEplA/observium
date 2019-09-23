@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -59,7 +59,7 @@ foreach ($oids as $index => $entry)
                      'limit_low'        => $entry['sfpDmiLowTempAlarm']);
 
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'perle-mcr-mgt-mib-temperature', $descr, $scale, $value, $options);
+    discover_sensor('temperature', $device, $oid, $index, 'perle-mcr-mgt-mib-temperature', $descr, $scale, $value, $options);
   }
 
   if (is_numeric($entry['sfpDmiRealTimeVolt']))
@@ -71,7 +71,7 @@ foreach ($oids as $index => $entry)
                      'limit_low'        => $entry['sfpDmiLowVoltAlarm']);
 
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'perle-mcr-mgt-mib-voltage', $descr, $scale, $value, $options);
+    discover_sensor('voltage', $device, $oid, $index, 'perle-mcr-mgt-mib-voltage', $descr, $scale, $value, $options);
   }
 
   if (is_numeric($entry['sfpDmiRealTimeTxBias']))
@@ -83,7 +83,7 @@ foreach ($oids as $index => $entry)
                      'limit_low'        => $entry['sfpDmiLowTxBiasAlarm'] * 0.001);
 
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'perle-mcr-mgt-mib-tx-bias', $descr, 0.001, $value, $options);
+    discover_sensor('current', $device, $oid, $index, 'perle-mcr-mgt-mib-tx-bias', $descr, 0.001, $value, $options);
   }
 
   if (is_numeric($entry['sfpDmiRealTimeTxPower']))
@@ -95,7 +95,7 @@ foreach ($oids as $index => $entry)
                      'limit_low'        => $entry['sfpDmiLowTxPowerAlarm']);
 
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'perle-mcr-mgt-mib-tx-power', $descr, $scale, $value, $options);
+    discover_sensor('dbm', $device, $oid, $index, 'perle-mcr-mgt-mib-tx-power', $descr, $scale, $value, $options);
   }
 
   if (is_numeric($entry['sfpDmiRealTimeRxPower']) || $entry['sfpDmiRealTimeRxPower'] == "-inf")
@@ -110,7 +110,7 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high'       => $entry['sfpDmiHighRxPowerAlarm'],
                      'limit_low'        => $entry['sfpDmiLowRxPowerAlarm']);
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'perle-mcr-mgt-mib-rx-power', $descr, $scale, $value, $options);
+    discover_sensor('dbm', $device, $oid, $index, 'perle-mcr-mgt-mib-rx-power', $descr, $scale, $value, $options);
   }
 
 

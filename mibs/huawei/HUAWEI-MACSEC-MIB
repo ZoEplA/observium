@@ -1,9 +1,9 @@
 --=================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI MACSEC MIB
 -- Reference:
--- Version: V1.01
+-- Version: V1.02
 -- History:
 --    wangkun 00280787 initial    03/10/2016
 -- =================================================================
@@ -20,7 +20,7 @@
 	
 	
 		hwMACsec MODULE-IDENTITY 
-			LAST-UPDATED "201603101013Z"		-- March 10, 2016 at 10:13 GMT
+			LAST-UPDATED "201711031622Z"		-- March 10, 2016 at 10:13 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -32,13 +32,18 @@
 				Email: support@huawei.com"
 			DESCRIPTION 
 				"This MIB describes objects used for MACsec."    
+				
+			REVISION  "201711031622Z"
+															   DESCRIPTION 
+				                                                                 "Add NOTIFICATION-TYPE of hwMacsecRcvRspTimeout, hwMacsecRcvRspTimeoutResume."
+				
 			REVISION  "201603101013Z"
-                                                               DESCRIPTION 
-            	                                                                 "Modify MAX-ACCESS of  hwMACsecPortRole ,hwMACsecPortName,hwMACsecPortOldCKN,hwMACsecPortNewCKN."    
+															   DESCRIPTION 
+				                                                                 "Modify MAX-ACCESS of  hwMACsecPortRole ,hwMACsecPortName,hwMACsecPortOldCKN,hwMACsecPortNewCKN."    
 
 			REVISION  "201603101013Z"
-                                                                DESCRIPTION 
-            	                                                                 "This MIB describes objects used for MACsec." 
+																DESCRIPTION 
+				                                                                 "This MIB describes objects used for MACsec." 
 
 
 	
@@ -138,6 +143,65 @@
 				"The configed CKN of this port."
 			::= { hwMACsecPortCfgEntry 5 }
 		
+		
+		--
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2
+		hwMacsecRcvRspTimeoutTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwMacsecRcvRspTimeoutEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"No heartbeat response alarm list."
+			::= { hwMACsecMibObjects 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1
+		hwMacsecRcvRspTimeoutEntry OBJECT-TYPE
+			SYNTAX HwMacsecRcvRspTimeoutEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the no heartbeat response alarm list."
+			INDEX { hwMacsecRcvRspTimeoutIfIndex, hwMacsecRcvRspTimeoutRole, hwMacsecRcvRspTimeoutLocalPort }
+			::= { hwMacsecRcvRspTimeoutTable 1 }
+		
+		HwMacsecRcvRspTimeoutEntry ::=
+			SEQUENCE {
+				hwMacsecRcvRspTimeoutIfIndex
+					Unsigned32,
+				hwMacsecRcvRspTimeoutRole
+					Unsigned32,
+				hwMacsecRcvRspTimeoutLocalPort
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1.1
+		hwMacsecRcvRspTimeoutIfIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS  read-only
+			STATUS current
+			DESCRIPTION
+				"Interface index."
+			::= { hwMacsecRcvRspTimeoutEntry 1 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1.2
+		hwMacsecRcvRspTimeoutRole OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS  read-only
+			STATUS current
+			DESCRIPTION
+				"Device role."
+			::= { hwMacsecRcvRspTimeoutEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1.3
+		hwMacsecRcvRspTimeoutLocalPort OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS  read-only
+			STATUS current
+			DESCRIPTION
+				"Local port."
+			::= { hwMacsecRcvRspTimeoutEntry 3 }
+			
+
 		-- 1.3.6.1.4.1.2011.5.25.347.2
 		hwMACsecTraps OBJECT IDENTIFIER ::= { hwMACsec 2 }
 		
@@ -162,14 +226,32 @@
 				"The reason of CKN switching failed."
 			::= { hwMACsecTrapOID 2 }
 		
+		
 		-- 1.3.6.1.4.1.2011.5.25.347.2.2
 		hwCKNSwitchFailAlarm NOTIFICATION-TYPE
-			OBJECTS { hwMACsecPortRole, hwMACsecPortName, hwMACsecPortOldCKN, hwMACsecPortNewCKN, hwMACsecCKNSwitchReason, 
-				hwMACsecCKNSwitchFailReason }
+			OBJECTS { hwMACsecPortRole, hwMACsecPortName, hwMACsecPortOldCKN, hwMACsecPortNewCKN, hwMACsecCKNSwitchReason, hwMACsecCKNSwitchFailReason }
 			STATUS current
 			DESCRIPTION 
 				"Failed to switch the CKN."
 			::= { hwMACsecTraps 2 }
+			
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.2.3
+		hwMacsecRcvRspTimeout NOTIFICATION-TYPE
+			OBJECTS {hwMacsecRcvRspTimeoutIfIndex, hwMacsecRcvRspTimeoutRole, hwMacsecRcvRspTimeoutLocalPort}
+			STATUS current
+			DESCRIPTION 
+				"No heartbeat response alarm list."
+			::= { hwMACsecTraps 3 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.2.4
+		hwMacsecRcvRspTimeoutResume NOTIFICATION-TYPE
+			OBJECTS {hwMacsecRcvRspTimeoutIfIndex, hwMacsecRcvRspTimeoutRole, hwMacsecRcvRspTimeoutLocalPort}
+			STATUS current
+			DESCRIPTION 
+				"No heartbeat response alarm resume list."
+			::= { hwMACsecTraps 4 }
+			
 		
 		-- 1.3.6.1.4.1.2011.5.25.347.3
 		hwMACsecConformance OBJECT IDENTIFIER ::= { hwMACsec 3 }

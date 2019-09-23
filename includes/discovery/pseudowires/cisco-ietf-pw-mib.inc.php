@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,20 +21,20 @@ if ($GLOBALS['snmp_status'] === FALSE)
   return;
 }
 
-$pws = snmpwalk_cache_oid($device, "cpwVcRowStatus",      $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcName",           $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcType",           $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcDescr",          $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcPsnType",        $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcPeerAddrType",   $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcPeerAddr",       $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcOutboundVcLabel", $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcInboundVcLabel", $pws, $mib, mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcRemoteIfString", $pws, $mib, mib_dirs('cisco'));
+$pws = snmpwalk_cache_oid($device, "cpwVcRowStatus",        $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcName",             $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcType",             $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcDescr",            $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcPsnType",          $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcPeerAddrType",     $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcPeerAddr",         $pws, $mib, NULL, OBS_SNMP_ALL_HEX);
+$pws = snmpwalk_cache_oid($device, "cpwVcOutboundVcLabel",  $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcInboundVcLabel",   $pws, $mib);
+$pws = snmpwalk_cache_oid($device, "cpwVcRemoteIfString",   $pws, $mib);
 
 // For MPLS pseudowires
-$pws = snmpwalk_cache_oid($device, "cpwVcMplsLocalLdpID", $pws, "CISCO-IETF-PW-MPLS-MIB", mib_dirs('cisco'));
-$pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID",  $pws, "CISCO-IETF-PW-MPLS-MIB", mib_dirs('cisco'));
+$pws = snmpwalk_cache_oid($device, "cpwVcMplsLocalLdpID", $pws, "CISCO-IETF-PW-MPLS-MIB");
+$pws = snmpwalk_cache_oid($device, "cpwVcMplsPeerLdpID",  $pws, "CISCO-IETF-PW-MPLS-MIB");
 //echo("PWS_WALK: ".count($pws)."\n"); var_dump($pws);
 
   $peer_where = generate_query_values($device['device_id'], 'device_id', '!='); // Additional filter for exclude self IPs

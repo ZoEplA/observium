@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -47,12 +47,12 @@ foreach ($oids as $index => $entry)
       break;
   }
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, "internalTemp.$index", 'wxgoos', $descr, $scale, $entry['internalTemp'], $options);
+  discover_sensor('temperature', $device, $oid, "internalTemp.$index", 'wxgoos', $descr, $scale, $entry['internalTemp'], $options);
 
   // internalHumidity
   $oid   = ".1.3.6.1.4.1.17373.4.1.2.1.6.$index";
   $scale = 1;
-  discover_sensor($valid['sensor'], 'humidity', $device, $oid, "internalHumidity.$index", 'wxgoos', $descr, $scale, $entry['internalHumidity']);
+  discover_sensor('humidity', $device, $oid, "internalHumidity.$index", 'wxgoos', $descr, $scale, $entry['internalHumidity']);
 }
 
 // EOF

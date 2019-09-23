@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Observium
  *
@@ -7,9 +6,15 @@
  *
  * @package    observium
  * @subpackage functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+// Include entity specific functions
+require_once($config['install_dir'] . "/includes/entities/port.inc.php");
+require_once($config['install_dir'] . "/includes/entities/sensor.inc.php");
+require_once($config['install_dir'] . "/includes/entities/status.inc.php");
+require_once($config['install_dir'] . "/includes/entities/counter.inc.php");
 
 /**
  *
@@ -35,15 +40,7 @@ function get_entity_attrib($entity_type, $entity_id, $attrib_type)
     return $GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id][$attrib_type];
   }
 
-  if ($entity_type == 'device' && get_db_version() < 240)
-  {
-    // CLEANME. Compatibility, remove in r8000, but not before CE 0.16.1 (Oct 7, 2015)
-    if ($row = dbFetchRow("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = ? AND `attrib_type` = ?", array($entity_id, $attrib_type)))
-    {
-      return $row['attrib_value'];
-    }
-  }
-  else if ($row = dbFetchRow("SELECT `attrib_value` FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?", array($entity_type, $entity_id, $attrib_type)))
+  if ($row = dbFetchRow("SELECT `attrib_value` FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?", array($entity_type, $entity_id, $attrib_type)))
   {
     return $row['attrib_value'];
   }
@@ -129,7 +126,8 @@ function set_entity_attrib($entity_type, $entity_id, $attrib_type, $attrib_value
     unset($GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id]);
   }
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?", array($entity_type, $entity_id, $attrib_type)))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `entity_attribs` WHERE `entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?", array($entity_type, $entity_id, $attrib_type)))
+  if (dbExist('entity_attribs', '`entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?', array($entity_type, $entity_id, $attrib_type)))
   {
     $return = dbUpdate(array('attrib_value' => $attrib_value), 'entity_attribs', '`entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?', array($entity_type, $entity_id, $attrib_type));
   } else {
@@ -165,13 +163,8 @@ function del_entity_attrib($entity_type, $entity_id, $attrib_type)
     unset($GLOBALS['cache']['entity_attribs'][$entity_type][$entity_id]);
   }
 
-  if ($entity_type == 'device' && get_db_version() < 240)
-  {
-    // CLEANME. Compatibility, remove in r8000, but not before CE 0.16.1 (Oct 7, 2015)
-    return dbDelete('devices_attribs', '`device_id` = ? AND `attrib_type` = ?', array($entity_id, $attrib_type));
-  } else {
-    return dbDelete('entity_attribs', '`entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?', array($entity_type, $entity_id, $attrib_type));
-  }
+  return dbDelete('entity_attribs', '`entity_type` = ? AND `entity_id` = ? AND `attrib_type` = ?', array($entity_type, $entity_id, $attrib_type));
+
 }
 
 /**
@@ -242,6 +235,475 @@ function get_device_entities_attribs($device_id, $entity_types = NULL)
   return $attribs;
 }
 
+/* MIB & object specific functions */
+
+/**
+ * Check if MIB available and permitted for device
+ * if $check_permissions is TRUE, check permissions by config option $config['mibs'][$mib]
+ * and from the enable/disable panel in the device configuration in the web interface
+ * if $check_sysORID is TRUE, we fetch the device's supplied list as well - should only be FALSE in the sysORID code
+ *
+ * @param array $device Device array
+ * @param string $mib MIB name
+ * @param boolean $check_permissions Check device specific MIB permissions (if FALSE ignores it)
+ * @param boolean $check_sysORID Check if MIB exist in sysOROID table
+ *
+ * @return boolean MIB is permitted for device or not.
+ */
+function is_device_mib($device, $mib, $check_permissions = TRUE, $check_sysORID = TRUE)
+{
+  global $config;
+
+  $mib_permitted = in_array($mib, get_device_mibs($device, $check_sysORID)); // Check if mib available for device
+
+  if ($check_permissions && $mib_permitted)
+  {
+    // Check if MIB permitted by config
+    $mib_permitted = $mib_permitted && (!isset($config['mibs'][$mib]['enable']) || $config['mibs'][$mib]['enable']);
+
+    // Check if MIB disabled on device by web interface or polling process
+    $mibs_disabled = get_device_mibs_disabled($device);
+    $mib_permitted = $mib_permitted && !in_array($mib, $mibs_disabled);
+  }
+
+  return $mib_permitted;
+}
+
+/**
+ * Return cached MIBs array available for device (from os definitions)
+ * By default includes sysORID-supplied MIBs unless check_sysORID is false
+ * When requesting list without sysORID, result will NOT be cached
+ *
+ * @param array|integer $device Device array
+ * @param boolean $check_sysORID Check or not mibs from sysORID table
+ * @param array $mibs_order Order how load available mibs. Default: ['model', 'os', 'group', 'default']
+ * @return array List of supported MIBs
+ */
+function get_device_mibs($device, $check_sysORID = TRUE, $mibs_order = NULL)
+{
+  global $config, $cache;
+
+  if (is_numeric($device))
+  {
+    $device_id = $device;
+    $device    = device_by_id_cache($device_id);
+  } else {
+    $device_id = $device['device_id'];
+  }
+
+  // Set custom mibs order
+  $mibs_order_default = array('model', 'os', 'group', 'default');
+  if      (empty($mibs_order))
+  {
+    // Default order: per-model mibs (if model set) -> os mibs -> os group mibs -> default mibs
+    $mibs_order = $mibs_order_default;
+  }
+  else if (!is_array($mibs_order))
+  {
+    // Order can passed as string with comma: 'model,os,group,default'
+    $mibs_order = explode(',', $mibs_order);
+  }
+
+  // Check if custom order used, than set first from passed argument, second from default
+  if ($mibs_order_custom = $mibs_order !== $mibs_order_default)
+  {
+    // Set first from passed argument, second
+    $mibs_order = array_unique(array_merge($mibs_order, $mibs_order_default));
+  }
+
+  // Do not cache MIBs if custom order used, unknown $device_id or in PHPUNIT
+  $use_cache = $device_id && !$mibs_order_custom && !defined('__PHPUNIT_PHAR__');
+
+  // Cache main device MIBs list
+  if (!isset($cache['devices']['mibs'][$device_id]))
+  {
+    $mibs = array();
+    $model_array = get_model_array($device);
+    foreach ($mibs_order as $order)
+    {
+      switch ($order)
+      {
+        case 'model':
+          if (is_array($model_array) && isset($model_array['mibs']))
+          {
+            $mibs = array_merge($mibs, (array)$model_array['mibs']);
+          }
+          break;
+        case 'os':
+          $mibs = array_merge((array)$mibs, (array)$config['os'][$device['os']]['mibs']);
+          break;
+        case 'group':
+          $os_group = $config['os'][$device['os']]['group'];
+          $mibs = array_merge((array)$mibs, (array)$config['os_group'][$os_group]['mibs']);
+          break;
+        case 'default':
+          //var_dump($config['os_group']['default']['mibs']);
+          $mibs = array_merge((array)$mibs, (array)$config['os_group']['default']['mibs']);
+          break;
+      }
+    }
+    $mibs = array_unique($mibs);
+
+    //$mibs = array_unique(array_merge((array)$mibs, (array)$config['os'][$device['os']]['mibs'],
+    //                                 (array)$config['os_group'][$config['os'][$device['os']]['group']]['mibs'],
+    //                                 (array)$config['os_group']['default']['mibs']));
+
+    // Remove blacklisted MIBs from array
+    $mibs = array_diff($mibs, get_device_mibs_blacklist($device));
+
+    if ($use_cache)
+    {
+      $cache['devices']['mibs'][$device_id] = $mibs;
+    }
+  } else {
+    $mibs = $cache['devices']['mibs'][$device_id];
+  }
+  //print_error('$cache[\'devices\'][\'mibs\'][$device_id]');
+  //print_vars($cache['devices']['mibs'][$device_id]);
+  //print_vars($mibs);
+
+  // Add and cache sysORID supplied MIBs if any
+  if ($check_sysORID)
+  {
+    if (!isset($cache['devices']['mibs_sysORID'][$device_id]))
+    {
+      $sysORID = json_decode(get_entity_attrib('device', $device, 'sysORID'), TRUE);
+      if (is_array($sysORID))
+      {
+        // Leave only not exist in main MIBs and blacklist
+        $sysORID = array_diff($sysORID, get_device_mibs_blacklist($device), $mibs);
+        //print_vars($sysORID);
+      } else {
+        $sysORID = array(); // Leave empty
+      }
+      if ($use_cache)
+      {
+        $cache['devices']['mibs_sysORID'][$device_id] = $sysORID;
+      }
+    } else {
+      $sysORID = $cache['devices']['mibs_sysORID'][$device_id];
+    }
+    // Attach sysORID MIBs
+    $mibs = array_merge($mibs, (array)$sysORID);
+  }
+
+  //print_error('$mibs');
+  return $mibs;
+}
+
+/**
+ * Return array of permitted MIBs for device
+ *
+ * @param array $device
+ * @param mixed $mibs_order
+ *
+ * @return array All MIB permitted for device
+ */
+function get_device_mibs_permitted($device, $mibs_order = NULL)
+{
+  $mibs = [];
+  foreach (get_device_mibs($device, TRUE, $mibs_order) as $mib)
+  {
+    if (is_device_mib($device, $mib))
+    {
+      $mibs[] = $mib;
+    }
+  }
+
+  return $mibs;
+}
+
+/**
+ * Return array with blacklisted MIBs for current device
+ *
+ * @param array $device Device array
+ * @return array Blacklisted MIBs
+ */
+function get_device_mibs_blacklist(array $device)
+{
+  global $config;
+  $blacklist = array_unique(array_merge((array)$config['os'][$device['os']]['mib_blacklist'],
+                                        (array)$config['os_group'][$config['os'][$device['os']]['group']]['mib_blacklist']));
+  return $blacklist;
+}
+
+/**
+ * Return array from DB with disabled mibs for device
+ *
+ * @param array|integer $device Device array
+ * @return array List of disabled MIBs for device
+ */
+function get_device_mibs_disabled($device)
+{
+  global $cache;
+
+  if (is_numeric($device))
+  {
+    $device_id = $device;
+    $device    = device_by_id_cache($device_id);
+  } else {
+    $device_id = $device['device_id'];
+  }
+
+  // Return cached
+  if (isset($cache['devices']['mibs_disabled'][$device_id]))
+  {
+    return $cache['devices']['mibs_disabled'][$device_id];
+  }
+
+  // CLEANME. Compatibility, remove in r10000, but not before CE 0.19.4 (Apr, 2019)
+  if (get_db_version() < 405)
+  {
+    $disabled = [];
+    // Old disabled mibs stored in device attribs
+    foreach (get_entity_attribs('device', $device['device_id']) as $attrib => $value)
+    {
+      if (str_starts($attrib, 'mib_') && $value)
+      {
+        $disabled[] = substr($attrib, 4);
+      }
+    }
+
+    $cache['devices']['mibs_disabled'][$device_id] = $disabled;
+    return $disabled;
+  }
+
+  $params = [$device['device_id'], 'mib', '1'];
+  $where  = "`device_id` = ? AND `use` = ? AND `disabled` = ?";
+
+  if ($disabled = dbFetchColumn("SELECT `mib` FROM `devices_mibs` WHERE $where", $params))
+  {
+    $cache['devices']['mibs_disabled'][$device_id] = $disabled;
+  } else {
+    // If none disabled, cache anyway for do not query db again
+    $cache['devices']['mibs_disabled'][$device_id] = [];
+  }
+
+  return $cache['devices']['mibs_disabled'][$device_id];
+}
+
+/**
+ * Set mib disabled in DB for device.
+ * Return IDs added or changed in DB.
+ *
+ * @param array $device Device array
+ * @param string $mib MIB name
+ * @param boolean $remove Remove MIB db entry complete
+ * @param boolean $disabled TRUE for disable, FALSE for enable
+ *
+ * @return integer ID of db entry for disabled MIB
+ */
+function set_device_mib_disable($device, $mib, $remove = FALSE, $disabled = TRUE)
+{
+  if (empty($mib))
+  {
+    // MIB name required
+    print_debug(__FUNCTION__ . "() required non empty mib name.");
+    return FALSE;
+  }
+
+  if (is_numeric($device))
+  {
+    $device_id = $device;
+    $device    = device_by_id_cache($device_id);
+  }
+
+  // Fetch/validate if MIB in db
+  $mib_db = dbFetchRow("SELECT `mib_id`, `disabled` FROM `devices_mibs` WHERE `device_id` = ? AND `use` = ? AND `mib` = ?", [$device['device_id'], 'mib', $mib]);
+
+  // Just delete from DB if remove requested
+  if ($remove)
+  {
+    if ($mib_db['mib_id'])
+    {
+      return dbDelete('devices_mibs', '`mib_id` = ?', [$mib_db['mib_id']]);
+    } else {
+      return FALSE;
+    }
+  }
+
+  // Convert to sql boolean
+  $disabled = ($disabled ? '1' : '0');
+
+  if (!$mib_db['mib_id'])
+  {
+    // Not exist, insert
+    return dbInsert(array('device_id' => $device['device_id'], 'mib' => $mib,
+                          'use' => 'mib', 'disabled' => '1'), 'devices_mibs');
+  }
+  else if ($mib_db['disabled'] != $disabled)
+  {
+    // Exist, but changed
+    dbUpdate(array('disabled' => $disabled), 'devices_mibs', '`mib_id` = ?', array($mib_db['mib_id']));
+  }
+
+  return $mib_db['mib_id'];
+}
+
+/**
+ * Set mib enabled in DB for device.
+ * Return IDs added or changed in DB.
+ *
+ * @param array $device Device array
+ * @param string $mib MIB name
+ * @param boolean $remove Remove MIB db entry complete
+ * @param boolean $disabled TRUE for disable, FALSE for enable
+ *
+ * @return integer ID of db entry for disabled MIB
+ */
+function set_device_mib_enable($device, $mib, $remove = FALSE, $disabled = FALSE)
+{
+  // Call to disable, just with different default
+  return set_device_mib_disable($device, $mib, $remove, $disabled);
+}
+
+/**
+ * Return array from DB with disabled Objects for device and specified MIB name
+ *
+ * @param array|integer $device Device array
+ * @param string $mib MIB name
+ *
+ * @return array List of disabled MIBs for device
+ */
+function get_device_objects_disabled($device, $mib = NULL)
+{
+  global $cache;
+
+  if (is_numeric($device))
+  {
+    $device_id = $device;
+    $device    = device_by_id_cache($device_id);
+  } else {
+    $device_id = $device['device_id'];
+  }
+
+  $params = [$device['device_id'], 'oid', '1'];
+  $where  = "`device_id` = ? AND `use` = ? AND `disabled` = ?";
+  if (empty($mib))
+  {
+    // For empty mib see NULL or empty string
+    // This is common for numeric Oids
+    $where .= " AND (`mib` = '' OR `mib` IS NULL)";
+    $mib = '__mib'; // Just for caching
+  } else {
+    $where .= " AND `mib` = ?";
+    $params[] = $mib;
+  }
+
+  // Return cached
+  if (isset($cache['devices']['objects_disabled'][$device_id][$mib]))
+  {
+    return $cache['devices']['objects_disabled'][$device_id][$mib];
+  }
+
+  // Query db for objects
+  if ($disabled = dbFetchColumn("SELECT `object` FROM `devices_mibs` WHERE $where", $params))
+  {
+    $cache['devices']['objects_disabled'][$device_id][$mib] = $disabled;
+  } else {
+    // If none disabled, cache anyway for do not query db again
+    $cache['devices']['objects_disabled'][$device_id][$mib] = [];
+  }
+
+  return $cache['devices']['objects_disabled'][$device_id][$mib];
+}
+
+/**
+ * Set object disabled in DB for device.
+ * Return IDs added or changed in DB.
+ *
+ * @param array $device Device array
+ * @param string $object Object name
+ * @param string $mib MIB name (optional)
+ * @param boolean $remove Remove MIB db entry complete
+ * @param boolean $disabled TRUE for disable, FALSE for enable
+ *
+ * @return integer ID of db entry for disabled MIB
+ */
+function set_device_object_disable($device, $object, $mib = '', $remove = FALSE, $disabled = TRUE)
+{
+  if (empty($object))
+  {
+    // MIB name required
+    print_debug(__FUNCTION__ . "() required non empty object name.");
+    return FALSE;
+  }
+
+  if (is_numeric($device))
+  {
+    $device_id = $device;
+    $device    = device_by_id_cache($device_id);
+  }
+
+  // Initial insert array
+  $insert_array = [ 'device_id' => $device['device_id'], 'object' => $object,
+                    'use' => 'object', 'disabled' => '1' ];
+
+  $where = '`device_id` = ? AND `use` = ? AND `object` = ?';
+  $params = [$device['device_id'], 'object', $object];
+  if (empty($mib))
+  {
+    // For empty mib see NULL or empty string
+    // This is common for numeric Oids
+    $where .= " AND (`mib` = '' OR `mib` IS NULL)";
+  } else {
+    $where .= " AND `mib` = ?";
+    $params[] = $mib;
+
+    // Append mib to insert
+    $insert_array['mib'] = $mib;
+  }
+  // Fetch/validate if MIB in db
+  $mib_db = dbFetchRow("SELECT `mib_id`, `disabled` FROM `devices_mibs` WHERE $where", $params);
+
+  // Just delete from DB if remove requested
+  if ($remove)
+  {
+    if ($mib_db['mib_id'])
+    {
+      return dbDelete('devices_mibs', '`mib_id` = ?', [$mib_db['mib_id']]);
+    } else {
+      return FALSE;
+    }
+  }
+
+  // Convert to sql boolean
+  $disabled = ($disabled ? '1' : '0');
+
+  if (!$mib_db['mib_id'])
+  {
+    // Not exist, insert
+    return dbInsert($insert_array, 'devices_mibs');
+  }
+  else if ($mib_db['disabled'] != $disabled)
+  {
+    // Exist, but changed
+    dbUpdate(array('disabled' => $disabled), 'devices_mibs', '`mib_id` = ?', array($mib_db['mib_id']));
+  }
+
+  return $mib_db['mib_id'];
+}
+
+/**
+ * Set object enabled in DB for device.
+ * Return IDs added or changed in DB.
+ *
+ * @param array $device Device array
+ * @param string $object Object name
+ * @param string $mib MIB name (optional)
+ * @param boolean $remove Remove MIB db entry complete
+ * @param boolean $disabled TRUE for disable, FALSE for enable
+ *
+ * @return integer ID of db entry for disabled MIB
+ */
+function set_device_object_enable($device, $object, $mib = '', $remove = FALSE, $disabled = FALSE)
+{
+  // Call to disable, just with different default
+  return set_device_object_disable($device, $object, $mib, $remove, $disabled);
+}
+
+/* End mib functions */
+
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 function get_entity_by_id_cache($entity_type, $entity_id)
@@ -311,7 +773,7 @@ function get_entity_by_id_cache($entity_type, $entity_id)
  *
  * @param string       $entity_type  Entity type (device, port)
  * @param string|array $network      Valid network string (or array)
- * @param boolean      $ignore       Exclude deleted/disabled/ignored entities (default FALSE)
+ * @param string       $add_where    Custom where string
  *
  * @return array       Array with entity specific IDs
  */
@@ -505,6 +967,200 @@ function entity_descr($type, $entity)
 
   return($text);
 }
+/**
+ * Generate entity description based on their type and discovery definition.
+ *
+ * @param string $entity_type Entity type
+ * @param array $definition Entity discovery definition entry
+ * @param array $descr_entry Array with possible descr strings received for example from snmpwalk, also used for tag replaces
+ * @param integer $count Optional entity count for current Table, when > 1 descr can use optional index or different descr
+ * @return string Parsed entity description
+ */
+function entity_descr_definition($entity_type, $definition, $descr_entry, $count = 1)
+{
+  //print_vars($definition);
+  //print_vars($descr_entry);
+
+  // Per index definitions
+  if (isset($descr_entry['index']) && isset($definition['indexes'][$descr_entry['index']]['descr']))
+  {
+    // Override with per index descr definition
+    $definition['descr'] = $definition['indexes'][$descr_entry['index']]['descr'];
+  }
+
+  // Descr contain tags, prefer tag replaces
+  $use_tags = isset($definition['descr']) && str_contains($definition['descr'], '%');
+
+  if (isset($definition['oid_descr']) && strpos($definition['oid_descr'], '::'))
+  {
+    list($mib, $definition['oid_descr']) = explode("::", $definition['oid_descr']);
+  }
+  if (isset($definition['oid_descr']) && strlen($descr_entry[$definition['oid_descr']]))
+  {
+    $descr = $descr_entry[$definition['oid_descr']];
+    if (!$use_tags)
+    {
+      // not tags and oid_descr exist, just return it
+      if (isset($definition['descr_transform']))
+      {
+        $descr = string_transform($descr, $definition['descr_transform']);
+      }
+      return $descr;
+    }
+
+    // Append to array for correct replace
+    $descr_entry['oid_descr'] = $descr;
+  }
+
+  if (isset($definition['descr']))
+  {
+    // Use definition descr
+    $descr = $definition['descr'];
+
+    if ($use_tags)
+    {
+
+      // Multipart index: Oid.0.1.2 -> %index0%, %index1%, %index2%
+      if (isset($descr_entry['index']) && preg_match('/%index\d+%/', $descr))
+      {
+        // Multipart index
+        foreach (explode('.', $descr_entry['index']) as $k => $k_index)
+        {
+          $descr_entry['index'.$k] = $k_index; // Multipart indexes
+        }
+      }
+
+      // Replace tags %tag%
+      $descr = array_tag_replace($descr_entry, $descr);
+    }
+    else if ($count > 1 && isset($descr_entry['index']))
+    {
+      // For multi append index, but always prefer to USE TAGS!
+      $descr .= ' ' . $descr_entry['index'];
+    }
+
+  }
+
+  // Use Entity Defaults (not defined descr or oid_descr)
+  if (!strlen($descr))
+  {
+    $translate = entity_type_translate_array($entity_type);
+    //print_vars($translate);
+
+    if ($count > 1 && isset($translate['name_multiple']))
+    {
+      $descr = $translate['name_multiple'];
+    }
+    else if (isset($translate['name']))
+    {
+      $descr = $translate['name'];
+    } else {
+      //$descr = 'Entity';
+      $descr = nicecase($entity_type);
+    }
+
+    if ($count > 1 && isset($descr_entry['index']))
+    {
+      // For multi append index
+      $descr .= ' ' . $descr_entry['index'];
+    }
+  }
+
+  // Transform/clean definition
+  if (isset($definition['descr_transform']))
+  {
+    $descr = string_transform($descr, $definition['descr_transform']);
+  }
+
+  return $descr;
+}
+
+/**
+ * Rule-based entity linking.
+ *
+ * @param $entity_type
+ * @param $definition
+ * @param $device
+ * @param $entity
+ *
+ * @return array
+ */
+function entity_measured_match_definition($device, $definition, $entity, $entity_type = NULL)
+{
+  // $entity_type unused currently
+
+  $options = array();
+  if (!isset($definition['measured_match'])) { return $options; }
+
+  // Convert single match array to multi-array
+  if (isset($definition['measured_match']['match']))
+  {
+    $definition['measured_match'] = array($definition['measured_match']);
+  }
+
+  $measured_found = FALSE;
+  foreach ($definition['measured_match'] as $rule)
+  {
+
+    // Allow tests here to allow multiple match rules on the same sensor table (entity-mib, etc)
+
+    // First we make substitutions using %key%, then we run transformations
+
+    $rule['match'] = array_tag_replace($entity, $rule['match']);
+
+    if (is_array($rule['transform'])) { string_transform($rule['match'], $rule['transform']); }
+
+    switch($rule['entity_type'])
+    {
+      case 'port':
+
+        switch($rule['field'])
+        {
+          case 'ifDescr':
+          case 'label':
+            $sql = "SELECT `port_id`, `ifIndex` FROM `ports` WHERE `device_id` = ? AND (`ifDescr` = ? OR `ifName` = ? OR `port_label` = ? OR `port_label_short` = ?) AND `deleted` = ? LIMIT 1";
+            $params = array($device['device_id'], $rule['match'], $rule['match'], $rule['match'], $rule['match'], 0);
+            if ($measured = dbFetchRow($sql, $params))
+            {
+              $options['measured_class']            = 'port';
+              $options['measured_entity']           = $measured['port_id'];
+              $options['port_label']                = $measured['port_label'];
+              print_debug('Linked to port '.$measured['port_id'].' via ifDescr');
+              $measured_found = TRUE;
+            }
+            break;
+
+          case 'ifAlias':
+            if ($measured = dbFetchRow("SELECT `port_id`, `ifIndex` FROM `ports` WHERE `device_id` = ? AND `ifAlias` = ? AND `deleted` = ? LIMIT 1", array($device['device_id'], $rule['match'], 0)))
+            {
+              $options['measured_class']            = 'port';
+              $options['measured_entity']           = $measured['port_id'];
+              $options['port_label']                = $measured['port_label'];
+              print_debug('Linked to port '.$measured['port_id'].' via ifAlias');
+              $measured_found = TRUE;
+            }
+            break;
+
+          case 'ifIndex':
+            if ($measured = get_port_by_index_cache($device['device_id'], $rule['match']))
+            {
+              $options['measured_class']            = 'port';
+              $options['measured_entity']           = $measured['port_id'];
+              //$options['entPhysicalIndex']          = $measured['ifIndex'];
+              $options['port_label']                = $measured['port_label'];
+              print_debug('Linked to port '.$measured['port_id'].' via ifIndex');
+              $measured_found = TRUE;
+            }
+            break;
+        }
+
+        break;
+    }
+    if ($measured_found) { break; } // Stop foreach if measured match found
+  }
+
+  return $options;
+}
 
 /**
  * Translate an entity type to the relevant table and the identifier field name
@@ -520,7 +1176,19 @@ function entity_type_translate_array($entity_type)
 
   // Base fields
   // FIXME, not listed here: agg_graphs, metric_graphs
-  $fields = array('table', 'table_fields', 'state_table', 'state_fields', 'humanize_function', 'parent_type', 'parent_table', 'parent_id_field', 'where', 'icon', 'graph');
+  $fields = array('name',               // Base entity name
+                  'name_multiple',      // (Optional) Plural entity name
+                  'table',              // Table name
+                  'table_fields',       // Array with table fields
+                  //'state_table',        // State table name (deprecated)
+                  //'state_fields',       // Array with state fields (deprecated)
+                  'humanize_function',  // Humanize function name
+                  'parent_type',        // Parent table type
+                  'parent_table',       // Parent table name
+                  'parent_id_field',    // Main parent id field
+                  'where',
+                  'icon',               // Entity icon
+                  'graph');
   foreach ($fields as $field)
   {
     if (isset($translate[$field]))
@@ -534,7 +1202,34 @@ function entity_type_translate_array($entity_type)
   }
 
   // Table fields
-  $fields_table = array('id', 'device_id', 'index', 'mib', 'name', 'shortname', 'descr', 'ignore', 'disable', 'deleted', 'limit_high', 'limit_low');
+  $fields_table = array(// Common fields
+                        'id',
+                        'device_id',
+                        'index',
+                        'mib',
+                        'object',
+                        'oid',
+                        'name',
+                        'shortname',
+                        'descr',
+                        'ignore',
+                        'disable',
+                        'deleted',
+                        // Limits fields
+                        'limit_high',       // High critical limit
+                        'limit_high_warn',  // High warning  limit
+                        'limit_low',        // Low  critical limit
+                        'limit_low_warn',   // Low  warning  limit
+                        // Value fields
+                        'value',            // RAW value
+                        'status',           // Entity specific status name (
+                        'event',            // Event name (ok, alert, warning, etc..)
+                        'uptime',           // Uptime
+                        'last_change',      // Last changed time
+                        // Measured entity fields
+                        'measured_type',    // Measured entity type
+                        'measured_id',      // Measured entity id
+    );
   if (isset($translate['table_fields']))
   {
     // New definition style
@@ -542,18 +1237,6 @@ function entity_type_translate_array($entity_type)
     {
       // Add old style name (ie 'id_field') for compatibility
       $data[$field . '_field'] = $entry;
-    }
-  } else {
-    // Old definition style
-    foreach ($fields_table as $field)
-    {
-      $field_old = $field . '_field';
-      if (isset($translate[$field_old]))
-      {
-        $data[$field_old] = $translate[$field_old];
-        // Additionally convert to new 'table_fields' array
-        $data['table_fields'][$field] = $translate[$field_old];
-      }
     }
   }
 
@@ -697,11 +1380,26 @@ function entity_rewrite($entity_type, &$entity)
  *
  */
 // TESTME needs unit testing
-function generate_entity_link($entity_type, $entity, $text = NULL, $graph_type = NULL, $escape = TRUE, $short = FALSE)
+function generate_entity_link($entity_type, $entity, $text = NULL, $graph_type = NULL, $escape = TRUE, $options = FALSE)
 {
   if (is_numeric($entity))
   {
     $entity = get_entity_by_id_cache($entity_type, $entity);
+  }
+  // Compat with old boolean $short option
+  if (is_array($options))
+  {
+    $short = isset($options['short']) && $options['short'];
+    $icon  = isset($options['icon'])  && $options['icon'];
+  } else {
+    $short = $options;
+    $icon  = FALSE;
+  }
+  if ($icon)
+  {
+    // Get entity icon and force do not escape
+    $text = get_icon($GLOBALS['config']['entities'][$entity_type]['icon']);
+    $escape = FALSE;
   }
 
   entity_rewrite($entity_type, $entity);
@@ -709,13 +1407,27 @@ function generate_entity_link($entity_type, $entity, $text = NULL, $graph_type =
   switch($entity_type)
   {
     case "device":
-      $link = generate_device_link($entity, short_hostname($entity['hostname'], 16));
+      if ($icon)
+      {
+        $link = generate_device_link($entity, $text, [], FALSE);
+      } else {
+        $link = generate_device_link($entity, short_hostname($entity['hostname'], 16));
+      }
       break;
     case "mempool":
       $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'mempool'));
       break;
     case "processor":
-      $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'processor', 'processor_id' => $entity['processor_id']));
+      //r($entity);
+      if (isset($entity['id']) && is_array($entity['id']))
+      {
+        // Multi-processors list
+        $ids = implode(',', $entity['id']);
+        $entity['entity_id'] = $ids;
+      } else {
+        $ids = $entity['processor_id'];
+      }
+      $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'processor', 'processor_id' => $ids));
       break;
     case "status":
       $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'status', 'id' => $entity['status_id']));
@@ -723,11 +1435,19 @@ function generate_entity_link($entity_type, $entity, $text = NULL, $graph_type =
     case "sensor":
       $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => $entity['sensor_class'], 'id' => $entity['sensor_id']));
       break;
+    case "counter":
+      $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'counter', 'id' => $entity['counter_id']));
+      break;
     case "printersupply":
       $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'printing', 'supply' => $entity['supply_type']));
       break;
     case "port":
-      $link = generate_port_link($entity, NULL, $graph_type, $escape, $short);
+      if ($icon)
+      {
+        $link = generate_port_link($entity, $text, $graph_type, FALSE, FALSE);
+      } else {
+        $link = generate_port_link($entity, NULL, $graph_type, $escape, $short);
+      }
       break;
     case "storage":
       $url = generate_url(array('page' => 'device', 'device' => $entity['device_id'], 'tab' => 'health', 'metric' => 'storage'));
@@ -773,239 +1493,66 @@ function generate_entity_link($entity_type, $entity, $text = NULL, $graph_type =
       $url = NULL;
   }
 
-  if (!isset($link))
+  if (isset($link))
   {
-    if (!isset($text))
-    {
-      if ($short && $entity['entity_shortname'])
-      {
-        $text = $entity['entity_shortname'];
-      } else {
-        $text = $entity['entity_name'];
-      }
-    }
-    if ($escape) { $text = escape_html($text); }
-    $link = '<a href="' . $url . '" class="entity-popup ' . $entity['html_class'] . '" data-eid="' . $entity['entity_id'] . '" data-etype="' . $entity_type . '">' . $text . '</a>';
+    return $link;
   }
+
+  if (!isset($text))
+  {
+    if ($short && $entity['entity_shortname'])
+    {
+      $text = $entity['entity_shortname'];
+    } else {
+      $text = $entity['entity_name'];
+    }
+  }
+  if ($escape) { $text = escape_html($text); }
+  $link = '<a href="' . $url . '" class="entity-popup ' . $entity['html_class'] . '" data-eid="' . $entity['entity_id'] . '" data-etype="' . $entity_type . '">' . $text . '</a>';
 
   return($link);
 }
 
-// Entity specific, moved from common
-
-// Get port id  by ip address (using cache)
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-function get_port_id_by_ip_cache($device, $ip)
+/**
+ * This function generate link to entity, but without any text descriptions
+ *
+ * @param $entity_type
+ * @param $entity
+ *
+ * @return string
+ */
+function generate_entity_icon_link($entity_type, $entity)
 {
-  global $cache;
-
-  $ip_version = get_ip_version($ip);
-
-  if (is_array($device) && isset($device['device_id']))
-  {
-    $device_id = $device['device_id'];
-  }
-  else if (is_numeric($device))
-  {
-    $device_id = $device;
-  }
-  if (!isset($device_id) || !$ip_version)
-  {
-    print_error("Invalid arguments passed into function get_port_id_by_ip_cache(). Please report to developers.");
-    return FALSE;
-  }
-
-  if ($ip_version == 6)
-  {
-    $ip = Net_IPv6::uncompress($ip, TRUE);
-  }
-
-  if (isset($cache['port_ip'][$device_id][$ip]))
-  {
-    return $cache['port_ip'][$device_id][$ip];
-  }
-
-  $ips = dbFetchRows('SELECT `port_id`, `ifOperStatus`, `ifAdminStatus` FROM `ipv'.$ip_version.'_addresses`
-                      LEFT JOIN `ports` USING(`port_id`)
-                      WHERE `deleted` = 0 AND `device_id` = ? AND `ipv'.$ip_version.'_address` = ?', array($device_id, $ip));
-  if (count($ips) === 1)
-  {
-    // Simple
-    $port = current($ips);
-    //return $port['port_id'];
-  } else {
-    foreach ($ips as $entry)
-    {
-      if ($entry['ifAdminStatus'] == 'up' && $entry['ifOperStatus'] == 'up')
-      {
-        // First UP entry
-        $port = $entry;
-        break;
-      }
-      else if ($entry['ifAdminStatus'] == 'up')
-      {
-        // Admin up, but port down or other state
-        $ips_up[]   = $entry;
-      } else {
-        // Admin down
-        $ips_down[] = $entry;
-      }
-    }
-    if (!isset($port))
-    {
-      if ($ips_up)
-      {
-        $port = current($ips_up);
-      } else {
-        $port = current($ips_down);
-      }
-    }
-  }
-  $cache['port_ip'][$device_id][$ip] = $port['port_id'] ? $port['port_id'] : FALSE;
-
-  return $cache['port_ip'][$device_id][$ip];
-
+  return generate_entity_link($entity_type, $entity, NULL, NULL, FALSE, ['icon' => TRUE]);
 }
 
-function get_port_by_ent_index($device, $entPhysicalIndex, $allow_snmp = FALSE)
+/**
+ * Fetch rrd filename for specified Entity ID
+ *
+ * @param string  $entity_type Entity type
+ * @param integer $entity_id   Entity ID
+ *
+ * @return string      RRD filename
+ */
+function get_entity_rrd_by_id($entity_type, $entity_id)
 {
-  $mib = 'ENTITY-MIB';
-  if (!is_numeric($entPhysicalIndex) ||
-      !is_numeric($device['device_id']) ||
-      !is_device_mib($device, $mib))
+  $entity = get_entity_by_id_cache($entity_type, $entity_id);
+  $device = device_by_id_cache($entity['device_id']);
+
+  switch ($entity_type)
   {
-    return FALSE;
+    case 'sensor':
+      $filename = get_sensor_rrd($device, $entity);
+      break;
+    case 'status':
+      $filename = get_status_rrd($device, $entity);
+      break;
+    case 'counter':
+      $filename = get_counter_rrd($device, $entity);
+      break;
   }
 
-  $allow_snmp = $allow_snmp || is_cli(); // Allow snmpwalk queries in poller/discovery or if in wui passed TRUE!
-
-  if (isset($GLOBALS['cache']['snmp'][$mib][$device['device_id']]))
-  {
-    // Cached
-    $entity_array = $GLOBALS['cache']['snmp'][$mib][$device['device_id']];
-    if (empty($entity_array))
-    {
-      // Force DB queries
-      $allow_snmp = FALSE;
-    }
-  }
-  else if ($allow_snmp)
-  {
-    // Inventory module disabled, this DB empty, try to cache
-    $entity_array = array();
-    $oids = array('entPhysicalDescr', 'entPhysicalName', 'entPhysicalClass', 'entPhysicalContainedIn', 'entPhysicalParentRelPos');
-    if (is_device_mib($device, 'ARISTA-ENTITY-SENSOR-MIB'))
-    {
-      $oids[] = 'entPhysicalAlias';
-    }
-    foreach ($oids as $oid)
-    {
-      $entity_array = snmpwalk_cache_multi_oid($device, $oid, $entity_array, snmp_mib_entity_vendortype($device, 'ENTITY-MIB'));
-      if (!$GLOBALS['snmp_status']) { break; }
-    }
-    $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
-    if (empty($entity_array))
-    {
-      // Force DB queries
-      $allow_snmp = FALSE;
-    }
-    $GLOBALS['cache']['snmp'][$mib][$device['device_id']] = $entity_array;
-  } else {
-    // Or try to use DB
-  }
-
-  //print_debug_vars($entity_array);
-  $sensor_index = $entPhysicalIndex; // Initial ifIndex  
-  do
-  {
-    if ($allow_snmp)
-    {
-      // SNMP (discovery)
-      $sensor_port = $entity_array[$sensor_index];
-    } else {
-      // DB (web)
-      $sensor_port = dbFetchRow('SELECT * FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $sensor_index));
-    }
-    print_debug_vars($sensor_index);
-    print_debug_vars($sensor_port);
-    if ($sensor_port['entPhysicalClass'] === 'port')
-    {
-      // Port found, get mapped ifIndex
-      unset($entAliasMappingIdentifier);
-      foreach (array(0, 1, 2) as $i)
-      {
-        if (isset($sensor_port[$i]['entAliasMappingIdentifier']))
-        {
-          $entAliasMappingIdentifier = $sensor_port[$i]['entAliasMappingIdentifier'];
-          break;
-        }
-      }
-      if (isset($entAliasMappingIdentifier) && str_contains($entAliasMappingIdentifier, 'fIndex'))
-      {
-        list(, $ifIndex) = explode('.', $entAliasMappingIdentifier);
-
-        $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-        if (is_array($port))
-        {
-          // Hola, port really found
-          //$options['entPhysicalIndex_measured'] = $ifIndex;
-          //$options['measured_class']  = 'port';
-          //$options['measured_entity'] = $port['port_id'];
-          print_debug("Port is found: ifIndex = $ifIndex, port_id = " . $port['port_id']);
-          return $port;
-        }
-      }
-      else if (!$allow_snmp && $sensor_port['ifIndex'])
-      {
-        $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-        print_debug("Port is found: ifIndex = $ifIndex, port_id = " . $port['port_id']);
-        return $port;
-      }
-
-      break; // Exit do-while
-    }
-    else if ($device['os'] == 'arista_eos' && $sensor_port['entPhysicalClass'] == 'container' && strlen($sensor_port['entPhysicalAlias']))
-    {
-      // Arista not have entAliasMappingIdentifier, but used entPhysicalAlias as ifDescr
-      $port_id = get_port_id_by_ifDescr($device['device_id'], $sensor_port['entPhysicalAlias']);
-      if (is_numeric($port_id))
-      {
-        // Hola, port really found
-        $port    = get_port_by_id($port_id);
-        $ifIndex = $port['ifIndex'];
-        //$options['entPhysicalIndex_measured'] = $ifIndex;
-        //$options['measured_class']  = 'port';
-        //$options['measured_entity'] = $port_id;
-        print_debug("Port is found: ifIndex = $ifIndex, port_id = " . $port_id);
-        return $port;
-        //break; // Exit do-while
-      }
-      $sensor_index = $sensor_port['entPhysicalContainedIn']; // Next ifIndex
-    }
-    else if ($sensor_index == $sensor_port['entPhysicalContainedIn'])
-    {
-      break; // Break if current index same as next to avoid loop
-    } else {
-      $sensor_index = $sensor_port['entPhysicalContainedIn']; // Next ifIndex
-
-      // See: http://jira.observium.org/browse/OBS-2295
-      // IOS-XE and IOS-XR can store in module index both: sensors and port
-      if ($sensor_port['entPhysicalClass'] == 'sensor' &&
-          str_icontains($sensor_port['entPhysicalName'] . $sensor_port['entPhysicalDescr'] . $sensor_port['entPhysicalVendorType'], array('transceiver', '-PORT-')))
-          //'module' == dbFetchCell('SELECT `entPhysicalClass` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', array($device['device_id'], $sensor_port['entPhysicalContainedIn']))) // high level, should be module
-      {
-        $tmp_index = dbFetchCell('SELECT `entPhysicalIndex` FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalContainedIn` = ? AND `entPhysicalClass` = ?', array($device['device_id'], $sensor_index, 'port'));
-        if (is_numeric($tmp_index) && $tmp_index > 0)
-        {
-          // If port index found, try this entPhysicalIndex in next round
-          $sensor_index = $tmp_index;
-        }
-      }
-    }
-    // NOTE for self: entPhysicalParentRelPos >= 0 because on iosxr trouble
-  } while ($sensor_port['entPhysicalClass'] !== 'port' && $sensor_port['entPhysicalContainedIn'] > 0 && ($sensor_port['entPhysicalParentRelPos'] >= 0 || $device['os'] == 'arista_eos'));
-
+  return $filename;
 }
 
 // EOF

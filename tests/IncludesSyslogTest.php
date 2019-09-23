@@ -233,6 +233,14 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
                                            'msg_orig'  => 'oly-er-01 LC/0/0/CPU0:Jan 14 07:29:45.556 CET: pfilter_ea[301]: %L2-PFILTER_EA-3-ERR_IM_CAPS : uidb set  acl failed on interface Bundle-Ether1.1501.ip43696. (null)',
                                            ));
 
+    // Cisco NX-OS
+    $result[] = array('nxos||23||5||5||:||2019-02-27 13:23:54|| 2019 Feb 27 13:23:54 GMT: %VSHD-5-VSHD_SYSLOG_CONFIG_I: Configured from vty by username on x.x.x.x@pts/1||',
+                                     array('facility'  => 'local7', 'priority' => '5', 'level' => '5',
+                                           'tag'       => 'VSHD_SYSLOG_CONFIG_I', 'program' => 'VSHD',
+                                           'msg'       => 'Configured from vty by username on x.x.x.x@pts/1',
+                                           'msg_orig'  => '2019 Feb 27 13:23:54 GMT: %VSHD-5-VSHD_SYSLOG_CONFIG_I: Configured from vty by username on x.x.x.x@pts/1',
+                                           ));
+
     // Cisco ASA
     // Old syslog format
     $result[] = array('asa||23||4||4||12601:||2016-10-24 11:34:01||Apr 24 2013 16:00:28 INT-FW01 : %ASA-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.203.230.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]||12601',
@@ -312,27 +320,27 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
 
     $result[] = array('junos||3||4||4||mib2d[1230]:||2015-04-08 14:30:11|| SNMP_TRAP_LINK_DOWN: ifIndex 602, ifAdminStatus up(1), ifOperStatus down(2), ifName ge-0/1/0||mib2d',
                                      array('facility'  => 'daemon', 'priority' => '4', 'level' => '4',
-                                           'tag'       => 'mib2d[1230]', 'program' => 'MIB2D',
-                                           'msg'       => 'SNMP_TRAP_LINK_DOWN: ifIndex 602, ifAdminStatus up(1), ifOperStatus down(2), ifName ge-0/1/0',
+                                           'tag'       => 'SNMP_TRAP_LINK_DOWN', 'program' => 'MIB2D',
+                                           'msg'       => 'ifIndex 602, ifAdminStatus up(1), ifOperStatus down(2), ifName ge-0/1/0',
                                            'msg_orig'  => 'SNMP_TRAP_LINK_DOWN: ifIndex 602, ifAdminStatus up(1), ifOperStatus down(2), ifName ge-0/1/0',
                                            ));
     $result[] = array('junos||3||6||6||eswd[1237]:||2018-03-11 07:25:06|| ESWD_STP_STATE_CHANGE_INFO: STP state for interface ge-0/0/8.0 context id 23 changed from FORWARDING to BLOCKING||eswd',
                                      array('facility'  => 'daemon', 'priority' => '6', 'level' => '6',
-                                           'tag'       => 'eswd[1237]', 'program' => 'ESWD',
-                                           'msg'       => 'ESWD_STP_STATE_CHANGE_INFO: STP state for interface ge-0/0/8.0 context id 23 changed from FORWARDING to BLOCKING',
+                                           'tag'       => 'ESWD_STP_STATE_CHANGE_INFO', 'program' => 'ESWD',
+                                           'msg'       => 'STP state for interface ge-0/0/8.0 context id 23 changed from FORWARDING to BLOCKING',
                                            'msg_orig'  => 'ESWD_STP_STATE_CHANGE_INFO: STP state for interface ge-0/0/8.0 context id 23 changed from FORWARDING to BLOCKING',
-                                           ));
-    $result[] = array('junos||3||6||6||rpd[1247]:||2018-03-11 07:25:09|| EVENT <UpDown> ge-0/0/8.0 index 79 <Up Broadcast Multicast> address #0 3c.61.4.f1.da.b||rpd',
-                                     array('facility'  => 'daemon', 'priority' => '6', 'level' => '6',
-                                           'tag'       => 'rpd[1247]', 'program' => 'RPD',
-                                           'msg'       => 'EVENT <UpDown> ge-0/0/8.0 index 79 <Up Broadcast Multicast> address #0 3c.61.4.f1.da.b',
-                                           'msg_orig'  => 'EVENT <UpDown> ge-0/0/8.0 index 79 <Up Broadcast Multicast> address #0 3c.61.4.f1.da.b',
                                            ));
     $result[] = array('junos||23||6||6||mgd[87681]:||2017-07-27 14:45:11|| UI_AUTH_EVENT: Authenticated user \'tpetrov\' at permission level \'j-super-user\'||mgd',
                                      array('facility'  => 'local7', 'priority' => '6', 'level' => '6',
-                                           'tag'       => 'mgd[87681]', 'program' => 'MGD',
-                                           'msg'       => 'UI_AUTH_EVENT: Authenticated user \'tpetrov\' at permission level \'j-super-user\'',
+                                           'tag'       => 'UI_AUTH_EVENT', 'program' => 'MGD',
+                                           'msg'       => 'Authenticated user \'tpetrov\' at permission level \'j-super-user\'',
                                            'msg_orig'  => 'UI_AUTH_EVENT: Authenticated user \'tpetrov\' at permission level \'j-super-user\'',
+                                           ));
+    $result[] = array('junos||3||6||6||rpd[1247]:||2018-03-11 07:25:09|| EVENT <UpDown> ge-0/0/8.0 index 79 <Up Broadcast Multicast> address #0 3c.61.4.f1.da.b||rpd',
+                                     array('facility'  => 'daemon', 'priority' => '6', 'level' => '6',
+                                           'tag'       => 'EVENT,UpDown', 'program' => 'RPD',
+                                           'msg'       => 'ge-0/0/8.0 index 79 <Up Broadcast Multicast> address #0 3c.61.4.f1.da.b',
+                                           'msg_orig'  => 'EVENT <UpDown> ge-0/0/8.0 index 79 <Up Broadcast Multicast> address #0 3c.61.4.f1.da.b',
                                            ));
     // Always skip this unusefull entries
     $result[] = array('junos||12||3||3||last||2018-02-16 16:15:49|| message repeated 3 times||last',
@@ -341,7 +349,7 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
     // FTOS
     $result[] = array('ftos||23||5||5||||2018-03-12 13:48:18|| Mar 12 14:48:18.631: spb-rad-sw1: %STKUNIT0-M:CP %SEC-5-TACACS_ACCESS_ACCEPTED: Tacacs access accepted for user "rancid"||',
                                      array('facility'  => 'local7', 'priority' => '5', 'level' => '5',
-                                           'tag'       => 'TACACS,ACCESS_ACCEPTED', 'program' => 'SEC',
+                                           'tag'       => 'TACACS_ACCESS_ACCEPTED', 'program' => 'SEC',
                                            'msg'       => 'Tacacs access accepted for user "rancid"',
                                            'msg_orig'  => 'Mar 12 14:48:18.631: spb-rad-sw1: %STKUNIT0-M:CP %SEC-5-TACACS_ACCESS_ACCEPTED: Tacacs access accepted for user "rancid"',
                                            ));
@@ -359,7 +367,7 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
                                            ));
     $result[] = array('ftos||23||5||5||||2018-03-19 05:48:12|| Mar 19 06:48:12.692: spb-rad-sw1: %STKUNIT0-M:CP %SEC-5-LOGIN_SUCCESS: Login successful for user rancid on line vty0 (1.1.1.1)||',
                                      array('facility'  => 'local7', 'priority' => '5', 'level' => '5',
-                                           'tag'       => 'LOGIN,SUCCESS', 'program' => 'SEC',
+                                           'tag'       => 'LOGIN_SUCCESS', 'program' => 'SEC',
                                            'msg'       => 'Login successful for user rancid on line vty0 (1.1.1.1)',
                                            'msg_orig'  => 'Mar 19 06:48:12.692: spb-rad-sw1: %STKUNIT0-M:CP %SEC-5-LOGIN_SUCCESS: Login successful for user rancid on line vty0 (1.1.1.1)',
                                            ));
@@ -417,6 +425,20 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
                                            'tag'       => 'LAGG_INACTIVE_PHYSTATE', 'program' => 'LAGG',
                                            'msg'       => 'Member port XGE1/0/33 of aggregation group BAGG33 changed to the inactive state, because the physical state of the port is down.',
                                            'msg_orig'  => 'Member port XGE1/0/33 of aggregation group BAGG33 changed to the inactive state, because the physical state of the port is down.',
+                                           ));
+
+    // NS-BSD
+    $result[] = array('ns-bsd||user||5||notice||0d||2018-10-16 18:13:05||2018-10-16T18:13:03+02:00 fw.hostname.net tproxyd - - - ﻿id=firewall time=\"2018-10-16 18:13:03\" fw=\"fw.hostname.net\" tz=+0200 startime=\"2018-10-16 18:13:02\" pri=5 proto=http confid=1 slotlevel=2 ruleid=9 rulename=\"16663e6700f_5\" op=GET result=416 user=\"\" domain=\"\" src=192.168.0.148 srcport=59365 srcportname=ephemeral_fw_tcp dst=88.221.145.155 dstport=80 dstportname=http srcmac=54:27:1e:5c:22:bb dstname=2.tlu.dl.delivery.mp.microsoft.com modsrc=192.168.1.2 modsrcport=9619 origdst=88.221.145.155 origdstport=80 ipv=4 sent=484 rcvd=0 duration=0.00 dstcontinent=\"eu\" dstcountry=\"it\" action=block contentpolicy=1 urlruleid=2 cat_site=\"vpnssl_owa\" arg=\"/filestreamingservice/files/5fa99684-8931-4eff-bc5d-27ff2a406a31%3FP1%3D1539706618%26P2%3D402%26P3%3D2%26P4%3DHCvXZchoZYgzbdK0XkO2CelafFHcA%252bUrQcgT5u%252b6WDwtpi5jZJu%252fUjCHpbffRGU5iG8kuHW1C5uQ68drtUWh%252fA%253d%253d\" msg=\"Requested range not satisfiable\" logtype=\"web\"||1',
+                                     array('facility'  => 'user', 'priority' => '5', 'level' => '5',
+                                           'tag'       => 'firewall', 'program' => 'TPROXYD',
+                                           'msg'       => '﻿id=firewall time=\"2018-10-16 18:13:03\" fw=\"fw.hostname.net\" tz=+0200 startime=\"2018-10-16 18:13:02\" pri=5 proto=http confid=1 slotlevel=2 ruleid=9 rulename=\"16663e6700f_5\" op=GET result=416 user=\"\" domain=\"\" src=192.168.0.148 srcport=59365 srcportname=ephemeral_fw_tcp dst=88.221.145.155 dstport=80 dstportname=http srcmac=54:27:1e:5c:22:bb dstname=2.tlu.dl.delivery.mp.microsoft.com modsrc=192.168.1.2 modsrcport=9619 origdst=88.221.145.155 origdstport=80 ipv=4 sent=484 rcvd=0 duration=0.00 dstcontinent=\"eu\" dstcountry=\"it\" action=block contentpolicy=1 urlruleid=2 cat_site=\"vpnssl_owa\" arg=\"/filestreamingservice/files/5fa99684-8931-4eff-bc5d-27ff2a406a31%3FP1%3D1539706618%26P2%3D402%26P3%3D2%26P4%3DHCvXZchoZYgzbdK0XkO2CelafFHcA%252bUrQcgT5u%252b6WDwtpi5jZJu%252fUjCHpbffRGU5iG8kuHW1C5uQ68drtUWh%252fA%253d%253d\" msg=\"Requested range not satisfiable\" logtype=\"web\"',
+                                           'msg_orig'  => '2018-10-16T18:13:03+02:00 fw.hostname.net tproxyd - - - ﻿id=firewall time=\"2018-10-16 18:13:03\" fw=\"fw.hostname.net\" tz=+0200 startime=\"2018-10-16 18:13:02\" pri=5 proto=http confid=1 slotlevel=2 ruleid=9 rulename=\"16663e6700f_5\" op=GET result=416 user=\"\" domain=\"\" src=192.168.0.148 srcport=59365 srcportname=ephemeral_fw_tcp dst=88.221.145.155 dstport=80 dstportname=http srcmac=54:27:1e:5c:22:bb dstname=2.tlu.dl.delivery.mp.microsoft.com modsrc=192.168.1.2 modsrcport=9619 origdst=88.221.145.155 origdstport=80 ipv=4 sent=484 rcvd=0 duration=0.00 dstcontinent=\"eu\" dstcountry=\"it\" action=block contentpolicy=1 urlruleid=2 cat_site=\"vpnssl_owa\" arg=\"/filestreamingservice/files/5fa99684-8931-4eff-bc5d-27ff2a406a31%3FP1%3D1539706618%26P2%3D402%26P3%3D2%26P4%3DHCvXZchoZYgzbdK0XkO2CelafFHcA%252bUrQcgT5u%252b6WDwtpi5jZJu%252fUjCHpbffRGU5iG8kuHW1C5uQ68drtUWh%252fA%253d%253d\" msg=\"Requested range not satisfiable\" logtype=\"web\"',
+                                           ));
+    $result[] = array('ns-bsd||user||1||alert||09||2018-10-16 18:14:35||2018-10-16T18:14:35+02:00 na_carfi asqd - - - ﻿id=firewall time=\"2018-10-16 18:14:35\" fw=\"na_carfi\" tz=+0200 startime=\"2018-10-16 18:14:34\" pri=1 confid=00 srcif=\"Ethernet1\" srcifname=\"in\" ipproto=udp proto=udp src=172.16.0.27 srcport=17500 srcmac=00:0c:29:09:f4:44 dst=255.255.255.255 dstport=17500 dstname=broadcast ipv=4 action=block msg=\"IP address spoofing (type=1)\" class=protocol classification=0 alarmid=1 target=dst logtype=\"alarm\"||1',
+                                     array('facility'  => 'user', 'priority' => '1', 'level' => '1',
+                                           'tag'       => 'firewall', 'program' => 'ASQD',
+                                           'msg'       => '﻿id=firewall time=\"2018-10-16 18:14:35\" fw=\"na_carfi\" tz=+0200 startime=\"2018-10-16 18:14:34\" pri=1 confid=00 srcif=\"Ethernet1\" srcifname=\"in\" ipproto=udp proto=udp src=172.16.0.27 srcport=17500 srcmac=00:0c:29:09:f4:44 dst=255.255.255.255 dstport=17500 dstname=broadcast ipv=4 action=block msg=\"IP address spoofing (type=1)\" class=protocol classification=0 alarmid=1 target=dst logtype=\"alarm\"',
+                                           'msg_orig'  => '2018-10-16T18:14:35+02:00 na_carfi asqd - - - ﻿id=firewall time=\"2018-10-16 18:14:35\" fw=\"na_carfi\" tz=+0200 startime=\"2018-10-16 18:14:34\" pri=1 confid=00 srcif=\"Ethernet1\" srcifname=\"in\" ipproto=udp proto=udp src=172.16.0.27 srcport=17500 srcmac=00:0c:29:09:f4:44 dst=255.255.255.255 dstport=17500 dstname=broadcast ipv=4 action=block msg=\"IP address spoofing (type=1)\" class=protocol classification=0 alarmid=1 target=dst logtype=\"alarm\"',
                                            ));
 
     // Test filter syslog messages

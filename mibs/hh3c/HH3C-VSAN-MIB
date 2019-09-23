@@ -1,25 +1,31 @@
 -- =====================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --      This MIB module is for configuring and monitoring VSAN (Virtual
 --      Storage Area Network) and domain management related entities.
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --   V1.0 Initial version created by qiaoxinghua 2013-02-27
 --   V1.1 Added hh3cVsanDmDomainIdChangeNotify and
 --        hh3cVsanDmDomainIdChangeNotifyEnable by qiaoxinghua 2014-3-4
+--   V1.2 Added hh3cVsanName and hh3cVsanWorkingMode
+--        to hh3cVsanTable by chengzhipeng 2014-05-09
+--        Added hh3cVsanFcIdTable and hh3cVsanFcIdPersistencyTable by wangyuqiang 2014-07-25
 -- =====================================================================
 HH3C-VSAN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Counter32
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Counter32,
+    Integer32
         FROM SNMPv2-SMI
     RowStatus, TruthValue
         FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
     Hh3cFcVsanIndex, Hh3cFcNameIdOrZero, Hh3cFcDomainPriority, Hh3cFcDomainId,
-    Hh3cFcNameId, Hh3cFcDomainIdOrZero, Hh3cFcDmState, Hh3cFcDomainIdList
+    Hh3cFcNameId, Hh3cFcAddressId, Hh3cFcDomainIdOrZero, Hh3cFcDmState, Hh3cFcDomainIdList
         FROM HH3C-FC-TC-MIB
     ifIndex
         FROM IF-MIB
@@ -27,11 +33,11 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
 hh3cSan MODULE-IDENTITY
-    LAST-UPDATED   "201403041550Z"
+    LAST-UPDATED   "201407251840Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085
@@ -39,6 +45,12 @@ hh3cSan MODULE-IDENTITY
     DESCRIPTION
         "This MIB module is for configuring and monitoring VSAN
          and domain management related entities."
+    REVISION       "201407251840Z"
+    DESCRIPTION
+        "Added hh3cVsanFcIdTable and hh3cVsanFcIdPersistencyTable."
+    REVISION       "201405091840Z"
+    DESCRIPTION
+        "Added hh3cVsanName and hh3cVsanWorkingMode."
     REVISION       "201403041550Z"
     DESCRIPTION
         "Added hh3cVsanDmDomainIdChangeNotify and
@@ -84,7 +96,11 @@ Hh3cVsanEntry ::=
         hh3cVsanCoreSwitchName
             Hh3cFcNameIdOrZero,
         hh3cVsanRowStatus
-            RowStatus
+            RowStatus,
+        hh3cVsanName
+            SnmpAdminString,
+        hh3cVsanWorkingMode
+            Integer32
        }
 
 hh3cVsanIndex OBJECT-TYPE
@@ -109,9 +125,47 @@ hh3cVsanRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "RowStatus.  Now only three states are supported:
+        "RowStatus. Now only three states are supported:
          createAndGo, active, and destroy."
     ::= { hh3cVsanEntry 3 }
+
+hh3cVsanName OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the VSAN.
+         The default value of this object will be the
+         string 'VSANxxxx' where xxxx is value of VSAN index
+         expressed as 4 digits.  For example, if VSAN index is
+         10, the default value of this object is 'VSAN0010'."
+    ::= { hh3cVsanEntry 4 }
+
+hh3cVsanWorkingMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the working modes the VSAN supports.
+         The object has three available values:
+         1: non-FCoE mode.
+         2: FCF mode.
+         3: NPV mode.
+
+         The working mode of VSAN 4079 is always non-FCoE mode and cannot be
+         converted.
+         If the switch mode is not FCF-NPV mode, then the 'SET' operation
+         on this object results in error.
+         When creating a VSAN, the 'SET' operation including this object
+         results in error.
+         When the switch mode is FCF mode, working modes of all user VSANs
+         are FCF mode.
+         When the switch mode is NPV mode, working modes of all user VSANs
+         are NPV mode.
+         When the switch mode is FCF-NPV mode, the default working mode of
+         a user VSAN is NPV mode.  If a VSAN has been created, the working mode
+         can be converted from NPV mode to FCF mode, or vice versa."
+    ::= { hh3cVsanEntry 5 }
 
 -- DM Configuration
 hh3cVsanDmTable     OBJECT-TYPE
@@ -436,6 +490,189 @@ hh3cVsanDmIfConfigRcfReject  OBJECT-TYPE
     DEFVAL          { false }
     ::= { hh3cVsanDmIfConfigEntry 1 }
 
+
+-- VSAN FC ID Table
+
+hh3cVsanFcIdTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cVsanFcIdEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains FC ID information for each VSAN."
+    ::= { hh3cVsanDmConfiguration 4 }
+
+hh3cVsanFcIdEntry OBJECT-TYPE
+    SYNTAX          Hh3cVsanFcIdEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry provides FC ID information for a VSAN."
+    INDEX  { hh3cVsanIndex }
+    ::= { hh3cVsanFcIdTable 1 }
+
+Hh3cVsanFcIdEntry ::= SEQUENCE {
+        hh3cVsanFreeFcIds                    Counter32,
+        hh3cVsanAssignedFcIds                Counter32,
+        hh3cVsanFcIdPersistency              TruthValue,
+        hh3cVsanFcIdPurge                    INTEGER
+}
+
+hh3cVsanFreeFcIds OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "The number of FC IDs that are unassigned on this VSAN."
+        ::= { hh3cVsanFcIdEntry 1 }
+
+hh3cVsanAssignedFcIds OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "The number of FC IDs that are assigned on this VSAN."
+        ::= { hh3cVsanFcIdEntry 2 }
+
+hh3cVsanFcIdPersistency OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+           "Enable or disable FC ID persistency on this VSAN.
+
+           If this object is set to 'true', then all the FC ID
+           assigned on this VSAN are made persistent on this VSAN, and
+           all login entries automatically created in the
+           hh3cVsanFcIdPersistencyTable with hh3cVsanFcIdPersistencyWwn
+           equal to either WWN of the logged-in Nx_Port for which the
+           FC ID was assigned and hh3cVsanFcIdPersistencyType equal
+           to 'dynamic'.
+
+           If this object is set to 'false', then all the entries on
+           this VSAN in dmFcIdPersistencyTable are deleted."
+    DEFVAL { true }
+    ::= { hh3cVsanFcIdEntry 3 }
+
+hh3cVsanFcIdPurge OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      noOp (1),
+                      enable (2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This object is used to purge the FC ID
+                persistency database on this VSAN.
+
+               If the value of this object is 'enable', then
+               all entries on this VSAN in the hh3cVsanFcIdPersistencyTable with
+               hh3cVsanFcIdPersistencyType is 'dynamic' and
+               hh3cVsanFcIdPersistencyUsed is 'false' are
+               purged from the persistency database."
+        ::= { hh3cVsanFcIdEntry 4 }
+
+-- FC ID Persistency Table
+
+hh3cVsanFcIdPersistencyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cVsanFcIdPersistencyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "This table contains the FC IDs which are in the FC ID
+           persistency database of each VSAN.
+
+           If the FC ID persistency is enabled, FC devices would get
+           the same FC IDs even if they disappear and appear again.
+
+           The FC ID persistency database contains information
+           about the FC IDs which are assigned to FC devices
+           either statically (configured) or dynamically.
+
+           An entry is automatically created when a FC ID is
+           assigned and hh3cVsanFcIdPersistency is 'true' on this VSAN.
+
+           The entries can also be created and deleted via
+           the hh3cVsanFcIdPersistencyRowStatus object.
+
+           If the object hh3cVsanFcIdPurge is set to 'enable', an entry is
+           deleted if its hh3cVsanFcIdPersistencyType is 'dynamic' and
+           hh3cVsanFcIdPersistencyUsed is 'false'.
+
+           If the hh3cVsanFcIdPersistency is 'false', no
+           entry can be created.
+
+           If the hh3cVsanDmDomainIdAssigned is changed on a VSAN, then all the
+           entries on that VSAN in this table are deleted."
+    ::= { hh3cVsanDmConfiguration 5 }
+
+hh3cVsanFcIdPersistencyEntry OBJECT-TYPE
+    SYNTAX          Hh3cVsanFcIdPersistencyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry provides FC ID persistency information for a VSAN."
+    INDEX  { hh3cVsanIndex, hh3cVsanFcIdPersistencyWwn }
+    ::= { hh3cVsanFcIdPersistencyTable 1 }
+
+Hh3cVsanFcIdPersistencyEntry ::= SEQUENCE {
+       hh3cVsanFcIdPersistencyWwn           Hh3cFcNameId,
+       hh3cVsanFcIdPersistencyFcId          Hh3cFcAddressId,
+       hh3cVsanFcIdPersistencyUsed          TruthValue,
+       hh3cVsanFcIdPersistencyType          INTEGER,
+       hh3cVsanFcIdPersistencyRowStatus     RowStatus
+}
+
+hh3cVsanFcIdPersistencyWwn OBJECT-TYPE
+        SYNTAX      Hh3cFcNameId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+               "This is either the port WWN of the FC device if the
+               local port is an F_port.  The local port is the port on
+               the local device to which the FC device is attached."
+        ::= { hh3cVsanFcIdPersistencyEntry 1 }
+
+hh3cVsanFcIdPersistencyFcId OBJECT-TYPE
+        SYNTAX      Hh3cFcAddressId
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+               "The FC ID assigned for this WWN on this VSAN.
+
+               This object cannot be changed if either the value of
+               hh3cVsanFcIdPersistencyUsed is 'true' or if the
+               new value being set is already assigned on this VSAN."
+        ::= { hh3cVsanFcIdPersistencyEntry 2 }
+
+hh3cVsanFcIdPersistencyUsed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+           "This object indicates this FC ID is used or not."
+    ::= { hh3cVsanFcIdPersistencyEntry 3 }
+
+hh3cVsanFcIdPersistencyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   static (1),
+                   dynamic (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of persistency of this FC ID."
+    DEFVAL { static }
+    ::= { hh3cVsanFcIdPersistencyEntry 4 }
+
+hh3cVsanFcIdPersistencyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "An entry cannot be created if hh3cVsanFcIdPersistency is 'false'.
+            An entry cannot be deleted if hh3cVsanFcIdPersistencyUsed is 'true'."
+    ::= { hh3cVsanFcIdPersistencyEntry 5 }
+
 -- DM Information
 hh3cVsanDmInformation  OBJECT IDENTIFIER ::= { hh3cVsanMibObjects 2 }
 
@@ -550,7 +787,7 @@ hh3cVsanDmDomainIdNotAssignedNotify NOTIFICATION-TYPE
     DESCRIPTION
         "This event will be triggered if a Domain ID is not
          assigned or configured, then the E_ports may be isolated
-         in the VSAN.  The conditions are listed as follows:
+         in the VSAN. The conditions are listed as follows:
 
          1. If the switch has enabled the fabric configuration and
             a request for a configured static Domain ID is rejected
@@ -593,7 +830,6 @@ hh3cVsanDmFabricChangeNotify NOTIFICATION-TYPE
             switch and other switches become disconnected, the sent or
             received message is BF.
          3. A BF or RCF process is triggered manually by configuration.
-
          The notification contains the index of the VSAN in which a BF
          or a RCF was sent or received."
    ::= { hh3cVsanDmNotificationPrefix 3 }

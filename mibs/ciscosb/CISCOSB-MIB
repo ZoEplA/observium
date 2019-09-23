@@ -175,6 +175,7 @@ CISCOSB-MIB DEFINITIONS ::= BEGIN
 -- 02-Apr-2009 added rlCustom1BonjourService
 -- 18-Apr-2010 added rlPfcMib
 -- 30-Jan-2015 added rlLan1
+-- 17-Jul-2016 added rlQueueStatistics
 
 
 -- Title:                CISCOSB ROS
@@ -738,9 +739,14 @@ rlQosApps OBJECT IDENTIFIER ::= { switch001 232 }
 
 rlQueueStatistics OBJECT IDENTIFIER ::= { switch001 233 }
 
+rlPNP OBJECT IDENTIFIER ::= { switch001 234 }
+
+rlFindit OBJECT IDENTIFIER ::= { switch001 235 }
+
 rndEndOfMibGroup   OBJECT IDENTIFIER ::= { switch001 1000  }
 
 -- see CISCOSB-ENDOFMIB-MIB.MIB
 
 END
+
 

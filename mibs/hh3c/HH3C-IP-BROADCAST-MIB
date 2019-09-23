@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (C) 2002 by H3C TECHNOLOGIES.  All rights reserved.
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Ip broadcast mib
 -- Reference:
@@ -19,9 +19,9 @@ HH3C-IP-BROADCAST-MIB DEFINITIONS ::= BEGIN
         hh3cIpBroadcast MODULE-IDENTITY
         LAST-UPDATED "200412131936Z"        -- December 13, 2004 at 19:36 GMT
         ORGANIZATION
-            "Hangzhou H3C Tech. Co., Ltd."
+            "New H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            "Platform Team New H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
             http://www.h3c.com
             Zip:100085

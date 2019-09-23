@@ -1,23 +1,23 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This MIB is to provide the definition of the POSA
 --              (Point Of Sale Access) system.
 -- Reference:
--- Version: V1.3
+-- Version: V1.9
 -- History:
 -- V1.0 2008-03-12 Initial version, created by Lei Hao, Yang Xu
 -- V1.1 2008-09-22 updated by yangxu
---      Modify the limitation(SIZE (4..7)) of h3cPosaMapDestCode
---      Modify the default value of h3cPosaFcmAnswerTimeout
---      Modify the limitation(0..65535) of h3cPosaAppHostPort
---      Modify the limitation(0..65535) of h3cPosaTerminalListenPort
---      Add new node h3cPosaTerminalTransAppID in h3cPosaTerminalTable
---      Rename h3cPosaAppDiscardedPkts to h3cPosaAppInDiscardedPkts
---      Add new node h3cPosaAppOutDiscardedPkts in h3cPosaAppStatTable
---      Rename h3cPosaTerminalDiscardedPkts to h3cPosaTerminalInDiscardedPkts
---      Add new node h3cPosaTerminalOutDiscardedPkts in h3cPosaTerminalStatTable
---      Modify the description of object h3cPosaAppHostPort,
+--      Modified the limitation(SIZE (4..7)) of h3cPosaMapDestCode
+--      Modified the default value of h3cPosaFcmAnswerTimeout
+--      Modified the limitation(0..65535) of h3cPosaAppHostPort
+--      Modified the limitation(0..65535) of h3cPosaTerminalListenPort
+--      Added new node h3cPosaTerminalTransAppID in h3cPosaTerminalTable
+--      Renamed h3cPosaAppDiscardedPkts to h3cPosaAppInDiscardedPkts
+--      Added new node h3cPosaAppOutDiscardedPkts in h3cPosaAppStatTable
+--      Renamed h3cPosaTerminalDiscardedPkts to h3cPosaTerminalInDiscardedPkts
+--      Added new node h3cPosaTerminalOutDiscardedPkts in h3cPosaTerminalStatTable
+--      Modified the description of object h3cPosaAppHostPort,
 --      h3cPosaFcmStatTimeoutCnts, h3cPosaFcmStatConnectFailCnts,
 --      h3cPosaAppRecvPkts, h3cPosaAppSendPkts, h3cPosaAppErrPkts,
 --      h3cPosaAppDistributeErrCnts, h3cPosaAppInDiscardedPkts,
@@ -25,13 +25,13 @@
 --      h3cPosaTerminalErrPkts, h3cPosaTerminalMapErrCnts,
 --      h3cPosaTerminalInDiscardedPkts.
 -- V1.2 2010-04-08 updated by Cai Zibin, Tong Wei
---      Add h3cPosaFcmConfTable
---      Add h3cPosaTcpTermStatTable
---      Add h3cPosaBatchTerminalTable
---      Add h3cPosaCallerStatTable
---      Add new node h3cPosaTerminalHangUp, h3cPosaFcmLinkNegoFailed,
+--      Added h3cPosaFcmConfTable
+--      Added h3cPosaTcpTermStatTable
+--      Added h3cPosaBatchTerminalTable
+--      Added h3cPosaCallerStatTable
+--      Added new node h3cPosaTerminalHangUp, h3cPosaFcmLinkNegoFailed,
 --      h3cPosaFcmPhyNegoFailed in h3cPosaTrapPrex
---      Add new node h3cPosaSrvStateChangeTrapEnable,
+--      Added new node h3cPosaSrvStateChangeTrapEnable,
 --      h3cPosaAppStateChangeTrapEnable, h3cPosaTerminalHangUpTrapEnable,
 --      h3cPosaFcmLnkNegoFailTrapEnable, h3cPosaFcmPhyNegoFailTrapEnable,
 --      in h3cPosaControl
@@ -40,16 +40,59 @@
 --      h3cPosaTerminalName and h3cPosaTerminalCfgIfIndex in h3cPosaTerminalTable
 --      h3cPosaMapSrcCode in h3cPosaMapTable
 -- V1.3 2011-09-01 updated by he changfu,du pengfei
---      Add new node h3cPosaBackupAppID,h3cPosaQuietTimeOut
+--      Added new node h3cPosaBackupAppID,h3cPosaQuietTimeOut
 --      in h3cPosaAppTable
---      Add a new value for H3cPeerState.
+--      Added a new value for H3cPeerState.
 --      2011-12-12 updated by lei hao,yang xu
---      Add new node, h3cPosaFcmStatTransCnts, h3cPosaFcmStatTransSuccessCnts
+--      Added new node, h3cPosaFcmStatTransCnts, h3cPosaFcmStatTransSuccessCnts
 --      and h3cPosaFcmStatTransCntsClear in h3cPosaFcmStatTable
---      2012-2-28 updated by zhangxianyi 
---      Add new node h3cPosaAppHello, h3cPosaAppHelloInterval
+--      2012-2-28 updated by zhangxianyi
+--      Added new node h3cPosaAppHello, h3cPosaAppHelloInterval
 --      h3cPosaAppRouterPort
 --      in h3cPosaAppTable
+-- V1.4 2012-8-22 updated by dupengfei
+--      Added value of "error(9)" for H3cPeerState
+-- V1.5 2013-08-30 updated by q04356
+--      Modified the range of h3cPosaAppID and h3cPosaBackupAppID in h3cPosaAppTable
+--      Modified the range of h3cPosaTerminalTransAppID in h3cPosaTerminalTable
+--      Modified the range of h3cPosaMapAppID in h3cPosaMapTable
+--      2013-09-03 updated by q04356
+--      Added new nodes h3cPosaTcpConnectionNumber, h3cPosaFcmConnectionNumber
+--      h3cPosaTcpConnectionThreshold, h3cPosaFcmConnectionThreshold,
+--      h3cPosaTcpConnectionTrapEnable and
+--      h3cPosaFcmConnectionTrapEnable in h3cPosaControl
+--      Added new nodes h3cPosaTcpConnectionExceed and
+--      h3cPosaFcmConnectionExceed in h3cPosaTrapPrex
+-- V1.6 2013-10-18 updated by zhangxinhua
+--      Modified the MAX-ACCESS of h3cPosaTerminalID to be accessible-for-notify
+--      Deleted the range description of h3cPosaTcpConnectionThreshold and
+--      h3cPosaFcmConnectionThreshold
+--      Added new nodes h3cPosaTcpTradeLimit, h3cPosaTcpTradeTrapEnable,
+--      h3cPosaTcpTradeTimeout in h3cPosaControl
+--      Added new nodes h3cPosaTcpTradeExceed in h3cPosaTrapPrex
+--      2013-12-14 updated by q04356
+--      Modified the default of h3cPosaFcmIdleTimeout in h3cPosaControl
+-- V1.7 2014-05-29 updated by liubo
+--      Modified the range for h3cPosaAppID and h3cPosaBackupAppID in h3cPosaAppTable
+--      Modified the range for h3cPosaTerminalTransAppID in h3cPosaTerminalTable
+--      Modified the range for h3cPosaMapAppID in h3cPosaMapTable
+-- V1.8 2014-11-14 updated by liubo
+--      Modified the range for h3cPosaTerminalID in h3cPosaTerminalTable
+--      Modified the range for h3cPosaBatchTerminalFirstID in h3cPosaBatchTerminalTable
+--      Modified the default value for h3cPosaFcmConnectionThreshold
+-- V1.9 2015-8-26 updated by limeng
+--      Added h3cPosaNiiStatTable
+--      Added h3cPosaE1StatTable
+--      Added new nodes h3cPosaTradeSuccessFallingTrapEnable, h3cPosaTradeSuccessFallingThreshold,
+--      h3cPosaE1DialFallingTrapEnable, h3cPosaE1DialFallingThreshold
+--      and h3cPosaFcmTradeAbnormalTrapEnable in h3cPosaControl
+--      Added new node h3cPosaTermianlTcpConnectionNumber in h3cPosaTerminalStatTable
+--      Added new nodes h3cPosaTradeSuccessFalling, h3cPosaE1DialFalling
+--      and h3cPosaFcmTradeAbnormal in h3cPosaTrapPrex
+--      Added new object h3cPosaCallerStatCallerID to h3cPosaTerminalHangUp
+--      Added new object h3cPosaCallerStatCallerID to h3cPosaFcmLinkNegoFailed
+--      Added new object h3cPosaCallerStatCallerID to h3cPosaFcmPhyNegoFailed
+--      Modified the MAX-ACCESS of h3cPosaCallerStatCallerID to be accessible-for-notify
 -- =================================================================
 H3C-POSA-MIB DEFINITIONS ::= BEGIN
 
@@ -67,18 +110,36 @@ IMPORTS
         FROM IF-MIB;
 
 h3cPosa MODULE-IDENTITY
-    LAST-UPDATED "201004090000Z"
+    LAST-UPDATED "201508260000Z"
     ORGANIZATION
-        "H3C Technologies Co., Ltd."
+        "Hangzhou H3C Technologies. Co., Ltd."
     CONTACT-INFO
-        "PLAT Team Hangzhou H3C Technologies Co.,Ltd.
-        Shang-Di Information Industry Base,
-        Hai-Dian District Beijing P.R. China
-        http://www.h3c.com
-        Zip:100085"
+        "Platform Team Hangzhou Technologies. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
     DESCRIPTION
         "This MIB is to provide the definition of the POSA
         (Point Of Sale Access) system."
+    REVISION "201508260000Z"
+    DESCRIPTION
+        "Added h3cPosaNiiStatTable.
+        Added h3cPosaE1StatTable.
+        Added new nodes h3cPosaTradeSuccessFallingTrapEnable, h3cPosaTradeSuccessFallingThreshold,
+        h3cPosaE1DialFallingTrapEnable, h3cPosaE1DialFallingThreshold
+        and h3cPosaFcmTradeAbnormalTrapEnable in h3cPosaContro.
+        Added new node h3cPosaTermianlTcpConnectionNumber in h3cPosaTerminalStatTable.
+        Added new nodes h3cPosaTradeSuccessFalling, h3cPosaE1DialFalling
+        and h3cPosaFcmTradeAbnormal in h3cPosaTrapPrex.
+        Added new object h3cPosaCallerStatCallerID to h3cPosaTerminalHangUp.
+        Added new object h3cPosaCallerStatCallerID to h3cPosaFcmLinkNegoFailed.
+        Added new object h3cPosaCallerStatCallerID to h3cPosaFcmPhyNegoFailed.
+        Modified the MAX-ACCESS of h3cPosaCallerStatCallerID to be accessible-for-notify."
+    REVISION "201411140000Z"
+    DESCRIPTION
+        "Modified the range for h3cPosaTerminalID in h3cPosaTerminalTable.
+        Modified the range for h3cPosaBatchTerminalFirstID in h3cPosaBatchTerminalTable.
+        Modified the default value for h3cPosaFcmConnectionThreshold"
     REVISION "200803120933Z"
     DESCRIPTION
         "The initial revision of this MIB module."
@@ -135,6 +196,7 @@ H3cPeerState ::= TEXTUAL-CONVENTION
         multilink(7)  There are multiple connections between router and the peer.
         blocked(8)    The connection between router and the peer is
                       unreachable.
+        error(9)      Enable failed.
 
         The status of down(2) and up(3) appear only when the router and the peer
         are connected with interface.
@@ -150,7 +212,8 @@ H3cPeerState ::= TEXTUAL-CONVENTION
         linking(5),
         linked(6),
         multilink(7),
-        blocked(8)
+        blocked(8),
+        error(9)
         }
 
 H3cTerminalAccessType ::= TEXTUAL-CONVENTION
@@ -235,7 +298,7 @@ h3cPosaFcmIdleTimeout OBJECT-TYPE
     DESCRIPTION
         "The maximum idle time of a POS connection through the FCM interface,
         in units of seconds."
-    DEFVAL { 60 }
+    DEFVAL { 180 }
     ::= { h3cPosaControl 4 }
 
 h3cPosaSrvStateChangeTrapEnable OBJECT-TYPE
@@ -287,6 +350,138 @@ h3cPosaFcmPhyNegoFailTrapEnable OBJECT-TYPE
         be sent or not."
     DEFVAL { true }
     ::= { h3cPosaControl 9 }
+
+h3cPosaTcpConnectionNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current number of TCP connections."
+    ::= { h3cPosaControl 10 }
+
+h3cPosaFcmConnectionNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current number of FCM connections."
+    ::= { h3cPosaControl 11 }
+
+h3cPosaTcpConnectionThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The threshold of TCP connections."
+    DEFVAL {4096}
+    ::= { h3cPosaControl 12 }
+
+h3cPosaFcmConnectionThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The threshold of FCM connections."
+    DEFVAL {1024}
+    ::= { h3cPosaControl 13 }
+
+h3cPosaTcpConnectionTrapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute specifies the threshold that must be exceeded to
+        send the h3cPosaTcpConnectionExceed trap."
+    DEFVAL { true }
+    ::= { h3cPosaControl 14 }
+
+h3cPosaFcmConnectionTrapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute specifies the threshold that must be exceeded to
+        send the h3cPosaFcmConnectionExceed trap."
+    DEFVAL { true }
+    ::= { h3cPosaControl 15 }
+
+h3cPosaTcpTradeLimit OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The limit of concurrent trades in one TCP connection.  The value 0
+        means unlimited."
+    DEFVAL {0}
+    ::= { h3cPosaControl 16 }
+
+h3cPosaTcpTradeTrapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute specifies the limit that must be exceeded to
+        send the h3cPosaTcpTradeExceed trap."
+    DEFVAL { true }
+    ::= { h3cPosaControl 17 }
+
+h3cPosaTcpTradeTimeout OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum interval to wait for the reply from sending the trade
+        packet to the application server.  The value 0 means wait forever."
+    DEFVAL {240}
+    ::= { h3cPosaControl 18 }
+
+h3cPosaTradeSuccessFallingTrapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute controls whether the h3cPosaTradeSuccessFalling trap will
+        be sent or not."
+    DEFVAL { true }
+    ::= { h3cPosaControl 19 }
+
+h3cPosaTradeSuccessFallingThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The threshold of transaction success rate ."
+    DEFVAL {90}
+    ::= { h3cPosaControl 20 }
+
+h3cPosaE1DialFallingTrapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute controls whether the h3cPosaE1DialFalling trap will
+        be sent or not."
+    DEFVAL { true }
+    ::= { h3cPosaControl 21 }
+
+h3cPosaE1DialFallingThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The threshold of dialing success rate ."
+    DEFVAL {90}
+    ::= { h3cPosaControl 22 }
+
+h3cPosaFcmTradeAbnormalTrapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute controls whether the h3cPosaFcmTradeAbnormal trap will
+        be sent or not."
+    DEFVAL { true }
+    ::= { h3cPosaControl 23 }
 
 h3cPosaTables OBJECT IDENTIFIER ::= { h3cPosa 2 }
 
@@ -356,17 +551,17 @@ H3cPosaAppEntry ::=
         h3cPosaAppHello
             TruthValue,
         h3cPosaAppHelloInterval
-            Integer32, 
+            Integer32,
         h3cPosaAppRouterPort
             Integer32
      }
 
 h3cPosaAppID OBJECT-TYPE
-    SYNTAX Integer32 (1..31)
+    SYNTAX Integer32 (1..1024)
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
-        "The identification of a POS application.  It ranges from 1 to 31."
+        "The identification of a POS application."
     ::= { h3cPosaAppEntry 1 }
 
 h3cPosaAppServiceType OBJECT-TYPE
@@ -529,7 +724,7 @@ h3cPosaTpduChangeStrategy OBJECT-TYPE
     ::= { h3cPosaAppEntry 17 }
 
 h3cPosaBackupAppID OBJECT-TYPE
-    SYNTAX Integer32 (0..31)
+    SYNTAX Integer32 (0..1024)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -620,8 +815,8 @@ H3cPosaTerminalEntry ::=
      }
 
 h3cPosaTerminalID OBJECT-TYPE
-    SYNTAX Integer32 (1..255)
-    MAX-ACCESS not-accessible
+    SYNTAX Integer32 (1..1024)
+    MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
         "The identification of a POS terminal."
@@ -648,7 +843,7 @@ h3cPosaTerminalIfIndex OBJECT-TYPE
     ::= { h3cPosaTerminalEntry 3 }
 
 h3cPosaTerminalTransAppID OBJECT-TYPE
-    SYNTAX Integer32 (0..31)
+    SYNTAX Integer32 (0..1024)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -753,7 +948,7 @@ h3cPosaMapDestCode OBJECT-TYPE
     ::= { h3cPosaMapEntry 1 }
 
 h3cPosaMapAppID OBJECT-TYPE
-    SYNTAX Integer32 (1..31)
+    SYNTAX Integer32 (1..1024)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -988,7 +1183,9 @@ H3cPosaTerminalStatEntry ::=
         h3cPosaTerminalInDiscardedPkts
             Counter32,
         h3cPosaTerminalOutDiscardedPkts
-            Counter32
+            Counter32,
+        h3cPosaTermianlTcpConnectionNumber
+            Integer32
      }
 
 h3cPosaTerminalRecvPkts OBJECT-TYPE
@@ -1041,6 +1238,14 @@ h3cPosaTerminalOutDiscardedPkts OBJECT-TYPE
         errors between the router and the POS terminal."
     ::= { h3cPosaTerminalStatEntry 6 }
 
+h3cPosaTermianlTcpConnectionNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of TCP connections between the router and the POS terminal."
+    ::= { h3cPosaTerminalStatEntry 7 }
+
 --
 -- definition of h3cPosaBatchTerminalTable
 --
@@ -1073,7 +1278,7 @@ H3cPosaBatchTerminalEntry ::=
      }
 
 h3cPosaBatchTerminalFirstID OBJECT-TYPE
-    SYNTAX Integer32 (1..255)
+    SYNTAX Integer32 (1..1024)
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -1381,7 +1586,7 @@ H3cPosaCallerStatEntry ::= SEQUENCE  {
 
 h3cPosaCallerStatCallerID OBJECT-TYPE
     SYNTAX OCTET STRING (SIZE (0..64))
-    MAX-ACCESS not-accessible
+    MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
         "The caller number."
@@ -1446,6 +1651,198 @@ h3cPosaCallerStatRowStatus OBJECT-TYPE
     ::= { h3cPosaCallerStatEntry 8 }
 
 --
+-- definition of h3cPosaNiiStatTable
+--
+
+h3cPosaNiiStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cPosaNiiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows statistics on the Network International Identifier."
+    ::= { h3cPosaTables 11 }
+
+h3cPosaNiiStatEntry OBJECT-TYPE
+    SYNTAX H3cPosaNiiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows statistics on the Network International Identifier."
+    INDEX { h3cPosaNiiStatIndex }
+    ::= { h3cPosaNiiStatTable 1 }
+
+H3cPosaNiiStatEntry ::=
+    SEQUENCE {
+        h3cPosaNiiStatIndex
+            OCTET STRING,
+        h3cPosaNiiRecvPkts
+            Counter32,
+        h3cPosaNiiSendPkts
+            Counter32,
+        h3cPosaNiiSuccessTradeCnt
+            Counter32,
+        h3cPosaNiiTradeCnt
+            Counter32
+     }
+
+h3cPosaNiiStatIndex OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The index of entity."
+    ::= { h3cPosaNiiStatEntry 1 }
+
+h3cPosaNiiRecvPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets received from the POS terminals."
+    ::= { h3cPosaNiiStatEntry 2 }
+
+h3cPosaNiiSendPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets sent to the POS terminals."
+    ::= { h3cPosaNiiStatEntry 3 }
+
+h3cPosaNiiSuccessTradeCnt OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of successful transactions of the Network International Identifier."
+    ::= { h3cPosaNiiStatEntry 4 }
+
+h3cPosaNiiTradeCnt OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of all transactions of the Network International Identifier."
+    ::= { h3cPosaNiiStatEntry 5 }
+
+--
+-- definition of h3cPosaE1StatTable
+--
+
+h3cPosaE1StatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cPosaE1StatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows statistics on E1-controller."
+    ::= { h3cPosaTables 12 }
+
+h3cPosaE1StatEntry OBJECT-TYPE
+    SYNTAX H3cPosaE1StatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table shows statistics on E1-controller."
+    INDEX { h3cPosaE1StatIndex }
+    ::= { h3cPosaE1StatTable 1 }
+
+H3cPosaE1StatEntry ::=
+    SEQUENCE {
+        h3cPosaE1StatIndex
+            Integer32,
+        h3cPosaE1DialCnt
+            Counter32,
+        h3cPosaE1DialSuccess
+            Counter32,
+        h3cPosaE1RecvPkts
+            Counter32,
+        h3cPosaE1SendPkts
+            Counter32,
+        h3cPosaE1ErrPkts
+            Counter32,
+        h3cPosaE1MapErrCnts
+            Counter32,
+        h3cPosaE1InDiscardedPkts
+            Counter32,
+        h3cPosaE1OutDiscardedPkts
+            Counter32
+     }
+
+h3cPosaE1StatIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of entity."
+    ::= { h3cPosaE1StatEntry 1 }
+
+h3cPosaE1DialCnt OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of dialing  from the E1-controller."
+    ::= { h3cPosaE1StatEntry 2 }
+
+h3cPosaE1DialSuccess OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of successful dialing  from the E1-controller."
+    ::= { h3cPosaE1StatEntry 3 }
+
+h3cPosaE1RecvPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets received from the POS terminals."
+    ::= { h3cPosaE1StatEntry 4 }
+
+h3cPosaE1SendPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets sent to the POS terminals."
+    ::= { h3cPosaE1StatEntry 5 }
+
+h3cPosaE1ErrPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of inbound packets that contained errors."
+    ::= { h3cPosaE1StatEntry 6 }
+
+h3cPosaE1MapErrCnts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets that are discarded because of mapping errors."
+    ::= { h3cPosaE1StatEntry 7 }
+
+h3cPosaE1InDiscardedPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of inbound packets that are discarded when the incoming
+        buffer is full."
+    ::= { h3cPosaE1StatEntry 8 }
+
+h3cPosaE1OutDiscardedPkts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound packets that are discarded because of link
+        errors between the router and the POS terminal."
+    ::= { h3cPosaE1StatEntry 9 }
+
+--
 -- traps defined
 --
 
@@ -1469,7 +1866,7 @@ h3cPosaAppStateChange NOTIFICATION-TYPE
     ::= { h3cPosaTrapPrex 2 }
 
 h3cPosaTerminalHangUp NOTIFICATION-TYPE
-    OBJECTS { ifIndex, ifDescr }
+    OBJECTS { ifIndex, ifDescr, h3cPosaCallerStatCallerID }
     STATUS current
     DESCRIPTION
         "This trap is generated whenever the POS connection through a FCM (Fast
@@ -1477,7 +1874,7 @@ h3cPosaTerminalHangUp NOTIFICATION-TYPE
     ::= { h3cPosaTrapPrex 3 }
 
 h3cPosaFcmLinkNegoFailed NOTIFICATION-TYPE
-    OBJECTS { ifIndex, ifDescr }
+    OBJECTS { ifIndex, ifDescr , h3cPosaCallerStatCallerID }
     STATUS current
     DESCRIPTION
         "This trap is generated whenever the link layer negotiation is failed
@@ -1486,13 +1883,56 @@ h3cPosaFcmLinkNegoFailed NOTIFICATION-TYPE
     ::= { h3cPosaTrapPrex 4 }
 
 h3cPosaFcmPhyNegoFailed NOTIFICATION-TYPE
-    OBJECTS { ifIndex, ifDescr }
+    OBJECTS { ifIndex, ifDescr , h3cPosaCallerStatCallerID }
     STATUS current
     DESCRIPTION
         "This trap is generated whenever the physical layer negotiation is failed
         between the POS terminal and router through a FCM (Fast Connection
         Modem) interface."
     ::= { h3cPosaTrapPrex 5 }
+
+h3cPosaTcpConnectionExceed NOTIFICATION-TYPE
+    OBJECTS { h3cPosaTcpConnectionThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated whenever the number of connections exceeds the threshold."
+    ::= { h3cPosaTrapPrex 6 }
+
+h3cPosaFcmConnectionExceed NOTIFICATION-TYPE
+    OBJECTS { h3cPosaFcmConnectionThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated whenever the number of connections exceeds the threshold."
+    ::= { h3cPosaTrapPrex 7 }
+
+h3cPosaTcpTradeExceed NOTIFICATION-TYPE
+    OBJECTS { h3cPosaTcpTradeLimit, h3cPosaTerminalID }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated whenever the number of trades in any TCP connect exceeds
+        the limit."
+    ::= { h3cPosaTrapPrex 8 }
+
+h3cPosaTradeSuccessFalling NOTIFICATION-TYPE
+    OBJECTS { h3cPosaNiiStatIndex, h3cPosaTradeSuccessFallingThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated whenever the transaction success rate of bank server is smaller than or equal to the threshold."
+    ::= { h3cPosaTrapPrex 9 }
+
+h3cPosaE1DialFalling NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr, h3cPosaE1DialFallingThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated whenever the dialing success rate of E1-controller is smaller than or equal to the threshold."
+    ::= { h3cPosaTrapPrex 10 }
+
+h3cPosaFcmTradeAbnormal NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr, h3cPosaCallerStatCallerID }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated whenever the dialing link is abnormal."
+    ::= { h3cPosaTrapPrex 11 }
 
 h3cPosaTrapObjects OBJECT IDENTIFIER ::= { h3cPosaTrap 1 }
 

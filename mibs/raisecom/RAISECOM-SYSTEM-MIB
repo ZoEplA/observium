@@ -830,15 +830,6 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		   system starting. This value may be cleared."
 	::= { raisecomMemory 3 }    
 	
-	raisecomUtilizationMemory OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE(1..64))
-            UNITS        "percent"
-        	MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                  "The memory utilization by this system."
-	::= { raisecomMemory 4 }
-	
 --
 -- RAISECOM Information objects
 --                

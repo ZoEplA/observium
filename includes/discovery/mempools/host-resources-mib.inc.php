@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -46,6 +46,7 @@ if (count($cache_discovery['host-resources-mib']))
         $deny = FALSE;
         break;
     }
+
 
     if ($device['os'] == "routeros" && $descr == "main memory") { $deny = FALSE; }
     else if ($device['os'] == "mcd")

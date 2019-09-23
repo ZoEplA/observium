@@ -1,16 +1,29 @@
 -- =============================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Ethernet Virtual Connection MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.3
 -- History:
 --   V1.0 2009-08-08 Initial version Created by Jianyong Song
 --   V1.1 2011-12-23 Updated by Xuanli Mou
---      Add hh3cEvcSrvInstEnableInStat in hh3cEvcSrvInstTable.
---      Add hh3cEvcSrvInstEnableOutStat in hh3cEvcSrvInstTable.
---      Add hh3cEvcSrvInstCarTable.
---      Add hh3cEvcSrvInstStatInfoTable.
+--      Added h3cEvcSrvInstEnableInStat in h3cEvcSrvInstTable.
+--      Added h3cEvcSrvInstEnableOutStat in h3cEvcSrvInstTable.
+--      Added h3cEvcSrvInstCarTable.
+--      Added h3cEvcSrvInstStatInfoTable.
+--   V1.2 2012-11-21 Updated by Neng Yan
+--      portbased is replaced by default.
+--   V1.3 2014-01-03 Updated by Neng Yan
+--      Added h3cEvcSrvInstCvlanIdListLow, h3cEvcSrvInstCvlanIdListHigh
+--          in h3cEvcSrvInstTable.
+--      Added encapSvlanIdCvlanId(6),
+--          encapSvlanIdCvlanIdList(7),
+--          encapCvlanId(8),
+--          encapCvlanIdList(9) for h3cEvcSrvInstEncapCapabilities.
+--      Added svlanIdCvlanId(6),
+--          svlanIdCvlanIdList(7),
+--          svlanIdCvlanIdAll(8),
+--          cvlanIdList(9) for h3cEvcSrvInstEncap.
 -- =============================================================================
 H3C-EVC-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -34,9 +47,9 @@ h3cEvc MODULE-IDENTITY
     LAST-UPDATED
         "200908081000Z"        -- Aug 08, 2009 at 10:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
@@ -59,23 +72,29 @@ h3cEvcScalarGroup OBJECT IDENTIFIER ::= { h3cEvcObjects 1 }
 h3cEvcSrvInstEncapCapabilities    OBJECT-TYPE
     SYNTAX      BITS
     {
-        encapPortBased(0),
+        encapDefault(0),
         encapUntagged(1),
         encapTagged(2),
         encapSvlanId(3),
         encapSvlanIdList(4),
-        encapSvlanIdOnlyTagged(5)
+        encapSvlanIdOnlyTagged(5),
+        encapSvlanIdCvlanId(6),
+        encapSvlanIdCvlanIdList(7),
+        encapCvlanId(8),
+        encapCvlanIdList(9)
     }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "This object displays the encapsulation capabilities of service
-         instance with respect to certain fields. The following values may be
+         instance with respect to certain fields.  The following values may be
          supported:
-         encapPortBased:     Support for matching packets by port.
+         encapDefault:       Support for matching packets by the default
+                             criteria which matches packets that do not match
+                             any other service instance.
          encapUntagged:      Support for matching untagged packets.
          encapTagged:        Support for matching all tagged packets.
-         encapSvlanId:       Support for matching packets by a SVLAN ID, and
+         encapSvlanId:       Support for matching packets by an SVLAN ID, and
                              the packets may be untagged if PVID of the port is
                              the SVLAN ID when the encapSvlanIdOnlyTagged field
                              is not set.
@@ -83,9 +102,14 @@ h3cEvcSrvInstEncapCapabilities    OBJECT-TYPE
                              the packets may be untagged if PVID of the port is
                              in SVLAN ID list when the encapSvlanIdOnlyTagged
                              field is not set.
-         encapSvlanIdOnlyTagged:  encapSvlanId or encapSvlanId field indicates
-                                  to support for matching only tagged packets
-                                  when this field is set."
+         encapSvlanIdOnlyTagged:   Support for matching only tagged packets
+                                   by an SVLAN ID or a SVLAN ID list.
+         encapSvlanIdCvlanId:      Support for matching packets by an SVLAN ID
+                                   and a CVLAN ID.
+         encapSvlanIdCvlanIdList:  Support for matching packets by an SVLAN ID
+                                   and a CVLAN ID list.
+         encapCvlanId:       Support for matching packets by a CVLAN ID.
+         encapCvlanIdList:   Support for matching packets by a CVLAN ID list."
     ::= { h3cEvcScalarGroup 1 }
 
 h3cEvcPortMaxSrvInstNum    OBJECT-TYPE
@@ -129,7 +153,9 @@ H3cEvcSrvInstEntry ::=
         h3cEvcSrvInstSvlanIdListHigh OCTET STRING,
         h3cEvcSrvInstRowStatus       RowStatus,
         h3cEvcSrvInstEnableInStat    TruthValue,
-        h3cEvcSrvInstEnableOutStat   TruthValue
+        h3cEvcSrvInstEnableOutStat   TruthValue,
+        h3cEvcSrvInstCvlanIdListLow  OCTET STRING,
+        h3cEvcSrvInstCvlanIdListHigh OCTET STRING
     }
 
 h3cEvcSrvInstId    OBJECT-TYPE
@@ -137,7 +163,7 @@ h3cEvcSrvInstId    OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Service instance ID. Its value ranges from 1 to the value of
+        "Service instance ID.  Its value ranges from 1 to the value of
         h3cEvcPortMaxSrvInstNum."
     ::= { h3cEvcSrvInstEntry 1 }
 
@@ -145,40 +171,72 @@ h3cEvcSrvInstEncap    OBJECT-TYPE
     SYNTAX      INTEGER
     {
         none(0),
-        portBased(1),
+        default(1),
         untagged(2),
         tagged(3),
         svlanIdList(4),
-        svlanIdListOnlyTagged(5)
+        svlanIdListOnlyTagged(5),
+        svlanIdCvlanId(6),
+        svlanIdCvlanIdList(7),
+        svlanIdCvlanIdAll(8),
+        cvlanIdList(9)
     }
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "Encapsulation mode of a service instance.
         none : Invalid value.
-        portBased :  Match packets by port. It is supported when encapPortBased
-                     field of h3cEvcCapabilities is set.
-        untagged :   Match untagged packets. It is supported when encapUntagged
-                     field of h3cEvcCapabilities is set.
-        tagged :     Match all tagged packets. It is supported when encapTagged
-                     field of h3cEvcCapabilities is set.
+        default :    Match packets by the default criteria which matches
+                     packets that do not match any other service instance.
+                     It is supported when the encapDefault field of
+                     h3cEvcCapabilities is set.
+        untagged :   Match untagged packets.  It is supported when the
+                     encapUntagged field of h3cEvcCapabilities is set.
+        tagged :     Match all tagged packets.  It is supported when the
+                     encapTagged field of h3cEvcCapabilities is set.
         svlanIdList: Match packets by SVLAN ID list and untagged packets if
                      PVID of the port is in SVLAN ID list, the SVLAN ID list is
                      denoted by h3cEvcSrvInstSvlanIdListLow and
-                     h3cEvcSrvInstSvlanIdListLow. It is supported when
+                     h3cEvcSrvInstSvlanIdListHigh.  It is supported when the
                      encapSvlanId or encapSvlanIdList field of
-                     h3cEvcCapabilities is set. Only a VLAN ID is supported
-                     when encapSvlanId field of h3cEvcCapabilities is set.
-        svlanIdListOnlyTagged: Match only tagged packets by SVLAN ID list, the
-                               SVLAN ID is denoted by
+                     h3cEvcCapabilities is set.  Only a VLAN ID is supported
+                     when the encapSvlanId field of h3cEvcCapabilities is set.
+        svlanIdListOnlyTagged: Match only tagged packets by an SVLAN ID list,
+                               the SVLAN ID is denoted by
                                h3cEvcSrvInstSvlanIdListLow and
-                               h3cEvcSrvInstSvlanIdListLow. It is
-                               supported when encapSvlanId (or
+                               h3cEvcSrvInstSvlanIdListLow.  It is
+                               supported when the encapSvlanId (or
                                encapSvlanIdList) and encapSvlanIdOnlyTagged
-                               fields of h3cEvcCapabilities are set. Only a
-                               VLAN ID is supported when encapSvlanId and
+                               fields of h3cEvcCapabilities are set.  Only a
+                               VLAN ID is supported when the encapSvlanId and
                                encapSvlanIdOnlyTagged field of
-                               h3cEvcCapabilities are set."
+                               h3cEvcCapabilities are set.
+        svlanIdCvlanId: Match packets by an SVLAN ID and a CVLAN ID.
+                        The SVLAN ID is denoted by h3cEvcSrvInstSvlanIdListLow
+                        or h3cEvcSrvInstSvlanIdListHigh.  The CVLAN ID is
+                        denoted by h3cEvcSrvInstCvlanIdListLow or
+                        h3cEvcSrvInstCvlanIdListHigh.  It is supported when
+                        the encapSvlanIdCvlanId field of
+                        h3cEvcCapabilities is set.
+        svlanIdCvlanIdList: Match packets by an SVLAN ID and a CVLAN ID list.
+                            The SVLAN ID is denoted by
+                            h3cEvcSrvInstSvlanIdListLow or
+                            h3cEvcSrvInstSvlanIdListHigh.  The CVLAN ID list is
+                            denoted by h3cEvcSrvInstCvlanIdListLow and
+                            h3cEvcSrvInstCvlanIdListHigh.  It is supported when
+                            the encapSvlanIdCvlanIdList field of
+                            h3cEvcCapabilities is set.
+        svlanIdCvlanIdAll:  Match packets by an SVLAN ID and all CVLAN IDs.
+                         The SVLAN ID is denoted by h3cEvcSrvInstSvlanIdListLow
+                         or h3cEvcSrvInstSvlanIdListHigh.  The CVLAN ID
+                         includes all VLAN IDs.  It is supported when the
+                         encapSvlanIdCvlanIdList field of h3cEvcCapabilities
+                         is set.
+        cvlanIdList:  Match packets by CVLAN ID list.  The CVLAN ID list is
+                      denoted by h3cEvcSrvInstCvlanIdListLow and
+                      h3cEvcSrvInstCvlanIdListLow.  It is supported when the
+                      encapCvlanId or encapCvlanIdList field of
+                      h3cEvcCapabilities is set."
     ::= { h3cEvcSrvInstEntry 2 }
 
 h3cEvcSrvInstSvlanIdListLow OBJECT-TYPE
@@ -186,10 +244,10 @@ h3cEvcSrvInstSvlanIdListLow OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "This object contains the first 2048 bits of the 4096 bit vector
-        indicating which SVLAN IDs are assigned to this service instance. The
+        "This object contains the first 2048 bits of the 4096-bit vector,
+        indicating which SVLAN IDs are assigned to this service instance.  The
         lowest order bit of the first octet corresponds to SVLAN 1, while the
-        highest order bit of the last octet corresponds to SVLAN 2048. A bit
+        highest order bit of the last octet corresponds to SVLAN 2048.  A bit
         that is on (equal to 1) indicates that the corresponding SVLAN ID is
         assigned to this service instance."
     ::= { h3cEvcSrvInstEntry 3 }
@@ -199,11 +257,11 @@ h3cEvcSrvInstSvlanIdListHigh OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "This object contains the second 2048 bits of the 4096 bit vector
-        indicating which SVLAN IDs are assigned to this service instance. The
+        "This object contains the second 2048 bits of the 4096-bit vector,
+        indicating which SVLAN IDs are assigned to this service instance.  The
         lowest order bit of the first octet corresponds to SVLAN 2049, while
         the third highest order bit of the last octet corresponds to SVLAN
-        4094. A bit that is on (equal to 1) indicates that the corresponding
+        4094.  A bit that is on (equal to 1) indicates that the corresponding
         SVLAN ID is assigned to this service instance."
     ::= { h3cEvcSrvInstEntry 4 }
 
@@ -212,7 +270,9 @@ h3cEvcSrvInstRowStatus  OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Operation status of this table entry."
+        "Operation status of this table entry.  When a row in this
+         table is in active state, no objects in that row
+         can be modified by the agent."
     ::= { h3cEvcSrvInstEntry 5 }
 
 h3cEvcSrvInstEnableInStat OBJECT-TYPE
@@ -234,6 +294,34 @@ h3cEvcSrvInstEnableOutStat OBJECT-TYPE
         to this service instance."
     DEFVAL { false }
     ::= { h3cEvcSrvInstEntry 7 }
+
+h3cEvcSrvInstCvlanIdListLow OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the first 2048 bits of the 4096-bit vector,
+        indicating which CVLAN IDs are assigned to this service instance.  The
+        lowest order bit of the first octet corresponds to CVLAN 1, while the
+        highest order bit of the last octet corresponds to CVLAN 2048.  A bit
+        that is on (equal to 1) indicates that the corresponding CVLAN ID is
+        assigned to this service instance."
+    DEFVAL { ''h }
+    ::= { h3cEvcSrvInstEntry 8 }
+
+h3cEvcSrvInstCvlanIdListHigh OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the second 2048 bits of the 4096-bit vector,
+        indicating which CVLAN IDs are assigned to this service instance.  The
+        lowest order bit of the first octet corresponds to CVLAN 2049, while
+        the third highest order bit of the last octet corresponds to CVLAN
+        4094.  A bit that is on (equal to 1) indicates that the corresponding
+        CVLAN ID is assigned to this service instance."
+    DEFVAL { ''h }
+    ::= { h3cEvcSrvInstEntry 9 }
 -- =============================================================================
 -- End of h3cEvcSrvInstTable Definition
 -- =============================================================================

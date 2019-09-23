@@ -1,5 +1,5 @@
 -- =============================================================================
--- Copyright (C) 2006-2007 by H3C TECHNOLOGIES.  All rights reserved.
+-- Copyright (C) 2006-2007 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide more information for WLAN network.
@@ -25,9 +25,9 @@ IMPORTS
 hh3cDot11WLANEXT MODULE-IDENTITY
     LAST-UPDATED "200706082000Z"            -- Jun. 08, 2007 at 20:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip: 100085"

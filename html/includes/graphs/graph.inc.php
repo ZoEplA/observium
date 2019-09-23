@@ -7,12 +7,15 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 #ob_clean();
 
+// Init & clean
+//print_vars($index);
+unset($index); // Clean accidentally global vars
 $total_start = utime();
 
 // Init global var for information about generated graph
@@ -29,11 +32,10 @@ $graph_return = array('status'        => FALSE,   // --> $GLOBALS['rrd_status']
 
 preg_match('/^(?P<type>[a-z0-9A-Z-]+)_(?P<subtype>[a-z0-9A-Z-_]+)/', $vars['type'], $graphtype);
 
-if(isset($vars['format']) && $vars['format'] == 'svg')
-{
-  $extension = 'svg';
-  $mimetype  = 'image/svg+xml';
-  $img_format = 'SVG';
+if (isset($vars['format']) && in_array($vars['format'], array_keys($config['graph_formats']))) {
+  $extension = $config['graph_formats'][$vars['format']]['extension'];
+  $mimetype  = $config['graph_formats'][$vars['format']]['mimetype'];
+  $img_format = strtoupper($vars['format']);
 } else {
   $extension = 'png';
   $mimetype  = 'image/png';
@@ -95,8 +97,11 @@ if (is_file($config['html_dir'] . "/includes/graphs/$type/$subtype.inc.php"))
 {
   $graph_include = $config['html_dir'] . "/includes/graphs/$type/$subtype.inc.php";
 }
-else if (is_array($config['graph_types'][$type][$subtype]['ds']))
+elseif (is_array($config['graph_types'][$type][$subtype]['ds']))
 {
+  // Init tags array
+  $tags = [];
+
   // Additional include with define some graph variables like $unit_text, $graph_title
   // Currently only for indexed definitions
   if ($config['graph_types'][$type][$subtype]['index'] &&
@@ -106,7 +111,7 @@ else if (is_array($config['graph_types'][$type][$subtype]['ds']))
   }
   $graph_include = $config['html_dir'] . "/includes/graphs/generic_definition.inc.php";
 }
-else if (is_file($config['html_dir'] . "/includes/graphs/$type/graph.inc.php"))
+elseif (is_file($config['html_dir'] . "/includes/graphs/$type/graph.inc.php"))
 {
   $graph_include = $config['html_dir'] . "/includes/graphs/$type/graph.inc.php";
 }

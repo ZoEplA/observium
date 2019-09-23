@@ -176,6 +176,8 @@ textarea {
   overflow: auto;
   vertical-align: top;
 }
+
+/*!
 @media print {
   * {
     text-shadow: none !important;
@@ -227,6 +229,9 @@ textarea {
     page-break-after: avoid;
   }
 }
+*/
+
+
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 html {
   font-family: sans-serif;
@@ -10108,6 +10113,7 @@ a.badge:focus {
 .visible-print {
   display: none !important;
 }
+/*!
 @media print {
   .visible-print {
     display: block !important;
@@ -10123,6 +10129,8 @@ a.badge:focus {
     display: table-cell !important;
   }
 }
+*/
+
 .visible-print-block {
   display: none !important;
 }

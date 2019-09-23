@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Interface Management MIB
 -- Reference:
--- Version: V3.6
+-- Version: V3.8
 -- History:
 --      V1.0 (1) Created by Zhangshilin, 2001.06.29
 --           (2) Revised by Qizhenglin, 2002.01.08
@@ -105,10 +105,17 @@
 --           Modify description of hh3cifUniSuppression, hh3cifMulSuppression and
 --           hh3cifMcastControl, modify value list of hh3cifMcastControl by huhonghui,
 --           for supporting value 0.
--- ==================================================================
+--      V3.7 2015-10-14
+--           Add hh3cifMulSuppressionFlag by chenzhouhui.
+--           Modify description of hh3cifMulSuppression and hh3cifPpsMulSuppression by chenzhouhui.
+--           Add hh3cifPktBufInDrop and hh3cifPktBufEgDrop to hh3cifPktBufTable,
+--           add hh3cifQueuePktBufTable by zhangji.
+--      V3.8 2016-07-02
+--           Add the values s2500M, s5000M, s20000M, s25000M and s50000M to SpeedModeFlag
+--           and hh3cifEthernetSpeed by yuhaiyan.
 -- ==================================================================
 --
--- Varibles and types be imported
+-- Variables and types be imported
 --
 -- ==================================================================
 HH3C-LswINF-MIB DEFINITIONS ::= BEGIN
@@ -116,7 +123,7 @@ HH3C-LswINF-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     RowStatus, DisplayString, TruthValue, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, Unsigned32, Counter32
         FROM SNMPv2-SMI
     ifIndex, InterfaceIndex
         FROM IF-MIB
@@ -124,20 +131,27 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
     hh3cLswL2InfMib MODULE-IDENTITY
-            LAST-UPDATED "200106290000Z"
+            LAST-UPDATED "201607020000Z"
             ORGANIZATION
-                "Hangzhou H3C Tech. Co., Ltd."
+                "New H3C Tech. Co., Ltd."
             CONTACT-INFO
-                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                "Platform Team New H3C Tech. Co., Ltd.
                 Hai-Dian District Beijing P.R. China
                 http://www.h3c.com
                 Zip:100085
                 "
             DESCRIPTION
             ""
+            REVISION "201607020000Z"
+            DESCRIPTION
+                "Add the values s2500M, s5000M, s20000M, s25000M and s50000M to SpeedModeFlag and hh3cifEthernetSpeed"
+            REVISION "201510140000Z"
+            DESCRIPTION
+                "Add hh3cifPktBufInDrop and hh3cifPktBufEgDrop to hh3cifPktBufTable,
+                 hh3cifMulSuppressionFlag, and hh3cifQueuePktBufTable, modify description of hh3cifMulSuppression and hh3cifPpsMulSuppression"
             REVISION "200106290000Z"
             DESCRIPTION
-            ""
+            "Initial version."
             ::= { hh3clswCommon 5 }
 
 
@@ -199,7 +213,12 @@ IMPORTS
                 s10000M(3),    -- 10000M speed
                 s24000M(4),    -- 24000M speed
                 s40000M(5),    -- 40000M speed
-                s100000M(6)    -- 100000M speed
+                s100000M(6),   -- 100000M speed
+                s2500M(7),     -- 2500M speed
+                s5000M(8),     -- 5000M speed
+                s20000M(9),    -- 20000M speed
+                s25000M(10),   -- 25000M speed
+                s50000M(11)    -- 50000M speed
             }
 
 
@@ -267,12 +286,12 @@ IMPORTS
         hh3cifInErrorPktsRate Integer32,
         hh3cifInPkts Counter64,
         hh3cifInNormalPkts  Counter64,
-        hh3cifOutPkts Counter64
+        hh3cifOutPkts Counter64,
+        hh3cifMulSuppressionFlag  INTEGER
         }
 
 
-
-    hh3cifUnBoundPort  OBJECT-TYPE
+   hh3cifUnBoundPort  OBJECT-TYPE
         SYNTAX  TruthValue
         MAX-ACCESS read-only
         STATUS current
@@ -456,7 +475,9 @@ IMPORTS
         DESCRIPTION
             "The multicast suppression with ranging from 0 to 100 percent
             in ratio mode.
-            The step is determined by hh3cifMulSuppressionStep."
+            The step is determined by hh3cifMulSuppressionStep.
+            If hh3cifMulSuppressionFlag is 2 it means only unknown
+            traffic suppression."
         ::= { hh3cifXXEntry 20 }
 
    hh3cifPpsMulSuppression OBJECT-TYPE
@@ -465,7 +486,9 @@ IMPORTS
         STATUS current
         DESCRIPTION
             "The multicast suppression in pps(packet per second) mode.
-            The max pps value is determined by hh3cifPpsMulSuppressionMax."
+            The max pps value is determined by hh3cifPpsMulSuppressionMax.
+            If hh3cifMulSuppressionFlag is 2 it means only unknown
+            traffic suppression."
         ::= { hh3cifXXEntry 21 }
 
    hh3cifComboActivePort OBJECT-TYPE
@@ -665,6 +688,19 @@ IMPORTS
         DESCRIPTION "
             The number of packets sent on the interface."
         ::= { hh3cifXXEntry 40 }
+
+   hh3cifMulSuppressionFlag OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            all      (1),    -- known and unknown traffic
+            unknown  (2)    -- only unknown traffic
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "
+            The multicast suppression flag.  If only unknown multicast
+            traffic is suppressed, the value is unknown(2), and all(1) for suppression of all traffic (unknown and known)."
+        ::= { hh3cifXXEntry 41 }
 
     hh3cifAggregateTable  OBJECT-TYPE
         SYNTAX SEQUENCE OF Hh3cIfAggregateEntry
@@ -910,7 +946,9 @@ IMPORTS
             hh3cifPktBufFree      Integer32,
             hh3cifPktBufInit      Integer32,
             hh3cifPktBufMin       Integer32,
-            hh3cifPktBufMiss      Counter64
+            hh3cifPktBufMiss      Counter64,
+            hh3cifPktBufInDrop    Counter64,
+            hh3cifPktBufEgDrop    Counter64
             }
 
     hh3cifPktBufFree OBJECT-TYPE
@@ -945,6 +983,90 @@ IMPORTS
             "The number of times that the interface failed to obtain a packet
              buffer.  Failure to obtain a buffer indicates that buffers were busy."
         ::= { hh3cifPktBufEntry 4 }
+
+    hh3cifPktBufInDrop OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ingress packets dropped by the interface
+             because of insufficient data buffer."
+        ::= { hh3cifPktBufEntry 5 }
+
+    hh3cifPktBufEgDrop OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of egress packets dropped by the interface
+             because of insufficient data buffer."
+        ::= { hh3cifPktBufEntry 6 }
+
+-- ======================if queue pkt buf table===============================
+    hh3cifQueuePktBufTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifQueuePktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "802.1p queue of the interface packet buffer table."
+        ::= { hh3cLswExtInterface  6 }
+
+    hh3cifQueuePktBufEntry  OBJECT-TYPE
+        SYNTAX Hh3cifQueuePktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hh3cifQueuePktBufTable."
+        INDEX
+            {
+                ifIndex,
+                hh3cifQueueId
+            }
+        ::= { hh3cifQueuePktBufTable 1}
+
+    Hh3cifQueuePktBufEntry  ::=
+        SEQUENCE {
+            hh3cifQueueId             Integer32,
+            hh3cifQueuePktBufTotal    Unsigned32,
+            hh3cifQueueBufUsed        Unsigned32,
+            hh3cifQueueBufThreCount   Counter32
+            }
+
+    hh3cifQueueId OBJECT-TYPE
+        SYNTAX  Integer32(1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 802.1p queue ID of the interface. This value is
+             used to specify the queue ID of the interface
+             when the user wants to read one queue of the interface.
+             The index number 1-8 correspond with 802.1p queue ID 0-7."
+        ::= { hh3cifQueuePktBufEntry 1 }
+
+    hh3cifQueuePktBufTotal OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers available for the interface,
+             including fixed buffer and shared buffer."
+        ::= { hh3cifQueuePktBufEntry 2 }
+
+    hh3cifQueueBufUsed OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers that have been used for each
+             802.1p queue of the interface."
+        ::= { hh3cifQueuePktBufEntry 3 }
+
+    hh3cifQueueBufThreCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times that each 802.1p queue of the interface has
+             exceeded the buffer threshold. The threshold is configurated by user."
+        ::= { hh3cifQueuePktBufEntry 4 }
 
 -- ========================l2========================================
     hh3cLswL2InfMibObject OBJECT IDENTIFIER ::= {  hh3cLswL2InfMib 1  }
@@ -1151,9 +1273,14 @@ IMPORTS
         s10M    (10),
         s100M   (100),
         s1000M  (1000),
+        s2500M  (2500),
+        s5000M  (5000),
         s10000M (10000),
         s24000M (24000),
         s40000M (40000),
+        s20000M (20000),
+        s25000M (25000),
+        s50000M (50000),
         s100000M (100000)
         }
         MAX-ACCESS read-write

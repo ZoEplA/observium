@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -76,10 +76,7 @@ if ($services['total'])
 
 if ($config['enable_syslog'])
 {
-  if (dbFetchCell("SELECT COUNT(*) from `syslog` WHERE `device_id` = ?", array($device['device_id'])))
-  {
-    include("overview/syslog.inc.php");
-  }
+  include("overview/syslog.inc.php");
 }
 
 echo("</div>");
@@ -111,6 +108,7 @@ if (is_array($entity_state['group']['c6kxbar']))
 
 include("overview/printersupplies.inc.php");
 include("overview/status.inc.php");
+include("overview/counter.inc.php");
 include("overview/sensors.inc.php");
 
 include("overview/events.inc.php");

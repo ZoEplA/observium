@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -57,24 +57,28 @@ if ($permit_tabs['ports'])
   $navbar['options']['alerts']['text']    = 'Alerts';
   $navbar['options']['alertlog']['text']  = 'Alert Log';
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `measured_class` = 'port' AND `measured_entity` = ? and `device_id` = ?", array($port['port_id'], $device['device_id'])))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `measured_class` = 'port' AND `measured_entity` = ? and `device_id` = ?", array($port['port_id'], $device['device_id'])))
+  if (dbExist('sensors', '`measured_class` = ? AND `measured_entity` = ? and `device_id` = ?', array('port', $port['port_id'], $device['device_id'])))
   {
     $navbar['options']['sensors']['text'] = 'Sensors';
   }
 
   $navbar['options']['realtime']['text']  = 'Real time';   // FIXME CONDITIONAL
 
-  if (dbFetchCell('SELECT COUNT(*) FROM `ip_mac` WHERE `port_id` = ?', array($port['port_id'])))
+  //if (dbFetchCell('SELECT COUNT(*) FROM `ip_mac` WHERE `port_id` = ?', array($port['port_id'])))
+  if (dbExist('ip_mac', '`port_id` = ?', array($port['port_id'])))
   {
     $navbar['options']['arp']['text']     = 'ARP/NDP Table';
   }
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `vlans_fdb` WHERE `port_id` = ?", array($port['port_id'])))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `vlans_fdb` WHERE `port_id` = ?", array($port['port_id'])))
+  if (dbExist('vlans_fdb', '`port_id` = ?', array($port['port_id'])))
   {
     $navbar['options']['fdb']['text']    = 'FDB Table';
   }
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `ports_cbqos` WHERE `port_id` = ?", array($port['port_id'])))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `ports_cbqos` WHERE `port_id` = ?", array($port['port_id'])))
+  if (dbExist('ports_cbqos', '`port_id` = ?', array($port['port_id'])))
   {
     $navbar['options']['cbqos']['text']    = 'CBQoS';
   }
@@ -91,7 +95,8 @@ if ($permit_tabs['ports'])
 
   $navbar['options']['events']['text']   = 'Eventlog';
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?", array($port['port_id'])))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?", array($port['port_id'])))
+  if (dbExist('ports_adsl', '`port_id` = ?', array($port['port_id'])))
   {
     $navbar['options']['adsl']['text'] = 'ADSL';
   }
@@ -103,7 +108,8 @@ if ($permit_tabs['ports'])
   }
   */
 
-  if (dbFetchCell('SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = ? and `device_id` = ?', array($port['port_id'], $device['device_id'])))
+  //if (dbFetchCell('SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = ? and `device_id` = ?', array($port['port_id'], $device['device_id'])))
+  if (dbExist('ports_vlans', '`port_id` = ? and `device_id` = ?', array($port['port_id'], $device['device_id'])))
   {
     $navbar['options']['vlans']['text'] = 'VLANs';
   }
@@ -113,7 +119,8 @@ if ($permit_tabs['ports'])
     $navbar['options']['macaccounting']['text'] = 'MAC Accounting';
   }
 
-  if (dbFetchCell('SELECT COUNT(*) FROM juniAtmVp WHERE port_id = ?', array($port['port_id'])) > '0')
+  //if (dbFetchCell('SELECT COUNT(*) FROM juniAtmVp WHERE port_id = ?', array($port['port_id'])) > '0')
+  if (dbExist('juniAtmVp', '`port_id` = ?', array($port['port_id'])))
   {
 
     // FIXME ATM VPs

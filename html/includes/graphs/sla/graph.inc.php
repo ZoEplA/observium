@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 if (empty($sla['sla_graph']))
 {
-  // Compatability
+  // Comparability
   $sla['sla_graph'] = ((stripos($sla['rtt_type'], 'jitter') !== FALSE) ? 'jitter' : 'echo');
 }
 

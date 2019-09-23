@@ -32,6 +32,7 @@ CISCOSB-QOS-CLI-MIB DEFINITIONS ::= BEGIN
 --             Add rlQosAceTidxTuple9, rlQosAceTidxTuple10 to rlQosAceTidxTable
 -- 18-Aug-2009 Removed Time Based Tables : code moved to general TimeBasedInfrastrucure
 -- 22-Oct-2009 Added rlQosAceTidxTuple11 to rlQosAceTidxTable in order to keep Src MAC addr of Dynamic ACLs
+-- 2-Mar-2017 Added ipv6-flow-label to ClassTupleType, to be set to rlQosAceTidxTuple11
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,Counter32,
     Gauge32, Unsigned32, IpAddress, TimeTicks   FROM SNMPv2-SMI
@@ -173,7 +174,8 @@ ClassTupleType ::= TEXTUAL-CONVENTION
          tcp-port-range-start-src(29),
          tcp-port-range-end-src(30),
          tcp-port-range-start-dest(31),
-         tcp-port-range-end-dest(32)
+         tcp-port-range-end-dest(32),
+         ipv6-flow-label(33)
         }
 
 AceActionType ::= TEXTUAL-CONVENTION
@@ -861,7 +863,8 @@ RlQosAclEntry ::= SEQUENCE {
     rlQosAclName                DisplayString,
     rlQosAclType                AclObjectType,
     rlQosAclStatus              RowStatus,
-    rlQosAclNumOfAces           INTEGER
+    rlQosAclNumOfAces           INTEGER,
+    rlQosAclIsBoundToInterface  TruthValue
     }
 
 rlQosAclIndex OBJECT-TYPE
@@ -907,6 +910,14 @@ rlQosAclNumOfAces OBJECT-TYPE
     DESCRIPTION
        "Holds number of aces in the acl."
     ::= { rlQosAclEntry 5 }
+
+rlQosAclIsBoundToInterface OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "Indicates whether the ACL is bound to any interface or not."
+    ::= { rlQosAclEntry 6 }
 
 
 
@@ -1337,9 +1348,10 @@ rlQosPolicyMapEntry OBJECT-TYPE
     ::= { rlQosPolicyMapTable 1 }
 
 RlQosPolicyMapEntry ::= SEQUENCE {
-    rlQosPolicyMapIndex          INTEGER,
-    rlQosPolicyMapName           DisplayString,
-    rlQosPolicyMapStatus         RowStatus
+    rlQosPolicyMapIndex          	INTEGER,
+    rlQosPolicyMapName           	DisplayString,
+    rlQosPolicyMapStatus         	RowStatus,
+    rlQosPolicyMapIsBoundToInterface	TruthValue
     }
 
 rlQosPolicyMapIndex OBJECT-TYPE
@@ -1368,6 +1380,13 @@ rlQosPolicyMapStatus OBJECT-TYPE
         It is used to delete/Add an entry from this table."
     ::= { rlQosPolicyMapEntry 3 }
 
+rlQosPolicyMapIsBoundToInterface     OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the policy map is bound to any interface or not."
+    ::= { rlQosPolicyMapEntry 4 }
 
 --QoS Policy Class map refernce table
 
@@ -4234,6 +4253,7 @@ rlQosLogInputInterfacesAceMatchedVlanList3073to4094 OBJECT-TYPE
 
    ::= { rlQosLogInputInterfacesAceMatchedEntry 6}
 
+
 -- rlQosCosProfileTable
 rlQosCosProfileTable OBJECT-TYPE
     SYNTAX SEQUENCE OF RlQosCosProfileEntry
@@ -4357,9 +4377,6 @@ rlQosCosProfileInterfaceCosProfileIndex    OBJECT-TYPE
     STATUS current
     DESCRIPTION        "CoS-Profile index per-application."
     ::= { rlQosCosProfileInterfaceEntry 3 }
-
-
-
 
 END
 

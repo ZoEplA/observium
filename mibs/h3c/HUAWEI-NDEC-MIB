@@ -1,7 +1,7 @@
 -- ==================================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: This file describes the huawei mib implementation of ndec
+-- Description: This file describes the MIB implementation of ndec
 -- Reference:
 -- Version: V1.6
 -- History:
@@ -37,19 +37,19 @@ IMPORTS
     mlsr
         FROM HUAWEI-3COM-OID-MIB;
 
---  HW-NDEC-MIB definition
+--  HUAWEI-NDEC-MIB definition
 
 
         huaweiNDEC MODULE-IDENTITY
             LAST-UPDATED "200409150000Z"        -- August 15, 2004  GMT
             ORGANIZATION
-                "HUAWEI Technologies Co., Ltd."
+                "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-                "HUAWEI Technologies Co.,Ltd.
-                Shang-Di Information Industry Base,
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
                 Hai-Dian District Beijing P.R. China
-                http://www.huawei.com
-                Zip:100085"
+                http://www.h3c.com
+                Zip:100085
+                "
             DESCRIPTION
                 "This MIB contains objects to manage the NDEC device.
                 "

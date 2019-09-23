@@ -258,6 +258,8 @@ IMPORTS
                        FanStatus
                            INTEGER,
                        FanSpeed
+                       	   INTEGER,
+                       FanShelfNum
                        	   INTEGER
                   }
 
@@ -292,6 +294,13 @@ IMPORTS
                    DESCRIPTION
                            "Fan-device speed."
                    ::= { FanTableEntry 3 }
+               FanShelfNum OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Fan-device shelf number."
+                   ::= { FanTableEntry 4 }
                        
 
               

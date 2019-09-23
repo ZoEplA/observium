@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -25,7 +25,7 @@ $array = array(
   'entPhysicalParentRelPos' => -1,
   'entPhysicalMfgName'      => 'HPE'
 );
-discover_inventory($valid['inventory'], $device, '-1', $array, 'hpvc-mib');
+discover_inventory($device, '-1', $array, $mib);
 
 $entries = snmpwalk_cache_oid($device, 'vcEnclosureTable', NULL, 'HPVC-MIB');
 
@@ -43,7 +43,7 @@ foreach ($entries as $index => $entry)
   );
   if(isset($entry['vcEnclosureIndex']))
   {
-    discover_inventory($valid['inventory'], $device, $index, $array, 'hpvc-mib');
+    discover_inventory($device, $index, $array, $mib);
   }
 }
 
@@ -64,7 +64,7 @@ foreach ($entries as $index => $entry)
     'entPhysicalContainedIn'  => $entry['vcPhysicalServerEnclosureIndex'],
     'entPhysicalMfgName'      => 'HPE'
   );
-  //discover_inventory($valid['inventory'], $device, '999'.$index, $array, 'hpvc-mib');
+  //discover_inventory($device, '999'.$index, $array, $mib);
 
   $array = array(
     'entPhysicalName'         => $entry['vcPhysicalServerProductName'],
@@ -79,7 +79,7 @@ foreach ($entries as $index => $entry)
   );
   if(isset($entry['vcPhysicalServerEnclosureIndex']))
   {
-    discover_inventory($valid['inventory'], $device, $index, $array, 'hpvc-mib');
+    discover_inventory($device, $index, $array, $mib);
   }
 
 }
@@ -105,7 +105,7 @@ foreach ($entries as $index => $entry)
   );
   if(isset($entry['vcModuleLocation']))
   {
-    discover_inventory($valid['inventory'], $device, '999'.$index, $array, 'hpvc-mib');
+    discover_inventory($device, '999'.$index, $array, $mib);
   }
 
 }

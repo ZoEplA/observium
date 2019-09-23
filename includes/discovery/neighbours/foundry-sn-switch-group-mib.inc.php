@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -51,12 +51,12 @@ if ($fdp_array)
         $if = $fdp['snFdpCacheDevicePort'];
         $remote_port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?", array($if, $if, $remote_device_id));
       } else {
-        $remote_port_id = "0";
+        $remote_port_id = NULL;
       }
 
       if (!is_bad_xdp($fdp['snFdpCacheDeviceId']))
       {
-        discover_link($valid_link, $port['port_id'], $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
+        discover_link($port, $fdp['snFdpCacheVendorId'], $remote_port_id, $fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheDevicePort'], $fdp['snFdpCachePlatform'], $fdp['snFdpCacheVersion']);
       }
     }
   }

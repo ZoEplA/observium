@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2002 by HUAWEI-3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (c) 2004-2016 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description:  HUAWEI-3COM LAN Switch RRPP MIB
+-- Description: RRPP MIB
 -- Reference:
--- Version: V1.4
+-- Version: V1.5
 -- History:
 -- V1.0 2004-12-02 Created by XueCong
 -- V1.1 2006-12-21 Modified by XuPengfei
@@ -19,35 +19,31 @@
 --     h3cRrppDomainInstanceListHigh.
 --     Add objects: h3cRrppDomainProtectVlanListLow,
 --     h3cRrppDomainProtectVlanListHigh, h3cRrppProtectVlanConfigMode.
--- ==================================================================
--- ==================================================================
---
--- Variables and types be imported
---
+-- V1.5 2016-01-26 Modified by limeng
+--     Modified the range of h3cRrppDomainID in h3cRrppDomainTable
+--     Modified the range of h3cRrppRingID in h3cRrppRingTable
 -- ==================================================================
 H3C-RRPP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-
-    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY,
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32,
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-
-    RowStatus,TEXTUAL-CONVENTION
+    RowStatus, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
-
     h3cCommon
         FROM HUAWEI-3COM-OID-MIB;
 
 h3cRrpp MODULE-IDENTITY
-    LAST-UPDATED "200412020000Z"
+    LAST-UPDATED "201601260000Z"
     ORGANIZATION
-        "Huawei 3Com Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Huawei 3Com Technologies Co., Ltd.
-         Hai-Dian District Beijing P.R. China
-         Http://www.huawei-3com.com
-         Zip:100085"
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
     DESCRIPTION
         "The RRPP (Rapid Ring Protection protocol) provides
         fast protection switching to layer 2 switches
@@ -59,6 +55,10 @@ h3cRrpp MODULE-IDENTITY
         than a second after link failure.
         This MIB defines management information used on
         products which support RRPP."
+    REVISION "201601260000Z"
+    DESCRIPTION
+        "Modified the range of h3cRrppDomainID in h3cRrppDomainTable
+         Modified the range of h3cRrppRingID in h3cRrppRingTable"
     ::= { h3cCommon  45 }
 
 EnabledStatus ::=  TEXTUAL-CONVENTION
@@ -160,12 +160,12 @@ H3cRrppDomainEntry  ::= SEQUENCE
     }
 
 h3cRrppDomainID OBJECT-TYPE
-    SYNTAX      Integer32(1..16)
+    SYNTAX      Integer32(1..128)
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "An index uniquely identifies a RRPP domain,
-        which ranges from 1~16.
+        which ranges from 1~128.
         This value can't be modified after created."
     ::= { h3cRrppDomainEntry 1 }
 
@@ -346,12 +346,12 @@ H3cRrppRingEntry  ::= SEQUENCE
     }
 
 h3cRrppRingID OBJECT-TYPE
-    SYNTAX      Integer32(1..64)
+    SYNTAX      Integer32(1..128)
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "An index uniquely identifies a RRPP Ring,
-        which ranges from 1~64.
+        which ranges from 1~128.
         This value can't be modified after created."
     ::= { h3cRrppRingEntry 1 }
 

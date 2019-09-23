@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -46,20 +46,39 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $mempool)
       if ($table_def['type'] == 'static')
       {
 
-        if      (isset($table_def['oid_perc_num']))  { $mempool['perc'] = snmp_get($device, $table_def['oid_perc_num'],   '-OUQnv'); }
-        else if (isset($table_def['oid_perc']))      { $mempool['perc'] = snmp_get($device, $table_def['oid_perc'],       '-OUQnv', $mempool['mempool_mib']); }
+        if      (isset($table_def['oid_perc_num']))  { $mempool['perc'] = snmp_get_oid($device, $table_def['oid_perc_num']); }
+        else if (isset($table_def['oid_perc']))      { $mempool['perc'] = snmp_get_oid($device, $table_def['oid_perc'], $mempool['mempool_mib']); }
 
-        if      (isset($table_def['oid_free_num']))  { $mempool['free'] = snmp_get($device, $table_def['oid_free_num'],   '-OUQnv'); }
-        else if (isset($table_def['oid_free']))      { $mempool['free'] = snmp_get($device, $table_def['oid_free'],       '-OUQnv', $mempool['mempool_mib']); }
+        if      (isset($table_def['oid_free_num']))  { $mempool['free'] = snmp_get_oid($device, $table_def['oid_free_num']); }
+        else if (isset($table_def['oid_free']))      { $mempool['free'] = snmp_get_oid($device, $table_def['oid_free'], $mempool['mempool_mib']); }
 
-        if      (isset($table_def['oid_used_num']))  { $mempool['used'] = snmp_get($device, $table_def['oid_used_num'],   '-OUQnv'); }
-        else if (isset($table_def['oid_used']))      { $mempool['used'] = snmp_get($device, $table_def['oid_used'],       '-OUQnv', $mempool['mempool_mib']); }
+        if      (isset($table_def['oid_used_num']))  { $mempool['used'] = snmp_get_oid($device, $table_def['oid_used_num']); }
+        else if (isset($table_def['oid_used']))      { $mempool['used'] = snmp_get_oid($device, $table_def['oid_used'], $mempool['mempool_mib']); }
 
         if      (isset($table_def['total']))         { $mempool['total'] = $table_def['total']; }
-        else if (isset($table_def['oid_total_num'])) { $mempool['total'] = snmp_get($device, $table_def['oid_total_num'], '-OUQnv'); }
-        else if (isset($table_def['oid_total']))     { $mempool['total'] = snmp_get($device, $table_def['oid_total'],     '-OUQnv', $mempool['mempool_mib']); }
+        else if (isset($table_def['oid_total_num'])) { $mempool['total'] = snmp_get_oid($device, $table_def['oid_total_num']); }
+        else if (isset($table_def['oid_total']))     { $mempool['total'] = snmp_get_oid($device, $table_def['oid_total'], $mempool['mempool_mib']); }
+
       } else {
-        // FIXME non-static not supported yet
+         // FIXME. Need pre-cache same as for sensors
+         if      (isset($table_def['oid_perc_num']))  { $mempool['perc'] = snmp_get_oid($device, $table_def['oid_perc_num'].'.'.$mempool['mempool_index']); }
+         else if (isset($table_def['oid_perc']))      { $mempool['perc'] = snmp_get_oid($device, $table_def['oid_perc'].'.'.$mempool['mempool_index'], $mempool['mempool_mib']); }
+
+         if      (isset($table_def['oid_free_num']))  { $mempool['free'] = snmp_get_oid($device, $table_def['oid_free_num'].'.'.$mempool['mempool_index']); }
+         else if (isset($table_def['oid_free']))      { $mempool['free'] = snmp_get_oid($device, $table_def['oid_free'].'.'.$mempool['mempool_index'], $mempool['mempool_mib']); }
+
+         if      (isset($table_def['oid_used_num']))  { $mempool['used'] = snmp_get_oid($device, $table_def['oid_used_num'].'.'.$mempool['mempool_index']); }
+         else if (isset($table_def['oid_used']))      { $mempool['used'] = snmp_get_oid($device, $table_def['oid_used'].'.'.$mempool['mempool_index'], $mempool['mempool_mib']); }
+
+         if      (isset($table_def['total']))         { $mempool['total'] = $table_def['total']; }
+         else if (isset($table_def['oid_total_num'])) { $mempool['total'] = snmp_get_oid($device, $table_def['oid_total_num'].'.'.$mempool['mempool_index']); }
+         else if (isset($table_def['oid_total']))     { $mempool['total'] = snmp_get_oid($device, $table_def['oid_total'].'.'.$mempool['mempool_index'], $mempool['mempool_mib']); }
+
+      }
+      // Clean not numeric symbols from snmp output
+      foreach (array('perc', 'free', 'used', 'total') as $param)
+      {
+        if (isset($mempool[$param])) { $mempool[$param] = snmp_fix_numeric($mempool[$param]); }
       }
 
       // Merge calculated used/total/free/perc array keys into $mempool variable (with additional options)
@@ -79,9 +98,16 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $mempool)
     StatsD::gauge(str_replace('.', '_', $device['hostname']).'.'.'mempool'.'.'.$mempool['mempool_mib'] . '.' . $mempool['mempool_index'].'.free', $mempool['free']);
   }
 
-  rrdtool_update_ng($device, 'mempool', array('used' => $mempool['used'], 'free' => $mempool['free']), $mib_lower . '-' . $mempool['mempool_index']);
+  // Need to handle multiple mempools from the same MIB
+  if(isset($mempool['mempool_table']))
+  {
+    $filename = $mib_lower . '-' . $mempool['mempool_table'] . '-' . $mempool['mempool_index'];
+    rename_rrd($device, 'mempool-'.$mib_lower . '-' . $mempool['mempool_index'], 'mempool-'.$mib_lower . '-' . $mempool['mempool_table'] . '-' . $mempool['mempool_index'] );
+  } else {
+    $filename = $mib_lower . '-' . $mempool['mempool_index'];
+  }
 
-  //if (!is_numeric($mempool['mempool_polled'])) { dbInsert(array('mempool_id' => $mempool['mempool_id']), 'mempools-state'); }
+  rrdtool_update_ng($device, 'mempool', array('used' => $mempool['used'], 'free' => $mempool['free']), $filename);
 
   $mempool['state'] = array('mempool_polled' => time(),
                             'mempool_used' => $mempool['used'],
@@ -93,8 +119,6 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $mempool)
   $graphs['mempool'] = TRUE;
 
   check_entity('mempool', $mempool, array('mempool_perc' => $mempool['perc'], 'mempool_free' => $mempool['free'], 'mempool_used' => $mempool['used']));
-
-//  print_message('Mempool '. $mempool['mempool_descr'] . ': '.$mempool['perc'].'%%'.$hc);
 
   $table_row = array();
   $table_row[] = $mempool['mempool_descr'];

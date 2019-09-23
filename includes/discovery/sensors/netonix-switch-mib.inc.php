@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -65,7 +65,7 @@ foreach ($oids as $index => $entry)
     $scale    = 1;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], 'power', $device, $oid_num, "pethMainPseConsumptionPower.$index", $type, $descr, $scale, $value, $options);
+    discover_sensor('power', $device, $oid_num, "pethMainPseConsumptionPower.$index", $type, $descr, $scale, $value, $options);
   }
 
   // Another status

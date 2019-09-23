@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -79,6 +79,16 @@ if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.1') // Workstation
       } else {
         $version = '10 (NT '.$windows['version'].')';
         $icon = 'windows10';
+
+        /*
+           10.0.10240	Windows 10 Version 1507
+           10.0.10586	Windows 10 Version 1511 (November Update)
+           10.0.14393	Windows 10 Version 1607 (Anniversary Update)
+           10.0.15063	Windows 10 Version 1703 (Creators Update)
+           10.0.16299	Windows 10 Version 1709 (Fall Creators Update)
+           10.0.17134	Windows 10 Version 1803 (April 2018 Update)
+        */
+
       }
       break;
     default:
@@ -123,8 +133,11 @@ else if ($poll_device['sysObjectID'] == '.1.3.6.1.4.1.311.1.1.3.1.2' || // Serve
       {
         if ($windows['build'] >  '9200') { $windows['sp'] = ', Update 1'; }
         $version = 'Server 2012 '.$windows['subtype'].'R2'.$windows['sp'].' (NT 6.3)';
-      } else {
+      } elseif ($windows['build'] <= 17744) {
         $version = 'Server 2016 '.$windows['subtype'].'(NT '.$windows['version'].')';
+        $icon = 'windows10';
+      } else {
+        $version = 'Server 2019 '.$windows['subtype'].'(NT '.$windows['version'].')';
         $icon = 'windows10';
       }
       break;

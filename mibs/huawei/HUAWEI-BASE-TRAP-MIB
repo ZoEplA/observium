@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-DC-BASE-MIB provides information about DataComm TRAPS
 -- 
 -- Reference:
--- Version:     V2.08
+-- Version:     V2.12
 -- History:
 -- 
 -- =================================================================
@@ -41,7 +41,7 @@
 
     
         hwBaseTrapMIB MODULE-IDENTITY 
-            LAST-UPDATED "201609091200Z"        -- Sep 9, 2016 at 12:00 GMT
+            LAST-UPDATED "201801151200Z"        -- Jan 15, 2018 at 12:00 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -55,33 +55,44 @@
             DESCRIPTION 
                 "This is the base trap definition for DataCom."
             -- Revision history
-                                                          REVISION     "201609091200Z"
-                                                          DESCRIPTION  "v2.08, add new node: hwHdlcIICPacketCrcErr"
+            REVISION     "201801151200Z"
+            DESCRIPTION  "v2.12, modify the description"
 
-                                                     REVISION     "201607251400Z"
-			DESCRIPTION  "V2.07,hwEntBandwidthMode, hwEntityBandwidthModeChange"
+            REVISION     "201712051200Z"
+            DESCRIPTION  "v2.11, add new node:hwCmuAlarm, hwCmuAlarmResume"
 
-			REVISION     "201506021411Z"
-			DESCRIPTION  "V2.06, hwVsDiskFullAlarm,hwVsDiskResume"
+            REVISION     "201712051200Z"
+            DESCRIPTION  "v2.10, add nps node"
 
-			REVISION     "201410131411Z"
-			DESCRIPTION  "V2.05, delete the content modified in V2.04 to rollback to V2.03"
+            REVISION     "201710261200Z"
+            DESCRIPTION  "v2.09, add new node: hwHdlcIICPacketCrcErrResume"
+
+            REVISION     "201609091200Z"
+            DESCRIPTION  "v2.08, add new node: hwHdlcIICPacketCrcErr"
+
+            REVISION     "201607251400Z"
+            DESCRIPTION  "V2.07,hwEntBandwidthMode, hwEntityBandwidthModeChange"
+
+            REVISION     "201506021411Z"
+            DESCRIPTION  "V2.06, hwVsDiskFullAlarm,hwVsDiskResume"
+
+            REVISION     "201410131411Z"
+            DESCRIPTION  "V2.05, delete the content modified in V2.04 to rollback to V2.03"
 			
-			REVISION     "201410091411Z"
-			DESCRIPTION  "V2.04, add ifindex as VB binder under hwPortPhysicalUp, hwPortPhysicalDown"
+            REVISION     "201410091411Z"
+            DESCRIPTION  "V2.04, add ifindex as VB binder under hwPortPhysicalUp, hwPortPhysicalDown"
 			
-			REVISION     "201409011411Z"
+            REVISION     "201409011411Z"
             DESCRIPTION  "V2.03, add ifOperStatus and ifAdminStatus to objects of hwPortPhysicalDown and hwPortPhysicalUp "
 			
             REVISION     "201306251411Z"
             DESCRIPTION  "V2.02, add hwPortPhysicalDownReason"
 
-            REVISION "201305240000Z"                                          -- May 24, 2013 at 16:19 GMT
-            DESCRIPTION 
-                                  "V2.01, Add new nodes : hwFESInconsistencyForMemoryLack , hwFESInconsistencyForMemoryLackResume." 
-            REVISION "200701170000Z"                                         -- January 17, 2007 at 00:00 GMT           
-            DESCRIPTION 
-                                  "V1.0, the first draft."
+            REVISION     "201305240000Z"                                          -- May 24, 2013 at 16:19 GMT
+            DESCRIPTION  "V2.01, Add new nodes : hwFESInconsistencyForMemoryLack , hwFESInconsistencyForMemoryLackResume." 
+
+            REVISION     "200701170000Z"                                         -- January 17, 2007 at 00:00 GMT           
+            DESCRIPTION   "V1.0, the first draft."
             ::= { hwDatacomm 129 }
         
     
@@ -538,7 +549,311 @@
             STATUS current
             DESCRIPTION
                 "The bandwidth mode of card."
-            ::= { hwBaseTrapObject 18 }   
+            ::= { hwBaseTrapObject 18 } 
+
+    hwNpsPackageName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Patch package name."
+            ::= { hwBaseTrapObject 19 }
+
+    hwNpsPackageVersion OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Patch package version."
+            ::= { hwBaseTrapObject 21 }
+
+    hwNpsFailReason OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Cause of the failure."
+            ::= { hwBaseTrapObject 22 }
+
+    hwNpsVmName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Virtaul machine name."
+            ::= { hwBaseTrapObject 23 }
+
+    hwNpsOsMemoryUsage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "OS memory usage."
+            ::= { hwBaseTrapObject 24 }
+
+    hwNpsOvloadThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ovload threshold."
+            ::= { hwBaseTrapObject 25 }
+
+    hwNpsNeName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The NE name."
+            ::= { hwBaseTrapObject 26 }
+
+    hwNpsEntityTrapFaultID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The trap fault ID."
+            ::= { hwBaseTrapObject 27 }
+
+    hwNpsCaClass OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ca class type."
+            ::= { hwBaseTrapObject 28 }
+
+    hwNpsRemainDays OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The remain days of certificate."
+            ::= { hwBaseTrapObject 29 }
+
+    hwNpsAlarmReason OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The fault alarm reason."
+            ::= { hwBaseTrapObject 30 }
+
+    hwNpsPartitionName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The partition name."
+            ::= { hwBaseTrapObject 31 }
+
+    hwNpsPartitionUsage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The usage of partition."
+            ::= { hwBaseTrapObject 32 }
+
+    hwNpsOverloadThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The threshold of overload."
+            ::= { hwBaseTrapObject 33 }
+
+    hwNpsAvailableSpace OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The available space of partition."
+            ::= { hwBaseTrapObject 34 }
+
+    hwNpsCapThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The caption threshold."
+            ::= { hwBaseTrapObject 35 }
+
+    hwNpsvnfcType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The VNFC type."
+            ::= { hwBaseTrapObject 36 }
+
+    hwNpsAppType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The application type."
+            ::= { hwBaseTrapObject 37 }
+
+    hwNpsVersionType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The application version type."
+            ::= { hwBaseTrapObject 38 }
+
+    hwNpsVersionId OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The application version ID."
+            ::= { hwBaseTrapObject 39 }
+
+    hwNpsVMId OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "MANO layer VMID."
+            ::= { hwBaseTrapObject 40 }
+
+    hwNpsCertFile OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The certificate file name."
+            ::= { hwBaseTrapObject 41 }
+
+    hwNpsVaildBeginTime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The certificate valid begin time."
+            ::= { hwBaseTrapObject 42 }
+
+    hwNpsVaildEndTime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The certificate valid end time.."
+            ::= { hwBaseTrapObject 43 }
+
+    hwNpsPhysicalVMID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Physical layer VMID."
+            ::= { hwBaseTrapObject 44 }
+
+    hwNpsVnfmIp OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The IP of VNFM."
+            ::= { hwBaseTrapObject 45 }
+
+    hwNpsVnfmPort OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The port of VNFM."
+            ::= { hwBaseTrapObject 46 }
+
+    hwNpsLocalVM OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The local VM name."
+            ::= { hwBaseTrapObject 47 }
+
+    hwNpsRemoteVM OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The remote VM name."
+            ::= { hwBaseTrapObject 48 }
+
+    hwNpsPlane OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The plane ID."
+            ::= { hwBaseTrapObject 49 }
+
+    hwNpsThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The threshold of subhealth."
+            ::= { hwBaseTrapObject 50 }
+
+    hwNpsVendorID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The vendor ID."
+            ::= { hwBaseTrapObject 51 }
+
+    hwNpsDeviceID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The device ID."
+            ::= { hwBaseTrapObject 52 }
+
+    hwNpsCurrentDriverType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The driver type of device."
+            ::= { hwBaseTrapObject 53 }
+
+    hwNpsVNFCName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The name of VNFC."
+            ::= { hwBaseTrapObject 54 }
+
+    hwNpsRUName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The name of RU."
+            ::= { hwBaseTrapObject 55 }
+
+    hwNpsPortName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The port name."
+            ::= { hwBaseTrapObject 56 }
+
+    hwNpsIpAdress OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The IP address."
+            ::= { hwBaseTrapObject 57 }
 
         hwBaseTraps OBJECT IDENTIFIER ::= { hwBaseTrapMIB 2 }
 
@@ -551,7 +866,7 @@
                  }
             STATUS current
             DESCRIPTION 
-                "Entity has been removed."
+                "This object indicates that a physical entity is removed."
             ::= { hwEntityTrap 1 }
 
         
@@ -560,7 +875,7 @@
                  }
             STATUS current
             DESCRIPTION 
-                "Entity has been inserted."
+                "This object indicates that a physical entity is inserted."
             ::= { hwEntityTrap 2 }
 
         
@@ -569,7 +884,7 @@
                  }
             STATUS current
             DESCRIPTION 
-                "Entity has been inserted but position unstable."
+                "This object indicates that an alarm is generated when a physical entity is not securely inserted."
             ::= { hwEntityTrap 3 }
 
         
@@ -578,7 +893,7 @@
                  }
             STATUS current
             DESCRIPTION 
-                "Resume from entity position unstable situation."
+                "This object indicates that the alarm generated when a physical entity is not securely inserted is cleared."
             ::= { hwEntityTrap 4 }
 
         
@@ -587,7 +902,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity will be reseted."
+                "This object indicates that a physical entity is reset."
             ::= { hwEntityTrap 5 }
 
         
@@ -596,7 +911,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity has been reseted and in good health now."
+                "This object indicates that a physical entity is restarted and runs properly."
             ::= { hwEntityTrap 6 }
 
         
@@ -605,8 +920,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Communication error has been detected.
-                Include all kinds of communication error between boards."
+                "This object indicates that channel detection fails."
             ::= { hwEntityTrap 7 }
 
         
@@ -615,7 +929,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Resume from communication error situation."
+                "This object indicates that channel detection recovers."
             ::= { hwEntityTrap 8 }
 
         
@@ -624,7 +938,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity is invalid for some reason."
+                "This object indicates that a physical entity is faulty."
             ::= { hwEntityTrap 9 }
 
         
@@ -633,7 +947,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity reusme from invalid situation."
+                "This object indicates that a physical entity recovers from a fault."
             ::= { hwEntityTrap 10 }
 
         
@@ -642,7 +956,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Redundant entity leave master role."
+                "This object indicates that a physical entity exits from the active state."
             ::= { hwEntityTrap 11 }
 
         
@@ -651,7 +965,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Redundant entity become master role."
+                "This object indicates that a physical entity becomes active."
             ::= { hwEntityTrap 12 }
 
         
@@ -660,7 +974,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity change to OFFLINE status."
+                "This object indicates that a physical entity becomes offline."
             ::= { hwEntityTrap 13 }
 
         
@@ -669,7 +983,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity change to ONLINE status."
+                "This object indicates that a physical entity becomes online."
             ::= { hwEntityTrap 14 }
 
         
@@ -678,9 +992,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "
-                Failure of self-check occurs to the board
-                "
+                "This object indicates that physical entity detection fails."
             ::= { hwEntityTrap 15 }
 
         
@@ -689,9 +1001,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "
-                The status is recovered from the failure of board self-check
-                "
+                "This object indicates that physical entity detection recovers."
             ::= { hwEntityTrap 16 }
 
         
@@ -700,7 +1010,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity fail in registration."
+                "This object indicates that physical entity registration fails."
             ::= { hwEntityTrap 17 }
 
         
@@ -709,7 +1019,7 @@
                 hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
             STATUS current
             DESCRIPTION 
-                "Entity success in registration."
+                "This object indicates that physical entity registration succeeds."
             ::= { hwEntityTrap 18 }
 
         hwEntityDyingGasp NOTIFICATION-TYPE
@@ -726,7 +1036,24 @@
             DESCRIPTION 
                 "The bandwidth mode of physical entity is changed."
             ::= { hwEntityTrap 20 }
+                
+        hwCmuAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "The CMU monitoring module alarm."
+            ::= { hwEntityTrap 21 }
+
         
+        hwCmuAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "The CMU monitoring module alarm recovered."
+            ::= { hwEntityTrap 22 }
+
         hwEnvironmentTrap OBJECT IDENTIFIER ::= { hwBaseTraps 2 }
 
         
@@ -735,7 +1062,7 @@
                 hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
             STATUS current
             DESCRIPTION 
-                "Temperature rise over HIGH threshold."
+                "This object indicates that an alarm is generated when the temperature sensor exceeds the upper threshold."
             ::= { hwEnvironmentTrap 1 }
 
         
@@ -744,7 +1071,7 @@
                 hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
             STATUS current
             DESCRIPTION 
-                "Temperature back to normal level."
+                "This object indicates that the alarm generated when the temperature sensor exceeds the upper threshold is cleared."
             ::= { hwEnvironmentTrap 2 }
 
         
@@ -807,7 +1134,7 @@
                 hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
             STATUS current
             DESCRIPTION 
-                "Voltage of power rise over HIGH threshold."
+                "This object indicates that an alarm is generated when the voltage sensor exceeds the upper threshold."
             ::= { hwEnvironmentTrap 9 }
 
         
@@ -816,7 +1143,7 @@
                 hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
             STATUS current
             DESCRIPTION 
-                "Voltage back to normal level."
+                "This object indicates that the alarm generated when the voltage sensor exceeds the upper threshold is cleared."
             ::= { hwEnvironmentTrap 10 }
 
         
@@ -825,7 +1152,7 @@
                 hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
             STATUS current
             DESCRIPTION 
-                "Voltage of power fall below LOW threshold."
+                "This object indicates that an alarm is generated when the voltage sensor exceeds the lower threshold."
             ::= { hwEnvironmentTrap 11 }
 
         
@@ -834,7 +1161,7 @@
                 hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
             STATUS current
             DESCRIPTION 
-                "Voltage back to normal level."
+                "This object indicates that the alarm generated when the voltage sensor exceeds the lower threshold is cleared."
             ::= { hwEnvironmentTrap 12 }
 
         
@@ -1324,6 +1651,13 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
                  "The packet(s) crc error"
               ::= { hwHdlcTrap 3 }
 
+         hwHdlcIICPacketCrcErrResume NOTIFICATION-TYPE
+             OBJECTS {hwSecStatTrapSlot, hwSecStatTrapCPU}
+             STATUS current
+             DESCRIPTION 
+                 "The packet(s) crc error resume"
+              ::= { hwHdlcTrap 4 }
+
     hwAutoFtpTrap OBJECT IDENTIFIER ::= { hwBaseTraps 16 }
         
         hwAutoFtpFailAlarm NOTIFICATION-TYPE
@@ -1350,6 +1684,296 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
             DESCRIPTION 
                 "Optical power resume."
             ::= { hwBaseOpticalTrap 2 }
+
+        hwBaseNpsTrap OBJECT IDENTIFIER ::= { hwBaseTraps 18 }
+
+        hwNpsPatchInstallationFail NOTIFICATION-TYPE
+            OBJECTS { hwNpsPackageName, hwNpsPackageVersion, hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "Patch Installation Failed."
+            ::= { hwBaseNpsTrap 1 }
+
+        hwNpsPatchInstallationResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsPackageName, hwNpsPackageVersion, hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "Patch Installation Success."
+            ::= { hwBaseNpsTrap 2 }
+
+        hwNpsPatchPacketError NOTIFICATION-TYPE
+            OBJECTS { hwNpsPackageName }
+            STATUS current
+            DESCRIPTION 
+                "Patch Package Error."
+            ::= { hwBaseNpsTrap 3 }
+
+        hwNpsPatchPacketResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsPackageName }
+            STATUS current
+            DESCRIPTION 
+                "Patch Package success."
+            ::= { hwBaseNpsTrap 4 }
+
+        hwNpsSysConfigError NOTIFICATION-TYPE
+            OBJECTS { hwNpsEntityTrapFaultID }
+            STATUS current
+            DESCRIPTION 
+                "System Configuration Error."
+            ::= { hwBaseNpsTrap 5 }
+
+        hwNpsSysConfigResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsEntityTrapFaultID }
+            STATUS current
+            DESCRIPTION 
+                "System Configuration Error."
+            ::= { hwBaseNpsTrap 6 }
+
+        hwNpsInnerSslCertificateInvalidEarlyWarning NOTIFICATION-TYPE
+            OBJECTS { hwNpsCaClass, hwNpsRemainDays }
+            STATUS current
+            DESCRIPTION 
+                "Inner SSL Certificate Invalid Early Warning."
+            ::= { hwBaseNpsTrap 7 }
+
+        hwNpsInnerSslCertificateInvalidEarlyResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsCaClass }
+            STATUS current
+            DESCRIPTION 
+                "Inner SSL Certificate Invalid Early resume."
+            ::= { hwBaseNpsTrap 8 }
+
+        hwNpsInnerSslCertificateInvalidAlarm NOTIFICATION-TYPE
+            OBJECTS { hwNpsCaClass, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Inner SSL Certificate Invalid Alarm."
+            ::= { hwBaseNpsTrap 9 }
+
+        hwNpsInnerSslCertificateInvalidResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsCaClass }
+            STATUS current
+            DESCRIPTION 
+                "Inner SSL Certificate Invalid Alarm resume."
+            ::= { hwBaseNpsTrap 10 }
+
+        hwNpsDiskPartitionUsageExceedingThreshold NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPartitionName, hwNpsPartitionUsage, hwNpsOverloadThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Disk Partition Usage Exceeding Threshold."
+            ::= { hwBaseNpsTrap 11 }
+
+        hwNpsDiskPartitionUsageExceedingThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPartitionName, hwNpsPartitionUsage, hwNpsOverloadThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Disk Partition Usage Exceeding Threshold Resume."
+            ::= { hwBaseNpsTrap 12 }
+
+        hwNpsDiskPartitionUnavailable NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPartitionName }
+            STATUS current
+            DESCRIPTION 
+                "Disk Partition Unavailable."
+            ::= { hwBaseNpsTrap 13 }
+        hwNpsDiskPartitionUnavailableResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPartitionName }
+            STATUS current
+            DESCRIPTION 
+                "Disk Partition Unavailable resume."
+            ::= { hwBaseNpsTrap 14 }
+
+        hwNpsDiskPartitionSpaceInsufficient NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPartitionName, hwNpsAvailableSpace, hwNpsCapThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Disk Partition Space Insufficient."
+            ::= { hwBaseNpsTrap 15 }
+        hwNpsDiskPartitionSpaceInsufficientResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPartitionName, hwNpsAvailableSpace, hwNpsCapThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Disk Partition Space Insufficient resume."
+            ::= { hwBaseNpsTrap 16 }
+
+        hwNpsExecutableFilesIncomplete NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName }
+            STATUS current
+            DESCRIPTION 
+                "Executable Files Incomplete."
+            ::= { hwBaseNpsTrap 17 }
+        hwNpsExecutableFilesIncompleteResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName }
+            STATUS current
+            DESCRIPTION 
+                "Executable Files Incomplete."
+            ::= { hwBaseNpsTrap 18 }
+
+        hwNpsSoftwareIntegrityError NOTIFICATION-TYPE
+            OBJECTS { hwNpsvnfcType, hwNpsAppType, hwNpsVersionType, hwNpsVersionId }
+            STATUS current
+            DESCRIPTION 
+                "Software Integrity Error."
+            ::= { hwBaseNpsTrap 19 }
+        hwNpsSoftwareIntegrityResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsvnfcType, hwNpsAppType, hwNpsVersionType, hwNpsVersionId }
+            STATUS current
+            DESCRIPTION 
+                "Software Integrity Error."
+            ::= { hwBaseNpsTrap 20 }
+
+        hwNpsMasterAdnSlaveSyncFail NOTIFICATION-TYPE
+            OBJECTS { hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Master and Slave OMU Synchronization Failure."
+            ::= { hwBaseNpsTrap 21 }
+        hwNpsMasterAdnSlaveSyncResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Master and Slave OMU Synchronization resume."
+            ::= { hwBaseNpsTrap 22 }
+
+        hwNpsVirtualMachineDiskInvalid NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName }
+            STATUS current
+            DESCRIPTION 
+                "Virtual Machine Disk Invalid."
+            ::= { hwBaseNpsTrap 23 }
+        hwNpsVirtualMachineDiskResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName }
+            STATUS current
+            DESCRIPTION 
+                "Virtual Machine Disk Resume."
+            ::= { hwBaseNpsTrap 24 }
+
+        hwNpsDatabaseRestoreFail NOTIFICATION-TYPE
+            OBJECTS { hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "Database Restoration Failure."
+            ::= { hwBaseNpsTrap 25 }
+
+        hwNpsSSLCertificateExpired NOTIFICATION-TYPE
+            OBJECTS { hwNpsCertFile, hwNpsCaClass, hwNpsVaildBeginTime, hwNpsVaildEndTime }
+            STATUS current
+            DESCRIPTION 
+                "SSL Certificate Expired."
+            ::= { hwBaseNpsTrap 26 }
+
+        hwNpsSSLCertificateExpiredEarlyWarning NOTIFICATION-TYPE
+            OBJECTS { hwNpsCertFile, hwNpsCaClass, hwNpsVaildBeginTime, hwNpsVaildEndTime }
+            STATUS current
+            DESCRIPTION 
+                "SSL Certificate Expired Early Warning."
+            ::= { hwBaseNpsTrap 27 }
+
+        hwNpsVMResInconsistAlarm NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVMId, hwNpsPhysicalVMID, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Virtual Machine Resource Inconsistent."
+            ::= { hwBaseNpsTrap 28 }
+        hwNpsVMResInconsistResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVMId, hwNpsPhysicalVMID, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Virtual Machine Resource Inconsistent."
+            ::= { hwBaseNpsTrap 29 }
+
+        hwNpsVmFauldAlarm NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVMId, hwNpsPhysicalVMID, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Virtual Machine Fault."
+            ::= { hwBaseNpsTrap 30 }
+        hwNpsVmFauldResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVMId, hwNpsPhysicalVMID, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "Virtual Machine Resume."
+            ::= { hwBaseNpsTrap 31 }
+
+        hwNpsVNFMConnectFault NOTIFICATION-TYPE
+            OBJECTS { hwNpsVnfmIp, hwNpsVnfmPort, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "VNF And VNFM Connection Fault."
+            ::= { hwBaseNpsTrap 32 }
+        hwNpsVNFMConnectResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVnfmIp, hwNpsVnfmPort, hwNpsAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "VNF And VNFM Connection Resume."
+            ::= { hwBaseNpsTrap 33 }
+
+        hwNpsFabricOamPlaneDown NOTIFICATION-TYPE
+            OBJECTS { hwNpsLocalVM, hwNpsRemoteVM, hwNpsPlane }
+            STATUS current
+            DESCRIPTION 
+                "Fabric OAM Detected Fabric Plane Down."
+            ::= { hwBaseNpsTrap 34 }
+        hwNpsFabricOamPlaneDownResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsLocalVM, hwNpsRemoteVM, hwNpsPlane }
+            STATUS current
+            DESCRIPTION 
+                "Fabric OAM Detected Fabric Plane Down."
+            ::= { hwBaseNpsTrap 35 }
+
+        hwNpsFabricLinkSubhealthy NOTIFICATION-TYPE
+            OBJECTS { hwNpsLocalVM, hwNpsRemoteVM, hwNpsPlane, hwNpsThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Fabric Link Goes Subhealthy."
+            ::= { hwBaseNpsTrap 36 }
+        hwNpsFabricLinkSubhealthyResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsLocalVM, hwNpsRemoteVM, hwNpsPlane, hwNpsThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Fabric Link Goes Subhealthy."
+            ::= { hwBaseNpsTrap 37 }
+
+        hwNpsDriverTypeMismatch NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVendorID, hwNpsDeviceID, hwNpsCurrentDriverType, hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "Driver Type Mismatch."
+            ::= { hwBaseNpsTrap 38 }
+        hwNpsDriverTypeMismatchResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVendorID, hwNpsDeviceID, hwNpsCurrentDriverType, hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "Driver Type Mismatch."
+            ::= { hwBaseNpsTrap 39 }
+
+        hwNpsRuCreateFail NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVNFCName, hwNpsRUName, hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "RU Create Failed."
+            ::= { hwBaseNpsTrap 40 }
+        hwNpsRuCreateResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsVNFCName, hwNpsRUName, hwNpsFailReason }
+            STATUS current
+            DESCRIPTION 
+                "RU Create success."
+            ::= { hwBaseNpsTrap 41 }
+
+        hwNpsIpSecRuleFail NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPortName, hwNpsIpAdress }
+            STATUS current
+            DESCRIPTION 
+                "Setting Security Group Rules Failed."
+            ::= { hwBaseNpsTrap 42 }
+        hwNpsIpSecRuleResume NOTIFICATION-TYPE
+            OBJECTS { hwNpsVmName, hwNpsPortName, hwNpsIpAdress }
+            STATUS current
+            DESCRIPTION 
+                "Setting Security Group Rules Resume."
+            ::= { hwBaseNpsTrap 43 }
+
         hwBaseTrapConformance OBJECT IDENTIFIER ::= { hwBaseTrapMIB 3 }
 
         
@@ -1374,8 +1998,13 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
                 hwBaseThresholdLowCritical, hwBaseThresholdLowWarning, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical, hwBaseUsageValue, 
                 hwBaseUsageUnit, hwBaseUsageThreshold, hwDevAvailablePower, hwEntityRatedPower, hwDeviceTotalPower, 
                 hwBaseTrapLastPortType, hwPortPhysicalDownReason, hwBaseTrapCurPortType, hwBaseTrapReasonDescr, 
-                hwBaseTrapRelativeResource, hwFIBOverloadModule, hwBaseFlowDirectionType, hwPowerDirection, hwBaseTrapTrafficDir,hwEntBandwidthMode
-                }
+                hwBaseTrapRelativeResource, hwFIBOverloadModule, hwBaseFlowDirectionType, hwPowerDirection, hwBaseTrapTrafficDir,hwEntBandwidthMode,
+                hwNpsPackageName,hwNpsPackageVersion,hwNpsFailReason,hwNpsVmName,hwNpsOsMemoryUsage,hwNpsOvloadThreshold,
+                hwNpsNeName,hwNpsEntityTrapFaultID,hwNpsCaClass,hwNpsRemainDays,hwNpsAlarmReason,hwNpsPartitionName,hwNpsPartitionUsage,
+                hwNpsOverloadThreshold,hwNpsAvailableSpace,hwNpsCapThreshold,hwNpsvnfcType,hwNpsAppType,hwNpsVersionType,hwNpsVersionId,
+                hwNpsVMId,hwNpsCertFile,hwNpsVaildBeginTime,hwNpsVaildEndTime,hwNpsPhysicalVMID,hwNpsVnfmIp,
+                hwNpsVnfmPort,hwNpsLocalVM,hwNpsRemoteVM,hwNpsPlane,hwNpsThreshold,hwNpsVendorID,hwNpsDeviceID,hwNpsCurrentDriverType,
+                hwNpsVNFCName,hwNpsRUName,hwNpsPortName,hwNpsIpAdress}
             STATUS current
             DESCRIPTION 
                 "Group for base trap objects."
@@ -1399,7 +2028,16 @@ hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
                 hwPppLoopbackDetect, hwPppLoopbackDetResume, hwEntityCheckFail, hwEntityCheckResume, hwFlowCongestion, hwFlowCongestionResume, hwDeviceAbnormalRisingAlarm, 
                 hwResExhaustBfdAlarm, hwResExhaustBfdResume, hwResExhaustOamAlarm, hwResExhaustOamResume, hwHdlcLoopbackDetect, 
                 hwAutoFtpFailAlarm, hwOpticalPowerResume, hwHdlcLoopbackDetResume, hwPortPhysicalPortTypeChange, hwPortPhysicalAutoNegotiateFail, 
-                hwPortPhysicalAutoNegotiateResume, hwOpticalPowerAbnormal, hwAcuSoftwareUpgradeFailure, hwEntityBandwidthModeChange,hwHdlcIICPacketCrcErr}
+                hwPortPhysicalAutoNegotiateResume, hwOpticalPowerAbnormal, hwAcuSoftwareUpgradeFailure, hwEntityBandwidthModeChange,hwHdlcIICPacketCrcErr,hwHdlcIICPacketCrcErrResume,
+                hwNpsPatchInstallationFail,hwNpsPatchInstallationResume,hwNpsPatchPacketError,hwNpsPatchPacketResume,hwNpsSysConfigError,hwNpsSysConfigResume,
+                hwNpsInnerSslCertificateInvalidEarlyWarning,hwNpsInnerSslCertificateInvalidEarlyResume,hwNpsInnerSslCertificateInvalidAlarm,hwNpsInnerSslCertificateInvalidResume,
+                hwNpsDiskPartitionUsageExceedingThreshold,hwNpsDiskPartitionUsageExceedingThresholdResume,hwNpsDiskPartitionUnavailable,hwNpsDiskPartitionUnavailableResume,
+                hwNpsDiskPartitionSpaceInsufficient,hwNpsDiskPartitionSpaceInsufficientResume,hwNpsExecutableFilesIncomplete,hwNpsExecutableFilesIncompleteResume,
+                hwNpsSoftwareIntegrityError,hwNpsSoftwareIntegrityResume,hwNpsMasterAdnSlaveSyncFail,hwNpsMasterAdnSlaveSyncResume,
+                hwNpsVirtualMachineDiskInvalid,hwNpsVirtualMachineDiskResume,hwNpsDatabaseRestoreFail,hwNpsSSLCertificateExpired,hwNpsSSLCertificateExpiredEarlyWarning,
+                hwNpsVMResInconsistAlarm,hwNpsVMResInconsistResume,hwNpsVmFauldAlarm,hwNpsVmFauldResume,hwNpsVNFMConnectFault,hwNpsVNFMConnectResume,
+                hwNpsFabricOamPlaneDown,hwNpsFabricOamPlaneDownResume,hwNpsFabricLinkSubhealthy,hwNpsFabricLinkSubhealthyResume,
+                hwNpsDriverTypeMismatch,hwNpsDriverTypeMismatchResume,hwNpsRuCreateFail,hwNpsRuCreateResume,hwNpsIpSecRuleFail,hwNpsIpSecRuleResume}
             STATUS current
             DESCRIPTION 
                 "Group for all base traps."

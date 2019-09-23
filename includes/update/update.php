@@ -5,7 +5,7 @@
  * @package    observium
  * @subpackage updater
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -150,7 +150,7 @@ foreach ($filelist as $file)
           // dbSchema inserted, now only update
           $schema_insert = FALSE;
         }
-        $update_time = formatUptime(time() - $start);
+        $update_time = format_uptime(time() - $start);
         echo(" Done ($update_time)." . PHP_EOL);
         log_event("Observium schema updated: " . $log_msg . "($update_time).", NULL, NULL, NULL, 5);
       } else {
@@ -234,7 +234,7 @@ foreach ($filelist as $file)
           }
         }
 
-        $update_time = formatUptime(time() - $start);
+        $update_time = format_uptime(time() - $start);
         if ($db_rev < 1)
         {
           log_event("Observium schema updated: " . $log_msg . "($update_time).", NULL, NULL, NULL, 5);

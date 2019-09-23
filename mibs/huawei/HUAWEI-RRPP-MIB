@@ -1,10 +1,12 @@
 -- ==================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:  HUAWEI LAN Switch RRPP MIB
 -- Reference:
--- Version: V2.14
+-- Version: V2.15
 -- Revision history: 
+--     REVISION     "201802260000Z"        
+ --     DESCRIPTION  "V2.15,  add hwRrppSnoopingRecvPackets, hwRrppSnoopingResetStatistics leaf node for statistics and clearing statistics of packets"
 --     REVISION     "201612080000Z"        
 --     DESCRIPTION  "V2.4,  add hwRrppDomainProtectedInstance leaf node for the rrpp Protected Instance function"
 
@@ -43,7 +45,7 @@
     
     
         hwRrpp MODULE-IDENTITY 
-            LAST-UPDATED "201612080000Z"        
+            LAST-UPDATED "201802260000Z"        
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -65,6 +67,9 @@
                 than a second after link failure.
                 This MIB defines management information used on 
                 products which support RRPP."
+            REVISION "201802260000Z"
+            DESCRIPTION
+            	"Add new node hwRrppSnoopingRecvPackets, hwRrppSnoopingResetStatistics "
             REVISION "201612080000Z"
             DESCRIPTION
             	"Add new node hwRrppDomainProtectedInstance "
@@ -970,7 +975,11 @@
                     hwRrppSnoopingRowStatus
                     RowStatus, 
                     hwRrppSnoopingAllVsiStatus
-                    EnabledStatus                                                     
+                    EnabledStatus,
+                    hwRrppSnoopingRecvPackets
+                    Counter32, 	
+                    hwRrppSnoopingResetStatistics
+                    INTEGER					
              }
                           
         hwRrppSnoopingInterfaceId OBJECT-TYPE
@@ -1029,6 +1038,27 @@
                 Default: disabled
                 "
             ::= { hwRrppSnoopingInterfaceEntry 6 }
+
+        hwRrppSnoopingRecvPackets OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics of common-flush or complete-flush packets received from
+                this port."
+            ::= { hwRrppSnoopingInterfaceEntry 7 }
+
+        hwRrppSnoopingResetStatistics OBJECT-TYPE
+            SYNTAX INTEGER
+                { 
+                cleared(1),
+                unused(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Clears the statistics of packets received from this port."
+            ::= { hwRrppSnoopingInterfaceEntry 8 }	
                                          
         hwRrppSnoopingVsiTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwRrppSnoopingVsiEntry
@@ -1194,7 +1224,8 @@
             ::= { hwRrppMibGroup 7 }   
               
         hwRrppSnoopingInterfaceGroup OBJECT-GROUP
-            OBJECTS { hwRrppSnoopingVsiName, hwRrppSnoopingVlanId, hwRrppSnoopingEnableStatus, hwRrppSnoopingRowStatus, hwRrppSnoopingAllVsiStatus }
+            OBJECTS { hwRrppSnoopingVsiName, hwRrppSnoopingVlanId, hwRrppSnoopingEnableStatus, hwRrppSnoopingRowStatus, hwRrppSnoopingAllVsiStatus,
+                      hwRrppSnoopingRecvPackets, hwRrppSnoopingResetStatistics}
             STATUS current
             DESCRIPTION
                  "The RRPP Snooping enable Interface group."

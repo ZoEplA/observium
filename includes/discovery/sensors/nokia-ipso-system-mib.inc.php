@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,7 +18,7 @@ if ($value !== '')
   $oid   = '.1.3.6.1.4.1.94.1.21.1.1.5.0';
   $descr = 'Chassis Temperature';
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'ipsoChassisTemperature.0', 'ipso-temperature-state', $descr, NULL, $value, array('entPhysicalClass' => 'temperature'));
+  discover_status($device, $oid, 'ipsoChassisTemperature.0', 'ipso-temperature-state', $descr, $value, array('entPhysicalClass' => 'temperature'));
 }
 
 // NOKIA-IPSO-SYSTEM-MIB::ipsoFanOperStatus.1 = INTEGER: running(1)
@@ -31,7 +31,7 @@ foreach ($data as $index => $entry)
   if ($data_multi) { $descr .= " $index"; }
   $value = $entry['ipsoFanOperStatus'];
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "ipsoFanOperStatus.$index", 'ipso-sensor-state', $descr, NULL, $value, array('entPhysicalClass' => 'fan'));
+  discover_status($device, $oid, "ipsoFanOperStatus.$index", 'ipso-sensor-state', $descr, $value, array('entPhysicalClass' => 'fan'));
 }
 
 // NOKIA-IPSO-SYSTEM-MIB::ipsoPowerSupplyOverTemperature.1 = INTEGER: normal(1)
@@ -45,14 +45,14 @@ foreach ($data as $index => $entry)
   if ($data_multi) { $descr .= " $index"; }
   $value = $entry['ipsoPowerSupplyOverTemperature'];
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "ipsoPowerSupplyOverTemperature.$index", 'ipso-temperature-state', $descr, NULL, $value, array('entPhysicalClass' => 'temperature'));
+  discover_status($device, $oid, "ipsoPowerSupplyOverTemperature.$index", 'ipso-temperature-state', $descr, $value, array('entPhysicalClass' => 'temperature'));
 
   $oid   = '.1.3.6.1.4.1.94.1.21.1.3.1.1.3.' . $index;
   $descr = 'Power Supply';
   if ($data_multi) { $descr .= " $index"; }
   $value = $entry['ipsoPowerSupplyOperStatus'];
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "ipsoPowerSupplyOperStatus.$index", 'ipso-sensor-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+  discover_status($device, $oid, "ipsoPowerSupplyOperStatus.$index", 'ipso-sensor-state', $descr, $value, array('entPhysicalClass' => 'other'));
 }
 
 // EOF

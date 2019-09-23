@@ -1,9 +1,9 @@
 --   =================================================================
---  Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved
+--  Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
 --  
 --  Description the HUAWEI-RSVPTE-MIB provides information about RSVPTE. 
 --  Reference:
---  Version: V3.00
+--  Version: V3.01
 --  History:
 --  V3.00  wenjing, 2014-10-25, hwRsvpTeIfStatus from read-only to read-create
 --  zhuguangdong 2007-04-16 publish
@@ -29,7 +29,7 @@
         
 --  Thu Apri 16 15:03:53 PDT 2007
                 hwRsvpTe MODULE-IDENTITY 
-                        LAST-UPDATED "201410251736Z"        -- oct 25, 2014 at 17:36 GMT
+                        LAST-UPDATED "201710271943Z"        -- oct 27, 2017 at 19:43 GMT
                           ORGANIZATION 
                                 "Huawei Technologies Co.,Ltd."
                         CONTACT-INFO 
@@ -44,6 +44,9 @@
                                 "The MIB module to describe the RSVP Protocol"
                    
                         --  Revision history 
+                        REVISION   "201710271943Z"
+                        DESCRIPTION "V3.01, minor modification to keep omsys mib file same as code mib."
+
                        REVISION   "201410251736Z"
                        DESCRIPTION "V3.00, hwRsvpTeIfStatus from read-only to read-create."            
 
@@ -3165,25 +3168,29 @@
                         ::= { hwRsvpTeTrapObjects 5 }
 
                 hwRsvpTeTrap OBJECT IDENTIFIER ::= { hwRsvpTeExtendTrap 2 }
-
+                
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.1
                 hwRsvpTeHelloLost NOTIFICATION-TYPE
                         OBJECTS { hwRsvpTeNbr }
                         STATUS current
                         DESCRIPTION "Indicates neighbour of RSVP hello lost."
                         ::= { hwRsvpTeTrap 1 }
 
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.2
                 hwRsvpTeHelloLostRecovery NOTIFICATION-TYPE
                         OBJECTS { hwRsvpTeNbr }
                         STATUS current
                         DESCRIPTION "Indicates neighbour of RSVP hello lost."
                         ::= { hwRsvpTeTrap 2 }
 
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.3
                 hwRsvpTeAuthFail NOTIFICATION-TYPE
                         OBJECTS { hwRsvpTeNbr }
                         STATUS current
                         DESCRIPTION "Indicates neighbour of RSVP hello lost."
                         ::= { hwRsvpTeTrap 3 }
 
+--   1.3.6.1.4.1.2011.5.25.148.1.12.2.4
                 hwRsvpTeAuthSuccess NOTIFICATION-TYPE
                         OBJECTS { hwRsvpTeNbr }
                         STATUS current

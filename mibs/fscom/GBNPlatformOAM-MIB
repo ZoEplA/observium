@@ -354,8 +354,8 @@
 
     offsetNegFlag OBJECT-TYPE
         SYNTAX INTEGER{    
-               true(1),     -----    negtive
-               false(2)     -----    positive
+               true(1),     -- negtive
+               false(2)     -- positive
         }
         MAX-ACCESS   read-write
         STATUS   current

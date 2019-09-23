@@ -7,18 +7,16 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-echo("CISCO-ENTITY-FRU-CONTROL-MIB ");
-
 // Skip statuses if we have any status from CISCO-ENVMON-MIB (for exclude duplicates)
-$skip_status = dbFetchCell('SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_type` = ?;', array($device['device_id'], 'cisco-envmon-state')) > 0;
+$skip_status = dbExist('status', '`device_id` = ? AND `status_type` = ? AND `status_deleted` = ?', array($device['device_id'], 'cisco-envmon-state', 0));
 
 // Walk CISCO-ENTITY-FRU-CONTROL-MIB oids
 $entity_array = array();
-$oids = array('cefcFRUPowerStatusEntry', 'cefcFanTrayStatusEntry');
+$oids = array('cefcFRUPowerStatusEntry', 'cefcFanTrayStatusEntry', 'cefcFanEntry');
 foreach ($oids as $oid)
 {
   $entity_array = snmpwalk_cache_multi_oid($device, $oid, $entity_array, 'CISCO-ENTITY-FRU-CONTROL-MIB');
@@ -111,8 +109,7 @@ if (count($entity_array))
         }
         $options['limit_high_warn'] = $options['limit_high'] * 0.8; // 80%
       }
-
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device, 'current', $mib, 'cefcTotalDrawnCurrent', $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
 
     $oid_name = 'cefcPowerRedundancyOperMode';
@@ -120,7 +117,7 @@ if (count($entity_array))
     $type     = 'cefcPowerRedundancyType';
     $value    = $entry[$oid_name];
 
-    discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'powersupply'));
+    discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'powersupply'));
   }
 
   foreach ($entity_array as $index => $entry)
@@ -137,7 +134,7 @@ if (count($entity_array))
       $type     = 'PowerOperType';
       $value    = $entry[$oid_name];
 
-      discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'powersupply'));
+      discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'powersupply'));
     }
 
     // Fans
@@ -148,7 +145,25 @@ if (count($entity_array))
       $type     = 'cefcFanTrayOperStatus';
       $value    = $entry[$oid_name];
 
-      discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'fan'));
+      discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'fan'));
+    }
+
+    // CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanSpeed.119000 = Gauge32: 9326 rpm
+    // CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanSpeedPercent.119000 = INTEGER: 57 percent
+    if (isset($entry['cefcFanSpeed']) && $entry['cefcFanSpeed'] > 0)
+    {
+      $options = [];
+      // Detect limits based on speed percent
+      if (isset($entry['cefcFanSpeedPercent']) && $entry['cefcFanSpeedPercent'] > 0)
+      {
+        $max = ($entry['cefcFanSpeed'] * 100) / $entry['cefcFanSpeedPercent'];
+        $options = ['limit_high' => intval($max * 0.95), 'limit_high_warn' => intval($max * 0.8), 'limit_low' => 0];
+      }
+
+      $oid_name = 'cefcFanSpeed';
+      $oid_num  = '.1.3.6.1.4.1.9.9.117.1.4.2.1.1.'.$index;
+      $value    = $entry[$oid_name];
+      discover_sensor_ng($device, 'fanspeed', $mib, $oid_name, $oid_num, $index, NULL, $descr, 1, $value, $options);
     }
   }
 }

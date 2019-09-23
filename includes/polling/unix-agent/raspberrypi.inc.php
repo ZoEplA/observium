@@ -9,7 +9,7 @@
  * @subpackage poller
  * @subpackage raspberrypi
  * @author     Dennis de Houx <info@all-in-one.be>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  * @version    1.0.1
  *
  */
@@ -44,9 +44,7 @@ if ($agent_data['raspberrypi'] != ':')
         case 'temp':
           $sensorindex = ++$tempcount;
           $sensortype = 'temperature';
-        case 'hddtemp':
-          $sensorindex = ++$tempcount;
-          $sensortype = 'temperature';
+          $info = 'Raspberry Pi';
           break;
         default:
           unset($sensortype);
@@ -56,7 +54,7 @@ if ($agent_data['raspberrypi'] != ':')
       if (isset($sensortype))
       {
         $value = trim($data[1]);
-        discover_sensor($valid['sensor'], $sensortype, $device, '', $sensorindex, 'raspberrypi', $info, 1, $value, array(), 'agent');
+        discover_sensor($sensortype, $device, '', $sensorindex, 'raspberrypi', $info, 1, $value, array(), 'agent');
         $agent_sensors[$sensortype]['raspberrypi'][$sensorindex] = array('description' => $info, 'current' => $value, 'index' => $sensorindex);
       }
     }

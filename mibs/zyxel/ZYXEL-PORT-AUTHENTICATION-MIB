@@ -208,5 +208,15 @@ ZYXEL-PORT-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
 			"If you set Host-mode to Multi-Secure, specify the maximum number of users that the 
 			Switch will authenticate on this port. "
         ::= { zyxelPortAuthenticationPortEntry 11 }
-
+		
+-- zyxelPortAuthenticationEapolFloodState
+		zyPortAuthenticationEapolFloodState	OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Enable/Disable EAPoL flood for the switch. Users can use 
+						this setting to control forwarding of EAPoL packet when 802.1x function is disable."
+        ::= { zyxelPortAuthenticationSetup 3 }
+		
 END   

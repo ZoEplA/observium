@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-PIM-STD-MIB.my , this MIB module for management of 
 --              the Protocol Independent Multicast (PIM) protocols for PIM routers.
 -- Reference:  
--- Version: V2.06
+-- Version: V2.10
 -- History:
 --    created by wangyanwei 63315 2007-04-24
 --    
@@ -34,7 +34,7 @@ IMPORTS
 hwMcast      OBJECT IDENTIFIER      ::= { hwDatacomm 149 }
 
 hwPimStdMib MODULE-IDENTITY
-    LAST-UPDATED  "201611090000Z" -- 9 Nov 2016
+    LAST-UPDATED  "201807051430Z" -- 5 July 2018
     ORGANIZATION
             "Huawei Technologies Co.,Ltd."
     CONTACT-INFO
@@ -51,6 +51,22 @@ hwPimStdMib MODULE-IDENTITY
             Huawei Technologies co.,Ltd . Supplementary information may
             be available at:
             http://www.huawei.com"
+
+    REVISION     "201807051430Z" -- 5 July 2018
+    DESCRIPTION  "1.Modify hwPimBasNeighborExceed trap.
+                                2.ModifyhwPimBasNeighborExceedClear trap."
+
+    REVISION     "201807050000Z" -- 5 July 2018
+    DESCRIPTION  "1.Add hwPimBasNeighborExceed trap.
+                                2.Add hwPimBasNeighborExceedClear trap.
+	             3.Add hwPimNotificationSlot."
+
+    REVISION     "201805170000Z" -- 17 May 2018
+    DESCRIPTION  "Add hwPimBasNeighborLoss trap."
+
+    REVISION     "201802050000Z" -- 5 Feb 2018
+    DESCRIPTION  "1.Add hwPimSrcNumLimit trap.
+                                2.Add hwPimSrcNumLimitClear trap."
 
     REVISION     "201611090000Z" -- 9 Nov 2016
     DESCRIPTION  "Modify the description of hwPimNotificationLimitType."
@@ -990,7 +1006,15 @@ hwPimNotificationThresholdClearReasonType  OBJECT-TYPE
              2:configuration is changed;
              100:Alarm Clear"  
     ::= { hwPim 79 }
-          
+
+hwPimNotificationSlot OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..64))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The name of the slot."
+    ::= { hwPim 80 }
+
 hwPimInterfaceTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HwPimInterfaceEntry
     MAX-ACCESS not-accessible
@@ -3538,8 +3562,63 @@ hwPimGlobalTypeSGExceedClear NOTIFICATION-TYPE
     DESCRIPTION
             "A hwPimGlobalTypeSGExceedClear notification signifies that the number of PIM specified type entries count of all instances fell below the limit."
       ::= { hwPimNotifications 24 }  
-     
-  
+
+hwPimSrcNumLimit NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSrcNumLimit notification signifies that the number of multicast sources for a multicast group exceeded the upper limit."
+      ::= { hwPimNotifications 25 }
+
+hwPimSrcNumLimitClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+              hwPimNotificationGrpAddr,
+              hwPimInstanceID,
+              hwPimInstanceName 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimSrcNumLimitClear notification signifies that the number of multicast sources for a multicast group fell below 90% of the specification."
+      ::= { hwPimNotifications 26 }     
+ 
+hwPimBasNeighborLoss NOTIFICATION-TYPE
+    OBJECTS { hwPimNeighborUpTime, 
+              hwPimNeighborIfName,
+              hwPimInstanceID,
+              hwPimInstanceName,
+              hwPimNeighborNotificationReason
+            }
+    STATUS     current
+    DESCRIPTION
+            "A hwPimBasNeighborLoss notification signifies the loss of an
+            adjacency with a neighbor.  This notification should be
+            generated when the bas neighbor is lost."
+    ::= { hwPimNotifications 27 }    
+
+hwPimBasNeighborExceed NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+	          hwPimNotificationSlot,
+              hwPimNotificationTypeTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimBasNeighborExceed notification signifies that PIM neighbors reached the upper limit."
+      ::= { hwPimNotifications 28 }
+	  
+hwPimBasNeighborExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwPimNotificationAddressType,
+			  hwPimNotificationSlot,
+              hwPimNotificationTypeTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwPimBasNeighborExceedClear notification signifies that PIM neighbors below the upper limit."
+      ::= { hwPimNotifications 29 }
+
 hwPimMibConformance OBJECT IDENTIFIER ::= { hwPimStdMib 2 }
 hwPimMibCompliances OBJECT IDENTIFIER ::= { hwPimMibConformance 1 }
 hwPimMibGroups      OBJECT IDENTIFIER ::= { hwPimMibConformance 2 }
@@ -3739,7 +3818,9 @@ hwPimTopologyGroup OBJECT-GROUP
     ::= { hwPimMibGroups 1 }
 
 hwPimNotificationGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { hwPimNeighborLoss }
+    NOTIFICATIONS { hwPimNeighborLoss ,
+                                   hwPimBasNeighborLoss
+                                 }
     STATUS  current
     DESCRIPTION
             "A collection of notifications for signaling important PIM
@@ -3952,7 +4033,11 @@ hwPimNetMgmtNotificationGroup NOTIFICATION-GROUP
                     hwPimGlobalTypeSGThresholdExceed,
                     hwPimGlobalTypeSGThresholdExceedClear,
                     hwPimGlobalTypeSGExceed,
-                    hwPimGlobalTypeSGExceedClear                    
+                    hwPimGlobalTypeSGExceedClear,
+                    hwPimSrcNumLimit,
+                    hwPimSrcNumLimitClear,
+                    hwPimBasNeighborExceed,
+                    hwPimBasNeighborExceedClear
                   }
     STATUS  current
     DESCRIPTION

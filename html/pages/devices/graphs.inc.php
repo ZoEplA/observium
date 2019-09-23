@@ -7,10 +7,12 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
+
+echo '<div class="row">';
 
 foreach ($devices as $device)
 {
@@ -43,13 +45,13 @@ foreach ($devices as $device)
       } else {
         if ($_SESSION['big_graphs'])
         {
-          $width_div = 611;
-          $width = 528;
+          $width_div = 614;
+          $width = 533;
           $height = 159;
           $height_div = 218;
         } else {
-          $width_div = 300;
-          $width = 225;
+          $width_div = 302;
+          $width = 227;
           $height = 100;
           $height_div = 158;
         }
@@ -77,7 +79,7 @@ foreach ($devices as $device)
       echo generate_box_open(array('title' => $device['hostname'],
                                    'url' => generate_device_url($device),
                                    'header-border' => TRUE,
-                                   'box-style' => 'float: left; margin-right: 10px; margin-bottom: 10px;  width:'.$width_div.'px; min-width: '.$width_div.'px; max-width:'.$width_div.'px; min-height:'.$height_div.'px; max-height:'.$height_div.';'));
+                                   'box-style' => 'float: left; margin-left: 10px; margin-bottom: 10px;  width:'.$width_div.'px; min-width: '.$width_div.'px; max-width:'.$width_div.'px; min-height:'.$height_div.'px; max-height:'.$height_div.';'));
 
       echo(overlib_link($link, $graph, $overlib_content));
 
@@ -85,5 +87,8 @@ foreach ($devices as $device)
     }
   }
 }
+
+echo '</div>';
+
 
 // EOF

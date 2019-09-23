@@ -7,465 +7,101 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-// Parse output of ipmitool sensor
-function parse_ipmitool_sensor($device, $results, $source = 'ipmi')
+
+/**
+ * Poll and cache entity _NUMERIC_ Oids,
+ * need for cross cache between different entities, ie status and sensors
+ *
+ * @param $device
+ * @param $entity_type
+ * @param $oid_cache
+ *
+ * @return bool
+ */
+function poll_cache_oids($device, $entity_type, &$oid_cache)
 {
-  global $valid, $config;
+  global $config;
 
-  $index = 0;
+  $use_walk = FALSE; // Use multi get by default
+  $mib_walk_option = $entity_type . '_walk'; // ie: $config['mibs'][$mib]['sensors_walk']
+  $snmp_flags = OBS_SNMP_ALL_NUMERIC; // Numeric Oids by default
 
-  foreach (explode("\n",$results) as $row)
+  $translate = entity_type_translate_array($entity_type);
+  $table          = $translate['table'];
+  $mib_field      = $translate['mib_field'];
+  $object_field   = $translate['object_field'];
+  $oid_field      = $translate['oid_field'];
+  $deleted_field  = $translate['deleted_field'];
+  $device_field   = $translate['device_id_field'];
+
+  switch ($entity_type)
   {
-    $index++;
+    case 'sensor':
+    case 'status':
+    case 'counter':
+      // Device not support walk
+      $use_walk = isset($config['os'][$device['os']]['sensors_poller_walk']) &&
+                        $config['os'][$device['os']]['sensors_poller_walk'];
 
-    # BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
-    list($desc,$current,$unit,$state,$low_nonrecoverable,$limit_low,$limit_low_warn,$limit_high_warn,$limit_high,$high_nonrecoverable) = explode('|',$row);
+      // For sensors and statuses always use same option
+      $mib_walk_option = 'sensors_walk';
 
-    if (trim($current) != "na" && trim($state) != "nr" && $config['ipmi_unit'][trim($unit)])
-    {
-      $limits = array('limit_high'      => trim($limit_high),
-                      'limit_low'       => trim($limit_low),
-                      'limit_high_warn' => trim($limit_high_warn),
-                      'limit_low_warn'  => trim($limit_low_warn));
-      discover_sensor($valid['sensor'], $config['ipmi_unit'][trim($unit)], $device, '', $index, $source, trim($desc), 1, trim($current), $limits, $source);
+      // Walk query
+      $walk_query = "SELECT DISTINCT `$mib_field`, `$object_field` FROM `$table` WHERE `$device_field` = ? AND `$deleted_field` = ? AND `poller_type` = ?";
+      $walk_query .= " AND `$mib_field` != ? AND `$object_field` != ?";
+      $walk_params = [$device['device_id'], '0', 'snmp', '', ''];
 
-      $ipmi_sensors[$config['ipmi_unit'][trim($unit)]][$source][$index] = array('description' => $desc, 'current' => $current, 'index' => $index, 'unit' => $unit);
-    }
+      // Multi-get query
+      $get_query = "SELECT `$oid_field` FROM `$table` WHERE `$device_field` = ? AND `$deleted_field` = ? AND `poller_type` = ? ORDER BY `$oid_field`";
+      $get_params = [$device['device_id'], '0', 'snmp'];
+
+      break;
+
+    default:
+      print_debug("Unknown Entity $entity_type");
+      return FALSE;
   }
 
-  return $ipmi_sensors;
-}
-
-// Poll a sensor
-function poll_sensor($device, $class, $unit, &$oid_cache)
-{
-  global $config, $agent_sensors, $ipmi_sensors, $graphs, $table_rows;
-
-  $sql  = "SELECT * FROM `sensors`";
-  //$sql .= " LEFT JOIN `sensors-state` USING(`sensor_id`)";
-  $sql .= " WHERE `sensor_class` = ? AND `device_id` = ? AND `sensor_deleted` = ?";
-  $sql .= ' ORDER BY `sensor_oid`'; // This fix polling some OIDs (when not ordered)
-
-  //print_vars($GLOBALS['cache']['entity_attribs']);
-  foreach (dbFetchRows($sql, array($class, $device['device_id'], '0')) as $sensor_db)
+  if ($use_walk)
   {
-    $sensor_poll = array();
-
-    //print_cli_heading("Sensor: ".$sensor_db['sensor_descr'], 3);
-
-    // Sensor attribs, by first must be cached
-    if (isset($GLOBALS['cache']['entity_attribs']['sensor'][$sensor_db['sensor_id']]))
+    // Walk by mib & object
+    $oid_to_cache = dbFetchRows($walk_query, $walk_params);
+    print_debug_vars($oid_to_cache);
+    foreach ($oid_to_cache as $entry)
     {
-      $attribs = $GLOBALS['cache']['entity_attribs']['sensor'][$sensor_db['sensor_id']];
-      //print_vars($attribs);
-    } else {
-      $attribs = array();
-    }
+      $mib    = $entry[$mib_field];
+      $object = $entry[$object_field];
 
-    if (OBS_DEBUG)
-    {
-      echo("Checking (" . $sensor_db['poller_type'] . ") $class " . $sensor_db['sensor_descr'] . " ");
-      print_debug_vars($sensor_db, 1);
-    }
-
-    if ($sensor_db['poller_type'] == "snmp")
-    {
-      $sensor_db['sensor_oid'] = '.' . ltrim($sensor_db['sensor_oid'], '.'); // Fix first dot in oid for caching
-
-      // Why all temperature?
-      if ($class == "temperature")
+      // MIB not support walk (by definition)
+      if (isset($config['mibs'][$mib][$mib_walk_option]) &&
+               !$config['mibs'][$mib][$mib_walk_option])
       {
-        for ($i = 0; $i < 5; $i++) // Try 5 times to get a valid temp reading
-        {
-          // Take value from $oid_cache if we have it, else snmp_get it
-          if (isset($oid_cache[$sensor_db['sensor_oid']]))
-          {
-            $oid_cache[$sensor_db['sensor_oid']] = snmp_fix_numeric($oid_cache[$sensor_db['sensor_oid']]);
-          }
-          if (is_numeric($oid_cache[$sensor_db['sensor_oid']]))
-          {
-            print_debug("value taken from oid_cache");
-            $sensor_poll['sensor_value'] = $oid_cache[$sensor_db['sensor_oid']];
-          } else {
-            $sensor_poll['sensor_value'] = snmp_get_oid($device, $sensor_db['sensor_oid'], 'SNMPv2-MIB');
-            $sensor_poll['sensor_value'] = snmp_fix_numeric($sensor_poll['sensor_value']);
-          }
-
-          if (is_numeric($sensor_poll['sensor_value']) && $sensor_poll['sensor_value'] != 9999)
-          {
-            break;
-          } // Papouch TME sometimes sends 999.9 when it is right in the middle of an update;
-          sleep(1); // Give the TME some time to reset
-        }
-        // If we received 999.9 degrees still, reset to Unknown.
-        if ($sensor_poll['sensor_value'] == 9999)
-        {
-          $sensor_poll['sensor_value'] = "U";
-        }
-      }
-      else if ($class == "runtime")
-      {
-        if (isset($oid_cache[$sensor_db['sensor_oid']]))
-        {
-          print_debug("value taken from oid_cache");
-          $sensor_poll['sensor_value'] = $oid_cache[$sensor_db['sensor_oid']];
-        } else {
-          $sensor_poll['sensor_value'] = snmp_get_oid($device, $sensor_db['sensor_oid'], 'SNMPv2-MIB');
-        }
-        if (strpos($sensor_poll['sensor_value'], ':') !== FALSE)
-        {
-          // Use timetick conversion only when snmpdata is formatted as timetick 0:0:21:00.00
-          $sensor_poll['sensor_value'] = timeticks_to_sec($sensor_poll['sensor_value']);
-        }
-      } else {
-        // Take value from $oid_cache if we have it, else snmp_get it
-        if (isset($oid_cache[$sensor_db['sensor_oid']]))
-        {
-          $oid_cache[$sensor_db['sensor_oid']] = snmp_fix_numeric($oid_cache[$sensor_db['sensor_oid']]);
-        }
-        if (is_numeric($oid_cache[$sensor_db['sensor_oid']]))
-        {
-          print_debug("value taken from oid_cache");
-          $sensor_poll['sensor_value'] = $oid_cache[$sensor_db['sensor_oid']];
-        } else {
-          $sensor_poll['sensor_value'] = snmp_get_oid($device, $sensor_db['sensor_oid'], 'SNMPv2-MIB');
-          $sensor_poll['sensor_value'] = snmp_fix_numeric($sensor_poll['sensor_value']);
-        }
-      }
-    }
-    else if ($sensor_db['poller_type'] == "agent")
-    {
-      if (isset($agent_sensors))
-      {
-        $sensor_poll['sensor_value'] = $agent_sensors[$class][$sensor_db['sensor_type']][$sensor_db['sensor_index']]['current']; // FIXME pass unit?
-      } else {
-        print_warning("No agent sensor data available.");
         continue;
       }
-    }
-    else if ($sensor_db['poller_type'] == "ipmi")
-    {
-      if (isset($ipmi_sensors))
+      else if (isset($GLOBALS['cache']['snmp_object_polled'][$mib][$object]))
       {
-        $sensor_poll['sensor_value'] = snmp_fix_numeric($ipmi_sensors[$class][$sensor_db['sensor_type']][$sensor_db['sensor_index']]['current']);
-        $unit = $ipmi_sensors[$class][$sensor_db['sensor_type']][$sensor_db['sensor_index']]['unit'];
-      } else {
-        print_warning("No IPMI sensor data available.");
+        print_debug("MIB/Object ($mib::$object)already polled.");
         continue;
       }
-    } else {
-      print_warning("Unknown sensor poller type.");
-      continue;
+
+      $oid_cache = snmp_walk_multipart_oid($device, $object, $oid_cache, $mib, NULL, $snmp_flags);
+      $GLOBALS['cache']['snmp_object_polled'][$mib][$object] = 1;
     }
-
-    $sensor_polled_time = time(); // Store polled time for current sensor
-
-    print_debug_vars($sensor_poll, 1);
-
-    if ($sensor_poll['sensor_value'] == -32768)
-    {
-      print_debug("Invalid (-32768) ");
-      $sensor_poll['sensor_value'] = 0;
-    }
-
-    // Addition & Scale
-    if (isset($attribs['sensor_addition']) && is_numeric($attribs['sensor_addition']))
-    {
-      $sensor_poll['sensor_value'] += $attribs['sensor_addition'];
-    }
-
-    //For Bluecoat multiplier may change very often - poll current data
-    if ($sensor_db['sensor_type']=='bluecoat-sg-proxy-mib'){
-      //poll only once - using snmpwalk
-      if (!isset($deviceSensorScale)){
-        $deviceSensorScale = snmpwalk_cache_multi_oid($device, 'deviceSensorScale', array(), 'BLUECOAT-SG-SENSOR-MIB');
-      }
-      if (isset($deviceSensorScale[$sensor_db['sensor_index']]['deviceSensorScale'])){
-        $sensor_db['sensor_multiplier']=si_to_scale($deviceSensorScale[$sensor_db['sensor_index']]['deviceSensorScale']);
-      }
-    }
-
-    if (isset($sensor_db['sensor_multiplier']) && $sensor_db['sensor_multiplier'] != 0)
-    {
-      //$sensor_poll['sensor_value'] *= $sensor_db['sensor_multiplier'];
-      $sensor_poll['sensor_value'] = scale_value($sensor_poll['sensor_value'], $sensor_db['sensor_multiplier']);
-    }
-
-    // Unit conversion to SI (if required)
-    $sensor_poll['sensor_value'] = value_to_si($sensor_poll['sensor_value'], $sensor_db['sensor_unit'], $class);
-
-    //print_cli_data("Value", $sensor_poll['sensor_value'] . "$unit ", 3);
-
-    // FIXME this block and the other block below it are kinda retarded. They should be merged and simplified.
-
-    if ($sensor_poll['sensor_ignore'] || $sensor_poll['sensor_disable'])
-    {
-      $sensor_poll['sensor_event'] = 'ignore';
-    } else {
-      if (($sensor_db['sensor_limit_low'] != '' && $sensor_poll['sensor_value'] < $sensor_db['sensor_limit_low']) ||
-          ($sensor_db['sensor_limit']     != '' && $sensor_poll['sensor_value'] > $sensor_db['sensor_limit']))
-      {
-        $sensor_poll['sensor_event'] = 'alert';
-        $sensor_poll['sensor_status'] = 'Sensor critical thresholds exceeded.'; // FIXME - be more specific
-      }
-      else if (($sensor_db['sensor_limit_low_warn'] != '' && $sensor_poll['sensor_value'] < $sensor_db['sensor_limit_low_warn']) ||
-               ($sensor_db['sensor_limit_warn']     != '' && $sensor_poll['sensor_value'] > $sensor_db['sensor_limit_warn']))
-      {
-        $sensor_poll['sensor_event'] = 'warning';
-        $sensor_poll['sensor_status'] = 'Sensor warning thresholds exceeded.'; // FIXME - be more specific
-      } else {
-        $sensor_poll['sensor_event'] = 'ok';
-        $sensor_poll['sensor_status'] = '';
-        //if ($sensor_db['sensor_event'] != 'up' && $sensor_db['sensor_event'] != '')
-        //{
-        //  $sensor_poll['sensor_status'] = 'Sensor thresholds cleared.'; // FIXME - be more specific
-        //}
-      }
-    }
-
-    // If last change never set, use current time
-    if (empty($sensor_db['sensor_last_change']))
-    {
-      $sensor_db['sensor_last_change'] = $sensor_polled_time;
-    }
-
-    if ($sensor_poll['sensor_event'] != $sensor_db['sensor_event'])
-    {
-      // Sensor event changed, log and set sensor_last_change
-      $sensor_poll['sensor_last_change'] = $sensor_polled_time;
-
-      if ($sensor_db['sensor_event'] == 'ignore')
-      {
-        print_message("[%ySensor Ignored%n]", 'color');
-      }
-      else if ($sensor_db['sensor_limit_low'] != "" && $sensor_db['sensor_value'] >= $sensor_db['sensor_limit_low'] && $sensor_poll['sensor_value'] < $sensor_db['sensor_limit_low'])
-      {
-        // If old value greater than low limit and new value less than low limit
-        $msg = ucfirst($class) . " Alarm: " . $device['hostname'] . " " . $sensor_db['sensor_descr'] . " is under threshold: " . $sensor_poll['sensor_value'] . "$unit (< " . $sensor_db['sensor_limit_low'] . "$unit)";
-        log_event(ucfirst($class) . ' ' . $sensor_db['sensor_descr'] . " under threshold: " . $sensor_poll['sensor_value'] . " $unit (< " . $sensor_db['sensor_limit_low'] . " $unit)", $device, 'sensor', $sensor_db['sensor_id'], 'warning');
-      }
-      else if ($sensor_db['sensor_limit'] != "" && $sensor_db['sensor_value'] <= $sensor_db['sensor_limit'] && $sensor_poll['sensor_value'] > $sensor_db['sensor_limit'])
-      {
-        // If old value less than high limit and new value greater than high limit
-        $msg = ucfirst($class) . " Alarm: " . $device['hostname'] . " " . $sensor_db['sensor_descr'] . " is over threshold: " . $sensor_poll['sensor_value'] . "$unit (> " . $sensor_db['sensor_limit'] . "$unit)";
-        log_event(ucfirst($class) . ' ' . $sensor_db['sensor_descr'] . " above threshold: " . $sensor_poll['sensor_value'] . " $unit (> " . $sensor_db['sensor_limit'] . " $unit)", $device, 'sensor', $sensor_db['sensor_id'], 'warning');
-      }
-    } else {
-      // If sensor not changed, leave old last_change
-      $sensor_poll['sensor_last_change'] = $sensor_db['sensor_last_change'];
-    }
-
-    // Send statistics array via AMQP/JSON if AMQP is enabled globally and for the ports module
-    if ($config['amqp']['enable'] == TRUE && $config['amqp']['modules']['sensors'])
-    {
-      $json_data = array('value' => $sensor_poll['sensor_value']);
-      messagebus_send(array('attribs' => array('t'      => time(), 'device' => $device['hostname'], 'device_id' => $device['device_id'],
-                                               'e_type' => 'sensor', 'e_class' => $sensor_db['sensor_class'], 'e_type' => $sensor_db['sensor_type'], 'e_index' => $sensor_db['sensor_index']), 'data' => $json_data));
-    }
-
-    // Add table row
-
-    $table_rows[] = array($sensor_db['sensor_descr'], $sensor_db['sensor_class'], $sensor_db['sensor_type'], $sensor_db['poller_type'],
-                          $sensor_poll['sensor_value'] . $unit, $sensor_poll['sensor_event'], format_unixtime($sensor_poll['sensor_last_change']));
-
-    // Update StatsD/Carbon
-    if ($config['statsd']['enable'] == TRUE)
-    {
-      StatsD::gauge(str_replace(".", "_", $device['hostname']) . '.' . 'sensor' . '.' . $sensor_db['sensor_class'] . '.' . $sensor_db['sensor_type'] . '.' . $sensor_db['sensor_index'], $sensor_poll['sensor_value']);
-    }
-
-    // Update RRD - FIXME - can't convert to NG because filename is dynamic! new function should return index instead of filename.
-    $rrd_file = get_sensor_rrd($device, $sensor_db);
-    rrdtool_create($device, $rrd_file, "DS:sensor:GAUGE:600:-20000:U");
-    rrdtool_update($device, $rrd_file, "N:" . $sensor_poll['sensor_value']);
-
-    // Enable graph
-    $graphs[$sensor_db['sensor_class']] = TRUE;
-
-    // Check alerts
-    $metrics = array();
-
-    $metrics['sensor_value']  = $sensor_poll['sensor_value'];
-    $metrics['sensor_event']  = $sensor_poll['sensor_event'];
-    $metrics['sensor_event_uptime'] = $sensor_polled_time - $sensor_poll['sensor_last_change'];
-    $metrics['sensor_status'] = $sensor_poll['sensor_status'];
-
-    check_entity('sensor', $sensor_db, $metrics);
-
-    // Update SQL State
-    dbUpdate(array('sensor_value'  => $sensor_poll['sensor_value'],
-                   'sensor_event'  => $sensor_poll['sensor_event'],
-                   'sensor_status' => $sensor_poll['sensor_status'],
-                   'sensor_last_change' => $sensor_poll['sensor_last_change'],
-                   'sensor_polled' => $sensor_polled_time),
-             'sensors', '`sensor_id` = ?', array($sensor_db['sensor_id']));
+  } else {
+    // Multi get for all others
+    $oid_to_cache = dbFetchColumn($get_query, $get_params);
+    usort($oid_to_cache, 'compare_numeric_oids'); // correctly sort numeric oids
+    print_debug_vars($oid_to_cache);
+    $oid_cache = snmp_get_multi_oid($device, $oid_to_cache, $oid_cache, NULL, NULL, $snmp_flags);
   }
-}
 
-function poll_status($device, &$oid_cache)
-{
-  global $config, $agent_sensors, $ipmi_sensors, $graphs, $table_rows;
+  print_debug_vars($oid_cache);
 
-  $sql  = "SELECT * FROM `status`";
-  //$sql .= " LEFT JOIN `status-state` USING(`status_id`)";
-  $sql .= " WHERE `device_id` = ? AND `status_deleted` = ?";
-  $sql .= ' ORDER BY `status_oid`'; // This fix polling some OIDs (when not ordered)
-
-  foreach (dbFetchRows($sql, array($device['device_id'], '0')) as $status_db)
-  {
-    //print_cli_heading("Status: ".$status_db['status_descr']. "(".$status_db['poller_type'].")", 3);
-
-    print_debug("Checking (" . $status_db['poller_type'] . ") " . $status_db['status_descr'] . " ");
-
-    // $status_poll = $status_db;    // Cache non-humanized status array for use as new status state
-
-    if ($status_db['poller_type'] == "snmp")
-    {
-      $status_db['status_oid'] = '.' . ltrim($status_db['status_oid'], '.'); // Fix first dot in oid for caching
-
-      // Check if a specific poller file exists for this status, else collect via SNMP.
-      $file = $config['install_dir']."/includes/polling/status/".$status_db['status_type'].".inc.php";
-
-      if (is_file($file))
-      {
-        include($file);
-      } else {
-        // Take value from $oid_cache if we have it, else snmp_get it
-        if (isset($oid_cache[$status_db['status_oid']]))
-        {
-          print_debug("value taken from oid_cache");
-          $status_value = $oid_cache[$status_db['status_oid']];
-        } else {
-          $status_value = snmp_get_oid($device, $status_db['status_oid'], 'SNMPv2-MIB');
-        }
-        //$status_value = snmp_fix_numeric($status_value); // Do not use fix, this broke not-enum (string) statuses
-      }
-    }
-    else if ($status_db['poller_type'] == "agent")
-    {
-      if (isset($agent_sensors['state']))
-      {
-        $status_value = $agent_sensors['state'][$status_db['status_type']][$status_db['status_index']]['current'];
-      } else {
-        print_warning("No agent status data available.");
-        continue;
-      }
-    }
-    else if ($status_db['poller_type'] == "ipmi")
-    {
-      if (isset($ipmi_sensors['state']))
-      {
-        $status_value = $ipmi_sensors['state'][$status_db['status_type']][$status_db['status_index']]['current'];
-      } else {
-        print_warning("No IPMI status data available.");
-        continue;
-      }
-    } else {
-      print_warning("Unknown status poller type.");
-      continue;
-    }
-
-    $status_polled_time = time(); // Store polled time for current status
-
-    // Write new value and humanize (for alert checks)
-    $state_array = get_state_array($status_db['status_type'], $status_value, $status_db['status_map'], $status_db['poller_type']);
-    $status_value                = $state_array['value']; // Override status_value by numeric for "pseudo" (string) statuses
-    $status_poll['status_value'] = $state_array['value'];
-    $status_poll['status_name']  = $state_array['name'];
-    if ($status_db['status_ignore'] || $status_db['status_disable'])
-    {
-      $status_poll['status_event'] = 'ignore';
-    } else {
-      $status_poll['status_event'] = $state_array['event'];
-    }
-
-    // If last change never set, use current time
-    if (empty($status_db['status_last_change']))
-    {
-      $status_db['status_last_change'] = $status_polled_time;
-    }
-
-    if ($status_poll['status_event'] != $status_db['status_event'])
-    {
-      // Status event changed, log and set status_last_change
-      $status_poll['status_last_change'] = $status_polled_time;
-
-      if ($status_poll['status_event'] == 'ignore')
-      {
-        print_message("[%ystatus Ignored%n]", 'color');
-      }
-      else if ($status_db['status_event'] != '')
-      {
-        // If old state not empty and new state not equals to new state
-        $msg = 'Status ' . ucfirst($status_poll['status_event']) . ': ' . $device['hostname'] . ' ' . $status_db['status_descr'] .
-               ' entered ' . strtoupper($status_poll['status_event']) . ' state: ' . $status_poll['status_name'] .
-               ' (previous: ' . $status_db['status_name'] . ')';
-
-        if (isset($config['entity_events'][$status_poll['status_event']]))
-        {
-          $severity = $config['entity_events'][$status_poll['status_event']]['severity'];
-        } else {
-          $severity = 'informational';
-        }
-        log_event($msg, $device, 'status', $status_db['status_id'], $severity);
-
-      }
-    } else {
-      // If status not changed, leave old last_change
-      $status_poll['status_last_change'] = $status_db['status_last_change'];
-    }
-
-    print_debug_vars($status_poll);
-
-    // Send statistics array via AMQP/JSON if AMQP is enabled globally and for the ports module
-    if ($config['amqp']['enable'] == TRUE && $config['amqp']['modules']['status'])
-    {
-      $json_data = array('value' => $status_value);
-      messagebus_send(array('attribs' => array('t' => time(), 'device' => $device['hostname'], 'device_id' => $device['device_id'],
-                                               'e_type' => 'status', 'e_type' => $status_db['status_type'], 'e_index' => $status_db['status_index']), 'data' => $json_data));
-    }
-
-    // Update StatsD/Carbon
-    if ($config['statsd']['enable'] == TRUE)
-    {
-      StatsD::gauge(str_replace(".", "_", $device['hostname']).'.'.'status'.'.'.$status_db['status_class'].'.'.$status_db['status_type'].'.'.$status_db['status_index'], $status_value);
-    }
-
-    // Update RRD - FIXME - can't convert to NG because filename is dynamic! new function should return index instead of filename.
-    $rrd_file = get_status_rrd($device, $status_db);
-    rrdtool_create($device, $rrd_file, "DS:status:GAUGE:600:-20000:U");
-    rrdtool_update($device, $rrd_file,"N:$status_value");
-
-    // Enable graph
-    $graphs[$sensor_db['status']] = TRUE;
-
-    // Check alerts
-    $metrics = array();
-
-    $metrics['status_value'] = $status_value;
-    $metrics['status_name']  = $status_poll['status_name'];
-    $metrics['status_name_uptime'] = $status_polled_time - $status_poll['status_last_change'];
-    $metrics['status_event'] = $status_poll['status_event'];
-
-    //print_cli_data("Event (State)", $status_poll['status_event'] ." (".$status_poll['status_name'].")", 3);
-
-    $table_rows[] = array($status_db['status_descr'], $status_db['status_type'], $status_db['status_index'] ,$status_db['poller_type'],
-                          $status_poll['status_name'], $status_poll['status_event'], format_unixtime($status_poll['status_last_change']));
-
-    check_entity('status', $status_db, $metrics);
-
-    // Update SQL State
-    dbUpdate(array('status_value'  => $status_value,
-                   'status_name'   => $status_poll['status_name'],
-                   'status_event'  => $status_poll['status_event'],
-                   'status_last_change' => $status_poll['status_last_change'],
-                   'status_polled' => $status_polled_time),
-                   'status', '`status_id` = ?', array($status_db['status_id']));
-  }
+  return TRUE;
 }
 
 function poll_device($device, $options)
@@ -538,7 +174,7 @@ function poll_device($device, $options)
 
       print_cli_data("Device status", "Device is reachable by " . $ping_msg . "SNMP (".$device['snmpable']."ms)", 1);
       $status = "1";
-      $status_type = '';
+      $status_type = 'ok';
     } else {
       print_cli_data("Device status", "Device is not responding to SNMP requests", 1);
       $status = "0";
@@ -547,8 +183,15 @@ function poll_device($device, $options)
   } else {
     print_cli_data("Device status", "Device is not responding to PINGs", 1);
     $status = "0";
-    $status_type = 'ping';
+    print_vars(get_status_var('ping_dns'));
+    if (isset_status_var('ping_dns') && get_status_var('ping_dns') != 'ok')
+    {
+      $status_type = 'dns';
+    } else {
+      $status_type = 'ping';
+    }
   }
+
 
   if ($device['status'] != $status)
   {
@@ -566,8 +209,18 @@ function poll_device($device, $options)
       $event_msg .= 'Down';
       $event_severity = 3;
     }
-    if ($status_type != '') { $event_msg .= ' (' . $status_type . ')'; }
+    if ($status_type != 'ok') { $event_msg .= ' (' . $status_type . ')'; }
     log_event($event_msg, $device, 'device', $device['device_id'], $event_severity);
+  }
+  // Device status type
+  if (isset($device['status_type']) && $device['status_type'] != $status_type)
+  {
+    dbUpdate(array('status_type' => $status_type), 'devices', 'device_id = ?', array($device['device_id']));
+    if ($status == '0' && $device['status_type'] != 'ok')
+    {
+      // Write eventlog entry (only if status Down)
+      log_event('Device status changed to Down ('.$device['status_type'].' -> '.$status_type.')', $device, 'device', $device['device_id'], 3);
+    }
   }
 
   rrdtool_update_ng($device, 'status', array('status' => $status));
@@ -617,6 +270,11 @@ function poll_device($device, $options)
 
     // Run these base modules always and before all other modules!
     $poll_modules = array('system', 'os');
+
+    if(isset($options['m']) && $options['m'] == 'none')
+    {
+      unset($poll_modules);
+    }
 
     $mods_disabled_global = array();
     $mods_disabled_device = array();
@@ -713,6 +371,13 @@ function poll_device($device, $options)
     {
       // Hardcoded poller performance
       $graphs['poller_perf'] = TRUE;
+      $graphs['pollersnmp_count']    = TRUE;
+      $graphs['pollersnmp_times']    = TRUE;
+      $graphs['pollersnmp_errors_count'] = TRUE;
+      $graphs['pollersnmp_errors_times'] = TRUE;
+      $graphs['pollerdb_count']    = TRUE;
+      $graphs['pollerdb_times']    = TRUE;
+      $graphs['pollermemory_perf'] = TRUE;
 
       // Delete not exists graphs from DB (only if poller run without modules option)
       foreach ($graphs_db as $graph => $entry)
@@ -793,10 +458,14 @@ function poll_device($device, $options)
 
       $device_state['poller_history'] = $poller_history;
 
-      // Keep discovery history too
+      // Keep discovery history and perf too
       if (isset($old_device_state['discovery_history']))
       {
         $device_state['discovery_history'] = $old_device_state['discovery_history'];
+      }
+      if (isset($old_device_state['discovery_mod_perf']))
+      {
+        $device_state['discovery_mod_perf'] = $old_device_state['discovery_mod_perf'];
       }
       unset($poller_history, $old_device_state);
 
@@ -830,6 +499,17 @@ function poll_device($device, $options)
 
     unset($cache_storage); // Clear cache of hrStorage ** MAYBE FIXME? ** (ok, later)
     unset($cache); // Clear cache (unify all things here?)
+
+  } else if (!$options['m']) {
+    // State is 0, also collect poller time for down devices, since it not zero!
+
+    $device_end  = utime();
+    $device_run  = $device_end - $device_start;
+    $device_time = round($device_run, 4);
+
+    print_cli_data("Poller time", $device_time." seconds", 1);
+    // Also store history in graph
+    rrdtool_update_ng($device, 'perf-poller', array('val' => $device_time));
   }
 
   check_entity('device', $device, $alert_metrics);
@@ -927,6 +607,7 @@ function collect_table($device, $oids_def, &$graphs)
   $call_function = strtolower($oids_def['call_function']);
   switch ($call_function)
   {
+    case 'snmp_get':
     case 'snmp_get_multi':
       $use_walk = FALSE;
       break;
@@ -948,7 +629,7 @@ function collect_table($device, $oids_def, &$graphs)
   {
     $rrd_file = $oids_def['file'];
   }
-  else if ($mib && isset($oids_def['table']))
+  elseif ($mib && isset($oids_def['table']))
   {
     // Try to use MIB & tableName as rrd_file
     $rrd_file = strtolower(safename($mib.'_'.$oids_def['table'])).'.rrd';
@@ -960,19 +641,22 @@ function collect_table($device, $oids_def, &$graphs)
   // Get MIBS/Tables/OIDs permissions
   if ($use_walk)
   {
-    // if use table walk, than check only this table permission (not oids)
-    if (dbFetchCell("SELECT COUNT(*) FROM `devices_mibs` WHERE `device_id` = ? AND `mib` = ? AND `table_name` = ?
-                    AND (`oid` = '' OR `oid` IS NULL) AND `disabled` = '1'", array($device['device_id'], $mib, $oids_def['table'])))
+    // if use table walk, than check only this table disabled (not oids)
+    $disabled_tables = get_device_objects_disabled($device, $mib);
+    if (in_array($oids_def['table'], $disabled_tables))
     {
       print_debug("  WARNING, table '".$oids_def['table']."' for '$mib' disabled and skipped.");
       return FALSE; // table disabled, exit
     }
-    $oids_ok = TRUE;
   } else {
-    // if use multi_get, than get all disabled oids
-    $oids_disabled = dbFetchColumn("SELECT `oid` FROM `devices_mibs` WHERE `device_id` = ? AND `mib` = ?
-                                   AND (`oid` != '' AND `oid` IS NOT NULL) AND `disabled` = '1'", array($device['device_id'], $mib));
-    $oids_ok = empty($oids_disabled); // if empty disabled, than set to TRUE
+    // if use multi_get, than check all oids disabled
+    $disabled_oids = get_device_objects_disabled($device, $mib);
+    $oids_ok = array_diff(array_keys($oids_def['oids']), $disabled_oids);
+    if (count($oids_ok) == 0)
+    {
+      print_debug("  WARNING, oids '".implode("', '", array_keys($oids_def['oids']))."' for '$mib' disabled and skipped.");
+      return FALSE;  // All oids disabled, exit
+    }
   }
 
   $search  = array();
@@ -997,7 +681,14 @@ function collect_table($device, $oids_def, &$graphs)
     {
       $entry['numeric'] = $oids_def['numeric'] . '.' . $entry['numeric']; // Numeric oid, for future using
     }
-    if (!isset($entry['index']) && isset($oids_def['index']))   { $entry['index'] = $oids_def['index']; } elseif (!isset($entry['index'])) { $entry['index'] = '0'; }
+    if (!isset($entry['index']) && isset($oids_def['index']))
+    {
+      $entry['index'] = $oids_def['index'];
+    }
+    elseif (!isset($entry['index']))
+    {
+      $entry['index'] = '0';
+    }
     if (!isset($entry['ds_type'])) { $entry['ds_type'] = 'COUNTER'; }
     if (!isset($entry['ds_min']))  { $entry['ds_min']  = 'U'; }
     if (!isset($entry['ds_max']))  { $entry['ds_max']  = '100000000000'; }
@@ -1017,24 +708,10 @@ function collect_table($device, $oids_def, &$graphs)
     } else {
       $oids[]       = $oid.'.'.$entry['index'];
     }
-
     $oids_index[] = array('index' => $entry['index'], 'oid' => $oid);
 
-    if (!$use_walk)
-    {
-      // Check permissions for snmp_get_multi _ONLY_
-      // if at least one oid missing in $oids_disabled than TRUE
-      $oids_ok = $oids_ok || !in_array($oid, $oids_disabled);
-    }
-
     $rrd['rrd_create'][] = ' DS:'.$ds_name.':'.$entry['ds_type'].':600:'.$entry['ds_min'].':'.$entry['ds_max'];
-    if ($GLOBALS['debug']) { $rrd['ds_list'][] = $ds_name; } // Make DS lists for compare with RRD file in debug
-  }
-
-  if (!$use_walk && !$oids_ok)
-  {
-    print_debug("  WARNING, oids '".implode("', '", array_keys($oids_def['oids']))."' for '$mib' disabled and skipped.");
-    return FALSE;  // All oids disabled, exit
+    if (OBS_DEBUG) { $rrd['ds_list'][] = $ds_name; } // Make DS lists for compare with RRD file in debug
   }
 
   switch ($call_function)
@@ -1045,12 +722,13 @@ function collect_table($device, $oids_def, &$graphs)
     case 'snmpwalk_cache_bare_oid':
       $data = snmpwalk_cache_bare_oid($device, $oids_def['table'], array(), $mib, $mib_dirs);
       break;
+    case 'snmp_get':
     case 'snmp_get_multi':
     case 'snmp_get_multi_oid':
       $data = snmp_get_multi_oid($device, $oids, array(), $mib, $mib_dirs);
       break;
   }
-  if (!$GLOBALS['snmp_status'])
+  if (!snmp_status())
   {
     // Break because latest snmp walk/get return not good exitstatus (wrong mib/timeout/error/etc)
     print_debug("  WARNING, latest snmp walk/get return not good exitstatus for '$mib', RRD update skipped.");
@@ -1139,6 +817,10 @@ function collect_table($device, $oids_def, &$graphs)
   {
     // Table NOT exist on device!
     // Disable polling table (only if table not enabled manually in DB)
+
+    // This code just disables collection forever after the first failed query!
+
+    /*
     if (!dbFetchCell("SELECT COUNT(*) FROM `devices_mibs` WHERE `device_id` = ? AND `mib` = ?
                      AND `table_name` = ? AND (`oid` = '' OR `oid` IS NULL)", array($device['device_id'], $mib, $oids_def['table'])))
     {
@@ -1146,9 +828,11 @@ function collect_table($device, $oids_def, &$graphs)
                      'table_name' => $oids_def['table'], 'disabled' => '1'), 'devices_mibs');
     }
     print_debug("  WARNING, table '".$oids_def['table']."' for '$mib' disabled.");
+    */
   } else {
     // OIDs NOT exist on device!
     // Disable polling oids (only if table not enabled manually in DB)
+    /*
     foreach (array_keys($oids_def['oids']) as $oid)
     {
       if (!dbFetchCell("SELECT COUNT(*) FROM `devices_mibs` WHERE `device_id` = ? AND `mib` = ?
@@ -1159,6 +843,7 @@ function collect_table($device, $oids_def, &$graphs)
       }
     }
     print_debug("  WARNING, oids '".implode("', '", array_keys($oids_def['oids']))."' for '$mib' disabled.");
+    */
   }
 
   // Return obtained snmp data

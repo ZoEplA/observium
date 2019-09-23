@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -132,6 +132,8 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
     if (is_numeric($ss['ssRawInterrupts'])) { $graphs['ucd_interrupts'] = TRUE; }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#
+    // FIXME. Convert this to definitions.
+    //        And this is duplicated by mempools!
 
     // Poll mem for load memory utilisation stats on UNIX-like hosts running UCD/Net-SNMPd
     #UCD-SNMP-MIB::memIndex.0 = INTEGER: 0
@@ -147,47 +149,57 @@ if (is_device_mib($device, 'UCD-SNMP-MIB'))
     #UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
     #UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
 
-    $mem_rrd_create = " \
-         DS:totalswap:GAUGE:600:0:10000000000 \
-         DS:availswap:GAUGE:600:0:10000000000 \
-         DS:totalreal:GAUGE:600:0:10000000000 \
-         DS:availreal:GAUGE:600:0:10000000000 \
-         DS:totalfree:GAUGE:600:0:10000000000 \
-         DS:shared:GAUGE:600:0:10000000000 \
-         DS:buffered:GAUGE:600:0:10000000000 \
-         DS:cached:GAUGE:600:0:10000000000 ";
+    //$mem_rrd_create = " \
+    //     DS:totalswap:GAUGE:600:0:10000000000 \
+    //     DS:availswap:GAUGE:600:0:10000000000 \
+    //     DS:totalreal:GAUGE:600:0:10000000000 \
+    //     DS:availreal:GAUGE:600:0:10000000000 \
+    //     DS:totalfree:GAUGE:600:0:10000000000 \
+    //     DS:shared:GAUGE:600:0:10000000000 \
+    //     DS:buffered:GAUGE:600:0:10000000000 \
+    //     DS:cached:GAUGE:600:0:10000000000 ";
 
-    $snmpdata = snmpwalk_cache_oid($device, "mem", array(), "UCD-SNMP-MIB");
+    $mem_oids = array('totalswap' => 'memTotalSwap.0', 'availswap' => 'memAvailSwap.0',
+                      'totalreal' => 'memTotalReal.0', 'availreal' => 'memAvailReal.0',
+                      'totalfree' => 'memTotalFree.0', 'shared'    => 'memShared.0',
+                      'buffered'  => 'memBuffer.0',    'cached'    => 'memCached.0');
+    $mem_array = array();
+    //$snmpdata = snmpwalk_cache_oid($device, "mem", array(), "UCD-SNMP-MIB");
+    $snmpdata = snmp_get_multi_oid($device, $mem_oids, array(), 'UCD-SNMP-MIB');
     if (is_array($snmpdata[0]))
     {
-      foreach (array_keys($snmpdata[0]) as $key)
+      $snmpdata = $snmpdata[0];
+      foreach ($mem_oids as $ds => $oid)
       {
-        $$key = $snmpdata[0][$key];
+        $oid = str_replace('.0', '', $oid);
         // Fix for some systems (who report negative values)
         //memShared.0 = 28292
         //memBuffer.0 = -3762592
         //memCached.0 = 203892
-        if (is_numeric($$key) && $$key < 0) { $$key = 0; }
+        $mem_array[$ds] = ($snmpdata[$oid] < 0) ? 0 : $snmpdata[$oid];
+        //$mem_array[$ds] = snmp_dewrap32bit($snmpdata[$oid]);
+        //$$key = $snmpdata[$key];
+        //if (is_numeric($$key) && $$key < 0) { $$key = 0; }
       }
+      print_debug_vars($mem_array);
     }
 
-    $snmpdata = $snmpdata[0];
-
     // Check to see that the OIDs are actually populated before we make the rrd
-    if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
+    if (is_numeric($mem_array['totalreal']) && is_numeric($mem_array['availreal']) && is_numeric($mem_array['totalfree']))
     {
-      rrdtool_create($device, $mem_rrd, $mem_rrd_create);
-      rrdtool_update($device, $mem_rrd,  array($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached));
+      //rrdtool_create($device, $mem_rrd, $mem_rrd_create);
+      //rrdtool_update($device, $mem_rrd,  array($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached));
+      rrdtool_update_ng($device, 'ucd_memory', $mem_array);
       $graphs['ucd_memory'] = TRUE;
 
-      $device_state['ucd_mem']['swap_total'] = $memTotalSwap;
-      $device_state['ucd_mem']['swap_avail'] = $memAvailSwap;
+      $device_state['ucd_mem']['swap_total'] = $mem_array['totalswap']; //$memTotalSwap;
+      $device_state['ucd_mem']['swap_avail'] = $mem_array['availswap']; //$memAvailSwap;
 
-      $device_state['ucd_mem']['mem_total'] = $memTotalReal;
-      $device_state['ucd_mem']['mem_avail'] = $memAvailReal;
-      $device_state['ucd_mem']['mem_shared'] = $memShared;
-      $device_state['ucd_mem']['mem_buffer'] = $memBuffer;
-      $device_state['ucd_mem']['mem_cached'] = $memCached;
+      $device_state['ucd_mem']['mem_total']  = $mem_array['totalreal']; //$memTotalReal;
+      $device_state['ucd_mem']['mem_avail']  = $mem_array['availreal']; //$memAvailReal;
+      $device_state['ucd_mem']['mem_shared'] = $mem_array['shared']; //$memShared;
+      $device_state['ucd_mem']['mem_buffer'] = $mem_array['buffered']; //$memBuffer;
+      $device_state['ucd_mem']['mem_cached'] = $mem_array['cached']; //$memCached;
     }
 
     /* Moved to mib definition

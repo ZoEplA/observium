@@ -68,7 +68,8 @@ RlSslCertificateGenerationEntry ::= SEQUENCE {
   rlSslCertificateGenerationValidDays               INTEGER,
   rlSslCertificateGenerationRsaKeyLength            INTEGER,
   rlSslCertificateGenerationPassphrase              DisplayString,
-  rlSslCertificateGenerationAction                  INTEGER
+  rlSslCertificateGenerationAction                  INTEGER,
+  rlSslCertificateGenerationEcKeyCurve	            INTEGER
 }
 
 rlSslCertificateGenerationIndex   OBJECT-TYPE
@@ -159,7 +160,7 @@ rlSslCertificateGenerationValidDays OBJECT-TYPE
     ::= { rlSslCertificateGenerationEntry   9 }
 
 rlSslCertificateGenerationRsaKeyLength OBJECT-TYPE
-    SYNTAX  INTEGER (512..2048)
+    SYNTAX  INTEGER (512..3072)
     MAX-ACCESS      read-write
     STATUS      current
     DESCRIPTION
@@ -180,13 +181,13 @@ rlSslCertificateGenerationPassphrase OBJECT-TYPE
         passphrase once a key was generated."
     ::= { rlSslCertificateGenerationEntry   11 }
 
-
 rlSslCertificateGenerationAction OBJECT-TYPE
     SYNTAX  INTEGER {
        generateRsaKeyAndSelfSignedCertificate(1),
        generateSelfSignedCertificate(2),
        generatePkcs12(3),
-       generateCertificateRequest(4)
+       generateCertificateRequest(4),
+       generateEcKeyAndSelfSignedCertificate(5)
      }
     MAX-ACCESS      read-write
     STATUS      current
@@ -195,8 +196,14 @@ rlSslCertificateGenerationAction OBJECT-TYPE
         generated and to be used for all new sessions."
     ::= { rlSslCertificateGenerationEntry   12 }
 
-
-
+rlSslCertificateGenerationEcKeyCurve OBJECT-TYPE
+    SYNTAX  INTEGER (1..1000)
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting the EC key curve that will be created when a new key is generated -
+         generateEcKeyAndSelfSignedCertificate"
+    ::= { rlSslCertificateGenerationEntry   13 }
 
 rlSslCertificateExportTable OBJECT-TYPE
    SYNTAX SEQUENCE OF RlSslCertificateExportEntry
@@ -397,7 +404,9 @@ RlSslPublicKeyAlgorithm ::= TEXTUAL-CONVENTION
 
     SYNTAX  INTEGER {
         rsa(1),
-        dsa(2)
+        dsa(2),
+        ec(3),
+        ecdsa(4)
     }
 
 
@@ -560,6 +569,4 @@ rlSslisCertificate2Default OBJECT-TYPE
 
 
 END
-
-
 

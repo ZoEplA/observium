@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 EXTREME-PORT-MIB DEFINITIONS ::= BEGIN
@@ -23,10 +17,21 @@ EXTREME-PORT-MIB DEFINITIONS ::= BEGIN
         DisplayString           FROM RFC1213-MIB;
 
         extremePort MODULE-IDENTITY
-                LAST-UPDATED "201104130000Z" -- April 13,2011
+                LAST-UPDATED "201705110000Z" -- May 11,2017
                 ORGANIZATION "Extreme Networks, Inc."
-                CONTACT-INFO "www.extremenetworks.com"
+                CONTACT-INFO
+                        "Postal:  Extreme Networks, Inc.
+                                  6480 Via Del Oro
+                                  San Jose, CA 95119 USA
+
+                                  Phone:   +1 408 579-2800
+                                  E-mail:  support@extremenetworks.com
+                                  WWW:     http://www.extremenetworks.com"
+
                 DESCRIPTION "Extreme network port objects"
+                REVISION     "201705110000Z"
+                DESCRIPTION
+                     "Added a set of new objects for 64-bits counters in extremePortUtilizationExtnTable"
         ::= { extremeAgent 4 }
 
 
@@ -214,10 +219,11 @@ EXTREME-PORT-MIB DEFINITIONS ::= BEGIN
     ::= { extremePortLoadshare2Table 1 }
 
     ExtremePortLoadshare2Entry ::= SEQUENCE {
-                extremePortLoadshare2MasterIfIndex INTEGER, 
-                extremePortLoadshare2SlaveIfIndex  INTEGER,
-           extremePortLoadshare2Algorithm       INTEGER,
-                extremePortLoadshare2Status        RowStatus 
+                extremePortLoadshare2MasterIfIndex  INTEGER, 
+                extremePortLoadshare2SlaveIfIndex   INTEGER,
+                extremePortLoadshare2Algorithm      INTEGER,
+                extremePortLoadshare2Status         RowStatus, 
+                extremePortLoadshare2MinActiveLinks Unsigned32 
     }
 
     extremePortLoadshare2MasterIfIndex OBJECT-TYPE
@@ -249,7 +255,8 @@ EXTREME-PORT-MIB DEFINITIONS ::= BEGIN
                                  roundRobin (3),
                                  l2Address (4),
                                  l3Address (5),
-                                 l3l4Address(6)
+                                 l3l4Address(6),
+                                 customAddress (7)
                                   }
                 MAX-ACCESS  read-create
                 STATUS current
@@ -266,6 +273,16 @@ EXTREME-PORT-MIB DEFINITIONS ::= BEGIN
                         "The row status variable, used according to
                         row installation and removal conventions."
         ::= { extremePortLoadshare2Entry 4 }
+
+    extremePortLoadshare2MinActiveLinks OBJECT-TYPE
+                SYNTAX    Unsigned32 (1..8)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                      "The minimum active links that must be up in order
+                       for group to remain up."  
+        ::= { extremePortLoadshare2Entry 5 }
+
 
 ----
 -- Port Rate Shape Table
@@ -861,30 +878,38 @@ extremeWiredClientIP OBJECT-TYPE
                 extremePortUtilizationAvgTxBytes     Integer32,
                 extremePortUtilizationAvgRxBytes     Integer32,
                 extremePortUtilizationPeakTxBytes    Integer32,
-                extremePortUtilizationPeakRxBytes    Integer32
+                extremePortUtilizationPeakRxBytes    Integer32,
+                extremePortUtilizationAvgTxPkts64    Counter64,
+                extremePortUtilizationAvgRxPkts64    Counter64,
+                extremePortUtilizationPeakTxPkts64   Counter64,
+                extremePortUtilizationPeakRxPkts64   Counter64,
+                extremePortUtilizationAvgTxBytes64   Counter64,
+                extremePortUtilizationAvgRxBytes64   Counter64,
+                extremePortUtilizationPeakTxBytes64  Counter64,
+                extremePortUtilizationPeakRxBytes64  Counter64
         }
 
         extremePortUtilizationAvgTxPkts  OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
-                   "The reported number of average packets in the transmit direction 
+                   "The reported number of average packets in the transmit direction
                     per second."
                 ::= {extremePortUtilizationExtnEntry 1 }
 
         extremePortUtilizationAvgRxPkts  OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
-                   "The reported number of average packets in the receive direction 
+                   "The reported number of average packets in the receive direction
                     per second."
                 ::= {extremePortUtilizationExtnEntry 2 }
-                
+
         extremePortUtilizationPeakTxPkts OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
                    "The reported number of peak packets in the transmit direction
@@ -893,34 +918,34 @@ extremeWiredClientIP OBJECT-TYPE
 
         extremePortUtilizationPeakRxPkts OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
-                   "The reported number of peak packets in the receive direction 
+                   "The reported number of peak packets in the receive direction
                     per second."
                 ::= {extremePortUtilizationExtnEntry 4 }
 
         extremePortUtilizationAvgTxBytes  OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
-                   "The reported number of average bytes in the transmit direction 
+                   "The reported number of average bytes in the transmit direction
                     per second."
                 ::= {extremePortUtilizationExtnEntry 5 }
 
         extremePortUtilizationAvgRxBytes  OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
                    "The reported number of average bytes in the receive direction
                     per second."
                 ::= {extremePortUtilizationExtnEntry 6 }
-                
+
         extremePortUtilizationPeakTxBytes OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
                    "The reported number of peak bytes in the transmit direction
@@ -929,12 +954,85 @@ extremeWiredClientIP OBJECT-TYPE
 
         extremePortUtilizationPeakRxBytes OBJECT-TYPE
                 SYNTAX  Integer32
-                MAX-ACCESS  read-only  
+                MAX-ACCESS  read-only
                 STATUS current
                 DESCRIPTION
-                   "The reported number of peak bytes in the receive direction 
+                   "The reported number of peak bytes in the receive direction
                     per second."
                 ::= {extremePortUtilizationExtnEntry 8 }
+
+        extremePortUtilizationAvgTxPkts64  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average packets in the transmit direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 9 }
+
+        extremePortUtilizationAvgRxPkts64  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average packets in the receive direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 10 }
+
+        extremePortUtilizationPeakTxPkts64 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak packets in the transmit direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 11 }
+
+        extremePortUtilizationPeakRxPkts64 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak packets in the receive direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 12 }
+
+        extremePortUtilizationAvgTxBytes64  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average bytes in the transmit direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 13 }
+
+        extremePortUtilizationAvgRxBytes64  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average bytes in the receive direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 14 }
+
+        extremePortUtilizationPeakTxBytes64 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak bytes in the transmit direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 15 }
+
+        extremePortUtilizationPeakRxBytes64 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak bytes in the receive direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 16 }
+
 
 --
 -- Per Port QoS Stats Table
@@ -1159,7 +1257,8 @@ extremePortMauEntry    OBJECT-TYPE
 ExtremePortMauEntry ::= SEQUENCE {
     extremePortMauType DisplayString,
     extremePortMauVendorName DisplayString,
-    extremePortMauStatus INTEGER
+    extremePortMauStatus INTEGER,
+    extremePortMauRestrict DisplayString
     }
 
 extremePortMauType OBJECT-TYPE
@@ -1189,6 +1288,14 @@ extremePortMauStatus  OBJECT-TYPE
         "This object idetifies the status of the mau for this interface."
     ::= {extremePortMauEntry 3 }
 
+extremePortMauRestrict OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+         "This object identifies the unsupported MAU restriction, if any."
+    ::= {extremePortMauEntry 4 }
+
 extremePortMauTraps OBJECT IDENTIFIER
     ::= {extremePortMau 2}
 
@@ -1203,6 +1310,14 @@ extremePortMauChangeTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent whenever a  MAU is inserted or removed. When the mau is inserted, the value of extremePortMauStatus will be 'inserted' and extremePortMauType indicates the type of the mau inserted. If mau is removed, the value of extremePortMauStatus is empty and the type of the mau will be NONE"
     ::= { extremePortMauTrapsPrefix 1 }
+
+extremePortMauRestrictionTrap NOTIFICATION-TYPE
+    OBJECTS { ifIndex,
+              extremePortMauRestrict
+             }
+    STATUS      current
+    DESCRIPTION "This trap is sent whenever a  restricted MAU is inserted or removed, or a port attached to a restricted Mau is enabled."
+    ::= { extremePortMauTrapsPrefix 2 }
 
 --
 -- Per Port Congestion Stats Table

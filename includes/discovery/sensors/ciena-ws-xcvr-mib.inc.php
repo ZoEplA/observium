@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -96,7 +96,8 @@ foreach ($oids as $index => $entry)
 
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+    $limits['rename_rrd'] = 'cwsXcvrTemperatureActual-'.$index;
+    discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, array_merge($options, $limits));
   }
 
   if ($entry['cwsXcvrChannelTxPowerActual'] == 0 && $entry['cwsXcvrChannelRxPowerActual'] == 0)
@@ -131,7 +132,8 @@ foreach ($oids as $index => $entry)
     unset($limits['limit_high_warn']);
   }
 
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+  $limits['rename_rrd'] = 'cwsXcvrChannelRxPowerActual-'.$index;
+  discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, array_merge($options, $limits));
 
 
   // CIENA-WS-XCVR-MIB::cwsXcvrChannelTxPowerActual.4.1.0 = INTEGER: 1.5
@@ -160,8 +162,8 @@ foreach ($oids as $index => $entry)
     unset($limits['limit_high_warn']);
   }
 
-
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+  $limits['rename_rrd'] = 'cwsXcvrChannelTxPowerActual-'.$index;
+  discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
 }
 
 // EOF

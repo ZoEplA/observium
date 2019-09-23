@@ -61,7 +61,7 @@ hm2MACNotifyAdminState    OBJECT-TYPE
     ::= { hm2MACNotifyMibObjects 1 }
 
 hm2MACNotifyInterval    OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (0..2147483647)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 

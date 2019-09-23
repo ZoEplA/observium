@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: Huawei common OID MIB definition.
 -- Reference:
--- Version: V4.85
+-- Version: V5.31
 -- ============================================================================
 
 HUAWEI-MIB DEFINITIONS ::= BEGIN
@@ -12,7 +12,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-SMI;
 
     huawei MODULE-IDENTITY
-        LAST-UPDATED "201702100000Z"
+        LAST-UPDATED "201808140000Z"
         ORGANIZATION
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -25,8 +25,373 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
  "
         DESCRIPTION
             "Huawei common OID MIB definition."
+--  Revision historys
+	REVISION    "201808140000Z"
+        DESCRIPTION  "V5.31, 
+	              The object identifier of S5720I-10X-PWH-SI-AC oversea is added
+	              The object identifier of S5720I-6X-PWH-SI-AC is added   
+                      "
 
---  Revision history
+	REVISION    "201807260000Z"
+        DESCRIPTION  "V5.30, 
+	              The object identifier of atn910C-F(atn 61) is added
+	              The object identifier of atn910C-F-IOT(atn 62) is added   
+                      "
+	REVISION    "201807170000Z"
+        DESCRIPTION  "V5.29, 
+	              The object identifier of ce6865-48S8CQ-EI is added
+	              The object identifier of ce8850-64CQ-EI is added   
+                      "
+	REVISION    "201807130000Z"
+        DESCRIPTION  "V5.28, 
+				  cx6601              OBJECT IDENTIFIER ::= { cx6600SysOid 5 }      is modified
+				  "
+	REVISION    "201807130000Z"
+        DESCRIPTION  "V5.27, 
+				  The object identifier of usg6630e-ac          is added
+	              The object identifier of usg6630e-dc          is added
+	              added product node and subnode:fw
+				  "
+	REVISION    "201806300000Z"
+        DESCRIPTION  "V5.26, 
+	              added product node and subnode:NE40EX16B
+                      "
+	REVISION    "201806280000Z"
+        DESCRIPTION  "V5.25, 
+	              added product node and subnode:usg,Fw,vFw,bigData
+                      "
+	REVISION    "201806090000Z"
+        DESCRIPTION  "V5.23, 
+	              The object CX6602-A is modified to CX6602
+                      "
+	REVISION    "201805210000Z"
+        DESCRIPTION  "V5.22, 
+	              The object identifier of s1600-8             is added
+	              The object identifier of s1600-16            is added
+	              The object identifier of s1600-24            is added
+	              The object identifier of s2600-10P           is added
+	              The object identifier of s2600-10P-PWR       is added
+	              The object identifier of s2600-28P           is added
+	              The object identifier of s2600-28P-PWR       is added
+	              The object identifier of s3600-28P           is added
+	              The object identifier of s3600-52P           is added
+	              The object identifier of s3600-52P-PWR       is added
+	              The object identifier of s1700-16-AC         is added
+	              The object identifier of s1700-24R           is added
+	              The object identifier of s5330-60C-HI-48S    is added
+	              The object identifier of s5330-36C-HI-24S    is added
+	              The object identifier of s5720-52X-LI-48S-AC is added
+	              The object identifier of s5320-52X-LI-48S-AC is added
+	              The object identifier of s5320-52X-LI-48S-DC is added
+	              The object identifier of s5320-52X-SI-48S    is added
+		            The object identifier of s5720-52X-SI-48S    is added  
+		            The object identifier of s6320-26Q-LI-24S    is added
+                      "
+
+	REVISION    "201805020000Z"
+        DESCRIPTION  "V5.21, 
+	              The object identifier of AC600EC-24 AP100EC AP200EC AP300EC is added
+                      "
+
+	REVISION    "201804190000Z"
+        DESCRIPTION  "V5.20, 
+	              The object identifier of S5730-44C-HI-24S is added
+	              The object identifier of S5730-60C-HI-48S is added   
+	              The object identifier of S5730-68C-HI-48S is added   
+	              The object identifier of S5730-36C-HI-24S is added   
+	              The object identifier of S5720I-12X-PWH-SI-AC is added
+	              The object identifier of S5720I-10X-PWH-SI-AC is added
+	              The object identifier of s12703lsw is added
+                      "
+
+	REVISION    "201804090000Z"
+        DESCRIPTION  "V5.19, 
+	              The object identifier of atn950BEX(atn 59) is added
+	              The object identifier of atn950BEX-IOT(ptn 60) is added
+                  The object name of etn550-D(etn 8) is modified to etn500-D(etn 8)
+                       "
+    REVISION    "201803140000Z" 
+        DESCRIPTION  "V5.18,  
+                      The object identifier of ptn6900-M2K is added
+					  The object identifier of ne40E-M8A is added
+					  The object identifier of ne40E-M16A is added
+					  The object identifier of ne40E-M2K-B is added
+					  The object identifier of cX600-M2K-B is added
+					  The object identifier of ptn6900-M2K-B is added
+					  The object identifier of cx6602-B is added
+					  The object identifier of ne40E-M1A is added
+					  The object identifier of cX600-M1A is added
+					  The object identifier of ptn6900-M1A is added
+					  The object identifier of cx6601 is added
+					  The object identifier of ne40E-X2-M16B is added
+					  The object identifier of cX600-X2-M16B is added
+					  The object identifier of ptn6900-2-M16B is added
+					  The object identifier of ne20E-S16B is added				  
+                      "
+    REVISION    "201803060000Z" 
+        DESCRIPTION  "V5.17,  
+                      The object identifier of AC6800V is added				  
+                      "
+	REVISION    "201802280000Z"
+        DESCRIPTION  "V5.16, 
+                      The object identifier of atn905-F-DC-IOT(atn 57) is added
+	              The object identifier of atn905-F-AC-IOT(atn 58) is added
+	              The object identifier of ptn960E(ptn 31) is added
+                       "
+    REVISION    "201802230000Z"
+        DESCRIPTION  "V5.15,
+                      The object identifier of ma5801-gp08(hwProducts 337) is added,
+                      The object identifier of ea5801-gp08(hwProducts 338) is added,
+                      The object identifier of ma5801-cg04(hwProducts 339) is added,
+                      The object identifier of ea5801-cg04(hwProducts 340) is added.
+                      "
+    REVISION    "201801300000Z" 
+        DESCRIPTION  "V5.14,  
+                      The object identifier of AP5050DN-S is added
+                      The object identifier of AP2030DN-S is added
+                      The object identifier of AP2051DN-E is added
+                      The object identifier of AP2051DN is added
+                      The object identifier of AP2051DN-S is added
+                      The object identifier of AP7060DN is added				  
+                      "
+	REVISION    "201712260000Z"
+        DESCRIPTION  "V5.12, 
+					   The object identifier of MA5811S-DE16(hwProducts 342) is added
+		               The object identifier of MA5811S-AE48(hwProducts 343) is added
+		               The object identifier of MA5811S-AE08(hwProducts 344) is added
+		               The object identifier of MA5811S-AE16(hwProducts 345) is added
+		               The object identifier of MA5811S-DE48(hwProducts 346) is added
+		               The object identifier of MA5611S-AE08(hwProducts 347) is added
+		               The object identifier of MA5611S-AE16(hwProducts 348) is added
+		               The object identifier of MA5611S-DE16(hwProducts 349) is added
+		               The object identifier of MA5611S-AE48(hwProducts 350) is added
+		               The object identifier of MA5611S-DE48(hwProducts 351) is added
+		               The object identifier of MA5611S-DE48-A(hwProducts 352) is added
+                       "
+					   
+	REVISION    "201712220000Z"
+        DESCRIPTION  "V5.12, 
+                      The object identifier of cloudedge(hwProducts 325) is added,
+                       "
+	REVISION    "201712050000Z"
+        DESCRIPTION  "V5.11, 
+                       The object identifier of atn905-F-DC(atn 55) is added
+					   The object identifier of atn905-F-AC(atn 56) is added
+					   The object identifier of ne08E-S9(ne0508e 17) is added
+					   The object identifier of etn550-D(etn 8) is added
+                       "
+   REVISION    "201711230000Z" 
+   DESCRIPTION  "V5.10,  
+                      The object identifier of ma5801-GP08(hwProducts 337) is added,
+                      The object identifier of ea5801-GP08(hwProducts 338) is added.                     
+                      "
+		      
+    REVISION    "201711090000Z" 
+        DESCRIPTION  "V5.09,  
+                      The object identifier of ce6875-48S4CQ-EI is added
+                      "
+    REVISION    "201710240000Z" 
+        DESCRIPTION  "V5.08,  
+                      The object identifier of s5320-52X-SI-AC-V1     is added for v2r11c10  
+                      The object identifier of s5320-52X-SI-DC-V1     is added for v2r11c10   
+                      The object identifier of s5320-52P-SI-AC-V1     is added for v2r11c10   
+                      The object identifier of s5320-52P-SI-DC-V1     is added for v2r11c10   
+                      The object identifier of s5300-52P-LI-DC-V1     is added for v2r11c10  
+                      The object identifier of s5320-36C-EI-28S-AC-V1 is added for v2r11c10
+                      The object identifier of s5320-36C-EI-28S-DC-V1 is added for v2r11c10
+                      The object identifier of s5720I-12X-SI-AC       is added for v2r12c00    
+                      The object identifier of s5720I-12X-PWH-SI-DC   is added for v2r12c00  
+                      The object identifier of s5720I-28X-SI-AC       is added for v2r12c00      
+                      The object identifier of s5720I-28X-PWH-SI-AC   is added for v2r12c00  
+                      The object identifier of s9316 serial           is added for v2r12c00
+                      "
+
+    REVISION    "201710120000Z" 
+        DESCRIPTION  "V5.07,  
+                      The object identifier of cX600-M2K is added
+                      The object identifier of ne40E-M2K is added
+                      The object identifier of cx6602-A is added
+                      "
+
+    REVISION    "201709290000Z" 
+        DESCRIPTION  "V5.06,  
+                      The object identifier of virtual-cluster-chassis is added
+                      "
+ 
+    REVISION    "201709040000Z" 
+        DESCRIPTION  "V5.05,  
+                      The object identifier of ce6856-48S6Q-HI is added
+                      The object identifier of ce6856-48T6Q-HI is added
+                      "
+ 
+    REVISION    "201708290000Z" 
+        DESCRIPTION  "V5.04,  
+                      The object identifier of AD9431DN-24X is added
+                      The object identifier of AP7152DN is added
+                      The object identifier of AP6052DN is added
+                      The object identifier of AP8082DN is added
+                      The object identifier of AP8182DN is added
+                      The object identifier of AP7052DE is added	
+                      The object identifier of AP7052TN-WI is added
+                      The object identifier of AP8050TN-HD is added
+                      The object identifier of AP4051TN is added
+                      The object identifier of AP7052DN is added				  
+                      "
+    REVISION    "201708160000Z" 
+        DESCRIPTION  "V5.03,  
+                      The object identifier of cx6600(hwProducts 336) is added
+                      The object identifier of cx6620 is added
+                      The object identifier of cx6608 is added
+                      "
+
+	REVISION    "201708100000Z"
+        DESCRIPTION  "V5.02, 
+                       The object identifier of atn950B-V8(atn 36) is added
+					   The object identifier of atn910B-V8(atn 37) is added
+					   The object identifier of atn910B-E-AC-V8(atn 38) is added
+					   The object identifier of atn910B-D-DC-V8(atn 39) is added
+					   The object identifier of atn910B-D-AC-V8(atn 40) is added
+					   The object identifier of atn910B-F-DC-V8(atn 41) is added
+					   The object identifier of atn910B-F-AC-V8(atn 42) is added
+					   The object identifier of atn980B-IOT(atn 43) is added
+					   The object identifier of atn950C-IOT(atn 44) is added
+					   The object identifier of atn910C-A-IOT(atn 45) is added
+					   The object identifier of atn910C-B-IOT(atn 46) is added
+					   The object identifier of atn910C-D-IOT(atn 47) is added
+					   The object identifier of atn950B-IOT(atn 48) is added
+					   The object identifier of atn910B-IOT(atn 49) is added
+					   The object identifier of atn910B-E-AC-IOT (atn 50) is added
+					   The object identifier of atn910B-D-DC-IOT (atn 51) is added
+					   The object identifier of atn910B-D-AC-IOT (atn 52) is added
+					   The object identifier of atn910B-F-DC-IOT (atn 53) is added
+					   The object identifier of atn910B-F-AC-IOT (atn 54) is added
+                       "
+   REVISION    "201707120000Z" 
+        DESCRIPTION  "V5.01,  
+                     The name of lanSw 519 522 524 526 528 529 532 are modify for CR Change 
+                      " 
+    REVISION    "201707030000Z" 
+        DESCRIPTION  "V5.00,  
+                      The object identifier of vne(hwProducts 314) is added
+                      The object identifier of vne9000 is added
+                      The object identifier of vsig9800 is added
+                      The object identifier of vne9000-CP is added
+                      "
+
+    REVISION    "201706290000Z" 
+        DESCRIPTION  "V4.99,  
+                      The object identifier of s7900 serial are added,
+                      The object identifier of s7905 is added,
+                      The object identifier of s7908 is added,
+                      "   
+   
+    REVISION    "201706140000Z" 
+        DESCRIPTION  "V4.98,  
+                      The object identifier of ptn7900E-32(ptn 30) is added,
+                     "
+    REVISION    "201706090000Z" 
+        DESCRIPTION  "V4.96,  
+                     The object identifier of S2320-52TP-EI-DC   is added for lsw v2r11c10,
+                     The object identifier of S5330-68C-SI-DC    is added for lsw v2r11c10,
+                     The object identifier of S5730S-48C-EI-AC   is added for lsw v2r11c10,
+                     The object identifier of S5730S-48C-PWR-EI  is added for lsw v2r11c10,
+                     The object identifier of S5730S-68C-EI-AC   is added for lsw v2r11c10,
+                     The object identifier of S5730S-68C-PWR-EI  is added for lsw v2r11c10,
+
+                     The object identifier of S5330-36C-HI       is added for lsw v2r11C50,
+                     The object identifier of S5730-36C-HI       is added for lsw v2r11C50,
+                     The object identifier of S5730-44C-HI       is added for lsw v2r11C50,
+                     The object identifier of S5330-36C-PWH-HI   is added for lsw v2r11C50,
+                     The object identifier of S5730-36C-PWH-HI   is added for lsw v2r11C50,
+                     The object identifier of S5730-44C-PWH-HI   is added for lsw v2r11C50,
+                     The object identifier of S5330-60C-HI       is added for lsw v2r11C50,
+                     The object identifier of S5730-60C-HI       is added for lsw v2r11C50,
+                     The object identifier of S5730-68C-HI       is added for lsw v2r11C50,
+                     The object identifier of S5730-60C-PWH-HI   is added for lsw v2r11C50,
+                     The object identifier of S5730-68C-PWH-HI   is added for lsw v2r11C50,
+                     The object identifier of S6720-50L-HI-48S   is added for lsw v2r11C50,
+                     The object identifier of S6320-50L-HI-48S   is added for lsw v2r11C50,
+                     The object identifier of S6720-30L-HI-24S   is added for lsw v2r11C50,
+                     The object identifier of S6320-30L-HI-24S   is added for lsw v2r11C50,
+ 
+                     " 
+
+    REVISION    "201706020000Z" 
+        DESCRIPTION  "V4.96,  
+                      The object identifier of AP1050DN-S is added, 
+                     " 
+
+
+    REVISION    "201705190000Z" 
+        DESCRIPTION  "V4.96,  
+                      The object identifier of AP1050DN-S is added, 
+                     " 
+
+    REVISION    "201705090000Z"
+        DESCRIPTION  "V4.95,
+                      The object identifier of S5730-52X-PWH-SI-ACF is added,
+                      The object identifier of S5730-56C-PWH-SI-AC  is added,
+                      The object identifier of S5730-32C-PWH-SI-AC is added, 
+                      
+                     "
+   REVISION     "201705020000Z"
+        DESCRIPTION  "V4.94,
+                      The object identifier of ce6880-48S4Q2CQ-EI is added,
+                      The object identifier of ce6880-24S4Q2CQ-EI is added,
+                      The object identifier of ce6880-48T4Q2CQ-EI is added,
+                      The object identifier of ce12804E is added,
+                      The object identifier of ce12808E is added,
+                      The object identifier of ce12812E is added,
+                      The object identifier of ce12816E is added,
+                      The object identifier of ce8850-32CQ-EI is added,
+                      The object identifier of ce12816M is added,
+                      The object identifier of ce6870-48T6CQ-EI is added,
+                      The object identifier of cx916 is added.
+                     "
+
+   REVISION    "201704260000Z"
+        DESCRIPTION  "V4.93,
+                      The object identifier of ea5821(hwProducts 314) change to ea5821(hwProducts 332) is modified.
+                     "
+		     
+    REVISION    "201704250000Z"
+        DESCRIPTION  "V4.92,
+                      The object identifier of ea5821(hwProducts 312) change to ea5821(hwProducts 314) is modified.
+                     "
+
+	REVISION    "201704110000Z"
+        DESCRIPTION  "V4.91, 
+                       The object identifier of BGW is added
+                       "
+                       
+	REVISION    "201704080000Z"
+        DESCRIPTION  "V4.90, 
+                       The object identifier of atn910C-D(atn 35) is added
+                       "
+
+	REVISION    "201704060000Z"
+        DESCRIPTION  "V4.89, 
+                       The object identifier of ea5821 is added
+                       "
+
+	REVISION    "201703270000Z"
+        DESCRIPTION  "V4.88, 
+                       The object identifier of ea5800-x17 is added,
+                       The object identifier of ea5800-x15 is added,
+                       The object identifier of ea5800-x7 is added
+                       The object identifier of ea5800-x2 is added
+                       "
+
+	REVISION    "201703140000Z"
+        DESCRIPTION  "V4.87, 
+                       The object identifier of AP8050DN is added,
+                       The object identifier of AP8050DN-S is added,
+                       The object identifier of AP8150DN is added
+                       "
+
+	REVISION    "201703130000Z"
+        DESCRIPTION  "V4.86, 
+                       The object identifier of ne9000-8 is added"
 
 	REVISION    "201702100000Z"
         DESCRIPTION  "V4.85, 
@@ -178,18 +543,17 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         REVISION    "201605110000Z"
         DESCRIPTION  "V4.61, 
                      The object identifier of acWan, acDcn is added."
-	
-	 REVISION    "201605090000Z"
+		     
+	REVISION    "201605100000Z"
+        DESCRIPTION  "V4.61, 
+                       The object name of ptn970 is added"				   
+        REVISION    "201605090000Z"
         DESCRIPTION  "V4.60, 
-                       The object name of hwSdn is added"          
+                       The object name of hwSdn is added"
                        
 	REVISION    "201605040000Z"
         DESCRIPTION  "V4.59, 
                        The object name of switch e628-V2 and e628-PER-V2 is modified"
-                       
-  REVISION    "201605010000Z"
-        DESCRIPTION  "V4.61, 
-                       The object name of ptn970 is added"		                     
 
 	REVISION    "201604150000Z"
         DESCRIPTION  "V4.58, 
@@ -241,7 +605,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
                       The object identifier of ma5800-x15(hwProducts 316) is added"
         REVISION    "201601200000Z"
         DESCRIPTION  "V4.50, 
-                      The object identifier of ar2204e-d¡¢ar2504e-h¡¢ar509g-lc is added"
+                      The object identifier of ar2204e-d, ar2504e-h, ar509g-lc is added"
 
         REVISION    "201601140000Z"
         DESCRIPTION  "V4.49, 
@@ -312,14 +676,14 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION  "V4.32,
                       The object identifier of ar121w, ar121w-s, ar161w and ar129w is added"
 
-       REVISION    "201503230000Z"
-        DESCRIPTION  "V4.30, 
-                      The object identifier of S5700S-28X-LI-AC, S5700S-52X-LI-AC and S5700S-28P-PWR-LI-AC is added"
-       
-        REVISION    "201503170000Z"
+        REVISION    "201503270000Z"
         DESCRIPTION  "V4.31,
                       The object identifier of VNE1000 is added"
                       
+        REVISION    "201503230000Z"
+        DESCRIPTION  "V4.30, 
+                      The object identifier of S5700S-28X-LI-AC, S5700S-52X-LI-AC and S5700S-28P-PWR-LI-AC is added"
+
         REVISION    "201503060000Z"
         DESCRIPTION  "V4.29, 
                       The object identifier of S12704, S5720SI, S5710XLI and S6720EI is added"
@@ -392,6 +756,9 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         REVISION    "201410160000Z"
         DESCRIPTION  "V4.18, merge the DC's nodes. "
 	
+        REVISION    "201409030000Z"
+        DESCRIPTION  "V4.00, merge the vrp and access network's nodes together. "
+
         REVISION    "201406040000Z"    
         DESCRIPTION  "V3.43, 
                       The object identifier of ma5800(hwProducts 294) is added.
@@ -399,14 +766,12 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         REVISION    "201401210000Z"    
         DESCRIPTION  "V3.42, 
                       The object identifier of hwRPS(hwProducts 287) is added.
-                     "     
+                     "
                      
         REVISION    "201312300000Z"    
         DESCRIPTION  "V3.41, 
                       Modify the comma from chinese mode to English mode.
                    "      
-        REVISION    "201309040000Z"
-        DESCRIPTION  "V4.00, merge the vrp and access network's nodes together. " 
 
         REVISION    "201309030000Z"    
         DESCRIPTION  "V3.40, 
@@ -1106,20 +1471,20 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             s5721-28X-SI-24S-AC       OBJECT IDENTIFIER ::= { lanSw 516 }        --lsw v2r11c10 add
             s5320-28X-SI-24S-AC       OBJECT IDENTIFIER ::= { lanSw 517 }        --lsw v2r11c10 add
             s5320-28X-SI-24S-DC       OBJECT IDENTIFIER ::= { lanSw 518 }        --lsw v2r11c10 add
-            s2720-12TP-EI-AC          OBJECT IDENTIFIER ::= { lanSw 519 }        --lsw v2r11c10 add TR2 delete 2016.12.15
+            s2720-12TP-EI          OBJECT IDENTIFIER ::= { lanSw 519 }        --lsw v2r11c10 add TR2,modify name,old name is S2720-12TP-EI-AC
             s2320-12TP-EI-AC          OBJECT IDENTIFIER ::= { lanSw 520 }        --lsw v2r11c10 add
             s2320-12TP-EI-DC          OBJECT IDENTIFIER ::= { lanSw 521 }        --lsw v2r11c10 add
-            s2720-12TP-PWR-EI-AC      OBJECT IDENTIFIER ::= { lanSw 522 }        --lsw v2r11c10 add TR2 delete 2016.12.15
+            s2720-12TP-PWR-EI      OBJECT IDENTIFIER ::= { lanSw 522 }        --lsw v2r11c10 add TR2,modify name,old name is s2720-12TP-PWR-EI-AC 
             s2320-12TP-PWR-EI-AC      OBJECT IDENTIFIER ::= { lanSw 523 }        --lsw v2r11c10 add
-            s2720-52TP-EI-AC          OBJECT IDENTIFIER ::= { lanSw 524 }        --lsw v2r11c10 add TR2 delete 2016.12.15
+            s2720-52TP-EI          OBJECT IDENTIFIER ::= { lanSw 524 }        --lsw v2r11c10 add TR2,modify name,old name is S2720-52TP-EI-AC
             s2320-52TP-EI-AC          OBJECT IDENTIFIER ::= { lanSw 525 }        --lsw v2r11c10 add
-            s2720-52TP-PWR-EI-AC      OBJECT IDENTIFIER ::= { lanSw 526 }        --lsw v2r11c10 add TR2 delete 2016.12.15
+            s2720-52TP-PWR-EI      OBJECT IDENTIFIER ::= { lanSw 526 }        --lsw v2r11c10 add TR2,modify name,old name is S2720-52TP-PWR-EI-AC
             s2320-52TP-PWR-EI-AC      OBJECT IDENTIFIER ::= { lanSw 527 }        --lsw v2r11c10 add
-            s2720-28TP-PWR-EI-ACL     OBJECT IDENTIFIER ::= { lanSw 528 }        --lsw v2r11c10 add TR2 delete 2016.12.15
-            s2720-28TP-EI-V2-AC       OBJECT IDENTIFIER ::= { lanSw 529 }        --lsw v2r11c10 add TR2 delete 2016.12.15
+            s2720-28TP-PWR-EI-L     OBJECT IDENTIFIER ::= { lanSw 528 }        --lsw v2r11c10 add TR2,modify name,old name is s2720-28TP-PWR-EI-ACL
+            s2720-28TP-EI       OBJECT IDENTIFIER ::= { lanSw 529 }        --lsw v2r11c10 add TR2,modify name,old name is s2720-28TP-EI-V2-AC
             s2320-28TP-EI-AC          OBJECT IDENTIFIER ::= { lanSw 530 }        --lsw v2r11c10 add
             s2320-28TP-EI-DC          OBJECT IDENTIFIER ::= { lanSw 531 }        --lsw v2r11c10 add
-            s2720-28TP-PWR-EI-AC      OBJECT IDENTIFIER ::= { lanSw 532 }        --lsw v2r11c10 add TR2 delete 2016.12.15
+            s2720-28TP-PWR-EI      OBJECT IDENTIFIER ::= { lanSw 532 }        --lsw v2r11c10 add TR2,modify name,old name is s2720-28TP-PWR-EI-AC
             s2320-28TP-PWR-EI-AC      OBJECT IDENTIFIER ::= { lanSw 533 }        --lsw v2r11c10 add
             s2320-28P-PWR-EI-ACF      OBJECT IDENTIFIER ::= { lanSw 534 }        --lsw v2r11c10 add
             
@@ -1179,7 +1544,75 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             s5330-68C-SI              OBJECT IDENTIFIER ::= { lanSw 585 }        -- S5330-68C-SI      for LSW V2R11C10
             s5730-68C-PWR-SI          OBJECT IDENTIFIER ::= { lanSw 586 }        -- S5730-68C-PWR-SI  for LSW V2R11C10
             
+            s5730-52X-PWH-SI-ACF      OBJECT IDENTIFIER ::= { lanSw 587 }        -- S5730-52X-PWH-SI-ACF  for LSW V2R11C10
+            s5730-56C-PWH-SI-AC       OBJECT IDENTIFIER ::= { lanSw 588 }        -- S5730-56C-PWH-SI-AC for LSW V2R11C10
+            s5730-32C-PWH-SI-AC       OBJECT IDENTIFIER ::= { lanSw 589 }        -- S5730-32C-PWH-SI-AC  for LSW V2R11C10
             
+            s2320-52TP-EI-DC   OBJECT IDENTIFIER ::= { lanSw 590 }        -- S5730-52X-PWH-SI-ACF  for LSW V2R11C10 
+            s5330-68C-SI-DC    OBJECT IDENTIFIER ::= { lanSw 591 }        -- s5330-68C-SI-DC       for LSW V2R11C10
+            s5730S-48C-EI-AC   OBJECT IDENTIFIER ::= { lanSw 592 }        -- s5730S-48C-EI-AC   for LSW V2R11C10
+            s5730S-48C-PWR-EI  OBJECT IDENTIFIER ::= { lanSw 593 }        -- s5730S-48C-PWR-EI    for LSW V2R11C10
+            s5730S-68C-EI-AC   OBJECT IDENTIFIER ::= { lanSw 594 }        -- s5730S-68C-EI-AC     for LSW V2R11C10
+            s5730S-68C-PWR-EI  OBJECT IDENTIFIER ::= { lanSw 595 }        -- s5730S-68C-PWR-EI      for LSW V2R11C10
+                                                                               
+            s5330-36C-HI       OBJECT IDENTIFIER ::= { lanSw 596 }        -- s5330-36C-HI        for LSW V2R11C50
+            s5730-36C-HI       OBJECT IDENTIFIER ::= { lanSw 597 }        -- s5730-36C-HI        for LSW V2R11C50
+            s5730-44C-HI       OBJECT IDENTIFIER ::= { lanSw 598 }        -- s5730-44C-HI        for LSW V2R11C50
+            s5330-36C-PWH-HI   OBJECT IDENTIFIER ::= { lanSw 599 }        -- s5330-36C-PWH-HI     for LSW V2R11C50
+            s5730-36C-PWH-HI   OBJECT IDENTIFIER ::= { lanSw 600 }        -- s5730-36C-PWH-HI      for LSW V2R11C50
+            s5730-44C-PWH-HI   OBJECT IDENTIFIER ::= { lanSw 601 }        -- s5730-44C-PWH-HI     for LSW V2R11C50
+            s5330-60C-HI       OBJECT IDENTIFIER ::= { lanSw 602 }        -- s5330-60C-HI         for LSW V2R11C50
+            s5730-60C-HI       OBJECT IDENTIFIER ::= { lanSw 603 }        -- s5730-60C-HI         for LSW V2R11C50
+            s5730-68C-HI       OBJECT IDENTIFIER ::= { lanSw 604 }        -- s5730-68C-HI         for LSW V2R11C50
+            s5730-60C-PWH-HI   OBJECT IDENTIFIER ::= { lanSw 605 }        -- s5730-60C-PWH-HI     for LSW V2R11C50
+            s5730-68C-PWH-HI   OBJECT IDENTIFIER ::= { lanSw 606 }        -- s5730-68C-PWH-HI     for LSW V2R11C50
+            s6720-50L-HI-48S   OBJECT IDENTIFIER ::= { lanSw 607 }        -- s6720-50L-HI-48S     for LSW V2R11C50
+            s6320-50L-HI-48S   OBJECT IDENTIFIER ::= { lanSw 608 }        -- s6320-50L-HI-48S     for LSW V2R11C50
+            s6720-30L-HI-24S   OBJECT IDENTIFIER ::= { lanSw 609 }        -- s6720-30L-HI-24S     for LSW V2R11C50
+            s6320-30L-HI-24S   OBJECT IDENTIFIER ::= { lanSw 610 }        -- s6320-30L-HI-24S     for LSW V2R11C50
+             
+            s5320-52X-SI-AC-V1        OBJECT IDENTIFIER ::= { lanSw 611 }   -- Real name S5320-52X-SI-AC for LSW V2R11C10 from S5320-52X-LI-AC 
+            s5320-52X-SI-DC-V1        OBJECT IDENTIFIER ::= { lanSw 612 }   -- Real name S5320-52X-SI-DC for LSW V2R11C10 from S5320-52X-LI-DC
+            s5320-52P-SI-AC-V1        OBJECT IDENTIFIER ::= { lanSw 613 }   -- Real name S5320-52P-SI-AC for LSW V2R11C10 from S5320-52P-LI-AC  
+            s5320-52P-SI-DC-V1        OBJECT IDENTIFIER ::= { lanSw 614 }   -- Real name S5320-52P-SI-DC for LSW V2R11C10 from S5320-52P-LI-AC
+            s5300-52P-LI-DC-V1        OBJECT IDENTIFIER ::= { lanSw 615 }   -- Real name S5300-52P-LI-DC for LSW V2R11C10 from S5320-52P-LI-AC
+            s5320-36C-EI-28S-AC-V1    OBJECT IDENTIFIER ::= { lanSw 616 }   -- Real name S5320-36C-EI-28S-AC for LSW V2R11C10 from S5320-28X-LI-24S-AC
+            s5320-36C-EI-28S-DC-V1    OBJECT IDENTIFIER ::= { lanSw 617 }   -- Real name S5320-36C-EI-28S-DC for LSW V2R11C10 from S5320-28X-LI-24S-DC 
+            s5720I-12X-SI-AC          OBJECT IDENTIFIER ::= { lanSw 618 }   -- S5720I-12X-SI-AC      for LSW V2R12C00   
+            s5720I-12X-PWH-SI-DC      OBJECT IDENTIFIER ::= { lanSw 619 }   -- S5720I-12X-PWH-SI-DC  for LSW V2R12C00
+            s5720I-28X-SI-AC          OBJECT IDENTIFIER ::= { lanSw 620 }   -- S5720I-28X-SI-AC      for LSW V2R12C00
+            s5720I-28X-PWH-SI-AC      OBJECT IDENTIFIER ::= { lanSw 621 }   -- S5720I-28X-PWH-SI-AC  for LSW V2R12C00
+            s5730-44C-HI-24S          OBJECT IDENTIFIER ::= { lanSw 622 }   -- S5730-44C-HI-24S      for LSW V2R13C00
+            s5730-60C-HI-48S          OBJECT IDENTIFIER ::= { lanSw 623 }   -- S5730-60C-HI-48S      for LSW V2R13C00
+            s5730-68C-HI-48S          OBJECT IDENTIFIER ::= { lanSw 624 }   -- S5730-68C-HI-48S      for LSW V2R13C00
+            s5730-36C-HI-24S          OBJECT IDENTIFIER ::= { lanSw 625 }   -- S5730-36C-HI-24S      for LSW V2R13C00
+            s5720I-12X-PWH-SI-AC      OBJECT IDENTIFIER ::= { lanSw 626 }   -- S5720I-12X-PWH-SI-AC  for LSW V2R13C00
+            s5720I-10X-PWH-SI-AC      OBJECT IDENTIFIER ::= { lanSw 627 }   -- s5720I-10X-PWH-SI-AC  for LSW V2R13C00
+            
+            s1600-8                   OBJECT IDENTIFIER ::= { lanSw 628 }   -- S1600-8              for LSW V2R12C10
+            s1600-16                  OBJECT IDENTIFIER ::= { lanSw 629 }   -- S1600-16             for LSW V2R12C10
+            s1600-24                  OBJECT IDENTIFIER ::= { lanSw 630 }   -- S1600-24             for LSW V2R12C10
+            s2600-10P                 OBJECT IDENTIFIER ::= { lanSw 631 }   -- S2600-10P            for LSW V2R12C10
+            s2600-10P-PWR             OBJECT IDENTIFIER ::= { lanSw 632 }   -- S2600-10P-PWR        for LSW V2R12C10
+            s2600-28P                 OBJECT IDENTIFIER ::= { lanSw 633 }   -- S2600-28P            for LSW V2R12C10
+            s2600-28P-PWR             OBJECT IDENTIFIER ::= { lanSw 634 }   -- S2600-28P-PWR        for LSW V2R12C10
+            s3600-28P                 OBJECT IDENTIFIER ::= { lanSw 635 }   -- S3600-28P            for LSW V2R12C10
+            s3600-28P-PWR             OBJECT IDENTIFIER ::= { lanSw 636 }   -- S3600-28P-PWR        for LSW V2R12C10
+            s3600-52P                 OBJECT IDENTIFIER ::= { lanSw 637 }   -- S3600-52P            for LSW V2R12C10
+            s3600-52P-PWR             OBJECT IDENTIFIER ::= { lanSw 638 }   -- S3600-52P-PWR        for LSW V2R12C10
+            s1700-16-AC               OBJECT IDENTIFIER ::= { lanSw 639 }   -- S1700-16-AC          for LSW V2R12C10
+            s1700-24R                 OBJECT IDENTIFIER ::= { lanSw 640 }   -- S1700-24R            for LSW V2R12C10
+            s5330-60C-HI-48S          OBJECT IDENTIFIER ::= { lanSw 641 }   -- s5330-60C-HI-48S     for LSW V2R13C00
+            s5330-36C-HI-24S          OBJECT IDENTIFIER ::= { lanSw 642 }   -- s5330-36C-HI-24S     for LSW V2R13C00
+            s5720-52X-LI-48S-AC       OBJECT IDENTIFIER ::= { lanSw 643 }   -- s5720-52X-LI-48S-AC  for LSW V2R13C00
+            s5320-52X-LI-48S-AC       OBJECT IDENTIFIER ::= { lanSw 644 }   -- s5320-52X-LI-48S-AC  for LSW V2R13C00
+            s5320-52X-LI-48S-DC       OBJECT IDENTIFIER ::= { lanSw 645 }   -- s5320-52X-LI-48S-DC  for LSW V2R13C00
+            s5320-52X-SI-48S          OBJECT IDENTIFIER ::= { lanSw 646 }   -- s5320-52X-SI-48S     for LSW V2R13C00
+            s5720-52X-SI-48S          OBJECT IDENTIFIER ::= { lanSw 647 }   -- s5720-52X-SI-48S     for LSW V2R13C00
+            s6320-26Q-LI-24S          OBJECT IDENTIFIER ::= { lanSw 648 }   -- s6320-26Q-LI-24S     for LSW V2R12C00
+            
+            s5720I-10X-PWH-SI-AC-sea  OBJECT IDENTIFIER ::= { lanSw 649 }   -- s5720I-10X-PWH-SI-AC oversea for LSW V2R13C00
+            s5720I-6X-PWH-SI-AC       OBJECT IDENTIFIER ::= { lanSw 650 }   -- s5720I-6X-PWH-SI-AC          for LSW V2R13C00
 
         apon                    OBJECT IDENTIFIER ::= { hwProducts 24 }
             ma5101              OBJECT IDENTIFIER ::= { apon 1 }
@@ -1278,7 +1711,30 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             wlanAP4050DN        OBJECT IDENTIFIER ::= { wlanAp 54}
             wlanAP4051DN-S      OBJECT IDENTIFIER ::= { wlanAp 55}
             wlanAP4051DN        OBJECT IDENTIFIER ::= { wlanAp 56}
-            wlanAP4151DN        OBJECT IDENTIFIER ::= { wlanAp 57}
+            wlanAP4151DN        OBJECT IDENTIFIER ::= { wlanAp 57}   
+            wlanAP8050DN        OBJECT IDENTIFIER ::= { wlanAp 58}
+            wlanAP8050DN-S      OBJECT IDENTIFIER ::= { wlanAp 59}
+            wlanAP8150DN        OBJECT IDENTIFIER ::= { wlanAp 60}
+            wlanAP1050DN-S      OBJECT IDENTIFIER ::= { wlanAp 61}      
+            wlanAD9431DN-24X    OBJECT IDENTIFIER ::= { wlanAp 62} 
+            wlanAP7152DN        OBJECT IDENTIFIER ::= { wlanAp 63} 
+            wlanAP6052DN        OBJECT IDENTIFIER ::= { wlanAp 64} 
+            wlanAP8082DN        OBJECT IDENTIFIER ::= { wlanAp 65} 
+            wlanAP8182DN        OBJECT IDENTIFIER ::= { wlanAp 66} 
+            wlanAP7052DE        OBJECT IDENTIFIER ::= { wlanAp 67} 
+            wlanAP7052TN-WI     OBJECT IDENTIFIER ::= { wlanAp 68} 
+            wlanAP8050TN-HD     OBJECT IDENTIFIER ::= { wlanAp 69} 
+            wlanAP4051TN        OBJECT IDENTIFIER ::= { wlanAp 70} 
+            wlanAP7052DN        OBJECT IDENTIFIER ::= { wlanAp 71} 	
+            wlanAP5050DN-S      OBJECT IDENTIFIER ::= { wlanAp 72} 
+            wlanAP2030DN-S      OBJECT IDENTIFIER ::= { wlanAp 73} 
+            wlanAP2051DN-E      OBJECT IDENTIFIER ::= { wlanAp 74} 
+            wlanAP2051DN        OBJECT IDENTIFIER ::= { wlanAp 75} 
+            wlanAP2051DN-S      OBJECT IDENTIFIER ::= { wlanAp 76} 
+            wlanAP7060DN        OBJECT IDENTIFIER ::= { wlanAp 77} 				
+            wlanAP100EC         OBJECT IDENTIFIER ::= { wlanAp 78}
+            wlanAP200EC         OBJECT IDENTIFIER ::= { wlanAp 79}
+            wlanAP300EC         OBJECT IDENTIFIER ::= { wlanAp 80}
 
         hwinfoX                 OBJECT IDENTIFIER ::= { hwProducts 40 }
         wlanApWA1006            OBJECT IDENTIFIER ::= { hwProducts 43 }
@@ -1330,7 +1786,14 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             ne40E-X2-M8A       OBJECT IDENTIFIER ::= { ne5000 24 }
             ne40E-X2-M16A      OBJECT IDENTIFIER ::= { ne5000 25 }
             ne40E-M2H     	OBJECT IDENTIFIER ::= { ne5000 26 }	
+            ne40E-M2K     	OBJECT IDENTIFIER ::= { ne5000 27 }	
             ne40E-X16B      OBJECT IDENTIFIER ::= { ne5000SysOid 27 } 			
+            virtual-cluster-chassis      OBJECT IDENTIFIER ::= { ne5000SysOid 20 }
+            ne40E-M8A       OBJECT IDENTIFIER ::= { ne5000 28 }
+            ne40E-M16A      OBJECT IDENTIFIER ::= { ne5000 29 } 
+            ne40E-M2K-B     OBJECT IDENTIFIER ::= { ne5000 30 }
+            ne40E-M1A       OBJECT IDENTIFIER ::= { ne5000 31 }
+            ne40E-X2-M16B   OBJECT IDENTIFIER ::= { ne5000 32 }
 			
         ggsn9811                OBJECT IDENTIFIER ::= { hwProducts 63 }
         pdsn9660                OBJECT IDENTIFIER ::= { hwProducts 64 }
@@ -1404,6 +1867,10 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             cX600-M8A-DO        OBJECT IDENTIFIER ::= { msp 43 }
             cX600-M16A-DO       OBJECT IDENTIFIER ::= { msp 44 }
 	    cX600-M2H       OBJECT IDENTIFIER ::= { msp 45 }
+	    cX600-M2K       OBJECT IDENTIFIER ::= { msp 46 }
+	    cX600-M2K-B     OBJECT IDENTIFIER ::= { msp 47 }
+	    cX600-M1A       OBJECT IDENTIFIER ::= { msp 48 }
+	    cX600-X2-M16B   OBJECT IDENTIFIER ::= { msp 49 }
 		
         ne20E                   OBJECT IDENTIFIER ::= { hwProducts 88 }
             ne20E-4             OBJECT IDENTIFIER ::= { ne20E 1 }
@@ -1416,7 +1883,8 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             ne20E-S8         OBJECT IDENTIFIER ::= { ne20E 5 }
             ne20E-S16        OBJECT IDENTIFIER ::= { ne20E 6 }
             ne20E-S2E	    OBJECT IDENTIFIER ::= { ne20E 7 }
-			ne20E-S2F	    OBJECT IDENTIFIER ::= { ne20E 8 }
+            ne20E-S2F	    OBJECT IDENTIFIER ::= { ne20E 8 }
+            ne20E-S16B      OBJECT IDENTIFIER ::= { ne20E 11 }
 
         me60             OBJECT IDENTIFIER ::= { hwProducts 89}
             me60-16             OBJECT IDENTIFIER ::= { me60 1 }
@@ -1475,6 +1943,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             s9310X       OBJECT IDENTIFIER ::= { s9300 11}
             s9310        OBJECT IDENTIFIER ::= { s9300 12}            
             s9300-NEW-COMM     OBJECT IDENTIFIER ::= { s9300 13}          -- Reserved for  U2000
+            s9316        OBJECT IDENTIFIER ::= { s9300 14}
 
         ma5603U          OBJECT IDENTIFIER ::= { hwProducts 172}
         mINIUA           OBJECT IDENTIFIER ::= { hwProducts 173}
@@ -1512,8 +1981,13 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
            ptn905E          OBJECT IDENTIFIER  ::= { ptn 27 } 
            ptn905D          OBJECT IDENTIFIER  ::= { ptn 28 } 
            ptn905F          OBJECT IDENTIFIER  ::= { ptn 29 }     -- 2016-11-28 added by zhuyuli 00256239 for PTN V1R9C00
+           ptn7900E-32      OBJECT IDENTIFIER  ::= { ptn 30 }     -- 2017-06-14 added by yumeiyong 00376328 for PTN V1R9C10
+           ptn960E          OBJECT IDENTIFIER  ::= { ptn 31 }     -- 2018-02-7 added by q00383574
+           ptn6900-M2K      OBJECT IDENTIFIER  ::= { ptn 32 }
+           ptn6900-M2K-B    OBJECT IDENTIFIER  ::= { ptn 33 }
+           ptn6900-M1A      OBJECT IDENTIFIER  ::= { ptn 34 }		   
+           ptn6900-2-M16B   OBJECT IDENTIFIER  ::= { ptn 35 }
 
- 
         ma5612           OBJECT IDENTIFIER ::= { hwProducts 184}
         ma5620          OBJECT IDENTIFIER ::= { hwProducts 185}
         ma5626          OBJECT IDENTIFIER ::= { hwProducts 186}
@@ -1579,6 +2053,34 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
 		   atn910C-A        OBJECT IDENTIFIER ::= { atn 32 }
 		   atn910C-B        OBJECT IDENTIFIER ::= { atn 33 }
 		   atn905-BM        OBJECT IDENTIFIER ::= { atn 34 }
+		   atn910C-D        OBJECT IDENTIFIER ::= { atn 35 }
+		   atn950B-V8       OBJECT IDENTIFIER ::= { atn 36 }
+		   atn910B-V8       OBJECT IDENTIFIER ::= { atn 37 }
+		   atn910B-E-AC-V8  OBJECT IDENTIFIER ::= { atn 38 }
+		   atn910B-D-DC-V8  OBJECT IDENTIFIER ::= { atn 39 }
+		   atn910B-D-AC-V8  OBJECT IDENTIFIER ::= { atn 40 }
+		   atn910B-F-DC-V8  OBJECT IDENTIFIER ::= { atn 41 }
+		   atn910B-F-AC-V8  OBJECT IDENTIFIER ::= { atn 42 }
+		   atn980B-IOT      OBJECT IDENTIFIER ::= { atn 43 }
+		   atn950C-IOT      OBJECT IDENTIFIER ::= { atn 44 }
+		   atn910C-A-IOT    OBJECT IDENTIFIER ::= { atn 45 }
+		   atn910C-B-IOT    OBJECT IDENTIFIER ::= { atn 46 }
+		   atn910C-D-IOT    OBJECT IDENTIFIER ::= { atn 47 }
+		   atn950B-IOT      OBJECT IDENTIFIER ::= { atn 48 }
+		   atn910B-IOT      OBJECT IDENTIFIER ::= { atn 49 }
+		   atn910B-E-AC-IOT OBJECT IDENTIFIER ::= { atn 50 }
+		   atn910B-D-DC-IOT OBJECT IDENTIFIER ::= { atn 51 }
+		   atn910B-D-AC-IOT OBJECT IDENTIFIER ::= { atn 52 }
+		   atn910B-F-DC-IOT OBJECT IDENTIFIER ::= { atn 53 }
+		   atn910B-F-AC-IOT OBJECT IDENTIFIER ::= { atn 54 }
+		   atn905-F-DC      OBJECT IDENTIFIER ::= { atn 55 }
+		   atn905-F-AC      OBJECT IDENTIFIER ::= { atn 56 }
+		   atn905-F-DC-IOT  OBJECT IDENTIFIER ::= { atn 57 }
+		   atn905-F-AC-IOT  OBJECT IDENTIFIER ::= { atn 58 }
+		   atn950BEX        OBJECT IDENTIFIER ::= { atn 59 }
+		   atn950BEX-IOT    OBJECT IDENTIFIER ::= { atn 60 }
+		   atn910C-F        OBJECT IDENTIFIER ::= { atn 61 }
+		   atn910C-F-IOT    OBJECT IDENTIFIER ::= { atn 62 }
 
         ne0508e          OBJECT IDENTIFIER ::= { hwProducts 297}
 			ne08E-S6        OBJECT IDENTIFIER ::= { ne0508e 1 }
@@ -1597,6 +2099,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
 			ne05E-SQ        OBJECT IDENTIFIER ::= { ne0508e 14 }
 			ne08E-S6E       OBJECT IDENTIFIER ::= { ne0508e 15 }
 			ne05E-SR        OBJECT IDENTIFIER ::= { ne0508e 16 }
+			ne08E-S9        OBJECT IDENTIFIER ::= { ne0508e 17 }
 			
 		etn 	          OBJECT IDENTIFIER ::= { hwProducts 298}
 			etn500-A        OBJECT IDENTIFIER ::= { etn 1 }
@@ -1606,6 +2109,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
 		    etn520-B        OBJECT IDENTIFIER ::= { etn 5 }	
 		    etn520-C        OBJECT IDENTIFIER ::= { etn 6 }	
 		    etn550-B        OBJECT IDENTIFIER ::= { etn 7 }	
+			etn500-D        OBJECT IDENTIFIER ::= { etn 8 }
 		   
         ma5652           OBJECT IDENTIFIER ::= { hwProducts 221}
         ma5622           OBJECT IDENTIFIER ::= { hwProducts 222}
@@ -1892,6 +2396,22 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
            ce6870-48S6CQ-EI        OBJECT IDENTIFIER ::= { dcswitch 32}
            ce6870-24S6CQ-EI        OBJECT IDENTIFIER ::= { dcswitch 33}
            ce7855-32Q-EI           OBJECT IDENTIFIER ::= { dcswitch 34}
+           ce6880-48S4Q2CQ-EI      OBJECT IDENTIFIER ::= { dcswitch 35}
+           ce6880-24S4Q2CQ-EI      OBJECT IDENTIFIER ::= { dcswitch 36}
+           ce6880-48T4Q2CQ-EI      OBJECT IDENTIFIER ::= { dcswitch 37}
+           ce12804E                OBJECT IDENTIFIER ::= { dcswitch 38}
+           ce12808E                OBJECT IDENTIFIER ::= { dcswitch 39}
+           ce12812E                OBJECT IDENTIFIER ::= { dcswitch 40}
+           ce12816E                OBJECT IDENTIFIER ::= { dcswitch 41}
+           ce8850-32CQ-EI          OBJECT IDENTIFIER ::= { dcswitch 42}
+           ce12816M                OBJECT IDENTIFIER ::= { dcswitch 43}
+           ce6870-48T6CQ-EI        OBJECT IDENTIFIER ::= { dcswitch 44}
+           cx916                   OBJECT IDENTIFIER ::= { dcswitch 45}
+           ce6856-48S6Q-HI         OBJECT IDENTIFIER ::= { dcswitch 46}
+           ce6856-48T6Q-HI         OBJECT IDENTIFIER ::= { dcswitch 47}
+           ce6875-48S4CQ-EI        OBJECT IDENTIFIER ::= { dcswitch 48}
+           ce6865-48S8CQ-EI        OBJECT IDENTIFIER ::= { dcswitch 49}
+           ce8850-64CQ-EI          OBJECT IDENTIFIER ::= { dcswitch 50}
            ce1800V                 OBJECT IDENTIFIER ::= { dcswitch 101}
 
     wlan                   OBJECT IDENTIFIER ::= { hwProducts 240 }
@@ -1908,6 +2428,9 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         acu2-ru                  OBJECT IDENTIFIER ::= { wlan  11}
         ac6003                   OBJECT IDENTIFIER ::= { wlan  12}
         ac6003-pwr               OBJECT IDENTIFIER ::= { wlan  13}
+        ac6800V                  OBJECT IDENTIFIER ::= { wlan  14}
+        ac600ec                  OBJECT IDENTIFIER ::= { wlan  15}
+        ac600ec-pwr              OBJECT IDENTIFIER ::= { wlan  16}
 		
        srg              OBJECT IDENTIFIER ::= { hwProducts 244}
            srg1320v          OBJECT IDENTIFIER ::= { srg 1 }
@@ -1941,12 +2464,25 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         ma5622A-16       OBJECT IDENTIFIER ::= { hwProducts 275}
         ma5811s          OBJECT IDENTIFIER ::= { hwProducts 296}
         ma5626b          OBJECT IDENTIFIER ::= { hwProducts 311}
+        ea5821           OBJECT IDENTIFIER ::= { hwProducts 332}
+		ma5811S-DE16     OBJECT IDENTIFIER ::= { hwProducts 342}
+		ma5811S-AE48     OBJECT IDENTIFIER ::= { hwProducts 343}
+		ma5811S-AE08     OBJECT IDENTIFIER ::= { hwProducts 344}
+		ma5811S-AE16     OBJECT IDENTIFIER ::= { hwProducts 345}
+		ma5811S-DE48     OBJECT IDENTIFIER ::= { hwProducts 346}
+		ma5611S-AE08     OBJECT IDENTIFIER ::= { hwProducts 347}
+		ma5611S-AE16     OBJECT IDENTIFIER ::= { hwProducts 348}
+		ma5611S-DE16     OBJECT IDENTIFIER ::= { hwProducts 349}
+		ma5611S-AE48     OBJECT IDENTIFIER ::= { hwProducts 350}
+		ma5611S-DE48     OBJECT IDENTIFIER ::= { hwProducts 351}
+		ma5611S-DE48-A   OBJECT IDENTIFIER ::= { hwProducts 352}
 	
     s12700lsw        OBJECT IDENTIFIER ::= { hwProducts 279}
             s12708lsw    OBJECT IDENTIFIER ::= { s12700lsw 1}
             s12712lsw    OBJECT IDENTIFIER ::= { s12700lsw 2}
             s12704lsw    OBJECT IDENTIFIER ::= { s12700lsw 3}
             s12710lsw    OBJECT IDENTIFIER ::= { s12700lsw 4}
+            s12703lsw    OBJECT IDENTIFIER ::= { s12700lsw 5}
 
        application-router  OBJECT IDENTIFIER ::= { hwProducts 282}
            ne16ex-8          OBJECT IDENTIFIER ::= { application-router 1 }
@@ -1967,7 +2503,125 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
 			snc   OBJECT IDENTIFIER ::= { sdnController 1 }	
 			acWan   OBJECT IDENTIFIER ::= { sdnController 2 }	
 			acDcn   OBJECT IDENTIFIER ::= { sdnController 3 }
-			acCampus   OBJECT IDENTIFIER ::= { sdnController 4 }			
+			acCampus   OBJECT IDENTIFIER ::= { sdnController 4 }	
+			
+      vne             OBJECT IDENTIFIER ::= { hwProducts 314}    
+            vne9000             OBJECT IDENTIFIER ::= { vne 1 }
+            vsig9800            OBJECT IDENTIFIER ::= { vne 2 }         
+            vne9000-CP          OBJECT IDENTIFIER ::= { vne 3 }
+
+--Security Gateway Product used sysOid 1.3.6..1.4.1.2011.2.321.X
+      usg             OBJECT IDENTIFIER ::= { hwProducts 321}    
+            fw             OBJECT IDENTIFIER ::= { usg 1 }
+            vFw            OBJECT IDENTIFIER ::= { usg 2 }         
+            bigData        OBJECT IDENTIFIER ::= { usg 3 }
+  --USG Firewall hardware sysoid added to 1.3.6..1.4.1.2011.2.321.1.X
+            usg6305              OBJECT IDENTIFIER ::= { fw 1 }
+	    usg6305-w            OBJECT IDENTIFIER ::= { fw 2 }
+	    usg6310s             OBJECT IDENTIFIER ::= { fw 3 }
+            usg6310s-w           OBJECT IDENTIFIER ::= { fw 4 }
+	    usg6310s-wl          OBJECT IDENTIFIER ::= { fw 5 }
+	    usg6310s-wl-ovs      OBJECT IDENTIFIER ::= { fw 6 }
+	    usg6510              OBJECT IDENTIFIER ::= { fw 7 }
+	    usg6510-wl           OBJECT IDENTIFIER ::= { fw 8 }
+            usg6510-c            OBJECT IDENTIFIER ::= { fw 9 }
+	    usg6510-wl-c         OBJECT IDENTIFIER ::= { fw 10 }
+	    usg6310s-c           OBJECT IDENTIFIER ::= { fw 11 }
+	    usg6310s-wl-ovs-c    OBJECT IDENTIFIER ::= { fw 12 }
+	    antiddos1680-ac      OBJECT IDENTIFIER ::= { fw 13 }
+            antiddos1680-dc      OBJECT IDENTIFIER ::= { fw 14 }
+	    antiddos1650-ac      OBJECT IDENTIFIER ::= { fw 15 }
+	    usg6390e             OBJECT IDENTIFIER ::= { fw 16 }
+	    usg6620-ave          OBJECT IDENTIFIER ::= { fw 17 }
+	    e200en3-ii-ac        OBJECT IDENTIFIER ::= { fw 18 }
+            e200en3-ii-dc        OBJECT IDENTIFIER ::= { fw 19 }
+	    e1000en5-ii-ac       OBJECT IDENTIFIER ::= { fw 20 }	
+	    e1000en5-ii-dc       OBJECT IDENTIFIER ::= { fw 21 }	
+            e1000en7-ii-ac       OBJECT IDENTIFIER ::= { fw 22 }
+	    e1000en7-ii-dc       OBJECT IDENTIFIER ::= { fw 23 }	
+	    usg6330-c            OBJECT IDENTIFIER ::= { fw 24 }
+	    --25-31 deleted by usgV6R6
+	    usg6307e             OBJECT IDENTIFIER ::= { fw 32 } 
+	    usg6306e             OBJECT IDENTIFIER ::= { fw 33 } 
+	    usg6308e             OBJECT IDENTIFIER ::= { fw 34 } 
+	    usg6311e             OBJECT IDENTIFIER ::= { fw 35 } 
+	    uusg6311e-poe        OBJECT IDENTIFIER ::= { fw 36 } 
+            --37 deleted by usgV6R6
+            usg6331e             OBJECT IDENTIFIER ::= { fw 38 } 
+	    usg6312e             OBJECT IDENTIFIER ::= { fw 39 } 
+	    usg6322e             OBJECT IDENTIFIER ::= { fw 40 } 
+	    usg6332e             OBJECT IDENTIFIER ::= { fw 41 } 
+	    usg6350e             OBJECT IDENTIFIER ::= { fw 42 } 
+            usg6360e             OBJECT IDENTIFIER ::= { fw 43 } 
+	    usg6380e             OBJECT IDENTIFIER ::= { fw 44} 
+	    usg6515e             OBJECT IDENTIFIER ::= { fw 45 } 
+	    usg6510e             OBJECT IDENTIFIER ::= { fw 46 } 
+	    usg6510e-poe         OBJECT IDENTIFIER ::= { fw 47 } 
+	    --48 deleted by usgv6r6	    
+            usg6530e             OBJECT IDENTIFIER ::= { fw 49} 
+	    usg6550e             OBJECT IDENTIFIER ::= { fw 50 } 
+	    usg6560e             OBJECT IDENTIFIER ::= { fw 51 } 
+	    usg6580e             OBJECT IDENTIFIER ::= { fw 52 } 
+	    usg6630e-ac             OBJECT IDENTIFIER ::= { fw 53 } 	    
+            usg6650e             OBJECT IDENTIFIER ::= { fw 54 } 
+	    usg6680e             OBJECT IDENTIFIER ::= { fw 55} 
+	    usg6712e             OBJECT IDENTIFIER ::= { fw 56 } 
+	    usg6716e             OBJECT IDENTIFIER ::= { fw 57 } 	    
+	    eudemon200e-g8-ac    OBJECT IDENTIFIER ::= { fw 58 } 	    
+            eudemon200e-g8-dc    OBJECT IDENTIFIER ::= { fw 59 } 
+	    eudemon1000e-g3-ac   OBJECT IDENTIFIER ::= { fw 60 } 
+	    eudemon1000e-g3-dc   OBJECT IDENTIFIER ::= { fw 61 } 
+	    eudemon1000e-g5-ac   OBJECT IDENTIFIER ::= { fw 62} 
+	    eudemon1000e-g5-dc   OBJECT IDENTIFIER ::= { fw 63 } 	    
+            eudemon1000e-g8-ac   OBJECT IDENTIFIER ::= { fw 64 } 
+	    eudemon1000e-g8-dc   OBJECT IDENTIFIER ::= { fw 65} 
+	    eudemon1000e-g12-ac  OBJECT IDENTIFIER ::= { fw 66 } 
+	    eudemon1000e-g12-dc  OBJECT IDENTIFIER ::= { fw 67 } 
+	    eudemon1000e-g16-ac  OBJECT IDENTIFIER ::= { fw 68 } 
+	    eudemon1000e-g16-dc  OBJECT IDENTIFIER ::= { fw 69 } 	    
+            nip6305e             OBJECT IDENTIFIER ::= { fw 70 } 
+	    nip6310e             OBJECT IDENTIFIER ::= { fw 71 } 
+	    nip6510e             OBJECT IDENTIFIER ::= { fw 72 } 
+	    nip6550e             OBJECT IDENTIFIER ::= { fw 73} 
+	    vscan1506            OBJECT IDENTIFIER ::= { fw 74 } 	    
+            vscan1508            OBJECT IDENTIFIER ::= { fw 75 } 
+	    waf5110              OBJECT IDENTIFIER ::= { fw 76} 
+	    waf5250              OBJECT IDENTIFIER ::= { fw 77 } 
+	    waf5260              OBJECT IDENTIFIER ::= { fw 78 } 
+	    waf5510              OBJECT IDENTIFIER ::= { fw 79 } 
+	    nip6610e             OBJECT IDENTIFIER ::= { fw 80 } 	    
+	    nip6610ed            OBJECT IDENTIFIER ::= { fw 81} 
+	    nip6620e             OBJECT IDENTIFIER ::= { fw 82 } 
+	    nip6620ed            OBJECT IDENTIFIER ::= { fw 83 } 
+	    antiddos1820         OBJECT IDENTIFIER ::= { fw 84} 
+	    antiddos1880         OBJECT IDENTIFIER ::= { fw 85 } 
+		usg6630e-dc           OBJECT IDENTIFIER ::= { fw 86 }	    
+    --USG Virtual Firewall software sysoid added to 1.3.6..1.4.1.2011.2.321.2.X		
+            usg9000v             OBJECT IDENTIFIER ::= { vFw 1 }
+            eudemon8000e-v       OBJECT IDENTIFIER ::= { vFw 2 }
+            nip9000v             OBJECT IDENTIFIER ::= { vFw 3 }
+            antiddos8000v        OBJECT IDENTIFIER ::= { vFw 4 }
+            usg6000v1            OBJECT IDENTIFIER ::= { vFw 5 }
+            usg6000v2            OBJECT IDENTIFIER ::= { vFw 6 }
+            usg6000v4            OBJECT IDENTIFIER ::= { vFw 7 }
+            usg6000v8            OBJECT IDENTIFIER ::= { vFw 8 }
+            eudemon1000e-v1      OBJECT IDENTIFIER ::= { vFw 9 }
+            eudemon1000e-v2      OBJECT IDENTIFIER ::= { vFw 10 }
+            eudemon1000e-v4      OBJECT IDENTIFIER ::= { vFw 11 }
+            eudemon1000e-v8      OBJECT IDENTIFIER ::= { vFw 12 }
+            das                  OBJECT IDENTIFIER ::= { vFw 13 }
+            waf5000-v-4          OBJECT IDENTIFIER ::= { vFw 14 }
+            waf5000-v-8          OBJECT IDENTIFIER ::= { vFw 15 }
+            waf5000-v-16         OBJECT IDENTIFIER ::= { vFw 16 }
+            waf5000-v-32	 OBJECT IDENTIFIER ::= { vFw 17 }  
+   --USG Big Data software Product (CIS,FireHunter...)sysoid added to 1.3.6..1.4.1.2011.2.321.3.X
+--end 1.3.6.1.4.1.2011.2.321.x for Secruity Gateway Product 
+
+
+	  s7900        OBJECT IDENTIFIER ::= { hwProducts 333}
+	       s7905    OBJECT IDENTIFIER ::= { s7900 1} 
+				 s7908    OBJECT IDENTIFIER ::= { s7900 2}
+				  
     huaweiExperimental          OBJECT IDENTIFIER ::= { huawei 4 }
 
     huaweiMgmt                  OBJECT IDENTIFIER ::= { huawei 5 }
@@ -2081,6 +2735,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
         hwTimeLocalization       OBJECT IDENTIFIER ::= { huaweiUtility 66}
         hwBulkStatistics         OBJECT IDENTIFIER ::= { huaweiUtility 103 }
         hwCfgInfoCollect         OBJECT IDENTIFIER ::= { huaweiUtility 121 }
+        hwSecurity               OBJECT IDENTIFIER ::= { huaweiUtility 122 }
         hwEntityVendorType       OBJECT IDENTIFIER ::= { huaweiUtility 162 }
         hwFTTODeviceMIB          OBJECT IDENTIFIER ::= { huaweiUtility 186 }
         h3c OBJECT IDENTIFIER ::= { huawei 10 }     -- July  09,2003,lcl added
@@ -2092,11 +2747,50 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
            ne9000                   OBJECT IDENTIFIER ::= { hwProducts 315 }
             ne9000SysOid            OBJECT IDENTIFIER ::= { ne9000 2 }
             ne9000-20              OBJECT IDENTIFIER ::= { ne9000SysOid 1 }
-        
+            ne9000-8               OBJECT IDENTIFIER ::= { ne9000SysOid 2 }
+
         ma5800-x15          OBJECT IDENTIFIER ::= { hwProducts 316}
         ma5800-x2           OBJECT IDENTIFIER ::= { hwProducts 317}
-
+        cloudedge           OBJECT IDENTIFIER ::= { hwProducts 325}
+        ea5800-x17          OBJECT IDENTIFIER ::= { hwProducts 327}
+        ea5800-x15          OBJECT IDENTIFIER ::= { hwProducts 328}
+        ea5800-x7           OBJECT IDENTIFIER ::= { hwProducts 329}
+        ea5800-x2           OBJECT IDENTIFIER ::= { hwProducts 330}
+        BGW                 OBJECT IDENTIFIER ::= { hwProducts 331}
+                                   BGW9916 OBJECT IDENTIFIER ::= { BGW 1 }
+        cx6600              OBJECT IDENTIFIER ::= { hwProducts 336 }
+          cx6600SysOid        OBJECT IDENTIFIER ::= { cx6600 1 }
+          cx6620              OBJECT IDENTIFIER ::= { cx6600SysOid 1 }
+          cx6608              OBJECT IDENTIFIER ::= { cx6600SysOid 2 }
+          cx6602              OBJECT IDENTIFIER ::= { cx6600SysOid 3 }
+          cx6602-B            OBJECT IDENTIFIER ::= { cx6600SysOid 4 }
+          cx6601              OBJECT IDENTIFIER ::= { cx6600SysOid 5 }
+    ma5801-gp08              OBJECT IDENTIFIER ::= { hwProducts 337}
+    ea5801-gp08              OBJECT IDENTIFIER ::= { hwProducts 338}
+    ma5801-cg04              OBJECT IDENTIFIER ::= { hwProducts 339}
+    ea5801-cg04              OBJECT IDENTIFIER ::= { hwProducts 340}
+	ne40ex16b               OBJECT IDENTIFIER ::= { hwProducts 354 }
+	      NE40EX16BSysOid        OBJECT IDENTIFIER ::= { ne40ex16b 1 }
+		  NE40EX16B              OBJECT IDENTIFIER ::= { NE40EX16BSysOid 1 }
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

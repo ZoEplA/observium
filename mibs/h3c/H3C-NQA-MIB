@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2005 by HUAWEI-3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (c) 2004-2017 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:  Extended MIB File(extended from DISMAN-PING-MIB RFC2925)
 -- Reference:
--- Version: V2.3
+-- Version: V2.6
 -- History:
 -- V1.0  Lv zhenfeng, 2003.08, Initial Version
 -- V1.1 2004-10-12 updated by gaolong
@@ -89,6 +89,18 @@
 --       h3cNqaStatJitterNumOfPosDS, h3cNqaStatJitterSumOfPosDS, h3cNqaStatJitterSumOfSquarePosDS,
 --       h3cNqaStatJitterNumOfNegDS, h3cNqaStatJitterSumOfNegDS, h3cNqaStatJitterSumOfSquareNegDS,
 --       h3cNqaStatJitterPacketLossSD, h3cNqaStatJitterPacketLossDS, h3cNqaStatJitterPktLossUnknown.
+-- V2.4 2012-04-20 Modified by sunbiliang and wanghaidong
+--      add raw in h3cNqaCtlHttpOperationType
+--      modifiy the range of h3cNqaCtlHttpOperationString
+-- V2.5 2013-12-17 Modified by wangbo
+--      modify the descriptions of h3cNqaCtlICPIFAdvFactor, h3cNqaStatJitterNumOfNegSD,
+--       h3cNqaStatJitterNumOfPosSD, h3cNqaStatJitterNumOfPosDS, h3cNqaStatJitterNumOfNegDS,
+--       h3cNqaReactCurrentStatus
+-- V2.6 2017-07-03 Modified by zhanbaobin
+--      add h3cNqaJitterStatsAveSD, h3cNqaJitterStatsAveDS to h3cNqaJitterStatsEntry,
+--      add h3cNqaStatJitterAveSD, h3cNqaStatJitterAveDS to h3cNqaGroupStatsJitterEntry.
+--      add h3cNqaTcpServerExtendTable
+--      add h3cNqaUdpServerExtendEntry
 -- =================================================================
 H3C-NQA-MIB DEFINITIONS ::= BEGIN
 
@@ -96,7 +108,7 @@ H3C-NQA-MIB DEFINITIONS ::= BEGIN
             MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
             OBJECT-IDENTITY, NOTIFICATION-TYPE, Integer32, Counter32, Gauge32
                 FROM SNMPv2-SMI
-            DateAndTime, DisplayString, RowStatus
+            DateAndTime, DisplayString, RowStatus, TEXTUAL-CONVENTION
                 FROM SNMPv2-TC
             InetAddressType, InetAddress
                 FROM INET-ADDRESS-MIB
@@ -109,17 +121,36 @@ H3C-NQA-MIB DEFINITIONS ::= BEGIN
                 FROM SNMP-FRAMEWORK-MIB;          -- RFC2571
 
     h3cNqa MODULE-IDENTITY
-        LAST-UPDATED "200608140000Z"
-        ORGANIZATION "Huawei 3Com Technologies Co., Ltd."
-            CONTACT-INFO
-                "Platform Team Huawei 3Com Technologies Co., Ltd.
-                Hai-Dian District Beijing P.R. China
-                http://www.huawei-3com.com
-                Zip:100085"
+        LAST-UPDATED "201707030000Z"
+        ORGANIZATION
+            "Hangzhou H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team Hangzhou H3C Technologies Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085"
             DESCRIPTION
-                "The private mib file includes the test information of the
+                "The private MIB file includes the test information of the
                 device. It is supplementary for rfc2925.txt."
+            REVISION "201707030000Z"
+            DESCRIPTION
+                "Add h3cNqaJitterStatsAveSD, h3cNqaJitterStatsAveDS to
+                h3cNqaJitterStatsEntry add h3cNqaStatJitterAveSD,
+                h3cNqaStatJitterAveDS to h3cNqaGroupStatsJitterEntry,
+                h3cNqaTcpServerExtendTable and h3cNqaUdpServerExtendTable."
         ::= { h3cRhw 3 }
+
+ -- Textual Conventions
+VpnInstanceType ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+         "A value that represents a type of VPN instance.
+          public(1)   Public network.
+          vpn(2)      Private network."
+     SYNTAX      INTEGER {
+                     public(1),
+                     vpn(2)
+                 }
 
     h3cNqaObjects OBJECT IDENTIFIER ::= { h3cNqa 1 }
 
@@ -304,17 +335,18 @@ h3cNqaCtlJitterAdminNumPackets OBJECT-TYPE
 h3cNqaCtlHttpOperationType OBJECT-TYPE
     SYNTAX      INTEGER{
                 get(1),
-                post(2)
+                post(2),
+                raw(3)
                 }
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Http operation type: get or post."
+        "Http operation type: get, post or raw."
     DEFVAL      { get }
     ::= { h3cNqaCtlEntry 6 }
 
 h3cNqaCtlHttpOperationString OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(0..255))
+    SYNTAX      DisplayString(SIZE(0..1023))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -407,7 +439,8 @@ h3cNqaCtlICPIFAdvFactor OBJECT-TYPE
     DESCRIPTION
         "The advantage factor depends on the type of access and how the service
         is to be used. This object will be used while calculating the ICPIF
-        (Calculated Planning Impairment Factor) values.
+        (Calculated Planning Impairment Factor) values.  This is applicable
+        only for the jitter probe.
 
         Suggestion values:
 
@@ -595,7 +628,6 @@ h3cNqaResultsMaxDelayDS OBJECT-TYPE
 
 h3cNqaResultsLostPacketRatio OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -744,7 +776,9 @@ H3cNqaJitterStatsEntry  ::= SEQUENCE
     h3cNqaJitterStatsAveNegativesDS          Gauge32,
     h3cNqaJitterStatsPktLossUnknown          Gauge32,
     h3cNqaJitterStatsOperOfICPIF             Gauge32,
-    h3cNqaJitterStatsOperOfMOS               Gauge32
+    h3cNqaJitterStatsOperOfMOS               Gauge32,
+    h3cNqaJitterStatsAveSD                   Gauge32,
+    h3cNqaJitterStatsAveDS                   Gauge32
 }
 
 h3cNqaJitterStatsNumOfRTT OBJECT-TYPE
@@ -759,6 +793,7 @@ h3cNqaJitterStatsNumOfRTT OBJECT-TYPE
 
 h3cNqaJitterStatsMinOfPositivesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -768,6 +803,7 @@ h3cNqaJitterStatsMinOfPositivesSD OBJECT-TYPE
 
 h3cNqaJitterStatsMaxOfPositivesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -788,6 +824,7 @@ h3cNqaJitterStatsNumOfPositivesSD OBJECT-TYPE
 
 h3cNqaJitterStatsSumOfPositivesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -797,6 +834,7 @@ h3cNqaJitterStatsSumOfPositivesSD OBJECT-TYPE
 
 h3cNqaJitterStatsSum2PositivesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -806,6 +844,7 @@ h3cNqaJitterStatsSum2PositivesSD OBJECT-TYPE
 
 h3cNqaJitterStatsMinOfNegativesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -815,6 +854,7 @@ h3cNqaJitterStatsMinOfNegativesSD OBJECT-TYPE
 
 h3cNqaJitterStatsMaxOfNegativesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -835,6 +875,7 @@ h3cNqaJitterStatsNumOfNegativesSD OBJECT-TYPE
 
 h3cNqaJitterStatsSumOfNegativesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -846,6 +887,7 @@ h3cNqaJitterStatsSumOfNegativesSD OBJECT-TYPE
 
 h3cNqaJitterStatsSum2NegativesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -855,6 +897,7 @@ h3cNqaJitterStatsSum2NegativesSD OBJECT-TYPE
 
 h3cNqaJitterStatsMinOfPositivesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -864,6 +907,7 @@ h3cNqaJitterStatsMinOfPositivesDS OBJECT-TYPE
 
 h3cNqaJitterStatsMaxOfPositivesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -882,6 +926,7 @@ h3cNqaJitterStatsNumOfPositivesDS OBJECT-TYPE
 
 h3cNqaJitterStatsSumOfPositivesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -891,6 +936,7 @@ h3cNqaJitterStatsSumOfPositivesDS OBJECT-TYPE
 
 h3cNqaJitterStatsSum2PositivesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -900,6 +946,7 @@ h3cNqaJitterStatsSum2PositivesDS OBJECT-TYPE
 
 h3cNqaJitterStatsMinOfNegativesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -909,6 +956,7 @@ h3cNqaJitterStatsMinOfNegativesDS OBJECT-TYPE
 
 h3cNqaJitterStatsMaxOfNegativesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -927,6 +975,7 @@ h3cNqaJitterStatsNumOfNegativesDS OBJECT-TYPE
 
 h3cNqaJitterStatsSumOfNegativesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -936,6 +985,7 @@ h3cNqaJitterStatsSumOfNegativesDS OBJECT-TYPE
 
 h3cNqaJitterStatsSum2NegativesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -961,6 +1011,7 @@ h3cNqaJitterStatsPacketLossDS OBJECT-TYPE
 
 h3cNqaJitterStatsAvePositivesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -970,6 +1021,7 @@ h3cNqaJitterStatsAvePositivesSD OBJECT-TYPE
 
 h3cNqaJitterStatsAveNegativesSD OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -979,6 +1031,7 @@ h3cNqaJitterStatsAveNegativesSD OBJECT-TYPE
 
 h3cNqaJitterStatsAvePositivesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -988,6 +1041,7 @@ h3cNqaJitterStatsAvePositivesDS OBJECT-TYPE
 
 h3cNqaJitterStatsAveNegativesDS OBJECT-TYPE
     SYNTAX      Gauge32
+    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -997,7 +1051,6 @@ h3cNqaJitterStatsAveNegativesDS OBJECT-TYPE
 
 h3cNqaJitterStatsPktLossUnknown OBJECT-TYPE
     SYNTAX      Gauge32
-    UNITS       "milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -1020,6 +1073,26 @@ h3cNqaJitterStatsOperOfMOS OBJECT-TYPE
     DESCRIPTION
         "The MOS (Mean Opinion Score) value for the latest jitter test."
     ::= { h3cNqaJitterStatsEntry 30 }
+
+h3cNqaJitterStatsAveSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from source to destination."
+    ::= { h3cNqaJitterStatsEntry 31 }
+
+h3cNqaJitterStatsAveDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from destination to source."
+    ::= { h3cNqaJitterStatsEntry 32 }
 
 h3cNqaAgentEnable OBJECT-TYPE
     SYNTAX      INTEGER{
@@ -1076,7 +1149,6 @@ h3cNqaTcpServerIpAddress          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Tcp server's ip address."
-    DEFVAL { ''H }
     ::= { h3cNqaTcpServerEntry 1 }
 
 h3cNqaTcpServerPort          OBJECT-TYPE
@@ -1085,7 +1157,6 @@ h3cNqaTcpServerPort          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Tcp server's port number."
-    DEFVAL      { 0 }
     ::= { h3cNqaTcpServerEntry 2 }
 
 h3cNqaTcpServerRowStatus OBJECT-TYPE
@@ -1133,7 +1204,6 @@ h3cNqaUdpServerIpAddress          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Udp server's ip address."
-    DEFVAL { ''H }
     ::= { h3cNqaUdpServerEntry 1 }
 
 h3cNqaUdpServerPort          OBJECT-TYPE
@@ -1142,7 +1212,6 @@ h3cNqaUdpServerPort          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Udp server's port number."
-    DEFVAL      { 0 }
     ::= { h3cNqaUdpServerEntry 2 }
 
 h3cNqaUdpServerRowStatus OBJECT-TYPE
@@ -1533,9 +1602,9 @@ h3cNqaStatResRttSum OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This object contains the sum of the squares for all NQA
-        responses received during the test lifetime. The value of this object
-        MUST be reported as 0 when no NQA responses have been received."
+        "This object contains the sum for all NQA responses received
+         during the test lifetime.  The value of this object MUST be
+         reported as 0 when no NQA responses have been received."
     ::= { h3cNqaStatisticsResultsEntry 21 }
 
 h3cNqaStatResNumOfDelaySD OBJECT-TYPE
@@ -1685,7 +1754,9 @@ H3cNqaGroupStatsJitterEntry ::=
             h3cNqaStatJitterMaxOfICPIF          Gauge32,
             h3cNqaStatJitterMinOfICPIF          Gauge32,
             h3cNqaStatJitterMaxOfMOS            Gauge32,
-            h3cNqaStatJitterMinOfMOS            Gauge32
+            h3cNqaStatJitterMinOfMOS            Gauge32,
+            h3cNqaStatJitterAveSD               Gauge32,
+            h3cNqaStatJitterAveDS               Gauge32
         }
 
 h3cNqaStatJitterIndex OBJECT-TYPE
@@ -1726,10 +1797,8 @@ h3cNqaStatJitterNumOfPosSD OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number that records positive jitter times from source to
-        destination in the jitter test.
-        The total number of all positive jitter values in packets sent
-        from source to destination."
+        "The total number of positive jitters from source to destination in the
+        jitter test."
     ::= { h3cNqaGroupStatsJitterEntry 4 }
 
 h3cNqaStatJitterSumOfPosSD OBJECT-TYPE
@@ -1777,10 +1846,8 @@ h3cNqaStatJitterNumOfNegSD OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number that records negative jitter times from source to
-        destination in the jitter test.
-        The total number of all negative jitter values sent from source to
-        destination."
+        "The total number of negative jitters from source to destination in the
+        jitter test."
     ::= { h3cNqaGroupStatsJitterEntry 9 }
 
 h3cNqaStatJitterSumOfNegSD OBJECT-TYPE
@@ -1828,8 +1895,8 @@ h3cNqaStatJitterNumOfPosDS OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number that records positive jitter times from destination to
-        source in the jitter test."
+        "The total number of positive jitters from destination to source in the
+        jitter test."
     ::= { h3cNqaGroupStatsJitterEntry 14 }
 
 h3cNqaStatJitterSumOfPosDS OBJECT-TYPE
@@ -1877,8 +1944,8 @@ h3cNqaStatJitterNumOfNegDS OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number that records negative jitter times from destination to
-        source in the jitter test."
+        "The total number of negative jitters from destination to source in the
+        jitter test."
     ::= { h3cNqaGroupStatsJitterEntry 19 }
 
 h3cNqaStatJitterSumOfNegDS OBJECT-TYPE
@@ -1996,6 +2063,26 @@ h3cNqaStatJitterMinOfMOS OBJECT-TYPE
     DESCRIPTION
         "The minimum of all MOS values in a statistic cycle for jitter test."
     ::= { h3cNqaGroupStatsJitterEntry 32 }
+
+h3cNqaStatJitterAveSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from source to destination."
+    ::= { h3cNqaGroupStatsJitterEntry 33 }
+
+h3cNqaStatJitterAveDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from destination to source."
+    ::= { h3cNqaGroupStatsJitterEntry 34 }
 
 -- Reaction Table
 h3cNqaReactionTable OBJECT-TYPE
@@ -2229,15 +2316,15 @@ h3cNqaReactCurrentStatus OBJECT-TYPE
     DESCRIPTION
         "Specifies the current status of this reaction entry:
 
-        invalid  - Specifies the reaction entry status is uncertain.
+        invalid  - The status of the reaction entry is unknown.
 
-        overThreshold   - Specifies the reaction entry has met
-                          the h3cNqaReactThresholdType and the
-                          threshold value.
+        overThreshold   - The status of the reaction entry is overThreshold
+                          when the monitored result exceeds the threshold
+                          value for the h3cNqaReactThresholdType.
 
-        belowThreshold  - Specifies the reaction entry has
-                          disobeyed the h3cNqaReactThresholdType
-                          and the threshold value."
+        belowThreshold  - The status of the reaction entry is belowThreshold
+                          when the monitored result is under the threshold
+                          value for the h3cNqaReactThresholdType."
     ::= { h3cNqaReactionEntry 11 }
 
 h3cNqaReactRowStatus OBJECT-TYPE
@@ -2346,9 +2433,9 @@ h3cNqaStatReactIndex OBJECT-TYPE
         this table is created when the statistics result of a NQA probe
         is determined.
 
- 	An implementation MUST start assigning h3cNqaStatResIndex values
- 	at 1 and wrap after exceeding the maximum possible value as
- 	defined by the limit of this object ('ffffffff'h)."
+        An implementation MUST start assigning h3cNqaStatResIndex values
+        at 1 and wrap after exceeding the maximum possible value as
+        defined by the limit of this object ('ffffffff'h)."
     DEFVAL { 0 }
     ::= { h3cNqaStatisticsReactionEntry 3 }
 
@@ -2358,7 +2445,7 @@ h3cNqaStatReactItemIndex OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The forth index of h3cNqaStatisticsReactionTable, it definitely
- 	identifies one of the reaction configurations for a test"
+        identifies one of the reaction configurations for a test"
     DEFVAL { 0 }
     ::= { h3cNqaStatisticsReactionEntry 4 }
 
@@ -2380,6 +2467,226 @@ h3cNqaStatReactThresholdNum OBJECT-TYPE
     DEFVAL { 0 }
     ::= { h3cNqaStatisticsReactionEntry 6 }
 
+-- =================================================================
+--   NQA server configuration extended information
+-- =================================================================
+
+h3cNqaTcpServerExtendTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cNqaTcpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of extended NQA TCP server
+        configuration information."
+    ::= { h3cNqaObjects 15 }
+
+h3cNqaTcpServerExtendEntry OBJECT-TYPE
+    SYNTAX      H3cNqaTcpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of extended NQA TCP server
+        configuration information.
+        This entry includes the TCP server IP address, port,
+        VPN name and DSField."
+    INDEX {
+            h3cNqaTcpServerExtIpAddress,
+            h3cNqaTcpServerExtPort,
+            h3cNqaTcpServerExtVPNType,
+            h3cNqaTcpServerExtVPNInstance
+          }
+    ::= { h3cNqaTcpServerExtendTable 1 }
+
+H3cNqaTcpServerExtendEntry  ::= SEQUENCE
+{
+    h3cNqaTcpServerExtIpAddress                InetAddress,
+    h3cNqaTcpServerExtPort                     Integer32,
+    h3cNqaTcpServerExtVPNType                  VpnInstanceType,
+    h3cNqaTcpServerExtVPNInstance              OCTET STRING,
+    h3cNqaTcpServerExtDSField                  Unsigned32,
+    h3cNqaTcpServerExtRowStatus                RowStatus
+}
+
+h3cNqaTcpServerExtIpAddress          OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's IP address."
+    ::= { h3cNqaTcpServerExtendEntry 1 }
+
+h3cNqaTcpServerExtPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's port number."
+    ::= { h3cNqaTcpServerExtendEntry 2 }
+
+h3cNqaTcpServerExtVPNType OBJECT-TYPE
+    SYNTAX      VpnInstanceType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's VPN instance type."
+    ::= { h3cNqaTcpServerExtendEntry 3 }
+
+h3cNqaTcpServerExtVPNInstance OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's VPN name.If the NQA server listens on the public network,
+        the value of h3cNqaTcpServerExtVPNType must be public(1) and the value
+        of this object can be set to any non-printable character string.If the
+        NQA server listens on the private network, the value of h3cNqaTcpServerExtVPNType
+        must be vpn(2) and the value of this object can be set to any non-printable
+        character string."
+    ::= { h3cNqaTcpServerExtendEntry 4 }
+
+h3cNqaTcpServerExtDSField OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value to store in the Differentiated
+        Services (DS) Field in the IP packet used to
+        encapsulate the probe.  The DS Field is defined
+        as the Type of Service (TOS) octet in a IPv4 header
+        or as the Traffic Class octet in a IPv6 header.
+
+        The value of this object must be a decimal integer
+        in the range of 0 to 255.  Not all values are legal or
+        meaningful.  A value of 0 means that the function
+        represented by this option is not supported.  DS Field
+        usage is often not supported by IP implementations and
+        not all values are supported.  Refer to RFC 2474 for
+        guidance on usage of this field."
+    REFERENCE
+        "Refer to RFC 2474 for the definition of the
+        Differentiated Services Field and to RFC 1812
+        Section 5.3.2 for Type of Service (TOS)."
+    DEFVAL { 0 }
+    ::= { h3cNqaTcpServerExtendEntry 5 }
+
+h3cNqaTcpServerExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "h3cNqaTcpServerIpAddress, h3cNqaTcpServerPort, h3cNqaTcpServerExtVPNType
+        and h3cNqaTcpServerVPNInstance must be set during a creation operation."
+    REFERENCE
+        "RFC 2579"
+    ::= { h3cNqaTcpServerExtendEntry 6 }
+
+h3cNqaUdpServerExtendTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cNqaUdpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status of extended NQA UDP server configuration information."
+    ::= { h3cNqaObjects 16 }
+
+h3cNqaUdpServerExtendEntry OBJECT-TYPE
+    SYNTAX      H3cNqaUdpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of extended NQA UDP server
+        configuration information.
+        This entry includes the UDP server IP address, port,
+        VPN name and DSField."
+    INDEX {
+            h3cNqaUdpServerExtIpAddress,
+            h3cNqaUdpServerExtPort,
+            h3cNqaUdpServerExtVPNType,
+            h3cNqaUdpServerExtVPNInstance
+          }
+    ::= { h3cNqaUdpServerExtendTable 1 }
+
+H3cNqaUdpServerExtendEntry  ::= SEQUENCE
+{
+    h3cNqaUdpServerExtIpAddress                InetAddress,
+    h3cNqaUdpServerExtPort                     Integer32,
+    h3cNqaUdpServerExtVPNType                  VpnInstanceType,
+    h3cNqaUdpServerExtVPNInstance              OCTET STRING,
+    h3cNqaUdpServerExtDSField                  Unsigned32,
+    h3cNqaUdpServerExtRowStatus                RowStatus
+}
+
+h3cNqaUdpServerExtIpAddress          OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's IP address."
+    ::= { h3cNqaUdpServerExtendEntry 1 }
+
+h3cNqaUdpServerExtPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's port number."
+    ::= { h3cNqaUdpServerExtendEntry 2 }
+
+h3cNqaUdpServerExtVPNType OBJECT-TYPE
+    SYNTAX      VpnInstanceType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's VPN instance type."
+    ::= { h3cNqaUdpServerExtendEntry 3 }
+
+h3cNqaUdpServerExtVPNInstance OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's VPN name.If the NQA server listens on the public network,
+        the value of h3cNqaUdpServerExtVPNType must be public(1) and the value
+        of this object can be set to any non-printable character string.If the
+        NQA server listens on the private network, the value of h3cNqaUdpServerExtVPNType
+        must be vpn(2) and the value of this object can be set to any non-printable
+        character string."
+    ::= { h3cNqaUdpServerExtendEntry 4 }
+
+h3cNqaUdpServerExtDSField OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value to store in the Differentiated
+        Services (DS) Field in the IP packet used to
+        encapsulate the probe.  The DS Field is defined
+        as the Type of Service (TOS) octet in a IPv4 header
+        or as the Traffic Class octet in a IPv6 header.
+
+        The value of this object must be a decimal integer
+        in the range of 0 to 255.  Not all values are legal or
+        meaningful.  A value of 0 means that the function
+        represented by this option is not supported.  DS Field
+        usage is often not supported by IP implementations and
+        not all values are supported.  Refer to RFC 2474 for
+        guidance on usage of this field."
+    REFERENCE
+        "Refer to RFC 2474 for the definition of the
+        Differentiated Services Field and to RFC 1812
+        Section 5.3.2 for Type of Service (TOS)."
+    DEFVAL { 0 }
+    ::= { h3cNqaUdpServerExtendEntry 5 }
+
+h3cNqaUdpServerExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "h3cNqaUdpServerIpAddress, h3cNqaUdpServerPort, h3cNqaUdpServerExtVPNType
+        and h3cNqaUdpServerVPNInstance must be set during a creation operation."
+    REFERENCE
+        "RFC 2579"
+    ::= { h3cNqaUdpServerExtendEntry 6 }
 
 -- Notification Definition section
 h3cNqaNotifications  OBJECT IDENTIFIER ::= { h3cNqa 3 }

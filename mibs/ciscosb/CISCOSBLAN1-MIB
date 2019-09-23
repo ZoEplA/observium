@@ -115,6 +115,40 @@ rlLan1x86VlanMappingEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
+        "A mapping of incoming s-tag to a group."
+    INDEX   { rlLan1x86VlanMappingVlanId  }
+    ::= { rlLan1x86VlanMappingTable 1 }
+
+RlLan1x86VlanMappingEntry ::=
+    SEQUENCE {
+        rlLan1x86VlanMappingVlanId
+            VlanId,
+        rlLan1x86VlanMappingGroupId
+            GroupId,
+        rlLan1x86VlanMappingRowStatus
+            RowStatus
+    }
+
+rlLan1x86VlanMappingVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The s-tag to mapped to group"
+    ::= { rlLan1x86VlanMappingEntry 1 }
+
+rlLan1x86VlanMappingGroupId OBJECT-TYPE
+    SYNTAX      GroupId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "group for filtering traffic"
+    ::= { rlLan1x86VlanMappingEntry 2 }
+
+
+rlLan1x86VlanMappingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "This object indicates the status of this entry."

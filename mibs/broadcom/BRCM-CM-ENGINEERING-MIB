@@ -1,31 +1,59 @@
---**************************************************************************
---                                                                          
---    Copyright 2002 Broadcom Corporation                                   
---    All Rights Reserved                                                   
---    No portions of this material may be reproduced in any form without the
---    written permission of:                                                
---             Broadcom Corporation                                         
---             16251 Laguna Canyon Road                                     
---             Irvine, California  92618                                    
---    All information contained in this document is Broadcom Corporation    
---    company private, proprietary, and trade secret.                       
---                                                                          
---                                                                          
---                                                                          
---**************************************************************************
+--****************************************************************************
+--
+-- Copyright (c) 2002-2011 Broadcom Corporation
+--
+-- This program is the proprietary software of Broadcom Corporation and/or
+-- its licensors, and may only be used, duplicated, modified or distributed
+-- pursuant to the terms and conditions of a separate, written license
+-- agreement executed between you and Broadcom (an "Authorized License").
+-- Except as set forth in an Authorized License, Broadcom grants no license
+-- (express or implied), right to use, or waiver of any kind with respect to
+-- the Software, and Broadcom expressly reserves all rights in and to the
+-- Software and all intellectual property rights therein.  IF YOU HAVE NO
+-- AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE IN ANY WAY,
+-- AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE ALL USE OF THE
+-- SOFTWARE.  
+--
+-- Except as expressly set forth in the Authorized License,
+--
+-- 1.     This program, including its structure, sequence and organization,
+-- constitutes the valuable trade secrets of Broadcom, and you shall use all
+-- reasonable efforts to protect the confidentiality thereof, and to use this
+-- information only in connection with your use of Broadcom integrated circuit
+-- products.
+--
+-- 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED
+-- "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES, REPRESENTATIONS
+-- OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+-- RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY DISCLAIMS ANY AND ALL
+-- IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR
+-- A PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+-- ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. YOU ASSUME
+-- THE ENTIRE RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+--
+-- 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL BROADCOM
+-- OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL, INCIDENTAL, SPECIAL,
+-- INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER ARISING OUT OF OR IN ANY WAY
+-- RELATING TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE EVEN IF BROADCOM
+-- HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN
+-- EXCESS OF THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR U.S. $1,
+-- WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING ANY
+-- FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.
+--
+--****************************************************************************
 --    Filename: brcm-cm-engineering.mib
 --    Author:   Kevin O'Neal
 --    Creation Date: 22-october-2002
 --
---**************************************************************************
+--****************************************************************************
 --    Description:
 --
 --		private MIB for cablemodem factory
 --		
---**************************************************************************
+--****************************************************************************
 --    Revision History:
 --
---**************************************************************************
+--****************************************************************************
 
 BRCM-CM-ENGINEERING-MIB DEFINITIONS ::= BEGIN
 
@@ -37,13 +65,16 @@ IMPORTS
         FROM SNMPv2-SMI
     TruthValue, RowPointer
         FROM SNMPv2-TC
+    TenthdBmV,
+    TenthdB
+        FROM DOCS-IF-MIB
     cableDataEngineering
         FROM BRCM-CABLEDATA-ENGINEERING-MIB
     cmDsCalOffsetIndex
         FROM BRCM-CM-FACTORY-MIB;
                 
 cablemodemEngineering MODULE-IDENTITY
-    LAST-UPDATED "0306230000Z"
+    LAST-UPDATED "201104140000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -59,33 +90,64 @@ cablemodemEngineering MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata private MIB"
-    REVISION     "0210220000Z"
+        "Broadcom proprietary MIB for management and configuration
+         of cablemodem objects used in engineering and development."
+    REVISION      "201104140000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
-    REVISION     "0211110000Z"
+        "Added object cmDsCalPhySymbolRate." 
+    REVISION      "201010200000Z"
     DESCRIPTION
-            "Added objects for 33xx hardware control in cmEngrBase and
-             populated cmEngrUpstreamCalibration."
-    REVISION     "0212110000Z"
+        "Updated value ranges on cmDsCalTunerIndex, cmDsCalPhyTuner and 
+         cmDsCalPhyTunerChannel." 
+    REVISION      "200910060000Z"
     DESCRIPTION
-            "Added more DS cal objects to control and report the results of the
-             CM DS characterization routine."
-    REVISION     "0212230000Z"
+        "Added cmEngrBpi objects.
+         Removed DEFVAL from cmDsCalTunerType object to fix compiler warning." 
+    REVISION      "200904030000Z"
     DESCRIPTION
-            "Added AGC control objects.  Ho, Ho, Ho."
-    REVISION     "0301030000Z"
+        "Added object cmUsCalDiplexer."     
+    REVISION      "200811030000Z"
     DESCRIPTION
-            "Added cmHwSTABW2 object."
-    REVISION     "0304240000Z"
+        "Added objects cmDsCalPhyFrequency and cmDsCalPhyFrequencyError."
+    REVISION      "200809230000Z"
     DESCRIPTION
-            "Added cmDsCalFrequencyError object."
-    REVISION     "0306230000Z"
+        "Added cmDsCalTunerTable and cmDsCalPhyTable in support of systems
+         which support multiple DS phys per tuner."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Added objects to allow dynamic population and de-population of
-             the downstream and upstream calibration tables in order to provide
-             more efficient RAM management when performing downstream and 
-             upstream CM characterization."
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected.
+         - Revision dates were updated to post-Y2K format.
+         - Range restrictions were added to objects cmDsCalTunerCoefIndex, 
+           cmDsCalIFCoefIndex, cmDsCalFineCoefIndex, cmDsCalEqCoefIndex, and 
+           cmUsCalControlIndex."
+    REVISION     "200306230000Z"
+    DESCRIPTION
+        "Added objects to allow dynamic population and de-population of
+         the downstream and upstream calibration tables in order to provide
+         more efficient RAM management when performing downstream and 
+         upstream CM characterization."
+    REVISION     "200304240000Z"
+    DESCRIPTION
+        "Added cmDsCalFrequencyError object."
+    REVISION     "200301030000Z"
+    DESCRIPTION
+        "Added cmHwSTABW2 object."
+    REVISION     "200212230000Z"
+    DESCRIPTION
+        "Added AGC control objects.  Ho, Ho, Ho."
+    REVISION     "200212110000Z"
+    DESCRIPTION
+        "Added more DS cal objects to control and report the results of the
+         CM DS characterization routine."
+    REVISION     "200211110000Z"
+    DESCRIPTION
+        "Added objects for 33xx hardware control in cmEngrBase and
+         populated cmEngrUpstreamCalibration."
+    REVISION     "200210220000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataEngineering 2 }
 
 -- cmEngrBase: miscellaneous control/state objects for engineering mode    
@@ -185,7 +247,7 @@ CmDsCalTunerCoefEntry ::=
     }
     
 cmDsCalTunerCoefIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -294,7 +356,7 @@ CmDsCalIFCoefEntry ::=
     }
     
 cmDsCalIFCoefIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -401,7 +463,7 @@ CmDsCalFineCoefEntry ::=
     }
     
 cmDsCalFineCoefIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -508,7 +570,7 @@ CmDsCalEqCoefEntry ::=
     }
     
 cmDsCalEqCoefIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -789,6 +851,298 @@ cmDsCalEqCoefTablePopulate  OBJECT-TYPE
          complete the population and that the table is incomplete."
     ::= { cmEngrDownstreamCalibration 31 }
     
+cmDsCalTunerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmDsCalTunerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table used to control all tuners present on this device."
+    ::= { cmEngrDownstreamCalibration 32 }
+    
+cmDsCalTunerEntry OBJECT-TYPE
+    SYNTAX      CmDsCalTunerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used to control an individual tuner."
+    INDEX   { cmDsCalTunerIndex }
+    ::= { cmDsCalTunerTable 1 }
+    
+CmDsCalTunerEntry ::= 
+    SEQUENCE    {
+                cmDsCalTunerIndex           Integer32,
+                cmDsCalTunerType            INTEGER,
+                cmDsCalTunerNumChannels     Integer32,
+                cmDsCalTunerFrequency       Integer32,
+                cmDsCalTunerTuneNow         TruthValue
+    }
+    
+cmDsCalTunerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the instance of this tuner."
+    ::= { cmDsCalTunerEntry 1 }
+    
+cmDsCalTunerType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+      temic473x(1),
+      temic4937(2),
+      celISG2000(3),
+      celISG2000EU(4),
+      celISG3300(5),
+      celISG3300EU(6),
+      celISG3300DS(7),
+      celISG3300DSEU(8),
+      panasonicET10(9),
+      panasonicET03(10),
+      alps(11),
+      bcm3400(12),
+      temic4706(13),
+      bcm3415(14), -- not for use in North America
+      alpsEU(15),
+      philips1236(16),
+      vendor(17),
+      bcm3416(18),
+      bcm3419(19),
+      bcm3418(20),
+      bcm3420(21),
+      bcm3421(22),
+      bcm3422(23),
+      bcmInternal(24)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the type of this tuner."
+    ::= { cmDsCalTunerEntry 2 }    
+    
+cmDsCalTunerNumChannels OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the maximum number of downstream channels which may be 
+         tuned by this tuner in this application.  Note that the value of this
+         object depends on the annex mode, because in Annex A each channel is 
+         8MHz in width, whereas in Annex B each channel is 6MHz in width."
+    ::= { cmDsCalTunerEntry 3 }
+
+cmDsCalTunerFrequency  OBJECT-TYPE    
+    SYNTAX      Integer32 (0..1000000000) 
+    UNITS       "hertz" 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        "The center frequency to which this tuner will tune when 
+         cmDsCalTunerTuneNow is set to true(1).  Note that a read of this object 
+         does NOT necessarily indicate that the CM is currently tuned to the 
+         indicated frequency, since the CM will not tune until 
+         cmDsCalTunerTuneNow is set to true(1)." 
+    REFERENCE 
+        "docsIfDownChannelFrequency from DOCS-IF-MIB" 
+    ::= { cmDsCalTunerEntry 4 }
+    
+cmDsCalTunerTuneNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this object is set to true(1), the tuner will tune to the
+         frequency specified by cmDsCalTunerFrequency.  Sets
+         to false(2) will be rejected with an inconsistentValue error.
+         taken.  When read, this object returns true(1) if the tuner is 
+         currently tuned to the specified frequency, false(2) otherwise."
+    ::= { cmDsCalTunerEntry 5 } 
+    
+cmDsCalPhyTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmDsCalPhyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which allows control over each individual downstream phy 
+         block present on the device."
+    ::= { cmEngrDownstreamCalibration 33 }
+    
+cmDsCalPhyEntry OBJECT-TYPE
+    SYNTAX      CmDsCalPhyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry allowing control over an individual downstream phy block."
+    INDEX   { cmDsCalPhyIndex }
+    ::= { cmDsCalPhyTable 1 }
+    
+CmDsCalPhyEntry ::= 
+    SEQUENCE    {
+                cmDsCalPhyIndex                 Integer32,
+                cmDsCalPhyTuner                 Integer32,
+                cmDsCalPhyTunerChannel          Integer32,
+                cmDsCalPhyModulation            INTEGER,
+                cmDsCalPhyLockNow               TruthValue,
+                cmDsCalPhyQamLocked             TruthValue,
+                cmDsCalPhyFecLocked             TruthValue,
+                cmDsCalPhySignalNoise           TenthdB,
+                cmDsCalPhyPower                 TenthdBmV,
+                cmDsCalPhyFrequency             Integer32,
+                cmDsCalPhyFrequencyError        Integer32,
+                cmDsCalPhySymbolRate            Integer32
+                }
+    
+cmDsCalPhyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..12)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies the instance of this phy block."
+    ::= { cmDsCalPhyEntry 1 }
+    
+cmDsCalPhyTuner OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls which tuner from the cmDsCalTunerTable this phy is mapped to."
+    ::= { cmDsCalPhyEntry 2 }
+    
+cmDsCalPhyTunerChannel OBJECT-TYPE
+    SYNTAX      Integer32 (-8..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls which channel of the tuner identified by cmDsCalPhyTuner is
+         mapped to this phy.  Values are defined as offsets from the center 
+         channel of the tuner, which is represented by a value of 0 for this 
+         object.  Note that allowable values for this object are constrained
+         by the value of cmDsCalTunerNumChannels for the tuner specified by
+         cmDsCalPhyTuner.  A value of 0 - denoting the exact center channel -
+         is only valid if cmDsCalTunerNumChannels is odd.  For even values of
+         cmDsCalTunerNumChannels, locking to the exact center frequency will 
+         not be possible."
+    ::= { cmDsCalPhyEntry 3 }
+    
+cmDsCalPhyModulation OBJECT-TYPE 
+     SYNTAX      INTEGER { 
+         qam64(3), 
+         qam256(4),
+         qam1024(5)
+     } 
+     MAX-ACCESS  read-write 
+     STATUS      current 
+     DESCRIPTION 
+        "The modulation type that the CM will attempt to lock under
+         when cmDsCalPhyLockNow is set to true.  Note that a read of
+         this object does NOT necessarily indicate that the CM is 
+         currently locked under the indicated modulation, since the
+         CM will not attempt to lock until cmDsCalPhyLockNow is set to
+         true.  The enumerated values for this object begin at 3 for
+         consistency with the docsIfDownChannelModulation values." 
+     REFERENCE 
+        "docsIfDownChannelModulation from DOCS-IF-MIB" 
+     ::= { cmDsCalPhyEntry 4 } 
+     
+cmDsCalPhyLockNow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When this object is set to true(1), the CM will attempt to lock the
+         downstream phy according to the parameters specified by the values of
+         cmDsCalTunerCenterFrequency, cmDsCalPhyTuner, cmDsCalPhyTunerChannel, 
+         and cmDsCalPhyModulation.  Note that prior to setting this object, 
+         the instance of cmDsCalTunerTuneNow corresponding to the value of 
+         cmDsCalPhyTuner must have previously been set to true(1).  Sets
+         of this object to false(2) will be rejected with an inconsistentValue 
+         error.  When read, this object returns false(2) if no lock has been
+         attempted, and true(1) if a lock has been attempted.  The success
+         or failure of an attempted lock is indicated by the values of objects
+         cmDsCalPhyQamLocked and cmDsCalPhyFecLocked."
+    ::= { cmDsCalPhyEntry 5 }
+    
+cmDsCalPhyQamLocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the last set of cmDsCalPhyLockNow to true resulted 
+         in the phy acheiving QAM lock.  The value of this object is reset 
+         whenever cmDsCalPhyLockNow is set to true, and its value will always 
+         indicate the result of the last attempt to lock."
+    ::= { cmDsCalPhyEntry 6 }
+    
+cmDsCalPhyFecLocked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the last set of cmDsCalPhyLockNow to true resulted 
+         in the phy acheiving FEC lock.  The value of this object is reset 
+         whenever cmDsCalPhyLockNow is set to true, and its value will always 
+         indicate the result of the last attempt to lock."
+    ::= { cmDsCalPhyEntry 7 }
+    
+cmDsCalPhySignalNoise OBJECT-TYPE
+    SYNTAX      TenthdB
+    UNITS       "TenthdB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal/Noise ratio as perceived for this phy."
+    REFERENCE
+        "Data-Over-Cable Service Interface Specifications: Radio
+         Frequency Interface Specification SP-RFIv2.0-I10-051209,
+         Tables 4-1 and 4-2"
+    ::= { cmDsCalPhyEntry 8 }
+    
+cmDsCalPhyPower OBJECT-TYPE
+     SYNTAX      TenthdBmV
+     UNITS       "dBmV"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The received power level for this phy."
+     REFERENCE
+         "Data-Over-Cable Service Interface Specifications: Radio
+          Frequency Interface Specification SP-RFIv2.0-I10-051209,
+          Tables 6-16, 6-17."
+     ::= { cmDsCalPhyEntry 9 }
+     
+cmDsCalPhyFrequency OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the frequency to which this phy is locked.  The value of this
+         object will reflect the frequency as calculated according to the 
+         settings of cmDsCalPhyTuner and cmDsCalPhyTuner, and does not include 
+         the frequency error as reported by cmDsCalPhyFrequencyError.  If 
+         cmDsCalPhyLockNow has not been set to true(1) then this object will
+         report a value of 0."
+    ::= { cmDsCalPhyEntry 10 }
+     
+cmDsCalPhyFrequencyError OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the frequency error for this phy.  The actual frequency to 
+         which the phy is locked will be the sum of the value of this object
+         and cmDsCalPhyFrequency.  If cmDsCalPhyLockNow has not been set to 
+         true(1) then this object will report a value of 0."
+    ::= { cmDsCalPhyEntry 11 }
+
+cmDsCalPhySymbolRate OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "symbols per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the downstream symbol rate for this phy.  If cmDsCalPhyLockNow 
+         has not been set to true(1) then this object will report a value of 0."
+    ::= { cmDsCalPhyEntry 12 }    
     
 ---
 --- Upstream Calibration engineering objects
@@ -867,7 +1221,7 @@ CmUsCalControlEntry ::=
     }
     
 cmUsCalControlIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -1044,6 +1398,25 @@ cmUsCalControlTablePopulate  OBJECT-TYPE
          is either unpopulated, or that insufficient RAM was available to 
          complete the population and that the table is incomplete."
     ::= { cmEngrUpstreamCalibration 14 }
+    
+cmUsCalDiplexerType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                lowSplit(1),
+                midSplit(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls and reflects the diplexer type on this board.  The primary
+         effect that this setting has is to control the range of frequencies
+         used in upstream calibration when operating in annex B mode.  A board
+         with a lowSplit diplexer will be calibrated over a frequency range of
+         5..42 MHz, while a board with a midSplit diplexer will be calibrated
+         over a frequency range of 5..85 MHz.  This setting does not affect the
+         calibration of an annex A board, which will always have a frequency
+         range of 5..65 MHz."
+    DEFVAL { lowSplit }
+    ::= { cmEngrUpstreamCalibration 15 }
 
 ---
 --- Hardware engineering objects
@@ -1090,5 +1463,51 @@ cmHwSTABW2 OBJECT-TYPE
     DESCRIPTION
         "AGC Bandwidth Control 2"
     ::= { cmEngrHardware 5 }
+
+---
+--- BPI engineering objects
+---
+
+cmEngrBpi OBJECT IDENTIFIER ::= { cablemodemEngineering 5 }    
+
+cmBpiTekEven  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0 | 8 | 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object returns the BPI Traffic Encryption Key (TEK) EVEN 
+        Key. The value may be 8 bytes if DES, 16 bytes if AES, or 
+        0 bytes (empty string) if not configured."
+    ::= { cmEngrBpi 1 }
+
+cmBpiTekOdd  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0 | 8 | 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object returns the BPI Traffic Encryption Key (TEK) ODD 
+        Key. The value may be 8 bytes if DES, 16 bytes if AES, or 
+        0 bytes (empty string) if not configured."
+    ::= { cmEngrBpi 2 }
+
+cmBpiCbcIvEven  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0 | 8 | 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object returns the BPI Cipher Block Chaining EVEN 
+        Initialization Vector. The value may be 8 bytes if DES, 
+        16 bytes if AES, or 0 bytes (empty string) if not configured."
+    ::= { cmEngrBpi 3 }
+
+cmBpiCbcIvOdd  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0 | 8 | 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object returns the BPI Cipher Block Chaining ODD 
+        Initialization Vector. The value may be 8 bytes if DES, 
+        16 bytes if AES, or 0 bytes (empty string) if not configured."
+    ::= { cmEngrBpi 4 }
 
 END

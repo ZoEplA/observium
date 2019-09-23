@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -41,9 +41,11 @@ if (is_array($cefs))
         echo(" | |-".$path.": ".$path_name['cefSwitchingPath']."\n");
         $cef_exists[$device['device_id']][$entity][$afi][$path] = 1;
 
-        if (dbFetchCell("SELECT COUNT(*) from `cef` WHERE device_id = ? AND entPhysicalIndex = ?, AND afi=? AND cef_index=?",array($device['device_id'], $entity,$afi,$path)) != "1")
+        // FIXME, old code was incorrect, but not sure that still fixed..
+        //if (dbFetchCell("SELECT COUNT(*) from `cef` WHERE `device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?", array($device['device_id'], $entity, $afi, $path)) != "1") // Why != 1 ???
+        if (!dbExist('cef_switching', '`device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_path` = ?', array($device['device_id'], $entity, $afi, $path)))
         {
-          dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_path' => $path), 'cef');
+          dbInsert(array('device_id' => $device['device_id'], 'entPhysicalIndex' => $entity, 'afi' => $afi, 'cef_path' => $path), 'cef_switching');
           echo("+");
         }
 

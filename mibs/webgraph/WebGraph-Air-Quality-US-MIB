@@ -1,5 +1,15 @@
 WebGraph-Air-Quality-US-MIB DEFINITIONS ::= BEGIN
 ----------------------------------------------------------------
+-- Revison: 1.36
+----------------------------------------------------------------
+-- 09.03.2017 	New: wtWebGraphAirQualityAlarmSensorLostSelection
+--		     		 wtWebGraphAirQualityAlarmLimitWindow
+----------------------------------------------------------------
+-- Revison: 1.35
+----------------------------------------------------------------
+-- 09.11.2016 	New: wtWebGraphAirQualityMQTT group
+--		     HTTP Request, MQTT Alarm, REST
+----------------------------------------------------------------
 -- Revison: 1.34
 ----------------------------------------------------------------
 -- 15.07.2015 	Changes for new Navigation (__JB__)
@@ -50,7 +60,7 @@ WebGraph-Air-Quality-US-MIB DEFINITIONS ::= BEGIN
 
 --  wtWebGraph Tree
 
-    wtWebGraphAirQuality  			OBJECT IDENTIFIER ::= { wtWebio 35 }
+    wtWebGraphAirQuality  			OBJECT IDENTIFIER ::= { wtWebio 41 }
     
 --  wtWebGraphAirQuality Tree
 
@@ -91,6 +101,9 @@ WebGraph-Air-Quality-US-MIB DEFINITIONS ::= BEGIN
     wtWebGraphAirQualityFTP			OBJECT IDENTIFIER ::= { wtWebGraphAirQualityBasic 7 }
     wtWebGraphAirQualityRSS			OBJECT IDENTIFIER ::= { wtWebGraphAirQualityBasic 8 }
     wtWebGraphAirQualityLedLights		OBJECT IDENTIFIER ::= { wtWebGraphAirQualityBasic 9 }
+    wtWebGraphAirQualityMQTT			OBJECT IDENTIFIER ::= { wtWebGraphAirQualityBasic 12 }
+    wtWebGraphAirQualityREST			OBJECT IDENTIFIER ::= { wtWebGraphAirQualityBasic 13 }
+    
     
 --  wtWebGraphAirQualityGraphics Tree
     
@@ -1161,7 +1174,102 @@ wtWebGraphAirQualityLedLightsLimitRed OBJECT-TYPE
         "Limit to switch on red LED"
     ::= { wtWebGraphAirQualityLedLights 4 }  
     
+--  wtWebGraphAirQualityMQTT Group
+--------------------------------
+
+wtWebGraphAirQualityMQTTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 7 schaltet MQTT frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0-6: ungenutzt
+                Bit 7  : MQTT enable"
+    ::= { wtWebGraphAirQualityMQTT 1 }  
+
+wtWebGraphAirQualityMQTTBrockerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP-address of the MQTT-Server."
+    ::= { wtWebGraphAirQualityMQTT 2 }
+
+wtWebGraphAirQualityMQTTUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login  user name."
+    ::= { wtWebGraphAirQualityMQTT 3 }
+
+wtWebGraphAirQualityMQTTPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login password."
+    ::= { wtWebGraphAirQualityMQTT 4 }
+
+wtWebGraphAirQualityMQTTLocalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Local port number."
+    ::= { wtWebGraphAirQualityMQTT 5 }
     
+wtWebGraphAirQualityMQTTBrokerServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Server port number."
+    ::= { wtWebGraphAirQualityMQTT 6 }
+    
+wtWebGraphAirQualityMQTTInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Ping intervall, if no data has to be send: time in seconds."
+    ::= { wtWebGraphAirQualityMQTT 7 }
+    	
+--  wtWebGraphAirQualityREST Group
+--------------------------------
+
+wtWebGraphAirQualityRESTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates REST :
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : REST enable"
+    ::= { wtWebGraphAirQualityREST 1 }  
+
+wtWebGraphAirQualityRESTDigestAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates Digest-Authentification:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : Digest Auth enable"
+    ::= { wtWebGraphAirQualityREST 2 }  	
+            
 -- wtWebGraphAirQualityDatalogger Group
 --------------------------------
 
@@ -1256,46 +1364,57 @@ wtWebGraphAirQualityAlarmEntry OBJECT-TYPE
     ::= { wtWebGraphAirQualityAlarmTable 1 }
 
 WtWebGraphAirQualityAlarmEntry ::= SEQUENCE {
-    wtWebGraphAirQualityAlarmTrigger		OCTET STRING,
-    wtWebGraphAirQualityAlarmMin		OCTET STRING,
-    wtWebGraphAirQualityAlarmMax		OCTET STRING,
-    wtWebGraphAirQualityAlarmHysteresis		OCTET STRING,
-    wtWebGraphAirQualityAlarmDelay		OCTET STRING,
-    wtWebGraphAirQualityAlarmInterval		OCTET STRING,
-    wtWebGraphAirQualityAlarmEnable		OCTET STRING,
-    wtWebGraphAirQualityAlarmEMailAddr		OCTET STRING,
-    wtWebGraphAirQualityAlarmMailSubject	OCTET STRING,
-    wtWebGraphAirQualityAlarmMailText		OCTET STRING,
-    wtWebGraphAirQualityAlarmManagerIP		OCTET STRING,
-    wtWebGraphAirQualityAlarmTrapText		OCTET STRING,
-    wtWebGraphAirQualityAlarmMailOptions	OCTET STRING,
-    wtWebGraphAirQualityAlarmTcpIpAddr		OCTET STRING,
-    wtWebGraphAirQualityAlarmTcpPort		INTEGER,
-    wtWebGraphAirQualityAlarmTcpText		OCTET STRING,
-    wtWebGraphAirQualityAlarmClearMailSubject	OCTET STRING,
-    wtWebGraphAirQualityAlarmClearMailText	OCTET STRING,
-    wtWebGraphAirQualityAlarmClearTrapText	OCTET STRING,
-    wtWebGraphAirQualityAlarmClearTcpText	OCTET STRING,
-    wtWebGraphAirQualityAlarmDeltaTemp		OCTET STRING,
-    wtWebGraphAirQualityAlarmRHMin		OCTET STRING,
-    wtWebGraphAirQualityAlarmRHMax		OCTET STRING,
-    wtWebGraphAirQualityAlarmRHHysteresis	OCTET STRING,
-    wtWebGraphAirQualityAlarmAHMin		OCTET STRING,
-    wtWebGraphAirQualityAlarmAHMax		OCTET STRING,    
-    wtWebGraphAirQualityAlarmSyslogIpAddr	OCTET STRING,
-    wtWebGraphAirQualityAlarmSyslogPort		INTEGER,
-    wtWebGraphAirQualityAlarmSyslogText		OCTET STRING,
-    wtWebGraphAirQualityAlarmSyslogClearText	OCTET STRING,
-    wtWebGraphAirQualityAlarmFtpDataPort	OCTET STRING,
-    wtWebGraphAirQualityAlarmFtpFileName	OCTET STRING,
-    wtWebGraphAirQualityAlarmFtpText		OCTET STRING,
-    wtWebGraphAirQualityAlarmFtpClearText	OCTET STRING,
-    wtWebGraphAirQualityAlarmFtpOption		OCTET STRING,
-    wtWebGraphAirQualityAlarmTimerCron		OCTET STRING,
-    wtWebGraphAirQualityAlarmVocMax		OCTET STRING,
-    wtWebGraphAirQualityAlarmVocHysteresis	OCTET STRING,
-	wtWebGraphAirQualityAlarmName 			OCTET STRING,
-	wtWebGraphAirQualityAlarmActive 		OCTET STRING  
+    wtWebGraphAirQualityAlarmTrigger			OCTET STRING,
+    wtWebGraphAirQualityAlarmMin			OCTET STRING,
+    wtWebGraphAirQualityAlarmMax			OCTET STRING,
+    wtWebGraphAirQualityAlarmHysteresis			OCTET STRING,
+    wtWebGraphAirQualityAlarmDelay			OCTET STRING,
+    wtWebGraphAirQualityAlarmInterval			OCTET STRING,
+    wtWebGraphAirQualityAlarmEnable			OCTET STRING,
+    wtWebGraphAirQualityAlarmEMailAddr			OCTET STRING,
+    wtWebGraphAirQualityAlarmMailSubject		OCTET STRING,
+    wtWebGraphAirQualityAlarmMailText			OCTET STRING,
+    wtWebGraphAirQualityAlarmManagerIP			OCTET STRING,
+    wtWebGraphAirQualityAlarmTrapText			OCTET STRING,
+    wtWebGraphAirQualityAlarmMailOptions		OCTET STRING,
+    wtWebGraphAirQualityAlarmTcpIpAddr			OCTET STRING,
+    wtWebGraphAirQualityAlarmTcpPort			INTEGER,
+    wtWebGraphAirQualityAlarmTcpText			OCTET STRING,
+    wtWebGraphAirQualityAlarmClearMailSubject		OCTET STRING,
+    wtWebGraphAirQualityAlarmClearMailText		OCTET STRING,
+    wtWebGraphAirQualityAlarmClearTrapText		OCTET STRING,
+    wtWebGraphAirQualityAlarmClearTcpText		OCTET STRING,
+    wtWebGraphAirQualityAlarmDeltaTemp			OCTET STRING,
+    wtWebGraphAirQualityAlarmRHMin			OCTET STRING,
+    wtWebGraphAirQualityAlarmRHMax			OCTET STRING,
+    wtWebGraphAirQualityAlarmRHHysteresis		OCTET STRING,
+    wtWebGraphAirQualityAlarmAHMin			OCTET STRING,
+    wtWebGraphAirQualityAlarmAHMax			OCTET STRING,    
+    wtWebGraphAirQualityAlarmSyslogIpAddr		OCTET STRING,
+    wtWebGraphAirQualityAlarmSyslogPort			INTEGER,
+    wtWebGraphAirQualityAlarmSyslogText			OCTET STRING,
+    wtWebGraphAirQualityAlarmSyslogClearText		OCTET STRING,
+    wtWebGraphAirQualityAlarmFtpDataPort		OCTET STRING,
+    wtWebGraphAirQualityAlarmFtpFileName		OCTET STRING,
+    wtWebGraphAirQualityAlarmFtpText			OCTET STRING,
+    wtWebGraphAirQualityAlarmFtpClearText		OCTET STRING,
+    wtWebGraphAirQualityAlarmFtpOption			OCTET STRING,
+    wtWebGraphAirQualityAlarmTimerCron			OCTET STRING,
+    wtWebGraphAirQualityAlarmVocMax			OCTET STRING,
+    wtWebGraphAirQualityAlarmVocHysteresis		OCTET STRING,
+    wtWebGraphAirQualityAlarmName 			OCTET STRING,
+    wtWebGraphAirQualityAlarmActive 			OCTET STRING  ,
+    wtWebGraphAirQualityAlarmHttpReqAuthEnable		OCTET STRING,
+    wtWebGraphAirQualityAlarmHttpReqAuthUser		OCTET STRING,
+    wtWebGraphAirQualityAlarmHttpReqAuthPassword	OCTET STRING,
+    wtWebGraphAirQualityAlarmHttpReqSetUrl		OCTET STRING,
+    wtWebGraphAirQualityAlarmHttpReqClearUrl		OCTET STRING,
+    wtWebGraphAirQualityAlarmHttpReqServerPort		OCTET STRING,
+    wtWebGraphAirQualityAlarmMqttTopicPath		OCTET STRING,
+    wtWebGraphAirQualityAlarmMqttTopicSetTopic		OCTET STRING,
+    wtWebGraphAirQualityAlarmMqttTopicClear		OCTET STRING,
+	wtWebGraphAirQualityAlarmSensorLostSelection	OCTET STRING,
+	wtWebGraphAirQualityAlarmLimitWindow			OCTET STRING
 }
 
 wtWebGraphAirQualityAlarmTrigger OBJECT-TYPE
@@ -1676,7 +1795,117 @@ wtWebGraphAirQualityAlarmActive OBJECT-TYPE
         "Alert active
 			1 = ON
 			0 = OFF"
-    ::= { wtWebGraphAirQualityAlarmEntry 40 } 	
+    ::= { wtWebGraphAirQualityAlarmEntry 40 }
+
+wtWebGraphAirQualityAlarmHttpReqAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 1-7: unused
+        Bit 0  : HHTP Request Authentication enable"
+    ::= { wtWebGraphAirQualityAlarmEntry 61 }
+
+wtWebGraphAirQualityAlarmHttpReqAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: User"
+    ::= { wtWebGraphAirQualityAlarmEntry 62 }
+
+wtWebGraphAirQualityAlarmHttpReqAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Password"
+    ::= { wtWebGraphAirQualityAlarmEntry 63 }
+
+wtWebGraphAirQualityAlarmHttpReqSetUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Set URL"
+    ::= { wtWebGraphAirQualityAlarmEntry 64 }
+
+wtWebGraphAirQualityAlarmHttpReqClearUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Clear URL"
+    ::= { wtWebGraphAirQualityAlarmEntry 65 }
+
+wtWebGraphAirQualityAlarmHttpReqServerPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Server Port"
+    ::= { wtWebGraphAirQualityAlarmEntry 66 }
+
+wtWebGraphAirQualityAlarmMqttTopicPath OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic path"
+    ::= { wtWebGraphAirQualityAlarmEntry 67 }
+
+wtWebGraphAirQualityAlarmMqttTopicSetTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic SET message"
+    ::= { wtWebGraphAirQualityAlarmEntry 68 }
+
+wtWebGraphAirQualityAlarmMqttTopicClear OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic CLEAR message"
+    ::= { wtWebGraphAirQualityAlarmEntry 69 }    
+    
+wtWebGraphAirQualityAlarmSensorLostSelection OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 3-7: unused
+		Bit 2  : Sensor 2
+		Bit 1  : Sensor 1
+        Bit 0  : Sensor 0"
+    ::= { wtWebGraphAirQualityAlarmEntry 70 }
+	
+wtWebGraphAirQualityAlarmLimitWindow OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If window type is INSIDE the alarm is genereted when the temperature
+        is greater minumum value and lower than maximum value. If window type is OUTSIDE
+        the alarm is generated when the measured value is lower than the minimum value
+        or greater than the maximum value.
+		Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : inside window
+        Bit 0  : outside window"
+    ::= { wtWebGraphAirQualityAlarmEntry 71 }	    
     
 -- wtWebGraphAirQualityGraphicsBase Group
 ----------------------------

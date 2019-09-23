@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -40,8 +40,10 @@ $form['row'][0]['device_id'] = array(
                               'values'      => $form_items['devices']);
 
 // Add device_id limit for other fields
+$query_devices = generate_query_values($form_devices, 'device_id'); // Convert NOT IN to IN for correctly use indexes
 if (isset($vars['device_id']))
 {
+  $query_devices .= generate_query_values($vars['device_id'], 'device_id');
   $where .= generate_query_values($vars['device_id'], 'device_id');
 }
 
@@ -67,9 +69,14 @@ $form['row'][0]['priority'] = array(
                               'values'      => $form_items['priorities']);
 
 // Program field
-$form_filter = dbFetchColumn('SELECT DISTINCT `program` FROM `syslog`' . $where);
-$form_items['programs'] = generate_form_values('syslog', $form_filter, 'programs');
-$form['row'][0]['program'] = array(
+dbQuery('SET SESSION MAX_EXECUTION_TIME=5000;'); // Set 5 sec maximum query execution time
+$form_filter = dbFetchColumn('SELECT DISTINCT `program` FROM `syslog` WHERE 1 ' . $query_devices);
+dbQuery('SET SESSION MAX_EXECUTION_TIME=0;'); // Reset maximum query execution time
+if (count($form_filter))
+{
+  // Use full multiselect form
+  $form_items['programs'] = generate_form_values('syslog', $form_filter, 'programs');
+  $form['row'][0]['program'] = array(
                               'type'        => 'multiselect',
                               'name'        => 'Programs',
                               'width'       => '100%',
@@ -77,6 +84,19 @@ $form['row'][0]['program'] = array(
                               'size'        => '15',
                               'value'       => $vars['program'],
                               'values'      => $form_items['programs']);
+} else {
+  // Use input form with speedup indexed ajax program list
+  $form['row'][0]['program'] = array(
+                              'type'        => 'text',
+                              'name'        => 'Programs',
+                              'placeholder' => 'Program: type for hints',
+                              'width'       => '100%',
+                              'div_class'   => 'col-lg-1 col-md-2 col-sm-2',
+                              //'grid'        => 3,
+                              'ajax'        => TRUE,
+                              'ajax_vars'   => array('field' => 'syslog_program'),
+                              'value'       => $vars['program']);
+}
 
 // Datetime Field
 $form['row'][0]['timestamp'] = array(

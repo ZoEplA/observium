@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage poller
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -25,23 +25,32 @@ $uptimes = array('use'       => 'sysUpTime',
                  'sysUpTime' => $poll_device['sysUpTime']);
 
 // Find MIB-specific SNMP data via OID fetch: sysDescr, sysLocation, sysContact, sysName, sysUpTime
-$system_metatypes = array('sysDescr', 'sysLocation', 'sysContact', 'sysName', 'sysUpTime'); // 'snmpEngineID');
+$system_metatypes = array('sysDescr', 'sysLocation', 'sysContact', 'sysName', 'sysUpTime', 'reboot'); // 'snmpEngineID');
 foreach ($system_metatypes as $metatype)
 {
-  if (!isset($poll_device[$metatype]) || $metatype == 'sysUpTime') // Skip search if already set (all uptimes always polled)
+
+  $param = ($metatype == 'sysUpTime') ? 'uptime' : strtolower($metatype); // For sysUptime use simple param name
+  foreach (get_device_mibs_permitted($device) as $mib) // Check every MIB supported by the device, in order
   {
-    $param = strtolower($metatype);
-    foreach (get_device_mibs($device, TRUE) as $mib) // Check every MIB supported by the device, in order
+    if (isset($config['mibs'][$mib][$param]))
     {
-      if (isset($config['mibs'][$mib][$param]))
+      foreach ($config['mibs'][$mib][$param] as $entry)
       {
-        foreach ($config['mibs'][$mib][$param] as $entry)
+        // For ability override metatype by vendor mib definition use 'force' boolean param
+        if (!isset($poll_device[$metatype]) ||                    // Poll if metatype not already set
+            $metatype == 'sysUpTime' || $metatype == 'reboot' ||  // Or uptime/reboot (always polled)
+            (isset($entry['override']) && $entry['override']))    // Or forced override (see ekinops EKINOPS-MGNT2-MIB mib definition
         {
           if (isset($entry['oid_num'])) // Use numeric OID if set, otherwise fetch text based string
           {
-            $value = snmp_hexstring(snmp_get_oid($device, $entry['oid_num']));
+            $value = trim(snmp_hexstring(snmp_get_oid($device, $entry['oid_num'])));
+          }
+          elseif (isset($entry['oid_next']))
+          {
+            // If Oid passed without index part use snmpgetnext (see FCMGMT-MIB definitions)
+            $value = trim(snmp_hexstring(snmp_getnext_oid($device, $entry['oid_next'], $mib)));
           } else {
-            $value = snmp_hexstring(snmp_get_oid($device, $entry['oid'], $mib));
+            $value = trim(snmp_hexstring(snmp_get_oid($device, $entry['oid'], $mib)));
           }
 
           if ($GLOBALS['snmp_status'] && $value != '')
@@ -52,16 +61,21 @@ foreach ($system_metatypes as $metatype)
             $value = string_transform($value, $entry['transformations']);
 
             // Detect uptime with MIB defined oids, see below uptimes 2.
-            if ($metatype == 'sysUpTime')
+            if ($metatype == 'sysUpTime' || $metatype == 'reboot')
             {
               // Previous uptime from standard sysUpTime or other MIB::oid
-              $uptime_previous = isset($poll_device['device_uptime']) ? $poll_device['device_uptime']: $poll_device['sysUpTime'];
+              $uptime_previous = isset($poll_device['device_uptime']) ? $poll_device['device_uptime'] : $poll_device['sysUpTime'];
+              if ($metatype == 'reboot' && is_numeric($value))
+              {
+                // Last reboot is same uptime, but as diff with current (polled) time (see INFINERA-ENTITY-CHASSIS-MIB)
+                $value = $polled - $value;
+              }
               // Detect if new sysUpTime value more than the previous
               if (is_numeric($value) && $value >= $uptime_previous)
               {
                 $poll_device['device_uptime'] = $value;
                 $uptimes['message'] = isset($entry['oid_num']) ? $entry['oid_num'] : $mib . '::' . $entry['oid'];
-                $uptimes['message'] = 'Using device MIB poller Uptime: ' . $uptimes['message'];
+                $uptimes['message'] = 'Using device MIB poller '.$metatype.': ' . $uptimes['message'];
 
                 print_debug("Added System Uptime from SNMP definition walk: 'device_uptime' = '$value'");
               }
@@ -79,6 +93,7 @@ foreach ($system_metatypes as $metatype)
       }
     }
   }
+
 }
 $poll_device['sysName_original'] = $poll_device['sysName']; // Store original sysName for devices who store hardware in this Oid
 $poll_device['sysName'] = strtolower($poll_device['sysName']);
@@ -119,6 +134,9 @@ else if (isset($poll_device['device_uptime']) && is_numeric($poll_device['device
   $uptimes['message']       = ($uptimes['message']) ? $uptimes['message'] : 'Using device MIB poller Uptime';
 } else {
   // 3. Uptime from hrSystemUptime (only in snmp v2c/v3)
+  // NOTE, about windows uptime,
+  // sysUpTime resets when SNMP service restarted, but hrSystemUptime resets at 49.7 days (always),
+  // Now we use LanMgr-Mib-II-MIB::comStatStart.0 as reboot time instead
   if ($device['os'] != 'windows' &&
       $device['snmp_version'] != 'v1' && is_device_mib($device, 'HOST-RESOURCES-MIB'))
   {
@@ -176,7 +194,7 @@ else if (isset($poll_device['device_uptime']) && is_numeric($poll_device['device
 }
 
 $uptimes['uptime']    = $uptimes[$uptimes['use']];        // Get actual uptime based on use flag
-$uptimes['formatted'] = formatUptime($uptimes['uptime']); // Human readable uptime
+$uptimes['formatted'] = format_uptime($uptimes['uptime']); // Human readable uptime
 if (!isset($uptimes['message'])) { $uptimes['message'] = 'Using SNMP Agent '.$uptimes['use']; }
 
 $uptime = $uptimes['uptime'];
@@ -187,13 +205,16 @@ if (is_numeric($uptime) && $uptime > 0) // it really is very impossible case for
   $uptimes['previous'] = $device['uptime'];              // Uptime from previous device poll
   $uptimes['diff']     = $uptimes['previous'] - $uptime; // Difference between previous and current uptimes
 
+  // Calculate current last rebooted time
+  $last_rebooted = $polled - $uptime;
   // Previous reboot unixtime
   $uptimes['last_rebooted']        = $device['last_rebooted'];
-  if (empty($uptimes['last_rebooted'])) // 0 or ''
+  if (empty($uptimes['last_rebooted']) ||                  // 0 or ''
+      abs($device['last_rebooted'] - $last_rebooted) > 1200) // Fix when uptime updated by other Oid
   {
     // Set last_rebooted for all devices who not have it already
-    $uptimes['last_rebooted']      = $polled - $uptime;
-    $update_array['last_rebooted'] = $uptimes['last_rebooted'];
+    $uptimes['last_rebooted']      = $last_rebooted;
+    $update_array['last_rebooted'] = $last_rebooted;
   }
 
   // Notify only if current uptime less than one week (eg if changed from sysUpTime to snmpEngineTime)
@@ -258,7 +279,7 @@ if (is_numeric($uptime) && $uptime > 0) // it really is very impossible case for
     {
       $update_array['last_rebooted'] = $polled - $uptime;                        // Update last reboot unixtime
       //$reboot_diff = $update_array['last_rebooted'] - $uptimes['last_rebooted']; // Calculate time between 2 reboots
-      log_event('Device rebooted: after '.formatUptime($polled - $uptimes['last_rebooted']) . ' (Uptime: '.$uptimes['formatted'].', previous: '.formatUptime($uptimes['previous']).', used: '.$uptimes['use'] . ')', $device, 'device', $device['device_id'], 4);
+      log_event('Device rebooted: after '.format_uptime($polled - $uptimes['last_rebooted']) . ' (Uptime: '.$uptimes['formatted'].', previous: '.format_uptime($uptimes['previous']).', used: '.$uptimes['use'] . ')', $device, 'device', $device['device_id'], 4);
       $uptimes['last_rebooted'] = $update_array['last_rebooted'];                // store new reboot unixtime
     }
   }
@@ -282,30 +303,50 @@ print_debug_vars($uptimes, 1);
 
 // Load Average
 
-foreach (get_device_mibs($device, TRUE) as $mib) // Check every MIB supported by the device
+foreach (get_device_mibs_permitted($device) as $mib) // Check every MIB supported by the device
 {
-  if (isset($config['mibs'][$mib]['la']) && is_device_mib($device, $mib))
+  if (isset($config['mibs'][$mib]['la']))
   {
-    $la_oids = array();
-    foreach (array('1min', '5min', '15min') as $min)
+    $la_def  = $config['mibs'][$mib]['la'];
+
+    // FIXME. Filter hack, need more common way!
+    // See Cisco CISCO-PROCESS-MIB
+    foreach ($la_def['filter'] as $param => $entries)
     {
-      if (isset($config['mibs'][$mib]['la']['oid_'.$min.'_num']))
-      {
-        $la_oids[$min] = $config['mibs'][$mib]['la']['oid_'.$min.'_num'];
-      }
-      else if (isset($config['mibs'][$mib]['la']['oid_'.$min]))
-      {
-        $la_oids[$min] = snmp_translate($config['mibs'][$mib]['la']['oid_'.$min], $mib);
-      }
+      if (!in_array($device[$param], (array)$entries)) { continue; }
     }
-    $la = snmp_get_multi_oid($device, $la_oids, array(), $mib, NULL, OBS_SNMP_ALL_NUMERIC);
+
+    $la_oids = array();
+    if (isset($la_def['type']) && $la_def['type'] == 'table')
+    {
+      // First element from table walk, currently only for Cisco IOS-XE
+      $la_oids = ['1min' => $la_def['oid_1min'], '5min' => $la_def['oid_5min'], '15min' => $la_def['oid_15min']];
+      $la = snmpwalk_cache_oid($device, $la_def['oid_1min'], array(), $mib);
+      $la = snmpwalk_cache_oid($device, $la_def['oid_5min'],     $la, $mib);
+      $la = snmpwalk_cache_oid($device, $la_def['oid_15min'],    $la, $mib);
+      $la = array_shift($la);
+    } else {
+      // Single oid
+      foreach (array('1min', '5min', '15min') as $min)
+      {
+        if (isset($la_def['oid_'.$min.'_num']))
+        {
+          $la_oids[$min] = $la_def['oid_'.$min.'_num'];
+        }
+        else if (isset($la_def['oid_'.$min]))
+        {
+          $la_oids[$min] = snmp_translate($la_def['oid_'.$min], $mib);
+        }
+      }
+      $la = snmp_get_multi_oid($device, $la_oids, array(), $mib, NULL, OBS_SNMP_ALL_NUMERIC);
+    }
 
     print_debug_vars($la_oids);
     print_debug_vars($la);
 
     if (snmp_status() && is_numeric($la[$la_oids['5min']]))
     {
-      $scale = isset($config['mibs'][$mib]['la']['scale']) ? $config['mibs'][$mib]['la']['scale'] : 1;
+      $scale = isset($la_def['scale']) ? $la_def['scale'] : 1;
       $scale_graph = $scale * 100; // Since want to keep compatability with old UCD-SNMP-MIB LA, graph stored as la * 100
 
       // CLEANME after r9500, but not before CE 18.6
@@ -315,11 +356,11 @@ foreach (get_device_mibs($device, TRUE) as $mib) // Check every MIB supported by
         rename_rrd($device, 'ucd_load.rrd', 'la.rrd');
       }
 
-      foreach ($la_oids as $min => $oid_num)
+      foreach ($la_oids as $min => $oid)
       {
-        $device_state['la'][$min] = $la[$oid_num] * $scale;
+        $device_state['la'][$min] = $la[$oid] * $scale;
         // Now, graph specific scale if not equals 1
-        $la[$min] = $la[$oid_num] * $scale_graph;
+        $la[$min] = $la[$oid] * $scale_graph;
       }
       $device_state['ucd_load'] = $device_state['la']['5min']; // Compatability witn old UCD-SNMP-MIB code
 
@@ -442,7 +483,7 @@ if ($config['geocoding']['enable'])
       {
         $geo_msg  = 'Geolocation ('.strtoupper($update_geo['location_geoapi']).') -> ';
         $geo_msg .= '['.sprintf('%f', $update_geo['location_lat']) .', ' .sprintf('%f', $update_geo['location_lon']) .'] ';
-        $geo_msg .= country_from_code($update_geo['location_country']).' (Country), '.$update_geo['location_state'].' (State), ';
+        $geo_msg .= $update_geo['location_country'].' (Country), '.$update_geo['location_state'].' (State), ';
         $geo_msg .= $update_geo['location_county'] .' (County), ' .$update_geo['location_city'] .' (City)';
       } else {
         $geo_msg  = FALSE;

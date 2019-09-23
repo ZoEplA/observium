@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -59,8 +59,12 @@ foreach ($oid_list as $index => $oid)
       {
         $options = array('sensor_unit' => 'F');
       }
+      else if ($type == "airflow")
+      {
+        $options = array('sensor_unit' => 'CFM');
+      }
 
-      discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'serverscheck_sensor', $descr, 1, $value, $options);
+      discover_sensor($type, $device, $oid, $index, 'serverscheck_sensor', $descr, 1, $value, $options);
     }
 
   }

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -70,8 +70,8 @@ foreach ($rrd_list as $rrd)
     $rrd_options .= " VDEF:totout".$i."=outB".$i.",TOTAL";
     $rrd_options .= " VDEF:tot".$i."=octets".$i.",TOTAL";
 
-    $rrd_multi['in_thing'][]  = $in .  $i . ",UN,0," . $in .  $i . ",IF";
-    $rrd_multi['out_thing'][] = $out . $i . ",UN,0," . $out . $i . ",IF";
+    $rrd_multi['in_thing'][]  = $in .  $i;
+    $rrd_multi['out_thing'][] = $out . $i;
   }
 
   if ($i) { $stack = ":STACK"; }
@@ -99,11 +99,10 @@ if ($custom_graph) { $rrd_options .= $custom_graph; }
 
 if (!$nototal)
 {
-  $in_thing  = implode(',', $rrd_multi['in_thing']);
-  $out_thing = implode(',', $rrd_multi['out_thing']);
-  $pluses    = str_repeat(',+', count($rrd_multi['in_thing']) - 1);
-  $rrd_options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
-  $rrd_options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
+
+  $rrd_options .= " CDEF:".$in."octets="  . rrd_aggregate_dses($rrd_multi['in_thing']);
+  $rrd_options .= " CDEF:".$out."octets=" . rrd_aggregate_dses($rrd_multi['out_thing']);
+
   $rrd_options .= " CDEF:octets=inoctets,outoctets,+";
   $rrd_options .= " CDEF:doutoctets=outoctets,-1,*";
   $rrd_options .= " CDEF:inbits=inoctets,8,*";

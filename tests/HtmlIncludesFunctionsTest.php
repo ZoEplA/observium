@@ -81,6 +81,10 @@ class HtmlIncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array(array('os' => 'ios'), TRUE, 'cisco'),
       // by $device['os'] and vendor definition
       array(array('os' => 'cyclades'), TRUE, 'emerson'),
+      // by $device['os'] and vendor defined icon
+      array(array('os' => 'summitd-wl'), TRUE, 'summitd'),
+      // by $device['os'] and vendor defined icon
+      array(array('os' => 'summitd-wl', 'vendor' => 'Summit Development'), TRUE, 'summitd'),
       // by $device['os'] and vendor definition (with non alpha chars)
       //array(array('os' => 'ccplus'), TRUE, 'c_c_power'),
       // by $device['os'] and distro name in array

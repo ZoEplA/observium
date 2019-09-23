@@ -363,6 +363,13 @@
               ::= { nmsEponOltComm 37 }
                
           
+          oltOnuStatusBitstring OBJECT-TYPE
+              SYNTAX  OCTET STRING 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Onu Status bitstring.Each bit means corresponding ONU status."
+              ::= { nmsEponOltComm 38 } 
 
 
 END

@@ -1,11 +1,11 @@
 -- =============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide AP object information such as
 --   performance statistic and notification events.
 -- Reference:
--- Version: V3.1
+-- Version: V3.4
 -- History:
 --   V1.0 2006-05-10 Initial version, created by shiyang (Richard)
 --   V1.1 2007-02-01 modified by xingjichen(Daniel)
@@ -302,6 +302,29 @@
 --        Add new table hh3cDot11APUserInfoStatis2CMTable to hh3cDot11APStatisGroup
 --        Add new object hh3cDot11RxTotalFrameCnt         to hh3cDot11APRxStatisTable
 --        Add new object hh3cDot11TxTotalFrameCnt         to hh3cDot11APTxStatisTable
+--   V3.2 2014-11-19 modified by yubo
+--        Add new object hh3cDot11AirPrimChnlBusy       to hh3cDot11APRadioTable
+--        Add new object hh3cDot11AirPrimChnlTxBusy     to hh3cDot11APRadioTable
+--        Add new object hh3cDot11AirPrimChnlRxBusy     to hh3cDot11APRadioTable
+--        Add new object hh3cDot11AirExtChnlBusy        to hh3cDot11APRadioTable
+--        Add new object hh3cDot11CurrAPIPv6PrefixLen   to hh3cDot11APObjectTable
+--        Add new object hh3cDot11APIPv6PrefixLen       to hh3cDot11APObjectStatusTable
+--        Add new object hh3cDot11APUserIPv6Addr2CM     to hh3cDot11APUserInfoStatis2CMTable
+--        2014-12-12 modified by yubo
+--        Add new object hh3cDot11APAssocStaNum   to hh3cDot11APSSIDObjectTable
+--   V3.3 2015-6-20 modified by wangshaojie
+--        Add new object hh3cDot11WTUAPInfoTable        to hh3cDot11APObjectGroup
+--   V3.4 2016-3-11 modified by yubo 04460
+--        Changed DESCRIPTION of hh3cDot11RadioModeSupport, hh3cDot11RadioModeSupport2,
+--        hh3cDot11TxDiscardFrameBytes, hh3cDot11Tx64DiscardFrameBytes
+--        Add hh3cDot11APUserInCirValueCM to hh3cDot11APUserInfoStatis2CMTable
+--        Add hh3cDot11APUserOutCirValueCM to hh3cDot11APUserInfoStatis2CMTable
+--        Add hh3cDot11APUserMac2CM to hh3cDot11APUserInfoStatis2CMTable
+--        Add hh3cDot11BSSRxFrameErrCntCM to hh3cDot11BSSRxStatisTable
+--        Add hh3cDot11BSSTxFrameErrCntCM to hh3cDot11BSSTxStatisTable
+--        Add hh3cDot11APFactoryDataResetCM to hh3cDot11APObjectStatusTable
+--        2016-6-15 modified by zhouwenshuai kf6157
+--        Add new node  hh3cDot11WsmAPLicenseType      to hh3cDot11APModelTable
 -- =============================================================================
 HH3C-DOT11-APMT-MIB DEFINITIONS ::= BEGIN
 
@@ -337,11 +360,11 @@ IMPORTS
     FROM HH3C-DOT11-REF-MIB;
 
 hh3cDot11APMT MODULE-IDENTITY
-    LAST-UPDATED "201205071800Z"        -- May 07, 2012 at 18:00 GMT
+    LAST-UPDATED "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip: 100085"
@@ -396,6 +419,12 @@ hh3cDot11APMT MODULE-IDENTITY
         A data rate that is mandatory for client
         devices to support in order for them to achieve
         successful association."
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new tables and new nodes."
+    REVISION "201506201800Z"        -- June 20, 2015 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new tables and new nodes."
 
     REVISION "201205071800Z"        -- May 07, 2012 at 18:00 GMT
     DESCRIPTION
@@ -463,6 +492,7 @@ hh3cDot11APObjectGroup OBJECT IDENTIFIER   ::= { hh3cDot11APMT 1 }
 --  hh3cDot11APSysInfoTable                ::= { hh3cDot11APObjectGroup 8 }
 --  hh3cDot11APIdleListTable               ::= { hh3cDot11APObjectGroup 9 }
 --  hh3cDot11APSysInfoByAPIDTable          ::= { hh3cDot11APObjectGroup 10 }
+--  hh3cDot11WTUAPInfoTable                ::= { hh3cDot11APObjectGroup 11 }
 
 --  AP Statistic Group
 --  DEFINED AS "The group to provide the statistic information of Rx
@@ -548,7 +578,9 @@ Hh3cDot11APObjectStatusEntry ::= SEQUENCE
         hh3cDot11APLastImgDownloadTime DateAndTime,
         hh3cDot11APIPv6Address         OCTET STRING,
         hh3cDot11APLastRegisterTime    DateAndTime,
-        hh3cDot11APResetCM             INTEGER
+        hh3cDot11APResetCM             INTEGER,
+        hh3cDot11APIPv6PrefixLen       Integer32,
+        hh3cDot11APFactoryDataResetCM  INTEGER
     }
 
 hh3cDot11APID OBJECT-TYPE
@@ -612,10 +644,10 @@ hh3cDot11APReset OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "When read the value from the node
-        2: Represents the AP can not be reseted.
-        1: Represents the AP can be reseted.
+        2: Represents the AP cannot be reset.
+        1: Represents the AP can be reset.
         When write the value to the node
-        1: Represents reseting the AP.  Other values are not supported"
+        1: Represents resetting the AP.  Other values are not supported"
     ::= { hh3cDot11APObjectStatusEntry 6 }
 
 hh3cDot11APCpuUsage OBJECT-TYPE
@@ -680,6 +712,30 @@ hh3cDot11APResetCM OBJECT-TYPE
         restart - Represents resetting the AP.  Other values are not supported."
     ::= { hh3cDot11APObjectStatusEntry 12 }
 
+hh3cDot11APIPv6PrefixLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the prefix length of an AP IPv6 address."
+    ::= { hh3cDot11APObjectStatusEntry 13 }
+
+hh3cDot11APFactoryDataResetCM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(0),
+            restart(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When reading the value from the node
+        normal  - Represents the AP cannot be reset.
+        restart - Represents the AP can be reset.
+        When writing the value to the node
+        restart - Represents resetting the AP.  Other values are not supported."
+    ::= { hh3cDot11APObjectStatusEntry 14 }
+
 -- *****************************************************************************
 -- *  End of Hh3cDot11APObjectStatusTable Definition
 -- *****************************************************************************
@@ -736,7 +792,8 @@ Hh3cDot11APObjectEntry ::= SEQUENCE
         hh3cDot11CurrRadioModeSupport2      Integer32,
         hh3cDot11CurrAPCPUTypeCM            OCTET STRING,
         hh3cDot11CurrAPMemoryTypeCM         OCTET STRING,
-        hh3cDot11CurrAPBSSIDNumberCM        Integer32
+        hh3cDot11CurrAPBSSIDNumberCM        Integer32,
+        hh3cDot11CurrAPIPv6PrefixLen        Integer32
     }
 
 hh3cDot11APObjID OBJECT-TYPE
@@ -850,7 +907,11 @@ hh3cDot11CurrRadioModeSupport OBJECT-TYPE
         dot11a(1),
         dot11b(2),
         dot11g(4),
-        dot11n(8)
+        dot11n(8),
+        dot11an(16),
+        dot11gn(32),
+        dot11ac(64),
+        dot11gac(128)
         For a AP,it could support multiple radio types at
         the same time.So the value of object could combine multiple value
         of radio type above.
@@ -968,7 +1029,9 @@ hh3cDot11CurrRadioModeSupport2 OBJECT-TYPE
         dot11b(2),
         dot11g(4),
         dot11an(8),
-        dot11gn(16)
+        dot11gn(16),
+        dot11gac(32),
+        dot11ac(64)
         For a AP,it could support multiple radio types at
         the same time.So the value of object could combine multiple value
         of radio type above.
@@ -1001,6 +1064,13 @@ hh3cDot11CurrAPBSSIDNumberCM OBJECT-TYPE
         "Represents the number of BSSID configured on AP."
     ::= { hh3cDot11APObjectEntry 28 }
 
+hh3cDot11CurrAPIPv6PrefixLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the prefix length of an AP IPv6 address."
+    ::= { hh3cDot11APObjectEntry 29 }
 -- *****************************************************************************
 -- *  End of hh3cDot11APObjectTable Definition
 -- *****************************************************************************
@@ -1056,7 +1126,11 @@ Hh3cDot11APRadioEntry ::= SEQUENCE
         hh3cDot11RadioIfUpdownTimes       Counter32,
         hh3cDot11RadioIfLastChange        TimeTicks,
         hh3cDot11RadioModeSupport2        Unsigned32,
-        hh3cDot11OperStatusCM             INTEGER
+        hh3cDot11OperStatusCM             INTEGER,
+        hh3cDot11AirPrimChnlBusy          Integer32,
+        hh3cDot11AirPrimChnlTxBusy        Integer32,
+        hh3cDot11AirPrimChnlRxBusy        Integer32,
+        hh3cDot11AirExtChnlBusy           Integer32
     }
 
 hh3cDot11CurAPID OBJECT-TYPE
@@ -1154,13 +1228,15 @@ hh3cDot11RadioModeSupport OBJECT-TYPE
         dot11b(2),
         dot11g(4),
         dot11gn(16),
-        dot11an(32).
+        dot11an(32),
+        dot11ac(64),
+        dot11gac(128)
         For the radio, it could support multiple radio types at
         the same time.  So the value of this object could combine multiple
         values of radio type above.
         For example:
         For one radio which supports both dot11b and dot11g mode, when get
-        value from the object, the value is 5(1 + 4)."
+        value from the object, the value is 6(2 + 4)."
     ::= { hh3cDot11APRadioEntry 11 }
 
 hh3cDot11TxPowerLevel2 OBJECT-TYPE
@@ -1273,13 +1349,15 @@ hh3cDot11RadioModeSupport2 OBJECT-TYPE
         dot11b(2),
         dot11g(4),
         dot11an(8),
-        dot11gn(16).
+        dot11gn(16),
+        dot11gac(32),
+        dot11ac(64)
         For the radio, it could support multiple radio types at
         the same time.  So the value of this object could combine multiple
         values of radio type above.
         For example:
         For one radio which supports both dot11b and dot11g mode, when get
-        value from the object, the value is 5(1 + 4)."
+        value from the object, the value is 6(2 + 4)."
     ::= { hh3cDot11APRadioEntry 24 }
 
 hh3cDot11OperStatusCM OBJECT-TYPE
@@ -1295,6 +1373,44 @@ hh3cDot11OperStatusCM OBJECT-TYPE
     DESCRIPTION
         "Represents the operational status of radio."
     ::= { hh3cDot11APRadioEntry 25 }
+
+hh3cDot11AirPrimChnlBusy OBJECT-TYPE
+    SYNTAX      Integer32(0..100 | 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Represents air interface utilization on the primary channel.
+    The value 255 represents an invalid value."
+    ::= { hh3cDot11APRadioEntry 26 }
+
+hh3cDot11AirPrimChnlTxBusy OBJECT-TYPE
+    SYNTAX      Integer32(0..100 | 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Represents air interface utilization for signal sending on the
+    primary channel.
+    The value 255 represents an invalid value."
+    ::= { hh3cDot11APRadioEntry 27 }
+
+hh3cDot11AirPrimChnlRxBusy OBJECT-TYPE
+    SYNTAX      Integer32(0..100 | 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Represents air interface utilization for signal receiving on the
+    primary channel.
+    The value 255 represents an invalid value."
+    ::= { hh3cDot11APRadioEntry 28 }
+
+hh3cDot11AirExtChnlBusy OBJECT-TYPE
+    SYNTAX      Integer32(0..100 | 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Represents air interface utilization on the secondary channel.
+    The value 255 represents an invalid value."
+    ::= { hh3cDot11APRadioEntry 29 }
 -- *****************************************************************************
 -- *  End of hh3cDot11APRadioTable Definition
 -- *****************************************************************************
@@ -1429,7 +1545,8 @@ Hh3cDot11APModelEntry ::= SEQUENCE
         hh3cDot11APFlashType          OCTET STRING,
         hh3cDot11APFlashSize          Unsigned32,
         hh3cDot11APMemSize            Gauge32,
-        hh3cDot11APFlashSizeInBytes   Unsigned32
+        hh3cDot11APFlashSizeInBytes   Unsigned32,
+        hh3cDot11WsmAPLicenseType     INTEGER
     }
 
 hh3cDot11APModelAlias OBJECT-TYPE
@@ -1555,6 +1672,22 @@ hh3cDot11APFlashSizeInBytes OBJECT-TYPE
         "This object represents the size of AP flash card in bytes."
     ::= { hh3cDot11APModelEntry 14 }
 
+hh3cDot11WsmAPLicenseType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(1),
+            wtu(2),
+            wt(3),
+            iot(4),
+            other(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents AP license type for iMc WSM."
+    ::= { hh3cDot11APModelEntry 15 }
+
+
 -- *****************************************************************************
 -- *  End of hh3cDot11APModelTable Definition
 -- *****************************************************************************
@@ -1567,7 +1700,7 @@ hh3cDot11APIfTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table represents the AP interface informations."
+        "This table represents the AP interface information."
     ::= { hh3cDot11APObjectGroup 6 }
 
 hh3cDot11APIfEntry OBJECT-TYPE
@@ -1602,7 +1735,7 @@ hh3cDot11APIfIndex OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Represents the index for a interface."
+        "Represents the index for an interface."
     ::= { hh3cDot11APIfEntry 1 }
 
 hh3cDot11APIfDescr OBJECT-TYPE
@@ -1610,7 +1743,7 @@ hh3cDot11APIfDescr OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Represents the interface description for a interface."
+        "Represents the interface description for an interface."
     ::= { hh3cDot11APIfEntry 2 }
 
 hh3cDot11APIfType OBJECT-TYPE
@@ -1618,7 +1751,7 @@ hh3cDot11APIfType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Represents the interface type for a interface."
+        "Represents the interface type for an interface."
     ::= { hh3cDot11APIfEntry 3 }
 
 hh3cDot11APIfMtu OBJECT-TYPE
@@ -1718,7 +1851,8 @@ Hh3cDot11APSSIDObjectEntry ::= SEQUENCE
         hh3cDot11APConfigSPID              Hh3cDot11ServicePolicyIDType,
         hh3cDot11APConfigSSIDName          Hh3cDot11SSIDStringType,
         hh3cDot11APConfigBSSIDNum          Integer32,
-        hh3cDot11APConfigPortalStaNum      Integer32
+        hh3cDot11APConfigPortalStaNum      Integer32,
+        hh3cDot11APAssocStaNum             Integer32
     }
 
 hh3cDot11APConfigSPID OBJECT-TYPE
@@ -1754,6 +1888,14 @@ hh3cDot11APConfigPortalStaNum OBJECT-TYPE
         "Represents the total number of associated protal
         stations with current SSID."
     ::= { hh3cDot11APSSIDObjectEntry 4 }
+
+hh3cDot11APAssocStaNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of associated stations with current SSID."
+    ::= { hh3cDot11APSSIDObjectEntry 5 }
 
 -- *****************************************************************************
 -- *  End of hh3cDot11APSSIDObjectTable Definition
@@ -2090,6 +2232,65 @@ hh3cDot11APACAssociateStatusCM OBJECT-TYPE
 
 -- *****************************************************************************
 -- *  End of hh3cDot11APSysInfoByAPIDTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WTUAPInfoTable Definition
+-- *****************************************************************************
+hh3cDot11WTUAPInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WTUAPInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table provides relationship information between wireless terminator units (WTUs) and WTs."
+    ::= { hh3cDot11APObjectGroup 11 }
+
+hh3cDot11WTUAPInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WTUAPInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides relationship information between a WTU and a WT."
+    INDEX
+        {
+            hh3cDot11ContainerSerialID,
+            hh3cDot11WTUAPSerialID
+        }
+    ::= { hh3cDot11WTUAPInfoTable 1 }
+
+Hh3cDot11WTUAPInfoEntry ::= SEQUENCE
+    {
+        hh3cDot11ContainerSerialID    Hh3cDot11ObjectIDType,
+        hh3cDot11WTUAPSerialID        Hh3cDot11ObjectIDType,
+        hh3cDot11WTUAPSubSlotID       Unsigned32
+    }
+
+hh3cDot11ContainerSerialID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Serial ID that uniquely identifies a WT."
+    ::= { hh3cDot11WTUAPInfoEntry 1 }
+
+hh3cDot11WTUAPSerialID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Serial ID that uniquely identifies a WTU."
+    ::= { hh3cDot11WTUAPInfoEntry 2 }
+
+hh3cDot11WTUAPSubSlotID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the sub-slot ID of a WTU."
+    ::= { hh3cDot11WTUAPInfoEntry 3 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11WTUAPInfoTable Definition
 -- *****************************************************************************
 
 -- *****************************************************************************
@@ -2629,7 +2830,7 @@ hh3cDot11TxDiscardFrameBytes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Represents the bytes of multicast frames transmission."
+        "Represents the bytes of discarded frames transmission."
     ::= { hh3cDot11APTxStatisEntry 17 }
 
 hh3cDot11TxAuthenFrameCnt OBJECT-TYPE
@@ -2827,7 +3028,8 @@ Hh3cDot11APAssocStatisEntry ::= SEQUENCE
         hh3cDot11ApStationAssocReqSum       Counter32,
         hh3cDot11AllStationUpSumTimeTicks   TimeTicks,
         hh3cDot11ApStationReassocReqSum     Counter32,
-        hh3cDot11ApStationReassocFailSum    Counter32
+        hh3cDot11ApStationReassocFailSum    Counter32,
+        hh3cDot11ApStationAssocRespSum       Counter32
     }
 
 hh3cDot11ApStationAssocSum OBJECT-TYPE
@@ -2936,6 +3138,15 @@ hh3cDot11ApStationReassocFailSum OBJECT-TYPE
         "Represents the total number of station reassociation failure
         with this AP."
     ::= { hh3cDot11APAssocStatisEntry 12 }
+
+hh3cDot11ApStationAssocRespSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of this AP response with station association."
+    ::= { hh3cDot11APAssocStatisEntry 13 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11APAssocStatisTable Definition
 -- *****************************************************************************
@@ -2978,7 +3189,8 @@ Hh3cDot11BSSRxStatisEntry ::= SEQUENCE
         hh3cDot11BSSRxPayloadBytes         Counter32,
         hh3cDot11BSSRxUniFrameCnt          Counter32,
         hh3cDot11BSSRxNonUniFrameCnt       Integer32,
-        hh3cDot11BSSRxAuthenFrameCnt       Counter32
+        hh3cDot11BSSRxAuthenFrameCnt       Counter32,
+        hh3cDot11BSSRxFrameErrCntCM        Counter32
     }
 
 hh3cDot11BSSRxFrameCnt OBJECT-TYPE
@@ -3062,6 +3274,14 @@ hh3cDot11BSSRxAuthenFrameCnt OBJECT-TYPE
         "Represents the count of authentication frames received."
     ::= { hh3cDot11BSSRxStatisEntry 10 }
 
+hh3cDot11BSSRxFrameErrCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of error authentication frames received."
+    ::= { hh3cDot11BSSRxStatisEntry 11 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11BSSRxStatisTable Definition
 -- *****************************************************************************
@@ -3104,7 +3324,8 @@ Hh3cDot11BSSTxStatisEntry ::= SEQUENCE
         hh3cDot11BSSTxRetryCnt             Counter32,
         hh3cDot11BSSTxUniFrameCnt          Counter32,
         hh3cDot11BSSTxNonUniFrameCnt       Integer32,
-        hh3cDot11BSSTxAuthenFrameCnt       Counter32
+        hh3cDot11BSSTxAuthenFrameCnt       Counter32,
+        hh3cDot11BSSTxFrameErrCntCM        Counter32
     }
 
 hh3cDot11BSSTxFrameCnt OBJECT-TYPE
@@ -3186,6 +3407,14 @@ hh3cDot11BSSTxAuthenFrameCnt OBJECT-TYPE
     DESCRIPTION
         "Represents the count of authentication frames transmission with this BSS."
     ::= { hh3cDot11BSSTxStatisEntry 10 }
+
+hh3cDot11BSSTxFrameErrCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of error authentication frames transmission with this BSS."
+    ::= { hh3cDot11BSSTxStatisEntry 11 }
 
 -- *****************************************************************************
 -- *  End of hh3cDot11BSSTxStatisTable Definition
@@ -5096,7 +5325,7 @@ hh3cDot11APUserLoginNameCM OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Represents the login name of dot1x user logging to this AP."
+        "Represents the login name of user logging to this AP."
     ::= { hh3cDot11APUserInfoStatisEntry 6 }
 
 hh3cDot11APUserAuthTypeCM OBJECT-TYPE
@@ -6056,7 +6285,7 @@ hh3cDot11Tx64DiscardFrameBytes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Represents the bytes of discard frames transmission."
+        "Represents the bytes of discarded frames transmission."
     ::= { hh3cDot11RadioTxStatis64Entry 17 }
 
 hh3cDot11Tx64AuthenFrameCnt OBJECT-TYPE
@@ -6576,7 +6805,11 @@ Hh3cDot11APUserInfoStatis2CMEntry ::= SEQUENCE
         hh3cDot11APUserTxPacketCnt2CM              Counter32,
         hh3cDot11APUserTxBytes2CM                  Counter64,
         hh3cDot11APUserRxPacketCnt2CM              Counter32,
-        hh3cDot11APUserRxBytes2CM                  Counter64
+        hh3cDot11APUserRxBytes2CM                  Counter64,
+        hh3cDot11APUserIPv6Addr2CM                 OCTET STRING,
+        hh3cDot11APUserMac2CM                      MacAddress,
+        hh3cDot11APUserInCirValueCM                Counter32,
+        hh3cDot11APUserOutCirValueCM               Counter32
     }
 
 hh3cDot11APUserMacAddr2CM OBJECT-TYPE
@@ -6669,6 +6902,38 @@ hh3cDot11APUserRxBytes2CM OBJECT-TYPE
     DESCRIPTION
         "Represents the total bytes received from online users."
     ::= { hh3cDot11APUserInfoStatis2CMEntry 10 }
+
+hh3cDot11APUserIPv6Addr2CM OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IPv6 address of online users."
+    ::= { hh3cDot11APUserInfoStatis2CMEntry 11 }
+
+hh3cDot11APUserMac2CM OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the mac address of authentication user logging to this AP."
+    ::= { hh3cDot11APUserInfoStatis2CMEntry 12 }
+
+hh3cDot11APUserInCirValueCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the CIR of inbound direction of this user."
+    ::= { hh3cDot11APUserInfoStatis2CMEntry 13 }
+
+hh3cDot11APUserOutCirValueCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the CIR of outbound direction of this user."
+    ::= { hh3cDot11APUserInfoStatis2CMEntry 14 }
 
 -- *****************************************************************************
 -- *  End of hh3cDot11APUserInfoStatis2CMTable Definition

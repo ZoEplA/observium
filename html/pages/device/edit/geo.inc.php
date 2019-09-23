@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -226,13 +226,14 @@ if ($updated && $update_message)
                                       'disabled'    => !$location['location_manual'],
                                       'value'       => escape_html($location['coordinates_manual']));
       $form['row'][7]['location_manual'] = array(
-                                      'type'        => 'checkbox',
+                                      'type'        => 'toggle',
+                                      'size'        => 'large',
                                       'readonly'    => $readonly,
                                       'onchange'    => "toggleAttrib('disabled', 'coordinates')",
                                       'value'       => $location['location_manual']);
 
       $form['row'][8]['reset_geolocation'] = array(
-                                      'type'        => 'switch',
+                                      'type'        => 'switch-ng',
                                       'name'        => 'Reset GEO location',
                                       //'fieldset'    => 'edit',
                                       'size'        => 'small',

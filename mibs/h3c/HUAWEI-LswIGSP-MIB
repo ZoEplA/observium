@@ -1,7 +1,7 @@
 -- ==================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description:  HUAWEI Lan Switch Igmp snooping MIB
+-- Description: Igmp snooping MIB
 -- Reference:
 -- Version: V1.4
 -- History:
@@ -50,9 +50,14 @@ IMPORTS
 
     hwLswIgmpsnoopingMib MODULE-IDENTITY
         LAST-UPDATED "200106290000Z"
-        ORGANIZATION ""
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            ""
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             ""
         REVISION "200106290000Z"

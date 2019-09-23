@@ -1,9 +1,9 @@
 -- ===========================================================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: System Management MIB
 -- Reference:
--- Version: V2.5
+-- Version: V2.7
 -- History:
 --  revision 1.0 2002-12-20 created by xuqingwei
 --  revision 1.1 2004-4-16  added the support for XRN  by xuqingwei
@@ -35,7 +35,11 @@
 --          V2.3 2010-03-17 add hh3cSysLocalClockString by jinyi
 --  revision V2.4 2011-08-30 add  hh3cSysPackage, hh3cSysIpePackage by z02031
 --  revision V2.5 2013-10-18 add hh3cSysPackageLoadAttribute, hh3cSysPackageModel, hh3cSysIpeFileModel,
---                h3cSysIpePackageModel and hh3cSysSetBootImage by z03030 and z08715
+--                hh3cSysIpePackageModel and hh3cSysSetBootImage by z03030 and z08715
+--  revision V2.6 2015-07-07 add hh3cSysClockProtocolGroup, hh3cSysClockProtocol, hh3cSysClockProtocolSrcMdc
+--                and hh3cSysClockProtocolSrcContext by l09650
+--  revision V2.7 2017-05-27 add hh3cSysLocalClockString2 by h12133
+--                2018-01-10 added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup by t16382
 -- ============================================================================================================
 HH3C-SYS-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -53,11 +57,11 @@ IMPORTS
 
 
 hh3cSystemMan MODULE-IDENTITY
-    LAST-UPDATED "200906070000Z"
+    LAST-UPDATED "201801100000Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
@@ -65,8 +69,14 @@ hh3cSystemMan MODULE-IDENTITY
         "This MIB contains objects to manage the system.
          It focuses on the display of current configure file and image
          file,and the definition of reloading image.
-         Add the support for XRN.
-        "
+         Add the support for XRN."
+    REVISION     "201801100000Z"
+    DESCRIPTION  "added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
+    REVISION     "201706120000Z"
+    DESCRIPTION  "Add hh3cSysLocalClockString2."
+    REVISION     "201507270000Z"
+    DESCRIPTION  "Add hh3cSysClockProtocolGroup, hh3cSysClockProtocol, hh3cSysClockProtocolSrcMdc
+--                and hh3cSysClockProtocolSrcContext."
     REVISION "200404081345Z"        -- April 08, 2004 at 13:45 GMT
     DESCRIPTION
         " "
@@ -194,6 +204,96 @@ hh3cSysLocalClockString OBJECT-TYPE
         For example, Tuesday May 26, 2002 at 1:30:15 would be
         displayed as: 2002-5-26T13:30:15.0Z"
     ::= { hh3cSysClock 3 }
+
+hh3cSysClockProtocolGroup OBJECT IDENTIFIER ::= { hh3cSysClock 4 }
+
+hh3cSysLocalClockString2 OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (14..19))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This node gives the current local time of the system.
+        For example, 1:30:15 on Tuesday, May 26th, 2002 will be
+        displayed as: 2002/05/26/01/30/15.
+        2002/5/26/1/30/15 or 2002/05/26/01/30/15 will be applied in a write operation."
+    ::= { hh3cSysClock 5 }
+
+hh3cSysClockProtocol OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        ntp(2),
+        ptp(3),
+        interface(4)
+         }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing none(1) to this object indicates to use the local system time.
+        When the value is set to none(1), hh3cSysClockProtocolSrcMdc and
+        hh3cSysClockProtocolSrcContext cannot be written and the value will be
+        set to invalid.  Change system time will be performed through the node
+        of hh3cSysLocalClock and hh3cSysSummerTime.
+        Writing ntp(2) to this object indicates to use NTP time source.
+        NTP means Network Time Protocol.  To get the system time through NTP,
+        NTP must be configured successfully.  NTP time source can be obtained
+        from non-default MDC and non-default context.
+        When ntp(2) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing ptp(3) to this object indicates to use PTP time source.
+        PTP means Precision Time Protocol.  To get clock time through PTP, PTP
+        must be configured successfully.  PTP time source can be obtained from
+        non-default MDC but cannot be obtained from non-default context.
+        When ptp(3) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing interface(4) to this object indicates to get time source from interface.
+        To get clock time through interface, interface must be configured successfully.
+        When interface(4) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        All MDCs on the device share the same time source and use the same system time.
+        The shared time source can be one of the following items:
+        Local system time - the time signal that is generated by the local
+        crystal oscillator
+        Remote time source - the time signal that is obtained by the specified MDC
+        from another device on the network."
+    ::= { hh3cSysClockProtocolGroup 1 }
+
+hh3cSysClockProtocolSrcMdc OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The MDC ID that is used for the system time source.
+        This node is valid when the clock protocol is NTP or PTP.
+        If MDC is not supported on this system, this node is invalid.
+        If the device supports MDC, the system time will be obtained
+        from NTP or PTP on the specified MDC.
+        If the device supports context and MDC, the most recent configuration of
+        hh3cSysClockProtocolSrcContext and hh3cSysClockProtocolSrcMdc takes
+        effect if set multiple times, and another one will be set to zero as an
+        invalid value."
+     DEFVAL { 1 }
+    ::= { hh3cSysClockProtocolGroup 2 }
+
+hh3cSysClockProtocolSrcContext OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The context ID that is used for the system time source.
+        This node is valid when the clock protocol is NTP or PTP.
+        If context is not supported on this system, this node is invalid.
+        If the system supports context, the system time will be obtained from
+        NTP or PTP on the specified context.
+        If the device supports context and MDC, the most recent configuration of
+        hh3cSysClockProtocolSrcContext and hh3cSysClockProtocolSrcMdc takes
+        effect if set multiple times, and another one will be set to zero as an
+        invalid value."
+    DEFVAL { 1 }
+    ::= { hh3cSysClockProtocolGroup 3 }
 
 hh3cSysCurrent OBJECT IDENTIFIER ::= { hh3cSystemManMIBObjects 2 }
 

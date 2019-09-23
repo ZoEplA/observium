@@ -2288,19 +2288,18 @@ vlanMappingTunnelEdgePortConfigEntry  OBJECT-TYPE
     ::= { vlanMappingTunnelEdgePortConfigTable 1 }
 
 VlanMappingTunnelEdgePortConfigEntry::=SEQUENCE{
-   vlanMappingTunnelEdgePortConfigVlanId      		INTEGER,
+   vlanMappingTunnelEdgePortConfigVlanId      		VlanIndex,
    vlanMappingTunnelEdgePortConfigCos   			INTEGER,
    vlanMappingTunnelEdgePortConfigDropThreshold		INTEGER,
    vlanMappingTunnelEdgePortConfigShutdownThreshold INTEGER,
    vlanMappingTunnelEdgePortConfigForwardCDP  		TruthValue, 
    vlanMappingTunnelEdgePortConfigForwardLLDP	  	TruthValue,
    vlanMappingTunnelEdgePortConfigForwardSTP  		TruthValue,
-   vlanMappingTunnelEdgePortConfigForwardVTP  		TruthValue,
-   vlanMappingTunnelEdgePortConfigRowStatus			RowStatus 
+   vlanMappingTunnelEdgePortConfigForwardVTP  		TruthValue
 }
 	
 vlanMappingTunnelEdgePortConfigVlanId	OBJECT-TYPE
-   SYNTAX  INTEGER
+   SYNTAX  VlanIndex
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
@@ -2308,28 +2307,29 @@ vlanMappingTunnelEdgePortConfigVlanId	OBJECT-TYPE
    ::= { vlanMappingTunnelEdgePortConfigEntry 1 }
 	
 vlanMappingTunnelEdgePortConfigCos	OBJECT-TYPE
-   SYNTAX      INTEGER
+   SYNTAX      INTEGER (0..8)
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
-     "Specify class of service (CoS) value globally into S-VLAN tag of forwarded Layer 2 frames."
-   DEFVAL { 5 }
+     "Specify class of service (CoS) value into S-VLAN tag of forwarded Layer 2 frames."
+   DEFVAL { 8 }
    ::= { vlanMappingTunnelEdgePortConfigEntry 2 }
 
 vlanMappingTunnelEdgePortConfigDropThreshold	OBJECT-TYPE
-   SYNTAX      INTEGER
+   SYNTAX      INTEGER (0..1024)
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
-     "Set a drop threshold for received forwarded L2 protocol frames."
+     "Set a drop threshold for received forwarded L2 protocol frames in packets-per-second resolution."
+   DEFVAL { 16 }	
    ::= { vlanMappingTunnelEdgePortConfigEntry 3 }
 
 vlanMappingTunnelEdgePortConfigShutdownThreshold	OBJECT-TYPE
-   SYNTAX      INTEGER
+   SYNTAX      INTEGER (0..1024)
    MAX-ACCESS  read-write
    STATUS      current
    DESCRIPTION
-     "Set a shutdown threshold for received forwarded L2 protocol frames."
+     "Set a shutdown threshold for received forwarded L2 protocol frames in packets-per-second resolution."
    ::= { vlanMappingTunnelEdgePortConfigEntry 4 }
 
 vlanMappingTunnelEdgePortConfigForwardCDP	OBJECT-TYPE
@@ -2368,15 +2368,6 @@ vlanMappingTunnelEdgePortConfigForwardVTP	OBJECT-TYPE
    DEFVAL { false }
    ::= { vlanMappingTunnelEdgePortConfigEntry 8 }
    			
-vlanMappingTunnelEdgePortConfigRowStatus	OBJECT-TYPE
-   SYNTAX      RowStatus
-   MAX-ACCESS  read-write
-   STATUS      current
-   DESCRIPTION
-     "The row status variable, used according to
-       row installation and removal conventions."
-   ::= { vlanMappingTunnelEdgePortConfigEntry 9 }
-
 
    
 --vlanMappingTunnelNniPortConfigTable
@@ -2623,7 +2614,7 @@ vlanMappingOneToOneEdgePortRowStatus	OBJECT-TYPE
   
    
 vlanMappingCosValue OBJECT-TYPE
-    SYNTAX      INTEGER 
+    SYNTAX      INTEGER (0..7)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION

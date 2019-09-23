@@ -334,6 +334,30 @@ msp32-2404	OBJECT-IDENTITY
    	 		STATUS  	current
    	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP32-2404 device."
    	 	 	::= { msp 6 }
+msp40-00280	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP40-00280 device."
+   	 	 	::= { msp 1000 }
+msp42-00280	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP42-00280 device."
+   	 	 	::= { msp 1001 }
+msp40-00200	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP40-00200 device."
+   	 	 	::= { msp 1002 }
+msp42-00200	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP42-00200 device."
+   	 	 	::= { msp 1003 }
+msp40-00120	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP40-00120 device."
+   	 	 	::= { msp 1004 }
+msp42-00120	OBJECT-IDENTITY
+   	 		STATUS  	current
+   	 	 	DESCRIPTION "Hirschmann MICE Switch Power MSP42-00120 device."
+   	 	 	::= { msp 1005 }
 
 --         
 -- Device groups per family (RSPS)

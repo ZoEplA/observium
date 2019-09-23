@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -47,31 +47,31 @@ foreach ($oids as $index => $port)
   if ($port['nbsCmmcPortTemperature'] != -2147483648)
   {
     $sensor_oid = '.1.3.6.1.4.1.629.200.8.1.1.30.' . $index;
-    discover_sensor($valid['sensor'], "temperature", $device, $sensor_oid, $index, 'nbsCmmcPortTemperature', $port['nbsCmmcPortName'], 1, $port['nbsCmmcPortTemperature'], $options);
+    discover_sensor("temperature", $device, $sensor_oid, $index, 'nbsCmmcPortTemperature', $port['nbsCmmcPortName'], 1, $port['nbsCmmcPortTemperature'], $options);
   }
 
   if ($port['nbsCmmcPortTxPower'] != -2147483648)
   {
     $sensor_oid = '.1.3.6.1.4.1.629.200.8.1.1.31.' . $index;
-    discover_sensor($valid['sensor'], "dbm", $device, $sensor_oid, $index, 'nbsCmmcPortTxPower', $port['nbsCmmcPortName'] . ' TX Power', 0.001, $port['nbsCmmcPortTxPower'], $options);
+    discover_sensor("dbm", $device, $sensor_oid, $index, 'nbsCmmcPortTxPower', $port['nbsCmmcPortName'] . ' TX Power', 0.001, $port['nbsCmmcPortTxPower'], $options);
   }
 
   if ($port['nbsCmmcPortRxPower'] != -2147483648)
   {
     $sensor_oid = '.1.3.6.1.4.1.629.200.8.1.1.32.' . $index;
-    discover_sensor($valid['sensor'], "dbm", $device, $sensor_oid, $index, 'nbsCmmcPortRxPower', $port['nbsCmmcPortName'] . ' RX Power', 0.001, $port['nbsCmmcPortRxPower'], $options);
+    discover_sensor("dbm", $device, $sensor_oid, $index, 'nbsCmmcPortRxPower', $port['nbsCmmcPortName'] . ' RX Power', 0.001, $port['nbsCmmcPortRxPower'], $options);
   }
 
   if ($port['nbsCmmcPortBiasAmps'] != -1)
   {
     $sensor_oid = '.1.3.6.1.4.1.629.200.8.1.1.33.' . $index;
-    discover_sensor($valid['sensor'], "current", $device, $sensor_oid, $index, 'nbsCmmcPortBiasAmps', $port['nbsCmmcPortName'] . ' Bias', 0.000001, $port['nbsCmmcPortBiasAmps'], $options);
+    discover_sensor("current", $device, $sensor_oid, $index, 'nbsCmmcPortBiasAmps', $port['nbsCmmcPortName'] . ' Bias', 0.000001, $port['nbsCmmcPortBiasAmps'], $options);
   }
 
   if ($port['nbsCmmcPortSupplyVolts'] != -1)
   {
     $sensor_oid = '.1.3.6.1.4.1.629.200.8.1.1.34.' . $index;
-    discover_sensor($valid['sensor'], "voltage", $device, $sensor_oid, $index, 'nbsCmmcPortSupplyVolts', $port['nbsCmmcPortName'] . ' Supply', 0.001, $port['nbsCmmcPortSupplyVolts'], $options);
+    discover_sensor("voltage", $device, $sensor_oid, $index, 'nbsCmmcPortSupplyVolts', $port['nbsCmmcPortName'] . ' Supply', 0.001, $port['nbsCmmcPortSupplyVolts'], $options);
   }
 }
 

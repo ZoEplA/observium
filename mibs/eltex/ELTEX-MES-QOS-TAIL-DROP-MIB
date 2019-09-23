@@ -1,8 +1,8 @@
 ELTEX-MES-QOS-TAIL-DROP-MIB DEFINITIONS ::= BEGIN
 
 -- Title:      Eltex MES QoS Tail-Drop Configuration
--- Version:    1.2
--- Date:       11-Feb-2016
+-- Version:    1.3
+-- Date:       19-Jul-2016
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
@@ -150,7 +150,24 @@ EltQosTailDropConfigEntry ::= SEQUENCE {
     eltQosTailDropConfigMCDescriptorsLimit              INTEGER,
     eltQosTailDropConfigMCBuffersLimit                  INTEGER,
     eltQosTailDropConfigSharedDescriptorsLimit          INTEGER,
-    eltQosTailDropConfigSharedBuffersLimit              INTEGER
+    eltQosTailDropConfigSharedBuffersLimit              INTEGER,
+    eltQosTailDropConfigMirrorRxDescriptorsLimit        INTEGER,
+    eltQosTailDropConfigMirrorTxDescriptorsLimit        INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit2         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit2             INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit3         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit3             INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit4         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit4             INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit5         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit5             INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit6         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit6             INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit7         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit7             INTEGER,
+    eltQosTailDropConfigSharedDescriptorsLimit8         INTEGER,
+    eltQosTailDropConfigSharedBuffersLimit8             INTEGER
+
 }
 
 eltQosTailDropConfigUnitId OBJECT-TYPE
@@ -211,7 +228,8 @@ eltQosTailDropConfigSharedDescriptorsLimit OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Maximum number of descriptors in shared pool that
-        may be used by all ports and queues."
+        may be used by all ports and queues for xCat 
+        devices or by queue 1 for Lion devices."
     ::= { eltQosTailDropConfigEntry 7 }
 
 eltQosTailDropConfigSharedBuffersLimit OBJECT-TYPE
@@ -220,8 +238,155 @@ eltQosTailDropConfigSharedBuffersLimit OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Maximum number of buffers in shared pool that
-        may be used by all ports and queues."
+        may be used by all ports and queues for xCat 
+        devices or by queue 1 for Lion devices."
     ::= { eltQosTailDropConfigEntry 8 }
+    
+eltQosTailDropConfigMirrorRxDescriptorsLimit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of packets being forwarded
+         to the analyzer port due
+         to ingress mirroring at the moment."
+    ::= { eltQosTailDropConfigEntry 9 }
+
+eltQosTailDropConfigMirrorTxDescriptorsLimit OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of packets being forwarded
+         to the analyzer port due
+         to egress mirroring at the moment."
+    ::= { eltQosTailDropConfigEntry 10 }
+
+eltQosTailDropConfigSharedDescriptorsLimit2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 2."
+    ::= { eltQosTailDropConfigEntry 11 }
+
+eltQosTailDropConfigSharedBuffersLimit2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 2."
+    ::= { eltQosTailDropConfigEntry 12 }
+
+eltQosTailDropConfigSharedDescriptorsLimit3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 3."
+    ::= { eltQosTailDropConfigEntry 13 }
+
+eltQosTailDropConfigSharedBuffersLimit3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 3."
+    ::= { eltQosTailDropConfigEntry 14 }
+
+eltQosTailDropConfigSharedDescriptorsLimit4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 4."
+    ::= { eltQosTailDropConfigEntry 15 }
+
+eltQosTailDropConfigSharedBuffersLimit4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 4."
+    ::= { eltQosTailDropConfigEntry 16 }
+
+eltQosTailDropConfigSharedDescriptorsLimit5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 5."
+    ::= { eltQosTailDropConfigEntry 17 }
+
+eltQosTailDropConfigSharedBuffersLimit5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 5."
+    ::= { eltQosTailDropConfigEntry 18 }
+
+eltQosTailDropConfigSharedDescriptorsLimit6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 6."
+    ::= { eltQosTailDropConfigEntry 19 }
+
+eltQosTailDropConfigSharedBuffersLimit6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 6."
+    ::= { eltQosTailDropConfigEntry 20 }
+
+eltQosTailDropConfigSharedDescriptorsLimit7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 7."
+    ::= { eltQosTailDropConfigEntry 21 }
+
+eltQosTailDropConfigSharedBuffersLimit7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 7."
+    ::= { eltQosTailDropConfigEntry 22 }
+
+eltQosTailDropConfigSharedDescriptorsLimit8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of descriptors in shared pool that
+        may be used by queue 8."
+    ::= { eltQosTailDropConfigEntry 23 }
+
+eltQosTailDropConfigSharedBuffersLimit8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of buffers in shared pool that
+        may be used by queue 8."
+    ::= { eltQosTailDropConfigEntry 24 }
 
 --
 -- Configuration - Profile table
@@ -264,6 +429,30 @@ eltQosTailDropProfilePortLimit OBJECT-TYPE
     ::= { eltQosTailDropProfileEntry 2 }
 
 --
+-- Configuration - global limits for a mirrored packets
+--
+
+--eltQosTailDropMirrorRxDescriptorsLimit OBJECT-TYPE
+--    SYNTAX     INTEGER
+--    MAX-ACCESS read-write
+--    STATUS     current
+--    DESCRIPTION       "The maximum number of packets being forwarded
+--                        to the analyzer port due
+--                        to ingress mirroring at the moment."
+--   DEFVAL{ 10 }
+--    ::= { eltMesQosTailDropConfig 5 }
+
+--eltQosTailDropMirrorTxDescriptorsLimit OBJECT-TYPE
+--    SYNTAX     INTEGER
+--    MAX-ACCESS read-write
+--    STATUS     current
+--    DESCRIPTION       "The maximum number of packets being forwarded
+--                        to the analyzer port due
+--                        to egress mirroring at the moment."
+--    DEFVAL{ 10 }
+--    ::= { eltMesQosTailDropConfig 6 }
+
+--
 -- Status - global buffers and descriptors table
 --
 
@@ -294,7 +483,24 @@ EltQosTailDropStatusEntry ::= SEQUENCE {
     eltQosTailDropStatusTotalMCDescriptorsEnqueuedCounter  INTEGER,
     eltQosTailDropStatusTotalMCBuffersEnqueuedCounter      INTEGER,
     eltQosTailDropStatusSharedDescriptorsEnqueuedCounter   INTEGER,
-    eltQosTailDropStatusSharedBuffersEnqueuedCounter       INTEGER
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter       INTEGER,
+    eltQosTailDropStatusMirrorRxDescriptorsEnqueuedCounter INTEGER,
+    eltQosTailDropStatusMirrorTxDescriptorsEnqueuedCounter INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter2  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter2      INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter3  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter3      INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter4  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter4      INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter5  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter5      INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter6  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter6      INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter7  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter7      INTEGER,
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter8  INTEGER,
+    eltQosTailDropStatusSharedBuffersEnqueuedCounter8      INTEGER
+
 }
 
 eltQosTailDropStatusUnitId OBJECT-TYPE
@@ -350,7 +556,8 @@ eltQosTailDropStatusSharedDescriptorsEnqueuedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Total shared pool usage."
+        "Total shared pool usage by all queues for xCat devices
+        or by queue 1 for Lion devices."
     ::= { eltQosTailDropStatusEntry 7 }
 
 eltQosTailDropStatusSharedBuffersEnqueuedCounter OBJECT-TYPE
@@ -358,9 +565,139 @@ eltQosTailDropStatusSharedBuffersEnqueuedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Total shared pool usage."
+        "Total shared pool usage by all queues for xCat devices
+        or by queue 1 for Lion devices."
     ::= { eltQosTailDropStatusEntry 8 }
+    
+eltQosTailDropStatusMirrorRxDescriptorsEnqueuedCounter OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       "The current number of packets being forwarded
+                        to the analyzer port due
+                        to ingress mirroring."
+    ::= { eltQosTailDropStatusEntry 9 }
 
+eltQosTailDropStatusMirrorTxDescriptorsEnqueuedCounter OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       "The current number of packets being forwarded
+                        to the analyzer port due
+                        to egress mirroring."
+    ::= { eltQosTailDropStatusEntry 10 }
+    
+    eltQosTailDropStatusSharedDescriptorsEnqueuedCounter2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 2."
+    ::= { eltQosTailDropStatusEntry 11 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 2."
+    ::= { eltQosTailDropStatusEntry 12 }
+
+eltQosTailDropStatusSharedDescriptorsEnqueuedCounter3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 3."
+    ::= { eltQosTailDropStatusEntry 13 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 3."
+    ::= { eltQosTailDropStatusEntry 14 }
+
+eltQosTailDropStatusSharedDescriptorsEnqueuedCounter4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 4."
+    ::= { eltQosTailDropStatusEntry 15 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 4."
+    ::= { eltQosTailDropStatusEntry 16 }
+
+eltQosTailDropStatusSharedDescriptorsEnqueuedCounter5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 5."
+    ::= { eltQosTailDropStatusEntry 17 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 5."
+    ::= { eltQosTailDropStatusEntry 18 }
+
+eltQosTailDropStatusSharedDescriptorsEnqueuedCounter6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 6."
+    ::= { eltQosTailDropStatusEntry 19 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 6."
+    ::= { eltQosTailDropStatusEntry 20 }
+
+eltQosTailDropStatusSharedDescriptorsEnqueuedCounter7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 7."
+    ::= { eltQosTailDropStatusEntry 21 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 7."
+    ::= { eltQosTailDropStatusEntry 22 }
+
+eltQosTailDropStatusSharedDescriptorsEnqueuedCounter8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 8."
+    ::= { eltQosTailDropStatusEntry 23 }
+
+eltQosTailDropStatusSharedBuffersEnqueuedCounter8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total shared pool usage by queue 8."
+    ::= { eltQosTailDropStatusEntry 24 }
 --
 -- Status - interface buffers and descriptors usage table
 --

@@ -12,13 +12,39 @@ foreach($assocs as $assoc)
    $checkers[$assoc['alert_test_id']]['assocs'][] = $assoc;
 }
 
-echo '<h4>Alert Rules</h4>';
+//echo '<h4>Alert Rules</h4>';
 
-print_vars($checkers);
+echo 'This page will assist you to migrate from legacy association format to the new association format.';
 
+//print_vars($checkers);
 echo generate_box_close();
 
+foreach($checkers as $alert)
+{
 
+  if($vars['migrate'] == $alert['alert_test_id'] || (!$alert['alert_assoc'] && $vars['migrate'] == 'all'))
+  {
+
+    print_message("Migrating ".$alert['alert_name']);
+
+    $ruleset = migrate_assoc_rules($alert);
+
+    dbUpdate(array('alert_assoc' => json_encode($ruleset)), 'alert_tests', '`alert_test_id` = ?', array($alert['alert_test_id']));
+    dbDelete('alert_assoc', '`alert_test_id` = ?', array($alert['alert_test_id']));
+    $alert['alert_assoc'] = json_encode($ruleset);
+    update_alert_table($alert, FALSE);
+
+  }
+
+}
+
+$checkers = cache_alert_rules();
+$assocs   = cache_alert_assoc();
+
+foreach($assocs as $assoc)
+{
+  $checkers[$assoc['alert_test_id']]['assocs'][] = $assoc;
+}
 
 foreach($checkers as $alert)
 {
@@ -27,7 +53,7 @@ foreach($checkers as $alert)
 
    echo generate_box_open(array('title' => $alert['alert_name'], 'padding' => TRUE, 'header-border' => TRUE));
 
-   if(!$aalert['alert_assoc']) {
+   if(!$alert['alert_assoc']) {
 
       $ruleset = migrate_assoc_rules($alert);
 
@@ -152,12 +178,7 @@ foreach($checkers as $alert)
       } else {
         print_message("Migration results match! (<b>DB</b>: ". $c_exist ." | <b>Old</b>: ".$c_legacy." | <b>New</b>: ".$c_new.")", 'success');
 
-        //dbUpdate(array('alert_assoc' => json_encode($ruleset)), 'alert_tests', '`alert_test_id` = ?', array($alert['alert_test_id']));
-        //dbDelete('alert_assoc', '`alert_test_id` = ?', array($alert['alert_test_id']));
-
-         $alert['alert_assoc'] = json_encode($ruleset);
-
-         //update_alert_table($alert, FALSE);
+        echo '<a class="btn btn-primary" href="'.generate_url($vars, array('migrate' => $alert['alert_test_id'])).'">Migrate Alert</a>';
 
       }
 
@@ -170,7 +191,7 @@ foreach($checkers as $alert)
 
    } else {
 
-      //echo 'Alert '.$alert['alert_name']. ' already has association rules <br />';
+      echo 'Alert '.$alert['alert_name']. ' already has new-style association rules <br />';
 
    }
    echo generate_box_close();

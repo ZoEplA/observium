@@ -1,7 +1,7 @@
 -- ***********************************************************************
 -- Module:    hpicfVsfVC.mib
 -- 
--- Copyright (C) 2015 Hewlett Packard Enterprise Development LP
+-- Copyright (C) 2016 Hewlett Packard Enterprise Development LP
 -- All Rights Reserved.
 --  
 -- The contents of this software are proprietary and confidential to
@@ -41,13 +41,20 @@ HP-VSF-VC-MIB DEFINITIONS ::= BEGIN
             FROM HP-ICF-OID;
 
     hpicfVsfVCMIB MODULE-IDENTITY
-        LAST-UPDATED "201503040000Z"  -- March 04, 2015
+        LAST-UPDATED "201606220000Z"  -- June 22, 2016
         ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
         DESCRIPTION  "This MIB module describes the objects that are used to 
                       manage VSF Virtual Chassis feature."   
+
+        REVISION     "201606220000Z"  -- June 22, 2016 
+        DESCRIPTION  "Added hpicfVsfMADVlan and hpicfVsfMADVlanConnectivity 
+                     object."
+
+        REVISION     "201605090000Z"  -- May 09, 2016
+        DESCRIPTION  "Added hpicfVsfVCPortSpeed object."
 
         REVISION     "201503040000Z"  -- March 04, 2015
         DESCRIPTION  "Initial version of this MIB."
@@ -189,6 +196,53 @@ HP-VSF-VC-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION "This object provides the VSF LLDP MAD (Multi-Active Detection) 
                       SNMP community-string."
          ::= { hpicfVsfVCConfig 11 }
+
+    hpicfVsfMADVlan OBJECT-TYPE
+         SYNTAX      Integer32 (0..4094)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "This object configures the VLAN as a Multi-Active Detection 
+                     (MAD) VLAN. The MAD VLAN will be used to send and receive 
+                     discovery packets to detect virtual chassis fragments in case 
+                     of a split. The default value (0) of the object indicates that 
+                     no MAD VLAN is currently configured."
+         DEFVAL      { 0 }                     
+         ::= { hpicfVsfVCConfig 12 }
+
+    hpicfVsfMADVlanConnectivity OBJECT-TYPE
+         SYNTAX      INTEGER {
+                          none    (1),
+                          full    (2),
+                          partial (3) 
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current 
+         DESCRIPTION "This object indicates the connectivity state of Multi-
+                     Active-Detection (MAD) VLAN.
+                     none (1)    - When the MAD VLAN does not have any operational  
+                                   port in all member switches.
+                     full (2)    - When the MAD VLAN has one up port 
+                                   in all member switches.
+                     partial (3) - When the MAD VLAN has some up ports but does not 
+                                   have an operational port in all member switches."
+         ::= { hpicfVsfVCConfig 13 }
+   
+    hpicfVsfVCPortSpeed OBJECT-TYPE
+         SYNTAX      INTEGER {
+                        none(0),
+                        oneGbps(1),
+                        tenGbps(2),
+                        fortyGbps(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "This object is used to set the speed of all VSF ports.
+                      If this object is not set, it is automatically set to the
+                      maximum speed of the first link port added to the VSF.
+                      The value none(0) indicates that no VSF links have been
+                      added so the speed is unknown."
+         DEFVAL { none }
+         ::= { hpicfVsfVCConfig 14 }
 
     --*************************************************************
     --*    VSF VC Status Scalar Group
@@ -806,9 +860,9 @@ HP-VSF-VC-MIB DEFINITIONS ::= BEGIN
                     hpicfVsfVCLldpMADDeviceIpType      ,
                     hpicfVsfVCLldpMADDeviceIpAddr      ,
                     hpicfVsfVCLldpMADSnmpVersion       ,
-                    hpicfVsfVCLldpMADSnmpCommunity     
+                    hpicfVsfVCLldpMADSnmpCommunity
                   }
-        STATUS      current
+        STATUS      deprecated
         DESCRIPTION "A collection of VSF virtual chassis scalar objects."
         ::= { hpicfVsfVCGroups 1 }
 
@@ -891,8 +945,29 @@ HP-VSF-VC-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION "A collection of VSF virtual chassis physical port objects."
         ::= { hpicfVsfVCGroups 6 }
 
-    hpicfVsfVCMibCompliance MODULE-COMPLIANCE 
+    hpicfVsfVCConfigScalarGroup1 OBJECT-GROUP
+        OBJECTS   { hpicfVsfVCDomainId                 ,
+                    hpicfVsfVCOperStatus               ,
+                    hpicfVsfVCAdminStatus              ,
+                    hpicfVsfVCTopology                 ,
+                    hpicfVsfVCTrapEnable               ,
+                    hpicfVsfLldpMADEnable              ,
+                    hpicfVsfVCOobmMADEnable            ,
+                    hpicfVsfVCLldpMADDeviceIpType      ,
+                    hpicfVsfVCLldpMADDeviceIpAddr      ,
+                    hpicfVsfVCLldpMADSnmpVersion       ,
+                    hpicfVsfVCLldpMADSnmpCommunity     ,
+                    hpicfVsfMADVlan                    ,
+                    hpicfVsfMADVlanConnectivity        ,
+                    hpicfVsfVCPortSpeed
+                  }
         STATUS      current
+        DESCRIPTION "A collection of VSF virtual chassis scalar objects."
+        ::= { hpicfVsfVCGroups 7 }
+
+
+    hpicfVsfVCMibCompliance MODULE-COMPLIANCE 
+        STATUS      deprecated
         DESCRIPTION "The compliance statement for devices implementing the
                      HP VSF VC Mib."
         MODULE
@@ -905,4 +980,18 @@ HP-VSF-VC-MIB DEFINITIONS ::= BEGIN
                                 }
         ::= { hpicfVsfVCCompliances 1 }
     
+    hpicfVsfVCMibCompliance1 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for devices implementing the
+                     HP VSF VC Mib."
+        MODULE
+            MANDATORY-GROUPS { hpicfVsfVCConfigScalarGroup1  ,
+                               hpicfVsfVCMemberTableGroup   ,
+                               hpicfVsfVCLinkTableGroup     ,
+                               hpicfVsfVCNotificationsGroup ,
+                               hpicfVsfVCStatusScalarGroup  ,
+                               hpicfVsfVCPortTableGroup
+                             }
+        ::= { hpicfVsfVCCompliances 2 }
+
 END

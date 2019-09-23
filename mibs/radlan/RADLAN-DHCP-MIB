@@ -1056,7 +1056,7 @@ RlDhcpSrvOptionParamsEntry ::= SEQUENCE {
     rlDhcpSrvOptionParamsType
        RlDhcpSrvOptionTypeEnum,
     rlDhcpSrvOptionParamsOrigString
-       DisplayString,
+       OCTET STRING,
     rlDhcpSrvOptionParamsDescription
        DisplayString,
     rlDhcpSrvOptionParamsRowStatus
@@ -1088,7 +1088,7 @@ rlDhcpSrvOptionParamsType OBJECT-TYPE
     ::= { rlDhcpSrvOptionParamsEntry 3 }
 
 rlDhcpSrvOptionParamsOrigString OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX OCTET STRING
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION

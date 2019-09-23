@@ -92,6 +92,250 @@ class HtmlIncludesPrintTest extends \PHPUnit\Framework\TestCase
       ),
     );
   }
+
+  /**
+   * @dataProvider providerGetForm
+   * @group forms
+   */
+  public function testGetForm($form, $html)
+  {
+    //echo "\n<<<FORM\n" . generate_form($form) . "\nFORM\n";
+    $this->assertSame($html, generate_form($form));
+  }
+
+  public function providerGetForm()
+  {
+    // Temporary use direct array, need switch to json+txt includes
+
+    $array = [];
+    $form = ['type'     => 'horizontal',
+             'id'       => 'logonform',
+             //'space'   => '20px',
+             //'title'   => 'Logon',
+             //'icon'    => 'oicon-key',
+             'class'    => NULL, // Use empty class here, to not add additional divs
+             'fieldset' => ['logon' => 'Please log in:'],
+    ];
+
+    $form['row'][0]['username'] = [
+      'type'        => 'text',
+      'fieldset'    => 'logon',
+      'name'        => 'Username',
+      'placeholder' => '',
+      'class'       => 'input-xlarge',
+      //'width'       => '95%',
+      'value'       => ''];
+    $form['row'][1]['password'] = [
+      'type'         => 'password',
+      'fieldset'     => 'logon',
+      'name'         => 'Password',
+      'autocomplete' => TRUE,
+      'placeholder'  => '',
+      'class'        => 'input-xlarge',
+      //'width'       => '95%',
+      'value'        => ''];
+
+    $form['row'][3]['submit'] = [
+      'type'      => 'submit',
+      'name'      => 'Log in',
+      'icon'      => 'icon-lock',
+      //'right'       => TRUE,
+      'div_class' => 'controls',
+      'class'     => 'btn-large'];
+
+    $html = <<<FORM
+
+<!-- START logonform -->
+
+<form method="POST" id="logonform" name="logonform" action="" class="form form-horizontal" style="margin-bottom: 0px;">
+
+          <fieldset> <!-- START fieldset-logon -->
+          <div class="control-group">
+              <div class="controls">
+                  <h3>Please log in:</h3>
+              </div>
+          </div>
+  <div id="username_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-0 -->
+    <label class="control-label" for="username">Username</label>
+
+    <div id="username_div" class="controls">
+
+    <input type="text" placeholder="" name="username" id="username" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-0 -->
+  <div id="password_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-1 -->
+    <label class="control-label" for="password">Password</label>
+
+    <div id="password_div" class="controls">
+
+    <input type="password" placeholder="" name="password" id="password" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-1 -->
+
+          </fieldset>  <!-- END fieldset-logon -->
+
+
+    <div id="submit_div" class="controls">
+      <button id="submit" name="submit" type="submit" class="btn btn-default btn-large text-nowrap"><i class="icon-lock" style="margin-right: 0px;"></i>&nbsp;&nbsp;Log in</button>
+    </div>
+</form>
+
+<!-- END logonform -->
+
+FORM;
+    $array[] = [$form, $html];
+
+    // Force text field with autocomplete OFF
+    $form['row'][0]['username']['autocomplete'] = FALSE;
+    $html = <<<FORM
+
+<!-- START logonform -->
+
+<form method="POST" id="logonform" name="logonform" action="" class="form form-horizontal" style="margin-bottom: 0px;">
+
+          <fieldset> <!-- START fieldset-logon -->
+          <div class="control-group">
+              <div class="controls">
+                  <h3>Please log in:</h3>
+              </div>
+          </div>
+  <div id="username_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-0 -->
+    <label class="control-label" for="username">Username</label>
+
+    <div id="username_div" class="controls">
+
+    <input type="text"  autocomplete="off" placeholder="" name="username" id="username" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-0 -->
+  <div id="password_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-1 -->
+    <label class="control-label" for="password">Password</label>
+
+    <div id="password_div" class="controls">
+
+    <input type="password" placeholder="" name="password" id="password" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-1 -->
+
+          </fieldset>  <!-- END fieldset-logon -->
+
+
+    <div id="submit_div" class="controls">
+      <button id="submit" name="submit" type="submit" class="btn btn-default btn-large text-nowrap"><i class="icon-lock" style="margin-right: 0px;"></i>&nbsp;&nbsp;Log in</button>
+    </div>
+</form>
+
+<!-- END logonform -->
+
+FORM;
+    $array[] = [$form, $html];
+
+    // Removed password autocomplete
+    unset($form['row'][1]['password']['autocomplete'], $form['row'][0]['username']['autocomplete']);
+    $html = <<<FORM
+
+<!-- START logonform -->
+
+<form method="POST" id="logonform" name="logonform" action="" class="form form-horizontal" style="margin-bottom: 0px;">
+
+          <fieldset> <!-- START fieldset-logon -->
+          <div class="control-group">
+              <div class="controls">
+                  <h3>Please log in:</h3>
+              </div>
+          </div>
+  <div id="username_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-0 -->
+    <label class="control-label" for="username">Username</label>
+
+    <div id="username_div" class="controls">
+
+    <input type="text" placeholder="" name="username" id="username" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-0 -->
+  <div id="password_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-1 -->
+    <label class="control-label" for="password">Password</label>
+
+    <div id="password_div" class="controls">
+
+    <input type="password"  autocomplete="new-password" placeholder="" name="password" id="password" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-1 -->
+
+          </fieldset>  <!-- END fieldset-logon -->
+
+
+    <div id="submit_div" class="controls">
+      <button id="submit" name="submit" type="submit" class="btn btn-default btn-large text-nowrap"><i class="icon-lock" style="margin-right: 0px;"></i>&nbsp;&nbsp;Log in</button>
+    </div>
+</form>
+
+<!-- END logonform -->
+
+FORM;
+    $array[] = [$form, $html];
+
+    // Append checkbox
+    $form['row'][2]['remember'] = [
+      'type'        => 'checkbox',
+      'fieldset'    => 'logon',
+      'placeholder' => 'Remember my login'];
+    $html = <<<FORM
+
+<!-- START logonform -->
+
+<form method="POST" id="logonform" name="logonform" action="" class="form form-horizontal" style="margin-bottom: 0px;">
+
+          <fieldset> <!-- START fieldset-logon -->
+          <div class="control-group">
+              <div class="controls">
+                  <h3>Please log in:</h3>
+              </div>
+          </div>
+  <div id="username_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-0 -->
+    <label class="control-label" for="username">Username</label>
+
+    <div id="username_div" class="controls">
+
+    <input type="text" placeholder="" name="username" id="username" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-0 -->
+  <div id="password_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-1 -->
+    <label class="control-label" for="password">Password</label>
+
+    <div id="password_div" class="controls">
+
+    <input type="password"  autocomplete="new-password" placeholder="" name="password" id="password" class="input input-xlarge"  value="" />
+
+    </div>
+  </div> <!-- END row-1 -->
+  <div id="remember_div" class="control-group" style="margin-bottom: 5px;"> <!-- START row-2 -->
+
+    <div id="remember_div" class="controls">
+    <input type="checkbox"  name="remember" id="remember"  value="1" />      <label for="remember" class="help-inline" style="margin-top: 4px;">Remember my login</label>
+    </div>
+  </div> <!-- END row-2 -->
+
+          </fieldset>  <!-- END fieldset-logon -->
+
+
+    <div id="submit_div" class="controls">
+      <button id="submit" name="submit" type="submit" class="btn btn-default btn-large text-nowrap"><i class="icon-lock" style="margin-right: 0px;"></i>&nbsp;&nbsp;Log in</button>
+    </div>
+</form>
+
+<!-- END logonform -->
+
+FORM;
+    $array[] = [$form, $html];
+
+    return $array;
+  }
 }
 
 // EOF

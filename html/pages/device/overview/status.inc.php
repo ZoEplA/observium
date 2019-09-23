@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -28,7 +28,7 @@
     echo('<table class="table table-condensed table-striped">');
     foreach ($status as $status)
     {
-      $status['status_descr'] = truncate($status['status_descr'], 48, '');
+      //$status['status_descr'] = truncate($status['status_descr'], 48, '');
 
       print_status_row($status, $vars);
     }

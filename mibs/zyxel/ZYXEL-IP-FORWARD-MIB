@@ -5,6 +5,8 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-IP-FORWARD-MIB.mib $ 
+-- Revision 1.6  2016/03/03 02:14:55  Viktor 
+-- add route uptime on route table. 
 -- Revision 1.5  2013/12/06 07:05:58  ccho 
 -- remove uncessary imports 
 -- Revision 1.4  2013/11/06 05:41:22  ccho 
@@ -194,8 +196,10 @@ ZYXEL-IP-FORWARD-MIB DEFINITIONS ::= BEGIN
         zyIpRouteGateway  				IpAddress,
         zyIpRouteIf						IpAddress,
         zyIpRouteMetric   				INTEGER,
-        zyIpRouteType   				INTEGER
-        }          
+        zyIpRouteType   				INTEGER,
+	zyIpRouteUptime                 TimeTicks
+        }      
+		
         zyIpRouteDestinationIpAddress OBJECT-TYPE
         SYNTAX  IpAddress
         MAX-ACCESS  not-accessible
@@ -247,5 +251,14 @@ ZYXEL-IP-FORWARD-MIB DEFINITIONS ::= BEGIN
         STATUS  current
         DESCRIPTION
 		"The method used to learn the route."
-        ::= { zyxelIpRouteEntry 6 }                 
+        ::= { zyxelIpRouteEntry 6 }
+		
+	zyIpRouteUptime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The time period since this route entry has been added in route table."           
+        ::= { zyxelIpRouteEntry 7 }
+		
 END

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -23,6 +23,11 @@ if ($device['type'] == 'network' || $device['type'] == 'firewall' || $device['ty
   foreach (dbFetchRows("SELECT * FROM `wifi_wlans` WHERE `device_id` = ?", array($device['device_id'])) as $wlan)
   {
     $GLOBALS['cache']['wifi_wlans'][$wlan['wlan_index']] = $wlan;
+  }
+
+  foreach (dbFetchRows("SELECT * FROM `wifi_aps` WHERE `device_id` = ?", array($device['device_id'])) as $aps)
+  {
+    $GLOBALS['cache']['wifi_aps'][$aps['ap_index']] = $aps;
   }
 
   $include_dir = "includes/polling/wifi";

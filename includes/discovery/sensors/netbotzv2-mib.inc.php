@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,7 +18,7 @@ $data = snmpwalk_cache_multi_oid($device, "tempSensorEntry", array(), "NETBOTZ41
 foreach($data as $index => $entry)
 {
   $oid = '.1.3.6.1.4.1.5528.100.4.1.1.1.2.' . $index;
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'tempSensor', $entry['tempSensorLabel'], 0.1, $entry['tempSensorValue']);
+  discover_sensor('temperature', $device, $oid, $index, 'tempSensor', $entry['tempSensorLabel'], 0.1, $entry['tempSensorValue']);
 }
 
 unset($data, $index, $entry);
@@ -30,7 +30,7 @@ $data = snmpwalk_cache_multi_oid($device, "humiSensorEntry", array(), "NETBOTZ41
 foreach($data as $index => $entry)
 {
   $oid = '.1.3.6.1.4.1.5528.100.4.1.2.1.2.' . $index;
-  discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'humiSensor', $entry['humiSensorLabel'], 0.1, $entry['humiSensorValue']);
+  discover_sensor('humidity', $device, $oid, $index, 'humiSensor', $entry['humiSensorLabel'], 0.1, $entry['humiSensorValue']);
 }
 
 unset($data, $index, $entry);
@@ -42,7 +42,7 @@ $data = snmpwalk_cache_multi_oid($device, "dewPointSensorEntry", array(), "NETBO
 foreach($data as $index => $entry)
 {
   $oid = '.1.3.6.1.4.1.5528.100.4.1.3.1.2.' . $index;
-  discover_sensor($valid['sensor'], 'dewpoint', $device, $oid, $index, 'dewPointSensor', $entry['dewPointSensorLabel'], 0.1, $entry['dewPointSensorValue']);
+  discover_sensor('dewpoint', $device, $oid, $index, 'dewPointSensor', $entry['dewPointSensorLabel'], 0.1, $entry['dewPointSensorValue']);
 }
 
 unset($data, $index, $entry);
@@ -56,7 +56,7 @@ $data = snmpwalk_cache_multi_oid($device, "audioSensorEntry", array(), "NETBOTZ4
 foreach($data as $index => $entry)
 {
   $oid = '.1.3.6.1.4.1.5528.100.4.1.4.1.2.' . $index;
-  discover_sensor($valid['sensor'], 'sound', $device, $oid, $index, 'audioPointSensor', $entry['audioPointSensorLabel'], 0.1, $entry['audioPointSensorValue']);
+  discover_sensor('sound', $device, $oid, $index, 'audioPointSensor', $entry['audioPointSensorLabel'], 0.1, $entry['audioPointSensorValue']);
 }
 
 unset($data, $index, $entry);
@@ -70,7 +70,9 @@ $data = snmpwalk_cache_multi_oid($device, "airFlowSensorEntry", array(), "NETBOT
 foreach($data as $index => $entry)
 {
   $oid = '.1.3.6.1.4.1.5528.100.4.1.5.1.2.' . $index;
-  discover_sensor($valid['sensor'], 'airflow', $device, $oid, $index, 'airFlowSensor', $entry['dewPointSensorLabel'], 3.531466672, $entry['airFlowSensorValue']);
+  //discover_sensor('airflow', $device, $oid, $index, 'airFlowSensor', $entry['dewPointSensorLabel'], 3.531466672, $entry['airFlowSensorValue']);
+  // I not keep compatibility, because previously used incorrect class and unit
+  discover_sensor_ng($device, 'velocity', 'NETBOTZ410-MIB', 'airFlowSensorValue', $oid, $index, NULL, $entry['airFlowSensorLabel'], 0.1, $entry['airFlowSensorValue'], ['sensor_unit' => 'm/min']);
 }
 unset($data, $index, $entry);
 
@@ -81,7 +83,7 @@ $data = snmpwalk_cache_multi_oid($device, "ampDetectSensorEntry", array(), "NETB
 foreach($data as $index => $entry)
 {
   $oid = '.1.3.6.1.4.1.5528.100.4.1.6.1.2.' . $index;
-  discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'ampDetectSensor', $entry['ampDetectSensorLabel'], 0.1, $entry['ampDetectSensorValue']);
+  discover_sensor('current', $device, $oid, $index, 'ampDetectSensor', $entry['ampDetectSensorLabel'], 0.1, $entry['ampDetectSensorValue']);
 }
 unset($data, $index, $entry);
 

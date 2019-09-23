@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description: HUAWEI Lan Switch MSTP MIB
+-- Description: MSTP MIB
 -- Reference:
--- Version: V1.15
+-- Version: V1.16
 -- History:
 --      v1.0 (1) Created by Zhang Shilin, 2001.6.29
 --           (2) Revised by Qi Zhenglin, 2002.01.08
@@ -37,6 +37,10 @@
 --            Remove the default value of hwdot1sMstiStpTransLimit.
 --            Add hwdot1sMstiStpPortRoleRestriction, hwdot1sMstiStpPortTcRestriction and
 --            hwdot1sMstiStpPortDisputed in hwdot1sPortTable.
+--     V1.16 2014-02-11 Updated by wangmingjun
+--            Add the binding value hwdot1sMstiDesignatedBridge of hwPortMstiBpduGuarded
+--            in mstp traps table.
+--            Add hwMstiNewRoot, hwPortPvstBpduProtection in mstp traps table.
 -- ==================================================================
 -- ==================================================================
 --
@@ -49,7 +53,7 @@ HUAWEI-LswMSTP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
-    MODULE-IDENTITY,OBJECT-TYPE,Counter32, OBJECT-IDENTITY, NOTIFICATION-TYPE
+    MODULE-IDENTITY,OBJECT-TYPE, Integer32, Counter32, OBJECT-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, TruthValue
         FROM SNMPv2-TC
@@ -60,14 +64,19 @@ IMPORTS
 
     hwdot1sMstp MODULE-IDENTITY
             LAST-UPDATED "200106290000Z"
-            ORGANIZATION ""
+            ORGANIZATION
+                "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-            ""
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
             DESCRIPTION
-            ""
+            "This MIB defines objects for managing MSTP."
             REVISION "200106290000Z"
             DESCRIPTION
-            ""
+            "The initial version of this MIB file."
             ::= { lswCommon  14 }
 
     EnabledStatus ::= TEXTUAL-CONVENTION
@@ -106,7 +115,7 @@ IMPORTS
     ::= { hwdot1sMstp 2 }
 
   hwdot1sStpDiameter OBJECT-TYPE
-    SYNTAX      INTEGER(2..7)
+    SYNTAX      Integer32(2..7)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -115,7 +124,7 @@ IMPORTS
     ::= { hwdot1sMstp 3 }
 
   hwdot1sMstBridgeMaxHops OBJECT-TYPE
-    SYNTAX      INTEGER(1..40)
+    SYNTAX      Integer32(1..40)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -132,7 +141,7 @@ IMPORTS
     ::= { hwdot1sMstp 5 }
 
   hwdot1sMstMasterPathCost OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -145,19 +154,19 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-      "Whether the Bridge BPDU Guard function is enabled. If the function
+      "Whether the Bridge BPDU Guard function is enabled.  If the function
       is enabled, the port will shutdown when received BPDU and the port
       is configured as portfast."
     DEFVAL      { disabled}
     ::= { hwdot1sMstp 7 }
 
   hwdot1sMstAdminFormatSelector OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
       "The administrative Configuration Identifier Format Selector in use
-      by the Bridge. This has a value of 0 indicate the format specified
+      by the Bridge.  This has a value of 0 indicate the format specified
       in the Standard of IEEE 802.1s."
     DEFVAL      { 0}
     ::= { hwdot1sMstp 8 }
@@ -171,7 +180,7 @@ IMPORTS
     ::= { hwdot1sMstp 9 }
 
   hwdot1sMstAdminRevisionLevel OBJECT-TYPE
-    SYNTAX      INTEGER(0..65535)
+    SYNTAX      Integer32(0..65535)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -180,12 +189,12 @@ IMPORTS
     ::= { hwdot1sMstp 10 }
 
   hwdot1sMstOperFormatSelector OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
       "The operative Configuration Identifier Format Selector in use by the
-      Bridge. This has a value of 0 indicate the format specified in the
+      Bridge.  This has a value of 0 indicate the format specified in the
       Standard of IEEE 802.1s."
     DEFVAL      { 0}
     ::= { hwdot1sMstp 11 }
@@ -199,7 +208,7 @@ IMPORTS
     ::= { hwdot1sMstp 12 }
 
   hwdot1sMstOperRevisionLevel OBJECT-TYPE
-    SYNTAX      INTEGER(0..65535)
+    SYNTAX      Integer32(0..65535)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -247,7 +256,7 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-      ""
+      "MSTP VLAN-to-instance mapping table."
     ::= { hwdot1sMstp 18 }
 
   hwdot1sVIDAllocationEntry OBJECT-TYPE
@@ -255,7 +264,7 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-      ""
+      "MSTP VLAN-to-instance mapping table entry."
     INDEX {
               hwdot1sMstVID
              }
@@ -264,13 +273,13 @@ IMPORTS
   Hwdot1sVIDAllocationEntry ::=
     SEQUENCE
     {
-      hwdot1sMstVID INTEGER,
-      hwdot1sAdminMstID INTEGER,
-      hwdot1sOperMstID  INTEGER
+      hwdot1sMstVID Integer32,
+      hwdot1sAdminMstID Integer32,
+      hwdot1sOperMstID  Integer32
     }
 
   hwdot1sMstVID OBJECT-TYPE
-    SYNTAX      INTEGER(1..4094)
+    SYNTAX      Integer32(1..4094)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -278,7 +287,7 @@ IMPORTS
     ::={ hwdot1sVIDAllocationEntry 1 }
 
   hwdot1sAdminMstID OBJECT-TYPE
-    SYNTAX      INTEGER(0..4094)
+    SYNTAX      Integer32(0..4094)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -286,7 +295,7 @@ IMPORTS
     ::={ hwdot1sVIDAllocationEntry 2 }
 
   hwdot1sOperMstID OBJECT-TYPE
-    SYNTAX      INTEGER(0..4094)
+    SYNTAX      Integer32(0..4094)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -299,7 +308,7 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-      ""
+      "MSTI table."
     ::= { hwdot1sMstp 19 }
 
   hwdot1sInstanceEntry OBJECT-TYPE
@@ -307,7 +316,7 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-      ""
+      "MSTI table entry."
     INDEX {
               hwdot1sInstanceID
              }
@@ -316,14 +325,14 @@ IMPORTS
   Hwdot1sInstanceEntry ::=
     SEQUENCE
     {
-      hwdot1sInstanceID INTEGER,
+      hwdot1sInstanceID Integer32,
       hwdot1sMstiBridgeID   BridgeId,
-      hwdot1sMstiBridgePriority INTEGER,
+      hwdot1sMstiBridgePriority Integer32,
       hwdot1sMstiDesignedRoot   BridgeId,
-      hwdot1sMstiRootPathCost   INTEGER,
-      hwdot1sMstiRootPort   INTEGER,
+      hwdot1sMstiRootPathCost   Integer32,
+      hwdot1sMstiRootPort   Integer32,
       hwdot1sMstiRootType   INTEGER,
-      hwdot1sMstiRemainingHops  INTEGER,
+      hwdot1sMstiRemainingHops  Integer32,
       hwdot1sMstiAdminMappedVlanListLow OCTET STRING,
       hwdot1sMstiAdminMappedVlanListHigh OCTET STRING,
       hwdot1sMstiOperMappedVlanListLow OCTET STRING,
@@ -331,7 +340,7 @@ IMPORTS
     }
 
   hwdot1sInstanceID OBJECT-TYPE
-    SYNTAX      INTEGER(0..4094)
+    SYNTAX      Integer32(0..4094)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -348,12 +357,12 @@ IMPORTS
     ::={ hwdot1sInstanceEntry 2 }
 
   hwdot1sMstiBridgePriority OBJECT-TYPE
-    SYNTAX      INTEGER(0..61440)
+    SYNTAX      Integer32(0..61440)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The Bridge Priority for the spanning tree instance
-        identified by MSTID. Step of 4096"
+        identified by MSTID.  Step of 4096"
     DEFVAL      { 32768 }
     ::={ hwdot1sInstanceEntry 3 }
 
@@ -367,7 +376,7 @@ IMPORTS
     ::={ hwdot1sInstanceEntry 4 }
 
   hwdot1sMstiRootPathCost OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -376,7 +385,7 @@ IMPORTS
     ::={ hwdot1sInstanceEntry 5 }
 
   hwdot1sMstiRootPort OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -394,7 +403,7 @@ IMPORTS
     ::={ hwdot1sInstanceEntry 7 }
 
   hwdot1sMstiRemainingHops OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -443,7 +452,7 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-      ""
+      "MSTP interface table."
     ::= { hwdot1sMstp 20 }
 
   hwdot1sPortEntry OBJECT-TYPE
@@ -451,7 +460,7 @@ IMPORTS
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-      ""
+      "MSTP interface table entry."
     INDEX {   hwdot1sInstanceID,
               hwdot1sMstiPortIndex
              }
@@ -460,20 +469,20 @@ IMPORTS
   Hwdot1sPortEntry ::=
     SEQUENCE
     {
-      hwdot1sMstiPortIndex  INTEGER,
+      hwdot1sMstiPortIndex  Integer32,
       hwdot1sMstiState  INTEGER,
-      hwdot1sMstiPortPriority   INTEGER,
-      hwdot1sMstiPathCost   INTEGER,
+      hwdot1sMstiPortPriority   Integer32,
+      hwdot1sMstiPathCost   Integer32,
       hwdot1sMstiDesignatedRoot BridgeId,
-      hwdot1sMstiDesignatedCost INTEGER,
+      hwdot1sMstiDesignatedCost Integer32,
       hwdot1sMstiDesignatedBridge   BridgeId,
       hwdot1sMstiDesignatedPort OCTET STRING,
       hwdot1sMstiMasterBridgeID BridgeId,
-      hwdot1sMstiMasterPortCost INTEGER,
+      hwdot1sMstiMasterPortCost Integer32,
       hwdot1sMstiStpPortEdgeport    EnabledStatus,
       hwdot1sMstiStpPortPointToPoint    INTEGER,
       hwdot1sMstiStpMcheck  INTEGER,
-      hwdot1sMstiStpTransLimit  INTEGER,
+      hwdot1sMstiStpTransLimit  Integer32,
       hwdot1sMstiStpRXStpBPDU   Counter32,
       hwdot1sMstiStpTXStpBPDU   Counter32,
       hwdot1sMstiStpRXTCNBPDU   Counter32,
@@ -497,7 +506,7 @@ IMPORTS
     }
 
   hwdot1sMstiPortIndex OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32(0..65535)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -514,7 +523,7 @@ IMPORTS
     ::={ hwdot1sPortEntry 2 }
 
   hwdot1sMstiPortPriority OBJECT-TYPE
-    SYNTAX      INTEGER(0..240)
+    SYNTAX      Integer32(0..240)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -526,14 +535,14 @@ IMPORTS
     ::={ hwdot1sPortEntry 3 }
 
   hwdot1sMstiPathCost OBJECT-TYPE
-    SYNTAX      INTEGER(1..200000000)
+    SYNTAX      Integer32(1..200000000)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The contribution of this port to the path cost of paths towards the
-        spanning tree root which include this port. The range of path cost
+        spanning tree root which include this port.  The range of path cost
         is 1..65535 for 802.1d standard, is 1..200000000 for 802.1t standard,
-        and is 1..200000 for the legacy standard. "
+        and is 1..200000 for the legacy standard."
     ::={ hwdot1sPortEntry 4 }
 
   hwdot1sMstiDesignatedRoot OBJECT-TYPE
@@ -546,7 +555,7 @@ IMPORTS
     ::={ hwdot1sPortEntry 5 }
 
   hwdot1sMstiDesignatedCost OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -578,17 +587,17 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The Bridge Idnetifier of the current Master Bridge.
+        "The Bridge Identifier of the current Master Bridge.
         Effective in CIST."
     ::={ hwdot1sPortEntry 9 }
 
   hwdot1sMstiMasterPortCost OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The CIST path cost from the transmitting Bridge to
-        the Master Bridge. Effective in CIST."
+        the Master Bridge.  Effective in CIST."
     ::={ hwdot1sPortEntry 10 }
 
   hwdot1sMstiStpPortEdgeport OBJECT-TYPE
@@ -596,7 +605,7 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        " Whether the port fast is enabled. Effective in CIST."
+        "Whether the port fast is enabled.  Effective in CIST."
     DEFVAL      { disabled }
     ::={ hwdot1sPortEntry 11 }
 
@@ -605,7 +614,7 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        " Whether the port connects the point to point link. Effective in CIST."
+        "Whether the port connects the point to point link.  Effective in CIST."
     DEFVAL      { auto }
     ::={ hwdot1sPortEntry 12 }
 
@@ -616,16 +625,16 @@ IMPORTS
     DESCRIPTION
         " Forcing the state machine to send MST BPDUs in this manner
         can be used to test whether all legacy Bridges on a given LAN
-        have been removed. Effective in CIST."
+        have been removed.  Effective in CIST."
     ::={ hwdot1sPortEntry 13 }
 
   hwdot1sMstiStpTransLimit OBJECT-TYPE
-    SYNTAX      INTEGER(1..255)
+    SYNTAX      Integer32(1..255)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value used by the Port Transmit state machine to limit
-        the maximum transmission rate. Effective in CIST."
+        the maximum transmission rate.  Effective in CIST."
     ::={ hwdot1sPortEntry 14 }
 
   hwdot1sMstiStpRXStpBPDU OBJECT-TYPE
@@ -633,7 +642,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of received Config BPDU. Effective in CIST."
+        "The number of received Config BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 15 }
 
   hwdot1sMstiStpTXStpBPDU OBJECT-TYPE
@@ -641,7 +650,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of transmitted Config BPDU. Effective in CIST."
+        "The number of transmitted Config BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 16 }
 
   hwdot1sMstiStpRXTCNBPDU OBJECT-TYPE
@@ -649,7 +658,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of received TCN BPDU. Effective in CIST."
+        "The number of received TCN BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 17 }
 
   hwdot1sMstiStpTXTCNBPDU OBJECT-TYPE
@@ -657,7 +666,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of transimitted TCN BPDU. Effective in CIST."
+        "The number of transmitted TCN BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 18 }
 
   hwdot1sMstiStpRXRSTPBPDU OBJECT-TYPE
@@ -665,7 +674,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of received RST BPDU. Effective in CIST."
+        "The number of received RST BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 19 }
 
   hwdot1sMstiStpTXRSTPBPDU OBJECT-TYPE
@@ -673,7 +682,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of transimitted RST BPDU. Effective in CIST."
+        "The number of transmitted RST BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 20 }
 
   hwdot1sMstiStpRXMSTPBPDU OBJECT-TYPE
@@ -681,7 +690,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of received MST BPDU. Effective in CIST."
+        "The number of received MST BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 21 }
 
   hwdot1sMstiStpTXMSTPBPDU OBJECT-TYPE
@@ -689,7 +698,7 @@ IMPORTS
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of transimitted MST BPDU. Effective in CIST."
+        "The number of transmitted MST BPDU.  Effective in CIST."
     ::={ hwdot1sPortEntry 22 }
 
   hwdot1sMstiStpClearStatistics OBJECT-TYPE
@@ -697,7 +706,7 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Clear the spanning tree statistic. Effective in CIST."
+        "Clear the spanning tree statistic.  Effective in CIST."
     ::={ hwdot1sPortEntry 23 }
 
   hwdot1sMstiStpDefaultPortCost OBJECT-TYPE
@@ -705,7 +714,7 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Set default Port path cost. "
+        "Set default Port path cost."
     ::={ hwdot1sPortEntry 24 }
 
   hwdot1sMstiStpStatus OBJECT-TYPE
@@ -723,7 +732,7 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Whether the root guard is enabled. Effective in CIST."
+        "Whether the root guard is enabled.  Effective in CIST."
     DEFVAL      { disabled }
     ::={ hwdot1sPortEntry 26 }
 
@@ -732,7 +741,7 @@ IMPORTS
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Whether the loop protection is enabled. Effective in CIST."
+        "Whether the loop protection is enabled.  Effective in CIST."
     DEFVAL      { disabled }
     ::={ hwdot1sPortEntry 27 }
 
@@ -858,7 +867,7 @@ IMPORTS
      STATUS   current
      DESCRIPTION
          "The SNMP trap that is generated when the bridge is no longer
-         the root bridge of the instance. Another switch with higher
+         the root bridge of the instance.  Another switch with higher
          priority has already been the root bridge of the instance."
      ::= { hwMstpEventsV2 3 }
 
@@ -871,11 +880,12 @@ IMPORTS
      ::= { hwMstpEventsV2 4 }
 
   hwPortMstiBpduGuarded NOTIFICATION-TYPE
-     OBJECTS  { dot1dStpPort }
+     OBJECTS  { dot1dStpPort , hwdot1sMstiDesignatedBridge}
      STATUS   current
      DESCRIPTION
-         "The SNMP trap that is generated when an edged port of
-         the BPDU-guard switch receives BPDU packets."
+         "The SNMP trap is generated when an edged port of the BPDU-guard
+         device receives a BPDU.  If the designated bridge ID can't be obtained
+         from the BPDU, the designated bridge ID will be zero."
      ::= { hwMstpEventsV2 5 }
 
   hwPortMstiLoopGuarded NOTIFICATION-TYPE
@@ -886,4 +896,22 @@ IMPORTS
          or Root-Port is aged out."
      ::= { hwMstpEventsV2 6 }
 
+  hwMstiNewRoot NOTIFICATION-TYPE
+     OBJECTS  { hwdot1sInstanceID , hwdot1sMstiDesignedRoot , hwdot1sMstiDesignedRoot}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when the sending device becomes the new
+         root of the spanning tree.  The first root bridge ID means the
+         old root bridge ID, and the second one means the new root bridge ID."
+     ::= { hwMstpEventsV2 7 }
+
+  hwPortPvstBpduProtection NOTIFICATION-TYPE
+     OBJECTS  { dot1dStpPort , hwdot1sMstiDesignatedBridge}
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when a PVST BPDU is received on an MSTP port
+         that is enabled with the PVST protection feature.  If the designated
+         bridge ID can't be obtained from the BPDU, the designated bridge ID
+         will be zero."
+     ::= { hwMstpEventsV2 8 }
 END

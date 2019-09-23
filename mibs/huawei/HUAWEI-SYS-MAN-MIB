@@ -1,10 +1,19 @@
 -- =====================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei Configuration management MIB
 -- Reference:   HUAWEI Enterprise MIB
--- Version:     V2.18
+-- Version:     V2.27
 -- History:
+--  2017-02-05  V2.27  zhangquanquan  add hwSysPatchDamagedNotification and hwSysPatchDamagedClearNotification
+--  2017-12-20  V2.26  Jiangyaguang  modify hwSysReloadScheduleTable log
+--  2017-12-20  V2.25  nixianhua add hwOMUSyncFailAlarm, hwOMUSyncFailResume 
+--  2017-10-31  V2.24  fengyongfei add hwBoardCommunicationLinkFaultAlarm,hwBoardCommunicationLinkFaultResume
+--  2017-10-26  V2.23  yaojunda add hwPackageName,hwInnerSSLCerts,hwPatchInstall,hwPatchInstallFailSlot,hwPatchPackageError,hwInnerSSLCertsInvalidEarlyWarning,hwInnerSSLCertificateInvalid
+--  2017-10-17  V2.22  huangenli add hwSysImageDamagedNotification
+--  2017-09-04  V2.21  luxiaodong modify description of hwSysReloadScheduleTable,hwSysImageTable,hwSysCFGFileTable,hwTpmStatusTable
+--  2017-08-17  V2.20  luxiaodong modify description of hwSysDelayReboot,hwPatchErrorTrap,hwPatchUpdateTrap
+--  2017-04-05  V2.19  zhangquanquan modify HWPatchErrorType
 --  2017-01-25  V2.18  xuxiangdong modify TrustStartup
 --  2017-01-05  V2.17  Hanxian modify hwCodeSign for software code signature
 --  2016-12-20  V2.16  Hanxian add hwCodeSign for software code signature
@@ -37,9 +46,11 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
         PhysicalIndex, entPhysicalIndex, entPhysicalName
-            FROM ENTITY-MIB            
-            EnabledStatus            
-                FROM P-BRIDGE-MIB            
+            FROM ENTITY-MIB
+        hwEntPhysicalName
+            FROM HUAWEI-ENTITY-TRAP-MIB            
+        EnabledStatus            
+            FROM P-BRIDGE-MIB            
         OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
             FROM SNMPv2-CONF            
         Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, IpAddress, Unsigned32            
@@ -52,7 +63,7 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
             FROM SNMP-FRAMEWORK-MIB;
 
     huaweiSystemManMIB MODULE-IDENTITY 
-        LAST-UPDATED "201701250000Z"        -- January 25, 2017  GMT
+        LAST-UPDATED "201802051139Z"        -- Feb. 05, 2018  GMT
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -70,6 +81,42 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
             reload actions, and notifications. By querying the system time,
             configuration files and system image files, NMS can reboot the device
             in the specified time and the specified configuration and system image."
+       REVISION
+           "201802051139Z"
+       DESCRIPTION 
+           "Add hwSysPatchDamagedNotification and hwSysPatchDamagedClearNotification."
+       REVISION
+           "201801301139Z"
+       DESCRIPTION 
+           "modify hwSysReloadScheduleTable log."
+       REVISION
+           "201712201139Z"
+       DESCRIPTION 
+           "Add hwOMUSyncFailAlarm, hwOMUSyncFailResume."
+       REVISION
+           "201710311139Z"
+       DESCRIPTION 
+           "Add hwBoardCommunicationLinkFaultAlarm,hwBoardCommunicationLinkFaultResume."
+       REVISION
+           "201710261008Z"
+       DESCRIPTION 
+           "Add hwPackageName,hwInnerSSLCerts,hwPatchInstall,hwPatchInstallFailSlot,hwPatchPackageError,hwInnerSSLCertsInvalidEarlyWarning,hwInnerSSLCertificateInvalid."
+       REVISION
+           "201710190000Z"
+       DESCRIPTION 
+           "Add hwSysImageDamagedNotification."
+       REVISION
+           "201708310000Z"
+       DESCRIPTION 
+           "modify description of hwSysReloadScheduleTable,hwSysImageTable,hwSysCFGFileTable,hwTpmStatusTable."
+       REVISION
+           "201708170000Z"
+       DESCRIPTION 
+           "modify description of hwSysDelayReboot,hwPatchErrorTrap,hwPatchUpdateTrap."
+       REVISION
+           "201704050000Z"
+       DESCRIPTION 
+           "modify HWPatchErrorType."
        REVISION
            "201701250000Z"
        DESCRIPTION 
@@ -289,6 +336,7 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
                 patchRestoreFailed(188),
                 patchPackageError(189),
                 patchMisoperation(190),
+                patchSystemUnstable(191),
                 unknown(65535)
                 }
 
@@ -459,7 +507,7 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "A reload parameters table."
+            "This table is used to create a device restart instance. You can configure the device to start immediately or at a specified time. With it, you can set the information such as startup configuration file, image file, and restart interval. This table supports the GET and GET-NEXT operations. SNMPv2 and SNMPv3 support the GET, GET-NEXT, GET-BULK."
         ::= { hwSysReload 3 }
 
     hwSysReloadScheduleEntry OBJECT-TYPE
@@ -810,11 +858,11 @@ HUAWEI-SYS-MAN-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Restart the device at a delayed time. The delayed time can be set up to 43200 minutes.
-            The node is used to set the delayed time, cancel the setting, or check the status of 
-            the delayed restart. If a value within the range of 0 to 43200 is entered, the delayed 
-            time is set. If the value 65535 is entered, the setting is cancelled. During system reboot,  
-a return value 65534 is displayed if the Get or Walk operation is performed. Other values are invalid. "
+            "A delay after which the device is restarted. 
+			Similar to the effect achieved when you set hwSysReboot to rebootAllRoute(2), this function delays device restart. 
+			The value ranges from 0 to 43200, in minutes. If the value is 65535, delayed restart is cancelled. 
+			loadCancel indicates that all the planned restart activities are cancelled.  
+			If hwSysReloadSchedule is invalid, or the row where hwSysReloadScheduleEntry and hwSysReloadSchedule are directed are not activated, all the restart activities are ignored, and inconsistent values are returned. If the system restart is completed or no restart activity exists, the value of the object is reloadUnavailable (1). "
         ::= { hwSysReload 8 }
 
     hwSysImage OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 4 }
@@ -835,7 +883,7 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "The system image management table."
+            "This table describes software package list on the device. This table supports the GET and GET-NEXT operations. SNMPv2 and SNMPv3 support the GET-BULK operation. This table does not support the SET operation."
         ::= { hwSysImage 2 }
 
     hwSysImageEntry OBJECT-TYPE
@@ -935,7 +983,7 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "A table of configuration files in this system."
+            "This table describes the configuration file list of the system. The list supports GET and GET-NEXT operations. SNMPv2 and SNMPv3 also support the GET-BULK operation. The SET operation is not supported. Currently, only the control board is supported."
         ::= { hwSysCFGFile 2 }
 
     hwSysCFGFileEntry OBJECT-TYPE
@@ -1250,6 +1298,14 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         DESCRIPTION
         "This object is an index that specifies patch fail reason."
             ::= { hwPatchBase 8 }
+
+    hwPackageName OBJECT-TYPE
+        SYNTAX DisplayString
+		MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "This object is Package Name."
+            ::= { hwPatchBase 9 }		
 
     hwPatchFileTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwPatchFileEntry
@@ -1636,7 +1692,7 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "The statistics information of the C patch area on each slot."
+            "The statistics information of the patch area on each slot."
         ::= { hwPatchInfo 2 }
 
     hwPatchStateEntry OBJECT-TYPE
@@ -2880,7 +2936,7 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "Tpm status query table."
+            "This table is used to set the trusted-startup function and query the status of the trusted-startup."
         ::= { hwTrustStartup 1 }
 
     hwTpmStatusEntry OBJECT-TYPE
@@ -3250,7 +3306,115 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
 			loading(7): Loading.
 			crlNameInvalid(8): The file name is invalid."
         ::= { hwSoftCrlLoadEntry 2 }		
-        
+		
+	hwInnerSSLCerts OBJECT IDENTIFIER  ::= { huaweiSystemManMIBObjects 28}
+	
+	hwInnerSSLCertsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwInnerSSLCertsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table of inner SSL certificate in this system."
+	::= { hwInnerSSLCerts 1 }
+	
+	hwInnerSSLCertsEntry OBJECT-TYPE
+	SYNTAX HwInnerSSLCertsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An inner SSL certificate entry. Each entry consists of information of
+		an inner SSL certificate."
+	INDEX { hwCaClass }
+	::= { hwInnerSSLCertsTable 1 }
+	
+
+	HwInnerSSLCertsEntry ::=
+        SEQUENCE {
+            hwCaClass
+                INTEGER,
+            hwRemainingDays
+                Integer32,
+			hwInvalidReason
+				INTEGER
+         }
+	
+    hwCaClass OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            defaultCertiticate(1),
+            latestCertiticate(2)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Certificate:1.Default Certificate.2.Latest certificate."
+        ::= { hwInnerSSLCertsEntry 1 }
+	
+    hwRemainingDays OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "remain days."
+        ::= { hwInnerSSLCertsEntry 2 }
+
+
+
+    hwInvalidReason OBJECT-TYPE
+        SYNTAX    INTEGER
+        {
+            damaged(1),
+            expired(2),
+			damagedAndExpired(3)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Alarm Reason:
+            1.The inner SSL certificate was damaged.
+            2.The inner SSL certificate expired.
+            3.The inner SSL certificate was damaged and expired."
+        ::= { hwInnerSSLCertsEntry 3 }
+		
+
+        hwPatchInstall OBJECT IDENTIFIER ::= { huaweiSystemManMIBObjects 29 }
+		
+
+		hwPatchInstallFileName OBJECT-TYPE
+			SYNTAX      OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the patch file."
+			::= { hwPatchInstall 1 }
+			
+
+		hwPatchInstallVersion OBJECT-TYPE
+			SYNTAX      OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the version of the patch file."
+			::= { hwPatchInstall 2 }
+
+
+        hwPatchInstallFailReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                patchOpenErr(1),
+                getPatchErr(2),
+                patchSpaceShortage(3),
+                patchConflict(4),
+                versionErr(5),
+                synchronizePatchPackageError(8),
+                patchConfigInconsistError(9)
+                }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "This object is an index that specifies patch fail reason."
+			::= { hwPatchInstall 3 }
+
 --    ====================================
 -- HUAWEI-SYS-MAN-MIB MIB - Notification Information
 -- ====================================     
@@ -3297,7 +3461,8 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         OBJECTS { hwPatchErrorSlot, hwPatchErrorPatchIndex, hwPatchErrorCode, hwPatchErrorPatchFileName }
         STATUS current
         DESCRIPTION 
-            "The trap is generated when the patch operation error occurs."
+            "Notification about a patch operation failure. This trap is reported when patch installation or patch status configuration fails. 
+			The trap contents include hwPatchErrorSlot, hwPatchErrorPatchIndex, hwPatchErrorCode, and hwPatchErrorPatchFileName."
         ::= { hwPatchTrap 1 }
 
     hwPatchActiveOverTimeTrap NOTIFICATION-TYPE
@@ -3318,9 +3483,37 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
         OBJECTS { hwPatchVersion, hwPatchType, hwPatchOperateState}
         STATUS current
         DESCRIPTION 
-            "The patch state change notification."
+            "Notification about a trap status change. This trap is reported when patch installation or patch status configuration succeeds."
         ::= { hwPatchTrap 4 }
         
+	hwPatchInstallFailSlot NOTIFICATION-TYPE
+    OBJECTS { hwEntPhysicalName, hwPatchInstallFileName, hwPatchInstallVersion, hwPatchInstallFailReason }
+        STATUS current
+        DESCRIPTION 
+    "The patch package install fail notification."
+        ::= { hwPatchTrap 5 }
+	
+    hwPatchInstallFailSlotClear NOTIFICATION-TYPE
+    OBJECTS { hwEntPhysicalName, hwPatchInstallFileName, hwPatchInstallVersion, hwPatchInstallFailReason }
+        STATUS current
+        DESCRIPTION 
+    "The patch package install fail clear notification."
+        ::= { hwPatchTrap 6 }
+		
+    hwPatchPackageError NOTIFICATION-TYPE
+    OBJECTS { hwPackageName}
+        STATUS current
+        DESCRIPTION 
+    "The patch package error notification."
+        ::= { hwPatchTrap 7 }		
+
+    hwPatchPackageErrorClear NOTIFICATION-TYPE
+    OBJECTS { hwPackageName}
+        STATUS current
+        DESCRIPTION 
+    "The patch package error clear notification."
+        ::= { hwPatchTrap 8 }			
+		
     hwSysMasterCfcardError NOTIFICATION-TYPE
         STATUS current
         DESCRIPTION 
@@ -3517,7 +3710,88 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
     DESCRIPTION 
         "Results of static integrity measurement resume matching during a boot"
     ::= { huaweiSystemManMIBNotifications 22 }
+
+    hwSysImageDamagedNotification NOTIFICATION-TYPE
+    OBJECTS { entPhysicalName, hwSysImageName}
+    STATUS current
+    DESCRIPTION 
+        "The image file in the board is damaged."
+    ::= { huaweiSystemManMIBNotifications 23 }
+	
+	hwInnerSSLCertsTraps OBJECT IDENTIFIER ::= { huaweiSystemManMIBNotifications 24 }
+	
+    hwInnerSSLCertsInvalidEarlyWarning  NOTIFICATION-TYPE  
+		OBJECTS { hwRemainingDays, hwCaClass}
+		STATUS current
+		DESCRIPTION 
+			"The inner SSL certificate will expire. This warning is generated 60 days before the SSL certificate expires."
+		::= { hwInnerSSLCertsTraps 1}
+	
+    hwInnerSSLCertsInvalidEarlyWarningResume NOTIFICATION-TYPE  
+		OBJECTS {hwCaClass}
+		STATUS current
+		DESCRIPTION 
+			"The inner SSL certificate was upgraded."
+		::= { hwInnerSSLCertsTraps 2}
+
+    hwInnerSSLCertificateInvalid NOTIFICATION-TYPE  
+		OBJECTS { hwInvalidReason, hwCaClass}
+		STATUS current
+		DESCRIPTION 
+			"The inner SSL certificate was invalid. This alarm is generated when the certificate file is damaged or expires."
+		::= { hwInnerSSLCertsTraps 3}
+
+    hwInnerSSLCertificateInvalidResume NOTIFICATION-TYPE  
+		OBJECTS {hwCaClass}
+		STATUS current
+		DESCRIPTION 
+			"The inner SSL certificate was repaired."
+		::= { hwInnerSSLCertsTraps 4}
     
+    hwBoardCommunicationLinkFaultTrap OBJECT IDENTIFIER ::= { huaweiSystemManMIBNotifications 25 }
+
+    hwBoardCommunicationLinkFaultAlarm NOTIFICATION-TYPE
+        OBJECTS { entPhysicalIndex, entPhysicalName }
+        STATUS current
+        DESCRIPTION 
+            "This alarm is generated when a slot encounters a fault."
+        ::= { hwBoardCommunicationLinkFaultTrap 1 }
+
+    hwBoardCommunicationLinkFaultResume NOTIFICATION-TYPE
+        OBJECTS { entPhysicalIndex, entPhysicalName }
+        STATUS current
+        DESCRIPTION 
+            "This alarm is cleared when the fault in a slot is rectified."
+        ::= { hwBoardCommunicationLinkFaultTrap 2 }
+
+   hwOMUSyncTrap OBJECT IDENTIFIER ::= { huaweiSystemManMIBNotifications 26 }
+
+   hwOMUSyncFailAlarm NOTIFICATION-TYPE
+           STATUS current
+           DESCRIPTION
+                   "This alarm is generated when the OMU data synchronization timed out."
+           ::= { hwOMUSyncTrap 1 }
+
+   hwOMUSyncFailResume NOTIFICATION-TYPE
+           STATUS current
+           DESCRIPTION
+                   "This alarm is cleared when the OMU data synchronization failure was removed."
+           ::= { hwOMUSyncTrap 2 }
+   
+    hwSysPatchDamagedNotification NOTIFICATION-TYPE
+    OBJECTS { entPhysicalName, hwPatchFileName}
+    STATUS current
+    DESCRIPTION
+        "The patch package running on a board was damaged."
+    ::= { huaweiSystemManMIBNotifications 27 }
+    
+    hwSysPatchDamagedClearNotification NOTIFICATION-TYPE
+    OBJECTS { entPhysicalName, hwPatchFileName}
+    STATUS current
+    DESCRIPTION
+        "The damaged patch package running on a board recovered."
+    ::= { huaweiSystemManMIBNotifications 28 }    
+
     huaweiSystemManMIBConformance OBJECT IDENTIFIER ::= { huaweiSystemManMIB 3 }
 
     huaweiSystemManMIBCompliances OBJECT IDENTIFIER ::= { huaweiSystemManMIBConformance 1 }
@@ -3580,7 +3854,8 @@ a return value 65534 is displayed if the Get or Walk operation is performed. Oth
     huaweiSystemManNotificationGroup NOTIFICATION-GROUP
             NOTIFICATIONS { hwSysClockChangedNotification, hwSysReloadNotification, hwSysSlaveSwitchSuccessNotification,
             hwSysSlaveSwitchFailNotification, hwSysIssuNotification, hwPatchInstallFail, hwPatchInstallFailClear, hwSumUpgradeSuccess, hwSysCfgFileErrorNotification, hwSysImageErrorNotification, hwSysPafChangeNotification, 
-            hwSysLicenseChangeNotification, hwSystemBoardExclude, hwSystemBoardExcludeClear, hwEvmVmAbnormalRunNotification, hwEvmVmNotRunningNotification, hwEvmVmAbnormalRestartNotification, hwEvmDownloadFailedNotification, hwEvmInstallFailedNotification }
+            hwSysLicenseChangeNotification, hwSystemBoardExclude, hwSystemBoardExcludeClear, hwEvmVmAbnormalRunNotification, hwEvmVmNotRunningNotification, hwEvmVmAbnormalRestartNotification, hwEvmDownloadFailedNotification, hwEvmInstallFailedNotification,
+            hwSysImageDamagedNotification }
         STATUS current
         DESCRIPTION 
             "A collection of notification."

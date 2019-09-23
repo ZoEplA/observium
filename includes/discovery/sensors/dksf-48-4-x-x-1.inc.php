@@ -7,9 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+// FIXME migrate to definitions
 
 $cache_discovery['DKSF-48-4-X-X-1']['smoke'] = snmpwalk_cache_multi_oid($device, 'npSmokeTable', array(), 'DKSF-48-4-X-X-1');
 foreach ($cache_discovery['DKSF-48-4-X-X-1']['smoke'] as $index => $entry)
@@ -49,7 +51,7 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['loop'] as $index => $entry)
 
   if ($value)
   {
-    discover_sensor($valid['sensor'], 'current', $device, $oid, 'npCurLoopI.'.$index, 'dskf-mib-loop', $descr, 0.001, $value);
+    discover_sensor('current', $device, $oid, 'npCurLoopI.'.$index, 'dskf-mib-loop', $descr, 0.001, $value);
   }
 
   // Loop voltage
@@ -58,7 +60,7 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['loop'] as $index => $entry)
 
   if ($value)
   {
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, 'npCurLoopV.'.$index, 'dskf-mib-loop', $descr, 0.001, $value);
+    discover_sensor('voltage', $device, $oid, 'npCurLoopV.'.$index, 'dskf-mib-loop', $descr, 0.001, $value);
   }
 
   // Loop resistance
@@ -67,7 +69,7 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['loop'] as $index => $entry)
 
   if ($value && $value < 99999)
   {
-    discover_sensor($valid['sensor'], 'resistance', $device, $oid, 'npCurLoopR.'.$index, 'dskf-mib-loop', $descr, 1, $value);
+    discover_sensor('resistance', $device, $oid, 'npCurLoopR.'.$index, 'dskf-mib-loop', $descr, 1, $value);
   }
 }
 */
@@ -82,7 +84,7 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['temphum'] as $index => $entry)
   if ($value && $entry['npRelHumSensorStatus'] != 'error')
   {
     $oid = '.1.3.6.1.4.1.25728.8400.2.9.'.$index;
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "npRelHumSensorValueT100.$index", 'dskf-mib', $descr, 0.01, $value);
+    discover_sensor('temperature', $device, $oid, "npRelHumSensorValueT100.$index", 'dskf-mib', $descr, 0.01, $value);
   }
 
   // Humidity
@@ -93,7 +95,7 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['temphum'] as $index => $entry)
   {
     $oid = '.1.3.6.1.4.1.25728.8400.2.2.'.$index;
     $limits = array('limit_high' => $entry['npRelHumSafeRangeHigh'], 'limit_low' => $entry['npRelHumSafeRangeLow']);
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "npRelHumSensorValueH.$index", 'dskf-mib', $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "npRelHumSensorValueH.$index", 'dskf-mib', $descr, 1, $value, $limits);
   }
 }
 
@@ -108,7 +110,7 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['thermo'] as $index => $entry)
   {
     $oid = '.1.3.6.1.4.1.25728.8800.1.1.2.'.$index;
     $limits = array('limit_high' => $entry['npThermoHigh'], 'limit_low' => $entry['npThermoLow']);
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "npThermoValue.$index", 'dskf-mib', $descr, 1, $value, $limits);
+    discover_sensor('temperature', $device, $oid, "npThermoValue.$index", 'dskf-mib', $descr, 1, $value, $limits);
   }
 }
 
@@ -119,15 +121,14 @@ foreach ($cache_discovery['DKSF-48-4-X-X-1']['io'] as $index => $entry)
 
   $descr = ($entry['npIoMemo'] ? $entry['npIoMemo'] : 'Pulse Counter '.$index);
   $descr .= ' (' . $entry['npIoSinglePulseDuration'] . 'ms)';
+  $oid_name = 'npIoPulseCounter';
   $value = $entry['npIoPulseCounter'];
   $oid = '.1.3.6.1.4.1.25728.8900.1.1.9.'.$index;
-  discover_sensor($valid['sensor'], 'counter', $device, $oid, "npIoPulseCounter.$index", 'dskf-mib', $descr, 1, $value);
+  //discover_sensor('counter', $device, $oid, "npIoPulseCounter.$index", 'dskf-mib', $descr, 1, $value);
+  discover_counter($device, 'counter', $mib, $oid_name, $oid, $index, $descr, 1, $value);
 }
 
-if (OBS_DEBUG > 1 && count($cache_discovery['DKSF-48-4-X-X-1']))
-{
-  print_vars($cache_discovery['DKSF-48-4-X-X-1']);
-}
+print_debug_vars($cache_discovery['DKSF-48-4-X-X-1']);
 
 unset($cache_discovery['DKSF-48-4-X-X-1']);
 

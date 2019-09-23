@@ -1,8 +1,8 @@
 -- =============================================================================
--- Copyright (C) 2002-2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002-2003 by  H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description:MPLS-BGP-VPN-MIB 
--- Reference:This mib was extracted from draft-ietf-mpls-arch-06.txt
+-- Reference:This MIB was extracted from draft-ietf-mpls-arch-06.txt
 -- Version: V1.11
 -- History:
 --   V1.1 Add copyright information
@@ -32,36 +32,19 @@ IMPORTS
    InetAddress, InetAddressType
       FROM INET-ADDRESS-MIB
 
-   huaweiMgmt, hwMpls
+   hwMpls
       FROM HUAWEI-3COM-OID-MIB;
 
 hwMplsVpn MODULE-IDENTITY
    LAST-UPDATED "200107201200Z"  -- 20 July 2001 12:00:00 GMT
-   ORGANIZATION "IETF Layer-3 Virtual Private
-                 Networks Working Group."
+   ORGANIZATION
+       "Hangzhou H3C Tech. Co., Ltd."
    CONTACT-INFO
-          "        Thomas D. Nadeau
-                   tnadeau@cisco.com
-
-                   Luyuan Fang
-                   luyuanfang@att.com
-
-                   Stephen Brannon
-
-                   Fabio M. Chiussi
-                   fabio@bell-labs.com
-
-                   Joseph Dube
-                   jdube@avici.com
-
-                   Martin Tatham
-                   martin.tatham@bt.com
-
-                   Harmen Van Der Linde
-                   hvdl@att.com
-
-                   Comments and discussion to ppvpn@ietf.org"
-
+       "Platform Team Hangzhou H3C Tech. Co., Ltd.
+       Hai-Dian District Beijing P.R. China
+       http://www.h3c.com
+       Zip:100085
+       "
    DESCRIPTION
         "This MIB contains managed object definitions for the
          Multiprotocol Label Switching (MPLS)/Border Gateway
@@ -102,8 +85,8 @@ hwMplsVpn MODULE-IDENTITY
    REVISION
          "200107101200Z"  -- 10 July 2001 12:00:00 GMT
    DESCRIPTION
-        "Renamed mplsNumVrfSecViolationThreshExceeded to
-         mplsNumVrfSecIllegalLabelThreshExceeded, and removed
+        "Renamed hwmplsNumVrfSecViolationThreshExceeded to
+         hwmplsNumVrfSecIllegalLabelThreshExceeded, and removed
          mplsVpnInterfaceConfIndex from varbind.
 
          Changed MplsVpnId TC from SnmpAdminString to OCTET STRING.
@@ -218,7 +201,7 @@ mplsVpnInterfaceConfIndex OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "This is a unique index for an entry in the
-        MplsVPNInterfaceConfTable."
+        mplsVpnInterfaceConfTable."
    REFERENCE
        "RFC 2233 - The Interfaces Group MIB using SMIv2,
         McCloghrie, K., and F. Kastenholtz, Nov. 1997"
@@ -419,7 +402,7 @@ mplsVpnVrfConfMaxRoutes  OBJECT-TYPE
    DESCRIPTION
      "Denotes maximum number of routes which this VRF is
       configured to hold. This value MUST be less than or
-      equal to mplsVrfMaxPossibleRoutes unless it is set
+      equal to hwmplsVrfMaxPossibleRoutes unless it is set
       to 0."
   ::= { mplsVpnVrfConfEntry 10 }
 
@@ -432,7 +415,7 @@ mplsVpnVrfConfRowStatus OBJECT-TYPE
         delete a row in this table."
   ::= { mplsVpnVrfConfEntry 11 }
 
--- MplsVpnRouteTargetTable
+-- mplsVpnVrfRouteTargetTable
 
    mplsVpnVrfRouteTargetTable OBJECT-TYPE
       SYNTAX        SEQUENCE OF MplsVpnVrfRouteTargetEntry
@@ -487,7 +470,7 @@ mplsVpnVrfRouteTargetRowStatus OBJECT-TYPE
        "Row status for this entry."
    ::= { mplsVpnVrfRouteTargetEntry 3 }
 
--- MplsVpnVrfBgpNbrAddrTable
+-- mplsVpnVrfBgpNbrAddrTable
 -- Ed Note: how does this table relate to the BGP peering table;
 --          this is only EBGP; what about IBGP info?
 --          route/tag distributions

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -30,37 +30,45 @@ $navbar = array('brand' => "Ports", 'class' => "navbar-narrow");
 $navbar['options']['basic']['text']   = 'Basic';
 $navbar['options']['details']['text'] = 'Details';
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `device_id` = ?", array($device['device_id'])))
+//if (dbFetchCell("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `device_id` = ?", array($device['device_id'])))
+if (dbExist('ipv4_addresses', '`device_id` = ?', array($device['device_id'])))
 {
   $navbar['options']['ipv4']['text'] = 'IPv4 addresses';
 }
-if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `device_id` = ?", array($device['device_id'])))
+//if (dbFetchCell("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `device_id` = ?", array($device['device_id'])))
+if (dbExist('ipv6_addresses', '`device_id` = ?', array($device['device_id'])))
 {
   $navbar['options']['ipv6']['text'] = 'IPv6 addresses';
 }
 
+// FIXME, need add device_id field into table ip_mac
 if (dbFetchCell("SELECT COUNT(*) FROM `ip_mac` LEFT JOIN `ports` USING(`port_id`) WHERE `device_id` = ?", array($device['device_id'])))
+//if (dbExist('ip_mac', '`device_id` = ?', array($device['device_id'])))
 {
   $navbar['options']['arp']['text'] = 'ARP/NDP Table';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `vlans_fdb` WHERE `device_id` = ?", array($device['device_id'])))
+//if (dbFetchCell("SELECT COUNT(*) FROM `vlans_fdb` WHERE `device_id` = ?", array($device['device_id'])))
+if (dbExist('vlans_fdb', '`device_id` = ?', array($device['device_id'])))
 {
   $navbar['options']['fdb']['text'] = 'FDB Table';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `measured_class` = ?", array($device['device_id'], 'port')))
+//if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `measured_class` = ?", array($device['device_id'], 'port')))
+if (dbExist('sensors', '`device_id` = ? AND `measured_class` = ?', array($device['device_id'], 'port')))
 {
   $navbar['options']['sensors']['text'] = 'Sensors';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `neighbours` LEFT JOIN `ports` USING(`port_id`) WHERE `device_id` = ?;", array($device['device_id'])))
+//if (dbFetchCell("SELECT COUNT(*) FROM `neighbours` /*LEFT JOIN `ports` USING(`port_id`, `device_id`) */ WHERE `device_id` = ?;", array($device['device_id'])))
+if (dbExist('neighbours', '`device_id` = ?', array($device['device_id'])))
 {
   $navbar['options']['neighbours']['text'] = 'Neighbours';
   $navbar['options']['map']['text']        = 'Map';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl' AND `device_id` = ?", array($device['device_id'])))
+//if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl' AND `device_id` = ?", array($device['device_id'])))
+if (dbExist('ports', '`ifType` = ? AND `device_id` = ?', array('adsl', $device['device_id'])))
 {
   $navbar['options']['adsl']['text'] = 'ADSL';
 }
@@ -219,7 +227,10 @@ else if (is_file($config['html_dir'] . '/pages/device/ports/' . $vars['view'] . 
   foreach ($ext_tables as $table)
   {
     // Here stored port_id!
-    $cache['ports_option'][$table] = dbFetchColumn("SELECT DISTINCT `port_id` FROM `$table` WHERE 1 " . $where);
+    $cache['ports_option'][$table] = dbFetchColumn("SELECT DISTINCT `port_id` FROM `$table` WHERE 1 " . generate_query_permitted(array('ports', 'devices'))); //. $where);
+
+    //r("SELECT DISTINCT `port_id` FROM `$table` WHERE 1 " . generate_query_permitted(array('ports', 'devices')));
+
   }
 
   $cache['ports_vlan'] = array(); // Cache port vlans

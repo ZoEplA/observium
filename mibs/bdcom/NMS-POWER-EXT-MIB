@@ -103,7 +103,10 @@ IMPORTS
 
 
                PowerDeviceType OBJECT-TYPE
-                   SYNTAX  INTEGER
+                   SYNTAX  INTEGER  { 
+                                    EMPTY-SHELF(0)                                  
+                                   }
+
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
@@ -125,7 +128,7 @@ IMPORTS
                                     ON(1),
                                     OFF(2)                                    
                                    }
-                   ACCESS  read-only
+                   ACCESS  read-write
                    STATUS  mandatory
                    DESCRIPTION
                            "When value is ON(1), that means Power-Device is working; when value is OFF(2) means Power-Device is out of working."
@@ -136,7 +139,7 @@ IMPORTS
                                     A(1),
                                     B(2)                                    
                                    }
-                   ACCESS  read-only
+                   ACCESS  read-write
                    STATUS  mandatory
                    DESCRIPTION
                            "Powerdevice belong to which shelf."

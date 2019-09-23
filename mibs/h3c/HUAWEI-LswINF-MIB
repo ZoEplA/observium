@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
--- Description: HUAWEI Lan Switch Interface Management MIB
+-- Description: Interface Management MIB
 -- Reference:
--- Version: V3.3
+-- Version: V3.8
 -- History:
 --      V1.0 (1) Created by Zhangshilin, 2001.06.29
 --           (2) Revised by Qizhenglin, 2002.01.08
@@ -37,7 +37,7 @@
 --           Add hwifVlanVPNStatus and hwBpduTunnelStatus by caiqiang
 --           Add hwVlanInterfaceIpMethod by wangchao
 --      V1.7 2005-01-22
---           Remove the content of hwLswVlan from this mib to HUAWEI-LswVLAN-MIB
+--           Remove the content of hwLswVlan from this MIB to HUAWEI-LswVLAN-MIB
 --           Remove SnmpAdminString
 --      V1.8 2005-2-2
 --           Add the object hwifPpsBcastDisValControl by zhangjianwei
@@ -94,38 +94,64 @@
 --      V3.3 2011-11-08
 --           Add the value s40000M and s100000M to SpeedModeFlag and
 --           hwifEthernetSpeed by xiedong.
--- ==================================================================
+--      V3.4 2012-09-29
+--           Modify description of hwifClearStat by xiedong.
+--           2012-11-03
+--           Add hwifPktBufTable, hwifPktBufEntry, hwifPktBufFree,
+--           hwifPktBufInit, hwifPktBufMin, hwifPktBufMiss by chenkaiping
+--      V3.5 2013-08-17
+--           Add hwifPortProtocolStatTable by yangxiaoren.
+--      V3.6 2014-02-08
+--           Modify description of hwifUniSuppression, hwifMulSuppression and
+--           hwifMcastControl, modify value list of hwifMcastControl by huhonghui,
+--           for supporting value 0.
+--      V3.7 2015-10-14
+--           Add hwifMulSuppressionFlag by chenzhouhui.
+--           Modify description of hwifMulSuppression and hwifPpsMulSuppression by chenzhouhui.
+--           Add hwifPktBufInDrop and hwifPktBufEgDrop to hwifPktBufTable,
+--           add hwifQueuePktBufTable by zhangji.
+--      V3.8 2016-07-02
+--           Add the values s2500M, s5000M, s20000M, s25000M and s50000M to SpeedModeFlag
+--           and hwifEthernetSpeed by yuhaiyan.
 -- ==================================================================
 --
--- Varibles and types be imported
+-- Variables and types be imported
 --
 -- ==================================================================
 HUAWEI-LswINF-MIB DEFINITIONS ::= BEGIN
-IMPORTS
 
+IMPORTS
     RowStatus, DisplayString, TruthValue, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
-
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, TimeTicks,
-    OBJECT-IDENTITY, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, Unsigned32, Counter32
         FROM SNMPv2-SMI
-
-    ifEntry, ifIndex
-        FROM RFC1213-MIB
-
+    ifIndex, InterfaceIndex
+        FROM IF-MIB
     lswCommon
         FROM HUAWEI-3COM-OID-MIB;
 
     hwLswL2InfMib MODULE-IDENTITY
-            LAST-UPDATED "200106290000Z"
-            ORGANIZATION ""
+            LAST-UPDATED "201607020000Z"
+            ORGANIZATION
+                "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-            ""
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
             DESCRIPTION
             ""
+            REVISION "201607020000Z"
+            DESCRIPTION
+                "Add the values s2500M, s5000M, s20000M, s25000M and s50000M to SpeedModeFlag and hwifEthernetSpeed"
+            REVISION "201510140000Z"
+            DESCRIPTION
+                "Add hwifPktBufInDrop and hwifPktBufEgDrop to hwifPktBufTable,
+                 hwifMulSuppressionFlag, and hwifQueuePktBufTable, modify description of hwifMulSuppression and hwifPpsMulSuppression"
             REVISION "200106290000Z"
             DESCRIPTION
-            ""
+            "Initial version."
             ::= { lswCommon 5 }
 
 
@@ -164,18 +190,6 @@ IMPORTS
             in the same way using this MIB."
         SYNTAX      Unsigned32 (0..4294967295)
 
-    InterfaceIndex ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "d"
-       STATUS       current
-       DESCRIPTION
-               "A unique value, greater than zero, for each interface or
-               interface sub-layer in the managed system.  It is
-               recommended that values are assigned contiguously starting
-               from 1.  The value for each interface sub-layer must remain
-               constant at least from one re-initialization of the entity's
-               network management system to the next re-initialization."
-       SYNTAX       Integer32
-
     DropDirection ::= TEXTUAL-CONVENTION
        STATUS  current
        DESCRIPTION
@@ -199,7 +213,12 @@ IMPORTS
                 s10000M(3),    -- 10000M speed
                 s24000M(4),    -- 24000M speed
                 s40000M(5),    -- 40000M speed
-                s100000M(6)    -- 100000M speed
+                s100000M(6),   -- 100000M speed
+                s2500M(7),     -- 2500M speed
+                s5000M(8),     -- 5000M speed
+                s20000M(9),    -- 20000M speed
+                s25000M(10),   -- 25000M speed
+                s50000M(11)    -- 50000M speed
             }
 
 
@@ -214,7 +233,7 @@ IMPORTS
         SYNTAX SEQUENCE OF HwIfXXEntry
         MAX-ACCESS not-accessible
         STATUS   current
-        DESCRIPTION "Extended Huawei private interface information table."
+        DESCRIPTION "Extended interface information table."
         ::= { hwLswExtInterface  1 }
 
 
@@ -222,8 +241,8 @@ IMPORTS
         SYNTAX HwIfXXEntry
         MAX-ACCESS not-accessible
         STATUS   current
-        DESCRIPTION "Entries of extended Huawei private interface information table."
-        AUGMENTS    { ifEntry }
+        DESCRIPTION "Entries of extended interface information table."
+        INDEX { ifIndex }
         ::= { hwifXXTable 1}
 
     HwIfXXEntry ::=
@@ -267,12 +286,12 @@ IMPORTS
         hwifInErrorPktsRate Integer32,
         hwifInPkts Counter64,
         hwifInNormalPkts  Counter64,
-        hwifOutPkts Counter64
+        hwifOutPkts Counter64,
+        hwifMulSuppressionFlag  INTEGER
         }
 
 
-
-    hwifUnBoundPort  OBJECT-TYPE
+   hwifUnBoundPort  OBJECT-TYPE
         SYNTAX  TruthValue
         MAX-ACCESS read-only
         STATUS current
@@ -327,13 +346,13 @@ IMPORTS
 
 
     hwifMcastControl OBJECT-TYPE
-        SYNTAX  INTEGER (1..100)
+        SYNTAX  INTEGER (0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "Broadcast storm suppression with the step length of 1,
-            ranging from 1 to 100 percent.
-            In some products the step is 5, ranging from 5 to 100."
+            ranging from 0 to 100 percent.
+            In some products the step is 5, ranging from 0 to 100."
         ::= { hwifXXEntry 6 }
 
     hwifFlowControl  OBJECT-TYPE
@@ -359,7 +378,7 @@ IMPORTS
         }
         MAX-ACCESS read-write
         STATUS current
-        DESCRIPTION "Clear all port statistics. Read operation not supported."
+        DESCRIPTION "Clear specify port statistics.  Operation read is not supported."
         ::= { hwifXXEntry 9 }
 
     hwifXXBasePortIndex OBJECT-TYPE
@@ -435,7 +454,7 @@ IMPORTS
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The unicast suppression with the ranging from 1 to 100 percent
+            "The unicast suppression with the ranging from 0 to 100 percent
             in ratio mode.
             The step is determined by hwifUniSuppressionStep."
         ::= { hwifXXEntry 18 }
@@ -454,9 +473,11 @@ IMPORTS
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The multicast suppression with ranging from 1 to 100 percent
+            "The multicast suppression with ranging from 0 to 100 percent
             in ratio mode.
-            The step is determined by hwifMulSuppressionStep."
+            The step is determined by hwifMulSuppressionStep.
+            If hwifMulSuppressionFlag is 2 it means only unknown
+            traffic suppression."
         ::= { hwifXXEntry 20 }
 
    hwifPpsMulSuppression OBJECT-TYPE
@@ -465,7 +486,9 @@ IMPORTS
         STATUS current
         DESCRIPTION
             "The multicast suppression in pps(packet per second) mode.
-            The max pps value is determined by hwifPpsMulSuppressionMax."
+            The max pps value is determined by hwifPpsMulSuppressionMax.
+            If hwifMulSuppressionFlag is 2 it means only unknown
+            traffic suppression."
         ::= { hwifXXEntry 21 }
 
    hwifComboActivePort OBJECT-TYPE
@@ -665,6 +688,19 @@ IMPORTS
         DESCRIPTION "
             The number of packets sent on the interface."
         ::= { hwifXXEntry 40 }
+
+   hwifMulSuppressionFlag OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            all      (1),    -- known and unknown traffic
+            unknown  (2)    -- only unknown traffic
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "
+            The multicast suppression flag.  If only unknown multicast
+            traffic is suppressed, the value is unknown(2), and all(1) for suppression of all traffic (unknown and known)."
+        ::= { hwifXXEntry 41 }
 
     hwifAggregateTable  OBJECT-TYPE
         SYNTAX SEQUENCE OF HwIfAggregateEntry
@@ -889,6 +925,149 @@ IMPORTS
             supported."
         ::= { hwifComboPortEntry 2 }
 
+-- ======================pkt buf table===============================
+    hwifPktBufTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwifPktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Packet buffer table."
+        ::= { hwLswExtInterface  5 }
+
+    hwifPktBufEntry  OBJECT-TYPE
+        SYNTAX HwifPktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hwifPktBufTable."
+        INDEX { ifIndex }
+        ::= { hwifPktBufTable 1}
+
+    HwifPktBufEntry  ::=
+        SEQUENCE {
+            hwifPktBufFree      Integer32,
+            hwifPktBufInit      Integer32,
+            hwifPktBufMin       Integer32,
+            hwifPktBufMiss      Counter64,
+            hwifPktBufInDrop    Counter64,
+            hwifPktBufEgDrop    Counter64
+            }
+
+    hwifPktBufFree OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers available for the interface."
+        ::= { hwifPktBufEntry 1 }
+
+    hwifPktBufInit OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers allocated when the interface was created."
+        ::= { hwifPktBufEntry 2 }
+
+    hwifPktBufMin OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The smallest number of packet buffers available for the interface."
+        ::= { hwifPktBufEntry 3 }
+
+    hwifPktBufMiss OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times that the interface failed to obtain a packet
+             buffer.  Failure to obtain a buffer indicates that buffers were busy."
+        ::= { hwifPktBufEntry 4 }
+
+    hwifPktBufInDrop OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ingress packets dropped by the interface
+             because of insufficient data buffer."
+        ::= { hwifPktBufEntry 5 }
+
+    hwifPktBufEgDrop OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of egress packets dropped by the interface
+             because of insufficient data buffer."
+        ::= { hwifPktBufEntry 6 }
+
+-- ======================if queue pkt buf table===============================
+    hwifQueuePktBufTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwifQueuePktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "802.1p queue of the interface packet buffer table."
+        ::= { hwLswExtInterface  6 }
+
+    hwifQueuePktBufEntry  OBJECT-TYPE
+        SYNTAX HwifQueuePktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hwifQueuePktBufTable."
+        INDEX
+            {
+                ifIndex,
+                hwifQueueId
+            }
+        ::= { hwifQueuePktBufTable 1}
+
+    HwifQueuePktBufEntry  ::=
+        SEQUENCE {
+            hwifQueueId             Integer32,
+            hwifQueuePktBufTotal    Unsigned32,
+            hwifQueueBufUsed        Unsigned32,
+            hwifQueueBufThreCount   Counter32
+            }
+
+    hwifQueueId OBJECT-TYPE
+        SYNTAX  Integer32(1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 802.1p queue ID of the interface. This value is
+             used to specify the queue ID of the interface
+             when the user wants to read one queue of the interface.
+             The index number 1-8 correspond with 802.1p queue ID 0-7."
+        ::= { hwifQueuePktBufEntry 1 }
+
+    hwifQueuePktBufTotal OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers available for the interface,
+             including fixed buffer and shared buffer."
+        ::= { hwifQueuePktBufEntry 2 }
+
+    hwifQueueBufUsed OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers that have been used for each
+             802.1p queue of the interface."
+        ::= { hwifQueuePktBufEntry 3 }
+
+    hwifQueueBufThreCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times that each 802.1p queue of the interface has
+             exceeded the buffer threshold. The threshold is configurated by user."
+        ::= { hwifQueuePktBufEntry 4 }
+
 -- ========================l2========================================
     hwLswL2InfMibObject OBJECT IDENTIFIER ::= {  hwLswL2InfMib 1  }
 
@@ -1042,7 +1221,7 @@ IMPORTS
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION "Entries of Ethernet port attribute table"
-        AUGMENTS    { ifEntry }
+        INDEX { ifIndex }
         ::= { hwethernetTable 1}
 
     HwEthernetEntry ::=
@@ -1094,9 +1273,14 @@ IMPORTS
         s10M    (10),
         s100M   (100),
         s1000M  (1000),
+        s2500M  (2500),
+        s5000M  (5000),
         s10000M (10000),
         s24000M (24000),
         s40000M (40000),
+        s20000M (20000),
+        s25000M (25000),
+        s50000M (50000),
         s100000M (100000)
         }
         MAX-ACCESS read-write
@@ -1425,4 +1609,250 @@ IMPORTS
         DESCRIPTION "The maximum number of MAC address that the port supports."
         ::= { hwLswL2InfMibObject  12 }
 
+
+    hwifPortProtocolStatTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwifPortProtocolStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains objects of port statistics information based on
+            IPv4 and IPv6 protocols."
+        ::= { hwLswL2InfMibObject  13 }
+
+    hwifPortProtocolStatEntry  OBJECT-TYPE
+        SYNTAX HwifPortProtocolStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hwifPortProtocolStatTable."
+        INDEX    { ifIndex }
+        ::= { hwifPortProtocolStatTable 1 }
+
+    HwifPortProtocolStatEntry ::=
+        SEQUENCE {
+            hwifIPv4InOctets                        Counter64,
+            hwifIPv4InUcastPkts                     Counter64,
+            hwifIPv4InMultiPkts                     Counter64,
+            hwifIPv4InBroadcastPkts                 Counter64,
+            hwifIPv4InDiscards                      Counter64,
+            hwifIPv4InErrors                        Counter64,
+            hwifIPv4OutOctets                       Counter64,
+            hwifIPv4OutUcastPkts                    Counter64,
+            hwifIPv4OutMultiPkts                    Counter64,
+            hwifIPv4OutBroadcastPkts                Counter64,
+            hwifIPv4OutDiscards                     Counter64,
+            hwifIPv4OutErrors                       Counter64,
+            hwifIPv6InOctets                        Counter64,
+            hwifIPv6InUcastPkts                     Counter64,
+            hwifIPv6InMultiPkts                     Counter64,
+            hwifIPv6InAnycastPkts                   Counter64,
+            hwifIPv6InDiscards                      Counter64,
+            hwifIPv6InErrors                        Counter64,
+            hwifIPv6OutOctets                       Counter64,
+            hwifIPv6OutUcastPkts                    Counter64,
+            hwifIPv6OutMultiPkts                    Counter64,
+            hwifIPv6OutAnycastPkts                  Counter64,
+            hwifIPv6OutDiscards                     Counter64,
+            hwifIPv6OutErrors                       Counter64
+        }
+    hwifIPv4InOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv4 received on the interface."
+        ::= { hwifPortProtocolStatEntry 1 }
+
+    hwifIPv4InUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv4 received on the interface."
+        ::= { hwifPortProtocolStatEntry 2 }
+
+    hwifIPv4InMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv4 received on the interface."
+        ::= { hwifPortProtocolStatEntry 3 }
+
+    hwifIPv4InBroadcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of broadcast packets based on IPv4 received on the interface."
+        ::= { hwifPortProtocolStatEntry 4 }
+
+    hwifIPv4InDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv4 received on the interface."
+        ::= { hwifPortProtocolStatEntry 5 }
+
+    hwifIPv4InErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv4 received on the interface."
+        ::= { hwifPortProtocolStatEntry 6 }
+
+    hwifIPv4OutOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv4 transmitted out of the interface."
+        ::= { hwifPortProtocolStatEntry  7 }
+
+    hwifIPv4OutUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry  8 }
+
+    hwifIPv4OutMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 9 }
+
+    hwifIPv4OutBroadcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of broadcast packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 10 }
+
+    hwifIPv4OutDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 11 }
+
+    hwifIPv4OutErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 12 }
+
+    hwifIPv6InOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv6 received on the interface."
+        ::= { hwifPortProtocolStatEntry 13 }
+
+    hwifIPv6InUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv6 received on the interface."
+        ::= { hwifPortProtocolStatEntry 14 }
+
+    hwifIPv6InMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv6 received on the interface."
+        ::= { hwifPortProtocolStatEntry 15 }
+
+    hwifIPv6InAnycastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of anycast packets based on IPv6 received on the interface."
+        ::= { hwifPortProtocolStatEntry 16 }
+
+    hwifIPv6InDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv6 received on the interface."
+        ::= { hwifPortProtocolStatEntry 17 }
+
+    hwifIPv6InErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv6 received on the interface."
+        ::= { hwifPortProtocolStatEntry 18 }
+
+    hwifIPv6OutOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv6 transmitted of the interface."
+        ::= { hwifPortProtocolStatEntry  19 }
+
+    hwifIPv6OutUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry  20 }
+
+    hwifIPv6OutMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 21 }
+
+    hwifIPv6OutAnycastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of anycast packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 22 }
+
+    hwifIPv6OutDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 23 }
+
+    hwifIPv6OutErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hwifPortProtocolStatEntry 24 }
 END

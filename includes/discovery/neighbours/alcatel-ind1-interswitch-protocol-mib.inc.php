@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -48,12 +48,12 @@ if ($amap_array)
       $if = $amap['aipAMAPRemSlot']."/".$amap['aipAMAPRemPort'];
       $remote_port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE (`ifDescr` = ? OR `ifName` = ?) AND `device_id` = ?", array($if, $if, $remote_device_id));
     } else {
-      $remote_port_id = "0";
+      $remote_port_id = NULL;
     }
 
     if (!is_bad_xdp($amap['aipAMAPRemHostname']) && is_numeric($port['port_id']) && isset($amap['aipAMAPRemHostname']))
     {
-      discover_link($valid_link, $port['port_id'], 'amap', $remote_port_id, $amap['aipAMAPRemHostname'], $amap['aipAMAPRemSlot']."/".$amap['aipAMAPRemPort'], $amap['aipAMAPRemDeviceType'], $amap['aipAMAPRemDevModelName']);
+      discover_link($port, 'amap', $remote_port_id, $amap['aipAMAPRemHostname'], $amap['aipAMAPRemSlot']."/".$amap['aipAMAPRemPort'], $amap['aipAMAPRemDeviceType'], $amap['aipAMAPRemDevModelName']);
     }
   }
 }

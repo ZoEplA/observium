@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 EXTREME-POE-MIB DEFINITIONS ::= BEGIN
@@ -362,7 +356,7 @@ ExtremePethPsePortEntry ::= SEQUENCE {
 }
 
 extremePethPortOperatorLimit  OBJECT-TYPE
-          SYNTAX Integer32 (3000..30000)  
+          SYNTAX Integer32 (3000..60000)  
           UNITS			"Milliwatts"
           MAX-ACCESS		read-write
           STATUS		current
@@ -372,13 +366,13 @@ extremePethPortOperatorLimit  OBJECT-TYPE
           ::= { extremePethPsePortEntry 1 }
 
 extremePethPortReservedBudget  OBJECT-TYPE
-          SYNTAX Integer32 (0..30000)  
+          SYNTAX Integer32 (0..60000)  
           UNITS			"Milliwatts"
           MAX-ACCESS		read-write
           STATUS		current
           DESCRIPTION
              "Controls individual port maximum power level. Value is 0 or 
-              in the range of 3000..30000"
+              in the range of 3000..60000"
           DEFVAL 		{ 0 }
           ::= { extremePethPsePortEntry  2 }
 

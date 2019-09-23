@@ -7,16 +7,16 @@
 -- 
 -- Copyright(c) 2000-2002 by Raisecom  Ltd.     
 
--- modify ISCOM Series name  guokai 20130315
+-- modify ISCOM Series name guokai b2JzZXJ2aXVtCg 20130315
 -- modify RAX711 ghm 20120720
 -- add ISCOM2906MA ghm 20120720
 -- add ISCOM2924GF-4GE/4C by wxz 20111102
 -- add iscom2110A-MA-PWR4 by ljk 20100714
 -- add iscom2824G by zlw 20090917
 -- add iscom2009ama by ljk 20090901
--- add iscom3026  iscom2826  			by gongguidong 20030819
--- add iscom4124  iscom2126  metrocom3000     	by gongguidong 20040205
--- update rcft to rc002  , fiber to rc003 , transmiter to rc004 by gongguidong 20040205
+-- add iscom3026  iscom2826 by gongguidong 20030819
+-- add iscom4124  iscom2126 metrocom3000 by gongguidong 20040205
+-- update rcft to rc002, fiber to rc003 , transmiter to rc004 by gongguidong 20040205
 -- merge iscom3526,iscom3026,iscom2826,iscom2126,iscom2016,iscom2008,iscom2026 to IscomSwitch by liqiong 20041218
 -- modify ros-lite OID from 12 to 16             
 -- add iscomMediaConvertor, modify RC581FE from 1 to 2, modify RC581GE from 2 to 3,by liqiong 20060411
@@ -137,14 +137,20 @@ IMPORTS
 --  PON Series 
 	ponSeries		        OBJECT IDENTIFIER ::= { raisecom 18 }
 
--- 	TDMoP Series                                                                  
+--	TDMoP Series                                                                  
 	tdmopSeries	            OBJECT IDENTIFIER ::= { raisecom 19 }    
 	
--- 	dlcom Series                                                                  
+--	dlcom Series                                                                  
 	dlcomSeries	            OBJECT IDENTIFIER ::= { raisecom 20 }   
+
+--	raisecomTerminal Series 
+	raisecomTerminalMgmt    OBJECT IDENTIFIER ::= { raisecom 21 }
 	
--- iPN Series added by chenjunyong
-   iPNSeries								OBJECT IDENTIFIER ::= { raisecom 23 }                                                 
+--	msg Series 
+	msgSeries               OBJECT IDENTIFIER ::= { raisecom 22 }
+	
+--      iPN Series added by chenjunyong
+        iPNSeries		OBJECT IDENTIFIER ::= { raisecom 23 }                                                 
 -- =======================================================================
 --
 --  raisecom Agent 
@@ -223,20 +229,20 @@ IMPORTS
 --  OPCOM Series 
 --
 
-	opcom3100			OBJECT IDENTIFIER ::= { opcomSeries 1 }
-	opcom100-4			OBJECT IDENTIFIER ::= { opcomSeries 2 }
-	opcom3500			OBJECT IDENTIFIER ::= { opcomSeries 3 }
-	opcom3101			OBJECT IDENTIFIER ::= { opcomSeries 4 }
-	opcom3102			OBJECT IDENTIFIER ::= { opcomSeries 5 }
-	opcom3103			OBJECT IDENTIFIER ::= { opcomSeries 6 }
-	opcom100-2c			OBJECT IDENTIFIER ::= { opcomSeries 7 }
-    opcom3500e          OBJECT IDENTIFIER ::= { opcomSeries 8 } 
-	opcom3500e-6          OBJECT IDENTIFIER ::= { opcomSeries 9 }     
-	opcom3105          OBJECT IDENTIFIER ::= { opcomSeries 10 }    
-	opcom3107          OBJECT IDENTIFIER ::= { opcomSeries 11 }     
-	opcom3109          OBJECT IDENTIFIER ::= { opcomSeries 12 }
-	opcom-100-oau          OBJECT IDENTIFIER ::= { opcomSeries 15 }
-	opcom3500e-c          OBJECT IDENTIFIER ::= { opcomSeries 16 }
+	opcom3100		OBJECT IDENTIFIER ::= { opcomSeries 1 }
+	opcom100-4		OBJECT IDENTIFIER ::= { opcomSeries 2 }
+	opcom3500		OBJECT IDENTIFIER ::= { opcomSeries 3 }
+	opcom3101		OBJECT IDENTIFIER ::= { opcomSeries 4 }
+	opcom3102		OBJECT IDENTIFIER ::= { opcomSeries 5 }
+	opcom3103		OBJECT IDENTIFIER ::= { opcomSeries 6 }
+	opcom100-2c		OBJECT IDENTIFIER ::= { opcomSeries 7 }
+	opcom3500e		OBJECT IDENTIFIER ::= { opcomSeries 8 } 
+	opcom3500e-6		OBJECT IDENTIFIER ::= { opcomSeries 9 }     
+	opcom3105		OBJECT IDENTIFIER ::= { opcomSeries 10 }    
+	opcom3107		OBJECT IDENTIFIER ::= { opcomSeries 11 }     
+	opcom3109		OBJECT IDENTIFIER ::= { opcomSeries 12 }
+	opcom-100-oau		OBJECT IDENTIFIER ::= { opcomSeries 15 }
+	opcom3500e-c		OBJECT IDENTIFIER ::= { opcomSeries 16 }
 -- =======================================================================
 --
 --  RAISECOM Manager 

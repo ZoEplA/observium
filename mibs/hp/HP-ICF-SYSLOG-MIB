@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 --* Module: hpicfSyslog.mib
 --*
---* Copyright (C) 2015 Hewlett Packard Enterprise Development Company LP
+--* Copyright (C) 2008-2018 Hewlett Packard Enterprise Development Company LP
 --* All Right Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -35,18 +35,83 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
 
     hpicfSyslogMIB MODULE-IDENTITY
 
-        LAST-UPDATED "201509110526Z"  --   September 11, 2015
-        ORGANIZATION "HP Networking"
+        LAST-UPDATED "201807100000Z"  --   July 10, 2018
+        ORGANIZATION "HPE Networking"
         CONTACT-INFO
-            "Hewlett-Packard Company
+            "Hewlett Packard Enterprise Development Company
             8000 Foothills Blvd.
             Roseville, CA 95747"
         DESCRIPTION
-            "The MIB module for configuring and 
+            "The MIB module for configuring and
              monitoring Syslog applications.
 
              The HP Syslog application sends Syslog messages."
- 
+
+       REVISION "201901080000Z"  --   January 8, 2019
+       DESCRIPTION
+          "Added 'estc' entry in HpicfSyslogSystemModule"
+
+       REVISION "201807100000Z"  --   July 10, 2018
+       DESCRIPTION
+           "Added 'authOrder' entry in HpicfSyslogSystemModule"
+
+       REVISION "201808220000Z"  --   August 22, 2018
+       DESCRIPTION
+           "Added 'caDownload' entry in HpicfSyslogSystemModule"
+
+       REVISION "201802140000Z"  --   Febrauary 14, 2018
+       DESCRIPTION
+           "Added 'dfp' entry in HpicfSyslogSystemModule"
+
+       REVISION "201712110000Z"  --   December 11, 2017
+       DESCRIPTION
+           "Added 'httpProxy' entry in HpicfSyslogSystemModule"
+
+       REVISION "201710170000Z"  --   October 17, 2017
+       DESCRIPTION
+           "Added 'devOnboard' entry in HpicfSyslogSystemModule"
+
+       REVISION "201710120000Z"  --   October 12, 2017
+       DESCRIPTION
+           "Added 'cfgRestore' entry in HpicfSyslogSystemModule"
+
+
+       REVISION "201709050000Z"  --   September 5, 2017
+       DESCRIPTION
+           "Added 'vlanMad' entry in HpicfSyslogSystemModule"
+
+       REVISION "201707030000Z"  --   Jul 03, 2017
+       DESCRIPTION
+           "Added hpicfSyslogControlFilterName"
+
+       REVISION "201607130000Z"  --   July 13, 2016
+       DESCRIPTION
+           "Added SyslogCmdClearLog to hpicfSyslogLogMsgOptions"
+
+       REVISION "201606140000Z"  --   June 14, 2016
+       DESCRIPTION
+           "Added 'userTnode' to HpicfSyslogSystemModule"
+
+       REVISION "201605120000Z"  --   May 12, 2016
+       DESCRIPTION
+           "Added 'ztpIpsec' to HpicfSyslogSystemModule"
+
+       REVISION "201604010000Z"  --   April 01, 2016
+       DESCRIPTION
+           "Added 'central' to HpicfSyslogSystemModule"
+
+       REVISION "201603230000Z"  --   March 23, 2016
+       DESCRIPTION
+           "Added 'activate' to 'HpicfSyslogSystemModule'."
+
+       REVISION "201603100000Z"  --   March 10, 2016
+       DESCRIPTION
+           "Added 'hpicfSyslogCommandLogging' to 'hpicfSyslogLogging'."
+
+       REVISION "201601210526Z"  --   January 21, 2016
+       DESCRIPTION
+           "Added 'tunneledNode' entry in HpicfSyslogSystemModule"
+
        REVISION "201509110526Z"  --   September 11, 2015
        DESCRIPTION
            "Added 'captivePortal' entry in hpicfSyslogSystemModule"
@@ -67,9 +132,25 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
            "Added 'mvrp' entry in hpicfSyslogSystemModule"
 
+       REVISION "201508070000Z"  --   August 7, 2015
+       DESCRIPTION
+           "Added 'psDetect' entry in hpicfSyslogSystemModule"
+
+       REVISION "201505200000Z"  --   May 20, 2015
+       DESCRIPTION
+           "Added 'rrpp' entry in hpicfSyslogSystemModule"
+
        REVISION "201505090000Z"  --   May 09, 2015
        DESCRIPTION
            "Added 'arpthrottle' entry in hpicfSyslogSystemModule"
+
+       REVISION "201505090000Z"  --   May 09, 2015
+       DESCRIPTION
+           "Added 'dnsfilter' entry in hpicfSyslogSystemModule"
+
+       REVISION "201505080000Z"  --   May 08, 2015
+       DESCRIPTION
+           "Added 'ipspf' entry in hpicfSyslogSystemModule"
 
        REVISION "201504160000Z"  --   Apr 16, 2015
        DESCRIPTION
@@ -416,14 +497,35 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
               arpthrottle    (120),
               ndsnoop        (122),
               ntp            (123),  
-              mdns           (126),
+              ipsla          (124),
+              psDetect       (125),
+	      mdns           (126),
               mvrp           (127),
               rip            (128),
               bfd            (129),
               lldpmad        (130),
               captive-portal (131),
-              profile-manager (132),
-              vsf            (133)
+             profile-manager (132),
+              vsf            (133),
+              tunneledNode   (134),
+              amp-server     (135),
+              activate       (136),
+              central        (137),
+              ztpIpsec       (138),
+              greTunnel      (139),
+              userTnode      (140),
+              vlanMad        (141),
+              ----------------------
+              -- internalRsvdID (142)
+              -- Add new system Id above internalRsvdID(142)
+              ----------------------
+              cfgRestore     (143),
+              devOnboard     (144),
+              httpProxy      (145),
+              dfp            (146),
+              authOrder      (147),
+              caDownload     (148),
+              estc           (149)
            }
 
    HpicfSyslogOriginId ::=  TEXTUAL-CONVENTION
@@ -497,7 +599,9 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
            hpicfSyslogControlTransportProtocol
                 INTEGER,
 	   hpicfSyslogControlDestinationPort
-                InetPortNumber  
+                InetPortNumber,
+           hpicfSyslogControlFilterName
+                SnmpAdminString   
         }
 
    hpicfSyslogControlIndex OBJECT-TYPE
@@ -633,6 +737,14 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
             Syslog server associated with this row.  The default Syslog port 
             for UDP is 514, for TCP is 1470, and for TLS is 6514."
        ::= { hpicfSyslogControlEntry 9 }
+
+   hpicfSyslogControlFilterName OBJECT-TYPE
+       SYNTAX      SnmpAdminString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION 
+           "The filter Name connected to the Syslog server."
+       ::= { hpicfSyslogControlEntry 10 }
 
    -- -------------------------------------------------------------
    -- hpicfSyslogOperations
@@ -1048,6 +1160,15 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
             log messages. This object always return FALSE when read." 
      ::= { hpicfSyslogLogMsgOptions 2 }
 
+   hpicfSyslogCmdClearLog OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Setting this object to TRUE will erase all command-related
+            log messages. This object always returns FALSE when it is read." 
+     ::= { hpicfSyslogLogMsgOptions 3 }
+
 -------------------------------------------------------------------
 
    hpicfSyslogServerStatisticsTable OBJECT-TYPE
@@ -1221,7 +1342,27 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
                      rate limit for alerts transmission."
         DEFVAL      { 0 }
         ::=  { hpicfSyslogAlertsEntry 3}
+
+   -- -------------------------------------------------------------
+   -- hpicfSyslogLogging
+   -- -------------------------------------------------------------
  
+   hpicfSyslogLogging OBJECT IDENTIFIER
+                        ::= { hpicfSyslogObjects 8 }
+  
+     hpicfSyslogCommandLogging OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is used to configure whether switch
+                     should log user entered commands. If this is set,
+                     commands are locally logged, else the commands
+                     are not logged. By default, this functionality is
+                     disabled."
+        DEFVAL       { false }
+        ::= { hpicfSyslogLogging 1}
+ 
+
   -- -------------------------------------------------------------
    -- Notification Information
    -- -------------------------------------------------------------
@@ -1459,12 +1600,39 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
                    hpicfSyslogClearLog,
                    hpicfSyslogSecClearLog
                }
-       STATUS  current
+       STATUS  deprecated
        DESCRIPTION
            "A collection of objects representing the log message information."
        ::= { hpicfSyslogGroups 17}
 
+   hpicfSyslogCommandLoggingGroup1 OBJECT-GROUP
+       OBJECTS {
+                  hpicfSyslogCommandLogging
+       }
+       STATUS  deprecated
+       DESCRIPTION
+           "A collection of objects for local command logging."
+       ::= { hpicfSyslogGroups 18 }
 
+   hpicfSyslogLogMsgOptionsGroup2 OBJECT-GROUP
+       OBJECTS {
+                   hpicfSyslogClearLog,
+                   hpicfSyslogSecClearLog,
+                   hpicfSyslogCmdClearLog
+               }
+       STATUS  current
+       DESCRIPTION
+           "A collection of objects representing the log message information."
+       ::= { hpicfSyslogGroups 19}
+
+   hpicfSyslogControlFilterNameGroup OBJECT-GROUP
+       OBJECTS {
+                  hpicfSyslogControlFilterName
+               }
+       STATUS  current
+       DESCRIPTION
+           "Objects representing the filter name."
+       ::= { hpicfSyslogGroups 20}
 
    -- -------------------------------------------------------------
    -- compliance statements
@@ -1710,6 +1878,31 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
        ::= { hpicfSyslogCompliances 15 }
 
     hpicfSyslogSmmLogMsgCompliance1 MODULE-COMPLIANCE
+       STATUS  deprecated
+       DESCRIPTION
+           "The compliance statement for Syslog
+            log messages for standby module."
+       MODULE -- this module
+       MANDATORY-GROUPS {
+           hpicfSyslogControlGroupSmm,
+           hpicfSyslogLogMsgOptionsGroup1
+       }
+
+       ::= { hpicfSyslogCompliances 16 }
+
+    hpicfSyslogCommandLoggingCompliance MODULE-COMPLIANCE
+       STATUS  deprecated
+       DESCRIPTION
+           "The compliance statement for Syslog
+           command logging ."
+       MODULE -- this module
+       MANDATORY-GROUPS {
+           hpicfSyslogCommandLoggingGroup1
+       }
+
+       ::= { hpicfSyslogCompliances 17 }
+
+   hpicfSyslogSmmLogMsgCompliance2 MODULE-COMPLIANCE
        STATUS  current
        DESCRIPTION
            "The compliance statement for Syslog
@@ -1717,11 +1910,21 @@ HP-ICF-SYSLOG-MIB DEFINITIONS ::= BEGIN
        MODULE -- this module
        MANDATORY-GROUPS {
            hpicfSyslogControlGroupSmm,
-           hpicfSyslogLogMsgOptionsGroup,
-           hpicfSyslogLogMsgOptionsGroup1
+           hpicfSyslogLogMsgOptionsGroup2
        }
 
-       ::= { hpicfSyslogCompliances 16 }
+       ::= { hpicfSyslogCompliances 18 }
+
+   hpicfSyslogTransportFilterNameCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+           "The compliance statement for Syslog
+            Filter Name ."
+       MODULE -- this module
+       MANDATORY-GROUPS {
+           hpicfSyslogControlFilterNameGroup
+       }
+       ::= { hpicfSyslogCompliances 19 }
 
 
 END

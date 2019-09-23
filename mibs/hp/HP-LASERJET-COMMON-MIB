@@ -3,7 +3,8 @@
 HP-LASERJET-COMMON-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-   enterprises               FROM SNMPv2-SMI;
+   enterprises               FROM SNMPv2-SMI,
+   DisplayString             FROM SNMPv2-TC;
 
 hp OBJECT IDENTIFIER ::= { enterprises 11 }
 nm OBJECT IDENTIFIER ::= { hp 2 }
@@ -11,8 +12,6 @@ hpsystem OBJECT IDENTIFIER ::= { nm 3 }
 net-peripheral OBJECT IDENTIFIER ::= { hpsystem 9 }
 netdm OBJECT IDENTIFIER ::= { net-peripheral 4 }
 dm OBJECT IDENTIFIER ::= {  netdm 2}
-
-DisplayString ::= OCTET STRING
 
 device                                 OBJECT IDENTIFIER ::=  { dm 1 }
 channel                                OBJECT IDENTIFIER ::=  { device 6 } 
@@ -41,6 +40,8 @@ simm5                                  OBJECT IDENTIFIER ::=  { simm 5 }
 simm6                                  OBJECT IDENTIFIER ::=  { simm 6 } 
 simm7                                  OBJECT IDENTIFIER ::=  { simm 7 } 
 simm8                                  OBJECT IDENTIFIER ::=  { simm 8 } 
+usb-interface                          OBJECT IDENTIFIER ::=  { interface 9 } 
+usb                                    OBJECT IDENTIFIER ::=  { usb-interface 2 } 
 test                                   OBJECT IDENTIFIER ::=  { system 5 } 
 job                                    OBJECT IDENTIFIER ::=  { system 6 } 
 settings-job                           OBJECT IDENTIFIER ::=  { job 1 } 
@@ -103,11 +104,12 @@ ports                                  OBJECT IDENTIFIER ::=  { io 3 }
 port1                                  OBJECT IDENTIFIER ::=  { ports 1 } 
 parallel                               OBJECT IDENTIFIER ::=  { port1 1 } 
 processing-subsystem                   OBJECT IDENTIFIER ::=  { device 3 } 
-pdl                                    OBJECT IDENTIFIER ::=  { processing-subsystem 3 } 
-pdl-esc-p                              OBJECT IDENTIFIER ::=  { pdl 5 }
+pdl                                    OBJECT IDENTIFIER ::=  { processing-subsystem 3 }
 settings-pdl                           OBJECT IDENTIFIER ::=  { pdl 1 } 
 pdl-pcl                                OBJECT IDENTIFIER ::=  { pdl 3 } 
 pdl-postscript                         OBJECT IDENTIFIER ::=  { pdl 4 } 
+pdl-esc-p                              OBJECT IDENTIFIER ::=  { pdl 5 } 
+pdl-pclxl                              OBJECT IDENTIFIER ::=  { pdl 16 } 
 pjl                                    OBJECT IDENTIFIER ::=  { processing-subsystem 5 } 
 destination-subsystem                  OBJECT IDENTIFIER ::=  { device 4 } 
 print-engine                           OBJECT IDENTIFIER ::=  { destination-subsystem 1 } 
@@ -118,6 +120,44 @@ settings-intray                        OBJECT IDENTIFIER ::=  { intray 1 }
 status-intray                          OBJECT IDENTIFIER ::=  { intray 2 }
 marking-agent                          OBJECT IDENTIFIER ::=  { print-engine 5 } 
 settings-marking-agent                 OBJECT IDENTIFIER ::=  { marking-agent 1 } 
+ph                                     OBJECT IDENTIFIER ::=  { print-engine 7 } 
+settings-ph                            OBJECT IDENTIFIER ::=  { ph 1 } 
+fax-job-control                        OBJECT IDENTIFIER ::=  { job 3 } 
+settings-fax-job                       OBJECT IDENTIFIER ::=  { fax-job-control 1 } 
+status-fax-job                         OBJECT IDENTIFIER ::=  { fax-job-control 2 } 
+faxjob                                 OBJECT IDENTIFIER ::=  { fax-job-control 3 }  
+faxjob-rx-status                       OBJECT IDENTIFIER ::=  { faxjob 1 } 
+faxjob-tx-status                       OBJECT IDENTIFIER ::=  { faxjob 3 } 
+faxjob-tx-error                        OBJECT IDENTIFIER ::=  { faxjob 4 } 
+faxjob-tx-current-page                 OBJECT IDENTIFIER ::=  { faxjob 5 } 
+faxjob-rx-current-page                 OBJECT IDENTIFIER ::=  { faxjob 6 } 
+faxjob-rx-duration                     OBJECT IDENTIFIER ::=  { faxjob 7 } 
+faxjob-tx-duration                     OBJECT IDENTIFIER ::=  { faxjob 8 } 
+fax-activity-log                       OBJECT IDENTIFIER ::=  { job 4 } 
+settings-faxlog                        OBJECT IDENTIFIER ::=  { fax-activity-log 1 } 
+settings-fax-proc-sub                  OBJECT IDENTIFIER ::=  { fax-proc-sub 1 } 
+status-fax-proc-sub                    OBJECT IDENTIFIER ::=  { fax-proc-sub 2 } 
+fax-forwarding                         OBJECT IDENTIFIER ::=  { fax-proc-sub 3 } 
+fax-receive                            OBJECT IDENTIFIER ::=  { source-subsystem 3 } 
+settings-fax-receive                   OBJECT IDENTIFIER ::=  { fax-receive 1 } 
+status-fax-receive                     OBJECT IDENTIFIER ::=  { fax-receive 2 } 
+destination-subsystem                  OBJECT IDENTIFIER ::=  { device 4 } 
+fax-send                               OBJECT IDENTIFIER ::=  { destination-subsystem 2 } 
+settings-fax-send                      OBJECT IDENTIFIER ::=  { fax-send 1 } 
+status-fax-send                        OBJECT IDENTIFIER ::=  { fax-send 2 } 
+transmit-fax                           OBJECT IDENTIFIER ::=  { fax-send 5 } 
+phone                                  OBJECT IDENTIFIER ::=  { system 9 } 
+dial                                   OBJECT IDENTIFIER ::=  { phone 1 } 
+dial-all-lines                         OBJECT IDENTIFIER ::=  { dial 1 } 
+answer                                 OBJECT IDENTIFIER ::=  { phone 2 } 
+answer-all-lines                       OBJECT IDENTIFIER ::=  { answer 1 } 
+scanner                                OBJECT IDENTIFIER ::=  { source-subsystem 2 } 
+settings-scanner                       OBJECT IDENTIFIER ::=  { scanner 1 } 
+status-scanner                         OBJECT IDENTIFIER ::=  { scanner 2 } 
+scan-calibration                       OBJECT IDENTIFIER ::=  { settings-scanner 32 } 
+fax-proc-sub                           OBJECT IDENTIFIER ::=  { processing-subsystem 7 } 
+settings-fax-proc-sub                  OBJECT IDENTIFIER ::=  { fax-proc-sub 1 } 
+status-fax-proc-sub                    OBJECT IDENTIFIER ::=  { fax-proc-sub 2 } 
 imaging                                OBJECT IDENTIFIER ::=  { print-engine 6 } 
 hrm                                    OBJECT IDENTIFIER ::=  { dm 3 } 
 hrStorage                              OBJECT IDENTIFIER ::=  { hrm 2 } 
@@ -128,6 +168,12 @@ hrDeviceTable                          OBJECT IDENTIFIER ::=  { hrDevice 2 }
 hrDeviceEntry                          OBJECT IDENTIFIER ::=  { hrDeviceTable 1 } 
 hrPrinterTable                         OBJECT IDENTIFIER ::=  { hrDevice 5 } 
 hrPrinterEntry                         OBJECT IDENTIFIER ::=  { hrPrinterTable 1 } 
+net-printer                            OBJECT IDENTIFIER ::=  { net-peripheral 1 }
+generalDeviceStatus                    OBJECT IDENTIFIER ::=  { net-printer 1 }
+netPrinterType                         OBJECT IDENTIFIER ::=  { net-printer 2 }
+gdStatusEntry                          OBJECT IDENTIFIER ::=  { generalDeviceStatus 2 }
+photo-job                              OBJECT IDENTIFIER ::=  { job 8 } 
+settings-photo-job                     OBJECT IDENTIFIER ::=  { photo-job 3 } 
 printmib                               OBJECT IDENTIFIER ::=  { dm 2 } 
 prtGeneral                             OBJECT IDENTIFIER ::=  { printmib 5 } 
 prtGeneralTable                        OBJECT IDENTIFIER ::=  { prtGeneral 1 } 
@@ -154,6 +200,7 @@ prtConsoleLightEntry                   OBJECT IDENTIFIER ::=  { prtConsoleLightT
 prtAlert                               OBJECT IDENTIFIER ::=  { printmib 18 } 
 prtAlertTable                          OBJECT IDENTIFIER ::=  { prtAlert 1 } 
 prtAlertEntry                          OBJECT IDENTIFIER ::=  { prtAlertTable 1 } 
+device-configure                       OBJECT IDENTIFIER ::=  { settings-system 32 }
 phd                                    OBJECT IDENTIFIER ::=  { interface 5 } 
 phd2                                   OBJECT IDENTIFIER ::=  { phd 2 } 
 phd3                                   OBJECT IDENTIFIER ::=  { phd 3 } 
@@ -313,6 +360,8 @@ prtChannel                             OBJECT IDENTIFIER ::=  { printmib 14 }
 prtChannelTable                        OBJECT IDENTIFIER ::=  { prtChannel 1 } 
 prtChannelEntry                        OBJECT IDENTIFIER ::=  { prtChannelTable 1 } 
 printed-media-usage                    OBJECT IDENTIFIER ::=  { printer-accounting 1 } 
+firmware-download                      OBJECT IDENTIFIER ::=  { system 18 } 
+upgradable-devices                     OBJECT IDENTIFIER ::=  { system 20 } 
 
 localization-language OBJECT-TYPE
     SYNTAX  INTEGER {
@@ -590,6 +639,48 @@ auto-continue OBJECT-TYPE
                 the job boundary is reached, the value last set will be returned."
 ::= { status-system 7 }
 
+
+install-date OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Identifies the date that the device was installed. The format
+		of the string is 'YYYYMMDDHHmmZ'. Where:    
+		    YYYY is the year.    
+		    MM is the month (1-12).    
+		    DD is the day (1-31).    
+		    HH is the hour of the day (0-23).    
+		    mm are the minutes (0-59).    
+		    'Z' designates Greenwich Mean Time; if 'Z' not specified,
+			value is local time.    
+		Device POS must specify the conditions for setting this
+		object.
+                Additional information:
+                Identifies the date that the device was installed. The
+                format of the string is 'YYYYMMDDHHmmZ'. Where:
+                YYYY is the year.
+                MM is the month (1-12).
+                DD is the day (1-31).	
+                HH is the hour of the day (0-23).
+                mm are the minutes (0-59).
+                'Z' designates Greenwich Mean Time; if 'Z' not specified,
+                value is local time.
+                
+                On Products without a real-time clock this
+                object has the inital value of 'INVALID'.  While in
+                the invalid state the object may written to.  Once the 
+                initial install date has been written a new intall date
+                can not be written without resetting the object to 'INVALID'.
+                
+                The behavior on products with real-time clocks is different.
+                The object is set to the initial real-time clock value, usually
+                this is '199000300000'.  Manufacturing sets the real-time
+                clock to the correct date and sets the INSTALL-DATE to 'INVALID'.
+                Then when the customer turns on the printer for the first time
+                the install date is reset."
+::= { status-system 8 }
+
+
 display-column-size OBJECT-TYPE
     SYNTAX  INTEGER
     ACCESS  read-only
@@ -609,6 +700,20 @@ display-number-of-rows OBJECT-TYPE
                 printer's display."
 ::= { display-status 2 }
                
+	       
+show-address OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eAuto(3),
+                          eOff(1)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "If this object is set to eAuto, and the device has an IP
+		address, the IP address of the device will be shown with the
+		READY message. If this object is set to eOff, the IP address
+		will not be shown."
+::= { display-status 3 }
+
                
 status-msg-line1-part1 OBJECT-TYPE
     SYNTAX  DisplayString 
@@ -1271,6 +1376,18 @@ simm8-capacity OBJECT-TYPE
                 eVolatileRandomAccessMemory."
 ::= { simm8 5 }
 
+
+usb-product-id OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Returns the Product ID of a connected USB device as defined in
+		the Standard Device Descriptor of the Universal Serial Bus
+		Specification Version 2.0. The value will be in the range
+		0..65535."
+::= { usb 5 }
+
+
 self-test OBJECT-TYPE
     SYNTAX  INTEGER {
 		   eNotInASelfTest(1),
@@ -1441,7 +1558,1247 @@ cancel-job OBJECT-TYPE
                 apply."
 ::= { settings-job 2 }
                
+         
+faxjob-action OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   ePrintFaxToPrinter(1),
+		   eDeleteFaxFromMemory(3)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Permits host to specify an action to be applied with a
+                particular fax."
+::= { settings-fax-job 1 }
                
+               
+faxjob-action-id OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Contains the fax job identification of the fax to be
+                acted upon by the action specified by the object FAXJOB-
+                ACTION."
+::= { settings-fax-job 2 }
+               
+               
+faxjob-tx-type OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eSrcHostOnly(2),
+		   eSrcScannerOnly(5),
+		   eSrcHostToMemoryOnly(9)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates sources of the fax image for transmission.
+                Also specifies the temporal order of the data sources.  
+                  eSrcHostOnly - The fax document images will be wholly
+                downloaded from the host.  
+                  eSrcScannerOnly - The fax document images originate
+                wholly from the device scanner/ADF subsystem.  
+                  eSrcHostThenScanner - The fax document is composed of
+                images downloaded from the host and pages from the
+                scanner/ADF subsystem.  The host downloaded pages will
+                be faxed first, followed by the pages in the
+                scanner/ADF.  
+                  eSrcScannerThenHost - The fax document is composed of
+                pages in the scanner/ADF and the images downloaded from
+                the host.  The document in the ADF is faxed first,
+                followed by the pages downloaded from the host.
+                wSrcHostThenMemory - The fax document is composed of
+                pages downloaded from the host and images already stored
+                within the device.  The fax transmission will contain
+                the host downloaded pages followed by the images in the
+                device memory.  
+                  eSrcHostToMemoryOnly - Permits fax images to be
+                downloaded into device memory for later use with
+                eSrcHostThenMemory.
+                Additional information:
+                GECKO NOTE:  eSrcHostToMemoryOnly is included for
+                development and testing only.  eSrcHostToMemoryOnly will
+                not be an allowed value for this object in the released
+                product."
+::= { settings-fax-job 3 }
+               
+               
+faxjob-print-duplex-mode-select OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eDuplexerDisabled(1),
+                          eDuplexerEnabled(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Allows the host to enable or disable duplex printing on a
+		device for the next fax job.
+                Additional information:
+                Allows the host to enable or disable duplex printing on a		
+                device for the next fax job."
+::= { settings-fax-job 5 }
+
+
+faxjob-download-id OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Contains the device assigned job identification for the
+                current fax downloading job.  The job ID is
+                monotonically increasing number.  The job ID may be
+                reset to zero or may roll over to zero after reaching
+                some maximum.  The maximum value before the rollover
+                should be stated in the POS.  
+                Additional information:
+                The maximum value before this object rolls over
+                to 0 is 2,147,483,648.  Behavior of this object once
+                the value rolls over to 0 is not specified."
+::= { status-fax-job 1 }
+               
+               
+faxjob-rx-id OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Contains the device assigned job identification for the
+                currently fax reception job.  The job ID is
+                monotonically increasing number.  The job ID may be
+                reset to zero or may roll over to zero after reaching
+                some maximum.  The maximum value before the rollover
+                should be stated in the POS.  
+                Additional information:
+                The maximum value before this object rolls over
+                to 0 is 2,147,483,648.  Behavior of this object once
+                the value rolls over to 0 is not specified."
+::= { status-fax-job 2 }
+               
+               
+faxjob-tx-id OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Contains the device assigned job identification for the
+                current fax transmission job.  The job ID is
+                monotonically increasing number.  The job ID may be
+                reset to zero or may roll over to zero after reaching
+                some maximum.  The maximum value before the rollover
+                should be stated in the POS.  
+                Additional information:
+                The maximum value before this object rolls over
+                to 0 is 2,147,483,648.  Behavior of this object once
+                the value rolls over to 0 is not specified."
+::= { status-fax-job 3 }
+               
+               
+faxjob-upload-id OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Contains the device assigned job identification for the
+                current fax upload job.  The job ID is monotonically
+                increasing number.  The job ID may be reset to zero or
+                may roll over to zero after reaching some maximum.  The
+                maximum value before the rollover should be stated in
+                the POS.
+                Additional information:
+                The maximum value before this object rolls over
+                to 0 is 2,147,483,648.  Behavior of this object once
+                the value rolls over to 0 is not specified."
+::= { status-fax-job 4 }
+               
+               
+faxjob-rx-status-1 OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFaxRxIdle(1),
+		   eFaxRxRinging(2),
+		   eFaxRxAnswering(3),
+		   eFaxRxReceiving(4)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Status of receiving fax session 1."
+::= { faxjob-rx-status 1 }
+               
+               
+faxjob-tx-status-1 OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFaxTxIdle(1),
+		   eFaxTxDialing(2),
+		   eFaxTxConnecting(3),
+		   eFaxTxTransmitting(4)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Status of sending fax session 1."
+::= { faxjob-tx-status 1 }
+               
+               
+faxjob-tx-error-1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Error status of the fax reception session 1.
+                Additional information:
+                Error status of the fax transmission session 1."
+::= { faxjob-tx-error 1 }
+               
+               
+faxjob-tx-current-page-1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "The page number of the fax page currently being
+                transmitted via send fax session 1.  Starts with page
+                number 1."
+::= { faxjob-tx-current-page 1 }
+               
+               
+faxjob-rx-current-page-1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "The page number of the fax page currently being received
+                via fax reception session 1.  Starts with page number
+                1."
+::= { faxjob-rx-current-page 1 }
+               
+               
+faxjob-rx-duration-1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Represent the number of seconds of phone-connect time
+                for a fax reception session 1."
+::= { faxjob-rx-duration 1 }
+               
+               
+faxjob-tx-duration-1 OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Represent the number of seconds of phone-connect time
+                for send fax session 1."
+::= { faxjob-tx-duration 1 }
+               
+               
+fax-log-action OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eIdle(1),
+		   eClear(2),
+		   ePrintLatest(3),
+		   ePrintAll(4)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides applications with the ability to clear or print
+                the fax transaction log.
+                  eIdle        - no action is occurring on the fax log.
+                  eClear       - clear the fax log.
+                  ePrintLatest - print the latest entry in the fax log.
+                  ePrintAll    - print all the entries in the fax log.
+                When this object is set to a non-eIdle value by an
+                application, the given action starts.  When the action
+                is complete, this object is changed back to eIdle by the
+                device.  A host's request to write this object will be
+                rejected when the object is not eIdle.  When eIdle, the
+                host may set the object to any value (including eIdle)."
+::= { settings-faxlog 1 }
+               
+               
+fax-log-reporting OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eNever(1),
+		   eErrorOnly(2),
+		   eSendOnly(3)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Specifies when fax transaction logs are to be printed."
+::= { settings-faxlog 2 }
+
+
+fax-dial-mode OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eToneDial(1),
+		   ePulseDial(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Device should use DTMF dialing if eToneDial, pulse dial
+                if ePulseDial."
+::= { dial-all-lines 1 }
+               
+               
+device-redial OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Device to permit redial upon detecting certain error
+                conditions."
+::= { dial-all-lines 2 }
+               
+               
+fax-answer-mode OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eManualAnswer(1),
+		   eFaxAnswer(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Sets the answering-priority when using a shared voice
+                line.
+                  eManualAnswer - Device will not automatically answer
+                the phone.  User must answer and push START button.
+                  eFaxAnswer - Device should assume call is fax, send
+                CED immediately upon answering.
+                  eTadAnswer - (Telephone Answering Device Mode) Device
+                allows downstream TAD to answer but device will
+                eavesdrop for fax CNG signal.  If a CNG detected, cut
+                off the downstream device, send CED.  Do nothing if CNG
+                not detected."
+::= { answer-all-lines 1 }
+               
+               
+fax-num-rings-pickup OBJECT-TYPE
+    SYNTAX  INTEGER(1..6)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Number of rings before the fax device answers the phone
+                if FAX-ANSWER-MODE is not set to MANUAL-MODE."
+::= { answer-all-lines 2 }
+               
+               
+device-ring-type-pickup OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Device to answer the incoming call based on detecting
+                the the specified type of telephone ring."
+::= { answer-all-lines 3 }
+               
+               
+fax-receive-stamping-enable OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Controls whether or not incoming pages of a fax will be
+                stamped upon receipt.  Content of the stamp is device-
+                specific but may include such information as date,
+                time, fax station name, and page number.  When this
+                object is set to eEnabled each page of an incoming fax
+                is stamped by the device.  When this object is set to
+                eDisabled incoming fax pages are not stamped.
+                Additional information:
+                When this object is set to eEnabled each page of an
+                incoming fax is stamped with the date, time, fax station
+                name, and page number.  When this object is set to
+                eDisabled incoming fax pages are not stamped.
+                //
+                The received fax page will be scaled down 0.03% to
+                accomodate the header. No header will be printed on 
+                page 2 of paginated output."
+::= { settings-fax-receive 1 }
+               
+               
+not-ready-fax-receive OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Indicates if the receiving fax sub-system in the device
+                is not ready.  If there are no items in the collection
+                (i.e. no bits are set), then the receiving fax sub-
+                system is ready.  If there is an item present, then the
+                item indicates what is causing the receiving fax sub-
+                system to be not ready."
+::= { status-fax-receive 1 }
+               
+               
+fax-rxscale OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Received faxes are to be printed at a reduced scale
+                percentage.  Value of 0 indicates auto-scaled printing
+                based on the length of the received fax image and the
+                length of the paper."
+::= { settings-fax-proc-sub 1 }
+               
+               
+fax-noise-volume OBJECT-TYPE
+    SYNTAX  INTEGER(0..200)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Range is 0..100, where 0 = quietest possible, and 100 =
+                loudest possible.  A device shall divide this value into
+                ranges corresponding to the possible volumes.
+                Additional information:
+                For HP Laserjet 3200 the range is 0..200, where 0=off (silent), 
+                96=soft, 160=medium, and 200=loud.
+                
+                For HP Laserjet 3200 this object refers to the line monitor 
+                noise volume. The decimal values above correspond
+                		to the hex values the object gets set to."
+::= { settings-fax-proc-sub 3 }
+               
+               
+fax-download OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFaxDownloadIdle(1),
+		   eFaxDownloadStart(2),
+		   eFaxDownloadActive(3),
+		   eFaxDownloadAborted(4),
+		   eFaxDownloadDone(5)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Note:  Changed enumeration values in a non-backwards
+                manner in version 4.7.  Handshake mechanism between host
+                and device to initiate and coordinate the download of
+                fax image data to be transmitted by the device fax
+                modem.  This object serves both as an indicator of fax
+                download activity as well as a trigger for the host to
+                alter fax download progress.  This object has been
+                redefined to track only the download acpect of the fax
+                transmission.  
+                  eFaxDownloadIdle - indicates no fax download activity
+                is occurring.  Device powers up in this state but will
+                otherwise never transition to this state of its own
+                accord.  Host setting to eFaxDownloadIdle while object
+                is in eFaxDownloadActive will cause download activity to
+                be prematurely terminated.  Host setting to this state
+                resets the handshake mechanism to permit a another fax
+                download activity to be initiated.  
+                  eFaxDownloadStart - indicates the host requests to
+                commence a download session for sending a fax.  This
+                state is host settable only from eFaxDownloadIdle.
+                Device will never transition to this state of its own
+                accord.  
+                  eFaxDownloadActive - indicates a fax download is
+                occurring.  This state is not host settable.  Device
+                will transition to this state from eFaxDownloadStart as
+                a positive response for host to commence download of fax
+                data.  This state is not host settable.  The object
+                FAXJOB-DOWNLOAD-ID now contains the job ID to be used to
+                track the progress of this fax job.  
+                  eFaxDownloadAborted - indicates the fax download
+                activity has been prematurely terminated by the device
+                due to some error.  Object FAX-DOWNLOAD-ERROR contains
+                the error reason for the premature session termination.
+                This state is device settable from eFaxDownloadStart or
+                eFaxDownloadActive.  This state is not host settable.
+                If modem transmission of fax data has started for this
+                download, the fax session will also be aborted.    
+                eFaxDownloadDone - indicates the fax download activity
+                has reached a successful termination in that the device
+                has accepted all the download data from the host.  This
+                state is only settable by the device from
+                eFaxDownloadActive.  This state is not host settable.
+                This state does not indicate the progress of the modem
+                transmission of the downloaded fax data.  Host should
+                transition from this state to eFaxDownloadIdle in order
+                to reset the handshake mechanism for subsequent
+                download."
+::= { settings-fax-proc-sub 6 }
+               
+               
+fax-silent-detection OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "When enabled, this object causes the FAX machine to
+                assume that the caller is a FAX even though the line has
+                remained silent for a time (i.e., no CNG detected).
+                When disabled, a CNG is required of the caller."
+::= { settings-fax-proc-sub 7 }
+               
+               
+fax-ring-enable OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "When the phone line rings, this object determines
+                whether an audible ring shall be emitted."
+::= { settings-fax-proc-sub 8 }
+               
+               
+fax-country OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eChina(6),
+		   eMexicoAndLatinAmerica(13),
+		   eCanadaFrench(14),
+		   eUnitedStatesAndCanadaEnglish(15),
+		   eNewZealand(19),
+		   eIsrael(21),
+		   eAustralia(23),
+		   eMalaysia(27),
+		   eHongKong(29),
+		   eSingapore(30),
+		   eUnitedKingdom(31),
+		   eAustria(34),
+		   eNetherlands(35),
+		   eSwitzerlandFrench(37),
+		   eGermany(39),
+		   eDenmark(40),
+		   eSweden(41),
+		   eNorway(43),
+		   eIreland(44),
+		   eBelgium(45),
+		   eFinland(46),
+		   eFrance(47),
+		   eItaly(51),
+		   eSpain(55),
+		   ePoland(56),
+		   eHungary(62),
+		   eUkraine(63),
+		   eRussia(64)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Note:  Non-backwards compatible change make in version
+                4.7.  Returns which country the telephone-electronics
+                (LIU) is configured for.   
+                  
+                If this object is implemented with an access of read-write
+                the device POS will specify what occurs when this object
+                is written.
+                Additional information:
+                GECKO NOTE:  Is enumeration 37 (eSwitzerlandFrench)
+                the correct setting for Switzerland?  The mib also
+                provides the following options:  
+                eSwitzerland(36)  
+                eSwitzerlandGerman(36)  
+                eSwitzerlandItalian(38)"
+::= { settings-fax-proc-sub 9 }
+               
+               
+fax-tx-phone-number OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  write-only
+    STATUS  optional
+    DESCRIPTION
+                "Phone number about to be dialed."
+::= { settings-fax-proc-sub 10 }
+               
+               
+fax-redial-time OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Number of seconds one must wait between the current
+                redial (set by FAX-WHICH-REDIAL) and any prior dialing."
+::= { settings-fax-proc-sub 14 }
+               
+               
+fax-pstn-access-code OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "The code used within a PBX to get access to an outside
+                PSTN line.  Typically this is ''9''."
+::= { settings-fax-proc-sub 18 }
+               
+               
+fax-rx-disposition OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   ePrintOnly(1),
+		   eUploadOnly(2),
+		   eUploadElsePrint(4),
+		   eForwardElsePrint(6)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates what is to be done with the incoming fax
+                call.  
+                  ePrintOnly - New fax arrivals only go to the printer.
+                If printer becomes unavailable, the fax is stored in
+                device memory until the printer becomes available.  If
+                device memory becomes full, no subsequent calls will be
+                answered.  If power is cycled on the device, the user
+                must be informed of any lost faxes.  If faxes are saved
+                in non-volatile memory, then they will be printed upon
+                successful power-up.  
+                  eUploadOnly - New fax can only be uploaded to the
+                host.  If host becomes unavailable, the fax is stored in
+                device memory until host becomes available again to
+                upload.  If device memory becomes full, no subsequent
+                calls will be answered.  If power is cycled on the
+                device, the user must be informed of any lost faxes.  If
+                faxes are saved in non-volatile device memory, the host
+                must be informed of a need to upload saved faxes upon
+                successful power up.  
+                  eUploadAndPrint - Received faxes are to be printed and
+                also uploaded to the host.  The fax is stored in device
+                memory until it has been printed and uploaded.  If
+                device memory becomes full, no subsequent calls will be
+                answered.  If power is cycled on the device, the user
+                must be informed of any lost faxes.  If faxes were saved
+                into non-volatile memory, then faxes must be printed and
+                uploaded before erasure from device memory.  
+                  eUploadElsePrint - Received faxes are to be uploaded
+                if host is available, otherwise the fax is printed.
+                During an upload, if the host becomes unavailable, the
+                remainder of the fax is printed.  Once the host is
+                detected to be unavailable, the object will transition
+                to ePrintOnly.  Refer to fax reception behavior for
+                ePrintOnly.  
+                  ePrintElseUpload - Received faxes are to be printed.
+                If printer is unavailable, the fax will be uploaded.  If
+                printer becomes unavailable while the fax is being
+                received, the remainder unprinted pages of the fax will
+                be uploaded.  If host then becomes unavailable, this
+                object will transition to ePrintOnly.  Remainder pages
+                of the fax being uploaded will be stored in device
+                memory, to be printed when printer becomes available.
+                If device memory becomes full, no subsequent calls will
+                be answered.  If power is cycled on the device, the user
+                must be informed of any lost faxes.  
+                  eForwardElsePrint - Received faxes are to be forwarded
+                to another fax station.  If remote number does not
+                answer, fax is printed.  If remote number is busy on
+                multiple redial attempts, the fax is printed.  If device
+                memory becomes full before fax reception is complete,
+                the fax is printed.  If printer becomes unavailable, the
+                fax is stored in device memory and then printed when
+                printer becomes available again.  "
+::= { settings-fax-proc-sub 19 }
+               
+               
+fax-error-correction-mode OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates whether the device is configured to send
+               and receive faxes in error correction mode (ECM).
+               This object controls both receiving and transmitting
+               in ECM. A value of eDisabled means ECM is off and the
+               device will not advertise the ability to do ECM during
+               negotiation with other fax machines. A value of eEnabled
+               means ECM is on and the device will advertise its ability
+               to do ECM.  
+                 
+               Changing this setting may or may not take affect on the
+               immediate page or ensuing pages of the document
+               currently being sent."
+::= { settings-fax-proc-sub 21 }
+               
+               
+fax-report-transmission OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eNone(1),
+		   ePrintReport(2),
+		   ePrintReportOnSend(3),
+		   ePrintReportOnError(4),
+		   ePrintReportOnSendError(5),
+		   ePrintReportOnReceiveError(6)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides a host application with the ability to
+               print a fax transmission report.  The supported
+               enumerations are:   
+               eNone - no transmission report printed   
+               ePrintReport - transmission report always printed   
+               ePrintReportOnSend - transmission report printed on
+               send only   
+               ePrintReportOnError - transmission report printed on
+               error only   
+               ePrintReportOnSendError - transmission report printed
+               on send error only   
+               ePrintReportOnReceiveError - transmission report
+               printed on receive error only."
+::= { settings-fax-proc-sub 22 }
+               
+               
+fax-report-activity-log OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eNever(1),
+		   eThreshold(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Specifies when a report of fax transactions is to be
+               printed.   
+                 
+               eNever - to never print a transaction report.   
+               eThreshold - to automatically print a transaction
+               report every N transactions.   
+                 
+               The POS for each product shall specify the value of N.  
+                 
+               FAX-REPORT-TRANSMISSION also prints a transaction report,
+               but for only a given fax, not a log of fax activities.
+               May not be settable if the fax machine is not idle.  
+                 
+               The log is cleared after each printing caused by this
+               object."
+::= { settings-fax-proc-sub 23 }
+               
+               
+fax-dial-tone-detection OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Determines whether the fax machine waits for a dial tone
+               before dialing a fax number. eEnabled - causes the fax
+               machine to wait until a dial tone is recognized before
+               attempting to dial a fax number. eDisabled - causes the
+               fax machine to dial without waiting to recognize a dial
+               tone."
+::= { settings-fax-proc-sub 24 }
+               
+               
+fax-alarm-volume OBJECT-TYPE
+    SYNTAX  INTEGER(0..3)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Range is 0..100, where 0 = quietest possible, and
+               100 = loudest possible. A device shall divide this value
+               into ranges corresponding to the possible volumes and
+               document these settings and their meanings in the product
+               POS.
+                Additional information:
+                For HP Laserjet 3200 the range is 0..3, where 0=off (silent), 
+                1=soft, 2=medium, and 3=loud."
+::= { settings-fax-proc-sub 25 }
+               
+               
+fax-beep-volume OBJECT-TYPE
+    SYNTAX  INTEGER(0..3)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Range is 0..100, where 0 = quietest possible, and
+               100 = loudest possible. A device shall divide this value
+               into ranges corresponding to the possible volumes and
+               document these settings and their meanings in the product
+               POS.
+                Additional information:
+                For HP Laserjet 3200 the range is 0..3, where 0=off (silent), 
+                1=soft, 2=medium, and 3=loud."
+::= { settings-fax-proc-sub 26 }
+               
+               
+fax-ring-volume OBJECT-TYPE
+    SYNTAX  INTEGER(0..3)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Range is 0..100, where 0 = quietest possible, and
+               100 = loudest possible. A device shall divide this value
+               into ranges corresponding to the possible volumes and
+               document these settings and their meanings in the product
+               POS.
+                Additional information:
+                For HP Laserjet 3200 the range is 0..3, where 0=off (silent), 
+                1=soft, 2=medium, and 3=loud."
+::= { settings-fax-proc-sub 27 }
+               
+               
+fax-master-host OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Identifies the hostname of the master host to which
+               the device is connected."
+::= { settings-fax-proc-sub 28 }
+               
+               
+fax-thumbnail-enable OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Controls whether or not a thumbnail reprint of the
+                first page of a fax shall be included on the
+                fax call report.  When set to eEnabled a thumbnail shall
+                be included on the report.  When set to eDisabled there
+                shall be not be a thumbnail on the fax call report.
+                Additional information:
+                Controls whether or not a thumbnail reprint of the 
+                first page of a fax shall be included on the
+                fax call report.  When set to eEnabled a thumbnail shall
+                be included on the report.  When set to eDisabled there
+                shall be not be a thumbnail on the fax call report."
+::= { settings-fax-proc-sub 29 }
+               
+               
+fax-phone-pickup-enable OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "This object is included to handle the situation where a
+               fax machine and a telephone share the same phone line.   
+                 
+               If a call picked up at the phone turns out to be a fax
+               call, the user may initiate a fax receive via the fax
+               machine front panel (with, say, a button press).  When
+               this object is set to eEnabled and a fax call is answered
+               at the phone, the user has the option of initiating the
+               fax receive in the usual way at the fax front panel or by
+               entering a (product-specific) key sequence on the telephone
+               keypad (e.g. '***').  The device POS must indicate what
+               the key sequence is for a particular product.   
+                 
+               When this object is set to eDisabled and a fax call is
+               answered at the phone, the user may only initiate the fax
+               receive by taking the product-specific action (such as a
+               button press) at the fax machine front panel.   
+                 
+               It is necessary to be able to turn this feature off (i.e.
+               set it to eDisabled) because the key sequence of a
+               particular fax device may interfere with other devices
+               connected to the phone line (e.g. an answering machine).
+                Additional information:
+                On HP Laserjet 3200, the key sequence to initiate a fax from the
+                phone keypad is '***'."
+::= { settings-fax-proc-sub 30 }
+               
+               
+fax-adf-scan-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages scanned for
+		faxing from the ADF. In order to write this object
+		SERVICE-PASSWORD must be set correctly.
+                Additional information:
+                This object tracks the page count for the pages scanned for faxing
+                from the ADF. In order to write this object SERVICE-PASSWORD must be
+                set correctly."
+::= { settings-fax-proc-sub 31 }
+
+
+fax-print-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages sent to the
+		print engine for fax jobs. In order to write this object
+		SERVICE-PASSWORD must be set correctly.
+                Additional information:
+                This object tracks the page count for the pages sent to the print
+                engine for fax jobs. In order to write this object SERVICE-PASSWORD
+                must be set correctly."
+::= { settings-fax-proc-sub 32 }
+
+
+fax-download-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages downloaded to
+		the peripheral for fax jobs. In order to write this object
+		SERVICE-PASSWORD must be set correctly.
+                Additional information:
+                This object tracks the page count for the pages downloaded to the
+                peripheral for fax jobs. In order to write this object SERVICE-PASSWORD
+                must be set correctly."
+::= { settings-fax-proc-sub 33 }
+
+
+fax-upload-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages uploaded from
+		the peripheral for fax jobs. In order to write this object
+		SERVICE-PASSWORD must be set correctly.
+                Additional information:
+                This object tracks the page count for the pages uploaded from the
+                peripheral for fax jobs. In order to write this object SERVICE-PASSWORD
+                must be set correctly."
+::= { settings-fax-proc-sub 34 }
+
+
+fax-flatbed-scan-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages scanned for
+		faxing from the flatbed. In order to write this object the
+		SERVICE-PASSWORD must be set.
+                Additional information:
+                This object tracks the page count for the pages scanned
+                for faxing from the flatbed.  In order to write this
+                object the SERVICE-PASSWORD must be set."
+::= { settings-fax-proc-sub 36 }
+
+
+default-fax-glass-size OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eUSLetter(2),
+                          eUSLegal(3),
+                          eISOandJISA4(26)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Indicates the default fax glass size.
+                Additional information:
+                Indicates the default fax glass size."
+::= { settings-fax-proc-sub 37 }
+
+
+fax-cold-reset-fax-glass-size OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eUSLetter(2),
+                          eUSLegal(3),
+                          eISOandJISA4(26)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Returns or sets the fax glass size that is used as the
+		DEFAULT-FAX-GLASS-SIZE when a cold reset occurs.
+                Additional information:
+                Returns or sets the fax glass size that is used as the
+                DEFAULT-FAX-GLASS-SIZE when a cold reset occurs."
+::= { settings-fax-proc-sub 38 }
+
+
+fax-upload OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFaxUploadIdle(1),
+		   eFaxUploadStart(2),
+		   eFaxUploadActive(3),
+		   eFaxUploadAborted(4),
+		   eFaxUploadDone(5),
+		   eFaxUploadNeeded(6)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Note: The enumeration values for this object where
+                changed in a non-backwards compatible manner in version
+                4.7.  Handshake mechanism between host and device to
+                notify and coordinate the transfer of fax image data
+                received by the device fax modem.  This object serves
+                both as an indicator of fax upload activity as well as a
+                trigger for the host to alter fax upload progress.
+                Handshake mechanism between host and device to initiate
+                scan operation and coordinate the transfer of scanned
+                image data to the host.  This object serves both as an
+                indicator of scan upload activity as well as a trigger
+                for the host to alter scan upload progress.  
+                  eFaxUploadIdle - indicates no fax upload activity is
+                is occurring.  Device powers up in this state but will
+                otherwise never transition to this state of its own
+                accord.  Host setting to eFaxUploadIdle while object is
+                in eFaxUploadActive will cause download activity to be
+                prematurely terminated.  Host setting to this state
+                resets the handshake mechanism to permit another fax
+                upload activity to be initiated.  
+                  eFaxUploadStart - indicates the host requests to
+                commence an upload session for a received fax.  This
+                state is host settable only from eFaxUploadIdle.  Device
+                will never transition to this state of its own accord.  
+                  eFaxUploadActive - indicates a fax upload is
+                occurring.  This state is not host settable.  Device
+                will transition to this state from eFaxUploadStart as a
+                positive response for host to commence upload of fax
+                data.  The object FAXJOB-UPLOAD-ID now contains the job
+                ID.  
+                  eFaxUploadAborted - indicates the fax upload activity
+                has been prematurely terminated by the device due to
+                some error.  Object FAX-UPLOAD-ERROR contains the error
+                reason for the premature session termination.  This
+                state is device settable from eFaxUploadStart,
+                eFaxUploadActive or eFaxUploadNeeded.  This state is not
+                host settable.  
+                  eFaxUploadDone - indicates the fax upload activity has
+                reached a successful termination in that the device has
+                transmitted all the upload data to the host.  This state
+                is only settable by the device from eFaxUploadActive.
+                This state is not host settable.  Host should transition
+                from this state to eFaxUploadIdle in order to reset the
+                handshake mechanism for subsequent upload session.  
+                  eFaxUploadNeeded - indicates device has received fax
+                modem data available for host upload.  This state is not
+                host settable.  This state is device settable from
+                eFaxUploadIdle.  Host should respond by setting to
+                eFaxUploadStart to initiate upload session.  Should host
+                fail to respond by the time fax reception is complete or
+                device has exhausted local memory storage, device shall
+                transition object from eFaxUploadNeeded to
+                eFaxUploadAborted.  The POS should state the recourse
+                behavior associated with the received fax."
+::= { status-fax-proc-sub 1 }
+               
+               
+fax-min-rings-pickup OBJECT-TYPE
+    SYNTAX  INTEGER(1..1)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the minimum legal rings before pickup.
+                Additional information:
+                GECKO NOTE:  Do all countries on the HP Laserjet 3200 list allow a
+                minimum of 1?  If not, object syntax must be amended."
+::= { status-fax-proc-sub 2 }
+               
+               
+fax-max-rings-pickup OBJECT-TYPE
+    SYNTAX  INTEGER(1..10)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the maximum legal rings before pickup."
+::= { status-fax-proc-sub 3 }
+               
+               
+fax-max-redials OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Maximum number of allowed redials."
+::= { status-fax-proc-sub 4 }
+               
+               
+fax-additional-wait OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Number of additional seconds to wait before beginning a
+                FAX-DOWNLOAD."
+::= { status-fax-proc-sub 5 }
+               
+               
+fax-download-error OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Error status of the fax download session.
+                Additional information:
+                GECKO NOTE:  What error conditions will be reported by
+                this object?  Provide a map for the meaning of each
+                valid value here."
+::= { status-fax-proc-sub 6 }
+               
+               
+fax-upload-error OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Error status of the fax upload session.
+                Additional information:
+                GECKO NOTE:  What error conditions will be reported by
+                this object?  Provide a map for the meaning of each
+                valid value here.  Does this functionality stay?  If not,
+                this object is superfluous."
+::= { status-fax-proc-sub 7 }
+               
+               
+fax-firmware-revision OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8))
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "This object identifies the fax firmware ROM revision
+               code. The format is device specific and shall be
+               specified in the device POS.
+                Additional information:
+                This object identifies the fax firmware ROM revision
+                code.  For HP Laserjet 3200, the format for this object is a date
+                in the form YYYYMMDD."
+::= { status-fax-proc-sub 8 }
+               
+               
+fax-forwarding-phone-num OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Phone number digits of the remote fax station where
+                arrived faxes are to be forwarded."
+::= { fax-forwarding 3 }
+               
+               
+fax-resolution OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1..64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "struct {
+                  unsigned_32bit x_res; /* 1st four bytes; big endian */
+                  unsigned_32bit y_res; /* 2nd four bytes; big endian */
+                }
+                Sets the send fax resolution.  The x and y resolutions
+                in this object are in fixed-point with 16 bits of
+                fraction, and 16 bits of integer, and are in dots per
+                inch.  X is horizontal; Y is vertical.
+                Examples of computing x_res and y_res:
+                   300 dots/inch:round(300 * 65536) = 19660800
+                   16 dots/mm:   round(16 * 25.4 * 65536) = 26633830.
+                If the device does not support the given combination,
+                then it'll select the nearest supported values in a
+                device-dependent manner (documented in the POS).
+                Additional information:
+                HP Laserjet 3200 supports 4 fax resolutions.  As far as the
+                end-user is concerned these resolutions are:  standard,
+                fine, superfine, and photo.  Photo is not really a
+                resolution--see more below.  Standard is the default.
+                Resolutions map as follows (values are given in dots per
+                inch (dpi) horizontal X vertical (x X y)):  standard(203
+                X 98), fine(203 X 196), superfine(300 X 300), and
+                photo(300 X 300).  
+                
+                Supported resolutions in hex notation (dpi, x X y) are:
+                standard(00cb0000 X 00620000), fine(00cb0000 X 00c4000),
+                superfine(012C0000 X 012C0000), and photo(012C0000 X
+                012C0000).  
+                
+                The device ignores attempts to set invalid resolutions.  
+                
+                Photo is not a resolution, but photo setting depends on
+                whether half-toning is on or off.  In the case of HP Laserjet 3200
+                photo setting doesn't actually change the bits going out
+                the modem -- still one bit per pixel so photo and
+                superfine are the same.  
+                
+                NOTE:  The last 16 bits of the horizontal and vertical
+                settings are ignored.  Only the first 16 bits of the
+                horizontal and vertical resolution setting are used."
+::= { settings-fax-send 1 }
+               
+               
+fax-contrast OBJECT-TYPE
+    SYNTAX  INTEGER(-127..127)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Behaves as SCL's 'Set Scanner Contrast Level' command
+                which is used for setting the sending fax contrast
+                level.  Range is 0..100.
+                Additional information:
+                Behaves as COPIER-CONTRAST and SCANNER-CONTRAST.
+                Contrast values can range from -127 to +127, for a total
+                of 255 contrast values.  Within that range, HP Laserjet 3200
+                supports 11 values.  They are:  -125, -100, -75, -50,
+                -25, 0, 25, 50, 75, 100, 125.  The default contrast level is 0
+                (normal).  A positive value results in a larger
+                difference, and a negative value results in a smaller
+                difference.  
+                
+                HP Laserjet 3200 snaps unsupported values toward zero as follows:  
+                <=-125 snaps to -125  
+                >-125 and <=-100 snaps to -100  
+                >-100 and <=-75 snaps to -75  
+                >-75 and <=-50 snaps to -50  
+                >-50 and <=-25 snaps to -25  
+                >-25 and <25 snaps to 0  
+                >=25 and <50 snaps to 25  
+                >=50 and <75 snaps to 50
+                >=75 and <100 snaps to 75  
+                >=100 and <125 snaps to 100  
+                >=125 snaps to 125"
+::= { settings-fax-send 2 }
+               
+               
+fax-pixel-data-type OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eBiLevelThesholded(1),
+		   eBiLevelHalfToned(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Sets the scanning method used when sending a fax.
+                 eBiLevelThesholded - One bit per pixel, using
+                                      simple thresholding of greyscale
+                                      scan data.
+                 eBiLevelHalfToned  - One bit per pixel, using some kind
+                                      of half-toning technique (such as
+                                      dithering or error-diffusion) to
+                                      approximate greyscale scan data."
+::= { settings-fax-send 3 }
+               
+               
+not-ready-fax-send OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Indicates if the sending fax sub-system in the device is
+                not ready.  If there are no items in the collection
+                (i.e. no bits are set), then the sending fax sub-system
+                is ready.  If there is an item present, then the item
+                indicates what is causing the sending fax sub-system to
+                be not ready."
+::= { status-fax-send 1 }
+               
+               
+fax-allow-redials OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFalse(1),
+		   eTrue(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "When eTrue, the FAX machine can redial a phone number if
+                the prior call failed for some reason.  When eFalse,
+                such redialing will not occur."
+::= { transmit-fax 3 }
+
+
 error1-time-stamp OBJECT-TYPE
     SYNTAX  INTEGER
     ACCESS  read-only
@@ -3838,6 +5195,13 @@ postscript-jam-recovery OBJECT-TYPE
                 option is installed."
 ::= { pdl-postscript 12 }
 
+pclxl-total-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Total number of PCLXL pages printed by the device."
+::= { pdl-pclxl 1 }
+
 esc-p-datecode OBJECT-TYPE
     SYNTAX  DisplayString
     ACCESS  read-only
@@ -4015,6 +5379,73 @@ print-density OBJECT-TYPE
                 >5 snaps to 5."
 ::= { settings-prt-eng 5 }
 
+               
+transfer-setting OBJECT-TYPE
+    SYNTAX  INTEGER(100..200)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "When set the object will cause the transfer setting of the
+               device to be changed to the nearest appropriate value. When
+               the object is read it will return the current transfer
+               setting. Each engine will have different supported values.
+               The object should snap to the nearest supported value.
+               Different products could use this value in different ways.
+               Typically, this value would be a voltage on an EP system,
+               but could be a pressure level on an inkjet.
+                Additional information:
+                This setting is a voltage adjustment in the LaserJet
+                2200.  Any value >= 150 snaps to 200."
+::= { settings-prt-eng 8 }
+               
+               
+separation-setting OBJECT-TYPE
+    SYNTAX  INTEGER(100..200)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "When set this object will cause the separation setting of
+               the device to be changed to the nearest appropriate value.
+               When the object is read it will return the current separation
+               setting.  Each engine will have different supported values.
+               The object should snap to the nearest supported value.
+               Different products could use this value in different ways.
+               Typically, this value would be a voltage in an EP system,
+               but could be some other parameter on an inkjet.  The device
+               POS will specify supported values, any snap behavior and
+               will detail the product specific meaning of
+               'device separation'.
+                Additional information:
+                This object changes the charge so the media does not
+                curl too much causing the media to jam under the cartridge.
+                Any value >= 150 snaps to 200."
+::= { settings-prt-eng 13 }
+               
+               
+total-engine-page-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Total number of pages printed by the device.  POS
+                indicates if the total engine page count is kept in
+                NVRAM, and the maximum supported value before the page
+                count rolls over to zero.
+                Additional information:
+                This object is stored in NVRAM.  The maximum value of
+                this count is 1000000 before it rolls over to zero."
+::= { status-prt-eng 5 }
+               
+               
+total-mono-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Total number of black pages printed by the device.
+                Additional information:
+                Total number of mono pages printed by the device."
+::= { status-prt-eng 6 }
+
 total-color-page-count OBJECT-TYPE
     SYNTAX  INTEGER(0..4294967296)
     ACCESS  read-only
@@ -4029,6 +5460,52 @@ total-color-page-count OBJECT-TYPE
                 		Each side of a duplexed sheet of media will be counted 
                 		independently based on the criteria listed above."
 ::= { status-prt-eng 7 }
+
+print-engine-jam-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Total number of pages jammed in the print engine's life
+               time. The POS indicates if the total jam count is kept in
+               NVRAM and the maximum supported value before the jam count
+               rolls over to zero.
+                Additional information:
+                This object is stored in NVRAM. The maximum value of
+                this count is 65000 before it rolls over to zero."
+::= { status-prt-eng 34 }
+               
+               
+print-engine-mispick-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Total number of pages mispicked in the print engine's life
+               time. The POS indicates if the total mispick count is kept in
+               NVRAM and the maximum supported value before the mispick count
+               rolls over to zero.
+                Additional information:
+                This object is stored in NVRAM. The maximum value of
+                this count is 65000 before it rolls over to zero."
+::= { status-prt-eng 35 }
+
+
+duplex-page-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Total number of sheets of media that have been duplex
+                printed.  A sheet is counted if it travels through the
+                duplex page path, regardless of whether or not marks are
+                made on the page.  The POS will indicate if the value is
+                kept in NVRAM.
+                Additional information:
+                Reports the number of pages run thru the 
+                duplexer as kept in NVRAM."
+::= { status-prt-eng 22 }
+
 
 default-manual-feed OBJECT-TYPE
     SYNTAX  INTEGER {
@@ -4090,7 +5567,47 @@ tray-lock OBJECT-TYPE
                 <badValue> and a return value
                 containing the collection of previously locked trays."
 ::= { settings-intray 6 }
-              
+               
+               
+custom-paper-dim-unit OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eTenThousandthsOfInches(3),
+		   eMicrometers(4)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "The units of measure used to specify the width and
+                height of the printer's custom paper.  The unit of
+                measure of eTenThousandthsOfInches is 0.0001 inches.
+                Additional information:
+                The only valid values for this object are
+                eTenThousandthsOfInches (3), and eMicrometers (4).  The
+                data for this object is stored in NVRAM."
+::= { settings-intray 7 }
+               
+               
+custom-paper-feed-dim OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Sets the printer's custom paper dimension in the feed
+                direction (direction parallel to the direction of paper
+                feeding).  The value for this object is specified in
+                micrometers or tenthousandths of an inch, depending upon
+                the value of CUSTOM-PAPER-DIM-UNIT.  The valid range is
+                engine-dependent and should be documented in the POS for
+                each product.
+                Additional information:
+                 The valid range is 50000 to 140000 if 
+                CUSTOM-PAPER_DIM_UNIT is eTenThousandthsOfInches or 127000 to 
+                355600 if CUSTOM-PAPER-DIM-UNIT is ePmicrometers.  Attempts
+                to set this object outside the valid range will result in a 
+                return value of <badValue>."
+::= { settings-intray 8 }
+
+
 not-ready-tray-missing OBJECT-TYPE
     SYNTAX  OCTET STRING
     ACCESS  read-only
@@ -4197,8 +5714,620 @@ default-print-quality OBJECT-TYPE
                 0 to 50 snap to 0   
                 51 to 100 snap to 100"
 ::= { imaging 7 }
+        
+gdStatusBytes OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "The number of valid bytes in the gdStatusEntry
+         array."
+::= { generalDeviceStatus 1 }
+
+
+gdStatusDisplay OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "The string diplayed on the peripheral front panel.
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this is always a zero length string."
+::= { generalDeviceStatus 3 }
+
+
+gdStatusId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "A formatted string of NVT ASCII 
+         charactersdescribing this peripheral."
+::= { generalDeviceStatus 7 }
+
+
+gdStatusJobTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-write
+    STATUS      obsolete
+::= { generalDeviceStatus 10 }
+
+
+gdPasswords OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-write
+    STATUS      current
+       DESCRIPTION "This object is used as a 256 byte NVRAM area for JetAdmin.  It
+         is completely managed by JetAdmin.  Initially it is initialized
+         to all zeros.  A coldboot will re-initialize to all zeros."
+::= { generalDeviceStatus 13 }
+
+gdStatusLineState OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This describes the line state of the peripheral.
+         When non-zero, the peripheral is off-line.  When
+         zero the peripheral is on-line."
+::= { gdStatusEntry 1 }
+
+
+gdStatusPaperState OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This describes the state of the paper on the peripheral.
+         When non-zero, the peripheral has a paper problem. When
+         zero, the peripheral does not have a paper problem."
+::= { gdStatusEntry 2 }
+
+
+gdStatusInterventionState OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This describes the intervention state of the
+         peripheral.  When non-zero, the peripheral requires
+         human intervention to continue working.  When
+         zero, it requires no assistance."
+::= { gdStatusEntry 3 }
+
+
+gdStatusPeripheralError OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This is the error code from the peripheral."
+::= { gdStatusEntry 6 }
+
+
+gdStatusPaperOut OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral is out of paper.
+                off (0),
+                paper-out-or-paper-mount (1),
+                manual-paper-feed-needed (2)
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 8 }
+
+
+gdStatusPaperJam OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral has a paper jam.
+              off (0),
+              paper-jam(1)
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 9 }
+
+
+gdStatusTonerLow OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral has a low toner condition.
+              off (0),
+              toner-low (1),
+              no-toner-cartridge (2)
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 10 }
+
+
+gdStatusPagePunt OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral did not receive data fast
+         enough to keep up with the print engine when generating a page.
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 11 }
+
+
+gdStatusMemoryOut OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral did not have enough memory
+         to render an image on a page.
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 12 }
+
+
+gdStatusIoActive OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral is processing data from
+         this I/O interface card. For some peripherals, such as the
+         HP LaserJet IIISi printer or HP DesignJet plotter,
+         this value is always a zero (0).
+
+         For X.20.06 firmware and later firmware releases, this object is 
+         not relevant. In order not to break legacy applications which call this
+         object in multi-varbind requests, this value is always zero (0)."
+::= { gdStatusEntry 13 }
+
+
+gdStatusBusy OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral is busy processing
+         print/plot data.
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 14 }
+
+
+gdStatusWait OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral is waiting for print/plot
+         data to process.
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 15 }
+
+
+gdStatusInitialize OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral is initializing or
+         warming up.
+              off (0),
+              initializing (1),
+              warm-up(2)
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 16 }
+
+
+gdStatusDoorOpen OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral cover or door is open.
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 17 }
+
+
+gdStatusPrinting OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral is printing or otherwise
+         marking or moving paper.
+              off (0),
+              ordinary-page (1),
+              test-fonts-config-or-start-page (2)
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 18 }
+
+
+gdStatusPaperOutput OBJECT-TYPE
+    SYNTAX      Integer32
+    ACCESS      read-only
+    STATUS      current
+       DESCRIPTION "This indicates that the peripheral has a paper output problem
+         such as the output storage bin being full.
+              off (0),
+              output-storage-full (1)
+         For some peripherals, such as the HP LaserJet IIISi printer
+         or HP DesignJet plotter, this value is always a zero (0)."
+::= { gdStatusEntry 19 }
+       
                
-               
+photo-access-card-error OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          ePhotoCardAccessNoError(0),
+                          ePhotoCardSmartMediaUpsideDown(1),
+                          ePhotoCardMediaNotFullyInserted(2),
+                          ePhotoCardMoreThenOneInSlots(3),
+                          ePhotoCardReadError(4),
+                          ePhotoCardRemovedWhileReading(5),
+                          ePhotoCardBadFileWhilePrinting(6),
+                          ePhotoCardNotInSlot(7),
+                          ePhotoCardContainsNoPhotos(8),
+                          ePhotoCardWriteError(9),
+                          ePhotoCardRemovedWhileWriting(10),
+                          ePhotoCardUnknownError(999)
+		   }
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Specifies the error reason for most recent unsucessful photo
+		card access.
+                Additional information:
+                Specifies the error reason for most recent unsucessful photo
+                card access."
+::= { photo-job 2 }
+
+
+photo-default-num-copies OBJECT-TYPE
+    SYNTAX      INTEGER(1..99)
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the default number of copies to be printed
+		during photo application print jobs. This value is saved over a
+		power cycle.
+                Additional information:
+                Reads or writes the default number of copies to be 
+                printed during photo application print jobs.  This value is
+                saved over a power cycle."
+::= { settings-photo-job 1 }
+
+
+photo-job-num-copies OBJECT-TYPE
+    SYNTAX      INTEGER(1..99)
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the number of copies to be printed during the
+		next photo application print job. This value is not saved over
+		power cycles.
+                Additional information:
+                Reads or writes the number of copies to be printed
+                during the next photo application print job.  This value is
+                not saved over a power cycle."
+::= { settings-photo-job 2 }
+
+
+photo-job-media-size OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eUSLetter(2),
+                          eISOandJISA4(26),
+                          ePhoto4x6(76)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the default media size to be used during the
+		next photo application print job. This value is not saved over
+		power cycles.
+                Additional information:
+                Reads or writes the default media size to be
+                used during the next photo application print job.  This 
+                value is not saved over a power cycle."
+::= { settings-photo-job 4 }
+
+
+photo-job-media-name OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the media type to be used on the next photo
+		application print job. This value is not saved over power
+		cycles.
+                Additional information:
+                Reads or writes the media type to be used on the next
+                photo application print job. This value is not saved over a
+                power cycle."
+::= { settings-photo-job 6 }
+
+
+photo-image-size OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eThumbnail(1),
+                          eWallet(2),
+                          e3halfx5in(3),
+                          e3x4in(4),
+                          e4x6in(5),
+                          e5x7in(6),
+                          e6x8in(7),
+                          e8x10in(8),
+                          e6x8cm(9),
+                          e7x10cm(10),
+                          e9x13cm(11),
+                          e10x15cm(12),
+                          e13x18cm(13),
+                          e15x21cm(14),
+                          e18x24cm(15),
+                          e20x25cm(16),
+                          eFullPage(17),
+                          ePanoramic(18)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the default image size to be used during photo
+		application print jobs. This value is saved over power cycles.
+                Additional information:
+                Reads or writes the default image size to be
+                used during photo application print jobs. This value is
+                saved over a power cycle. Valid image sizes are determined
+                by the PHOTO-IMAGE-SIZE-SET pml object."
+::= { settings-photo-job 7 }
+
+
+photo-job-image-size OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eThumbnail(1),
+                          eWallet(2),
+                          e3halfx5in(3),
+                          e3x4in(4),
+                          e4x6in(5),
+                          e5x7in(6),
+                          e6x8in(7),
+                          e8x10in(8),
+                          e6x8cm(9),
+                          e7x10cm(10),
+                          e9x13cm(11),
+                          e10x15cm(12),
+                          e13x18cm(13),
+                          e15x21cm(14),
+                          e18x24cm(15),
+                          e20x25cm(16),
+                          eFullPage(17),
+                          ePanoramic(18)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the image size to be used during the next photo
+		application print job. This value is not saved over power
+		cycles.
+                Additional information:
+                Reads or writes the image size to be used during
+                the next photo application print job. This value is not
+                saved over a power cycle. Valid image sizes are determined
+                by the PHOTO-IMAGE-SIZE-SET pml object."
+::= { settings-photo-job 8 }
+
+
+photo-select-images OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the list of images to print during the next
+		photo application print job. Each image number or number range
+		must be separated by a comma. The image number corresponds to
+		the location of the file on the image card. For example, if
+		there are 10 images on the photo card, then you could select
+		'1-10' or '1,2,3,4,5' or '1,2,3,4-9'. The same image number can
+		also appear multiple times in the list. i.e.
+		'1,2,2,2,3,3,4,4,5'. This value is not saved over power cycles
+		and only applies to the next job.
+                Additional information:
+                Reads or writes the list of images to print
+                during the next photo application print job. Each image
+                number or number range must be separated by a comma.  The
+                image number corresponds to the location of the file on 
+                the image card.  For example, if there are 10 images on 
+                the photo card, then you could select 1-10 or 1,2,3,4,5 or
+                1,2,3,4-9.  The same image number can also appear multiple
+                times in the list. i.e. 1,2,2,2,3,3,4,4,5.  This value is
+                not saved over a power cycle, and only applies to the next
+                job."
+::= { settings-photo-job 9 }
+
+
+photo-images-on-card OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Reads the number of printable photo images found on the
+		inserted memory card. If 0, then no images were found, or the
+		card was not properly inserted.
+                Additional information:
+                Reads the number of printable photo images found
+                on the inserted memory card.  If 0, then no images were
+                found, or the card was not properly inserted."
+::= { settings-photo-job 10 }
+
+
+photo-job-source OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          ePhotoPrintProofSheet(1),
+                          ePhotoScanProofSheet(2),
+                          ePhotoPrintColorJob(3),
+                          ePhotoPrintMonochromeJob(4),
+                          ePhotoPrintIndexPrint(5)
+		   }
+    ACCESS      write-only
+    STATUS      optional
+       DESCRIPTION "Controls initiating photo application features.
+                Additional information:
+                Controls initiating photo application features."
+::= { settings-photo-job 11 }
+
+
+photo-color-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the page count for color pages printed by the
+		photo application. This value is saved over power cycles.
+                Additional information:
+                Reads or writes the page count for color pages
+                printed by the photo application. This value is saved over
+                a power cycle."
+::= { settings-photo-job 12 }
+
+
+photo-mono-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the page count for monochrome pages printed by
+		the photo application. This value is saved over power cycles.
+                Additional information:
+                Reads or writes the page count for monochrome pages
+                printed by the photo application. This value is saved over
+                a power cycle."
+::= { settings-photo-job 13 }
+
+
+photo-image-size-set OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eImageSizeSetInch1(1),
+                          eImageSizeSetInch2(2),
+                          eImageSizeSetCentimeter1(3),
+                          eImageSizeSetCentimeter2(4),
+                          eImageSizeSetCentimeter3(5)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This is only writable in service mode. This object changes the
+		set of valid image sizes for the device. The image sizes groups
+		are as follows:    
+		    eImageSizeSetInch1: Wallet, 3x4in, 3 1/2 x 5in, 4x6in,
+			5x7in, 8x10in, full page    
+		    eImageSizeSetInch2: Wallet, 3 1/2 x 5in, 4x6in, 5x7in,
+			6x8in, 8x10in, full page    
+		    eImageSizeSetCentimeter1: 6x8cm, 7x10cm, 9x13cm, 10x15cm,
+			13x18cm, 15x21cm, 20x25cm, full page    
+		    eImageSizeSetCentimeter2: 7x10cm, 9x13cm, 10x15cm, 13x18cm,
+			20x25cm, full page    
+		eImageSizeSetCentimeter3: 6x8cm, 9x13cm, 10x15cm, 13x18cm,
+		15x21cm, 18x24cm, 20x25cm, full page   .
+                Additional information:
+                This is only writable in service mode.  This object
+                changes the set of valid image sizes for the device.  The image
+                sizes groups are as follows:
+                eImageSizeSetInch1:  Thumbnail, Wallet, 3x4in, 3 1/2 x 5in, 4x6in,
+                5x7in, 8x10in, full page, panorama
+                eImageSizeSetInch2:  Thumbnail, Wallet, 3 1/2 x 5in, 4x6in, 5x7in,
+                6x8in, 8x10in, full page, panorama
+                eImageSizeSetCentimeter1:  Thumbnail, 6x8cm, 7x10cm, 9x13cm, 10x15cm,
+                13x18cm, 15x21cm, 20x25cm, full page, panorama
+                eImageSizeSetCentimeter2:  Thumbnail, 7x10cm, 9x13cm, 10x15cm, 13x18cm,
+                20x25cm, full page, panorama
+                eImageSizeSetCentimeter3:  Thumbnail, 6x8cm, 9x13cm, 10x15cm, 13x18cm,
+                15x21cm, 18x24cm, 20x25cm, full page, panorama"
+::= { settings-photo-job 15 }
+
+
+photo-clear-counts OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eClearPageCounts(1),
+                          eClearInsertCounts(2),
+                          eClearAllCounts(3)
+		   }
+    ACCESS      write-only
+    STATUS      optional
+       DESCRIPTION "writing this object causes the page counts, insert counts, or
+		all photo counts to be cleared and reset to 0.
+                Additional information:
+                writing this object causes the page counts, insert counts, or all photo counts
+                to be cleared and reset to 0."
+::= { settings-photo-job 18 }
+
+
+photo-compact-flash-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times a compact
+		flash memory card has been inserted in the device. This value
+		is saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times a compact flash memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 19 }
+
+
+photo-memory-stick-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times a memory
+		stick memory card has been inserted in the device. This value
+		is saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times a memory stick memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 20 }
+
+
+photo-memory-stick-pro-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times a memory
+		stick pro memory card has been inserted in the device. This
+		value is saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times a memory stick pro memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 21 }
+
+
+photo-smart-media-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times a smart media
+		memory card has been inserted in the device. This value is
+		saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times a compact flash memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 22 }
+
+
+photo-secure-digital-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times a secure
+		digital memory card has been inserted in the device. This value
+		is saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times a compact flash memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 23 }
+
+
+photo-mmc-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times a
+		MultiMediaCard memory card has been inserted in the device.
+		This value is saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times a MultiMediaCard memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 24 }
+
+
+photo-xd-insert-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Reads or writes the count for the number of times an xD-Picture
+		memory card has been inserted in the device. This value is
+		saved over a power cycle.
+                Additional information:
+                reads or writes the count for the number of times an xD-Picture memory card
+                has been inserted in the device.  This value is saved over a power cycle."
+::= { settings-photo-job 25 }
+
+
 hrstorageindex OBJECT-TYPE
     SYNTAX  INTEGER(1..2147483647)
     ACCESS  read-only
@@ -10052,6 +12181,235 @@ usage-scanner-total-charge OBJECT-TYPE
 ::= { scanner-accounting 2 }
                
                
+scan-contrast OBJECT-TYPE
+    SYNTAX  INTEGER(-127..127)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Behaves as SCL's 'Set Scanner Contrast Level' command
+                which is used for setting the scanner contrast level.
+                Range is 0..100.
+                Additional information:
+                There are 11 different tonemap that will 
+                be used on scan images to change the contrast. Software 
+                can set the contrast setting to -125, -100, -75, -50, -25, 
+                0, 50, 75, 100, and 125 to select the different tonemaps.  
+                A user can also set the value to -127, which is a special 
+                mode used by manufacturing to tell the device to use all 
+                linear tonemaps and to perform no gamma correction.  The 
+                scan pml object does not snap the pml scan-contrast.  However, 
+                the contrast setting is mapped to the correct tonemap within
+                the device."
+::= { settings-scanner 1 }
+               
+               
+scan-resolution OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1..64))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "struct {
+                  unsigned_32bit x_res; /* 1st four bytes; big endian */
+                  unsigned_32bit y_res; /* 2nd four bytes; big endian */
+                }
+                Sets the scanning resolution.  The x and y resolutions
+                in this object are in fixed-point with 16 bits of
+                fraction, and 16 bits of integer, and are in dots per
+                inch.  X is horizontal; Y is vertical.
+                Examples of computing x_res and y_res:
+                   300 dots/inch:round(300 * 65536) = 19660800
+                   16 dots/mm:   round(16 * 25.4 * 65536) = 26633830.
+                If the device does not support the given combination,
+                then it'll select the nearest supported values in a
+                device-dependent manner (documented in the POS).
+                Additional information:
+                The 4-pack device will support only: 100,
+                150, 200, 300 and 600.  The Host SW may scale the image to
+                many more resolutions. If an invalid resolution setting
+                is passed to the device or the setting is greater than
+                the max value(600ppi), the device will set the resolution
+                to the default value.  If the resolution setting is not
+                100, 150, 200, 300 or 600, the value is snapped up.  For
+                instance, if the value is < 100, the resolution is snapped
+                to 100.  If the value is between 101-149, the value is 
+                snapped to 150, etc. NOTE: The last 16 bits of the
+                horizontal and vertical settings are ignored.  Only the
+                first 16 bits of the horizontal and vertical resolution
+                setting are used."
+::= { settings-scanner 2 }
+               
+               
+scan-pixel-data-type OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eBiLevelThesholded(1),
+		   eGrey256(8),
+		   e24BitColor(24)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Sets the method used when scanning.  
+                  eBiLevelThesholded - One bit per pixel, using simple
+                thresholding of greyscale scan data.  
+                  eBiLevelHalfToned - One bit per pixel, using some kind
+                of half-toning technique (such as dithering or error-
+                diffusion) to approximate greyscale scan data.  
+                  eGrey16 - 4 bits per pixel to represent 16 shades of
+                grey.  
+                  eGrey64 - 6 bits per pixel to represent 64 shades of
+                grey.  
+                  e3BitColor - 1 bit thresholded per Red, Green, and
+                Blue plane.  
+                  eGrey128 - 7 bits per pixel to represent 128 shades of
+                grey.  
+                  eGrey256 - 8 bits per pixel to represent 256 shades of
+                grey.  
+                  e24BitColor - 24 bits per pixel, 8 bits for Red, 8 bit
+                for Green, and 8 bits for Blue."
+::= { settings-scanner 3 }
+               
+               
+scan-compression OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eCompressNone(1),
+		   eCompressDefault(2),
+		   eCompressionMMR(5),
+		   eCompressionJPEG(6)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the type of data compression applied to the
+                image data in the scanning upload session."
+::= { settings-scanner 4 }
+               
+               
+scan-compression-factor OBJECT-TYPE
+    SYNTAX  INTEGER(0..100)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the level of compression to be applied to the
+                scanned image data for upload.  Range is normalized to
+                be between 0..100.  The device POS determines the
+                mapping of the normalized scale to the actual Q factor
+                for JPEG.
+                Additional information:
+                The 4-pack will use the 
+                SCAN-COMPRESSION-FACTOR for JPEG as described above 
+                in the General Description."
+::= { settings-scanner 5 }
+               
+               
+scan-upload-error OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Error status of the image scanning upload session."
+::= { settings-scanner 6 }
+               
+               
+scan-upload OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eScanUploadIdle(1),
+		   eScanUploadStart(2),
+		   eScanUploadActive(3),
+		   eScanUploadAborted(4),
+		   eScanUploadDone(5),
+		   eScanUploadNewPage(6)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Handshake mechanism between host and device to initiate
+                scan operation and coordinate the transfer of scanned
+                image data to the host.  This object serves both as an
+                indicator of scan upload activity as well as a trigger
+                for the host to alter scan upload progress.  The
+                handshake is on a per page basis to allow greater host
+                control.  
+                  eScanUploadIdle - indicates the scan upload activity
+                is not occurring.  Host setting this object to
+                eScanUploadIdle from eScanUploadActive will cause the
+                scan upload activity to be prematurely terminated.  Host
+                may set object to this state at any time.  Device sets
+                object to this state only upon initial power up but will
+                otherwise never set to this state of its own accord.  
+                  eScanUploadStart - indicates host requesting to
+                commence a scan to host operation.  Host may set object
+                to this state from eScanUploadIdle or
+                eScanUploadNewPage.  Device will not set object to this
+                state of its own accord.  
+                  eScanUploadActive - indicates scan upload activity is
+                occurring.  The device sets object to this state to
+                indicate host may commence receiving scanned image data.
+                During this state, the device will be writing scanned
+                image data to the I/O channel.  
+                  eScanUploadAborted - indicates the scanning and scan
+                upload activity has terminated in error state.  This
+                value is set by the device.  This state is not settable
+                by the host.  The host should transition this state to
+                eScanUploadIdle.  
+                  eScanUploadDone - indicates the device is signaling
+                successful completion of scan upload activity and there
+                are no more document pages in the scanner/ADF.  The
+                application should set this object to eScanUploadIdle.  
+                  eScanUploadNewPage - indicates the device is signaling
+                successful completion of scan upload activity for the
+                current page and there remains at least one page in the
+                scanner/ADF available for scanning.  Host may choose to
+                begin scan upload cycle by setting object to
+                eScanUploadStart or end the cycle by setting object to
+                eScanUploadIdle.
+                Additional information:
+                eScanUploadNewPage - indicates 
+                the device is signaling successful completion 
+                of scan upload activity for the current page. There
+                may be a page in the device or not.  The device will
+                wait to prefeed another page until the application sets
+                the object to eScanUploadStart.  This was to fix
+                a bug on HP LaserJet 1100 that a prefed page would cause a jam
+                if the application set the object to eScanUploadIdle.  
+                The application could not create another scan job until
+                the prefed page was removed.
+                
+                Host may choose to begin scan upload cycle by 
+                setting object to eScanUploadStart or end the cycle 
+                by setting object to eScanUploadIdle."
+::= { settings-scanner 12 }
+               
+               
+default-scanner-margin-left OBJECT-TYPE
+    SYNTAX  INTEGER(0..5088)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Sets the left scanner margin. The unit of measure should
+                be documented in the device POS.
+                Additional information:
+                The margin value must be a multiple of 4
+                for alignment reasons.  If the entered value is not
+                a multiple of 4, the resolution value will be snapped
+                down to the closest value divisible by 4."
+::= { settings-scanner 16 }
+               
+               
+default-scanner-margin-right OBJECT-TYPE
+    SYNTAX  INTEGER(32..5120)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Sets the right scanner margin. The unit of measure
+                should be documented in the device POS.
+                Additional information:
+                The margin value must be a multiple of 4
+                for alignment reasons.  If the entered value is not
+                a multiple of 4, the resolution value will be snapped
+                down to the closest value divisible by 4."
+::= { settings-scanner 17 }
+
+
 scanner-accessory-serial-number OBJECT-TYPE
     SYNTAX  INTEGER(0..65535)
     ACCESS  read-only
@@ -10288,6 +12646,555 @@ scanner-accessory-nvram4 OBJECT-TYPE
 ::= { settings-scanner 36 }
                
                
+ui-add-option OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  write-only
+    STATUS  optional
+    DESCRIPTION
+                "Lets the host application set up target (eg.scan) destinations.
+                The destinations can be a host network address and/or an
+                application to be launched on that host. The string sent
+                down has a list of 'KEYWORD=value;' items. The data sent
+                down also contains a string to be displayed in the device
+                LCD display.  The device POS specifies the number of strings
+                that can be handled (eg. 20) and the replacement/expiration
+                policy as new target destinations are added.
+                Additional information:
+                For push scanning on the 4-pack, there will be a 
+                limitation to the number of unique strings sent to the device
+                via UI-ADD-OPTION.  A host registers for push scanning by using
+                the UI-ADD-OPTION object. HP Laserjet 3200 will limit the number of hosts 
+                registered for push scanning to 20.  HP LaserJet 1220 will have a
+                limitation of 1.  Another limitation for the 4-pack is that the
+                DISPLAY value must be at most 18 characters.  This limitation is
+                due to the control panel display. "
+::= { settings-scanner 37 }
+               
+               
+ui-select-option OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Triggers a job from the device based on the option selected."
+::= { settings-scanner 38 }
+               
+               
+ui-delete-option OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  write-only
+    STATUS  optional
+    DESCRIPTION
+                "Lets the host application delete target eg. scan
+                destinations that were setup with UI-ADD-OPTION.
+                The host sends down the entire string that was
+                sent earlier. The firmware looks for an exact
+                match in its lists and deletes the requested
+                option.
+                Additional information:
+                Removes an existing option only if it is 
+                uniquely matched by the given object value."
+::= { settings-scanner 42 }
+               
+               
+scanner-jam-page-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates a count of the total pages jammed in the scanner'slifetime."
+::= { settings-scanner 43 }
+               
+               
+scanner-adf-page-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates a count of the total pages scanned through the ADF on the
+                device. This may include scan to host jobs, copyjobs, and fax jobs. If
+                only the total pages scanned to the host are wanted, use
+                SCAN-ADF-PAGE-COUNT."
+::= { settings-scanner 44 }
+               
+               
+scan-adf-page-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the total pages scanned through the ADF to the host from the
+                device. If the total pages scanned through the scanner are needed for
+                all features, including copy and fax jobs, use the
+                SCANNER-ADF-PAGE-COUNT object."
+::= { settings-scanner 45 }
+               
+               
+scan-image-type OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eText(1),
+		   ePhoto(2),
+		   eMixed(3)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the image type of the scan data."
+::= { settings-scanner 46 }
+               
+               
+scan-subsample OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFourToOneToOne(1),
+		   eFourToTwoToTwo(2),
+		   eFourToThreeToThree(3),
+		   eFourToFourToFour(4)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the subsampling used for Scan Data. 4:1:1, 4:2:2, and
+                4:3:3 subsampling are used to modify the scan image quality and amount
+                of scan data by reducing the number of samples or pixels of the
+                luminous and chrominance data."
+::= { settings-scanner 47 }
+               
+               
+scanner-retrieve-scanline OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "This object facilitates the sending of a scan line of data from the
+                scanner to a host.  It grabs either raw or corrected data.
+                SERVICE-PASSWORD must be set correctly to use this object.   
+                 cScannerRequestRawScanLine - This is set by the host in order to
+                signal to the firmware that it wants an scan line of raw (no PRNU or
+                DSNU correction)data to be sent back up to the host.    
+                 cScannerRequestCorrectedScanLine - This is set by the host in order to
+                signal to the firmware that it wants a scan line of corrected (PRNU or
+                DSNU correction) data to be sent back up to the host.   
+                 cScannerSendDataRequest - This is set by firmware to indicate that it
+                has acquired the scan line from scan engine and is ready to send the
+                data to the host.   
+                 cScannerSendDataOK - This is set by the host to
+                indicate that it is ready to receive the data from the device.   
+                 cScannerSendDataDone - This is set by the firmware to indicate that
+                the transfer of data is complete.   
+                 cScannerPickSheet - This is set by the
+                host to tell the device to pick and stage the sheet of paper in the
+                ADF.   
+                 cScannerFlushSheet - This is set by the host to tell the device to
+                flush the sheet of paper currently in the device.
+                Additional information:
+                This object is meant to be used by Manufacturing
+                		in order to facilitate the sending of a scan line of data from
+                		 the scanner over HDT.  It
+                		grabs either raw or corrected data."
+::= { settings-scanner 48 }
+               
+               
+scanner-motor-control OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "This objects is set to the number of steps that the scan motor should move.
+                  SERVICE-PASSWORD must be setcorrectly to use this object.
+                Additional information:
+                This objects is set to the number of steps that
+                		the scan motor should move. It is meant to be used by Manufacturing
+                		in order to position the scanner shipping blocks."
+::= { settings-scanner 49 }
+               
+               
+scan-height OBJECT-TYPE
+    SYNTAX  INTEGER(0..25200)
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Used to set the height of a scan image in Decapoints.  The use of
+                 Decapoints as units of measure eliminates the need for the user to
+                 understand the scanner mechanics and the device supported resolutions.
+                Additional information:
+                This object will be used to set the height of the
+                scan image.  The height will be entered using the 
+                measurement of 1/720th  of an inch.  This will eliminate
+                the host being tied to the scanner mechanics and needing
+                to know what resolutions and number of lines the device
+                supports."
+::= { settings-scanner 50 }
+               
+               
+scanner-scanline-statistics OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "This object is used to obtain statistics about the scan line
+                 that was previously obtained using the SCANNER-RETRIEVE-SCANLINE
+                 object. Just as SERVICE-PASSWORD must be set correctly for
+                 SCANNER-RETRIEVE-SCANLINE, it must be set correctly to use this
+                 object as well.
+                Additional information:
+                This object is used to obtain statistics about
+                the scan line that was previously grabbed using the SCANNER_
+                RETRIEVE_SCANLINE object, max string is 256 bytes.  The format
+                is the following: max red value; position; min red value; position;
+                max red pixel to pixel difference; position; red mean; max blue value; 
+                position; min blue value; position; max blue pixel to pixel difference;
+                position; blue mean; max green value; position; min green value; 
+                position; max green pixel to pixel difference; position; green mean;"
+::= { settings-scanner 51 }
+               
+               
+scan-control-descriptor OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Describes the control language and formats supported for this scanner."
+::= { settings-scanner 52 }
+               
+               
+scan-gamma-correction OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1..32))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "A 32-bit quantity that indicates the gamma correction to
+               use on the scan image. The first 16 bits indicate the
+               integral portion of the gamma correction.  The last 16
+               bits indicate the fraction portion in units of 1/65536.
+               An example is gamma correction value of 2.2 will be
+               representedas 0x00023333 (2 & 13107/65536ths)).    
+                 
+               The 4-pack products (HP Laserjet 3200, HP Laserjet 1220, HP Laserjet 2200 & HP Laserjet 1200)
+               software will set the gamma correction to be applied on
+               the scan data.  IPE SW will request a value of 1.0, which
+               indicates no gamma correction. TWAIN software will request a
+               value of 2.2 for grayscale scans and 2.9 for color scans.   
+                 
+               The device pos will indicate any deviation from the
+               above description.
+                Additional information:
+                Indicates the gamma correction to use on the 
+                scan image. The first 16 bits indicate the integral portion 
+                of the gamma correction.  The last 16 bits indicate the fraction 
+                portion and in units of 1/65536.  An example is gamma correction 
+                value of 2.2 will be represented as 0x00023333 (2 & 13107/65536ths). "
+::= { settings-scanner 53 }
+               
+               
+scan-pad-image OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eOff(1),
+		   eOn(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates if the scan image should be padded with white data
+               or not."
+::= { settings-scanner 54 }
+
+
+scan-flatbed-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages scanned from
+		the flatbed."
+::= { settings-scanner 73 }
+
+
+scanner-flatbed-page-count OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object tracks the page count for the pages scanned for all
+		jobs from the flatbed. This includes scan to host jobs, fax
+		jobs, and copy jobs. "
+::= { settings-scanner 74 }
+
+
+scanner-modular-hardware OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Used to specify whether optional hardware is installed or not.
+                Additional information:
+                This HP LaserJet MFP uses this object to allow
+                a host to query whether or not it has an ADF installed, 
+                		Letter/A4 flatbed, or Legal flatbed."
+::= { settings-scanner 75 }
+
+
+scanner-clock-edge-modifiers OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object accesses a table used by firmware to modify clock
+		edge values for CCD scanner modules.
+                Additional information:
+                This object accesses a table used by firmware to modify
+                	  	   clock edge values for CCD scanner modules."
+::= { settings-scanner 84 }
+
+
+scan-clock-edges OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Returns a table of clock edges used by the scanner.
+                Additional information:
+                Returns a table of clock edges used by the scanner."
+::= { settings-scanner 85 }
+
+
+scan-emulate-copy OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eYes(1),
+                          eNo(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Setting this object to eYes will cause firmware to run the next
+		scan job as if it were a copy job, using copy values for
+		scanner h/w and image processing, and then return the data to
+		the host as if it were a scan job. Setting this object to eNo
+		will cause firmware to process scan jobs in the normal way.
+                Additional information:
+                Setting this object to eYes will cause firmware to run
+                the next scan job as if it were a copy job, using copy
+                values for scanner h/w and image processing, and then
+                return the data to the host as if it were a scan job.
+                Setting this object to eNo will cause firmware to
+                process scan jobs in the normal way."
+::= { settings-scanner 86 }
+
+
+scan-calibration-target OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eWhiteSheet(1),
+		   ePlaten(2)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "This object is used by the host to check which type of calibration
+                 this scan device supports.  The device pos will describe the meaning
+                 and intent of each type of scan calibration supported.
+                Additional information:
+                This object is used by the host to check which
+                type of calibration the firmware supports.  This is in
+                anticipation of the fact that the initial release of HP Laserjet 3200
+                will be calibrated off of a sheet, but the 'Rest of World'
+                release will be calibrated off of the platen."
+::= { scan-calibration 18 }
+               
+               
+not-ready-source-scanner OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Indicates whether and why the scanner is not ready.  A
+                set bit indicates a problem.
+                Additional information:
+                ISSUES: HP LaserJet 1100 only used 
+                cScannerFeederJam.  Tahiti does not have 
+                an ADF sensor.  Can cScannerFeederEmpty still 
+                be used (i.e. when the device tries to pull 
+                a page, but the ADF is empty or a mispick 
+                occurred).  cInvalidScannerMediaSize may be used.  
+                If a page is longer that 33 inches normally this would be 
+                shown to the host as a Jam.  However, can the device 
+                use cInvalidScannerMediaSize instead?"
+::= { status-scanner 1 }
+               
+               
+scan-resolution-range OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Enumerates the range of selectable scanning resolutions.
+                Format as follows: Each supported resolution is in the
+                format: (m)x(n) where m describes the x dpi resolution
+                along the paper width.  n describes the y dpi resolution
+                along the paper length.  A scanner that supports several
+                resolutions would enumerate each resolution separated by
+                a comma.  A scanner that supports a continuous
+                resolution range would format its range as: (m1-m2)x(n1-
+                n2) where m1 < m2, n1 < n2 "
+::= { status-scanner 3 }
+               
+               
+scan-calibration-download OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Returns or changes the state of the calibration
+                operation.  
+                cScanCalibrationIdle - indicates that calibration is not
+                in progress.  
+                cScanCalibrationStart - This state is set by host to
+                request calibration initiation. Device should not set to
+                this state.  
+                cScanCalibrationActive - Indicates device is in
+                calibration mode.  Device sets cScanCalibrationActive to
+                signal calibration is in process.  
+                cScanCalibrationAborted - Set by device to indicate
+                calibration was prematurely terminated. Set by host when
+                a calibration error occurs.  
+                cScanCalibrationSendDataRequest - Set by host when host
+                wants to send data to the device.  
+                cScanCalibrationSendDataRequestOK - Set by the device to
+                tell the host that the device is ready to accept data.  
+                cScanCalibrationSendDataRequestDone -Set by the device
+                to indicate the data was received by the device.  
+                cScanCalibrationRequestScanBuffer - Set by the host to
+                request a buffer from the device.  
+                cScanCalibrationDone - Set by the host to inform the
+                device calibration is complete.  
+                The sequence of bits being set and the restrictions for
+                setting bits should be documented in the device POS.
+                Additional information:
+                This object was originally defined for
+                		use on HP LaserJet 1100. HP Laserjet 3200 we will not be using
+                		values 3-6.  These are no longer applicable since
+                		the calibration is completely contained within firmware."
+::= { status-scanner 5 }
+               
+               
+scan-calibration-error OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eNoError(1),
+		   eUnknownCalibrationError(2),
+		   eScannerFeederEmpty(3),
+		   eLowMemory(4),
+		   eWriteFailed(5),
+		   eScannerBusy(6),
+		   eADFMispick(7),
+		   eADFJam(8),
+		   eUncorrectablePixels(9)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Error status of the most recent calibration session.  
+                eNoError(1) - The calibation was successful.  
+                eUnknownCalibrationError(2) - An unknown error
+                occurred.  
+                eScannerFeederEmpty(3) - The feeder contained nothing to
+                scan.  
+                eLowMemory(4) - Insufficient memory available to
+                complete the calibration.  
+                eWriteFailed(5) - Write to NVRAM failure.  
+                eScannerBusy(6) - Scanner is busy.  
+                Detailed information about the cause and remedy for each
+                error should be documented in the device POS.
+                Additional information:
+                This object was originally defined for use on
+                		HP LaserJet 1100. We are proposing the new enums number 7-9.
+                	        Note: Option 9 would only be set during a factory calibration
+                to indicate that at least one pixel was not correctable by
+                the digital calibration factors."
+::= { status-scanner 6 }
+               
+               
+scanner-button-status OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eOff(1),
+		   eOn(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the scanner button has been pressed. The value
+                changes to eOn(2) when the button is pressed. The host
+                acknowledges the button press by setting the value to
+                eOff(1)."
+::= { status-scanner 7 }
+
+
+scanner-lamp-gain-value OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Provides PWM and analog gain for the color channels. The range
+		will vary based on scan mode. The device specific POS should
+		describe the valid range. The format is the following:   
+		    PWM value; red analog gain; green analog gain; blue analog
+			gain.   
+                Additional information:
+                 The range will vary based on scan mode.  The values
+                will differ from those of San Diego.  The initial value
+                can be obtained at the start of warmup and the final
+                value can be obtained at the end of warmup. The warmup period is about
+                2 minutes.  The format is the following PWM value; red analog gain;
+                green analog gain; blue analog gain;.  The valid values for PWM value
+                are 580 - 730 and the valid values for analog gains are 1.00-5.80.
+                The gains are reported with accuracy to 2 decimal places.
+                A sample return value would be '584;1.00;1.34;1.00;' "
+::= { status-scanner 8 }
+
+
+scanner-light-monitor-window OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Provides the pixel at which the LMW starts, as the ratio of the
+		average LMW value to the six pixel average value. The device
+		specific pos should specify the valid ranges for each value.
+		The format is the following:   
+		    LMW position; ratio of LMWavg to 6 pixel avg.   
+                Additional information:
+                Provides the pixel at which the LMW starts as well as
+                the ratio of the average LMW value over a 6 pixel average value.
+                A algebraic representation of this ratio is:
+                Average of Light Monitor Window pixels
+                ______________________________________
+                Average of 6 test point pixels
+                
+                The 6 test point pixels do not inlcude any of the Light Monitor Window.
+                A sample return value would be '50;0.059;'. "
+::= { status-scanner 9 }
+
+
+scanner-reference-position OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Provides 3 pairs of x,y coordinates within a specified range of
+		the calibrate reference position. The device specific POS
+		should specify the valid ranges. The format is the following:
+		'x;y;x;y;x;y'
+                Additional information:
+                Provides x,y coordinates within 1/300 of a line of the
+                calibrate reference position.  The 3 locations in order that are
+                reported are the 1st Reference Mark, the 2nd Reference Mark, and
+                the Document Origin.  A sample return value would be
+                80,471;2523,2914;80,471;1;34326;27,32;193;35748;28,27;194;0,0;0;0;0;0;0;0;0,0;0;0;0;0;0;0;0,0;0;0,0;0;0;0 
+                The extra 0's on the end are used specifically to gather information during
+                the cimation process. "
+::= { status-scanner 10 }
+
+
+scanner-sensor-manufacturer OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Reports the scan sensor manufacturer. The device specific POS
+		should list valid manufacturers.
+                Additional information:
+                Reports the scan sensor manufacturer.  The device specific
+                POS should list valid manufacturers."
+::= { status-scanner 11 }
+
+
 rpc-test-return-code OBJECT-TYPE
     SYNTAX  OCTET STRING
     ACCESS  write-only
@@ -11030,6 +13937,168 @@ control-panel-lock OBJECT-TYPE
                 the control panel."
 ::= { settings-system 8 }
 
+service-password OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  write-only
+    STATUS  optional
+    DESCRIPTION
+                "When set to the password value, other service related
+                objects become 'visible' (i.e readable) and/or become
+                writable.  When written with any other value, the
+                service related objects become 'hidden' (i.e. are no
+                longer readable) and/or are not longer writable.  The
+                objects that can be effected by the SERVICE-PASSWORD
+                object include: SERIAL-NUMBER and TOTAL-ENGINE-PAGE-
+                COUNT.  The password value, and the list of objects
+                effected by the SERVICE-PASSWORD being set to the
+                correct value, should be documented in the device POS.
+                Additional information:
+                The objects that can be effected by the SERVICE-
+                PASSWORD are:  SCANNER-JAM-PAGE-COUNT, SCANNER-ADF-PAGE
+                -COUNT, SCAN-ADF-PAGE-COUNT, SCANNER-RETRIEVE-SCANLINE,
+                SCANNER-MOTOR-CONTROL, COPIER-ADF-PAGE-COUNT, COPIER-
+                PRINT-PAGE-COUNT, TOTAL-ENGINE-PAGE-COUNT, PRINT-ENGINE-
+                JAM-COUNT, PRINT-ENGINE-MISPICK-COUNT"
+::= { settings-system 9 }
+
+
+device-cfg-download OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eCfgDownloadIdle(1),
+		   eCfgDownloadStart(2),
+		   eCfgDownloadActive(3),
+		   eCfgDownloadAborted(4),
+		   eCfgDownloadDone(5)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Handshaking mechanism between host and device to coordinate the download of device specific data.  
+  eCfgDownloadIdle - indicates device configuration download activity is not occurring.  Device powers up in this state but will otherwise never transition to this state.  This state is host settable from eCfgDownloadActive, eCfgDownloadDone, and eCfgDownloadAborted.  Host setting to eCfgDownloadIdle while object is in eCfgDownloadActive will cause the download activity to be prematurely terminated.  Host setting to this state resets the object to permit another download activity to be initiated.  
+  eCfgDownloadStart - indicates host wishes to commence a device configuration download activity.  This state is only host settable from eCfgDownloadIdle.  Only the device can transition this object from this state to eCfgDownloadActive or eCfgDownloadAborted.  Device will not set to this state.  
+  eCfgDownloadActive - indicates download activity is in progress.  Device transitions object to this state only from eCfgDownloadStart, to signal data download can commence.  The device can transition from this state to eCfgDownloadDone or eCfgDownloadAborted.  The host can transition from this state to eCfgDownloadIdle.  This state is not host settable.  
+  eCfgDownloadAborted - indicates the download activity was terminated by the device.  Only the device can set to this state from eCfgDownloadStart or eCfgDownloadActive.  Only the host can transition from this state to eCfgDownloadIdle.  This state is not host settable.  
+   eCfgDownloadDone - indicates device has completely received the download data.  Device transitions to this state only from eCfgDownloadActive.  Only the host can transition from this state to eCfgDownloadIdle.  This state is not host settable."
+::= { settings-system 11 }
+               
+               
+device-cfg-download-data-type OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eSpeedDials(5),
+		   eFaxLogs(6),
+		   eConfigPrams(7),
+		   eJunkFaxDialStrings(9)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the type of device specific data to be
+                downloaded."
+::= { settings-system 12 }
+               
+               
+device-cfg-upload OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eCfgUploadIdle(1),
+		   eCfgUploadStart(2),
+		   eCfgUploadActive(3),
+		   eCfgUploadAborted(4),
+		   eCfgUploadDone(5)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Handshaking mechanism between host and device to
+                coordinate the upload of device specific data.  
+                  eCfgUploadIdle - indicates device configuration upload
+                activity is not occurring.  Device powers up in this
+                state but will otherwise never transition to this state.
+                This state is host settable from eCfgUploadActive,
+                eCfgUploadDone, and eCfgUploadAborted.  Host setting to
+                eCfgUploadIdle while object is in eCfgUploadActive will
+                cause the upload activity to be prematurely terminated.
+                Host setting to this state resets the object allowing a
+                new upload to be initiated.  
+                  eCfgUploadStart - indicates host wishes to commence a
+                device configuration upload activity.  This state is
+                only host settable from eCfgUploadIdle.  Only the device
+                can transition this object from this state to
+                eCfgUploadActive or eCfgUploadAborted.  Device will not
+                set to this state.  
+                  eCfgUploadActive - indicates upload activity is in
+                progress.  Device transitions object to this state only
+                from eCfgUploadStart, to signal data upload can
+                commence.  The device can transition from this state to
+                eCfgUploadDone or eCfgUploadAborted.  The host can
+                transition from this state to eCfgUploadIdle.  This
+                state is not host settable.  
+                  eCfgUploadAborted - indicates the upload activity was
+                terminated by the device.  Only the device can set to
+                this state from eCfgUploadStart or eCfgUploadActive.
+                Only the host can transition from this state to
+                eCfgUploadIdle.  This state is not host settable.  
+                  eCfgUploadDone - indicates device completely
+                transmitted the upload data.  Device transitions to this
+                state only from eCfgUploadActive.  Only the host can
+                transition from this state to eCfgUploadIdle.  This
+                state is not host settable."
+::= { settings-system 13 }
+               
+               
+device-cfg-upload-data-type OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eSpeedDials(5),
+		   eFaxLogs(6),
+		   eConfigPrams(7),
+		   eJunkFaxDialStrings(9)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Indicates the type of device specific data to be
+                uploaded."
+::= { settings-system 14 }
+               
+               
+download-timeout OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Specifies the number of seconds that device will wait
+                for data from the host before the device determines the
+                host is being unresponsive.  This timeout condition may
+                cause the device to take recourse action regarding the
+                disposition of the download activity.  A value of zero
+                indicates device will wait forever for the host data.
+                POS should indicate whether this object value, when set
+                by the host, is remembered between device power cycles.
+                Additional information:
+                This object is volatile and as such will not be
+                retained by the device between power cycles."
+::= { settings-system 17 }
+               
+               
+upload-timeout OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Specifies the number of seconds that device will wait
+                for response from the host after transmitting a unit of
+                data before the device determines the host is being
+                unresponsive.  This timeout condition may cause the
+                device to take recourse action regarding the disposition
+                of the upload activity.  A value of zero indicates
+                device will wait forever for the host response.  POS
+                should indicate whether this object value, when set by
+                the host, is remembered between device power cycles
+                Additional information:
+                This object is volatile and as such will not be
+                retained by the device between power cycles."
+::= { settings-system 18 }
+               
+
 run-location OBJECT-TYPE
     SYNTAX  INTEGER(0..9)
     ACCESS  read-write
@@ -11054,6 +14123,665 @@ run-location OBJECT-TYPE
                 		unsupported value causes the printer to leave the run location
                 		set to its previous value."
 ::= { settings-system 21 }
+
+date-display OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDateDisplayMMDDYY(1),
+		   eDateDisplayDDMMYY(2),
+		   eDateDisplayYYMMDD(3)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Controls front-panel date display format."
+::= { settings-system 22 }
+               
+               
+device-cfg-param-command OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "A C structure containing the following fields:  
+                   typedef struct {  
+                   u8bit list_id;  
+                   s8bit auto_incr;  
+                   u16bit max_index;  
+                   u16bit rec_size;  
+                   u16bit index;  
+                   u8bit data[];  
+                } PML_device_cfg_param_cmd_t;  
+                where u8bit is an unsigned byte (0..255), s8bit is a
+                signed byte (-128..127), and u16bit is an big endian
+                format unsigned short (0..65535).  The POS should state
+                which list_id's the device supports.
+                Additional information:
+                HP Laserjet 3200 supports two values for list_id:  
+                0 for configuration parameters and   
+                1 for default configuration parameters."
+::= { settings-system 23 }
+         
+	 
+copier-token OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1..128))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides an advisory locking mechanism for hosts to coordinate
+                 exclusive access to a copier device. Setting the object to a
+                 unique id will only succeed if the token is currently set to 0.
+                 The token is unlocked when it is set to 0. If the token is set
+                 to a any value other than 0, then token is locked. If the token
+                 was set to a unique id (locked), then an attempt to set (lock)
+                 the token will fail. If the token was set to 0 (unlocked), then
+                 an attempt to set (lock) the token will succeed in locking the
+                 token. A get operation on COPIER-TOKEN will return its current
+                 setting. The device does not prevent access to any objects. It
+                 is assumed that hosts will be well behaved; respecting this
+                 advisory locking mechanism by:  
+                 1) acquiring the lock before changing copier objects, and  
+                 2) releasing the lock when done changing copier objects.
+                Additional information:
+                Provides an advisory locking mechanism for hosts to
+                coordinate exclusive access.  Setting the object to a unique id
+                will only succeed if the token is currently set to 0.  The token 
+                is unlocked when it is set to 0. If the token is set to a any
+                value other than 0, then token is locked.
+                
+                If the token was set to a unique id (locked), then an 
+                attempt to set (lock) the token will fail.
+                
+                If the token was set to 0 (unlocked), then an attempt to set (lock)
+                the token will succeed in locking the token.
+                
+                A get operation on COPY-TOKEN will return its current setting.
+                The device does not prevent access to any objects.  It is assumed 
+                that hosts will be well behaved; respecting this advisory locking 
+                mechanism by:
+                1) acquiring the lock before changing copy objects, and
+                2) releasing the lock when done changing copy objects."
+::= { settings-system 24 }
+      
+               
+fax-upload-token OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1..128))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides an advisory locking mechanism for hosts to coordinate
+                 exclusive access to the fax upload features of a device. Setting
+                 the object to a unique id will only succeed if the token is
+                 currently set to 0. The token is unlocked when it is set to 0.
+                 If the token is set to a any value other than 0, then token is
+                 locked. If the token was set to a unique id (locked), then an
+                 attempt to set (lock) the token will fail. If the token was set
+                 to 0 (unlocked), then an attempt to set (lock) the token will
+                 succeed in locking the token. A get operation on FAX-UPLOAD-TOKEN
+                 will return its current setting. The device does not prevent
+                 access to any objects. It is assumed that hosts will be well behaved;
+                 respecting this advisory locking mechanism by:  
+                 1) acquiring the lock before changing any fax-upload objects, and  
+                 2) releasing the lock when done changing scan objects.
+                Additional information:
+                Provides an advisory locking mechanism for hosts to
+                coordinate exclusive access.  Setting the object to a unique id
+                will only succeed if the token is currently set to 0.  The token 
+                is unlocked when it is set to 0. If the token is set to a any
+                value other than 0, then token is locked.
+                
+                If the token was set to a unique id (locked), then an 
+                attempt to set (lock) the token will fail.
+                
+                If the token was set to 0 (unlocked), then an attempt to set (lock)
+                the token will succeed in locking the token.
+                
+                A get operation on FAX-UPLOAD-TOKEN will return its current setting.
+                The device does not prevent access to any objects.  It is assumed 
+                that hosts will be well behaved; respecting this advisory locking 
+                mechanism by:
+                1) acquiring the lock before changing fax objects, and
+                2) releasing the lock when done changing fax objects."
+::= { settings-system 26 }
+               
+               
+fax-download-token OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(1..128))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides an advisory locking mechanism for hosts to coordinate
+                 exclusive access to the fax download features of a device. Setting
+                 the object to a unique id will only succeed if the token is
+                 currently set to 0. The token is unlocked when it is set to 0.
+                 If the token is set to a any value other than 0, then token is
+                 locked. If the token was set to a unique id (locked), then an
+                 attempt to set (lock) the token will fail. If the token was set
+                 to 0 (unlocked), then an attempt to set (lock) the token will
+                 succeed in locking the token. A get operation on FAX-DOWNLOAD-TOKEN
+                 will return its current setting. The device does not prevent
+                 access to any objects. It is assumed that hosts will be well behaved;
+                 respecting this advisory locking mechanism by:  
+                 1) acquiring the lock before changing any fax-download objects, and  
+                 2) releasing the lock when done changing scan objects.
+                Additional information:
+                Provides an advisory locking mechanism for hosts to
+                coordinate exclusive access.  Setting the object to a unique id
+                will only succeed if the token is currently set to 0.  The token 
+                is unlocked when it is set to 0. If the token is set to a any
+                value other than 0, then token is locked.
+                
+                If the token was set to a unique id (locked), then an 
+                attempt to set (lock) the token will fail.
+                
+                If the token was set to 0 (unlocked), then an attempt to set (lock)
+                the token will succeed in locking the token.
+                
+                A get operation on FAX-DOWNLOAD-TOKEN will return its current setting.
+                The device does not prevent access to any objects.  It is assumed 
+                that hosts will be well behaved; respecting this advisory locking 
+                mechanism by:
+                1) acquiring the lock before changing fax objects, and
+                2) releasing the lock when done changing fax objects."
+::= { settings-system 27 }
+
+device-config-token OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(128))
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides an advisory locking mechanism for hosts to coordinate
+                 exclusive access to a specific device or subset of device
+                 capabilities. Setting the object to a unique id will only succeed
+                 if the token is currently set to 0. The token is unlocked when it
+                 is set to 0. If the token is set to a any value other than 0, then
+                 token is locked. If the token was set to a unique id (locked),
+                 then an attempt to set (lock) the token will fail. If the token
+                 was set to 0 (unlocked), then an attempt to set (lock) the token
+                 will succeed in locking the token. A get operation on
+                 DEVICE-CONFIG-TOKEN will return its current setting. The device
+                 does not prevent access to any objects. It is assumed that hosts
+                 will be well behaved; respecting this advisory locking mechanism by:  
+                 1) acquiring the lock before changing device config objects, and  
+                 2) releasing the lock when done changing device config objects.
+                Additional information:
+                Provides an advisory locking mechanism for hosts to
+                coordinate exclusive access.  Setting the object to a unique id
+                will only succeed if the token is currently set to 0.  The token 
+                is unlocked when it is set to 0. If the token is set to a any
+                value other than 0, then token is locked.
+                
+                If the token was set to a unique id (locked), then an 
+                attempt to set (lock) the token will fail.
+                
+                If the token was set to 0 (unlocked), then an attempt to set (lock)
+                the token will succeed in locking the token.
+                
+                A get operation on CONFIG-TOKEN will return its current setting.
+                The device does not prevent access to any objects.  It is assumed 
+                that hosts will be well behaved; respecting this advisory locking 
+                mechanism by:
+                1) acquiring the lock before changing CONFIG objects, and
+                2) releasing the lock when done changing CONFIG objects."
+::= { settings-system 28 }
+
+
+mono-color-switching-mode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eNeverSwitch(1),
+                          eAlwaysSwitch(2),
+                          eLookAheadSwitch(3)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object allows the user to view/change the color/mono		
+                switching mode for a device.
+                Additional information:
+                This object allows the user to view/change the color/mono		
+                switching mode for a device."
+::= { settings-system 31 }
+
+
+control-panel-button-press-delay OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object gives the number of seconds to wait before
+		simulating the button press when CONTROL-PANEL-BUTTON-PRESS is
+		next called.
+                Additional information:
+                This object gives the number of seconds to wait before		
+                simulating the button press when CONTROL-PANEL-BUTTON-PRESS is		
+                next called."
+::= { settings-system 47 }
+
+
+low-power OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Returns or changes the Auto Low Power sleep value. The device
+		will go into energy saving Auto Low Power mode after the print
+		engine has been idle for the number of seconds specified by
+		this object. Frida supports values of 300 until 14400 seconds.
+		If the value is invalid then it will return status of
+		PML_Status_ErrUnsupValue and will not issue command to the
+		engine.
+                Additional information:
+                Returns or changes the Auto Low Power sleep value. The device
+                will go into energy saving Auto Low Power mode after the print
+                engine has been idle for the number of seconds specified by	
+                this object. The product supports values of 0 (Off), 60 (1
+                minute), 900 (15 minutes), 1800 (30 minutes), 3600 (1 hour),
+                and 7200 (2 hours).
+                If the value is invalid then it will return a status of
+                PML_ERROR_INVALID_OR_UNSUPPORTED_VALUE and will not issue
+                a command to the engine."
+::= { settings-system 49 }
+
+
+fuser-pressure-release OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eDisengage(1)
+		   }
+    ACCESS      write-only
+    STATUS      optional
+       DESCRIPTION "This object is used to disengage the pressure on the fuser to
+		prevent roller marks on the fuser, which can occur when the
+		pressure is engaged for long periods of time.
+                Additional information:
+                This object is used to disengage the pressure on the 
+                	fuser to prevent roller marks on the fuser, which can occur when 
+                	the pressure is engaged for long periods of time."
+::= { settings-system 53 }
+
+
+control-panel-display-contrast OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eLightest(1),
+                          eLight(2),
+                          eMedium(3),
+                          eDark(4),
+                          eDarkest(5)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object returns or sets the display contrast setting if the
+		control panel has a display and it supports contrast
+		adjustment. The setting Is stored in NVRAM, so the value is
+		saved over power cycles.
+                Additional information:
+                This object returns or sets the display contrast setting 
+                			if the control panel has a display and it supports 
+                			contrast adjustment. The setting is stored in NVRAM, 
+                			so the value is saved over power cycles."
+::= { settings-system 73 }
+
+calibration-lowspeed-enable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eDisable(1),
+                          eEnable(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Enable or disable an optional low speed calibration. This
+		calibration will allow the device to obtain accurate data for
+		use with low speed print modes.
+                Additional information:
+                Enable or disable an optional low speed calibration. This
+                		calibration will allow the device to obtain accurate data for
+                		use with low speed print modes."
+::= { settings-system 85 }
+
+
+start-engine-early-warmup OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eValue1(1)
+		   }
+    ACCESS      write-only
+    STATUS      mandatory
+       DESCRIPTION "This PML object is used by HP SW drivers to signal the printer
+		that a job is coming, and to start the warm-up process
+		early.The effect of warming up early will reduce the First Page
+		Out time.
+                Additional information:
+                This PML object is used by HP SW drivers to signal the printer
+                that a job is coming, and to start the warm-up process
+                early.The effect of warming up early will reduce the First Page
+                Out time."
+::= { settings-system 99 }
+
+
+enable-engine-early-warmup OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eDisable(1),
+                          eEnable(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This PML object is used by HP SW to enable/disable the printer
+		to send the signal of warm-up process early to engine. The
+		effect of warming up early will reduce the First Page Out
+		time.
+                Additional information:
+                This PML object is used by HP SW to enable/disable the printer
+                to send the signal of warm-up process early to engine. The
+                effect of warming up early will reduce the First Page Out
+                time."
+::= { settings-system 101 }
+
+
+copy-scanner-dimensions OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "This object is used to obtain the exact pixel scan dimensions
+		for copy. The dimensions returned correspond to the quality,
+		reduce/enlarge, and media size currently selected.
+                Additional information:
+                This object is used to obtain the exact pixel scan dimensions for copy.
+                			     The dimensions returned correspond to the quality, reduce/enlarge,
+                			     and media size currently selected."
+::= { status-scanner 13 }
+
+
+device-configure-generic-language-prompt OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eDisabled(1),
+                          eEnabled(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object is used to determine whether to prompt the user to
+		enter the appropriate language.
+                Additional information:
+                This object is used to determine whether to 
+                		     prompt the user to enter the appropriate language
+                	   	     at boot."
+::= { device-configure 10 }
+
+
+device-configure-generic-country-prompt OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eDisabled(1),
+                          eEnabled(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION " This object is used to determine whether to prompt the user to
+		enter the appropriate country at boot.
+                Additional information:
+                This object is used to determine whether to
+                	 	     prompt the user to enter the appropriate country
+                	    	     at boot."
+::= { device-configure 11 }
+
+
+device-configure-generic-country OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eKorea(4),
+                          eIndonesia(5),
+                          eChina(6),
+                          eTaiwan(7),
+                          ePhilippines(8),
+                          eThailand(9),
+                          eSriLanka(10),
+                          eBrazil(12),
+                          eCanada(13),
+                          eMexico(14),
+                          eUnitedStates(15),
+                          eArgentina(16),
+                          eChile(17),
+                          eNewZealand(19),
+                          eIsrael(21),
+                          eAustralia(23),
+                          eIndia(25),
+                          ePakistan(26),
+                          eMalaysia(27),
+                          eHongKong(29),
+                          eSingapore(30),
+                          eUnitedKingdom(31),
+                          eAustria(34),
+                          eNetherlands(35),
+                          eGermany(39),
+                          eDenmark(40),
+                          eSweden(41),
+                          eSouthAfrica(42),
+                          eNorway(43),
+                          eIreland(44),
+                          eBelgium(45),
+                          eFinland(46),
+                          eFrance(47),
+                          eTurkey(48),
+                          eGreece(49),
+                          ePortugal(50),
+                          eItaly(51),
+                          eSpain(55),
+                          ePoland(56),
+                          eBulgaria(57),
+                          eCroatia(58),
+                          eRomania(59),
+                          eSlovakRepublic(60),
+                          eCzechRepublic(61),
+                          eHungary(62),
+                          eRussia(64),
+                          ePeru(70),
+                          eJordan(78),
+                          eLebanon(79),
+                          eSwitzerland(82),
+                          eVietnam(83),
+                          eLuxemberg(85),
+                          eNorthAfrica(86),
+                          eBelarus(66),
+                          eBrunei(33),
+                          eCambodia(94),
+                          eCyprus(95),
+                          eEgypt(67),
+                          eEstonia(54),
+                          eIceland(96),
+                          eLatvia(53),
+                          eLiechtentstein(98),
+                          eLithuania(52),
+                          eMalta(99),
+                          eMorocco(65),
+                          eSaudiArabia(28),
+                          eTunisia(32),
+                          eUAE(88),
+                          eUkraine(63)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Set the location configuration for the device. This affects
+		parameters that vary per region like the default paper size,
+		symbol set, supply reorder URL, and fax parameters if
+		applicable."
+::= { device-configure 16 }
+
+
+device-configure-secure-nvram-items OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object is used to configure product settings that are
+		stored in secure area of nvram. The object consists of a 16-bit
+		variable in secure nvram. Bits 15-8 are product specific. Bits
+		7-0 are system specific.
+                Additional information:
+                This object is used to configure product settings that are		
+                stored in secure area of nvram. The object consists of a 16-bit		
+                variable in secure nvram. Bits 15-8 are product specific. Bits		
+                7-0 are system specific."
+::= { device-configure 17 }
+
+
+device-configure-cpe-feature OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "This object allows CPE to enable specific bug fixes or
+		enhancements in post-release products.
+                Additional information:
+                This object allows CPE to enable specific bug fixes or		
+                enhancements in post-release products."
+::= { device-configure 18 }
+
+
+device-configure-custom-product-number OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "This object allows manufacturing to change the product number
+		to a pre-defined alternate after release. This feature will
+		allow manufacturing to assign unique product numbers to custom
+		product bundles when the device is unable to determine its
+		product number in firmware. For example, A HP Color LaserJet
+		CP1515n could be configured to display CP1516n to the customer.
+		This product number must be defined prior to release.
+                Additional information:
+                This object allows manufacturing to change the product number
+                to a pre-defined alternate after release. This feature will
+                allow manufacturing to assign unique product numbers to custom
+                product bundles when the device is unable to determine its
+                product number in firmware. For example, A HP Color LaserJet
+                CP1515n could be configured to display CP1516n to the customer.
+                This product number must be defined prior to release."
+::= { device-configure 19 }
+
+
+device-configure-preferred-boot-localization-language OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eEnglish(1),
+                          eFrench(2),
+                          eGerman(3),
+                          eSpanish(4),
+                          eItalian(5),
+                          eSwedish(6),
+                          eDanish(7),
+                          eNorwegian(8),
+                          eDutch(9),
+                          eFinnish(10),
+                          ePortuguese(12),
+                          ePolish(13),
+                          eTurkish(14),
+                          eTradChinese(16),
+                          eSimpChinese(17),
+                          eRussian(18),
+                          eCzech(19),
+                          eHungarian(20),
+                          eKorean(21),
+                          eThai(22),
+                          eUnknownLanguage(44)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Preferred localization language used by the device at boot up
+		time. Setting this object will instruct the device to boot up
+		in that language. Setting this language does not impact device
+		generated PML strings, control panel messages, and text
+		contained in any of the printer generated printed pages. The
+		order of these languages is the same order that is defined for
+		LOCALIZATION-LANGUAGE.
+                Additional information:
+                Preferred localization language used by the device at 
+                boot up time.  Setting this object will instruct the device to boot 
+                up in that language.  This will allow the device to NOT show the 
+                generic prompt on the CP display, since the device already knows
+                the language."
+::= { device-configure 20 }
+
+
+date-and-time OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "A C structure containing the following fields:    typedef
+		struct {    
+		    ubyte yr; /* year: 0 to 99 */    
+		    ubyte mon; /* month: 1 to 12 */    
+		    ubyte day; /* day: 1 to 31 */    
+		    ubyte wday; /* Day of week: 1 to 07 */    
+		    ubyte hr; /* hour: 0 to 23 */    
+		    ubyte min; /* minute: 0 to 59 */    
+		    ubyte sec; /* second: 0 to 59 */    
+		    } date_t;    
+		where ubyte is an unsigned byte (0-255)."
+::= { status-system 17 }
+
+
+time-display OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eTimeDisplayTwelveHour(1),
+                          eTimeDisplayTwentyFourHour(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Controls front-panel time display format. Set to
+		eTimeDisplayTwelveHour for AM/PM display. Set to
+		eTimeDisplayTwentyFourHour for military-type display."
+::= { status-system 28 }
+
+
+device-cfg-download-error OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Error status of the configuration download session. POS should
+		indicate the actual error values reserving value 0 as NO
+		ERROR.
+                Additional information:
+                A value of 0 indicates NO ERROR."
+::= { status-system 43 }
+
+
+device-cfg-upload-error OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "Error status of the configuration upload session. POS should
+		indicate the actual error values reserving value 0 as NO
+		ERROR.
+                Additional information:
+                A value of 0 indicates NO ERROR."
+::= { status-system 45 }
+
+
+ship-cartridge-installed-in-printer OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eFalse(1),
+                          eTrue(2)
+		   }
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "Set developer motor cams in the position needed for shipping
+		the cartridges installed in the printer if set to eTrue.
+                Additional information:
+                Notifies the engine that it needs to change it's shipping state."
+::= { status-system 97 }
+
+
+device-mac-address OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "The device's MAC address.
+                Additional information:
+                The device's MAC address."
+::= { status-system 120 }
+
+
+extended-print-modes-modified OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          eYes(1),
+                          eNo(2)
+		   }
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "This object allows the user to view whether the extended print
+		modes have been modified from their default settings.
+                Additional information:
+                This object allows the user to view whether the extended print		
+                modes have been modified from their default settings."
+::= { status-system 121 }
+
 
 model-name OBJECT-TYPE
     SYNTAX  DisplayString (SIZE(1..32))
@@ -11080,6 +14808,22 @@ model-name OBJECT-TYPE
                 model name does not change based on sensing of installed options."
 ::= { id 2 }
                
+	       
+fax-local-phone-num OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "CCITT sender's station id (ex. 08-396-4122)."
+::= { id 8 }
+
+
+fax-station-name OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-write
+    STATUS      optional
+       DESCRIPTION "name for the fax device (ex. HP R&D)."
+::= { id 9 }
+
                
 device-name OBJECT-TYPE
     SYNTAX  DisplayString (SIZE(0..32))
@@ -11098,7 +14842,20 @@ device-name OBJECT-TYPE
                 return the <noError> status."
 ::= { id 10 }
                
-               
+              
+fax-line-interface-unit-id OBJECT-TYPE
+    SYNTAX      INTEGER(0..8)
+    ACCESS      read-only
+    STATUS      optional
+       DESCRIPTION "The fax device line interface unit (LIU) identifier. The LIU
+		number identifies the telephone system electrical
+		characteristics supported by this device.
+                Additional information:
+                In this LaserJet MFP this value is stored in 3 bits on the
+                LIU."
+::= { id 18 }
+
+ 
 simm1-bank1-type OBJECT-TYPE
     SYNTAX  INTEGER {
 		   eEmpty(1),
@@ -11412,6 +15169,49 @@ maximum-ram-disk-memory OBJECT-TYPE
                 memory that is available for increasing the size of the RAM 
                 disk."
 ::= { status-mass-storage-bd 1 }
+
+
+device-configure-print-engine-speed OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eNormal(1),
+		   eSlowDown1(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Return or set the value of the print engine speed. Where		
+                eNormal is the default speed and with each eSlowDownN setting		
+                the printer gets progressively slower than the previous speed.
+                Additional information:
+                This object will only be registered once the 
+                PE_TEST_PASSWORD is set. This object is used to
+                return or set the value for the engine's print speed.
+                This value is written to NVRAM and is persistant.
+                eNormal = Normal engine speed.
+                eSlowDown1 = Decreased engine speed."
+::= { device-configure 5 }
+
+
+device-configure-duplexer-enabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Return or set the value for the duplexer installed. eEnabled =		
+                The duplexer is installed. eDisabled = The duplexer is not		
+                installed.
+                Additional information:
+                This object will only be registered once the 
+                PE_TEST_PASSWORD is set. This object is used to
+                return or set the value controlling the duplexer
+                This value is written to NVRAM and is persistant.
+                eDisabled = Disabled Duplexer.
+                eEnabled = Enabled Duplexer."
+::= { device-configure 8 }
+
 
 disk-storage-block-driver2-test-return-code OBJECT-TYPE
     SYNTAX  OCTET STRING
@@ -14700,6 +18500,268 @@ printed-media-total-charge OBJECT-TYPE
                 "The total charge for pages printed in this media size."
 ::= { printed-media-usage 5 }
                
+firmware-download-write-status-supported OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFalse(1),
+		   eTrue(2)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "This object provides information on whether the printer has the		
+                ability to communicate the write-status of the firmware		
+                download while the download is taking place."
+::= { firmware-download 1 }
+
+
+firmware-download-write-time OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "If the design of the firmware-download implementation does not		
+                allow PML interaction during the download process, this value		
+                provides an estimation of the time where the printer will not		
+                be able to engage in PML communication.
+                Additional information:
+                If the design of the firmware-download 
+                			implementation does not allow PML interaction during 
+                			the download process, this value provides an 
+                			estimation of the time where the printer will not be 
+                			able to engage in PML communication. The calculated
+                			time is expected to be 140 secs. However, this time
+                			may increase as high as 280 secs as the flash part 
+                			nears the maximum flash count."
+::= { firmware-download 2 }
+
+
+firmware-download-write-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Tells the number of times that firmware has been downloaded to		
+                the flash part.
+                Additional information:
+                Tells the number of times that firmware has been
+                	downloaded to the flash part. The default value will
+                			vary depending on how many times the firmware is
+                			rolled before shipping."
+::= { firmware-download 3 }
+
+
+firmware-download-current-state OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eIdle(1),
+		   eReceivingImage(2),
+		   eReceivedImageError(3),
+		   eVerifyingImage(4),
+		   eVerifiedImageError(5),
+		   eWritingImage(6),
+		   eWritingImageError(7),
+		   eDownloadComplete(8),
+		   eOKtoShutDown(9),
+		   eCancelDownload(10),
+		   eShuttingDown(11)
+		   }
+    ACCESS  read-write
+    STATUS  optional
+    DESCRIPTION
+                "Provides the current or last reportable state of the firmware		
+                download process. The current state may not necessarily be the		
+                current state, but could be the post-mortem state."
+::= { firmware-download 4 }
+
+
+firmware-download-maximum-write-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Reports the manufacturer specified number of times that		
+                firmware can be downloaded to the flash part. A value of -1		
+                means that there is no limit. A value of 0 means that		
+                downloading firmware is not permitted by this part. Any other		
+                positive integer value corresponds to the number of times that		
+                firmware can be downloaded to the flash part.
+                Additional information:
+                Reports the manufacturer specified number of 
+                			times that firmware can be downloaded to the flash 
+                			part.  A value of -1 means that there is no limit.  
+                			A value of 0 means that downloading firmware is not 
+                			permitted by this part.  Any other positive integer 
+                			value corresponds to the number of times that 
+                			firmware can be downloaded to the flash part. The 
+                			current maximum write count is 500. This may change
+                			as flash technology evolves."
+::= { firmware-download 5 }
+
+
+firmware-download-name OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+                "This returns the name of the printer. This should match the		
+                name in the header of the upgrade image being sent to the flash		
+                part. If the name does not match with the name returned then		
+                the image that we are attempting to download does not upgrade		
+                the printer firmware.
+                Additional information:
+                This object returns the HP name of the printer.  
+                			     This should match what is in the PJL header of the RFU job
+                			     Web Jet Admin uses this to ensure the printer is available
+                		   	     to be upgraded."
+::= { firmware-download 6 }
+
+
+firmware-download-version OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+                "This object will return a string value representing the current		
+                revision of firmware that the printer is operating with. This		
+                is used to determine if code needs to be upgraded when an		
+                firmware bundle comes in, in an upgrade job.
+                Additional information:
+                Web Jet Admin uses the version string that is returned to
+                			     determine what peices of an RFU bundle need to be upgraded 
+                			     when an RFU job is being built. This objects will return
+                			     the version string of the printer."
+::= { firmware-download 7 }
+
+
+upgradable-devices-write-status-supported OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eFalse(1),
+		   eTrue(2)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "This object provides information on whether the upgradable
+                device has the ability to communicate the write-status of the
+                upgrade while the upgrade is taking place."
+::= { upgradable-devices 1 }
+
+
+upgradable-devices-write-time OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "If the design of the device upgrade implementation does not
+                allow PML interaction during the download process, this value
+                provides an estimation of the time where the device will not
+                be able to engage in PML communication.  The time returned
+                will depend upon what device is attempting to be upgraded."
+::= { upgradable-devices 2 }
+
+
+upgradable-devices-write-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Tells the number of times that firmware for device X has been
+                downloaded to the flash part.  The default value will vary
+                depending on how many times the firmware is rolled before
+                shipping."
+::= { upgradable-devices 3 }
+
+
+upgradable-devices-current-state OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eIdle(1),
+		   eReceivedImage(2),
+		   eReceivedImageError(3),
+		   eVerifiedImage(4),
+		   eVerifiedImageError(5),
+		   eWritingImage(6),
+		   eWritingImageError(7),
+		   eUpgradeComplete(8)
+		   }
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Provides the current or last reportable state of the device
+                upgrade process.  The current state may not necessarily be the
+                current state, but could be the post-mortem state."
+::= { upgradable-devices 4 }
+
+
+upgradable-devices-max-write-count OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+                "Reports the manufacturer specified number of times that
+                firmware for device X can be downloaded to the flash part.  A
+                value of -1 means that there is no limit.  A value of 0 means
+                that downloading firmware is not permitted by this part.  Any
+                other positive integer value corresponds to the number of
+                times that the firmware for device X can be downloaded to the
+                flash part.  The current maximum write count is 500.  This may
+                change as flash technology evolves."
+::= { upgradable-devices 5 }
+
+
+upgradable-devices-name OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+                "This returns the name of the upgradable device.  This should
+                match the name in the header of the upgrade image being sent
+                to the flash part.  If the name does not match with any of the
+                names returned then the device that we are attempting to
+                upgrade is unavailable for upgrading.
+                Additional information:
+                This object returns the HP name of the printer and the upgradable
+                			     devices. There is one Name object per upgradable device.  
+                			     This should match what is in the PJL header of the RFU job
+                			     Web Jet Admin uses this to ensure the printer or device  is
+                			     available to be upgraded."
+::= { upgradable-devices 6 }
+
+
+upgradable-devices-version OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+                "This object will return a string value representing the
+                current revision of firmware that device X is operating with.
+                This is used to determine if code needs to be upgraded when an
+                firmware bundle comes in, in an upgrade job.
+                Additional information:
+                Web Jet Admin uses the version string that is returned to
+                			     determine what peices of an RFU bundle need to be upgraded 
+                			     when an RFU job is being built. This internal object will 
+                			     return the current version string of the printer or device 
+                			     that it corresponds to."
+::= { upgradable-devices 7 }
+
+
+remote-upgrade-enable OBJECT-TYPE
+    SYNTAX  INTEGER {
+		   eOff(1),
+		   eOn(2)
+		   }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+                "Enables or disables the ability to upgrade the firmware
+                associated with any device that is available to be upgraded.
+                This will be set to on or off at the RFU level in that if this
+                mode is on any available device can be upgraded and if this
+                mode is off none of the devices can be upgraded.  There is not
+                an individual mode for each device.  Trying to set this to a
+                value other than eOn or eOff will cause an UnsupportedValue
+                error to occur."
+::= { upgradable-devices 8 }
+
                
 END
 

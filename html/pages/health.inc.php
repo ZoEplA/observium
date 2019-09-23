@@ -7,27 +7,60 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $datas = array('processor' => array('icon' => $config['entities']['processor']['icon']),
                'mempool'   => array('icon' => $config['entities']['mempool']['icon']),
-               'storage'   => array('icon' => $config['entities']['storage']['icon']),
-               'status'    => array('icon' => $config['entities']['status']['icon']));
+               'storage'   => array('icon' => $config['entities']['storage']['icon']));
 
-if (isset($health_items['printersupplies'])) { $datas['printersupplies'] = array('icon' => $config['entities']['printersupply']['icon']); }
+if ($cache['sensors']['stat']['count'])  { $datas['sensor']        = array('icon' => $config['entities']['sensor']['icon']); }
+if ($cache['statuses']['stat']['count']) { $datas['status']        = array('icon' => $config['entities']['status']['icon']); }
+if ($cache['counters']['stat']['count']) { $datas['counter']       = array('icon' => $config['entities']['counter']['icon']); }
+if ($cache['printersupplies']['count'])  { $datas['printersupply'] = array('icon' => $config['entities']['printersupply']['icon']); }
 
-foreach (array_keys($config['sensor_types']) as $type)
+if (isset($config['sensor_types'][$vars['metric']]))
 {
-  if ($cache['sensor_types'][$type]) { $datas[$type] = $config['sensor_types'][$type]; }
+  // Override sensor specific metric to sensor_class
+  $vars['sensor_class'] = $vars['metric'];
+  $vars['metric'] = "sensor";
 }
-
-if (!$vars['metric']) { $vars['metric'] = "processor"; }
+elseif ($vars['metric'] == 'sensors')
+{
+  // Compat with old metric
+  $vars['metric'] = "sensor";
+}
+elseif (isset($config['counter_types'][$vars['metric']]))
+{
+  //$vars['counter_class'] = $vars['metric'];
+  $vars['metric'] = "counter";
+}
+elseif ($vars['metric'] == 'status')
+{
+  // Status
+  if (isset($vars['class']) && !isset($vars['entPhysicalClass']))
+  {
+    $vars['entPhysicalClass'] = $vars['class'];
+    unset($vars['class']);
+  }
+}
+elseif ($vars['metric'] == 'printersupplies')
+{
+  // Compat with old metric
+  $vars['metric'] = "printersupply";
+}
+elseif (!isset($datas[$vars['metric']]))
+{
+  // By default display processor
+  $vars['metric'] = "processor";
+}
 if (!$vars['view'])   { $vars['view']   = "detail"; }
 
 $link_array = array('page' => 'health');
 
+
+$navbar = [];
 $navbar['brand'] = "Health";
 $navbar['class'] = "navbar-narrow";
 
@@ -35,56 +68,13 @@ $navbar_count = count($datas);
 foreach ($datas as $type => $options)
 {
   if ($vars['metric'] == $type) { $navbar['options'][$type]['class'] = "active"; }
-  else if ($navbar_count > 5)   { $navbar['options'][$type]['class'] = "icon"; } // Show only icons if too many items in navbar
+  elseif ($navbar_count > 7)   { $navbar['options'][$type]['class'] = "icon"; } // Show only icons if too many items in navbar
   if (isset($options['icon']))
   {
     $navbar['options'][$type]['icon'] = $options['icon'];
   }
   $navbar['options'][$type]['url']  = generate_url($link_array, array('metric'=> $type, 'view' => $vars['view']));
-  $navbar['options'][$type]['text'] = nicecase($type);
-}
-
-// Add filter by Physical Class for statuses
-if ($vars['metric'] == 'status')
-{
-  $navbar['options']['class'] = array('text' => 'Physical Class', 'right' => 'true');
-  $sql = 'SELECT DISTINCT `entPhysicalClass` FROM `status` WHERE 1' . $cache['where']['devices_permitted'];
-  $classes = dbFetchColumn($sql);
-  asort($classes);
-  foreach ($classes as $class)
-  {
-    if ($class == '') { $class = OBS_VAR_UNSET; }
-    $name = nicecase($class);
-
-    if (isset($navbar['options']['class']['suboptions'][$class])) { continue; } // Heh, class can be NULL and ''
-    if ($class == $vars['class'] || (is_array($vars['class']) && in_array($class, $vars['class'])))
-    {
-      $navbar['options']['class']['class'] = 'active';
-      $navbar['options']['class']['text'] .= " (".$name.')';
-      $navbar['options']['class']['suboptions'][$class]['url'] = generate_url($vars, array('class' => NULL));
-      $navbar['options']['class']['suboptions'][$class]['class'] = 'active';
-    } else {
-      $navbar['options']['class']['suboptions'][$class]['url'] = generate_url($vars, array('class' => $class));
-    }
-    $navbar['options']['class']['suboptions'][$class]['text'] = $name;
-  }
-}
-
-$groups = get_type_groups($vars['metric']);
-
-$navbar['options']['group'] = array('text' => '', 'icon' => $config['icon']['group'], 'right' => TRUE, 'community' => FALSE);
-foreach ($groups as $group)
-{
-  if ($group['group_id'] == $vars['group'] || in_array($group['group_id'], $vars['group']) )
-  {
-    $navbar['options']['group']['class'] = 'active';
-    $navbar['options']['group']['text'] .= ' ('.escape_html($group['group_name']).')';
-    $navbar['options']['group']['suboptions'][$group['group_id']]['url'] = generate_url($vars, array('group' => NULL));
-    $navbar['options']['group']['suboptions'][$group['group_id']]['class'] = 'active';
-  } else {
-    $navbar['options']['group']['suboptions'][$group['group_id']]['url'] = generate_url($vars, array('group' => $group['group_id']));
-  }
-  $navbar['options']['group']['suboptions'][$group['group_id']]['text'] = escape_html($group['group_name']);
+  $navbar['options'][$type]['text'] = $config['entities'][$type]['names'];
 }
 
 //$navbar['options']['graphs']['text']  = 'Graphs';
@@ -96,23 +86,26 @@ if ($vars['view'] == "graphs")
   $navbar['options']['graphs']['class'] = 'active';
   $navbar['options']['graphs']['url']   = generate_url($vars, array('view' => "detail"));
 } else {
-  $navbar['options']['graphs']['url']    = generate_url($vars, array('view' => "graphs"));
+  $navbar['options']['graphs']['url']   = generate_url($vars, array('view' => "graphs"));
 }
 
 print_navbar($navbar);
 
-if (isset($datas[$vars['metric']]) || $vars['metric'] == "sensors")
+if ($vars['metric'] == "sensor")
 {
-  if (is_file('pages/health/'.$vars['metric'].'.inc.php'))
-  {
-    include($config['html_dir'].'/pages/health/'.$vars['metric'].'.inc.php');
-  } else {
-    $sensor_type = $vars['metric'];
-
-    include($config['html_dir'].'/pages/health/sensors.inc.php');
-  }
-} else {
-  print_warning("No sensors of type " . $vars['metric'] . " found.");
+  include($config['html_dir'].'/pages/health/sensor.inc.php');
+}
+elseif ($vars['metric'] == "counter")
+{
+  include($config['html_dir'].'/pages/health/counter.inc.php');
+}
+elseif (isset($datas[$vars['metric']]) && is_file('pages/health/'.$vars['metric'].'.inc.php'))
+{
+  include($config['html_dir'].'/pages/health/'.$vars['metric'].'.inc.php');
+}
+else
+{
+  print_warning("Unknown health metric " . $vars['metric'] . " found.");
 }
 
 register_html_title("Health");

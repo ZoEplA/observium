@@ -311,7 +311,46 @@ portSecurityMacAddressTable	OBJECT-TYPE
        STATUS      current
        DESCRIPTION       
                "The eighth entry of lastest user mac address."
-       ::= { switchUserMacEntry 10 }          	       
+       ::= { switchUserMacEntry 10 }   
+       
+   cpuBandwidthTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF cpuBandwidthEntry
+       ACCESS  not-accessible
+       STATUS  mandatory
+       DESCRIPTION
+               "A list of cpu bandwidth table entries."
+       ::= { switchSystem 2 }
+
+   cpuBandwidthEntry OBJECT-TYPE
+       SYNTAX cpuBandwidthEntry
+       ACCESS  not-accessible
+       STATUS  mandatory
+       DESCRIPTION
+               "A collection of additional objects in the cpu bandwidth table."
+       INDEX { cpuBandwidthQueueIndex }
+       ::= { cpuBandwidthTable 1 }
+
+   cpuBandwidthEntry ::=
+       SEQUENCE {
+           cpuBandwidthQueueIndex                INTEGER,
+           cpuBandwidthQueueBW                   INTEGER
+       }
+
+   cpuBandwidthQueueIndex OBJECT-TYPE
+       SYNTAX  INTEGER(1..8)
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+               "Queue id. The range is 1-8."
+       ::= { cpuBandwidthEntry 1 } 
+        
+   cpuBandwidthQueueBW OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+               "The rate limitation of cpu queue. Unit is 64kbps. The range is 1-1562. 0 means disable. Default is 0."
+       ::= { cpuBandwidthEntry 2 }               	       
 END
 
 

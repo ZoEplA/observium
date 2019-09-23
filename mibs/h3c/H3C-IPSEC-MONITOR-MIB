@@ -1,8 +1,8 @@
 -- ====================================================================
--- Copyright (C) 2004 by HUAWEI-3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2004 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: The MIB is designed to get IPSec tunnels' statistic information.
--- Reference: Huawei Enterprise MIB
+-- Reference:
 -- Version: 1.5
 -- History:
 --   V1.0: The initial version created by Caixiansen, Renweichun and
@@ -47,13 +47,13 @@ H3C-IPSEC-MONITOR-MIB DEFINITIONS ::= BEGIN
     h3cIPSecMonitor MODULE-IDENTITY
         LAST-UPDATED "200410260000Z"            -- Oct. 26, 2004  GMT
         ORGANIZATION
-            "Huawei-3COM Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Huawei 3Com Technologies Co., Ltd.
-             Shang-Di Information Industry Base,
-             Hai-Dian District Beijing P.R. China
-             http://www.huawei-3com.com
-             ZIP: 100085"
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             "The MIB is designed to get statistic information of
              IPSec tunnels. With this MIB, we can get information of a certain

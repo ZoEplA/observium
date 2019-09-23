@@ -5,7 +5,7 @@ MERAKI-CLOUD-CONTROLLER-MIB
 DEFINITIONS ::= BEGIN
 
   IMPORTS
-    enterprises, MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress, Counter32
       FROM SNMPv2-SMI
     DateAndTime, DisplayString
       FROM SNMPv2-TC
@@ -15,16 +15,25 @@ DEFINITIONS ::= BEGIN
       FROM RFC1213-MIB;
 
 cloudController MODULE-IDENTITY
-  LAST-UPDATED "201205240001Z"
-  ORGANIZATION "Meraki, Inc."
+  LAST-UPDATED "201609010001Z"
+  ORGANIZATION "Cisco Systems, Inc."
   CONTACT-INFO
-    "Meraki, Inc.
-     660 Alabama St.,
-     San Francisco, CA 94110
+    "Cisco Systems, Inc.
+     500 Terry Francois Blvd.,
+     San Francisco, CA 94158
      USA
      Tel: +1-415-632-5800"
   DESCRIPTION
     "Management information base in SMI v2 for the Meraki Cloud Controller."
+  REVISION      "201609010001Z"
+  DESCRIPTION
+    "Updated vpnConnectivityChange trap."
+  REVISION      "201506250001Z"
+  DESCRIPTION
+    "The latest version of this MIB module."
+  REVISION      "201205240001Z"
+  DESCRIPTION
+    "The initial version of this MIB module."
   ::= { meraki 1 }
 
 meraki OBJECT IDENTIFIER ::= { enterprises 29671 }
@@ -35,6 +44,8 @@ merakiProducts OBJECT IDENTIFIER ::= { meraki 2 }
 
 traps OBJECT IDENTIFIER ::= { organization 7 }
 
+merakiObjects OBJECT IDENTIFIER ::= { meraki 3 }
+
 testTrap NOTIFICATION-TYPE
   OBJECTS {networkName}
   STATUS current
@@ -43,7 +54,7 @@ testTrap NOTIFICATION-TYPE
   ::= { traps 1 }
 
 deviceGoesDownTrap NOTIFICATION-TYPE
-  OBJECTS       {devMac, networkName, organizationName}
+  OBJECTS       {organizationName, networkName, devMac}
   STATUS        current
   DESCRIPTION   "Alert when a device becomes unreachable
                  from the Meraki cloud. The device's mac address is
@@ -51,7 +62,7 @@ deviceGoesDownTrap NOTIFICATION-TYPE
   ::= { traps 2 }
 
 deviceComesOnline NOTIFICATION-TYPE
-  OBJECTS       {devMac, networkName, organizationName }
+  OBJECTS       {organizationName, networkName, devMac}
   STATUS        current
   DESCRIPTION   "Alert when a device reconnects to
                  the Meraki cloud. The device's mac address is
@@ -59,117 +70,117 @@ deviceComesOnline NOTIFICATION-TYPE
   ::= { traps 3 }
 
 foreignAPDetected NOTIFICATION-TYPE
-  OBJECTS       {devMac, networkName, organizationName}
+  OBJECTS       {organizationName, networkName, devMac}
   STATUS        current
   DESCRIPTION   "Alert when an unknown access point appears
                  on the network."
   ::= { traps 4 }
 
 cellularNetworkUp NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceModel, devInterfaceCarrier, devInterfaceName}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceModel, devInterfaceCarrier, devInterfaceName}
   STATUS        current
   DESCRIPTION   "Alert when a network connects to a cellular
                  network."
   ::= { traps 5 }
 
 cellularNetworkDown NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceModel, devInterfaceCarrier, devInterfaceName}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceModel, devInterfaceCarrier, devInterfaceName}
   STATUS        current
   DESCRIPTION   "Alert when a network disconnects from a cellular
                  network."
   ::= { traps 6 }
 
 newDhcpServerAlert NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devLanIp, devSubnet, vlanNumber}
+  OBJECTS       {organizationName, networkName, devMac, devLanIp, devSubnet, vlanNumber}
   STATUS        current
   DESCRIPTION   "Alert when a new dhcp server appears on the
                  network."
   ::= { traps 7 }
 
 noDhcpLeases NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devLanIp, vlanNumber}
+  OBJECTS       {organizationName, networkName, devMac, devLanIp, vlanNumber}
   STATUS        current
   DESCRIPTION   "Alert when DHCP leases are exhausted."
   ::= { traps 8 }
 
 uplinkStatusChanged NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceName}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceName}
   STATUS        current
   DESCRIPTION   "Alert when an uplink status changes."
   ::= { traps 9 }
 
 unreachableDevicesDetected NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName}
+  OBJECTS       {organizationName, networkName}
   STATUS        current
   DESCRIPTION   "Unreachable devices have been detected on the
                  network. Adjust firewall settings accordingly."
   ::= { traps 10 }
 
 upcomingFirewallInformationChanges NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName}
+  OBJECTS       {organizationName, networkName}
   STATUS        current
   DESCRIPTION   "Upcoming firewall information changes. Adjust firewall
                  settings accordingly."
   ::= { traps 11 }
 
 gatewayToRepeater NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac}
+  OBJECTS       {organizationName, networkName, devMac}
   STATUS        current
   DESCRIPTION   "Alert when a gateway becomes a repeater."
   ::= { traps 12 }
 
 ipConflict NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devLanIp, devMac}
+  OBJECTS       {organizationName, networkName, devLanIp, devMac}
   STATUS        current
   DESCRIPTION   "Alert if a client IP conflict is detected."
   ::= { traps 13 }
 
 newSplashSignup NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, ssidName, userName, userEmail}
+  OBJECTS       {organizationName, networkName, ssidName, userName, userEmail}
   STATUS        current
   DESCRIPTION   "Alert when a new splash user registers to an SSID."
   ::= { traps 14 }
 
 portCableError NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceDescription, devInterfacePortDescription}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceDescription, devInterfacePortDescription}
   STATUS        current
   DESCRIPTION   "Alert when a cable error is detected."
   ::= { traps 15 }
 
 portConnected NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceDescription}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceDescription}
   STATUS        current
   DESCRIPTION   "Alert when a switch port is connected."
   ::= { traps 16 }
 
 portDisconnected NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceDescription}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceDescription}
   STATUS        current
   DESCRIPTION   "Alert when a switch port is disconnected."
   ::= { traps 17 }
 
 portSpeedChange NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devInterfaceDescription, devInterfacePortDescription}
+  OBJECTS       {organizationName, networkName, devMac, devInterfaceDescription, devInterfacePortDescription}
   STATUS        current
   DESCRIPTION   "Alert when a switch port link speed changed."
   ::= { traps 18 }
 
 rogueDhcpServer NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, devSubnet, devLanIp, vlanNumber }
+  OBJECTS       {organizationName, networkName, devMac, devSubnet, devLanIp, vlanNumber }
   STATUS        current
   DESCRIPTION   "Alert when a rogue DHCP server is detected. Contains the mac, IP,
                  subnet and VLAN of the Rogue DHCP server."
   ::= { traps 19 }
 
 settingsChanged NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, networkAdmin}
+  OBJECTS       {organizationName, networkName, networkAdmin, changeDescription}
   STATUS        current
   DESCRIPTION   "Alert when Meraki Dashboard settings are changed. Includes
                  information about the network admin that made the changes."
   ::= { traps 20 }
 
 unreachableRadiusServer NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, radiusServerIp, ssidName, devLanIp}
+  OBJECTS       {organizationName, networkName, radiusServerIp, ssidName, devLanIp}
   STATUS        current
   DESCRIPTION   "Alert when a RADIUS authentication server becomes
                  unreachable. Contains the IP of the RADIUS server,
@@ -178,18 +189,141 @@ unreachableRadiusServer NOTIFICATION-TYPE
   ::= { traps 21 }
 
 vpnConnectivityChange NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName, devMac, vpnPeer, devStatus}
+  OBJECTS       {organizationName, networkName, devMac, vpnPeer, devStatus, tunnelDescription}
   STATUS        current
   DESCRIPTION   "Alert when VPN connectivity changed. Contains the IP and port of
                  VPN peer, the mac address of the device used to VPN, and the status
                  whether or not the VPN is on or offline"
   ::= { traps 22 }
 
-vpnFailoverDetected NOTIFICATION-TYPE
-  OBJECTS       {networkName, organizationName}
+warmSpareFailoverDetected NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac, devStatus}
   STATUS        current
-  DESCRIPTION   "Alert when a VPN failover is detected."
+  DESCRIPTION   "Alert when a warm spare failover is detected."
   ::= { traps 23 }
+
+loginAttempt NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, loginEmail, loginResult, loginDescription}
+  STATUS        current
+  DESCRIPTION   "Alert when a login attempt is detected."
+  ::= { traps 24 }
+
+malwareDetected NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName}
+  STATUS        current
+  DESCRIPTION   "Alert when malware has been downloaded on the network."
+  ::= { traps 25 }
+
+malwareBlocked NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName}
+  STATUS        current
+  DESCRIPTION   "Alert when malware download attempt has been blocked on the network."
+  ::= { traps 26 }
+
+powerSupplyUp NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac, powerSupplyNum}
+  STATUS        current
+  DESCRIPTION   "Alert when an external power supply gains connectivity."
+  ::= { traps 27 }
+
+powerSupplyDown NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac, powerSupplyNum}
+  STATUS        current
+  DESCRIPTION   "Alert when an external power supply loses connectivity."
+  ::= { traps 28 }
+
+redundantPowerSupplyBackup NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac, powerSupplyNum}
+  STATUS        current
+  DESCRIPTION   "Alert when an external redundant power supply is providing primary power to a switch. Only applies to Layer 2 switches."
+  ::= { traps 29 }
+
+redundantPowerSupplyBackToPrimary NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac, powerSupplyNum}
+  STATUS        current
+  DESCRIPTION   "Alert when the internal power supply returns to providing primary power to a switch. Only applies to Layer 2 switches."
+  ::= { traps 30 }
+
+udldError NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac, portNumber, devInterfacePortDescription, actionTaken}
+  STATUS        current
+  DESCRIPTION   "Alert when there are UDLD errors seen on a port."
+  ::= { traps 31 }
+
+criticalTemperature NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, devMac}
+  STATUS        current
+  DESCRIPTION   "Alert when a device starts operating at critical temperature."
+  ::= { traps 32 }
+
+usageAlert NOTIFICATION-TYPE
+  OBJECTS       {organizationName, networkName, period, endOfHighUsageWindow, threshold, usage}
+  STATUS        current
+  DESCRIPTION   "Alert when a network's total usage passes a specified threshold."
+  ::= { traps 33 }
+
+changeDescription OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The description of a settingsChanged event."
+  ::= { merakiObjects 1 }
+
+loginEmail OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The email used for the login attempt."
+  ::= { merakiObjects 2 }
+
+loginResult OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The result of the login attempt, either success or failure."
+  ::= { merakiObjects 3 }
+
+loginDescription OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "A JSON description of the login attempt which includes the location and time of the attempt."
+  ::= { merakiObjects 4 }
+
+tunnelDescription OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "A JSON description of the tunnel's detailed information."
+  ::= { merakiObjects 5 }
+
+period OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Time period over which network usage is tracked for threshold."
+  ::= { merakiObjects 6 }
+
+endOfHighUsageWindow OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "End time of high usage window."
+  ::= { merakiObjects 7 }
+
+threshold OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Maximum desired network usage."
+  ::= { merakiObjects 8 }
+
+usage OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Actual network usage."
+  ::= { merakiObjects 9 }
 
 organizationName OBJECT-TYPE
   SYNTAX DisplayString
@@ -345,7 +479,8 @@ MerakiDev ::= SEQUENCE {
   devSerial DisplayString,
   devProductCode DisplayString,
   devProductDescription DisplayString,
-  devNetworkName DisplayString
+  devNetworkName DisplayString,
+  devCellularStatus DisplayString
 }
 
 devMac OBJECT-TYPE
@@ -439,6 +574,13 @@ devSubnet OBJECT-TYPE
   DESCRIPTION "The subnet the device is on. Useful for DHCP server alerts."
   ::= { devEntry 13 }
 
+devCellularStatus OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The Cellular status of the device. Useful for monitoring the state of the cellular modem."
+  ::= { devEntry 14 }
+
 devInterfaceTable OBJECT-TYPE
   SYNTAX SEQUENCE OF MerakiDev
   MAX-ACCESS not-accessible
@@ -529,7 +671,7 @@ devInterfacePortDescription OBJECT-TYPE
   SYNTAX DisplayString
   MAX-ACCESS read-only
   STATUS current
-  DESCRIPTION "Description for errors occuring on the interface.
+  DESCRIPTION "Description for errors occurring on the interface.
                Useful for information about ports"
   ::= { devInterfaceEntry 11 }
 
@@ -547,6 +689,27 @@ vlanEntry OBJECT-TYPE
   DESCRIPTION "Describes each VLAN."
   INDEX { networkId, vlanNumber }
   ::= { vlanTable 1 }
+
+powerSupplyNum OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "External power supply number. Will be 0 for redundant supplies and 1+ for modular supplies."
+  ::= { devInterfaceEntry 12 }
+
+actionTaken OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Action taken on the port."
+  ::= { devInterfaceEntry 13 }
+
+portNumber OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Description for the interface. Useful for information about ports"
+  ::= { devInterfaceEntry 14 }
 
 MerakiVLAN ::= SEQUENCE {
   vlanNetworkName DisplayString,
@@ -595,16 +758,45 @@ mr18   OBJECT IDENTIFIER ::= { merakiProducts 18 }
 mr26   OBJECT IDENTIFIER ::= { merakiProducts 19 }
 mr32   OBJECT IDENTIFIER ::= { merakiProducts 20 }
 mr72   OBJECT IDENTIFIER ::= { merakiProducts 21 }
+mr42   OBJECT IDENTIFIER ::= { merakiProducts 22 }
+mr52   OBJECT IDENTIFIER ::= { merakiProducts 23 }
+mr53   OBJECT IDENTIFIER ::= { merakiProducts 24 }
+mr84   OBJECT IDENTIFIER ::= { merakiProducts 25 }
+mr30h  OBJECT IDENTIFIER ::= { merakiProducts 26 }
+mr33   OBJECT IDENTIFIER ::= { merakiProducts 27 }
+mr74   OBJECT IDENTIFIER ::= { merakiProducts 28 }
+mr70   OBJECT IDENTIFIER ::= { merakiProducts 29 }
+mr42e   OBJECT IDENTIFIER ::= { merakiProducts 32 }
+mr53e   OBJECT IDENTIFIER ::= { merakiProducts 33 }
+mr20   OBJECT IDENTIFIER ::= { merakiProducts 34 }
+gr10   OBJECT IDENTIFIER ::= { merakiProducts 35 }
+gr60   OBJECT IDENTIFIER ::= { merakiProducts 36 }
 
 z1     OBJECT IDENTIFIER ::= { merakiProducts 100 }
 mx70   OBJECT IDENTIFIER ::= { merakiProducts 101 }
+mx60   OBJECT IDENTIFIER ::= { merakiProducts 102 }
+mx60w  OBJECT IDENTIFIER ::= { merakiProducts 102 }
 mx80   OBJECT IDENTIFIER ::= { merakiProducts 102 }
 mx90   OBJECT IDENTIFIER ::= { merakiProducts 103 }
 mx400  OBJECT IDENTIFIER ::= { merakiProducts 104 }
 mx600  OBJECT IDENTIFIER ::= { merakiProducts 105 }
 mx100  OBJECT IDENTIFIER ::= { merakiProducts 106 }
-mx60   OBJECT IDENTIFIER ::= { merakiProducts 107 }
-mx60w  OBJECT IDENTIFIER ::= { merakiProducts 108 }
+mx64   OBJECT IDENTIFIER ::= { merakiProducts 107 }
+mx64w  OBJECT IDENTIFIER ::= { merakiProducts 108 }
+mx84   OBJECT IDENTIFIER ::= { merakiProducts 109 }
+mx65   OBJECT IDENTIFIER ::= { merakiProducts 110 }
+mx65w  OBJECT IDENTIFIER ::= { merakiProducts 111 }
+mx250  OBJECT IDENTIFIER ::= { merakiProducts 112 }
+mx450  OBJECT IDENTIFIER ::= { merakiProducts 113 }
+z3     OBJECT IDENTIFIER ::= { merakiProducts 116 }
+gx20   OBJECT IDENTIFIER ::= { merakiProducts 117 }
+mx67   OBJECT IDENTIFIER ::= { merakiProducts 118 }
+mx67w  OBJECT IDENTIFIER ::= { merakiProducts 119 }
+mx67c  OBJECT IDENTIFIER ::= { merakiProducts 120 }
+mx68   OBJECT IDENTIFIER ::= { merakiProducts 121 }
+mx68w  OBJECT IDENTIFIER ::= { merakiProducts 122 }
+mx68cw OBJECT IDENTIFIER ::= { merakiProducts 123 }
+z3c    OBJECT IDENTIFIER ::= { merakiProducts 124 }
 
 merakiVM10   OBJECT IDENTIFIER ::= { merakiProducts 200 }
 
@@ -626,5 +818,42 @@ ms320-48lp  OBJECT IDENTIFIER ::= { merakiProducts 314 }
 ms320-48fp  OBJECT IDENTIFIER ::= { merakiProducts 315 }
 ms420-24    OBJECT IDENTIFIER ::= { merakiProducts 316 }
 ms420-48    OBJECT IDENTIFIER ::= { merakiProducts 317 }
-
+ms350-24    OBJECT IDENTIFIER ::= { merakiProducts 318 }
+ms350-24p   OBJECT IDENTIFIER ::= { merakiProducts 319 }
+ms350-48    OBJECT IDENTIFIER ::= { merakiProducts 320 }
+ms350-48lp  OBJECT IDENTIFIER ::= { merakiProducts 321 }
+ms350-48fp  OBJECT IDENTIFIER ::= { merakiProducts 322 }
+ms410-16    OBJECT IDENTIFIER ::= { merakiProducts 323 }
+ms410-32    OBJECT IDENTIFIER ::= { merakiProducts 324 }
+ms425-16    OBJECT IDENTIFIER ::= { merakiProducts 325 }
+ms425-32    OBJECT IDENTIFIER ::= { merakiProducts 326 }
+ms350-24x   OBJECT IDENTIFIER ::= { merakiProducts 327 }
+ms225-24    OBJECT IDENTIFIER ::= { merakiProducts 328 }
+ms225-24p   OBJECT IDENTIFIER ::= { merakiProducts 329 }
+ms225-48    OBJECT IDENTIFIER ::= { merakiProducts 330 }
+ms225-48lp  OBJECT IDENTIFIER ::= { merakiProducts 331 }
+ms225-48fp  OBJECT IDENTIFIER ::= { merakiProducts 332 }
+ms250-24    OBJECT IDENTIFIER ::= { merakiProducts 333 }
+ms250-24p   OBJECT IDENTIFIER ::= { merakiProducts 334 }
+ms250-48    OBJECT IDENTIFIER ::= { merakiProducts 335 }
+ms250-48lp  OBJECT IDENTIFIER ::= { merakiProducts 336 }
+ms250-48fp  OBJECT IDENTIFIER ::= { merakiProducts 337 }
+ms120-8     OBJECT IDENTIFIER ::= { merakiProducts 338 }
+ms120-8lp   OBJECT IDENTIFIER ::= { merakiProducts 339 }
+ms120-8fp   OBJECT IDENTIFIER ::= { merakiProducts 340 }
+ms120-24    OBJECT IDENTIFIER ::= { merakiProducts 341 }
+ms120-24p   OBJECT IDENTIFIER ::= { merakiProducts 342 }
+ms120-48    OBJECT IDENTIFIER ::= { merakiProducts 343 }
+ms120-48lp  OBJECT IDENTIFIER ::= { merakiProducts 344 }
+ms210-24    OBJECT IDENTIFIER ::= { merakiProducts 345 }
+ms210-24p   OBJECT IDENTIFIER ::= { merakiProducts 346 }
+ms210-48    OBJECT IDENTIFIER ::= { merakiProducts 347 }
+ms210-48lp  OBJECT IDENTIFIER ::= { merakiProducts 348 }
+ms210-48fp  OBJECT IDENTIFIER ::= { merakiProducts 349 }
+ms120-48fp  OBJECT IDENTIFIER ::= { merakiProducts 356 }
+ms355-24x   OBJECT IDENTIFIER ::= { merakiProducts 357 }
+ms355-24x2  OBJECT IDENTIFIER ::= { merakiProducts 358 }
+ms355-48x   OBJECT IDENTIFIER ::= { merakiProducts 359 }
+ms355-48x2  OBJECT IDENTIFIER ::= { merakiProducts 360 }
+ms450-12    OBJECT IDENTIFIER ::= { merakiProducts 361 }
 END

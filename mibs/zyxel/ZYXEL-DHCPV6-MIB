@@ -5,6 +5,14 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-DHCPV6-MIB.mib $ 
+-- Revision 1.12  2015/05/27 07:31:02  Bruno 
+-- Revise length range 
+-- Revision 1.11  2015/05/04 07:04:01  Randy 
+-- 1. Add the refresh time range 0. 2. Change the PD table index(DUID) to not-accessible type. 
+-- Revision 1.10  2015/03/16 07:20:14  Randy 
+-- Move the DHCPv6 info entry and PD entry table's RowStatus column to lastest, and modify the OID to 100. 
+-- Revision 1.9  2014/12/18 07:03:54  Randy 
+-- Support DHCPv6 Server. 
 -- Revision 1.8  2013/12/06 07:03:52  ccho 
 -- remove uncessary imports 
 -- Revision 1.7  2012/12/11 08:27:20  Dana 
@@ -236,6 +244,158 @@ ZYXEL-DHCPV6-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION
 		"Sets the time interval (in seconds) at which the switch exchanges other configuration information with a DHCPv6 server again."
 		::= { zyxelDhcpv6ClientEntry 6 }
+		
+--  zyDhcpv6ServerMaxInfoNumber
+    	zyDhcpv6ServerMaxInfoNumber OBJECT-TYPE
+        SYNTAX  	INTEGER
+        MAX-ACCESS  read-only
+        STATUS  	current
+        DESCRIPTION
+		"The maximum numbers of DHCPv6 server entry that can be created."
+		::= { zyxelDhcpv6Setup 4 }
+		
+-- 	zyxelDhcpv6ServerTable
+		zyxelDhcpv6ServerTable	OBJECT-TYPE
+		SYNTAX 	SEQUENCE OF ZyxelDhcpv6ServerInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		"The table contains DHCPv6 server configuration. "
+		::= { zyxelDhcpv6Setup 5 }
+		
+		zyxelDhcpv6ServerInfoEntry	OBJECT-TYPE
+		SYNTAX	ZyxelDhcpv6ServerInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION		
+		"An entry contains DHCPv6 server configuration."
+		INDEX	{ zyDhcpv6ServerInfoIfIndex }
+		::= { zyxelDhcpv6ServerTable 1}
+		
+		ZyxelDhcpv6ServerInfoEntry ::=
+			SEQUENCE {
+				zyDhcpv6ServerInfoIfIndex	 			INTEGER,
+				zyDhcpv6ServerInfoDNSServerIpAddress	InetAddress,
+				zyDhcpv6ServerInfoRefreshTime			Unsigned32,
+				zyDhcpv6ServerInfoRowStatus 			RowStatus
+			}		
+		
+		zyDhcpv6ServerInfoIfIndex	OBJECT-TYPE
+		SYNTAX	INTEGER (1..4096)
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		"DHCPv6 server interface index."
+		::= { zyxelDhcpv6ServerInfoEntry 1}
+				
+		zyDhcpv6ServerInfoDNSServerIpAddress	OBJECT-TYPE
+		SYNTAX	InetAddress
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		"Enter the IPv6 address of a DNS server."
+		::= { zyxelDhcpv6ServerInfoEntry 2}
+		
+		zyDhcpv6ServerInfoRefreshTime	OBJECT-TYPE
+		SYNTAX	Unsigned32 (0|600..4294967295)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		"Sets the time interval of DHCPv6 server refresh time option."
+		::= { zyxelDhcpv6ServerInfoEntry 3}
+		
+		zyDhcpv6ServerInfoRowStatus	OBJECT-TYPE
+		SYNTAX	RowStatus
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+		"This object allows DHCPv6 server entries to be created and deleted."
+		::= { zyxelDhcpv6ServerInfoEntry 100}  
+
+--  zyDhcpv6ServerMaxPDNumber
+    	zyDhcpv6ServerMaxPDNumber OBJECT-TYPE
+        SYNTAX  	INTEGER
+        MAX-ACCESS  read-only
+        STATUS  	current
+        DESCRIPTION
+		"The maximum numbers of DHCPv6 Server Prefix Delegation entry that can be created."
+		::= { zyxelDhcpv6Setup 6 }
+
+--	zyxelDhcpv6PDTable
+		zyxelDhcpv6PDTable	OBJECT-TYPE
+		SYNTAX 	SEQUENCE OF ZyxelDhcpv6ServerPDEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		"The table contains DHCPv6 server prefix delegation configuration. "
+		::= { zyxelDhcpv6Setup 7 }
+		
+		zyxelDhcpv6ServerPDEntry	OBJECT-TYPE
+		SYNTAX	ZyxelDhcpv6ServerPDEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION		
+		"An entry contains DHCPv6 server configuration."
+		INDEX	{ zyDhcpv6ServerPDClientDUID }
+		::= { zyxelDhcpv6PDTable 1}
+		
+		ZyxelDhcpv6ServerPDEntry ::=
+			SEQUENCE {
+				zyDhcpv6ServerPDClientDUID		DisplayString,
+				zyDhcpv6ServerPDClientName		DisplayString,
+				zyDhcpv6ServerPDIfIndex			INTEGER,
+				zyDhcpv6ServerPDPrefix			InetAddress,
+				zyDhcpv6ServerPDPrefixLength	INTEGER,
+				zyDhcpv6ServerPDRowStatus		RowStatus
+			}		
+
+		zyDhcpv6ServerPDClientDUID	OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		"The client DUID of the DHCPv6 Server Prefix Delegation entries."
+		::= { zyxelDhcpv6ServerPDEntry 1}  
+		
+		zyDhcpv6ServerPDClientName	OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		"The client name of the DHCPv6 Server Prefix Delegation entries."
+		::= { zyxelDhcpv6ServerPDEntry 2}  
+			
+		zyDhcpv6ServerPDIfIndex	OBJECT-TYPE
+		SYNTAX	INTEGER
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		"DHCPv6 Server interface index."
+		::= { zyxelDhcpv6ServerPDEntry 3}  
+		
+		zyDhcpv6ServerPDPrefix	OBJECT-TYPE
+		SYNTAX	InetAddress
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		"Enter the IPv6 prefix of a DHCPv6 server Prefix Delegation entry."
+		::= { zyxelDhcpv6ServerPDEntry 4}  
+		
+		zyDhcpv6ServerPDPrefixLength	OBJECT-TYPE
+		SYNTAX	INTEGER (1..128)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		"Enter the IPv6 prefix Length of a DHCPv6 server Prefix Delegation entry."
+		::= { zyxelDhcpv6ServerPDEntry 5}  
+		    
+		zyDhcpv6ServerPDRowStatus	OBJECT-TYPE
+		SYNTAX	RowStatus
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+		"This object allows DHCPv6 Server Prefix Delegation entries to be created and deleted."
+		::= { zyxelDhcpv6ServerPDEntry 100} 
 		
 --	2. zyxelDhcpv6Status
 

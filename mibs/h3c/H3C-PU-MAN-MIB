@@ -1,7 +1,7 @@
 -- ===========================================================================================================
 -- Copyright (C) 2007 by H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: H3C EC(Encoder) Feature Configuration management MIB
+-- Description: EC(Encoder) Feature Configuration management MIB
 -- Reference:
 -- Version: V1.0
 -- History:
@@ -21,13 +21,13 @@ IMPORTS
 h3cPUMan MODULE-IDENTITY
     LAST-UPDATED "200709050000Z"        -- September 5, 2007  GMT
     ORGANIZATION
-        "H3C Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Surveillance Network Management Team H3C Technologies Co.,Ltd.
-        East-Com Information Industry Base,
-        Bing-Jiang District Hangzhou P.R. China
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
         http://www.h3c.com
-        Zip:100085"
+        Zip:100085
+        "
     DESCRIPTION
         "The PU includes those device like EC(Encoder), DC(Decoder) and
         ECR(Encoder Recorder). The PU will survey the remote video and

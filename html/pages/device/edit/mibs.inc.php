@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -19,7 +19,7 @@ foreach (get_device_mibs($device) as $mib) { $mibs[$mib]++; }
 // Sort alphabetically
 ksort($mibs);
 
-$attribs = get_entity_attribs('device', $device['device_id']);
+$mibs_disabled = get_device_mibs_disabled($device);
 
 if ($vars['submit'])
 {
@@ -31,15 +31,17 @@ if ($vars['submit'])
     {
       $mib = $vars['toggle_mib'];
 
-      if (isset($attribs['mib_'.$mib]))
+      $mib_disabled = in_array($mib, $mibs_disabled);
+      if ($mib_disabled)
       {
-        del_entity_attrib('device', $device, 'mib_' . $mib);
+        set_device_mib_enable($device, $mib, TRUE); // really just remove
       } else {
-        set_entity_attrib('device', $device, 'mib_' . $mib, "0");
+        set_device_mib_disable($device, $mib);
       }
 
       // reload attribs
-      $attribs = get_entity_attribs('device', $device['device_id']);
+      unset($cache['devices']['mibs_disabled'][$device['device_id']]);
+      $mibs_disabled = get_device_mibs_disabled($device);
     }
   }
 }
@@ -89,12 +91,12 @@ print_warning("This page allows you to disable certain MIBs to be polled for a d
 
 foreach ($mibs as $mib => $count)
 {
-  $attrib_set = isset($attribs['mib_'.$mib]);
-  $mib_errors = isset($snmp_errors[$mib]);
+  $mib_disabled = in_array($mib, $mibs_disabled);
+  $mib_errors   = isset($snmp_errors[$mib]);
 
   echo('<tr'. ($mib_errors ? ' class="error"' : '') . '><td><strong>'.$mib.'</strong></td><td>');
 
-  if ($attrib_set && $attribs['mib_'.$mib] == 0)
+  if ($mib_disabled)
   {
     $attrib_status = '<span class="label label-error">disabled</span>';
     $toggle = 'Enable'; $btn_class = 'btn-success'; $btn_icon = 'icon-ok';
@@ -192,7 +194,7 @@ foreach ($snmp_errors as $mib => $entries)
     $text_class = (count(explode(' ', $error_db['oid'])) > 3 ? '' : 'text-nowrap');
     echo('<tr width="100%" class="'.$error_class2.'"><td style="width: 50%;" class="'.$text_class.'"><strong><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;'.$error_db['oid'].'</strong></td>' . PHP_EOL);
     $timediff = $GLOBALS['config']['time']['now'] - $error_db['updated'];
-    echo('<td style="width: 100px; white-space: nowrap; text-align: right;">'.generate_tooltip_link('', formatUptime($timediff, "short-3").' ago', format_unixtime($error_db['updated'])).'</td>' . PHP_EOL);
+    echo('<td style="width: 100px; white-space: nowrap; text-align: right;">'.generate_tooltip_link('', format_uptime($timediff, "short-3").' ago', format_unixtime($error_db['updated'])).'</td>' . PHP_EOL);
     echo('<td style="width: 80px; white-space: nowrap;"><span class="text-'.$error_class.'">'.$error_codes[$error_db['error_code']]['reason'].'</span></td>' . PHP_EOL);
     echo('<td style="width: 40px; text-align: right;"><span class="label">'.$error_db['error_count'].'</span></td>' . PHP_EOL);
     echo('<td style="width: 80px; text-align: right;"><span class="label">'.round($error_db['error_rate'], 2).'/poll</span></td>' . PHP_EOL);

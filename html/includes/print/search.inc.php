@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -135,7 +135,7 @@ function print_search($data, $title = NULL, $button = 'search', $url = NULL)
       $string .= '        <option value="'.$item.'"';
       if ($sort['value'] == $item)
       {
-        $string .= ' data-icon="'.$config['icon']['sort'].'" selected';
+        $string .= ' data-icon="'.$GLOBALS['config']['icon']['sort'].'" selected';
       }
       $string .= '>'.$name.'</option>';
     }
@@ -159,10 +159,10 @@ function print_search($data, $title = NULL, $button = 'search', $url = NULL)
   {
     // Note. 'update' - use POST request, all other - use GET with generate url from js.
     case 'update':
-      $string .= '<i class="icon-refresh"></i> Update</button>' . PHP_EOL;
+      $string .= get_icon('icon-refresh').'&nbsp;Update</button>' . PHP_EOL;
       break;
     default:
-      $string .= '<i class="icon-search"></i> Search</button>' . PHP_EOL;
+      $string .= get_icon('icon-search').'&nbsp;Search</button>' . PHP_EOL;
   }
   $string .= '    </div>' . PHP_EOL;
   $string .= '</div></div></div></form>' . PHP_EOL;
@@ -300,14 +300,14 @@ function print_form($data, $return = FALSE)
           }
         }
       }
-      $row_grid = 12 - $grid_count;                            // Free grid size after custom grind
+      $row_grid = 12 - $grid_count;                            // Free grid size after custom grid
       $row_grid = intval($row_grid / $row_count);              // Default (auto) grid size for elements
       if ($grid_count > 2 && $row_grid < 1) { $row_grid = 1; } // minimum 1 for auto if custom grid passed
       else if ($row_grid < 2)               { $row_grid = 2; } // minimum 2 for auto
 
       $data['grid'][$k] = $row_grid;                           // Store default grid size for row
     }
-    //r($data);
+    //r($data['grid']);
 
     foreach ($data['row'] as $k => $row)
     {
@@ -395,10 +395,7 @@ function print_form($data, $return = FALSE)
       if (isset($data['title']))
       {
         $div_begin .= '  <div class="title">';
-        if ($data['icon'])
-        {
-           $div_begin .= '<i class="'.$data['icon'].'"></i>';
-        }
+        $div_begin .= get_icon($data['icon']);
         $div_begin .= '&nbsp;'.$data['title'].'</div>' . PHP_EOL;
       }
       $div_end   = '</div>' . PHP_EOL;
@@ -565,7 +562,7 @@ function print_form($data, $return = FALSE)
         }
         $row_elements .= PHP_EOL . $fieldset[$row_group] . '
           </fieldset>  <!-- END fieldset-'.$row_group.' -->
-        ' . PHP_EOL;
+' . PHP_EOL;
         $fieldset[$row_group] = $row_elements . $fieldset_end;
       }
     }
@@ -1030,7 +1027,7 @@ function generate_form_element($item, $type = '')
   if (!isset($item['type']))  { $item['type'] = $type; }
   $string          = '';
   $element_tooltip = '';
-  $element_attribs = '';
+  $element_data    = '';
   if (isset($item['attribs']) && is_array($item['attribs']))
   {
     // Custom html attributes
@@ -1059,17 +1056,35 @@ function generate_form_element($item, $type = '')
         //  register_html_resource('script', '$("[data-toggle=\'' . $item['attribs']['data-toggle'] . '\']").bootstrapSwitch();');
         //  break;
         case 'toggle':
-          // TinyToggle
-          $script = '';
-          if ($item['onchange'])
+          if (str_contains($item['class'], 'tiny-toggle'))
           {
-            // Here toggle specific onchange behavior
-            $script .= 'onChange: function(obj, value) { ' . $item['onchange'] . ' },';
-            unset($item['onchange']);
+            // TinyToggle
+            $script = '';
+            if ($item['onchange'])
+            {
+              // Here toggle specific onchange behavior
+              $script .= 'onChange: function(obj, value) { ' . $item['onchange'] . ' },';
+              // Set custom element selector
+              $selector = 'tiny-toggle-' . md5($item['onchange']);
+              $element_data .= ' data-selector="'.$selector.'"';
+              register_html_resource('script', '$("input[data-selector=\''.$selector.'\'].tiny-toggle").tinyToggle({' . $script . '});');
+              unset($item['onchange']);
+            } else {
+              $element_data .= ' data-selector="tiny-toggle"';
+              //register_html_resource('script', '$("[data-toggle=\'' . $item['attribs']['data-toggle'] . '\']").tinyToggle({'.$script.'});'); // this selector intersects with bootstrap toggle
+              register_html_resource('script', '$("input[data-selector=\'tiny-toggle\'].tiny-toggle").tinyToggle();');
+            }
+            register_html_resource('js',  'tiny-toggle.min.js');
+            register_html_resource('css', 'tiny-toggle.min.css');
+          } else {
+            // Bootstrap Toggle
+            $element_data .= ' data-selector="bootstrap-toggle"';
+            register_html_resource('js',     'bootstrap-toggle.min.js');
+            //register_html_resource('js',     'bootstrap-toggle.js'); /// DEVEL
+            register_html_resource('css',    'bootstrap-toggle.min.css');
+            register_html_resource('script', '$("input[data-selector=\'bootstrap-toggle\']").bootstrapToggle();');
           }
-          register_html_resource('js',     'jquery.tinytoggle.min.js');
-          register_html_resource('css',    'tinytoggle.min.css');
-          register_html_resource('script', '$("[data-toggle=\'' . $item['attribs']['data-toggle'] . '\']").tinyToggle({'.$script.'});');
+          //r($item);
           break;
       }
     }
@@ -1090,16 +1105,14 @@ function generate_form_element($item, $type = '')
       if ($item['type'] != 'textarea')
       {
         $item_begin = '    <input type="'.$item['type'].'" ';
+        // Autocomplete
+        $autocomplete_off = isset($item['autocomplete']) && !$item['autocomplete']; // Disable autocomplete if it set in item params as FALSE!
         // password specific options
         if ($item['type'] == 'password')
         {
-          // disable autocomplete for passwords
-          //$item_begin .= ' autocomplete="off" ';
-          // http://stackoverflow.com/questions/15738259/disabling-chrome-autofill
-          if (!(isset($item['autocomplete']) && $item['autocomplete']))
-          {
-            $item_begin .= ' autocomplete="new-password" ';
-          }
+          // disable autocomplete for passwords by default!
+          $autocomplete_off = !(isset($item['autocomplete']) && $item['autocomplete']);
+
           // mask password field for disabled/readonly by bullet
           if (strlen($item['value']) && ($item['disabled'] || $item['readonly']))
           {
@@ -1115,6 +1128,51 @@ function generate_form_element($item, $type = '')
             register_html_resource('js', 'bootstrap-show-password.min.js');
             $GLOBALS['cache_html']['javascript'][] = "$('[data-toggle=\"password\"]').password();";
           }
+        }
+        // Disable Autocomplete if required
+        if ($autocomplete_off)
+        {
+          $browser = detect_browser();
+          //r($browser);
+
+          // Autofill off is not simple!
+          //https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion#The_autocomplete_attribute_and_login_fields
+          //https://www.chromium.org/developers/design-documents/form-styles-that-chromium-understands
+          if ($item['type'] == 'password') {
+            $autocomplete_value = 'new-password';
+          } else {
+            $autocomplete_value = 'off';
+          }
+          $item_begin .= ' autocomplete="'.$autocomplete_value.'" ';
+
+          if ($browser['browser'] == 'Safari') {
+            // Safari issue: https://stackoverflow.com/questions/22661977/disabling-safari-autofill-on-usernames-and-passwords
+            //$item_begin .= ' autocomplete="off" readonly onfocus="if (this.hasAttribute(\'readonly\')) {this.removeAttribute(\'readonly\'); this.blur(); this.focus();}" ';
+            //$item_begin .= ' autocomplete="false" ';
+            // This disable safari autocomplete button
+            register_html_resource('style', <<<STYLE
+input::-webkit-contacts-auto-fill-button, 
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+STYLE
+            );
+          }
+          /*
+          else if ($browser['browser'] == 'Chrome') {
+            // Chrome issue: http://stackoverflow.com/questions/15738259/disabling-chrome-autofill
+            //$item_begin .= ' autocomplete="new-password" ';
+            $item_begin .= ' autocomplete="off" ';
+
+          } else {
+            $item_begin .= ' autocomplete="new-password" '; // This not worked in latest Chrome versions
+          }
+          // http://stackoverflow.com/questions/15738259/disabling-chrome-autofill
+          //$item_begin .= ' autocomplete="off" '; // This not worked in latest Chrome versions
+          */
         }
         $item_end   = ' value="'.$item['value_escaped'].'" />';
         $item_class = 'input';
@@ -1153,7 +1211,7 @@ function generate_form_element($item, $type = '')
         $item['placeholder'] = TRUE; // Set to true for check at end
       } else {
         $string .= '  <div class="input-prepend">' . PHP_EOL;
-        if (!$item['name']) { $item['name'] = '<i class="icon-list"></i>'; }
+        if (!$item['name']) { $item['name'] = get_icon('icon-list'); }
         $string .= '    <span class="add-on">'.$item['name'].'</span>' . PHP_EOL;
         $string .= $item_begin;
       }
@@ -1196,6 +1254,13 @@ function generate_form_element($item, $type = '')
       wildcard: '%QUERY',
       filter: function(json) {
         return json.options;
+      },
+      transform: function (data) {
+          var newData = [];
+          data.forEach(function (item) {
+            newData.push({'value': item});
+          });
+          return newData;
       }
     }
   });
@@ -1246,10 +1311,75 @@ SCRIPT;
       return generate_form_element($item);
       // end switch
 
+    case 'switch-ng':
+    case 'switch-new':
+      // toggle specific options
+      // Convert to data attribs and recursive call to checkbox
+      $item['attribs']['data-toggle'] = 'toggle';
+      // Convert to data attribs and recursive call to checkbox
+      $item_attribs = ['size', 'width', 'height'];
+      foreach($item_attribs as $attr)
+      {
+        if (isset($item[$attr])) { $item['attribs']['data-'.$attr] = $item[$attr]; }
+      }
+      // Append icons
+      if (isset($item['icon']))
+      {
+        $item['on-icon']  = isset($item['on-icon'])  ? $item['on-icon']  : $item['icon'];
+        $item['off-icon'] = isset($item['off-icon']) ? $item['off-icon'] : $item['icon'];
+      }
+      if (isset($item['on-icon']))
+      {
+        if (isset($item['on-text']))
+        {
+          $item['on-text'] = get_icon($item['on-icon']) . '&nbsp;' . $item['on-text'];
+        } else {
+          $item['on-text'] = get_icon($item['on-icon']);
+        }
+      }
+      if (isset($item['off-icon']))
+      {
+        if (isset($item['off-text']))
+        {
+          $item['off-text'] = get_icon($item['off-icon']) . '&nbsp;' . $item['off-text'];
+        } else {
+          $item['off-text'] = get_icon($item['off-icon']);
+        }
+      }
+      // This is compat with old 'switch' item attribs
+      $item_attribs = ['on-color' => 'onstyle', 'on-text' => 'on', 'off-color' => 'offstyle', 'off-text' => 'off', 'class' => 'style'];
+      foreach($item_attribs as $attr => $data_attr)
+      {
+        if (isset($item[$attr])) { $item['attribs']['data-'.$data_attr] = $item[$attr]; }
+      }
+
+      // Onchange target id
+//      if ($item['onchange-id'])
+//      {
+//        $item['attribs']['data-onchange-id'] = $item['onchange-id'];
+//      }
+
+      //$item['class'] .= ' tiny-toggle'; // additional class for toggle
+      $item['type'] = 'checkbox';       // replace item type
+      return generate_form_element($item);
+    // end toggle
+
     case 'toggle':
       // toggle specific options
       // Convert to data attribs and recursive call to checkbox
       $item['attribs']['data-toggle'] = 'toggle';
+      // Convert switch style attr to toggle
+      $item_attribs = ['on-icon' => 'icon-check', 'on-text' => 'label-check', 'off-icon' => 'icon-uncheck', 'off-text' => 'label-uncheck'];
+      foreach($item_attribs as $attr => $data_attr)
+      {
+        if (isset($item[$attr]) && !isset($item[$data_attr])) { $item[$data_attr] = $item[$attr]; }
+      }
+      // Move placeholder to label
+      if (isset($item['placeholder']) && is_string($item['placeholder']))
+      {
+        $item['attribs']['data-tt-label'] = $item['placeholder'];
+        unset($item['placeholder']);
+      }
       $item_attribs = array('size', 'palette', 'group', 'label', 'icon-check', 'label-check', 'icon-uncheck', 'label-uncheck');
       foreach($item_attribs as $attr)
       {
@@ -1267,6 +1397,12 @@ SCRIPT;
       {
         $item['attribs']['data-onchange-id'] = $item['onchange-id'];
       }
+      // tiny-toggle not support readonly
+      if (isset($item['readonly']))
+      {
+        $item['disabled'] = $item['readonly'] || $item['disabled'];
+        //unset($item['readonly']);
+      }
 
       $item['class'] .= ' tiny-toggle'; // additional class for toggle
       $item['type'] = 'checkbox'; // replace item type
@@ -1278,7 +1414,7 @@ SCRIPT;
       $string .= ' name="'.$item['id'] . '" id="' .$item['id'] . '" ' . $item_switch;
       if ($item['title'])
       {
-        $string .= ' data-rel="tooltip" data-tooltip="'.escape_html($item['title']).'"';
+        $string .= ' data-rel="tooltip" data-tooltip="'.escape_html($item['title']).'" title="'.escape_html($item['title']).'"';
       }
       if ($item['value'] == '1' || $item['value'] === 'on' || $item['value'] === 'yes' || $item['value'] === TRUE)
       {
@@ -1296,6 +1432,10 @@ SCRIPT;
       {
         $string .= ' onchange="'.$item['onchange'].'"';
       }
+      if ($item['class'])
+      {
+        $string .= ' class="' . trim($item['class']) . '"';
+      }
       $string .= $element_data; // Add custom data- attribs
       $string .= ' value="1" />';
       if (is_string($item['placeholder']))
@@ -1303,6 +1443,8 @@ SCRIPT;
         // add placeholder text at right of the element
         $string .= '      <label for="' . $item['id'] . '" class="help-inline" style="margin-top: 4px;">' .
                    $item['placeholder'] . '</label>' . PHP_EOL;
+//        $string = '      <label for="' . $item['id'] . '" class="help-inline" style="margin-top: 4px;">' . $string .
+//                  $item['placeholder'] . '</label>' . PHP_EOL;
       }
       // End 'switch' & 'checkbox'
       break;
@@ -1798,6 +1940,11 @@ SCRIPT;
         $button_onclick = " onclick=\"form_to_path('".$item['form_id']."');\"";
       }
 
+      if ($item['onclick'])
+      {
+        $button_onclick = ' onclick="'.$item['onclick'].'"';
+      }
+
       $button_disabled = $item['disabled'] || $item['readonly'];
       if ($button_disabled)
       {
@@ -2015,7 +2162,7 @@ function generate_modal_open(&$args)
     $string .= '        <h3 class="modal-title" id="' . $args['id'] . '_label">';
     if ($args['icon'])
     {
-      $string .= '<i class="' . $args['icon'] . '"></i>&nbsp;';
+      $string .= get_icon($args['icon']) . '&nbsp;';
     }
     $string .= $args['title'] . '</h3>' . PHP_EOL;
   }

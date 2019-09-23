@@ -6,7 +6,7 @@ ELTEX-MES-MNG-MIB DEFINITIONS ::= BEGIN
 -- 21-Sep-2012 - Added eltMesIfExtensionMIB
 
 IMPORTS
-    eltMesMng                                               FROM ELTEX-MES
+    eltMesMng                                              	FROM ELTEX-MES
     MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI;
 
 elt-mes-mib-2               OBJECT IDENTIFIER ::= { eltMesMng   1 }
@@ -15,9 +15,12 @@ eltMesAAAStatMIB            OBJECT IDENTIFIER ::= { eltMesMng   3 }
 eltMesSnmpCommExtMIB        OBJECT IDENTIFIER ::= { eltMesMng   4 }
 --eltMesFlexLinksMIB        OBJECT IDENTIFIER ::= { eltMesMng   5 }
 --eltMesIpSlaMIB            OBJECT IDENTIFIER ::= { eltMesMng   6 }
---eltMesMacNotificationMIB  OBJECT IDENTIFIER ::= { eltMesMng   7 }
---eltMesCountersMIB         OBJECT IDENTIFIER ::= { eltMesMng   8 }
+eltMesMacNotificationMIB    OBJECT IDENTIFIER ::= { eltMesMng   7 }
+eltMesCountersMIB           OBJECT IDENTIFIER ::= { eltMesMng   8 }
 eltMesCpuTasksUtilMIB       OBJECT IDENTIFIER ::= { eltMesMng   9 }
+eltMesSystemExtMIB          OBJECT IDENTIFIER ::= { eltMesMng  10 }
+
+
 
 eltMesIfExtensionMIB        OBJECT IDENTIFIER ::= { eltMesMng 276 }
 eltMesBridgeExtMIB          OBJECT IDENTIFIER ::= { eltMesMng 401 }

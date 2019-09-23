@@ -1,7 +1,7 @@
 -- ====================================================================
--- Copyright (C) 2005 by HUAWEI 3Com TECHNOLOGIES.  All rights reserved
+-- Copyright (C) 2005 by H3C TECHNOLOGIES.  All rights reserved
 --
--- Description: DLSW HUAWEI 3Com Specific Features MIB
+-- Description: DLSW Specific Features MIB
 -- Reference: RFC2024
 -- Version: V1.0
 -- History:
@@ -37,18 +37,15 @@ IMPORTS
 h3cDlswExt MODULE-IDENTITY
     LAST-UPDATED "200507201900Z"        -- Jul 20, 2005 at 19:00 GMT
     ORGANIZATION
-        "Huawei-3com Technologies co.,Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "R&D Beijing Huawei-3com Technologies Co., Ltd.
-         Oriental Electronic Bld., NO.1, Street 8,
-         Shang-Di Information Industry Base,
-         Hai-Dian District, Beijing, P.R. China
-         Zip:100085
-         Http://www.huawei-3com.com
-         E-mail:support@huawei-3com.com"
-
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
     DESCRIPTION
-        "The MIB module for management of HUAWEI-3COM specific Data Link
+        "The MIB module for management of specific Data Link
          Switching protocol enhancements. DLSw is described in
          RFC 1795, RFC 2024 and RFC2166."
     REVISION "200507201900Z"   -- Jul 20, 2005 at 19:00 GMT
@@ -69,7 +66,7 @@ h3cdeEthernetBackup OBJECT IDENTIFIER ::= { h3cDlswExtMIBObjects 8 }
 
 
 -- ====================================================================
--- H3C DLSw Extension Node Objects
+-- DLSw Extension Node Objects
 -- ====================================================================
 
 h3cdeNodeVendorID OBJECT-TYPE
@@ -335,7 +332,7 @@ h3cdeNodeTcpQueueMax OBJECT-TYPE
 
 
 -- ====================================================================
--- H3C DLSw Extension Transport Connection Configuration Table
+-- DLSw Extension Transport Connection Configuration Table
 -- ====================================================================
 h3cdeTConnConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeTConnConfigEntry
@@ -449,7 +446,7 @@ h3cdeTConnConfigBackupLinger OBJECT-TYPE
     ::= { h3cdeTConnConfigEntry 7 }
 
 -- ====================================================================
--- H3C DLSw Extension Transport Connection Operation Table
+-- DLSw Extension Transport Connection Operation Table
 -- ====================================================================
 h3cdeTConnOperTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeTConnOperEntry
@@ -570,7 +567,7 @@ h3cdeTConnOperDropPkts OBJECT-TYPE
     ::= { h3cdeTConnOperEntry 9 }
 
 -- ====================================================================
--- H3C DLSw Extension TCP Transport Connection Specific Configuration
+-- DLSw Extension TCP Transport Connection Specific Configuration
 -- ====================================================================
 h3cdeTConnTcpConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeTConnTcpConfigEntry
@@ -621,7 +618,7 @@ h3cdeTConnTcpConfigQueueMax  OBJECT-TYPE
     ::= { h3cdeTConnTcpConfigEntry 1 }
 
 -- ====================================================================
--- H3C DLSw Bridge MIB-Group
+-- DLSw Bridge MIB-Group
 -- ====================================================================
 h3cdeBridgeTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeBridgeEntry
@@ -663,7 +660,7 @@ h3cdeBridgeRowStatus OBJECT-TYPE
     ::= { h3cdeBridgeEntry 2 }
 
 -- ====================================================================
--- H3C DLSw Bridge group number and interface
+-- DLSw Bridge group number and interface
 -- ====================================================================
 h3cdeBridgeIfTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeBridgeIfEntry
@@ -706,7 +703,7 @@ h3cdeBridgeIfRowStatus OBJECT-TYPE
     ::= { h3cdeBridgeIfEntry 2 }
 
 -- ====================================================================
--- H3C DLSw Extension QLLC Port Configuration Table
+-- DLSw Extension QLLC Port Configuration Table
 -- ====================================================================
 h3cdeQllcTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeQllcEntry
@@ -793,7 +790,7 @@ h3cQllcRowStatus  OBJECT-TYPE
     ::= { h3cdeQllcEntry 6 }
 
 -- ====================================================================
--- H3C DLSw Extension SDLC Port Configuration Table
+-- DLSw Extension SDLC Port Configuration Table
 -- ====================================================================
 h3cdeSdlcPortTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeSdlcPortEntry
@@ -944,7 +941,7 @@ h3cdeSdlcPortRowStatus OBJECT-TYPE
     ::= { h3cdeSdlcPortEntry 11 }
 
 -- ====================================================================
--- H3C DLSw Extension LLC2 Port Configuration Table
+-- DLSw Extension LLC2 Port Configuration Table
 -- ====================================================================
 h3cdeLlc2PortTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cdeLlc2PortEntry
@@ -1107,7 +1104,7 @@ h3cdeLlc2PortRowStatus OBJECT-TYPE
     ::= { h3cdeLlc2PortEntry 13 }
 
 -- ====================================================================
--- H3C DLSw Reachable Cache MIB-Group
+-- DLSw Reachable Cache MIB-Group
 -- ====================================================================
 h3cdeRchCacheStat OBJECT IDENTIFIER ::= { h3cdeReachableCache 1 }
 
@@ -1224,7 +1221,7 @@ h3cdeRchCacheRowStatus OBJECT-TYPE
     ::= { h3cdeRchCacheEntry 7 }
 
 -- ====================================================================
--- H3C DLSw Ethernet Backup MIB-Group
+-- DLSw Ethernet Backup MIB-Group
 -- ====================================================================
 h3cdeEBMacMapStat OBJECT IDENTIFIER ::= { h3cdeEthernetBackup 1 }
 

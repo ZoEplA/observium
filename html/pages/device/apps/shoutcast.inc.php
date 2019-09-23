@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage applications
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -24,12 +24,10 @@ if ($handle = opendir($rrddir))
 {
   while (false !== ($file = readdir($handle)))
   {
-    if ($file != "." && $file != "..")
+    if ($file != "." && $file != ".." &&
+        str_starts($file, "app-shoutcast-".$app['app_id']))
     {
-      if (eregi("app-shoutcast-".$app['app_id'], $file))
-      {
-        array_push($files, $file);
-      }
+      array_push($files, $file);
     }
   }
 }
@@ -58,8 +56,7 @@ if (isset($total) && $total == true)
 
 foreach ($files as $id => $file)
 {
-  $hostname          = eregi_replace('app-shoutcast-'.$app['app_id'].'-', '', $file);
-  $hostname          = eregi_replace('.rrd', '', $hostname);
+  $hostname          = str_replace(['app-shoutcast-'.$app['app_id'].'-', '.rrd'], '', $file);
   list($host, $port) = explode('_', $hostname, 2);
   $graphs            = array(
                              'shoutcast_bits'  => 'Traffic Statistics - '.$host.' (Port: '.$port.')',

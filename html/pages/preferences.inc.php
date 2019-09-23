@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -91,8 +91,8 @@ if (is_numeric($_SESSION['user_id']))
     }
   }
 }
-$atom_key_updated = (isset($prefs['atom_key']['updated']) ? formatUptime(time() - strtotime($prefs['atom_key']['updated']), 'shorter').' ago' : 'Never');
-$api_key_updated  = (isset($prefs['api_key']['updated'])  ? formatUptime(time() - strtotime($prefs['api_key']['updated']),  'shorter').' ago' : 'Never');
+$atom_key_updated = (isset($prefs['atom_key']['updated']) ? format_uptime(time() - strtotime($prefs['atom_key']['updated']), 'shorter').' ago' : 'Never');
+$api_key_updated  = (isset($prefs['api_key']['updated'])  ? format_uptime(time() - strtotime($prefs['api_key']['updated']), 'shorter').' ago' : 'Never');
 
   $filename = $config['html_dir'] . '/pages/preferences/' . $vars['section'] . '.inc.php';
   if (is_file($filename))

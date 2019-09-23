@@ -39,7 +39,11 @@ rlDot3adAggBalanceTable  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "An entry of this table specifies a balancing criterion used
-         for the corresponding dot3adAggIndex."
+         for the corresponding dot3adAggIndex.
+
+         A criterion configured in this table is used to distribute
+         the traffic both over Link Aggregation Group members and
+         multiple ECMP paths."
     ::= { rlDot3adAgg 2 }
 
 rlDot3adAggBalanceEntry OBJECT-TYPE

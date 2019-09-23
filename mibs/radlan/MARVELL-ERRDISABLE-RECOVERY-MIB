@@ -39,7 +39,8 @@ RlErrdisableRecoveryCauseType::= TEXTUAL-CONVENTION
         pcb-overheat(7),
         udld(8),
         storm-control(9),
-	link-flapping(10)
+        link-flapping(10),
+        l2pt-guard(11)
     }
 
 

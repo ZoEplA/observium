@@ -7,9 +7,114 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+
+
+function generate_inventory_query($vars)
+{
+
+  $param = array();
+  $where = ' WHERE 1 ';
+  $select[] = 'entPhysical.*';
+  // By default hide deleted inventory
+  if (!isset($vars['deleted'])) {
+    $vars['deleted'] = '0';
+  }
+
+  foreach ($vars as $var => $value)
+  {
+    if ($value != '')
+    {
+      switch ($var)
+      {
+        case 'device':
+        case 'device_id':
+          $where .= generate_query_values($value, 'device_id');
+          break;
+        case 'os':
+          $where .= generate_query_values($value, 'os');
+          $select[] = 'devices.os';
+          $devices = TRUE;
+          break;
+        case 'parts':
+        case 'entPhysicalModelName':
+          $where .= generate_query_values($value, 'entPhysicalModelName', 'LIKE');
+          break;
+        case 'serial':
+        case 'entPhysicalSerialNum':
+        $where .= generate_query_values($value, 'entPhysicalSerialNum', '%LIKE%');
+          break;
+        case 'description':
+        case 'entPhysicalDescr':
+          $where .= generate_query_values($value, 'entPhysicalDescr', '%LIKE%');
+          break;
+        case 'deleted':
+          $where .= generate_query_values($value, 'deleted', 'NOT NULL');
+          break;
+      }
+    }
+  }
+
+  // Show inventory only for permitted devices
+  //$query_permitted = generate_query_permitted(array('device'), array('device_table' => 'D'));
+
+  $query = 'FROM `entPhysical`';
+
+  if ($vars['sort'] == 'hostname' || $vars['sort'] == 'device' || $vars['sort'] == 'device_id' || $devices == TRUE)
+  {
+    $query .= ' LEFT JOIN `devices` USING(`device_id`)';
+    $select[] = 'devices.hostname';
+  }
+
+  $query .= $where . $GLOBALS['cache']['where']['devices_permitted'];
+  $query_count = 'SELECT COUNT(entPhysical_id) ' . $query;
+
+  $query =  'SELECT ' . implode(', ', $select) . ' ' . $query;
+
+  switch ($vars['sort_order'])
+  {
+    case 'desc':
+      $sort_order = 'DESC';
+      $sort_neg   = 'ASC';
+      break;
+    case 'reset':
+      unset($vars['sort'], $vars['sort_order']);
+    // no break here
+    default:
+      $sort_order = 'ASC';
+      $sort_neg   = 'DESC';
+  }
+
+  switch($vars['sort'])
+  {
+    case 'device':
+    case 'hostname':
+      $query .= ' ORDER BY `hostname` '.$sort_order;
+      break;
+    case 'descr':
+    case 'event':
+      $query .= ' ORDER BY `sensor_'.$vars['sort'].'` '.$sort_order;
+      break;
+    case 'value':
+    case 'last_change':
+      $query .= ' ORDER BY `sensor_'.$vars['sort'].'` '.$sort_order;
+      break;
+    default:
+      // $sql .= ' ORDER BY `hostname` '.$sort_order.', `sensor_descr` '.$sort_order;
+  }
+
+  if (isset($vars['pageno']))
+  {
+    $start = $vars['pagesize'] * ($vars['pageno'] - 1);
+    $query .= ' LIMIT '.$start.','.$vars['pagesize'];
+  }
+
+  return array('query' => $query, 'query_count' => $query_count, 'param' => $param);
+
+}
 
 /**
  * Display Devices Inventory.
@@ -49,50 +154,13 @@ function print_inventory($vars)
   $pagesize = $vars['pagesize'];
   $start = $pagesize * $pageno - $pagesize;
 
-  $param = array();
-  $where = ' WHERE 1 ';
-  foreach ($vars as $var => $value)
-  {
-    if ($value != '')
-    {
-      switch ($var)
-      {
-        case 'device':
-        case 'device_id':
-          $where .= generate_query_values($value, 'device_id');
-          break;
-        case 'os':
-          $where .= generate_query_values($value, 'os');
-          break;
-        case 'parts':
-          $where .= generate_query_values($value, 'entPhysicalModelName', 'LIKE');
-          break;
-        case 'serial':
-          $where .= generate_query_values($value, 'entPhysicalSerialNum', '%LIKE%');
-          break;
-        case 'description':
-          $where .= generate_query_values($value, 'entPhysicalDescr', '%LIKE%');
-          break;
-      }
-    }
-  }
-
-  // Show inventory only for permitted devices
-  //$query_permitted = generate_query_permitted(array('device'), array('device_table' => 'D'));
-
-  $query = 'FROM `entPhysical`';
-  $query .= ' LEFT JOIN `devices` USING(`device_id`) ';
-  $query .= $where . $GLOBALS['cache']['where']['devices_permitted'];
-  $query_count = 'SELECT COUNT(*) ' . $query;
-
-  $query =  'SELECT * ' . $query;
-  $query .= ' ORDER BY `hostname`';
-  $query .= " LIMIT $start,$pagesize";
+  $queries = generate_inventory_query($vars);
 
   // Query inventories
-  $entries = dbFetchRows($query, $param);
+  $entries = dbFetchRows($queries['query'], $queries['param']);
+
   // Query inventory count
-  if ($pagination) { $count = dbFetchCell($query_count, $param); }
+  if ($pagination) { $count = dbFetchCell($queries['query_count'], $queries['param']); }
 
   $list = array('device' => FALSE);
   if (!isset($vars['device']) || empty($vars['device']) || $vars['page'] == 'inventory') { $list['device'] = TRUE; }
@@ -108,6 +176,7 @@ function print_inventory($vars)
     $string .= '      <th>Description</th>' . PHP_EOL;
     $string .= '      <th>Part #</th>' . PHP_EOL;
     $string .= '      <th>Serial #</th>' . PHP_EOL;
+    $string .= '      <th>Removed</th>' . PHP_EOL;
     $string .= '    </tr>' . PHP_EOL;
     $string .= '  </thead>' . PHP_EOL;
   }
@@ -129,14 +198,14 @@ function print_inventory($vars)
     {
       $sensor = dbFetchRow("SELECT * FROM `sensors` 
                             WHERE `device_id` = ? AND (`entPhysicalIndex` = ? OR `sensor_index` = ?)", array($entry['device_id'], $entry['entPhysicalIndex'], $entry['entPhysicalIndex']));
-// LEFT JOIN `sensors-state` USING(`sensor_id`)
-      //$ent_text .= ' ('.$sensor['sensor_value'] .' '. $sensor['sensor_class'].')';
+
       $entry['entPhysicalName'] = generate_entity_link('sensor', $sensor);
     }
     $string .= '    <td style="width: 160px;">' . $entry['entPhysicalName'] . '</td>' . PHP_EOL;
     $string .= '    <td>' . $entry['entPhysicalDescr'] . '</td>' . PHP_EOL;
     $string .= '    <td>' . $entry['entPhysicalModelName'] . '</td>' . PHP_EOL;
     $string .= '    <td>' . $entry['entPhysicalSerialNum'] . '</td>' . PHP_EOL;
+    $string .= '    <td>' . $entry['deleted'] . '</td>' . PHP_EOL;
     $string .= '  </tr>' . PHP_EOL;
 
   }

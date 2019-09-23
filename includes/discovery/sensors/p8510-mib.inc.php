@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -66,7 +66,7 @@ if ($oids)
       $limits = array('limit_high' => trim($sensor['limit_high'], ' "'),
                       'limit_low'  => trim($sensor['limit_low'], ' "'));
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, $scale, $temperature, $limits);
+      discover_sensor('temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, $scale, $temperature, $limits);
     }
   }
 }

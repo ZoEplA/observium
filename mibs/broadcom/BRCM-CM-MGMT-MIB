@@ -1,6 +1,6 @@
 --****************************************************************************
 --
--- Copyright (c) 2003-2009 Broadcom Corporation
+-- Copyright (c) 2003-2011 Broadcom Corporation
 --
 -- This program is the proprietary software of Broadcom Corporation and/or
 -- its licensors, and may only be used, duplicated, modified or distributed
@@ -63,7 +63,8 @@ IMPORTS
     NOTIFICATION-TYPE,
     Unsigned32,
     Counter32,
-    Integer32
+    Integer32,
+    Gauge32
         FROM SNMPv2-SMI
     TruthValue,
     DisplayString,
@@ -86,13 +87,14 @@ IMPORTS
     docsIfCmCmtsAddress,
     docsIfDocsisBaseCapability,
     docsIfCmStatusDocsisOperMode,
-    docsIfCmStatusModulationType
+    docsIfCmStatusModulationType,
+    TenthdBmV
         FROM DOCS-IF-MIB
     cableDataMgmtMIBObjects
         FROM BRCM-CABLEDATA-MGMT-MIB;
                 
 cablemodemMgmt MODULE-IDENTITY
-    LAST-UPDATED "200908260000Z"
+    LAST-UPDATED "201104260000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -109,24 +111,52 @@ cablemodemMgmt MODULE-IDENTITY
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
         "Broadcom proprietary MIB for runtime management of cablemodem devices." 
+    REVISION      "201104260000Z"
+    DESCRIPTION
+        "Added object cmExtendedUsTxPowerCapability."
+    REVISION      "201104130000Z"
+    DESCRIPTION
+        "Added object cmOverrideUcdMaxBurst."
+    REVISION      "201008130000Z"
+    DESCRIPTION
+        "Added object cmStartDsidLearningWhenDccRspArriveSent."
+    REVISION      "200911090000Z"
+    DESCRIPTION
+        "Obsoleted autonomous1x1 value and added disabled value for 
+         cmChannelBondingPowerSaveStrategy object."
+    REVISION      "200911030000Z"
+    DESCRIPTION
+        "Added object cmUcastDsidAllowNonZeroInitialPsn."    
+    REVISION      "200910190000Z"
+    DESCRIPTION
+        "Added object cmForwardingHwAssistEnable."    
+    REVISION      "200909090000Z"
+    DESCRIPTION
+        "Added objects cmDsChanInfoTuner and cmDsChanInfoTunerChannel."    
     REVISION      "200908260000Z"
     DESCRIPTION
-            "Added cmServiceQueueTable."    
+        "Added cmServiceQueueTable."    
+    REVISION      "200908070000Z"
+    DESCRIPTION
+        "Added cmChannelBondingUpstreamTable."    
     REVISION      "200907310000Z"
     DESCRIPTION
-            "Added cmIpProvisioningMode object."    
+        "Added cmIpProvisioningMode object."    
+    REVISION      "200906180000Z"
+    DESCRIPTION
+        "Added cmChannelBondingPowerSaveStrategy object."    
     REVISION      "200904010000Z"
     DESCRIPTION
-            "Added cmDownstreamChannelInfoTable with cmDsChanInfoCodewordErrorRate 
-            and cmDsChanInfoMeanSquareError objects."    
+        "Added cmDownstreamChannelInfoTable with cmDsChanInfoCodewordErrorRate 
+        and cmDsChanInfoMeanSquareError objects."    
     REVISION      "200806120000Z"
     DESCRIPTION
         "Added conformances & compliances."
     REVISION      "200708140000Z"
     DESCRIPTION
-            "Added node cmEmbeddedDevices for location of other modules which 
-             control CM features specific only to embedded devices (such as 
-             EMTA, EPS, etc)."    
+        "Added node cmEmbeddedDevices for location of other modules which 
+         control CM features specific only to embedded devices (such as 
+         EMTA, EPS, etc)."    
     REVISION      "200702050000Z"
     DESCRIPTION
         "Compilability issues were cleaned up: 
@@ -136,31 +166,31 @@ cablemodemMgmt MODULE-IDENTITY
          - Defval syntax for object cmHostIpFilterInterfaces was corrected."    
     REVISION      "200701040030Z"
     DESCRIPTION
-            "Added cmMDDTimeoutTrap notification."
+        "Added cmMDDTimeoutTrap notification."
     REVISION      "200701040000Z"
     DESCRIPTION
-            "Added cmNotification group and cmDocsDevEventTrap notification."        
+        "Added cmNotification group and cmDocsDevEventTrap notification."        
     REVISION      "200611030000Z"
     DESCRIPTION
-            "Added cmHostIpFilterTable object."        
+        "Added cmHostIpFilterTable object."        
     REVISION      "200610060000Z"
     DESCRIPTION
-            "Added cmTodRefreshInterval object."        
+        "Added cmTodRefreshInterval object."        
     REVISION      "200605030000Z"
     DESCRIPTION
-            "Added cmResetFactoryDefaults object."
+        "Added cmResetFactoryDefaults object."
     REVISION      "200603070000Z"
     DESCRIPTION
-            "Added cmCpeInterface object."
+        "Added cmCpeInterface object."
     REVISION      "200510280000Z"
     DESCRIPTION
-            "Added cmDsdExtendedRetryEnable object."
+        "Added cmDsdExtendedRetryEnable object."
     REVISION      "200505090000Z"
     DESCRIPTION
-            "Added cmMiniFirewallEnable object."                
+        "Added cmMiniFirewallEnable object."                
     REVISION      "200504180000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
+        "Initial version of this MIB module."
     ::= { cableDataMgmtMIBObjects 2 }
     
 cmMgmtBase OBJECT IDENTIFIER ::= { cablemodemMgmt 1 }
@@ -268,10 +298,11 @@ cmTodRefreshInterval OBJECT-TYPE
     REFERENCE
          "Time Protocol (RFC-868)"
     ::= { cmMgmtBase 7 }
-      
+
 --   
 -- The CM Downstream Parameters Table
 --
+
 cmDownstreamChannelInfoTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CmDownstreamChannelInfoEntry
     MAX-ACCESS  not-accessible
@@ -288,13 +319,15 @@ cmDownstreamChannelInfoEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "An entry describing the attributes of a single downstream channel."
-    INDEX  { ifIndex }
+    INDEX  { ifIndex }   
     ::= { cmDownstreamChannelInfoTable 1 } 
     
 CmDownstreamChannelInfoEntry ::=
     SEQUENCE {
              cmDsChanInfoCodewordErrorRate      DisplayString,
-             cmDsChanInfoMeanSquareError        DisplayString
+             cmDsChanInfoMeanSquareError        DisplayString,
+             cmDsChanInfoTuner                  Integer32,
+             cmDsChanInfoTunerChannel           Integer32
              }
    
 cmDsChanInfoCodewordErrorRate OBJECT-TYPE
@@ -312,6 +345,40 @@ cmDsChanInfoMeanSquareError OBJECT-TYPE
     DESCRIPTION
         "Downstream Mean Square Error"
     ::= { cmDownstreamChannelInfoEntry 2 }  
+    
+cmDsChanInfoTuner OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the tuner to which this downstream channel is mapped.  A 
+         value of 0 is a special case which indicates that this channel is not 
+         mapped to any tuner - this would generally only be the case under 
+         unusual circumstances such as very shortly after bootup before 
+         scanning has started."
+    ::= { cmDownstreamChannelInfoEntry 3 }
+    
+cmDsChanInfoTunerChannel OBJECT-TYPE
+    SYNTAX      Integer32 (-2..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates which channel of the tuner identified by cmDsChanInfoTuner 
+         is mapped to this downstream channel.  Values are defined as offsets 
+         from the center channel of the tuner, which is represented by a value 
+         of 0 for this object.  
+         
+         Note that allowable values for this object are constrained by the 
+         number of channels that this tuner is capable of spanning.  A value of 
+         0 - denoting the exact center channel - is only valid if the number of 
+         channels spanned by the tuner is odd.  For tuners which span an even 
+         number of channels, a value of 0 will never be reported.  Single 
+         channel tuners will always report a value of 0.
+         
+         If cmDsChanInfoTuner has a value of 0 (not associated) then the value
+         returned by this object has no meaning; in this case a value of 0
+         will be returned."
+    ::= { cmDownstreamChannelInfoEntry 4 }
     
 cmIpProvisioningMode OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -403,7 +470,12 @@ cmServiceQueueMaxQueueDepth  OBJECT-TYPE
     STATUS      current
     DESCRIPTION    
         "Indicates the maximum number of packets which can be enqueued on this
-         service queue."
+         service queue.
+
+         Note that for DOCSIS 3.0 devices operating in QoS mode, max queue depth 
+         is now specified in terms of bytes, not packets.  Thus, for such a 
+         configuration, this object will return 0.  The maximum queue depth for
+         such a configuration may be read from docsQosServiceFlowBufferSize."
     ::= { cmServiceQueueEntry 2 }
 
 cmServiceQueueCurrentQueueDepth  OBJECT-TYPE
@@ -414,6 +486,67 @@ cmServiceQueueCurrentQueueDepth  OBJECT-TYPE
         "Indicates the number of packets currently enqueued on this service 
          queue."
     ::= { cmServiceQueueEntry 3 }
+    
+cmForwardingHwAssistEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the hardware forwarding assist engine is enabled,
+         for devices which support such assistace.  
+         
+         For devices which do not have hardware forwarding assist support,
+         this object will always return false(2), and an attempt to set this
+         object to true(1) will result in an inconsistentValue error."
+    DEFVAL { true }
+    ::= { cmMgmtBase 11 }
+
+cmOverrideUcdMaxBurst OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    UNITS       "mini-slots"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object may be used to override the max burst value specified in
+         the burst descriptor corresponding to the long data grant IUC from the 
+         upstream channel descriptor (UCD).
+
+         If set to the default value of 0, the CM will conform to the DOCSIS
+         specification requirements and abide by the max burst values as
+         specified in the UCD.
+
+         If set to any other value, the CM will limit burst sizes to either the
+         value specified by this object or the UCD specified value, whichever
+         is larger.
+
+         Setting this object to a value of 255 effectively means that the burst
+         size will be unlimited.  This setting will maximize upstream 
+         throughput.
+
+         Note that the value of this object has no effect on burst limitations
+         as configured by service flow parameter sets."
+     REFERENCE
+        "Data-Over-Cable Service Interface Specifications Docsis 3.0: Physical 
+         Layer Specification CM-SP-PHYv3.0-I09-101008, Table 6-11"
+     DEFVAL { 0 }
+    ::= { cmMgmtBase 12 }
+
+cmExtendedUsTxPowerCapability  OBJECT-TYPE
+    SYNTAX      Integer32 (0|205..244)
+    UNITS       "quarter dBmV" 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Specifies the maximum extended upstream transmit power of which this 
+          device is capable.  A value of zero indicates that the device has no 
+          extended upstream power capability.  The value specified in this 
+          object will be advertised in TLV 5.40 of the CM's modem capability
+          message."
+    REFERENCE 
+         "Data-Over-Cable Service Interface Specifications DOCSIS 3.0 MAC and 
+          Upper Layer Protocols Interface Specification 
+          CM-SP-MULPIv3.0-I15-110210 section 6.4.28.1.15" 
+    ::= { cmMgmtBase 13 }
     
 cmFilter OBJECT IDENTIFIER ::= { cablemodemMgmt 2 }
     
@@ -563,6 +696,162 @@ cmHostIpFilterDestPortHigh OBJECT-TYPE
          port range that is to be matched."
     ::= { cmHostIpFilterEntry 8 }
 
+cmChannelBonding OBJECT IDENTIFIER ::= { cablemodemMgmt 3 }    
+
+cmChannelBondingPowerSaveStrategy OBJECT-TYPE
+    SYNTAX      INTEGER {
+                disabled(-1),
+                cmStatus(0),
+                autonomous1x1(1) -- obsolete
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the channel bonding strategy used by the CM upon transition         
+         to power save mode.
+         
+         When set to a value of disabled(-1), there will be no channel bonding
+         response to power save mode and the device will continue to operate
+         in the bonding mode that was in effect at the time power save was
+         entered.
+         
+         When set to the default value of cmStatus(0), the CM will conform to 
+         DOCSIS 3.0 requirements by dispatching a CM-STATUS message to the CMTS 
+         indicating a transition to battery power.  The CMTS is then expected 
+         to initiate a DBC which will reduce the number of channels used by the
+         CM.
+         
+         The autonomous1x1 value is obsolete.  If this object is set to 
+         autonomous1x1(1), then channel bonding power save will be disabled and
+         a subsequent read of this object will return a value of disabled(-1)."
+    DEFVAL { cmStatus }
+    ::= { cmChannelBonding 1 }
+    
+cmChannelBondingUpstreamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CmChannelBondingUpstreamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining management extensions for DOCSIS 3.0 upstream channels."
+    ::= { cmChannelBonding 2 }
+
+cmChannelBondingUpstreamEntry OBJECT-TYPE
+    SYNTAX      CmChannelBondingUpstreamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the characteristics of a single upstream channel.  
+         An entry exists in this table for each entry in the ifTable with an 
+         ifType value of docsCableUpstream(129)."
+    INDEX  { ifIndex }
+    ::= { cmChannelBondingUpstreamTable 1 } 
+    
+CmChannelBondingUpstreamEntry ::=
+    SEQUENCE {
+             cmBondedUsDRWTop           TenthdBmV,
+             cmBondedUsDRWBottom        TenthdBmV,
+             cmBondedUsDRWViolations    Counter32
+    }
+    
+cmBondedUsDRWTop OBJECT-TYPE
+    SYNTAX      TenthdBmV
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reports an absolute power level which is the top of the 
+         dynamic range window for this upstream channel.  
+         
+         This value is calculated by applying the value for Pload_min_set,
+         specified  by the dynamic range window upper edge TLV in the RNG-RSP 
+         or TCC encodings, to the max allowable power level (Phi) of this 
+         particular channel.
+         
+         This object will return zero if no dynamic range window upper edge TLV
+         has been specified in either the RNG-RSP or TCC encodings."
+    REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface Specification 
+         CM-SP-MULPIv3.0-I10-090529, sections 8.3.3 'Dynamic Range Window' and
+         C.1.5.1.9 'Dynamic Range Window'"
+    ::= { cmChannelBondingUpstreamEntry 1 }
+    
+cmBondedUsDRWBottom OBJECT-TYPE
+    SYNTAX      TenthdBmV
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object reports an absolute power level which is the bottom of 
+         the dynamic range window for this upstream channel.  
+         
+         This value is calculated by applying the value for Pload_min_set,
+         specified  by the dynamic range window upper edge TLV in the RNG-RSP 
+         or TCC encodings, and the fixed 12dB range of transmit power levels 
+         defined by the DRW, to the max allowable power level (Phi) of this 
+         particular channel.
+         
+         This object will return zero if no dynamic range window upper edge TLV
+         has been specified in either the RNG-RSP or TCC encodings."
+    REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface Specification 
+         CM-SP-MULPIv3.0-I10-090529, sections 8.3.3 'Dynamic Range Window' and
+         C.1.5.1.9 'Dynamic Range Window'"
+    ::= { cmChannelBondingUpstreamEntry 2 }
+   
+cmBondedUsDRWViolations OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object counts the number of RNG-RSP power adjustments made by the
+         CMTS which would cause the CM to violate the constraints of the dynamic 
+         ranging window.  
+         
+         Such adjustments (if any) will have been ignored by the CM in 
+         compliance with DOCSIS 3.0 requirements."
+    REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface Specification 
+         CM-SP-MULPIv3.0-I10-090529, section 8.3.3.5 'Power Offset in RNG-RSP 
+         Causing Dynamic Range Window Violation'."
+    ::= { cmChannelBondingUpstreamEntry 3 }
+    
+cmUcastDsidAllowNonZeroInitialPsn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to true(1) allows the CM to disregard the 
+         requirement that the packet sequence number for a newly created
+         unicast resequencing DSID must begin at zero.  This allows the CM
+         to recover more quickly when an invalid initial PSN is received for
+         a unicast DSID.
+         
+         Note that in order to comply with DOCSIS 3.0 requirements, this
+         object MUST be set to a value of false(2)."
+    REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface Specification 
+         CM-SP-MULPIv3.0-I10-090529, section 8.2.3 'Sequenced Downstream 
+         Packets'."
+    DEFVAL { false }
+    ::= { cmChannelBonding 3 }
+
+cmStartDsidLearningWhenDccRspArriveSent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to true(1) causes the CM to discard the next 
+         expected sequence number for all DSIDs when a DCC-RSP (arrive) message 
+         is sent, in case the PSNs are reset by the CMTS at this time.  This 
+         allows the CM to bypass the two minute out of range PSN window and 
+         reset the next expected sequence numbers immediately.
+         
+         Note that in order to comply with DOCSIS 3.0 requirements, this object 
+         MUST be set to a value of false(2)."
+    REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface Specification 
+         CM-SP-MULPIv3.0-I13-100611, sections 8.2.31 'Downstream Sequencing'"
+    DEFVAL { false }
+    ::= { cmChannelBonding 4 }
+    
 cmEmbeddedDevices OBJECT IDENTIFIER ::= { cablemodemMgmt 98 }
     
 --
@@ -664,6 +953,15 @@ cmFilterGroup OBJECT-GROUP
         "A set of objects supported by agents which support CM extended
          filtering as described by this MIB."
     ::= { cmGroups 2 }
+    
+cmChannelBondingGroup OBJECT-GROUP
+    OBJECTS {
+        cmChannelBondingPowerSaveStrategy 
+    }
+    STATUS      current
+    DESCRIPTION
+        "A set of objects supported by agents which support channel bonding."
+    ::= { cmGroups 3 }
     
 cmNotificationGroup NOTIFICATION-GROUP
 	NOTIFICATIONS { 

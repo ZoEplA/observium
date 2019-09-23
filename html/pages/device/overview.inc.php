@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -39,13 +39,7 @@ echo("</div>");
 /* Begin Right Pane */
 echo('<div class="col-md-6">');
 
-if (isset($device['graphs']['ucd_ss_cpu']) ||
-    ($device['os_group'] == 'unix' && isset($device['graphs']['hr_processes'])))
-{
-  include("overview/processors-unix.inc.php");
-} else {
-  include("overview/processors.inc.php");
-}
+include("overview/processors.inc.php");
 
 if (is_array($device_state['ucd_mem']))
 {
@@ -63,6 +57,7 @@ if (is_array($entity_state['group']['c6kxbar']))
 
 include("overview/printersupplies.inc.php");
 include("overview/status.inc.php");
+include("overview/counter.inc.php");
 include("overview/sensors.inc.php");
 
 /* End Right Pane */

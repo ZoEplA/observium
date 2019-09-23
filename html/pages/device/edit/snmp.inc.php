@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -93,6 +93,13 @@ if ($vars['editing'])
         $update['snmp_maxrep'] = array('NULL');
       }
 
+      if (strlen(trim($vars['snmp_context'])))
+      {
+        $update['snmp_context'] = trim($vars['snmp_context']);
+      } else {
+        $update['snmp_context'] = array('NULL');
+      }
+
       if (dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id'])))
       {
         print_success("Device SNMP configuration updated");
@@ -125,13 +132,18 @@ $form['fieldset']['edit']    = array('div'   => 'top',
                                      'title' => 'Basic Configuration',
                                      'class' => 'col-md-6');
 $form['fieldset']['snmpv2']  = array('div'   => 'top',
-                                     'title' => 'Authentication Configuration',
+                                     'title' => 'SNMP v1/v2c Authentication',
                                      //'right' => TRUE,
                                      'class' => 'col-md-6 col-md-pull-0');
 $form['fieldset']['snmpv3']  = array('div'   => 'top',
-                                     'title' => 'Authentication Configuration',
+                                     'title' => 'SNMP v3 Authentication',
                                      //'right' => TRUE,
                                      'class' => 'col-md-6 col-md-pull-0');
+$form['fieldset']['snmpextra'] = array('div'   => 'top',
+                                     'title' => 'Extra Configuration',
+                                     //'right' => TRUE,
+                                     'class' => 'col-sm-12 col-md-6 pull-right');
+
 // bottom row div
 $form['fieldset']['submit']  = array('div'   => 'bottom',
                                      'style' => 'padding: 0px;',
@@ -250,6 +262,16 @@ $form['row'][13]['snmp_cryptoalgo'] = array(
                                 'readonly'    => $readonly,
                                 'values'      => array('AES' => 'AES', 'DES' => 'DES'),
                                 'value'       => $device['snmp_cryptoalgo']);
+
+$form['row'][15]['snmp_context'] = array(
+                              'type'        => 'password',
+                              'fieldset'    => 'snmpextra',
+                              'name'        => 'SNMP Context',
+                              'width'       => '250px',
+                              'readonly'    => $readonly,
+                              'show_password' => !$readonly,
+                              'placeholder' => '(Optional) Context',
+                              'value'       => $device['snmp_context']); // FIXME. For passwords we should use filter instead escape!
 
 $form['row'][20]['submit']    = array(
                                 'type'        => 'submit',

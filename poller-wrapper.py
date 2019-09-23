@@ -7,7 +7,7 @@
  @package    observium
  @subpackage poller
  @author     Job Snijders <job.snijders@atrato.com>
- @copyright  (C) 2013-2014 Job Snijders, (C) 2014-2017 Observium Limited
+ @copyright  (C) 2013-2014 Job Snijders, (C) 2014-2019 Observium Limited
 """
 
 """
@@ -39,6 +39,7 @@
                 */5 *  * * *   root /opt/observium/observium-wrapper billing >> /dev/null 2>&1
 
  Ubuntu Linux:  apt-get install python-mysqldb
+ New Ubuntu:    sudo apt install python3-pymysql
  RHEL/CentOS:   yum install MySQL-python (Requires the EPEL repo!)
  FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
 
@@ -48,6 +49,7 @@
                 Python 3.4.3  / PHP 5.5.9-1ubuntu4.14 / Ubuntu 14.04 LTS
                 Python 2.7.12 / PHP 7.0.13            / Ubuntu 16.04 LTS
                 Python 3.5.2  / PHP 7.0.13            / Ubuntu 16.04 LTS
+                Python 3.6.6  / PHP 7.2.10            / Ubuntu 18.04 LTS
 
 """
 
@@ -85,6 +87,17 @@ def new_except_hook(exctype, value, traceback):
         sys.__excepthook__(exctype, value, traceback)
 sys.excepthook = new_except_hook
 
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 """
     Definition for write msg to log file
 """
@@ -109,6 +122,7 @@ if python_version < (3,0):
         sys.exit(2)
     try:
         import MySQLdb
+        db_version = "MySQLdb " + MySQLdb.__version__
     except:
         print("ERROR: missing python module: MySQLdb")
         print("On Ubuntu: apt-get install python-mysqldb")
@@ -127,9 +141,13 @@ else:
         import pymysql as MySQLdb
         MySQLdb.install_as_MySQLdb()
         import MySQLdb
+        db_version = "pymysql " + MySQLdb.__version__
     except:
         print("ERROR: missing python module: pymysql")
-        print(" On Ubuntu: sudo apt-get install python3-setuptools")
+        print(" On Ubuntu >= 16.04 and Debian >= 9.0:")
+        print("            sudo apt install python3-pymysql")
+        print(" On older Ubuntu/Debian:")
+        print("            sudo apt-get install python3-setuptools")
         print("            sudo easy_install3 pip")
         print("            sudo pip3 install PyMySQL")
         # FIXME. I not know how install on RHEL and FreeBSD
@@ -154,6 +172,7 @@ try:
     parser.add_argument('process', nargs='?', default='poller', help='Process name, one of \'poller\', \'discovery\', \'billing\'.')
     #parser.add_argument('process', nargs='?', default='poller', choices=['poller', 'discovery', 'billing'], help='Process name, one of \'poller\', \'discovery\', \'billing\'.')
     parser.add_argument('-w', '--workers', nargs='?', type=int, default=0, help='Number of threads to spawn. Defauilt: CPUs x 2')
+    parser.add_argument('-p', '--poller_id', nargs='?', type=int, default=-1, help='Specify poller_id if this wrapper for partitioned poller. Default not used.')
     parser.add_argument('-s', '--stats', action='store_true', help='Store total polling times to RRD.', default=False)
     parser.add_argument('-i', '--instances', nargs='?', type=int, default=-1, help='Process instances count.')
     parser.add_argument('-n', '--number', nargs='?', type=int, default=-1, help='Instance id (number), must start from 0 and to be less than instances count.')
@@ -207,9 +226,6 @@ except ImportError:
             process = 'poller'
         workers = 0
 
-if test:
-    print("Script: %s, Prosess: %s, Workers: %s, Stats: %s, Debug: %s, Test: %s" % (scriptname, process, workers, stats, debug, test))
-
 """
     Allowed process list, if not one of this exit with error
 """
@@ -260,6 +276,7 @@ db_username  = config['db_user']
 db_password  = config['db_pass']
 db_server    = config['db_host']
 db_dbname    = config['db_name']
+
 try:
     db_port  = int(config['db_port'])
 except KeyError:
@@ -273,8 +290,6 @@ poller_path     = config['install_dir'] + '/poller.php'
 discovery_path  = config['install_dir'] + '/discovery.php'
 alerter_path    = config['install_dir'] + '/alerter.php'
 billing_path    = config['install_dir'] + '/poll-billing.php'
-#temp_path       = config['temp_dir']
-temp_path       = '/tmp'
 
 # RRDcacheD & remote rrd
 try:
@@ -284,6 +299,10 @@ except KeyError:
     # rrdcached config not set, reset remote_rrd
     remote_rrd = False
 
+try:
+    temp_path   = config['temp_dir']
+except KeyError:
+    temp_path   = '/tmp'
 try:
     rrd_path = config['rrd_dir']
 except KeyError:
@@ -318,6 +337,11 @@ if amount_of_workers < 1:
         amount_of_workers = 8
         print("WARNING: used default threads number %s. For change use configuration option or pass as argument -w [THREADS]" % (amount_of_workers))
 
+if test:
+    print("Script: %s, Prosess: %s, Workers: %s, Stats: %s, Debug: %s, Test: %s" % (scriptname, process, amount_of_workers, stats, debug, test))
+    print("Versions:\n  Python - %s.%s.%s" % sys.version_info[:3])
+    print("  DB - %s" % (db_version))
+
 if os.path.isfile(alerter_path):
     alerting = config['poller-wrapper']['alerter']
 else:
@@ -343,6 +367,16 @@ except:
     max_la = 10
 if max_la <= 0:
     max_la = 10
+
+# partitioned poller
+if args.poller_id < 0:
+    # poller_id not passed from command line, use config or default
+    try:
+        poller_id = int(config['poller_id'])
+    except:
+        poller_id = 0
+else:
+    poller_id = args.poller_id
 
 """
     Check mibs dir for stale .index files
@@ -379,11 +413,22 @@ per_device_duration = {}
 devices_list = []
 
 try:
-    if not bool(db_socket):
-        db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname, port=db_port)
-    else:
-        db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname, port=db_port, unix_socket=db_socket)
-    #db.autocommit(True)
+    # set db connection params
+    db_params = {'host':   db_server,
+                 'user':   db_username,
+                 'passwd': db_password,
+                 'db':     db_dbname,
+                 'port':   db_port}
+    if bool(db_socket):
+        db_params['unix_socket'] = db_socket
+    if "pymysql" in db_version:
+        # enable autocommit for pymysql lib
+        db_params['autocommit'] = True
+
+    db = MySQLdb.connect(**db_params)
+    if "MySQLdb" in db_version:
+        # enable autocommit for MySQLdb lib
+        db.autocommit(True)
     cursor = db.cursor()
 except:
     print("ERROR: Could not connect to MySQL database!")
@@ -426,11 +471,20 @@ if args.exclude_groups != None:
         exclude_devices.append(row[0])
     #print(map(str, exclude_devices))
     #print(query % ",".join(map(str, args.include_groups)))
+
     where_devices += " AND device_id NOT IN (%s)" % ",".join(map(str, exclude_devices))
+
+if poller_id > 0:
+    print(bcolors.OKBLUE + 'INFO: This is poller_id ('+str(poller_id)+') using poller-restricted devices list' + bcolors.ENDC)
+    where_devices += " AND poller_id = '" + str(poller_id) + "'"
+
+else:
+    print(bcolors.OKBLUE + 'This is the default poller. Will only poll devices with no specified poller set.' + bcolors.ENDC)
+    # Set default value of 0 for process tables and the like
+    poller_id = 0
 
 if test:
     print(where_devices)
-
 
 if instances_count > 1 and instance_number >= 0 and (instance_number < instances_count):
     # Use distributed wrapper
@@ -558,9 +612,9 @@ ps_count = 0
 
 p_query = """SELECT `process_id`, `process_pid`, `process_ppid`, `process_uid`, `process_command`, `process_start`
              FROM   `observium_processes`
-             WHERE  `process_name` = %s"""
+             WHERE  `process_name` = %s AND `poller_id` = %s"""
 try:
-  cursor.execute(p_query, (processname,))
+  cursor.execute(p_query, (processname,poller_id))
   for row in cursor.fetchall():
     # print(row)
     test_running = False
@@ -583,7 +637,7 @@ try:
       # process not exist, remove stale db entry
       try:
         cursor.execute("""DELETE FROM `observium_processes` WHERE `process_id` = %s""", (test_id,))
-        db.commit()
+        #db.commit()
         # print("Removed stale DB entry %s" % test_id)
       except:
         pass
@@ -603,7 +657,7 @@ except:
     pass
 
 # This prevents race and too high LA on server. Default is 4 processes and 10 load average. More than 4 already running poller-wrapper it's big trouble!
-if ps_count >= max_running or la[1] >= max_la:
+if ps_count > max_running and la[1] >= max_la:
   print("URGENT: %s not started because already running %s processes, load average (5min) %.2f" % (processname, ps_count, la[1]))
   logfile("URGENT: %s not started because already running %s processes, load average (5min) %.2f" % (processname, ps_count, la[1]))
   sys.exit(2)
@@ -612,12 +666,12 @@ if ps_count >= max_running or la[1] >= max_la:
 ps_count += 1
 
 # write into db current process info
-p_query = """INSERT INTO `observium_processes` (`process_pid`,`process_ppid`,`process_name`,`process_uid`,`process_command`,`process_start`,`device_id`)
-             VALUES (%s,%s,%s,%s,%s,%s,'0')"""
+p_query = """INSERT INTO `observium_processes` (`process_pid`,`process_ppid`,`process_name`,`process_uid`,`process_command`,`process_start`,`device_id`,`poller_id`)
+             VALUES (%s,%s,%s,%s,%s,%s,'0',%s)"""
 try:
-  cursor.execute(p_query, (pid,ppid,processname,uid,command,s_time))
+  cursor.execute(p_query, (pid,ppid,processname,uid,command,s_time,poller_id))
   process_id = db.insert_id()
-  db.commit()
+  #db.commit()
 except:
   pass
 
@@ -627,7 +681,7 @@ if test:
   #time.sleep(30) # delays for 30 seconds
   p_query = """DELETE FROM `observium_processes` WHERE `process_id` = %s"""
   cursor.execute(p_query, (process_id,))
-  db.commit()
+  #db.commit()
   sys.exit(2)
 
 # Open dev null handle
@@ -649,12 +703,67 @@ if process == 'discovery' and instance_number == 0 and 'host_wildcard' not in gl
     os.system("/usr/bin/env php %s %s >> /dev/null 2>&1" % (discovery_path, command_options))
     print("INFO: finished discovery.php for update")
 
+"""
+    Create/update poller stat times
+"""
+def update_wrapper_times(rrd_file, count, runtime, workers):
+
+    if not remote_rrd:
+        rrd_file = rrd_path + '/' + rrd_file
+    # always create rrd (with no-overwrite) for remote rrdcached
+    if remote_rrd or not os.path.isfile(rrd_file):
+        # Create RRD
+        rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
+        cmd_create = config['rrdtool'] + ' create ' + rrd_file + ' DS:devices' + rrd_dst + ' DS:totaltime' + rrd_dst + ' DS:threads' + rrd_dst
+        cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
+        if remote_rrd:
+            # --no-overwrite avialable since 1.4.3
+            cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
+        else:
+            logfile(cmd_create)
+        os.system(cmd_create)
+        if debug:
+            print("DEBUG: " + cmd_create)
+
+    cmd_update = config['rrdtool'] + ' update ' + rrd_file + ' N:%s:%s:%s' % (count, runtime, workers)
+    if remote_rrd:
+        cmd_update += ' --daemon ' + rrdcached_address
+    os.system(cmd_update)
+    if debug:
+        print("DEBUG: " + cmd_update)
+
+"""
+    Create/update poller wrapper count
+"""
+def update_wrapper_count(rrd_file, count):
+    if not remote_rrd:
+        rrd_file = rrd_path  + '/' + rrd_file
+
+    if remote_rrd or not os.path.isfile(rrd_file):
+        # Create RRD
+        rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
+        cmd_create = config['rrdtool'] + ' create ' + rrd_file + ' DS:wrapper_count' + rrd_dst
+        cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
+        if remote_rrd:
+            # --no-overwrite avialable since 1.4.3
+            cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
+        else:
+            logfile(cmd_create)
+        os.system(cmd_create)
+        if debug:
+            print("DEBUG: " + cmd_create)
+    cmd_update = config['rrdtool'] + ' update ' + rrd_file + ' N:%s' % (count)
+    if remote_rrd:
+        cmd_update += ' --daemon ' + rrdcached_address
+    os.system(cmd_update)
+    if debug:
+        print("DEBUG: " + cmd_update)
 
 """
     A seperate queue and a single worker for printing information to the screen prevents
     the good old joke:
 
-        Some people, when confronted with a problem, think, 
+        Some people, when confronted with a problem, think,
         "I know, I'll use threads," and then two they hav erpoblesms.
 """
 
@@ -842,101 +951,49 @@ if process == 'poller' and stats:
 
     # write instance and total stats into db
     cursor.execute("UPDATE `observium_attribs` SET `attrib_value` = %s WHERE `attrib_type` = %s", (json.dumps(instance_stats), 'poller_wrapper_instance_' + str(instance_number)))
-    db.commit()
+    #db.commit()
     #print("Number of rows updated: %d" % cursor.rowcount)
     if cursor.rowcount == 0:
         cursor.execute("INSERT INTO `observium_attribs` (`attrib_value`,`attrib_type`) VALUES (%s,%s)", (json.dumps(instance_stats), 'poller_wrapper_instance_' + str(instance_number)))
-        db.commit()
+        #db.commit()
 
     cursor.execute("UPDATE `observium_attribs` SET `attrib_value` = %s WHERE `attrib_type` = %s", (json.dumps(poller_stats), 'poller_wrapper_stats'))
-    db.commit()
+    #db.commit()
     print("Number of rows updated: %d" % cursor.rowcount)
     if cursor.rowcount == 0:
         cursor.execute("INSERT INTO `observium_attribs` (`attrib_value`,`attrib_type`) VALUES (%s,%s)", (json.dumps(poller_stats), 'poller_wrapper_stats'))
-        db.commit()
+        #db.commit()
 
     # clean stale instance stats
     for row in instances_clean:
         cursor.execute("DELETE FROM `observium_attribs` WHERE `attrib_type` = %s", (row,))
-        db.commit()
+        #db.commit()
 
     # Write poller statistics to RRD
-    rrd_path_total = 'poller-wrapper.rrd'
-    if not remote_rrd:
-        rrd_path_total = rrd_path  + '/' + rrd_path_total
+    if poller_id > 0:
+        # partioned poller wrapper
+        rrd_name_base = 'poller-wrapper-id' + str(poller_id)
+    else:
+        # default poller wrapper
+        rrd_name_base = 'poller-wrapper'
 
-    if not os.path.isfile(rrd_path_total):
-        # Create RRD
-        rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
-        cmd_create = config['rrdtool'] + ' create ' + rrd_path_total + ' DS:devices' + rrd_dst + ' DS:totaltime' + rrd_dst + ' DS:threads' + rrd_dst
-        cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
-        if remote_rrd:
-            # --no-overwrite avialable since 1.4.3
-            cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
-        os.system(cmd_create)
-        logfile(cmd_create)
-        if debug:
-            print("DEBUG: " + cmd_create)
-    cmd_update = config['rrdtool'] + ' update ' + rrd_path_total + ' N:%s:%s:%s' % (poller_stats['total_devices_count'], poller_stats['average_runtime'], amount_of_workers)
-    if remote_rrd:
-        cmd_update += ' --daemon ' + rrdcached_address
-    os.system(cmd_update)
-    if debug:
-        print("DEBUG: " + cmd_update)
+    rrd_path_total = rrd_name_base + '.rrd'
+    rrd_path_count = rrd_name_base + '_count.rrd'
 
-    # Write poller wrapper count statistics to RRD
-    rrd_path_count = 'poller-wrapper_count.rrd'
-    if not remote_rrd:
-        rrd_path_count = rrd_path  + '/' + rrd_path_count
+    update_wrapper_times(rrd_path_total, poller_stats['total_devices_count'], poller_stats['average_runtime'], amount_of_workers)
+    update_wrapper_count(rrd_path_count, poller_stats['wrapper_count'])
 
-    if not os.path.isfile(rrd_path_count):
-        # Create RRD
-        rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
-        cmd_create = config['rrdtool'] + ' create ' + rrd_path_count + ' DS:wrapper_count' + rrd_dst
-        cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
-        if remote_rrd:
-            # --no-overwrite avialable since 1.4.3
-            cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
-        os.system(cmd_create)
-        logfile(cmd_create)
-        if debug:
-            print("DEBUG: " + cmd_create)
-    cmd_update = config['rrdtool'] + ' update ' + rrd_path_count + ' N:%s' % (poller_stats['wrapper_count'])
-    if remote_rrd:
-        cmd_update += ' --daemon ' + rrdcached_address
-    os.system(cmd_update)
-    if debug:
-        print("DEBUG: " + cmd_update)
-
+    # Additionally per instance statistics
     if instances_count > 1:
-        # Per instance statistics
-        rrd_path_instance = 'poller-wrapper_' + str(instances_count) + '_' + str(instance_number) + '.rrd'
-        if not remote_rrd:
-            rrd_path_instance = rrd_path + '/' + rrd_path_instance
-        if not os.path.isfile(rrd_path_instance):
-            # Create RRD
-            rrd_dst = ':GAUGE:' + str(config['rrd']['step'] * 2) + ':0:U'
-            cmd_create = config['rrdtool'] + ' create ' + rrd_path_instance + ' DS:devices' + rrd_dst + ' DS:totaltime' + rrd_dst + ' DS:threads' + rrd_dst
-            cmd_create += ' --step ' + str(config['rrd']['step']) + ' ' + ' '.join(config['rrd']['rra'].split())
-            if remote_rrd:
-                # --no-overwrite avialable since 1.4.3
-                cmd_create += ' --no-overwrite --daemon ' + rrdcached_address
-            os.system(cmd_create)
-            logfile(cmd_create)
-            if debug:
-                print("DEBUG: " + cmd_create)
-        cmd_update = config['rrdtool'] + ' update ' + rrd_path_instance + ' N:%s:%s:%s' % (instance_stats['devices_count'], instance_stats['last_runtime'], amount_of_workers)
-        if remote_rrd:
-            cmd_update += ' --daemon ' + rrdcached_address
-        os.system(cmd_update)
-        if debug:
-            print("DEBUG: " + cmd_update)
+        rrd_path_instance = rrd_name_base + '_' + str(instances_count) + '_' + str(instance_number) + '.rrd'
+        update_wrapper_times(rrd_path_instance, instance_stats['devices_count'], instance_stats['last_runtime'], amount_of_workers)
+
 
 # Remove process info from DB
 p_query = """DELETE FROM `observium_processes` WHERE `process_id` = %s"""
 try:
   cursor.execute(p_query, (process_id,))
-  db.commit()
+  #db.commit()
 except:
   pass
 

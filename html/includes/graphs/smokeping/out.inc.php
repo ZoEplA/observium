@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -24,9 +24,9 @@ include_once($config['html_dir']."/includes/graphs/common.inc.php");
 include("smokeping_common.inc.php");
 
 $i = 0;
-$pings = $config['smokeping']['pings'];
+$pings = 20;
 $iter = 0;
-$colourset = "mixed-10c";
+$colourset = "mixed";
 
 if($width > "500")
 {
@@ -46,9 +46,16 @@ $target=$dest['hostname'];
 if($config['smokeping']['suffix']) $target = str_replace($config['smokeping']['suffix'],"",$target);
 if($config['smokeping']['split_char']) $target = str_replace(".", $config['smokeping']['split_char'],$target);
 
+if (isset($config['smokeping']['master_hostname']))
+{
+  $master_hostname = $config['smokeping']['master_hostname'];
+} else {
+  $master_hostname = $config['own_hostname'];
+}
+
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($config['smokeping']['dir'])) as $filename_dir)
 {
-    if (($device['hostname'] == $config['own_hostname']) && strstr($filename_dir, $target.".rrd"))
+    if (($device['hostname'] == $master_hostname) && strstr($filename_dir, $target.".rrd"))
         $filename = $filename_dir;
     elseif(strstr($filename_dir, $target."~".$device['hostname'].".rrd"))
         $filename = $filename_dir;

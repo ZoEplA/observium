@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2003 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -39,7 +39,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-MGMT-MIB;
                 
 snmpMgmt MODULE-IDENTITY
-    LAST-UPDATED "0610050000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -55,13 +55,19 @@ snmpMgmt MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom SNMP management MIB"
-    REVISION      "0304290000Z"
+        "Broadcom proprietary MIB for runtime management and configuration
+         of objects related to SNMP."
+    REVISION      "200702050000Z"
     DESCRIPTION
-        "Initial version of this MIB module."
-    REVISION      "0610050000Z"
+        "Module description was updated.
+         Compilability issues were cleaned up:
+         - Chronological order of revision list was corrected."
+    REVISION      "200610050000Z"
     DESCRIPTION
         "Added object snmpDscpTag."
+    REVISION      "200304290000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataMgmtBase 2 }
     
 snmpUdpPort OBJECT-TYPE
@@ -111,6 +117,4 @@ snmpDscpTag OBJECT-TYPE
    DEFVAL { 0 }
  ::= { snmpMgmt 3 }
  
-
-    
 END

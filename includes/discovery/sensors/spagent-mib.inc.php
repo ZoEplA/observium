@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -44,7 +44,7 @@ foreach ($akcp_array as $index => $entry)
 
     if ($entry['sensorProbeTempStatus'] != 'noStatus')
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'akcp', $descr, 1, $value, $options);
+      discover_sensor('temperature', $device, $oid, $index, 'akcp', $descr, 1, $value, $options);
     }
   }
 
@@ -64,7 +64,7 @@ foreach ($akcp_array as $index => $entry)
 
     if ($entry['sensorProbeHumidityStatus'] != 'noStatus')
     {
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'akcp', $descr, 1, $value, $options);
+      discover_sensor('humidity', $device, $oid, $index, 'akcp', $descr, 1, $value, $options);
     }
   }
 
@@ -78,7 +78,7 @@ foreach ($akcp_array as $index => $entry)
 
     if ($entry['sensorProbeSwitchStatus'] != 'noStatus')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, $index, 'spagent-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, $index, 'spStatusExt', $descr, $value, array('entPhysicalClass' => 'other'));
     }
   }
 }

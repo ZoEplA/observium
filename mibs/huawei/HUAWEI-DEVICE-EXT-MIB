@@ -1,5 +1,5 @@
 --====================================================================
--- Copyright (C) 2008 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: Huawei Device extent MIB File for base device infomation
 -- Reference:
@@ -25,15 +25,15 @@
         hwDeviceExt MODULE-IDENTITY 
             LAST-UPDATED "200901051414Z"
             ORGANIZATION 
-                "Huawei Technologies Co.,Ltd."
+                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "VRP Team Huawei Technologies Co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                http://www.huawei.com
-                Zip:100085
-                "
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
             DESCRIPTION 
                 "The MIB module for collect base device information."
             REVISION "200812171414Z"
@@ -75,7 +75,7 @@
             STATUS current
             DESCRIPTION
                 "The name of a product.For example,Quidway NetEngine 5000E.The product name is not equal to the system name.
-                the system name is an instance of the product name.User can config the system name of a device,bot can not change 
+                the system name is an instance of the product name.User can config the system name of a device,but can not change 
                 the  product name of the device."  
             ::= { hwDeviceExtObject 4 }   
             

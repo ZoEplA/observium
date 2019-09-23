@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -22,13 +22,11 @@ foreach (dbFetchRows($sql, array($device['device_id'])) as $entry)
   $sla_db_count++; // Fetch all entries for correct counting, but skip inactive/deleted
   if ($entry['sla_status'] != 'active') { continue; }
 
-  if (!isset($entry['sla_mib'])) { $entry['sla_mib'] = 'CISCO-RTTMON-MIB'; } // CLEANME, remove in r7500, but not before CE 0.16.1
-
   $index = $entry['sla_index'];
   $mib_lower = strtolower($entry['sla_mib']);
-  if ($mib_lower != 'cisco-rttmon-mib')
+  if (!in_array($entry['sla_mib'], ['CISCO-RTTMON-MIB', 'HPICF-IPSLA-MIB']))
   {
-    // Use 'owner.index' as index, because all except Cisco use this!
+    // Use 'owner.index' as index for all except Cisco and HPE
     $index = $entry['sla_owner'] . '.' . $index;
   }
 
@@ -51,7 +49,7 @@ foreach (array_keys($sla_db) as $mib_lower)
   }
   $sla_polled_time = time(); // Store polled time for current MIB
 
-  if (OBS_DEBUG > 1) { print_vars($cache_sla); }
+  print_debug_vars($cache_sla);
 
   //$sla_db_count   += count($sla_db[$mib_lower]);
   $sla_snmp_count += count($cache_sla[$mib_lower]);
@@ -69,9 +67,9 @@ foreach (array_keys($sla_db) as $mib_lower)
     $rrd_ds       = "DS:rtt:GAUGE:600:0:300000";
 
     $index = $sla['sla_index'];
-    if ($mib_lower != 'cisco-rttmon-mib')
+    if (!in_array($sla['sla_mib'], ['CISCO-RTTMON-MIB', 'HPICF-IPSLA-MIB']))
     {
-      // Use 'owner.index' as index, because all except Cisco use this!
+      // Use 'owner.index' as index for all except Cisco and HPE
       $index = $sla['sla_owner'] . '.' . $index;
     }
 
@@ -128,7 +126,7 @@ foreach (array_keys($sla_db) as $mib_lower)
         $sla_state['rtt_last_change'] = $sla['rtt_last_change'];
       }
 
-      // Compatability with old code
+      // Compatibility with old code
       if (empty($sla['sla_graph']))
       {
         if (stripos($sla['rtt_type'], 'jitter') !== FALSE)

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,13 +21,9 @@ $cpqrack = snmpwalk_cache_oid($device, 'cpqRackCommonEnclosureHasFans',         
 //print_vars($oids);
 
 // Power Supplies
-if (!isset($cache_discovery['cpqrack-mib_power']))
-{
-  $cache_discovery['cpqrack-mib_power'] = snmpwalk_cache_oid($device, 'cpqRackPowerSupplyTable', NULL, 'CPQRACK-MIB');
-}
+$oids = snmp_cache_table($device, 'cpqRackPowerSupplyTable', NULL, 'CPQRACK-MIB');
 
-//print_vars($cache_discovery['cpqrack-mib_power']);
-foreach ($cache_discovery['cpqrack-mib_power'] as $index => $entry)
+foreach ($oids as $index => $entry)
 {
   $rack    = $entry['cpqRackPowerSupplyRack'];
   if ($cpqrack[$rack]['cpqRackCommonEnclosureHasPowerSupplies'] == 'false' ||
@@ -48,7 +44,7 @@ foreach ($cache_discovery['cpqrack-mib_power'] as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'power', $device, $oid, $index, $type, 'Power Supply Output ' . $descr, 1, $value);
+    discover_sensor_ng($device, 'power', 'CPQRACK-MIB', $oid_name, $oid, $index, $type, 'Power Supply Output ' . $descr, 1, $value);
   }
 
   // Intake Temperature
@@ -59,7 +55,7 @@ foreach ($cache_discovery['cpqrack-mib_power'] as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, 'Power Supply Intake ' . $descr, 1, $value);
+    discover_sensor_ng($device, 'temperature', 'CPQRACK-MIB', $oid_name, $oid, $index, $type, 'Power Supply Intake ' . $descr, 1, $value);
   }
 
   // Exhaust Temperature
@@ -70,26 +66,26 @@ foreach ($cache_discovery['cpqrack-mib_power'] as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, 'Power Supply Exhaust ' . $descr, 1, $value);
+    discover_sensor_ng($device, 'temperature', 'CPQRACK-MIB', $oid_name, $oid, $index, $type, 'Power Supply Exhaust ' . $descr, 1, $value);
   }
 
   // Status
   $oid     = '.1.3.6.1.4.1.232.22.2.5.1.1.1.14.'.$index;
   $value   = $entry['cpqRackPowerSupplyStatus'];
 
-  discover_status($device, $oid, 'cpqRackPowerSupplyStatus.'.$index, 'cpqRackPowerSupplyStatus', 'Power Supply Status ' . $descr, $value, array('entPhysicalClass' => 'powersupply'));
+  discover_status_ng($device, $mib, 'cpqRackPowerSupplyStatus', $oid, $index, 'cpqRackPowerSupplyStatus', 'Power Supply Status ' . $descr, $value, array('entPhysicalClass' => 'powersupply'));
 
   // InputLine
   $oid     = '.1.3.6.1.4.1.232.22.2.5.1.1.1.15.'.$index;
   $value   = $entry['cpqRackPowerSupplyInputLineStatus'];
 
-  discover_status($device, $oid, 'cpqRackPowerSupplyInputLineStatus.'.$index, 'cpqRackPowerSupplyInputLineStatus', 'Power Supply InputLine ' . $descr, $value, array('entPhysicalClass' => 'powersupply'));
+  discover_status_ng($device, $mib, 'cpqRackPowerSupplyInputLineStatus', $oid, $index, 'cpqRackPowerSupplyInputLineStatus', 'Power Supply InputLine ' . $descr, $value, array('entPhysicalClass' => 'powersupply'));
 
   // Condition
   $oid     = '.1.3.6.1.4.1.232.22.2.5.1.1.1.17.'.$index;
   $value   = $entry['cpqRackPowerSupplyCondition'];
 
-  discover_status($device, $oid, 'cpqRackPowerSupplyCondition.'.$index, 'cpqRackCommonEnclosureCondition', 'Power Supply ' . $descr, $value, array('entPhysicalClass' => 'powersupply'));
+  discover_status_ng($device, $mib, 'cpqRackPowerSupplyCondition', $oid, $index, 'cpqRackCommonEnclosureCondition', 'Power Supply ' . $descr, $value, array('entPhysicalClass' => 'powersupply'));
 }
 
 // Rack Power
@@ -107,7 +103,7 @@ foreach ($oids as $index => $entry)
   $oid     = '.1.3.6.1.4.1.232.22.2.3.3.1.1.9.'.$index;
   $value   = $entry['cpqRackPowerEnclosureCondition'];
 
-  discover_status($device, $oid, 'cpqRackPowerEnclosureCondition.'.$index, 'cpqRackCommonEnclosureCondition', $descr, $value, array('entPhysicalClass' => 'power'));
+  discover_status_ng($device, $mib, 'cpqRackPowerEnclosureCondition', $oid, $index, 'cpqRackCommonEnclosureCondition', $descr, $value, array('entPhysicalClass' => 'power'));
 }
 
 // Temperatures
@@ -131,7 +127,7 @@ foreach ($oids as $index => $entry)
   $value      = $entry[$oid_name];
   $limits     = array('limit_high' => $entry['cpqRackCommonEnclosureTempThreshold']);
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, 1, $value, $limits);
+  discover_sensor_ng($device, 'temperature', 'CPQRACK-MIB', $oid_name, $oid, $index, $type, $descr, 1, $value, $limits);
 
   // State
   $oid     = '.1.3.6.1.4.1.232.22.2.3.1.2.1.8.'.$index;
@@ -157,7 +153,7 @@ foreach ($oids as $index => $entry)
   $oid     = '.1.3.6.1.4.1.232.22.2.3.1.3.1.11.'.$index;
   $value   = $entry['cpqRackCommonEnclosureFanCondition'];
 
-  discover_status($device, $oid, 'cpqRackCommonEnclosureFanCondition.'.$index, 'cpqRackCommonEnclosureCondition', $descr, $value, array('entPhysicalClass' => 'fan'));
+  discover_status_ng($device, $mib, 'cpqRackCommonEnclosureFanCondition', $oid, $index, 'cpqRackCommonEnclosureCondition', $descr, $value, array('entPhysicalClass' => 'fan'));
 }
 
 // EOF

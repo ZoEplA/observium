@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -38,7 +38,7 @@ if (is_device_mib($device, 'JUNIPER-VLAN-MIB')) // Unsure if other Juniper platf
 }
 
 /* Base port ifIndex association */
-$dot1d_baseports = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
+$dot1d_baseports = snmp_cache_table($device, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
 
 // Detect min ifIndex for vlan base ports
 // Why, see here: http://jira.observium.org/browse/OBS-963
@@ -134,6 +134,8 @@ foreach ($dot1q_ports as $vlan_num => $vlan)
         //$ifIndex = $i + $vlan_ifindex_min; // This is incorrect ifIndex association!
         if ($use_baseports)
         {
+          // Skip all unknown indexes (OBS-2958)
+          if (!isset($dot1d_baseports[$i + 1]['dot1dBasePortIfIndex'])) { continue; }
           $ifIndex = $dot1d_baseports[$i + 1]['dot1dBasePortIfIndex'];
         } else {
           $ifIndex = $i;

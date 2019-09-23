@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd.  All rights reserved.
 -- Description: This MIB will maintain the products MIB OID and management
 --              properties root node for H3C products
 --
 -- Reference:
--- Version: V1.25
+-- Version: V1.27
 -- History:
 --   V1.00 2006-04-19 created by longyin
 --   V1.01 2007/08/09 add hh3cSiemMib by gaolong
@@ -49,6 +49,10 @@
 --   V1.24 2014/09/18 add hh3cJointMibs, hh3cMulticastSnoop, hh3cPvst, hh3cSmlk,
 --                        hh3c8021XExt2, hh3cObjp, hh3cNvgre by songhao
 --   V1.25 2015/04/23 add 157 to 162 under hh3cCommon by songhao
+--   V1.26 2016/04/02 add 163 to 165 under hh3cCommon
+--                    add hh3cJointVendorId by songhao
+--   V1.27 2018/04/18 add 166 to 175 under hh3cCommon by jiliyan
+--                    add 13 under hh3c by jiliyan
 -- ============================================================================
 HH3C-OID-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -70,6 +74,10 @@ HH3C-OID-MIB DEFINITIONS ::= BEGIN
     hh3cStorageRef              OBJECT IDENTIFIER ::= { hh3c 10 }
     hpNetworking                OBJECT IDENTIFIER ::= { hh3c 11 }
     hh3cJointMibs               OBJECT IDENTIFIER ::= { hh3c 12 }
+    hh3c2014                    OBJECT IDENTIFIER ::= { hh3c 13 }
+
+-- Define joint vendor product ID
+    hh3cJointVendorId           OBJECT IDENTIFIER ::= { hh3cJointMibs 1 }
 
 -- Object under .enterprises.hh3c.hh3cCommon
     hh3cFtm                     OBJECT IDENTIFIER ::= { hh3cCommon 1 }
@@ -148,6 +156,7 @@ HH3C-OID-MIB DEFINITIONS ::= BEGIN
     hh3cAcfp                    OBJECT IDENTIFIER ::= { hh3cCommon 74 }
     hh3cDot11                   OBJECT IDENTIFIER ::= { hh3cCommon 75 }
     hh3cE1T1VI                  OBJECT IDENTIFIER ::= { hh3cCommon 76 }
+    hh3cwapiMIB                 OBJECT IDENTIFIER ::= { hh3cCommon 77 }
     hh3cL2VpnPwe3               OBJECT IDENTIFIER ::= { hh3cCommon 78 }
     hh3cMplsOam                 OBJECT IDENTIFIER ::= { hh3cCommon 79 }
     hh3cMplsOamPs               OBJECT IDENTIFIER ::= { hh3cCommon 80 }
@@ -233,6 +242,19 @@ HH3C-OID-MIB DEFINITIONS ::= BEGIN
     hh3cMplsVpnBgp              OBJECT IDENTIFIER ::= { hh3cCommon 160 }
     hh3cOspf                    OBJECT IDENTIFIER ::= { hh3cCommon 161 }
     hh3cL2vpn                   OBJECT IDENTIFIER ::= { hh3cCommon 162 }
+    hh3cMACsec                  OBJECT IDENTIFIER ::= { hh3cCommon 163 }
+    hh3cFailover                OBJECT IDENTIFIER ::= { hh3cCommon 164 }
+    hh3cVpnPeer                 OBJECT IDENTIFIER ::= { hh3cCommon 165 }
+    hh3cSecp                    OBJECT IDENTIFIER ::= { hh3cCommon 166 }
+    hh3cOfp                     OBJECT IDENTIFIER ::= { hh3cCommon 167 }
+    hh3cARPEntry                OBJECT IDENTIFIER ::= { hh3cCommon 168 }
+    hh3cResMon                  OBJECT IDENTIFIER ::= { hh3cCommon 169 }
+    hh3cSslvpn                  OBJECT IDENTIFIER ::= { hh3cCommon 170 }
+    hh3cSecHigh                 OBJECT IDENTIFIER ::= { hh3cCommon 171 }
+    hh3cBgpEvpn                 OBJECT IDENTIFIER ::= { hh3cCommon 172 }
+    hh3cEvpn                    OBJECT IDENTIFIER ::= { hh3cCommon 173 }
+    hh3cLTE                     OBJECT IDENTIFIER ::= { hh3cCommon 174 }
+    hh3cPPP                     OBJECT IDENTIFIER ::= { hh3cCommon 175 }
 
 -- under enterprises.hh3c.hh3cCommon.hh3cQos2
     hh3cIfQos2                  OBJECT IDENTIFIER ::= { hh3cQos2 1 }

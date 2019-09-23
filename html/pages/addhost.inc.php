@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -74,18 +74,17 @@ foreach ($config['snmp']['transports'] as $transport)
       // top row div
       $form['fieldset']['edit']    = array('div'   => 'top',
                                            'title' => 'Basic Configuration',
-                                           'icon'  => $config['icon']['settings'],
                                            'class' => 'col-md-6');
       $form['fieldset']['snmpv2']  = array('div'   => 'top',
-                                           'title' => 'Authentication Configuration',
-                                           'icon'  => $config['icon']['lock'],
-                                           //'right' => TRUE,
+                                           'title' => 'SNMP v1/v2c Authentication',
                                            'class' => 'col-md-6 col-md-pull-0');
       $form['fieldset']['snmpv3']  = array('div'   => 'top',
-                                           'title' => 'Authentication Configuration',
-                                           'icon'  => $config['icon']['lock'],
-                                           //'right' => TRUE,
+                                           'title' => 'SNMP v3 Authentication',
                                            'class' => 'col-md-6 col-md-pull-0');
+      $form['fieldset']['snmpextra'] = array('div'   => 'top',
+                                             'title' => 'Extra Configuration',
+                                             'class' => 'col-sm-12 col-md-6 pull-right');
+
       // bottom row div
       $form['fieldset']['submit']  = array('div'   => 'bottom',
                                            'style' => 'padding: 0px;',
@@ -200,7 +199,15 @@ foreach ($config['snmp']['transports'] as $transport)
                                       'width'       => '250px',
                                       'values'      => array('AES' => 'AES', 'DES' => 'DES'),
                                       'value'       => $vars['snmp_cryptoalgo']);
-
+      $form['row'][25]['snmp_context'] = array(
+                                      'type'        => 'text',
+                                      'fieldset'    => 'snmpextra',
+                                      'name'        => 'SNMP Context',
+                                      'width'       => '250px',
+                                      'readonly'    => $readonly,
+                                      'show_password' => !$readonly,
+                                      'placeholder' => '(Optional) Context',
+                                      'value'       => $vars['snmp_context']); // FIXME. For passwords we should use filter instead escape!
       $form['row'][30]['submit']    = array(
                                       'type'        => 'submit',
                                       'fieldset'    => 'submit',

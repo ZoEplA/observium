@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS
 -- 
 -- Reference:
--- Version:     V2.01
+-- Version:     V1.0
 -- History:
 -- 
 -- =================================================================
@@ -27,7 +27,7 @@
     
     
         hwDCTrapMIB MODULE-IDENTITY 
-            LAST-UPDATED "201507220000Z"        -- April 24, 2006 at 00:00 GMT
+            LAST-UPDATED "200604240000Z"        -- April 24, 2006 at 00:00 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -38,11 +38,10 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                  "
-            DESCRIPTION "The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS."
-            
-            REVISION    "201507220000Z"
-			      DESCRIPTION "modify name hwFanFail->hwDCFanFail;hwFanFailResume->hwDCFanFailResume"	
-			      
+            DESCRIPTION 
+                "
+                The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS.
+                "
             ::= { hwDatacomm 37 }
         
     
@@ -433,14 +432,14 @@
                 "Fan hardware failure!"
             ::= { hwDCTraps 50 }
         
-        hwDCFanFail NOTIFICATION-TYPE
+        hwFanFail NOTIFICATION-TYPE
             OBJECTS { entPhysicalName }
             STATUS current
             DESCRIPTION 
                 "Fan failure!"
             ::= { hwDCTraps 51 }
         
-        hwDCFanFailResume NOTIFICATION-TYPE
+        hwFanFailResume NOTIFICATION-TYPE
             OBJECTS { entPhysicalName }
             STATUS current
             DESCRIPTION 
@@ -1008,8 +1007,8 @@
                 hwVoltSensorFail, hwVoltSensorFailResume, hwVoltBtmC, hwVoltBtmCResume, hwVoltSprC, 
                 hwVoltSprCResume, hwVoltBtmM, hwVoltBtmMResume, hwVoltSprM, hwVoltSprMResume, 
                 hwTempSensorFail, hwTempSensorFailResume, hwTempMnr, hwTempMnrResume, hwTempMjr, 
-                hwTempMjrResume, hwTempCtl, hwTempCtlResume, hwFanHFail, hwDCFanFail, 
-                hwDCFanFailResume, hwFanAbsent, hwFanAbsentResume, hwFanCabUN, hwFanCabUNResume, 
+                hwTempMjrResume, hwTempCtl, hwTempCtlResume, hwFanHFail, hwFanFail, 
+                hwFanFailResume, hwFanAbsent, hwFanAbsentResume, hwFanCabUN, hwFanCabUNResume, 
                 hwPwrFail, hwPwrFailResume, hwPwrAbsent, hwPwrAbsentResume, hwPwrCabUN, 
                 hwPwrCabUNResume, hwLCDHFail, hwLCDFail, hwLCDAbsent, hwLCDAbsentResume, 
                 hwLCDCabUN, hwLCDCabUNResume, hwROMFail, hwMonitorBUSFail, hwMonitorBUSFailResume, 

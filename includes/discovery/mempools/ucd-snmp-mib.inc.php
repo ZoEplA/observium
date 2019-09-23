@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -32,8 +32,10 @@
 $data = snmp_get_multi_oid($device, 'memTotalReal.0 memAvailReal.0 memBuffer.0 memCached.0', array(), 'UCD-SNMP-MIB');
 $data = $data[0];
 
-if(is_array($data) && isset($data['memTotalReal']) && isset($data['memBuffer']) && isset($data['memCached']) && isset($data['memAvailReal']) &&
-   $data['memCached'] >= 0 && $data['memBuffer'] >= 0 && $data['memAvailReal'] >= 0 && $data['memTotalReal'] >= 0)
+//if(is_array($data) && isset($data['memTotalReal']) && isset($data['memBuffer']) && isset($data['memCached']) && isset($data['memAvailReal']) &&
+//   $data['memCached'] >= 0 && $data['memBuffer'] >= 0 && $data['memAvailReal'] >= 0 && $data['memTotalReal'] >= 0)
+if(is_array($data) && isset($data['memTotalReal']) && isset($data['memAvailReal']) &&
+   $data['memAvailReal'] >= 0 && $data['memTotalReal'] >= 0)
 {
 
   $mempool['total'] = $data['memTotalReal'] * 1024;
@@ -42,7 +44,7 @@ if(is_array($data) && isset($data['memTotalReal']) && isset($data['memBuffer']) 
   $mempool['perc']  = $mempool['free'] / $mempool['total'] * 100;
 
   $index = '0';
-  $descr = 'Physical memory';
+  $descr = 'Physical Memory';
 
   discover_mempool($valid['mempool'], $device, $index, 'UCD-SNMP-MIB', $descr, "1", $mempool['total'], $mempool['used']);
 }

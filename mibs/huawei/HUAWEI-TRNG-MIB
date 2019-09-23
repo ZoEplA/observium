@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (C) 2011 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring time range. 
 --               When configuring the ACL rule, if you need to specify the time 
 --               for the ACL rule to take effect, you need to run this command 
@@ -7,7 +7,7 @@
 --               you can specify the time for an ACL to take effect by referring
 --               the time range name when configuring the ACL rule.
 -- Reference:  
--- Version: V1.01
+-- Version: V1.02
 -- ============================================================================
 
   HUAWEI-TRNG-MIB DEFINITIONS ::= BEGIN
@@ -24,7 +24,7 @@
             FROM HUAWEI-MIB;
         
         hwTRNG MODULE-IDENTITY 
-        LAST-UPDATED "201103220000Z"    
+        LAST-UPDATED "201711220000Z"    
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO                                        
@@ -44,6 +44,10 @@
             the time range name when configuring the ACL rule."  
           
         -- Revision history
+        REVISION     "201711220000Z"  
+        DESCRIPTION  "V1.02, modified the description of hwTrngCreateTimerangeTable,
+                                                hwTrngAbsoluteTable and hwTrngPeriodicTable."
+
         REVISION     "201103220000Z"  
         DESCRIPTION  "V1.01, modified the description of hwTimerangePeriodicEndTimes.
 		              modified the description of hwTrngCreateTimerangeTable, 
@@ -71,7 +75,6 @@
              After the configuration, the effective time is specified by referencing the time range 
              when an ACL rule is being configured.
              An ACL time range can be a relative time range and an absolute time range. 
-             The index of this table is hwTrngIndex.
             "
         ::= { hwTRNGMibObjects 1 }
 
@@ -173,7 +176,6 @@
              An absolute time range refers to the time range without a period. 
              The time range is active from the specified start time and date to the end time and date. 
              Otherwise, the time range is inactive.
-             The indexes of this table are hwTrngAbsoluteNameIndex and hwTrngAbsoluteSubIndex. 
             "
         ::= { hwTRNGMibObjects 2 }
     
@@ -293,7 +295,6 @@
              but the date is set to a day from Monday to Sunday. 
              The time range is active at the specified time and date. 
              Otherwise, the time range is inactive. 
-             The indexes of this table are hwTrngPeriodicNameIndex and hwTrngPeriodicSubIndex. 
             "
         ::= { hwTRNGMibObjects 3 }
     

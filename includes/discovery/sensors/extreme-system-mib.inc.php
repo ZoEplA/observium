@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -38,13 +38,22 @@ foreach ($oids['FanStatus'] as $index => $entry)
   } else {
     $descr  = $entity_array[$entry['extremeFanEntPhysicalIndex']]['entPhysicalDescr'];
   }
+
   $oid_name = 'extremeFanSpeed';
   $oid_num  = ".1.3.6.1.4.1.1916.1.1.1.9.1.4.$index";
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
   $options  = array('entPhysicalIndex' => $entry['extremeFanEntPhysicalIndex']);
 
-  discover_sensor($valid['sensor'], 'fanspeed', $device, $oid_num, $index, $type, $descr, 1, $value, $options);
+  discover_sensor_ng($device,'fanspeed', $mib, $oid_name, $oid_num, $index, NULL, $descr, 1, $value, $options);
+
+  // Fan Status
+  $oid_name = 'extremeFanOperational';
+  $oid_num  = '.1.3.6.1.4.1.1916.1.1.1.9.1.2.'.$index;
+  $value    = $entry[$oid_name];
+
+  discover_status($device, $oid_num, $oid_name.'.'.$index, 'extremeTruthValue', $descr, $value, array_merge($options, array('entPhysicalClass' => 'fan')));
+
 }
 
 //EXTREME-SYSTEM-MIB::extremePowerSupplyNumber.1 = INTEGER: 1
@@ -80,6 +89,11 @@ foreach ($oids['PowerSupply'] as $index => &$entry)
     $name   = "Power Supply $index";
   } else {
     $name   = $entity_array[$entry['extremePowerSupplyEntPhysicalIndex']]['entPhysicalDescr'];
+    if (!preg_match('/[0-9]/', $name))
+    {
+      // Append index if name not contain any number for identification
+      $name .= " $index";
+    }
   }
   $entry['name'] = $name;
   $options  = array('entPhysicalIndex' => $entry['extremePowerSupplyEntPhysicalIndex']);
@@ -99,7 +113,7 @@ foreach ($oids['PowerSupply'] as $index => &$entry)
     $oid_num  = ".1.3.6.1.4.1.1916.1.1.1.27.1.9.$index";
     $type     = $mib . '-' . $oid_name;
 
-    discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, si_to_scale($entry['extremePowerSupplyInputPowerUsageUnitMultiplier']), $value, $options);
+    discover_sensor_ng($device,'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, si_to_scale($entry['extremePowerSupplyInputPowerUsageUnitMultiplier']), $value, $options);
   }
 }
 
@@ -139,7 +153,7 @@ foreach ($oids['PowerSupplyOutput'] as $extremePowerSupplyIndex => $entry1)
       $oid_num  = ".1.3.6.1.4.1.1916.1.1.1.38.1.3.$index";
       $type     = $mib . '-' . $oid_name;
 
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device,'voltage', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
 
     $oid_name = 'extremePowerSupplyOutputCurrent';
@@ -149,7 +163,7 @@ foreach ($oids['PowerSupplyOutput'] as $extremePowerSupplyIndex => $entry1)
       $oid_num  = ".1.3.6.1.4.1.1916.1.1.1.38.1.4.$index";
       $type     = $mib . '-' . $oid_name;
 
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device,'current', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
   }
 }
@@ -173,7 +187,7 @@ if ($value > 0)
   $oid_num  = ".1.3.6.1.4.1.1916.1.1.1.40.1.$index";
   $type     = $mib . '-' . $oid_name;
 
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor_ng($device,'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value);
 }
 
 unset($oids);

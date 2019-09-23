@@ -23,7 +23,7 @@ FROM SNMPv2-CONF
   FROM SNMPv2-TC
   multiDiskName, multiDiskFreeAvailablePercent, raidVolumeID, raidVolumeState, raidDiskVolumeID, raidDiskID, raidDiskState, raidDiskFlags
 	FROM CHECKPOINT-MIB
-  svnNetIfName, svnNetIfAddress, svnNetIfState, svnNetIfOperState, multiProcIndex, multiProcUserTime, multiProcSystemTime, multiProcIdleTime, multiProcUsage
+  svnNetIfName, svnNetIfAddress, svnNetIfState, svnNetIfOperState, svnNetIfRXDrops, multiProcIndex, multiProcUserTime, multiProcSystemTime, multiProcIdleTime, multiProcUsage
 	FROM CHECKPOINT-MIB
   multiProcRunQueue, multiProcInterrupts, memActiveReal64, memTotalReal64, memActiveVirtual64, memTotalVirtual64, tempertureSensorName, tempertureSensorValue
 	FROM CHECKPOINT-MIB
@@ -31,13 +31,15 @@ FROM SNMPv2-CONF
 	FROM CHECKPOINT-MIB
   voltageSensorName, voltageSensorValue, voltageSensorUnit, voltageSensorType, voltageSensorStatus
 	FROM CHECKPOINT-MIB
-  haIdentifier, haState, haBlockState, haStatCode, haStatShort, haStatLong, haProblemName, haProblemStatus, haProblemPriority, haProblemVerified, haProblemDescr
+  haIdentifier, haState, haBlockState, haStatCode, haStatShort, haStatLong, haProblemName, haProblemStatus, haProblemPriority, haProblemVerified, haProblemDescr, haClusterXLFailover
 	FROM CHECKPOINT-MIB
   haIfName, haIP, haStatus, haTrusted, haShared
 	FROM CHECKPOINT-MIB
   fwLSConnName, fwLSConnState, fwLSConnStateDesc, fwLSConnOverall, fwLSConnOverallDesc
 	FROM CHECKPOINT-MIB
   fwLocalLoggingDesc, fwLocalLoggingStat, fwLocalLoggingDesc, fwLocalLoggingStat, fwLocalLoggingDesc, fwLocalLoggingStat
+	FROM CHECKPOINT-MIB
+  asgNetIfName
 	FROM CHECKPOINT-MIB;
 
 	chkpntTrapMibModule MODULE-IDENTITY
@@ -75,6 +77,18 @@ FROM SNMPv2-CONF
         chkpntTrapHWSensor		OBJECT IDENTIFIER ::= { chkpntTrap 5 }
         chkpntTrapHA		OBJECT IDENTIFIER ::= { chkpntTrap 6 }
         chkpntTrapLSConn		OBJECT IDENTIFIER ::= { chkpntTrap 7 }
+        asgTrap         		OBJECT IDENTIFIER ::= { products 2001 } 
+		asgTrapInfo				OBJECT IDENTIFIER ::= { asgTrap 0 } 
+        asgTrapHA				OBJECT IDENTIFIER ::= { asgTrap 1 } 				
+		asgTrapNet	      		OBJECT IDENTIFIER ::= { asgTrap 2 } 
+		asgTrapDisk				OBJECT IDENTIFIER ::= { asgTrap 3 } 
+        asgTrapCPU				OBJECT IDENTIFIER ::= { asgTrap 4 } 
+        asgTrapMemory			OBJECT IDENTIFIER ::= { asgTrap 5 } 
+        asgTrapCplic			OBJECT IDENTIFIER ::= { asgTrap 6 } 
+		asgTrapHWSensor			OBJECT IDENTIFIER ::= { asgTrap 7 }		
+		asgTrapPerf				OBJECT IDENTIFIER ::= { asgTrap 8 }		
+		asgTrapGeneral			OBJECT IDENTIFIER ::= { asgTrap 10 }
+
 
            chkpntTrapOID  OBJECT-TYPE   
                        SYNTAX  DisplayString
@@ -121,6 +135,83 @@ FROM SNMPv2-CONF
                        "The category of the trap"
                        ::= { chkpntTrapInfo 14 }
 
+
+			asgTrapChassisId  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "Chassis identifier"
+                       ::= { asgTrapInfo 10 }
+
+			asgTrapBladeId  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "Blade identifier"
+                       ::= { asgTrapInfo 11 }
+
+			asgTrapMsgText OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "Alert Message Text"
+                       ::= { asgTrapInfo 12 }
+					   
+			asgTrapPriority OBJECT-TYPE
+                       SYNTAX  INTEGER (1..65535)
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "Alert Severity Value
+			  - Critical Alert(4)
+                          - High Alert(3)
+                          - Medium Alert(2)
+                          - Low Alert(1)
+                          - Clear Alert(0)"
+                       ::= { asgTrapInfo 13 }
+					   
+			asgTrapOID  OBJECT-TYPE   
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "The trap OID that triggered this event."
+                       ::= { asgTrapInfo 14 } 
+
+			asgTrapOIDValue  OBJECT-TYPE    
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "The value of the trap OID that triggered this event."                   
+                       ::= { asgTrapInfo 15 } 
+
+			asgTrapSN  OBJECT-TYPE      
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "The appliance serial number - labelled on the appliance"
+                       ::= { asgTrapInfo 16 }
+
+			asgCoreId  OBJECT-TYPE      
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "Core identifier"
+                       ::= { asgTrapInfo 17 }
+
+			asgTrapCategory  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       MAX-ACCESS  read-only
+                       STATUS  current
+                       DESCRIPTION
+                       "Trap Category"
+                       ::= { asgTrapInfo 18 }					   
 
 -- ******************************************
 -- Disk Space Traps
@@ -193,6 +284,56 @@ FROM SNMPv2-CONF
                           DESCRIPTION
                           "Monitored RAID disk flag alert, alerts when raidDiskFalgs contains the OUT_OF_SYNC(0x01) or QUIESCED(0x02) flags (disk ID and volume ID in trap)"
                           ::= { chkpntTrapDisk 4 }
+
+		asgDiskSpaceTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Monitored disk partiton is dangerously Full Alert (filesystem name in trap)"
+                          ::= { asgTrapDisk 1 }
+       
+		asgRAIDVolumeTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+                                asgTrapCategory,
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                raidVolumeID,
+                                raidVolumeState 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Monitored RAID volume state (volume ID in trap)"
+                          ::= { asgTrapDisk 2 }
+                          
+		asgRAIDDiskTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+                                asgTrapCategory,
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                raidDiskVolumeID,
+                                raidDiskID,
+                                raidDiskState 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Monitored RAID disk state (disk ID and volume ID in trap)"
+                          ::= { asgTrapDisk 3 }
 
                           
 -- ******************************************
@@ -305,7 +446,58 @@ FROM SNMPv2-CONF
                           DESCRIPTION
                           "Interface operational link status alert, alerts when svnNetIfOperState = 0(Interface name provided in trap)"     
                           ::= { chkpntTrapNet 7 }
+					
+		  chkpntTrapNetIfRXDrop NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                chkpntTrapOID,
+                                chkpntTrapOIDValue,
+                                chkpntTrapMsgText,
+                                chkpntTrapSeverity,
+                                chkpntTrapCategory,
+                                svnNetIfName,
+                                svnNetIfState,
+                                svnNetIfRXDrops
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Interface RX drops changed alert, alerts when svnNetIfRXDrop changed"     
+                          ::= { chkpntTrapNet 8 }
 
+			asgTrapNetIfState NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+                                asgTrapCategory,
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgNetIfName
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Interface Status Alert (Interface name provided in trap)"     
+                          ::= { asgTrapNet 1 }
+            
+			asgTrapNetAdminState NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+                                asgTrapCategory,
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgNetIfName
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Administrative Status Alert (Interface name provided in trap)"     
+                          ::= { asgTrapNet 2 }
+						  
 -- ******************************************
 -- CPU Core Traps
 -- ******************************************
@@ -353,6 +545,42 @@ FROM SNMPv2-CONF
                           "Core interrupts alert, alerts when multiProcInterrupts >= X (core name in trap)"
                           ::= { chkpntTrapCPU 2 }
 
+			asgCPUCoreUtilTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "CPU Core Utilization Alert (Core number provided in trap)"
+                          ::= { asgTrapCPU 1 }
+                          
+			asgCPUCoreInterruptsTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+                                asgTrapCategory,
+				asgTrapChassisId,
+                                asgTrapBladeId,
+                                multiProcIndex,
+                                multiProcUserTime,
+                                multiProcSystemTime, 
+                                multiProcIdleTime,
+                                multiProcUsage,
+                                multiProcRunQueue,
+                                multiProcInterrupts
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "CPU Core Interrupts Alert (Core number provided in trap)"
+                          ::= { asgTrapCPU 2 }
+						  
 -- ******************************************
 -- Memory Traps
 -- ******************************************
@@ -389,6 +617,34 @@ FROM SNMPv2-CONF
                           "Real memory utilization alert, alerts when memActiveReal64 exceeds X% of memTotalReal64"
                           ::= { chkpntTrapMemory 2 }
  
+ 			asgSwapMemoryTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+								asgTrapChassisId,
+                                asgTrapBladeId
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Swap Memory Utilization Alert"
+                          ::= { asgTrapMemory 1 }
+
+			asgRealMemoryTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Real Memory Utilization Alert"
+                          ::= { asgTrapMemory 2 }	
+
 -- ******************************************
 -- HW Sensor Traps
 -- ******************************************
@@ -455,6 +711,128 @@ FROM SNMPv2-CONF
                           "Voltage sensor alert (Sensor name provided in trap)"
                           ::= { chkpntTrapVoltageSensor 1 }
             
+			asgTrapTempertureSensor		OBJECT IDENTIFIER ::= { asgTrapHWSensor 1 }
+			asgTrapFanSpeedSensor		OBJECT IDENTIFIER ::= { asgTrapHWSensor 2 }
+			asgTrapVoltageSensor		OBJECT IDENTIFIER ::= { asgTrapHWSensor 3 }	
+        	asgTrapSSMSensor			OBJECT IDENTIFIER ::= { asgTrapHWSensor 4 }
+        	asgTrapCMMSensor			OBJECT IDENTIFIER ::= { asgTrapHWSensor 5 }
+        		
+			asgTempertureTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Temperture sensor alert (Sensor name provided in trap)"
+                          ::= { asgTrapTempertureSensor 1 }
+                          
+			asgTempertureSensorStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Temperture sensor status alert (Sensor name provided in trap)"
+                          ::= { asgTrapTempertureSensor 2 }
+
+			asgFanSpeedTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Fan speed sensor alert (Sensor name provided in trap)"
+                          ::= { asgTrapFanSpeedSensor 1 }
+                          
+			asgFanSpeedSensorStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Fan speed sensor status alert (Sensor name provided in trap)"
+                          ::= { asgTrapFanSpeedSensor 2 }
+                          
+			asgVoltageTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Voltage sensor alert (Sensor name provided in trap)"
+                          ::= { asgTrapVoltageSensor 1 }
+                          
+			asgVoltageSensorStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Voltage sensor status alert (Sensor name provided in trap)"
+                          ::= { asgTrapVoltageSensor 2 }     
+
+			asgSSMTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Security Switch Module alert (Sensor name provided in trap)"
+                          ::= { asgTrapSSMSensor 1 }
+                          
+			asgSSMPortTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Security Switch Module port status alert (Sensor name provided in trap)"
+                          ::= { asgTrapSSMSensor 2 }     
+
+			asgCMMTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Chassis Management Module alert (Sensor name provided in trap)"
+                          ::= { asgTrapCMMSensor 1 }
                           
 -- ******************************************
 -- HA Traps
@@ -553,7 +931,171 @@ FROM SNMPv2-CONF
                           DESCRIPTION
                           "Cluster interface status alert, alerts when haStatus is not equal to Up (Interface name provided in trap)"
                           ::= { chkpntTrapHA 5 }  
+						  						  
+			chkpntClusterXLFailoverTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                { haClusterXLFailover }
+                          STATUS        current 
+                          DESCRIPTION
+                          "ClusterXL failover alert, alerts when haClusterXLFailover is happened (clusterXL failover counter value provided in trap)"
+                          ::= { chkpntTrapHA 6 }  
+
+			asgChassisStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapChassisId,
+								asgTrapMsgText,
+								asgTrapPriority
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Critical Alert: Chassis State"
+                          ::= { asgTrapHA 1 }
+     
+			asgBladeStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+								asgTrapMsgText,
+								asgTrapPriority
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Critical Alert: Blade State"
+                          ::= { asgTrapHA 2 }
+						  
+			asgClusterProblemStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapOID,
+                                asgTrapOIDValue,
+                                asgTrapMsgText,
+                                asgTrapPriority,
+                                asgTrapCategory, 
+                                haProblemName, 
+                                haProblemStatus,
+                                haProblemPriority,
+                                haProblemVerified,
+                                haProblemDescr
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "Cluster problem status alert"
+                          ::= { asgTrapHA 3 }
+
+			asgMonitorStateTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+					  asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Monitor state"
+                          ::= { asgTrapHA 5 }
+        						 
+-- ******************************************
+-- Performance Traps
+-- ******************************************
+			asgTrapConnRate NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Connection Rate Alert (per blade), in connections/sec"     
+                          ::= { asgTrapPerf 1 }
+
+		  asgTrapConcurrentConn NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Concurrent Connections Alert (per blade)"     
+                          ::= { asgTrapPerf 2 }
+
+		  asgTrapConcurrentConnectionsTotal NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Concurrent Connections Total Alert (per system)"     
+                          ::= { asgTrapPerf 3 }
                           
+			asgTrapConnRateTotal NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Connections Rate Total Alert (per system), in connections/sec"     
+                          ::= { asgTrapPerf 4 }
+
+						  
+			asgTrapThroughput NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Throughput Alert (per blade), in bps"     
+                          ::= { asgTrapPerf 5 }
+						  
+			asgTrapThroughputTotal NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Throughput Total Alert (per system), in bps"     
+                          ::= { asgTrapPerf 6 }
+		
+			asgTrapPacketRate NOTIFICATION-TYPE
+							  OBJECTS
+									{
+									asgTrapChassisId,
+									asgTrapBladeId,
+									asgTrapMsgText,
+									asgTrapPriority 
+									}       
+							  STATUS        current 
+							  DESCRIPTION
+							  "Packet Rate Alert (per blade), in bps"     
+							  ::= { asgTrapPerf 7 }
+		
+			asgTrapPacketRateTotal NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Packet Rate Total Alert (per system), in bps"     
+                          ::= { asgTrapPerf 8 }						  
 -- ******************************************
 -- LS Connection Traps
 -- ******************************************         
@@ -614,4 +1156,77 @@ FROM SNMPv2-CONF
                           "Problem with one or more log servers resulted with local logging"     
                           ::= { chkpntTrapLSConn 3 }
                            
+-- ******************************************
+-- General Traps
+-- ******************************************
+			asgRouteTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Route inconsistency"     
+                          ::= { asgTrapGeneral 1 }
+
+			asgDiagTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Periodic system diagnostics (asg diag)"     
+                          ::= { asgTrapGeneral 2 }
+
+			asgPingableHostsTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Pingable hosts state"     
+                          ::= { asgTrapGeneral 3 }
+
+			asgMemoryLeakDetectTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "Memory leak detection reached threshold"     
+                          ::= { asgTrapGeneral 4 }
+						  
+			asgTrapSynatk NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "SYN Defender activation"     
+                          ::= { asgTrapGeneral 5 }
+
+			asgLspTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+								asgTrapChassisId,
+                                asgTrapBladeId,
+                                asgTrapMsgText,
+                                asgTrapPriority 
+                                }       
+                          STATUS        current 
+                          DESCRIPTION
+                          "LSP monitor change port state"
+                          ::= { asgTrapGeneral 6 }
+						   
 END

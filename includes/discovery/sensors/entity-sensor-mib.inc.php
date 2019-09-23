@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -74,8 +74,11 @@ if ($GLOBALS['snmp_status'])
 
   foreach ($entity_array as $index => $entry)
   {
-    if ($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index) &&
-        $entry['entPhySensorOperStatus'] != 'unavailable' && $entry['entPhySensorOperStatus'] != 'nonoperational')
+    if ($entitysensor[$entry['entPhySensorType']] &&
+        is_numeric($entry['entPhySensorValue']) &&
+        is_numeric($index) &&
+        $entry['entPhySensorOperStatus'] != 'unavailable' &&
+        $entry['entPhySensorOperStatus'] != 'nonoperational')
     {
       $ok      = TRUE;
       $options = array('entPhysicalIndex' => $index);
@@ -124,6 +127,8 @@ if ($GLOBALS['snmp_status'])
       }
       if ($value == -127) { $ok = FALSE; }
 
+      if($value == -1000000000) { $ok = FALSE; } // Optic RX/TX watt sensors on Arista
+
       // Now try to search port bounded with sensor by ENTITY-MIB
       if ($ok && in_array($type, array('temperature', 'voltage', 'current', 'dbm', 'power')))
       {
@@ -136,7 +141,6 @@ if ($GLOBALS['snmp_status'])
           $options['measured_entity']  = $port['port_id'];
           $options['entPhysicalIndex_measured'] = $port['ifIndex'];
         }
-
       }
 
       // Set thresholds for numeric sensors
@@ -157,10 +161,11 @@ if ($GLOBALS['snmp_status'])
       }
 
       // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
-      if ($ok && !isset($valid['sensor'][$type]['cisco-entity-sensor'][$index]))
+      if ($ok && !isset($valid['sensor'][$type]['CISCO-ENTITY-SENSOR-MIB-entSensorValue'][$index]))
       {
         $options = array_merge($limits, $options);
-        discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $scale, $value, $options);
+        $options['rename_rrd'] = 'entity-sensor-'.$index;
+        discover_sensor_ng($device, $type, $mib, 'entPhySensorValue', $oid, $index, NULL, $descr, $scale, $value, $options);
       }
     }
   }

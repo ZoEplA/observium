@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private IPFPM MIB
 -- Reference:
--- Version: V1.32
+-- Version: V1.35
 -- History:
 --          Wang XuanXuan,2012-08-13,Create 
 -- ==================================================================
@@ -31,7 +31,7 @@ IMPORTS
     
     
     hwIpfpmMib MODULE-IDENTITY 
-        LAST-UPDATED "201608191122Z"-- 
+        LAST-UPDATED "201708171704Z"-- 
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -53,6 +53,12 @@ IMPORTS
             get measurement data from them to report to MCP. MCP 
             works as the control role to collect and calculate the 
             measurement data that DCP reported."
+        REVISION "201708171704Z"  
+        DESCRIPTION  "revision 1.35, modify the description of hwIpfpmMultiOneDelayRecovery, hwIpfpmMultiTwoDelayRecovery"
+        REVISION "201707211530Z"  
+        DESCRIPTION  "revision 1.34, add hwIpfpmDcpInstTlpIndexTable, hwIpfpmDcpInstTlpNHIndexTable"
+        REVISION "201707211451Z"  
+        DESCRIPTION  "revision 1.33, modify the description of hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum, hwIpfpmDcpMcpVpnType, hwIpfpmPeriodSource, hwIpfpmMcpInstDesc, hwIpfpmDcpInstTlpBackwardFlowLabelFlag"
         REVISION "201608191122Z"  
         DESCRIPTION  "revision 1.32, add hwIpfpmDcpFlowVxlan and hwIpfpmDcpFlowVni,hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum"
         REVISION "201607262022Z"  
@@ -348,6 +354,15 @@ IMPORTS
         default  (0),
         ntp      (1)
         }
+		
+    HWIpfpmTlpRoleIndex ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the TLP midpoint."
+    SYNTAX INTEGER
+        {
+        mid-point(3)        
+        } 
 --
 -- Node definitions
 --    
@@ -534,7 +549,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Description of the test instance. 
+        "This object indicates the IP FPM instance description on an MCP.
          if the string length is 0, it represents that it is not configured."
     ::= { hwIpfpmMcpInstEntry 2 }
   
@@ -563,7 +578,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Upper threshold of one-way delay(us) for alarm.
+        "Upper threshold of one-way delay(microsecond) for alarm.
          The value 0 represents that it is not configured, and the alarm is not enabled."
     DEFVAL { 0 }    
     ::= { hwIpfpmMcpInstEntry 5 }
@@ -573,7 +588,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Lower threshold of one-way delay(us) for alarm recovery.
+        "Lower threshold of one-way delay(microsecond) for alarm recovery.
          The value 0 represents that it is not configured, and the alarm is not enabled."
     DEFVAL { 0 }       
     ::= { hwIpfpmMcpInstEntry 6 }
@@ -583,7 +598,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Upper threshold of two-way delay(us) for alarm.
+        "Upper threshold of two-way delay(microsecond) for alarm.
          The value 0 represents that it is not configured, and the alarm is not enabled."
     DEFVAL { 0 }           
     ::= { hwIpfpmMcpInstEntry 7 }
@@ -593,7 +608,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "Lower threshold of two-way delay(us) for alarm recovery.
+        "Lower threshold of two-way delay(microsecond) for alarm recovery.
          The value 0 represents that it is not configured, and the alarm is not enabled."
     DEFVAL { 0 }    
     ::= { hwIpfpmMcpInstEntry 8 }
@@ -873,7 +888,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the maximum number of all instance TLP can be managed by MCP.
+        "This object indicates the maximum number of all instance TLP can be managed by MCP. For statistical instances of which the statistical period is 1s, the number of used instance-specific TLPs is 10 times the actual number of configured instance-specific TLPs. For statistical instances of which the statistical period is 10s or longer, the number of used instance-specific TLPs is the same as the actual number of configured instance-specific TLPs.
 		-1 means unused of this number"
     ::= { hwIpfpmMcpStatisticsTable 3 }
 
@@ -882,7 +897,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This object indicates the total number of all ACH can be managed by MCP.
+        "This object indicates the total number of all ACH can be managed by MCP. For statistical instances of which the statistical period is 1s, the number of used instance-specific ACHs is 10 times the actual number of configured instance-specific ACHs. For statistical instances of which the statistical period is 10s or longer, the number of used instance-specific ACHs is the same as the actual number of configured instance-specific ACHs.
 		-1 means unused of this number"
     ::= { hwIpfpmMcpStatisticsTable 4 }
 
@@ -1194,7 +1209,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The one-way delay(us) of forward flow."
+        "The one-way delay(microsecond) of forward flow."
     ::= { hwIpfpmMcpOneDelayStatEntry 2 }
     
     hwIpfpmMcpForwardOneDelayVariation OBJECT-TYPE
@@ -1202,7 +1217,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The one-way delay variation(us) of forward flow."
+        "The one-way delay variation(microsecond) of forward flow."
     ::= { hwIpfpmMcpOneDelayStatEntry 3 }
     
     hwIpfpmMcpBackwardOneDelay OBJECT-TYPE
@@ -1210,7 +1225,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The one-way delay(us) of backward flow."
+        "The one-way delay(microsecond) of backward flow."
     ::= { hwIpfpmMcpOneDelayStatEntry 4 }
     
     hwIpfpmMcpBackwardOneDelayVariation OBJECT-TYPE
@@ -1218,7 +1233,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The one-way delay variation(us) of backward flow."
+        "The one-way delay variation(microsecond) of backward flow."
     ::= { hwIpfpmMcpOneDelayStatEntry 5 }
 
     hwIpfpmMcpForwardOneDelayMMSType OBJECT-TYPE
@@ -1283,7 +1298,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The two-way delay(us) of monitored flow."
+        "The two-way delay(microsecond) of monitored flow."
     ::= { hwIpfpmMcpTwoDelayStatEntry 2 }
     
     hwIpfpmMcpTwoDelayVariation OBJECT-TYPE
@@ -1291,7 +1306,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The two-way delay variation(us) of monitored flow."
+        "The two-way delay variation(microsecond) of monitored flow."
     ::= { hwIpfpmMcpTwoDelayStatEntry 3 }
     
     hwIpfpmMcpForwardDelay OBJECT-TYPE
@@ -1299,7 +1314,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The forward flow delay(us) in two-way delay measurement."
+        "The forward flow delay(microsecond) in two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayStatEntry 4 }
     
     hwIpfpmMcpForwardDelayVariation OBJECT-TYPE
@@ -1307,7 +1322,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The forward flow variation(us) in two-way delay measurement."
+        "The forward flow variation(microsecond) in two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayStatEntry 5 }
     
     hwIpfpmMcpBackwardDelay OBJECT-TYPE
@@ -1315,7 +1330,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The backward flow delay(us) in two-way delay measurement."
+        "The backward flow delay(microsecond) in two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayStatEntry 6 }
     
     hwIpfpmMcpBackwardDelayVariation OBJECT-TYPE
@@ -1323,7 +1338,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The backward flow variation(us) in two-way delay measurement."
+        "The backward flow variation(microsecond) in two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayStatEntry 7 }
     
     --
@@ -1422,7 +1437,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The multi-in-point one-way delay(us)."
+        "The multi-in-point one-way delay(microsecond)."
     ::= { hwIpfpmMcpOneDelayMultiStatEntry 7 }
 
     hwIpfpmMcpOneDelayMultiVariation OBJECT-TYPE
@@ -1430,7 +1445,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The multi-in-point one-way delay variation(us)."
+        "The multi-in-point one-way delay variation(microsecond)."
     ::= { hwIpfpmMcpOneDelayMultiStatEntry 8 }
 
     --
@@ -1567,7 +1582,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The multi-in-point two-way delay(us) of monitored flow."
+        "The multi-in-point two-way delay(microsecond) of monitored flow."
     ::= { hwIpfpmMcpTwoDelayMultiStatEntry 10 }
 
     hwIpfpmMcpTwoDelayMultiVariation OBJECT-TYPE
@@ -1575,7 +1590,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The multi-in-point two-way delay variation(us) of monitored flow."
+        "The multi-in-point two-way delay variation(microsecond) of monitored flow."
     ::= { hwIpfpmMcpTwoDelayMultiStatEntry 11 }
 
     hwIpfpmMcpForwardDelayMulti OBJECT-TYPE
@@ -1583,7 +1598,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The forward flow delay(us) in multi-in-point two-way delay measurement."
+        "The forward flow delay(microsecond) in multi-in-point two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayMultiStatEntry 12 }
 
     hwIpfpmMcpForwardDelayMultiVariation OBJECT-TYPE
@@ -1591,7 +1606,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The forward flow variation(us) in multi-in-point two-way delay measurement."
+        "The forward flow variation(microsecond) in multi-in-point two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayMultiStatEntry 13 }
 
     hwIpfpmMcpBackwardDelayMulti OBJECT-TYPE
@@ -1599,7 +1614,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The backward flow delay(us) in multi-in-point two-way delay measurement."
+        "The backward flow delay(microsecond) in multi-in-point two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayMultiStatEntry 14 }
 
     hwIpfpmMcpBackwardDelayMultiVariation OBJECT-TYPE
@@ -1607,7 +1622,7 @@ IMPORTS
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The backward flow variation(us) in multi-in-point two-way delay measurement."
+        "The backward flow variation(microsecond) in multi-in-point two-way delay measurement."
     ::= { hwIpfpmMcpTwoDelayMultiStatEntry 15 }
 
 -- ==================================================================
@@ -1698,7 +1713,11 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "The type of the VPN instance. 'hwIpfpmDcpInstMcpId' should be setted first 
-	before setting this object."
+         before setting this object.
+             Available options:
+             none(0)
+             manage-vpn(1)
+             vpn-instance(2)"
     ::= { hwIpfpmDcpGlobalTable 9 } 
 
     hwIpfpmPeriodSource OBJECT-TYPE
@@ -1707,7 +1726,10 @@ IMPORTS
     STATUS current
     DESCRIPTION
         "The clock source using by period.Priority should be given to the use of
-         this setting in period calculation."
+         this setting in period calculation.
+              Available options: 
+              default(0)
+              ntp(1)"
     ::= { hwIpfpmDcpGlobalTable 10 } 
 
     --
@@ -2536,7 +2558,7 @@ IMPORTS
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "This value indicate whether the flow-label is configured."
+        "This object indicates whether the flow label function is configured for the backward target flow. If the value is false(2), the flow label function is not configured."
     DEFVAL { false }
     ::= { hwIpfpmDcpInstTlpEntry 22 }
     
@@ -3205,7 +3227,296 @@ IMPORTS
     ::= { hwIpfpmDcpInstTlpNHEntry 2 }
 	
     --End add for nexthop 
+	
+    --
+    -- hwIpfpmDcpInstTlpIndexTable: DCP TLP information of DCP test instance 
+    --
+    hwIpfpmDcpInstTlpIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of TLPs for load balancing paths."
+    ::= { hwIpfpmDcpConfiguration 20 }
     
+    hwIpfpmDcpInstTlpIndexEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular load balancing path TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId,
+            hwIpfpmIndex }
+    ::= { hwIpfpmDcpInstTlpIndexTable 1 }
+    
+    HwIpfpmDcpInstTlpIndexEntry ::=
+		SEQUENCE { 		                
+				hwIpfpmIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpRoleIndex
+				    HWIpfpmTlpRoleIndex,
+				hwIpfpmDcpInstTlpFlowTypeIndex
+		                    HWIpfpmFlowType,
+				hwIpfpmDcpInstTlpDirecIndex
+				    HWIpfpmFlowTlpDirec,
+				hwIpfpmDcpInstTlpVpnLabelIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpCtrlWordFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpLspLabelIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpL2VpnFlagIndex
+				    TruthValue, 
+				hwIpfpmDcpInstTlpTpIdIndex
+				    OCTET STRING,				    
+				hwIpfpmDcpInstTlpRowStatusIndex
+				    RowStatus,
+				hwIpfpmDcpInstTlpFlowLabelFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpLspLabel2Index
+				    Integer32, 
+				hwIpfpmDcpInstTlpBackwardVpnLabelIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardCtrlWordFlagIndex
+		                                              TruthValue,
+				hwIpfpmDcpInstTlpBackwardLspLabelIndex
+		                                               Integer32,
+				hwIpfpmDcpInstTlpBackwardLspLabel2Index
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardL2VpnFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpBackwardFlowLabelFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpBackwardTpIdIndex
+		                    OCTET STRING
+    }
+    
+    
+    hwIpfpmIndex OBJECT-TYPE
+    SYNTAX Integer32(1..16)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The indexid of a load balancing path. The value range is from '1' to '16'."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 1 }   
+	
+    hwIpfpmDcpInstTlpRoleIndex OBJECT-TYPE
+    SYNTAX HWIpfpmTlpRoleIndex
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP position 'mid-point(3)'."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 2 }
+    
+    hwIpfpmDcpInstTlpFlowTypeIndex OBJECT-TYPE
+    SYNTAX HWIpfpmFlowType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the flow type of the instance TLP is 
+        'forward(1)' or 'backward(2)' or 'bidirectional(3)' or 
+        'forwardandbackward(4)'. Only 'forward(1)' and 'backward(2)'
+        can be configured when 'hwIpfpmDcpInstTlpRoleIndex' is 
+        'mid-point(3)'. The value 'null(0)' represents that this 
+        flow is not configured under the instance."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 3 } 
+    
+    hwIpfpmDcpInstTlpDirecIndex OBJECT-TYPE
+    SYNTAX HWIpfpmFlowTlpDirec
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP is 'ingress(1)' or 'egress(2)' 
+        of the flow of DCP test instance."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 4 }
+    
+    hwIpfpmDcpInstTlpVpnLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN label of of the flow that the TLP measured. The 
+        value -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 5 }
+    
+    hwIpfpmDcpInstTlpCtrlWordFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The control word flag of the flow that the TLP measured. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 6 }
+    
+    hwIpfpmDcpInstTlpLspLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 7 }
+    
+    hwIpfpmDcpInstTlpL2VpnFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The L2VPN flag of the flow that the TLP measured. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 8 } 
+    
+    hwIpfpmDcpInstTlpTpIdIndex OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..4))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The tpid for vlan. The value range is from '600' to 'FFFF'."
+    DEFVAL { 8100 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 9 }   
+    
+    hwIpfpmDcpInstTlpRowStatusIndex OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 10 }
+    
+    hwIpfpmDcpInstTlpFlowLabelFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value indicate whether the flow-label is configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 11 } 
+
+    hwIpfpmDcpInstTlpLspLabel2Index OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 12 } 
+    
+    hwIpfpmDcpInstTlpBackwardVpnLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN label of of the flow that the TLP measured. The 
+        value -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 13 }
+    
+    hwIpfpmDcpInstTlpBackwardCtrlWordFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The control word flag of the flow that the TLP measured. The value 
+    	false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 14 }	
+    	
+    hwIpfpmDcpInstTlpBackwardLspLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+    	-1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 15 }
+    
+    hwIpfpmDcpInstTlpBackwardLspLabel2Index OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 16 }
+      
+    
+    hwIpfpmDcpInstTlpBackwardL2VpnFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The L2VPN flag of the flow that the TLP measured. The value 
+    	false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 17 } 
+    		
+    hwIpfpmDcpInstTlpBackwardFlowLabelFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value indicate whether the flow-label is configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 18 }
+    
+    hwIpfpmDcpInstTlpBackwardTpIdIndex OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..4))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The tpid for vlan. The value range is from '600' to 'FFFF'."
+        DEFVAL { 8100 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 19 }   
+	
+	
+    -- hwIpfpmDcpInstTlpNHIndexTable: DCP TLP nexthop information
+    hwIpfpmDcpInstTlpNHIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpNHIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a particular TLP of the test instance."
+    ::= { hwIpfpmDcpConfiguration 21 }
+    
+    hwIpfpmDcpInstTlpNHIndexEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpNHIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a  a particular load balancing path TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId,
+            hwIpfpmIndex,
+	    hwIpfpmDcpNexthopIp}
+    ::= { hwIpfpmDcpInstTlpNHIndexTable 1 }
+    
+    HwIpfpmDcpInstTlpNHIndexEntry ::=
+		SEQUENCE { 		                							    
+				hwIpfpmDcpInstTlpNHIndexRowStatus
+				    RowStatus    					    				     				    
+    }
+		
+	
+    hwIpfpmDcpInstTlpNHIndexRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpNHIndexEntry 1 }
+	
+	
+	
 -- ==================================================================    
 -- IPFPM Traps
 -- ==================================================================   
@@ -3345,7 +3656,7 @@ IMPORTS
     DESCRIPTION 
         "A hwIpfpmMultiOneDelayRecovery trap is sent when the one-way delay 
         of IPFPM test instance is under the lower threshold in 
-        continuous five test intervals."
+        continuous five test intervals. This trap supports multi one-way delay for a period."
     ::= { hwIpfpmTraps 11 }
     
     hwIpfpmMultiTwoDelayExceed NOTIFICATION-TYPE
@@ -3367,7 +3678,7 @@ IMPORTS
     DESCRIPTION 
         "A hwIpfpmMultiTwoDelayRecovery trap is sent when the two-way delay 
         of IPFPM test instance is under the lower threshold in 
-        continuous five test intervals."
+        continuous five test intervals. This trap supports multi two-way delay for a period."
     ::= { hwIpfpmTraps 13 }
     
 -- ==================================================================    
@@ -3509,11 +3820,11 @@ IMPORTS
 		hwIpfpmDcpInstAuthKey,
 		hwIpfpmDcpInstAuthRowStatus,	
 		hwIpfpmDcpInstRowStatus,
-                                          hwIpfpmDcpInstType,
-	                     hwIpfpmDcpSourceInstId,
-                                          hwIpfpmDcpInstMcpVpnName,
-                                          hwIpfpmDcpInstMcpVpnType,
-                                        hwIpfpmDcpInstGroupId,
+		hwIpfpmDcpInstType,
+		hwIpfpmDcpSourceInstId,
+		hwIpfpmDcpInstMcpVpnName,
+		hwIpfpmDcpInstMcpVpnType,
+		hwIpfpmDcpInstGroupId,
 		hwIpfpmDcpFlowType,
 		hwIpfpmDcpFlowProtocol,
 		hwIpfpmDcpFlowDscp,
@@ -3530,34 +3841,52 @@ IMPORTS
 		hwIpfpmDcpFlowOuterDstAddr,
 		hwIpfpmDcpFlowForwardGtpTeid,
 		hwIpfpmDcpFlowBackwardGtpTeid,
-	                     hwIpfpmDcpFlowVxlan,
+		hwIpfpmDcpFlowVxlan,
 		hwIpfpmDcpFlowVni,
-		hwIpfpmDcpInstTlpRole,                                                               
-		hwIpfpmDcpInstTlpFlowType,                           
-                                          hwIpfpmDcpInstTlpDirec,                                 
-		hwIpfpmDcpInstTlpVpnLabel,                           
-		hwIpfpmDcpInstTlpCtrlWordFlag,                    
-		hwIpfpmDcpInstTlpLspLabel, 
+		hwIpfpmDcpInstTlpRole,
+		hwIpfpmDcpInstTlpRoleIndex,		
+		hwIpfpmDcpInstTlpFlowType,
+		hwIpfpmDcpInstTlpFlowTypeIndex,		
+		hwIpfpmDcpInstTlpDirec, 
+		hwIpfpmDcpInstTlpDirecIndex,		
+		hwIpfpmDcpInstTlpVpnLabel,  
+		hwIpfpmDcpInstTlpVpnLabelIndex,		
+		hwIpfpmDcpInstTlpCtrlWordFlag, 
+		hwIpfpmDcpInstTlpCtrlWordFlagIndex,  		
+		hwIpfpmDcpInstTlpLspLabel,
+		hwIpfpmDcpInstTlpLspLabelIndex,		
 		hwIpfpmDcpInstTlpL2VpnFlag,
-                                          hwIpfpmDcpInstTlpTpId, 
-		hwIpfpmDcpInstTlpRowStatus,		  
-                                          hwIpfpmDcpInstTlpMultiSrcType,  
+		hwIpfpmDcpInstTlpL2VpnFlagIndex,
+		hwIpfpmDcpInstTlpTpId, 
+		hwIpfpmDcpInstTlpTpIdIndex,
+		hwIpfpmDcpInstTlpRowStatus,
+		hwIpfpmDcpInstTlpRowStatusIndex,		
+		hwIpfpmDcpInstTlpMultiSrcType,  
 		hwIpfpmDcpInstTlpFlowLabelFlag,
+		hwIpfpmDcpInstTlpFlowLabelFlagIndex,
 		hwIpfpmDcpInstTlpLspLabel2,
+		hwIpfpmDcpInstTlpLspLabel2Index,
 		hwIpfpmDcpInstTlpLspLabel3,
 		hwIpfpmDcpInstTlpOuterVlan,
 		hwIpfpmDcpInstTlpInnerVlan,
 		hwIpfpmDcpInstTlpBackwardVpnLabel,
+		hwIpfpmDcpInstTlpBackwardVpnLabelIndex,
 		hwIpfpmDcpInstTlpBackwardCtrlWordFlag,
+		hwIpfpmDcpInstTlpBackwardCtrlWordFlagIndex,
 		hwIpfpmDcpInstTlpBackwardLspLabel,
+		hwIpfpmDcpInstTlpBackwardLspLabelIndex,
 		hwIpfpmDcpInstTlpBackwardLspLabel2,
+		hwIpfpmDcpInstTlpBackwardLspLabel2Index,
 		hwIpfpmDcpInstTlpBackwardLspLabel3,
 		hwIpfpmDcpInstTlpBackwardL2VpnFlag,
+		hwIpfpmDcpInstTlpBackwardL2VpnFlagIndex,
 		hwIpfpmDcpInstTlpBackwardFlowLabelFlag,
+		hwIpfpmDcpInstTlpBackwardFlowLabelFlagIndex,
 		hwIpfpmDcpInstTlpBackwardOuterVlan,
 		hwIpfpmDcpInstTlpBackwardInnerVlan,
-		hwIpfpmDcpInstTlpBackwardTpId,							    
-	                     hwIpfpmDcpInstTlpNHRowStatus,
+		hwIpfpmDcpInstTlpBackwardTpId,
+		hwIpfpmDcpInstTlpBackwardTpIdIndex,		
+		hwIpfpmDcpInstTlpNHRowStatus,
 		hwIpfpmDcpLossEnable,                     	    
 		hwIpfpmDcpLossContEnable,                            
 		hwIpfpmDcpLossTimeRange,

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -78,7 +78,8 @@ function process_port_adsl(&$this_port, $device, $port)
     }
   }
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?", array($port['port_id'])) == "0")
+  //if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?", array($port['port_id'])) == "0")
+  if (!dbExist('ports_adsl', '`port_id` = ?', array($port['port_id'])))
   {
     dbInsert(array('port_id' => $port['port_id']), 'ports_adsl');
   }

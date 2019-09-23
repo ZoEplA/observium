@@ -19,7 +19,7 @@ IMPORTS
          Phone:      +49 7127 140
          E-mail:     hac.support@belden.com"
     DESCRIPTION 
-        "The Hirschmann Private Platform2 MIB for SFlow.
+        "The Hirschmann Private Platform2 MIB for sFlow.
          Copyright (C) 2011. All Rights Reserved."
     REVISION "201110120000Z"
     DESCRIPTION

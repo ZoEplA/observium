@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -52,7 +52,8 @@ foreach (dbFetchRows("SELECT * FROM `devices` ORDER BY `hostname`") as $dev);
 
 if ($updated) { print_message("Device Settings Saved"); }
 
-if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?", array($device['device_id'])) > '0')
+//if (dbFetchCell("SELECT COUNT(*) from `services` WHERE `device_id` = ?", array($device['device_id'])) > '0')
+if (dbExist('services', '`device_id` = ?', array($device['device_id'])))
 {
   $i = "1";
   foreach (dbFetchRows("select * from services WHERE device_id = ? ORDER BY service_type", array($device['device_id'])) as $service)

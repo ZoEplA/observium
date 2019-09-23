@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -23,7 +23,7 @@ $pws = snmpwalk_cache_oid($device, "pwType",           $pws, 'PW-STD-MIB');
 $pws = snmpwalk_cache_oid($device, "pwDescr",          $pws, 'PW-STD-MIB');
 $pws = snmpwalk_cache_oid($device, "pwPsnType",        $pws, 'PW-STD-MIB');
 $pws = snmpwalk_cache_oid($device, "pwPeerAddrType",   $pws, 'PW-STD-MIB');
-$pws = snmpwalk_cache_oid($device, "pwPeerAddr",       $pws, 'PW-STD-MIB');
+$pws = snmpwalk_cache_oid($device, "pwPeerAddr",       $pws, 'PW-STD-MIB', NULL, OBS_SNMP_ALL_HEX);
 $pws = snmpwalk_cache_oid($device, "pwOutboundLabel",  $pws, 'PW-STD-MIB');
 $pws = snmpwalk_cache_oid($device, "pwInboundLabel",   $pws, 'PW-STD-MIB');
 $pws = snmpwalk_cache_oid($device, "pwRemoteIfString", $pws, 'PW-STD-MIB');
@@ -37,7 +37,10 @@ $pws = snmpwalk_cache_oid($device, "pwMplsPeerLdpID",  $pws, "PW-MPLS-STD-MIB");
   foreach ($pws as $pw_id => $pw)
   {
     $peer_addr_type = $pw['pwPeerAddrType'];
-    if ($peer_addr_type == "ipv4" || $peer_addr_type == "ipv6") { $peer_addr = hex2ip($pw['pwPeerAddr']); }
+    if ($peer_addr_type == "ipv4" || $peer_addr_type == "ipv6")
+    {
+      $peer_addr = hex2ip($pw['pwPeerAddr']);
+    }
     if (!get_ip_version($peer_addr) && $pw['pwMplsPeerLdpID'])
     {
       // Sometime return wrong peer addr (not hex string):
@@ -72,6 +75,14 @@ $pws = snmpwalk_cache_oid($device, "pwMplsPeerLdpID",  $pws, "PW-MPLS-STD-MIB");
       print_debug("Not found correct peer address. See snmpwalk for 'pwPeerAddr' and 'pwMplsPeerLdpID'.");
     }
     if (empty($remote_device)) { $remote_device = array('NULL'); }
+
+    // Clean some entries on Extreme devices, ie:
+    // pwName.10001 = V_AKN_POP001....................
+    // pwDescr.10001 = ................................
+    // pwRemoteIfString.10001 = ................................
+    $pw['pwName']           = rtrim($pw['pwName'], ". \t\n\r\0\x0B");
+    $pw['pwDescr']          = rtrim($pw['pwDescr'], ". \t\n\r\0\x0B");
+    $pw['pwRemoteIfString'] = rtrim($pw['pwRemoteIfString'], ". \t\n\r\0\x0B");
 
     $if_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE `ifDescr` = ? AND `device_id` = ? LIMIT 1;', array($pw['pwName'], $device['device_id']));
     if (!is_numeric($if_id) && strpos($pw['pwName'], '_'))

@@ -639,7 +639,9 @@ portRateControlTable	OBJECT-TYPE
 							portEgressType						Integer32,
                             portIngressRate                     Integer32,
                             portEgressRate                      Integer32,
-                            portRateLimitUnitDescr              DisplayString
+                            portRateLimitUnitDescr              DisplayString,
+                            portIngressBurst                    Integer32,
+                            portEgressBurst                     Integer32
 					}
 
 			portRateIndex				OBJECT-TYPE
@@ -680,7 +682,21 @@ portRateControlTable	OBJECT-TYPE
 						MAX-ACCESS	read-write
 						STATUS		current
 						DESCRIPTION	"This string describes how to set rate when the type is 1. "
-						::= { portRateControlEntry 6 }     
+						::= { portRateControlEntry 6 }  
+			portIngressBurst			OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit ingress burst.It has three levels composed of low,middle and high.
+								 When level is 1,it means high. And 2 means middle, while 3 means low."
+						::= { portRateControlEntry 7 }  
+			portEgressBurst				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"Port ratelimit egress burst.It has three levels composed of low,middle and high.
+								 When level is 1,it means high. And 2 means middle, while 3 means low."
+ 						::= { portRateControlEntry 8 }  
 						
  --  RED       
 RED	OBJECT IDENTIFIER ::= { qos 8 }
@@ -697,79 +713,33 @@ RED	OBJECT IDENTIFIER ::= { qos 8 }
 						STATUS		current
 						DESCRIPTION	"RED Enable.Enable(1) and disable(0)."
 						::= { RED 2 }  
-
-
--- REDTable
-
-	redTable	OBJECT-TYPE
-		SYNTAX		SEQUENCE OF RedTableEntry
-		MAX-ACCESS	not-accessible
-		STATUS		current
-		DESCRIPTION	"Random Early Detection Table."
-		::= { RED 3 }
-
-	redTableEntry	OBJECT-TYPE
-		SYNTAX		RedTableEntry
-		MAX-ACCESS	not-accessible
-		STATUS		current
-		DESCRIPTION	"RED(Random Early Detection) Type.NONE(0), sRED(1) and WRED(2). "
-		INDEX		{ portRateIndex }
-		::= { redTable 1 }
-
-        RedTableEntry ::=
-              SEQUENCE {
-                  rEDQueue 
-                      INTEGER,
-                  rEDDroplevel 
-                      INTEGER,
-                  rEDLowlimit 
-                      INTEGER,
-                  rEDSlope
-                      INTEGER
-              }
-
-          rEDQueue OBJECT-TYPE
-              SYNTAX  INTEGER(1..8)
-              ACCESS  read-only
-              STATUS  mandatory
-
-              DESCRIPTION
-                      "Index of RED table. RED queue.It ranges 1 to 8 in RED."
-              ::= { redTableEntry 1 }
-
-          rEDDroplevel OBJECT-TYPE
-              SYNTAX  INTEGER{
-		              all-color(15),
-		              green(0),
-		              yellow(1),
-		              red(2)                                 
-                             }
-              ACCESS  read-only
-              STATUS  mandatory
-
-              DESCRIPTION
-                      "RED droplevel.Means the color in RED.It ranges -1 to 2.All color(15),green(0),yellow(1) and red(2)."
-              ::= { redTableEntry 2 }
-
-          rEDLowlimit OBJECT-TYPE
-              SYNTAX  INTEGER(0..100)
-              ACCESS  read-only
-              STATUS  mandatory
-
-              DESCRIPTION
-                      "RED lowlimit by percent.Means the point to start discard.It ranges 0 to 100."
-              ::= { redTableEntry 3 }
-
-          rEDSlope OBJECT-TYPE
-              SYNTAX  INTEGER(0..7)
-              ACCESS  read-only
-              STATUS  mandatory
-
-              DESCRIPTION
-                      "RED slope.It has different meaning in sRED and WRED.For sRED,it means drop rate,ranges 0 to 7.Number 0 means 100% drop,and others means probabilistic drop.For WRED,it means droprate slope,ranges 0 to 90.The drop rate is 0 in low limit point,and then increase by slope."
-              ::= { redTableEntry 4 }
-
-
+ 			REDQueue				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED queue.It ranges -1 to 7,and -1 means all queue is in RED."
+						::= { RED 3 }  
+			REDDroplevel				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED droplevel.Means the color in RED.It ranges -1 to 2.All color(-1),green(0),yellow(1) and red(2),"
+						::= { RED 4 }  
+			REDLowlimit				OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED lowlimit by percent.Means the point to start discard.It ranges 0 to 100."
+						::= { RED 5 }  
+ 			REDSlope		OBJECT-TYPE
+						SYNTAX		Integer32
+						MAX-ACCESS	read-write
+						STATUS		current
+						DESCRIPTION	"RED slope.It has different meaning in sRED and WRED.
+								For sRED,it means drop rate,ranges 0 to 7.Number 0 means 100% drop,and others means probabilistic drop.
+								For WRED,it means droprate slope,ranges 0 to 90.The drop rate is 0 in low limit point,and then increase by slope."
+						::= { RED 6 }     						
+						
 
  --  defaultCoS        
 defaultCoS	OBJECT-TYPE

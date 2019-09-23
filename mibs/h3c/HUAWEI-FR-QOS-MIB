@@ -1,7 +1,7 @@
 -- =================================================================
--- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2004 by  H3C TECHNOLOGIES. All rights reserved
 -- 
--- Description:This mib file is used for management of huawei Class Based 
+-- Description:This MIB file is used for management of Class Based 
 --             FR QoS information. 
 -- Reference:
 -- Version: V1.1
@@ -31,16 +31,14 @@
 
             hwFrQoSMib MODULE-IDENTITY 
                     LAST-UPDATED "200407120000Z"            -- JULY 12, 2004 at 00:00 GMT
-                    ORGANIZATION 
-                            "Huawei Technologies co.,Ltd."
-                    CONTACT-INFO 
-                            " R&D BeiJing, Huawei Technologies co.,Ltd.
-                            Huawei Bld.,NO.3 Xinxi Rd., 
-                            Shang-Di Information Industry Base,
-                            Hai-Dian District Beijing P.R. China
-                            Zip:100085 
-                            Http://www.huawei.com                                       
-                            E-mail:support@huawei.com "
+                    ORGANIZATION
+                        "Hangzhou H3C Tech. Co., Ltd."
+                    CONTACT-INFO
+                        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                        Hai-Dian District Beijing P.R. China
+                        http://www.h3c.com
+                        Zip:100085
+                        "
                     DESCRIPTION 
                             "This MIB contains objects to 
                             Manage configuration and Monitor running state 

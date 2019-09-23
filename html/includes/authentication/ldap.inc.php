@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -47,20 +47,25 @@ function ldap_search_user($ldap_group, $userdn, $depth = -1)
 {
   global $ds, $config;
 
-  $compare = ldap_compare($ds, $ldap_group, $config['auth_ldap_groupmemberattr'], $userdn);
+  if ($config['auth_ldap_groupreverse'])
+  {
+    $compare = ldap_compare($ds, $userdn, $config['auth_ldap_attr']['memberOf'], $ldap_group);
+  } else {
+    $compare = ldap_compare($ds, $ldap_group, $config['auth_ldap_groupmemberattr'], $userdn);
+  }
 
   if ($compare === TRUE)
   {
     return TRUE; // Member found, return TRUE
   }
-  elseif (($config['auth_ldap_recursive'] === true) && ($depth < $config['auth_ldap_recursive_maxdepth']))
+  elseif (!$config['auth_ldap_groupreverse'] && $config['auth_ldap_recursive'] && ($depth < $config['auth_ldap_recursive_maxdepth']))
   {
     $depth++;
 
     //$filter = "(&(objectClass=group)(memberOf=". $ldap_group ."))";
     $filter_params                = array();
     $filter_params[] = ldap_filter_create('objectClass', 'group');
-    $filter_params[] = ldap_filter_create('memberOf',    $ldap_group);
+    $filter_params[] = ldap_filter_create($config['auth_ldap_attr']['memberOf'], $ldap_group);
     $filter          = ldap_filter_combine($filter_params);
 
     print_debug("LDAP[UserSearch][$depth][Comparing: " . $ldap_group . "][".$config['auth_ldap_groupmemberattr']."=$userdn][Filter: $filter]");
@@ -169,7 +174,12 @@ function ldap_authenticate($username, $password)
 
           foreach ($config['auth_ldap_group'] as $ldap_group)
           {
-            print_debug("LDAP[Authenticate][Comparing: " . $ldap_group . "][".$config['auth_ldap_groupmemberattr']."=$userdn]");
+            if ($config['auth_ldap_groupreverse'])
+            {
+              print_debug("LDAP[Authenticate][Comparing: " . $userdn . "][".$config['auth_ldap_attr']['memberOf']."=$ldap_group]");
+            } else {
+              print_debug("LDAP[Authenticate][Comparing: " . $ldap_group . "][".$config['auth_ldap_groupmemberattr']."=$userdn]");
+            }
             $compare = ldap_search_user($ldap_group, $userdn);
 
             if ($compare === -1)
@@ -488,13 +498,13 @@ function ldap_auth_user_list($username = NULL)
   if (count($config['auth_ldap_group']) == 1)
   {
     //$filter = '(&'.$filter.'(memberof='.$config['auth_ldap_group'][0].'))';
-    $filter_params[] = ldap_filter_create('memberOf', $config['auth_ldap_group'][0]);
+    $filter_params[] = ldap_filter_create($config['auth_ldap_attr']['memberOf'], $config['auth_ldap_group'][0]);
   } else if (count($config['auth_ldap_group']) > 1) {
     $group_params = array();
     foreach($config['auth_ldap_group'] as $group)
     {
       //$group_filter .= '(memberof='.$group.')';
-      $group_params[] = ldap_filter_create('memberOf', $group);
+      $group_params[] = ldap_filter_create($config['auth_ldap_attr']['memberOf'], $group);
     }
     
     $filter_params[] = ldap_filter_combine($group_params, '|');
@@ -593,7 +603,12 @@ function ldap_internal_user_entries($entries, &$userlist)
       $description = $entry['description'][0];
 
       $userdn = (strtolower($config['auth_ldap_groupmembertype']) == 'fulldn' ? $entry['dn'] : $username);
-      print_debug("LDAP[UserList][Compare: " . implode('|',$config['auth_ldap_group']) . "][".$config['auth_ldap_groupmemberattr']."][$userdn]");
+      if ($config['auth_ldap_groupreverse'])
+      {
+        print_debug("LDAP[UserList][Compare: $userdn][".$config['auth_ldap_attr']['memberOf']."][" . implode('|',$config['auth_ldap_group']) . "]");
+      } else {
+        print_debug("LDAP[UserList][Compare: " . implode('|',$config['auth_ldap_group']) . "][".$config['auth_ldap_groupmemberattr']."][$userdn]");
+      }
 
       //if (!is_numeric($user_id)) { print_vars($entry); continue; }
 
@@ -1057,8 +1072,13 @@ function asc2hex32($string)
  */
 function hex2asc($string)
 {
-  $string = preg_replace("/\\\([0-9A-Fa-f]{2})/e", "''.chr(hexdec('\\1')).''", $string);
-  return $string;
+  return preg_replace_callback("/\\\([0-9A-Fa-f]{2})/",
+                                  function($matches){
+                                    foreach($matches as $match){
+                                      return chr(hexdec($match));
+                                    }
+                                  },
+                                  $string);
 }
 
 // EOF

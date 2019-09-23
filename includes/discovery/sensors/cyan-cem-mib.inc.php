@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -51,7 +51,7 @@ foreach ($entries as $index => $entry)
 
   $descr = $entry['cyanCemDescription'] . ' ' . $entry['cyanCemIdentifier'];
 
-  discover_sensor($valid['sensor'], 'current', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.11.$index", $index, 'cyanCemCurrent', $descr, 0.01, $entry['cyanCemCurrent']);
+  discover_sensor('current', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.11.$index", $index, 'cyanCemCurrent', $descr, 0.01, $entry['cyanCemCurrent']);
 
   $options = array();
   $options['limit_high'] = $entry['cyanCemIntakeTempAlarmHighThres'] * 0.001;
@@ -59,7 +59,7 @@ foreach ($entries as $index => $entry)
   $options['warn_high']  = $entry['cyanCemIntakeTempWarnHighThres']  * 0.001;
   $options['warn_low']   = $entry['cyanCemIntakeTempWarnLowThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'temperature', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.20.$index", $index, 'cyanCemIntakeAirTemp', $descr. ' Intake', 0.001, $entry['cyanCemIntakeAirTemp'], $options);
+  discover_sensor('temperature', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.20.$index", $index, 'cyanCemIntakeAirTemp', $descr. ' Intake', 0.001, $entry['cyanCemIntakeAirTemp'], $options);
 
   $options = array();
   $options['limit_high'] = $entry['cyanCemExhaustTempAlarmHighThres'] * 0.001;
@@ -67,14 +67,14 @@ foreach ($entries as $index => $entry)
   $options['warn_high']  = $entry['cyanCemExhaustTempWarnHighThres']  * 0.001;
   $options['warn_low']   = $entry['cyanCemExhaustTempWarnLowThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'temperature', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.13.$index", $index, 'cyanCemExhaustAirTemp', $descr. ' Exhaust', 0.001, $entry['cyanCemExhaustAirTemp'], $options);
+  discover_sensor('temperature', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.13.$index", $index, 'cyanCemExhaustAirTemp', $descr. ' Exhaust', 0.001, $entry['cyanCemExhaustAirTemp'], $options);
 
   $options = array();
   $options['limit_high'] = $entry['cyanCemOvervoltageThreshold']  * 0.001;
   $options['limit_low']  = $entry['cyanCemUndervoltageThreshold'] * 0.001;
 
-  discover_sensor($valid['sensor'], 'voltage', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.43.$index", $index, 'cyanCemPwrFeedAVoltage', $descr.' Feed A', 0.001, $entry['cyanCemPwrFeedAVoltage'], $options);
-  discover_sensor($valid['sensor'], 'voltage', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.45.$index", $index, 'cyanCemPwrFeedBVoltage', $descr.' Feed B', 0.001, $entry['cyanCemPwrFeedBVoltage'], $options);
+  discover_sensor('voltage', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.43.$index", $index, 'cyanCemPwrFeedAVoltage', $descr.' Feed A', 0.001, $entry['cyanCemPwrFeedAVoltage'], $options);
+  discover_sensor('voltage', $device, ".1.3.6.1.4.1.28533.5.30.50.1.1.1.45.$index", $index, 'cyanCemPwrFeedBVoltage', $descr.' Feed B', 0.001, $entry['cyanCemPwrFeedBVoltage'], $options);
 
 }
 

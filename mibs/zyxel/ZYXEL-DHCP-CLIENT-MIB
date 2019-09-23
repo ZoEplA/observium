@@ -80,7 +80,9 @@ ZYXEL-DHCP-CLIENT-MIB DEFINITIONS ::= BEGIN
         ZyxelDhcpClientEntry ::=
            SEQUENCE {
            	zyDhcpClientID				INTEGER,
-        	zyDhcpClientRowStatus		RowStatus
+        	zyDhcpClientRowStatus		RowStatus,
+        	zyDhcpClientOption60State   EnabledStatus,
+        	zyDhcpClientOption60ClassId DisplayString
            }
 
         zyDhcpClientID OBJECT-TYPE
@@ -98,7 +100,25 @@ ZYXEL-DHCP-CLIENT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
 		"This object allows DHCP client entries to be created and deleted."
         ::= { zyxelDhcpClientEntry 2 }
-                   
+
+        zyDhcpClientOption60State OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+		"Enable(1)/Disable(2) DHCP option 60 vendor class-id."
+        ::= { zyxelDhcpClientEntry 3 }
+
+        zyDhcpClientOption60ClassId OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+		"Set/Get the vendor class identifier (DHCPv4 option 60) to be sent with the DHCP packet.
+		Min length of string is 1 byte.
+		Max length of string is 32 bytes."
+        ::= { zyxelDhcpClientEntry 4 }
+                                   
 --		zyxelDhcpClientInfoTable
 
         zyxelDhcpClientInfoTable OBJECT-TYPE

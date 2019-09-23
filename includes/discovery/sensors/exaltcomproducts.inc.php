@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -24,12 +24,12 @@ $discover['temp'] = snmp_get_multi_oid($device, 'locCurrentTemp.0 remCurrentTemp
 if (is_numeric($discover['temp'][0]['locCurrentTemp']) && $discover['temp'][0]['locCurrentTemp'] > 0)
 {
   $oid = '.1.3.6.1.4.1.25651.1.2.4.2.3.1.3.0';
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'locCurrentTemp.0', 'exaltcomproducts', 'Temperature (Internal)', 1, $discover['temp'][0]['locCurrentTemp']);
+  discover_sensor('temperature', $device, $oid, 'locCurrentTemp.0', 'exaltcomproducts', 'Temperature (Internal)', 1, $discover['temp'][0]['locCurrentTemp']);
 }
 if (is_numeric($discover['temp'][0]['remCurrentTemp']) && $discover['temp'][0]['remCurrentTemp'] > 0)
 {
   $oid = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.3.0';
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'remCurrentTemp.0', 'exaltcomproducts', 'Temperature (Far end radio)', 1, $discover['temp'][0]['remCurrentTemp']);
+  discover_sensor('temperature', $device, $oid, 'remCurrentTemp.0', 'exaltcomproducts', 'Temperature (Far end radio)', 1, $discover['temp'][0]['remCurrentTemp']);
 }
 
 //ExaltComProducts::locCurrentRSL.0 = INTEGER: -65 dBm
@@ -51,14 +51,14 @@ if (is_numeric($discover['dbm'][0]['locCurrentRSL']))
   $oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.3.0';
   $limits = array('limit_high' => $discover['dbm'][0]['locMaxRSL'],
                   'limit_low'  => $discover['dbm'][0]['locMinRSL']);
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'locCurrentRSL.0', 'exaltcomproducts', 'Received Signal Level (Internal)', 1, $discover['dbm'][0]['locCurrentRSL'], $limits);
+  discover_sensor('dbm', $device, $oid, 'locCurrentRSL.0', 'exaltcomproducts', 'Received Signal Level (Internal)', 1, $discover['dbm'][0]['locCurrentRSL'], $limits);
 }
 if (is_numeric($discover['dbm'][0]['remCurrentRSL']))
 {
   $oid = '.1.3.6.1.4.1.25651.1.2.4.3.2.3.0';
   $limits = array('limit_high' => $discover['dbm'][0]['remMaxRSL'],
                   'limit_low'  => $discover['dbm'][0]['remMinRSL']);
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'remCurrentRSL.0', 'exaltcomproducts', 'Received Signal Level (Far end radio)', 1, $discover['dbm'][0]['remCurrentRSL'], $limits);
+  discover_sensor('dbm', $device, $oid, 'remCurrentRSL.0', 'exaltcomproducts', 'Received Signal Level (Far end radio)', 1, $discover['dbm'][0]['remCurrentRSL'], $limits);
 }
 
 //ExaltComProducts::locLinkState.0 = INTEGER: almNORMAL(0)
@@ -79,27 +79,27 @@ if (!empty($discover['state'][0]['locLinkState']))
 {
   $oid   = '.1.3.6.1.4.1.25651.1.2.4.2.3.1.1.0';
   $value = $discover['state'][0]['locLinkState'];
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'locLinkState.0', $sensor_state_type, 'Link Status (Internal)', NULL, $value, $options);
+  discover_status($device, $oid, 'locLinkState.0', $sensor_state_type, 'Link Status (Internal)', $value, $options);
 }
 if (!empty($discover['state'][0]['remLinkState']))
 {
   $oid   = '.1.3.6.1.4.1.25651.1.2.4.2.4.1.1.0';
   $value = $discover['state'][0]['remLinkState'];
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'remLinkState.0', $sensor_state_type, 'Link Status (Far end radio)', NULL, $value, $options);
+  discover_status($device, $oid, 'remLinkState.0', $sensor_state_type, 'Link Status (Far end radio)', $value, $options);
 }
 if (is_numeric($discover['state'][0]['locErrorDuration']) && is_numeric($discover['state'][0]['locUnavailDuration']))
 {
   $oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.5.0';
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'locErrorDuration.0', 'exaltcomproducts', 'Errored Seconds (Internal)', 1, $discover['state'][0]['locErrorDuration']);
+  discover_status($device, $oid, 'locErrorDuration.0', 'exaltcomproducts', 'Errored Seconds (Internal)',  $discover['state'][0]['locErrorDuration']);
   $oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.7.0';
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'locUnavailDuration.0', 'exaltcomproducts', 'Unavailable Seconds (Internal)', 1, $discover['state'][0]['locUnavailDuration']);
+  discover_status($device, $oid, 'locUnavailDuration.0', 'exaltcomproducts', 'Unavailable Seconds (Internal)',  $discover['state'][0]['locUnavailDuration']);
 }
 if (is_numeric($discover['state'][0]['remErrorDuration']) && is_numeric($discover['state'][0]['remUnavailDuration']))
 {
   $oid = '.1.3.6.1.4.1.25651.1.2.4.3.2.5.0';
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'remErrorDuration.0', 'exaltcomproducts', 'Errored Seconds (Far end radio)', 1, $discover['state'][0]['remErrorDuration']);
+  discover_status($device, $oid, 'remErrorDuration.0', 'exaltcomproducts', 'Errored Seconds (Far end radio)',  $discover['state'][0]['remErrorDuration']);
   $oid = '.1.3.6.1.4.1.25651.1.2.4.3.2.7.0';
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'remUnavailDuration.0', 'exaltcomproducts', 'Unavailable Seconds (Far end radio)', 1, $discover['state'][0]['remUnavailDuration']);
+  discover_status($device, $oid, 'remUnavailDuration.0', 'exaltcomproducts', 'Unavailable Seconds (Far end radio)',  $discover['state'][0]['remUnavailDuration']);
 }
 
 unset($discover, $oid, $value, $sensor_state_type);

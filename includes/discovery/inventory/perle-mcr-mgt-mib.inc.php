@@ -7,20 +7,17 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$vendor_mib="PERLE-MCR-MGT-MIB";
-$mib_dirs = mib_dirs($config['mibs'][$vendor_mib]['mib_dir']);
-
-$ChasProductType = snmp_get($device, 'chassisModelName.1', '-OQv', 'PERLE-MCR-MGT-MIB', $mib_dirs);
+$ChasProductType = snmp_get_oid($device, 'chassisModelName.1', 'PERLE-MCR-MGT-MIB');
 
 if ($ChasProductType)
 {
-  $ChasDesc = snmp_get($device, 'chassisModelDesc.1', '-OQv', 'PERLE-MCR-MGT-MIB', $mib_dirs);
-  $ChasSerNum = snmp_get($device, 'chassisSerialNumber.1', '-OQv', 'PERLE-MCR-MGT-MIB', $mib_dirs);
-  $ChasMgmtSlot = snmp_get($device, 'chassisCfgMgmtSlot.1', '-OQv', 'PERLE-MCR-MGT-MIB', $mib_dirs);
+  $ChasDesc = snmp_get_oid($device, 'chassisModelDesc.1', 'PERLE-MCR-MGT-MIB');
+  $ChasSerNum = snmp_get_oid($device, 'chassisSerialNumber.1', 'PERLE-MCR-MGT-MIB');
+  $ChasMgmtSlot = snmp_get_oid($device, 'chassisCfgMgmtSlot.1', 'PERLE-MCR-MGT-MIB');
   
   // Insert chassis as index 1, everything hangs off of this.
   $system_index = 1;
@@ -35,11 +32,11 @@ if ($ChasProductType)
     'entPhysicalMfgName'      => 'Perle'
   );
 
-  discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], 'perle-mcr-mgt-mib');
+  discover_inventory($device, $system_index, $inventory[$system_index], $mib);
 
   // Now fetch data for the rest of the hardware in the chassis
-  $data = snmpwalk_cache_oid($device, 'mcrChassisSlotTable', array(), 'PERLE-MCR-MGT-MIB', $mib_dirs);
-  $data_sfp = snmpwalk_cache_oid($device, 'mcrSfpDmiModuleTable', array(), 'PERLE-MCR-MGT-MIB', $mib_dirs);
+  $data = snmpwalk_cache_oid($device, 'mcrChassisSlotTable', array(), 'PERLE-MCR-MGT-MIB');
+  $data_sfp = snmpwalk_cache_oid($device, 'mcrSfpDmiModuleTable', array(), 'PERLE-MCR-MGT-MIB');
 
   $relPos = 0;
 
@@ -71,7 +68,7 @@ if ($ChasProductType)
           'entPhysicalMfgName'      => 'Perle',
         );
 
-        discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], 'perle-mcr-mgt-mib');
+        discover_inventory($device, $system_index, $inventory[$system_index], $mib);
       }
       
       foreach ($data_sfp as $part_sfp)
@@ -96,7 +93,7 @@ if ($ChasProductType)
           'entPhysicalMfgName'      => $part_sfp['sfpDmiVendorName'],
         );
 
-        discover_inventory($valid['inventory'], $device, $system_index_sfp, $inventory[$system_index], 'perle-mcr-mgt-mib');
+        discover_inventory($device, $system_index_sfp, $inventory[$system_index], $mib);
           
         }
       }

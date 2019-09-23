@@ -7,9 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+// FIXME. Seems as possible convert to definitions
 
 $mib = "RITTAL-CMC-TC-MIB";
 
@@ -43,6 +45,7 @@ foreach ($sensorTables as $table)
     $name = $entry[$tableprefix.'Text'];
     $value = $entry[$tableprefix.'Value'];
     $status = $entry[$tableprefix.'Status'];
+    $options = [];
 
     if ($type !="notAvail" && $type != NULL)
     {
@@ -113,6 +116,7 @@ foreach ($sensorTables as $table)
           break;
         case 'waterFlow':
           $t = 'waterflow';
+          $options['sensor_unit'] = 'l/min';
           break;
         case 'heatflowRCT':
           $t = 'power';
@@ -131,7 +135,7 @@ foreach ($sensorTables as $table)
           break;
 
         default:
-          continue;
+          continue 2;
       }
 
       $name = $unit_name . ' ' . $name;
@@ -144,9 +148,10 @@ foreach ($sensorTables as $table)
       if ($t == 'status')
       {
         $oid = $table['statusOID'].$index;
-        discover_status($device, $oid, $index, "rittal-cmc-tc-state", $name, $status, array('entPhysicalClass' => 'status'));
+        $options['entPhysicalClass'] = 'status';
+        discover_status($device, $oid, $index, "rittal-cmc-tc-state", $name, $status, $options);
       } else {
-        discover_sensor($valid['sensor'], $t, $device, $oid, "$tablename.$index", "Rittal-CMC-TC", $name, $scale, $value, $limits);
+        discover_sensor($t, $device, $oid, "$tablename.$index", "Rittal-CMC-TC", $name, $scale, $value, array_merge($limits, $options));
       }
     }
   }

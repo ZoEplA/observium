@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -28,8 +28,8 @@ $colour_line_in      = "008800FF";
 $colour_line_out     = "000088FF";
 $colour_area_in      = "bEFFbEAA";
 $colour_area_out     = "bEbEFFAA";
-$colour_area_in_max  = "CC88CC";
-$colour_area_out_max = "FFEFAA";
+$colour_area_in_max  = $config['colours']['graphs']['pkts']['in_max'];
+$colour_area_out_max = $config['colours']['graphs']['pkts']['out_max'];
 
 include($config['html_dir']."/includes/graphs/generic_duplex.inc.php");
 

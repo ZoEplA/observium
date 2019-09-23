@@ -71,7 +71,22 @@ Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "This data type is used to model IPv6 address prefixes. This is a binary 
         string of up to 16 octets in network byte-order."
-    SYNTAX       OCTET STRING (SIZE (0..16))   
+    SYNTAX       OCTET STRING (SIZE (0..16))
+
+PolicingAction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "Policing action"
+    
+    SYNTAX  INTEGER {
+             drop(1),
+             markdscp(2),
+						 markprec(3),
+						 send(4),
+						 markcos(5),
+						 markcos2(6),
+						 markcosAsSecCos(7)
+            }  
 
 --**************************************************************************************
 --    hm2AgentDiffServGenStatusGroup
@@ -1042,15 +1057,15 @@ Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
       hm2AgentDiffServPolicyAttrStmtMarkIpPrecedenceVal
               Unsigned32,
 	  hm2AgentDiffServPolicyAttrStmtPoliceConformAct
-              INTEGER,
+              PolicingAction,
 	  hm2AgentDiffServPolicyAttrStmtPoliceConformVal
               Unsigned32,    
 	  hm2AgentDiffServPolicyAttrStmtPoliceExceedAct
-              INTEGER,
+              PolicingAction,
 	  hm2AgentDiffServPolicyAttrStmtPoliceExceedVal
               Unsigned32,
 	  hm2AgentDiffServPolicyAttrStmtPoliceNonconformAct
-              INTEGER,
+              PolicingAction,
 	  hm2AgentDiffServPolicyAttrStmtPoliceNonconformVal
               Unsigned32,
 	  hm2AgentDiffServPolicyAttrStmtPoliceSimpleCrate
@@ -1178,22 +1193,14 @@ Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
          ::= { hm2AgentDiffServPolicyAttrEntry 10 }
     
     hm2AgentDiffServPolicyAttrStmtPoliceConformAct OBJECT-TYPE
-         SYNTAX      INTEGER {
-                      drop(1),
-                      markdscp(2),
-                      markprec(3),
-		      send(4),
-		      markcos(5),
-		      markcos2(6),
-		      markcosAsSecCos(7)
-		      }
+         SYNTAX      PolicingAction
          MAX-ACCESS  read-create
          STATUS      current
          DESCRIPTION
                      "Policing conform action attribute statement value -- determines 
 		      the action taken on conforming traffic for the policing style
 		      (simple,singlerate,tworate) currently configured for the specified 
-		      class instance within the policy. The default conform action is send(3).
+		      class instance within the policy. The default conform action is send(4).
 		      This attribute is only valid if the value of 
                       hm2AgentDiffServPolicyAttrStmtEntryType is policeSimple(6), 
                       policeSinglerate(7), or policeTworate(8)."
@@ -1219,15 +1226,7 @@ Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
          ::= { hm2AgentDiffServPolicyAttrEntry 12 }
 
     hm2AgentDiffServPolicyAttrStmtPoliceExceedAct OBJECT-TYPE
-         SYNTAX      INTEGER {
-                      drop(1),
-                      markdscp(2),
-                      markprec(3),
-		      send(4),
-		      markcos(5),
-		      markcos2(6),
-		      markcosAsSecCos(7)
-		      }
+         SYNTAX      PolicingAction
          MAX-ACCESS  read-create
          STATUS      current
          DESCRIPTION
@@ -1258,15 +1257,7 @@ Ipv6AddressPrefix ::= TEXTUAL-CONVENTION
          ::= { hm2AgentDiffServPolicyAttrEntry 14 }
          
     hm2AgentDiffServPolicyAttrStmtPoliceNonconformAct OBJECT-TYPE
-         SYNTAX      INTEGER {
-                      drop(1),
-                      markdscp(2),
-                      markprec(3),
-		      send(4),
-		      markcos(5),
-		      markcos2(6),
-              markcosAsSecCos(7)
-		      }
+         SYNTAX      PolicingAction
          MAX-ACCESS  read-create
          STATUS      current
          DESCRIPTION

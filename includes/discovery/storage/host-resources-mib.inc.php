@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -122,12 +122,16 @@ if (count($cache_discovery['host-resources-mib']))
     if (!$deny && is_numeric($index))
     {
       discover_storage($valid['storage'], $device, $index, $fstype, $mib, $descr, $units, $size, $used, array('storage_hc' => $hc));
+
+      $dsk_done[$descr] = $descr;
+
     }
 
     unset($deny, $fstype, $descr, $size, $used, $units, $path, $dsk, $hc);
   }
 }
-else if (count($cache_discovery['ucd-snmp-mib']))
+
+if (count($cache_discovery['ucd-snmp-mib']))
 {
   // Discover 'UCD-SNMP-MIB' if 'HOST-RESOURCES-MIB' empty.
   $mib = 'UCD-SNMP-MIB';
@@ -153,7 +157,7 @@ else if (count($cache_discovery['ucd-snmp-mib']))
       $used  = $dsk['dskUsed'] * $units;
     }
 
-    if (!$deny && is_numeric($index))
+    if (!$deny && is_numeric($index) && !in_array($descr, $dsk_done))
     {
       discover_storage($valid['storage'], $device, $index, $fstype, $mib, $descr, $units, $size, $used, array('storage_hc' => $hc));
     }

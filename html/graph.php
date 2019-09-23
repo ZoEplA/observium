@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage graphing
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,6 +18,7 @@
 define('OBS_GRAPH', TRUE);
 
 include_once("../includes/sql-config.inc.php");
+
 
 $start = utime(); // Needs common.php
 
@@ -37,6 +38,7 @@ elseif (isset($config['allow_unauth_graphs_cidr']) && count($config['allow_unaut
     print_debug("Authentication by matched CIDR.");
   }
 }
+
 
 if (!$auth)
 {

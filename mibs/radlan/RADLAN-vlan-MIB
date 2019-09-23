@@ -1,7 +1,7 @@
 RADLAN-vlan-MIB DEFINITIONS ::= BEGIN
 
--- Version:    7.46
--- Date:       15 Jan 2007
+-- Version:    7.47
+-- Date:       25 Apr 2017
 --
 -- 26-Oct-2004 Added
 --              vlanDynamicVlanSupported
@@ -46,12 +46,15 @@ IMPORTS
     InetAddressType                             FROM INET-ADDRESS-MIB;
 
 vlan MODULE-IDENTITY
-              LAST-UPDATED "200602120000Z"
+              LAST-UPDATED "201606220000Z"
               ORGANIZATION "Radlan Computer Communications Ltd."
               CONTACT-INFO
                       "radlan.com"
               DESCRIPTION
                       "The private MIB module definition for IP Multicast support in Radlan devices."
+              REVISION "201704250000Z"
+              DESCRIPTION
+                       "Added changes for vlanPrivateTable."
               REVISION "200602120000Z"
               DESCRIPTION
                        "Editorial changes to support new MIB compilers."
@@ -1410,6 +1413,7 @@ vlanPrivateVid OBJECT-TYPE
 
 vlanPrivateType OBJECT-TYPE
     SYNTAX INTEGER {
+    	none(0),
         primary(1),
         isolated(2),
         community(3)
@@ -1418,6 +1422,8 @@ vlanPrivateType OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "private vlan types:
+        	none       - Normal VLAN
+        	
             primary    - Carries traffic from promiscuous ports.
                          promiscuous port can communicate with all ports of the
                          same PVLAN, including the isolated and community
@@ -1431,7 +1437,7 @@ vlanPrivateType OBJECT-TYPE
                          community ports of the same community can communicate
                          among themselves and with the promiscuous ports of the
                          same PVLAN."
-    DEFVAL  { primary }
+    DEFVAL  { none }
     ::= { vlanPrivateEntry 2 }
 
 

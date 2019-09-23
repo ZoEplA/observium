@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -121,7 +121,7 @@ foreach (array_keys($pseudowires_db) as $mib)
         $pw_poll['last_change'] = $pseudowire_polled_time; // - $pw_uptime;
         if ($pw['pwOperStatus']) // Log only if old status not empty
         {
-          log_event('Pseudowire flapped: [#'.$pw['pwID'].'] time ' . formatUptime($pw_uptime) . ' ago', $device, 'pseudowire', $pw['pseudowire_id']);
+          log_event('Pseudowire flapped: [#'.$pw['pwID'].'] time ' . format_uptime($pw_uptime) . ' ago', $device, 'pseudowire', $pw['pseudowire_id']);
         }
       } else {
         // If status not changed, leave old last_change
@@ -157,7 +157,7 @@ foreach (array_keys($pseudowires_db) as $mib)
       $table_row[] = $pw['pwPsnType'];
       $table_row[] = $pw['peer_addr'];
       $table_row[] = $metrics['pwOperStatus'];
-      $table_row[] = formatUptime($pw_uptime);
+      $table_row[] = format_uptime($pw_uptime);
       $table_rows[] = $table_row;
       unset($table_row);
 

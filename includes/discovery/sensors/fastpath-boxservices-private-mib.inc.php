@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -65,12 +65,12 @@ foreach ($oids as $index => $entry)
     'entPhysicalClass' => 'temperature',
   );
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, "boxServicesStackTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
+  discover_sensor('temperature', $device, $oid, "boxServicesStackTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
 
   $oid   = ".1.3.6.1.4.1.4413.1.1.43.1.9.1.4.$index";
   $value = $entry['boxServicesStackTempSensorState'];
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "boxServicesStackTempSensorState.$index", 'boxServicesTempSensorState', $descr, 1, $value, array('entPhysicalClass' => 'temperature'));
+  discover_status($device, $oid, "boxServicesStackTempSensorState.$index", 'boxServicesTempSensorState', $descr, $value, array('entPhysicalClass' => 'temperature'));
 }
 
 if (!$boxServicesStackTempSensorsTable)
@@ -95,12 +95,12 @@ if (!$boxServicesStackTempSensorsTable)
       'entPhysicalClass' => 'temperature',
     );
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "boxServicesTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
+    discover_sensor('temperature', $device, $oid, "boxServicesTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
 
     $oid   = ".1.3.6.1.4.1.4413.1.1.43.1.8.1.3.$index";
     $value = $entry['boxServicesTempSensorState'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "boxServicesTempSensorState.$index", 'boxServicesTempSensorState', $descr, 1, $value, array('entPhysicalClass' => 'temperature'));
+    discover_status($device, $oid, "boxServicesTempSensorState.$index", 'boxServicesTempSensorState', $descr, $value, array('entPhysicalClass' => 'temperature'));
   }
 }
 
@@ -152,7 +152,7 @@ foreach ($oids as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('fanspeed', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
     $scale    = 1;
     $oid_name = 'boxServicesFanDutyLevel';
@@ -160,7 +160,7 @@ foreach ($oids as $index => $entry)
     $type     = $mib . '-' . $oid_name;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], 'load', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('load', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 }
 
@@ -181,7 +181,7 @@ foreach ($oids as $index => $entry)
 
   if ($entry['boxServicesPowSupplyItemState'] != 'notpresent')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "boxServicesPowSupplyItemState.$index", 'boxServicesItemState', $descr, 1, $value, array('entPhysicalClass' => 'power'));
+    discover_status($device, $oid, "boxServicesPowSupplyItemState.$index", 'boxServicesItemState', $descr, $value, array('entPhysicalClass' => 'power'));
   }
 }
 

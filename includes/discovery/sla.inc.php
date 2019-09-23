@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -19,25 +19,23 @@ if ($config['enable_sla'])
   $include_dir = "includes/discovery/slas";
   include($config['install_dir']."/includes/include-dir-mib.inc.php");
 
-  if (OBS_DEBUG > 1) { print_vars($sla_table); }
+  print_debug_vars($sla_table);
 
   // Get existing SLAs
   $sla_db  = array();
   foreach (dbFetchRows("SELECT * FROM `slas` WHERE `device_id` = ?", array($device['device_id'])) as $entry)
   {
-    if (!isset($entry['sla_mib'])) { $entry['sla_mib'] = 'CISCO-RTTMON-MIB'; } // FIXME, remove in r7000
-
     $index = $entry['sla_index'];
     $mib_lower = strtolower($entry['sla_mib']);
-    if ($mib_lower != 'cisco-rttmon-mib')
+    if (!in_array($entry['sla_mib'], ['CISCO-RTTMON-MIB', 'HPICF-IPSLA-MIB']))
     {
-      // Use 'owner.index' as index, because all except Cisco use this!
+      // Use 'owner.index' as index for all except Cisco and HPE
       $index = $entry['sla_owner'] . '.' . $index;
     }
 
     $sla_db[$mib_lower][$index] = $entry;
   }
-  if (OBS_DEBUG > 1) { print_vars($sla_db); }
+  print_debug_vars($sla_db);
 
   foreach ($sla_table as $mib => $oids)
   {

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -37,6 +37,7 @@ foreach ($sensor_types as $sensor_type)
 // Now print founded bundle (measured_class+sensor)
 if (isset($sensors_db['measured']))
 {
+  $vars['measured_icon'] = FALSE; // Hide measured icons
   foreach ($sensors_db['measured'] as $measured_class => $measured_entity)
   {
     $box_args = array('title' => nicecase($measured_class).' sensors',
@@ -50,24 +51,30 @@ if (isset($sensors_db['measured']))
     foreach ($measured_entity as $entity_id => $entry)
     {
       $entity      = get_entity_by_id_cache($measured_class, $entity_id);
-      $entity_name = entity_name($measured_class, $entity);
+      //r($entity);
       $entity_link = generate_entity_link($measured_class, $entity);
       $entity_type = entity_type_translate_array($measured_class);
 
+      // Remove port name from sensor description
+      $rename_from = [];
+      if ($measured_class == 'port')
+      {
+        $rename_from[] = $entity['port_label'];
+        $rename_from[] = $entity['ifDescr'];
+        $rename_from[] = $entity['port_label_short'];
+        if (strlen($entity['port_label_base']) > 4) { $rename_from[] = $entity['port_label_base']; }
+        $rename_from = array_unique($rename_from);
+      } else {
+          $rename_from[] = entity_rewrite($measured_class, $entity);
+      }
+      //r($rename_from);
       //echo('      <tr class="'.$port['row_class'].'">
       //  <td class="state-marker"></td>
       echo('      <tr>
-        <td colspan="6" class="entity"><i class="' . $entity_type['icon'] . '"></i> ' . $entity_link . '</td></tr>');
+        <td colspan="6" class="entity">' . get_icon($entity_type['icon']) . '&nbsp;' . $entity_link . '</td></tr>');
       foreach ($entry as $sensor)
       {
-        // Remove port name from sensor description
-        $rename_from = array($entity_name);
-        if ($measured_class == 'port')
-        {
-          // for port add full ifDescr, since it can differ from humanized name
-          array_unshift($rename_from, $entity['ifDescr']);
-        }
-        $sensor['sensor_descr'] = trim(str_ireplace($rename_from, '', $sensor['sensor_descr']));
+        $sensor['sensor_descr'] = trim(str_ireplace($rename_from, '', $sensor['sensor_descr']), ":- \t\n\r\0\x0B");
         if (empty($sensor['sensor_descr']))
         {
           // Some time sensor descriptions equals to entity name

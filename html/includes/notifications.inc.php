@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -45,11 +45,13 @@ if (!ishit_cache_item($notifications_item) || !ishit_cache_item($alerts_item))
                                           'unixtime' => $config['time']['now']);
     }
 
+    /* INI directive 'register_globals' is deprecated since PHP 5.3 and removed since PHP 5.4
     if (ini_get('register_globals'))
     {
       $notifications[] = array('text' => '<h4>The PHP Option "register_globals" enabled in the php.ini.</h4> Please disable it!', 'severity' => 'alert',
                                'unixtime' => $config['time']['now']);
     }
+    */
 
 //if (!function_exists('hash_exists'))
 //{

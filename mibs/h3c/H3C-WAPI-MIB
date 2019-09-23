@@ -1,9 +1,9 @@
 -- ************************************************************************
--- Copyright (c) 2004-2011 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: WAPI extension mib
 -- Reference:
--- Version: V1.3
+-- Version: V1.4
 -- History:
 --   V1.0 created by zhanglianglun
 --     Initial version 2007-5-20
@@ -22,6 +22,8 @@
 --        Add h3cwapiCfgExtASName
 --        Add h3cwapiCfgExtCertDomain
 --        Add h3cwapiCfgExtCertInstalled
+--   V1.4 2013-01-10 modified by xuyonggang
+--        Add h3cwapiTrapInfoAPMacAddr
 -- ************************************************************************
 H3C-WAPI-MIB DEFINITIONS ::= BEGIN
 
@@ -41,9 +43,9 @@ H3C-WAPI-MIB DEFINITIONS ::= BEGIN
     h3cwapiMIB MODULE-IDENTITY
         LAST-UPDATED "201012011757Z"
         ORGANIZATION
-            "H3C Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team H3C Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
             http://www.h3c.com
             Zip:100085
@@ -436,7 +438,8 @@ H3C-WAPI-MIB DEFINITIONS ::= BEGIN
             h3cwapiTrapInfoMacAddr,
             h3cwapiTrapInfoAPId,
             h3cwapiTrapInfoRadioId,
-            h3cwapiTrapInfoBSSId
+            h3cwapiTrapInfoBSSId,
+            h3cwapiTrapInfoAPMacAddr
         }
         STATUS current
         DESCRIPTION
@@ -452,7 +455,8 @@ H3C-WAPI-MIB DEFINITIONS ::= BEGIN
             h3cwapiTrapInfoMacAddr,
             h3cwapiTrapInfoAPId,
             h3cwapiTrapInfoRadioId,
-            h3cwapiTrapInfoBSSId
+            h3cwapiTrapInfoBSSId,
+            h3cwapiTrapInfoAPMacAddr
         }
         STATUS current
         DESCRIPTION
@@ -468,7 +472,8 @@ H3C-WAPI-MIB DEFINITIONS ::= BEGIN
             h3cwapiTrapInfoMacAddr,
             h3cwapiTrapInfoAPId,
             h3cwapiTrapInfoRadioId,
-            h3cwapiTrapInfoBSSId
+            h3cwapiTrapInfoBSSId,
+            h3cwapiTrapInfoAPMacAddr
         }
         STATUS current
         DESCRIPTION
@@ -485,7 +490,8 @@ H3C-WAPI-MIB DEFINITIONS ::= BEGIN
             h3cwapiTrapInfoMacAddr,
             h3cwapiTrapInfoAPId,
             h3cwapiTrapInfoRadioId,
-            h3cwapiTrapInfoBSSId
+            h3cwapiTrapInfoBSSId,
+            h3cwapiTrapInfoAPMacAddr
         }
         STATUS current
         DESCRIPTION
@@ -503,7 +509,8 @@ H3C-WAPI-MIB DEFINITIONS ::= BEGIN
             h3cwapiTrapInfoMacAddr,
             h3cwapiTrapInfoAPId,
             h3cwapiTrapInfoRadioId,
-            h3cwapiTrapInfoBSSId
+            h3cwapiTrapInfoBSSId,
+            h3cwapiTrapInfoAPMacAddr
         }
         STATUS current
         DESCRIPTION
@@ -549,4 +556,11 @@ h3cwapiTrapInfoBSSId OBJECT-TYPE
             "As MAC Address format, it is to identify BSS."
         ::= { h3cwapiTrapInfo 4 }
 
+h3cwapiTrapInfoAPMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "As MAC Address format, it is to identify AP"
+        ::= { h3cwapiTrapInfo 5 }
 END

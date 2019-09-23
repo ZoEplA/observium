@@ -1,9 +1,9 @@
 -- ===================================================================
--- Copyright (C) 2013 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This MIB provides management of MPLS basic configurations.
 --              It is an extension of MPLS-LSR-STD-MIB.
 -- Reference:
--- Version: V2.01
+-- Version: V2.02
 -- History:
 -- V2.01 ZhangAiFen, 2013-09-24, revision
 -- ===================================================================

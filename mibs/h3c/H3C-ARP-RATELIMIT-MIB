@@ -1,13 +1,15 @@
 -- ============================================================================
--- Copyright (c) 2004-2010 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The purpose of this MIB file is to provide the definition of
 --              the ARP Rate Limit general configuration.
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 -- V1.0 2009-12-08
 --   Initial version, created by gejianzhuang
+-- V1.1 2013-10-14
+--   Add h3cARPRatelimitConfigTable, modified by yanjun
 -- ============================================================================
 H3C-ARP-RATELIMIT-MIB DEFINITIONS ::= BEGIN
 
@@ -15,10 +17,13 @@ IMPORTS
         h3cCommon
     FROM HUAWEI-3COM-OID-MIB
         Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
-    FROM SNMPv2-SMI;
+    FROM SNMPv2-SMI
+        ifIndex
+    FROM IF-MIB;
 
+-- Node definitions
 h3cARPRatelimit MODULE-IDENTITY
-    LAST-UPDATED "200912081912Z"        -- DEC 08, 2009 at 19:12 GMT
+    LAST-UPDATED "201310141800Z"        -- OCT 14, 2013 at 18:00 GMT
     ORGANIZATION
         "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -31,6 +36,9 @@ h3cARPRatelimit MODULE-IDENTITY
         The ARP packet rate limit feature monitors and controls the
         rate of ARP packets delivered to the CPU on a device.  The
         current version supports the monitoring feature only."
+    REVISION "201310141800Z"
+    DESCRIPTION
+        "Add h3cARPRatelimitConfigTable."
     REVISION "200912081912Z"
     DESCRIPTION
         "The initial version of this MIB file."
@@ -40,6 +48,8 @@ h3cARPRatelimit MODULE-IDENTITY
 h3cARPRatelimitObjects OBJECT IDENTIFIER ::= { h3cARPRatelimit 1 }
 
 h3cARPRatelimitTrap OBJECT IDENTIFIER  ::= { h3cARPRatelimitObjects 1 }
+
+h3cARPRatelimitConfig OBJECT IDENTIFIER  ::= { h3cARPRatelimitObjects 2 }
 
 -- h3cARPRatelimitTraps
 
@@ -109,4 +119,42 @@ h3cARPRatelimitTrapMsg OBJECT-TYPE
         and has size of 4 octets."
 
     ::= { h3cARPRatelimitTrapObjects 3 }
+
+-- h3cARPRatelimitConfigTable
+
+h3cARPRatelimitConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cARPRatelimitConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is used to configure ARP packet
+        rate limit on interfaces."
+    ::= { h3cARPRatelimitConfig 1 }
+
+h3cARPRatelimitConfigEntry OBJECT-TYPE
+    SYNTAX      H3cARPRatelimitConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of h3cARPRatelimitConfigTable."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { h3cARPRatelimitConfigTable 1 }
+
+H3cARPRatelimitConfigEntry ::= SEQUENCE
+    {
+        h3cARPRatelimitValue     Unsigned32
+    }
+
+h3cARPRatelimitValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure ARP packet rate limit.  Support for the value range
+        depends on the device model.  If the object is set to 0, the ARP
+        packet rate limit will be disabled."
+    ::= { h3cARPRatelimitConfigEntry 1 }
 END

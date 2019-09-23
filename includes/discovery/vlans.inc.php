@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -39,13 +39,19 @@ include("includes/include-dir-mib.inc.php");
 
 /* Process discovered Vlans */
 $table_rows = array();
-$vlan_params = array('vlan_name', 'vlan_mtu', 'vlan_type', 'vlan_status', 'ifIndex');
+$vlan_params = array('vlan_name', 'vlan_mtu', 'vlan_type', 'vlan_status', 'vlan_context', 'ifIndex');
 foreach ($discovery_vlans as $domain_index => $vlans)
 {
   foreach ($vlans as $vlan_id => $vlan)
   {
     echo(" $vlan_id");
     $vlan_update = array();
+
+    // Currently vlan_context param only actual for CISCO-VTP-MIB
+    if (!isset($vlan['vlan_context']))
+    {
+      $vlan['vlan_context'] = 0;
+    }
 
     if (isset($vlans_db[$domain_index][$vlan_id]))
     {
@@ -54,7 +60,13 @@ foreach ($discovery_vlans as $domain_index => $vlans)
       {
         if ($vlans_db[$domain_index][$vlan_id][$param] != $vlan[$param])
         {
-          $vlan_update[$param] = $vlan[$param];
+          if ($param == 'ifIndex' && (is_null($vlan[$param]) || $vlan[$param] === ''))
+          {
+            // Empty string stored as 0, prevent
+            $vlan_update[$param] = ['NULL'];
+          } else {
+            $vlan_update[$param] = $vlan[$param];
+          }
         }
       }
 

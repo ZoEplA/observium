@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (C) 2003 by HUAWEI 3COM TECHNOLOGIES.  All rights reserved.
+-- Copyright (C) 2003 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: This MIB is a framework MIB for unicast technology
 -- Reference:
@@ -21,9 +21,13 @@ H3C-UNICAST-MIB DEFINITIONS ::= BEGIN
     h3cUnicast MODULE-IDENTITY
         LAST-UPDATED "200501311454Z"        -- January 31, 2005 at 14:54 GMT
         ORGANIZATION
-            "Huawei 3com Technologies Co.,Ltd"
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Hangzhou Institute Huawei-3Com Tech, Inc."
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             " This MIB is a framework MIB for unicast related features."
         REVISION      "200503241454Z"

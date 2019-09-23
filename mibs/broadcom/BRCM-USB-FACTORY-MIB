@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2004 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -41,7 +41,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-FACTORY-MIB;
                 
 usbFactory MODULE-IDENTITY
-    LAST-UPDATED "200408250000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -57,15 +57,21 @@ usbFactory MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata factory MIB"
-    REVISION      "200408250000Z"
+        "Broadcom proprietary MIB for factory management and configuration
+         of objects related to the USB network interface."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected."
     REVISION      "200411120000Z"
     DESCRIPTION
-            "Changed root node of this module to cableDataFactory.8 to resolve
-             conflict with residentialGatewayFactory root node from the
-             BRCM-RG-FACTORY-MIB."
+        "Changed root node of this module to cableDataFactory.8 to resolve
+         conflict with residentialGatewayFactory root node from the
+         BRCM-RG-FACTORY-MIB."
+    REVISION      "200408250000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataFactory 8 }
     
 usbFactMacAddress OBJECT-TYPE

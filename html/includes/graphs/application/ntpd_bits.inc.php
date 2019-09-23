@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -16,12 +16,12 @@ $ds_in               = "packets_recv";
 $ds_out              = "packets_sent";
 $graph_title        .= "::packets";
 $unit_text           = "Packets";
-$colour_line_in      = "330033";
-$colour_line_out     = "FF6600";
-$colour_area_in      = "AA66AA";
-$colour_area_out     = "FFDD88";
-$colour_area_in_max  = "CC88CC";
-$colour_area_out_max = "FFEFAA";
+$colour_line_in      = $config['colours']['graphs']['pkts']['in_line'];
+$colour_line_out     = $config['colours']['graphs']['pkts']['out_line'];
+$colour_area_in      = $config['colours']['graphs']['pkts']['in_area'];
+$colour_area_out     = $config['colours']['graphs']['pkts']['out_area'];
+$colour_area_in_max  = $config['colours']['graphs']['pkts']['in_max'];
+$colour_area_out_max = $config['colours']['graphs']['pkts']['out_max'];
 
 $ntpdserver_rrd      = get_rrd_path($device, "app-ntpd-server-".$app['app_id'].".rrd");
 

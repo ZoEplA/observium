@@ -3,8 +3,7 @@
 -- Version info 
 --
 -- Version 0.1 Created 2002.5.24 by GONGGUIDONG
--- This version of MIB is created just for management of base and user. 
--- raisecomConfigLoadOperation add savingflashdb, synchronizingstartup, synchronizingflashdb by qiyun 20110506
+-- This version of MIB is created just for management of base and user.   
 -- Added raisecomClockGroup.raisecomClockMode sub-node by XueChaomin 20081220
 -- remove UserManage and OnlineUpgrade group by guoxiaodan 20070716
 -- removed keepalve group by LIAOBIN 20070709
@@ -45,15 +44,11 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
 			FROM RAISECOM-BASE-MIB;
 	
 	raisecomCommonManagement    MODULE-IDENTITY
-		LAST-UPDATED 	"201806250000Z"
+		LAST-UPDATED 	"200412170000Z"
 		ORGANIZATION 	"RAISECOM TECH, Ltd."
 		CONTACT-INFO 	"www.raisecom.com"
 		DESCRIPTION  	
 		    "The MIB module defining objects for common management"
-		REVISION "201806250000Z"
-		DESCRIPTION
-			"Fix a few syntax errors (replace underscores with hyphens
-			 in descriptors) so that Net-SNMP tools can now load the MIB."
 		::= { raisecomAgent  2}  
                 
 	--groups                 
@@ -75,10 +70,7 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
         			erasing(3),
         			reboot(4),
         			restore(5),
-        			reload(6),
-        			savingflashdb(7),
-        			synchronizingstartup(8),
-        			synchronizingflashdb(9)
+        			reload(6)
         			}
         MAX-ACCESS      read-write
         STATUS          current
@@ -163,6 +155,22 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The operation to reload startup-config file"
          ::= { raisecomCommonFunctionGroup 8 }
+         
+    DoubleSystemSelect OBJECT-TYPE
+        SYNTAX      INTEGER { system1(1), system2(2) }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "Select the started system next time."
+        ::= { raisecomCommonFunctionGroup 9 }
+
+    raisecomStartupConfigFile OBJECT-TYPE
+        SYNTAX      INTEGER { main(1), backup(2) }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "Select startup configuration file."
+        ::= { raisecomCommonFunctionGroup 10 }
                           
 --raisecomNotificationGroup
 	raisecomObjectStatusDesc    OBJECT-TYPE
@@ -197,6 +205,14 @@ RAISECOM-COMMON-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
              			currently being sent.such as Environment,Complement"
 		::= { raisecomNotificationGroup 4 }
                
+	raisecomNotificationLocation    OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The description of location which notification generates. 
+						This is a display string which can be showned on NMS such like OpenView"
+		::= { raisecomNotificationGroup 101 }
+		
 --raisecomClockGroup
     raisecomClockDateAndTime OBJECT-TYPE
     SYNTAX      DateAndTime
@@ -329,8 +345,31 @@ raisecomSummerTime          OBJECT IDENTIFIER ::= { raisecomClockGroup 3 }
         to use auxiliary clock as system timer, whom is required to set this variable's value
         as 3, i.e SYSCLK_AUX.
         All supported values of this variable are listed as follows:
-        1: SYSCLK_DFLT   default mode
-        2: SYSCLK_TS     timestamp mode
-        3: SYSCLK_AUX    auxiliary clock mode."
+        1: SYSCLK-DFLT   default mode
+        2: SYSCLK-TS     timestamp mode
+        3: SYSCLK-AUX    auxiliary clock mode."
     ::= { raisecomClockGroup 4 }
+    
+    raisecomClockDisplay OBJECT-TYPE
+    SYNTAX      INTEGER{
+        			EraisecomClockDisplay-DFLT(1),
+        			EraisecomClockDisplay-UTC(2),
+        			EraisecomClockDisplay-other(3)        			
+        			}
+    MAX-ACCESS  read-write
+    STATUS      current                
+    DESCRIPTION
+        "System clock  display mode, which range from 1 to 3, stands for default mode, UTC mode
+        and other clock mode which is made to prepare for fulture respectively. It allows network administrator to change 
+        system clock mechanism by setting this variable. For instance, if administrator intend
+        to use default display mode, the time will be shown as 'yyyy-mm-dd, hh:mm:ss'. 
+        else if if administrator intend to use UTC display mode,
+        the time will be shown as'dd.mm.yyyy-hh:mm:ss'
+        All supported values of this variable are listed as follows:
+        1: EraisecomClockDisplay-DFLT    default mode
+        2: EraisecomClockDisplay-UTC     UTC mode
+        3: EraisecomClockDisplay-other   other mode."
+    ::= { raisecomClockGroup 5 }
+
 END
+

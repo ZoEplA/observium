@@ -218,12 +218,12 @@ ZYXEL-MRSTP-MIB DEFINITIONS ::= BEGIN
               ::= { zyxelMrstpPortEntry 2 }
 
           zyMrstpPortPathCost OBJECT-TYPE
-              SYNTAX  INTEGER (1..65535)
+              SYNTAX  INTEGER (1..200000000)
               MAX-ACCESS  read-write
               STATUS  current
               DESCRIPTION
                       "The contribution of this port to the path cost of paths towards the spanning tree root 
-                      which include this port.  802.1D-1990 recommends that the default value of this parameter 
+                      which include this port.  802.1D-2004 recommends that the default value of this parameter 
                       be in inverse proportion to the speed of the attached LAN."
               REFERENCE
                       "IEEE 802.1D-1990: Section 4.5.5.3"

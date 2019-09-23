@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: EVI MIB
 -- Reference:
@@ -48,9 +48,9 @@ IMPORTS
 -- ==================================================================
 hh3cEvi MODULE-IDENTITY
     LAST-UPDATED "201304280000Z"
-    ORGANIZATION "Hangzhou H3C Tech. Co., Ltd."
+    ORGANIZATION "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085"

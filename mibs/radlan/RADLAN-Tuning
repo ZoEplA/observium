@@ -2004,8 +2004,17 @@ rlDependendFeaturesEnabled OBJECT-TYPE
                               -- is enabled.
         qualityOfServiceEnables(2),
                               -- QOS feature is enabled.
-        iscsiEnabled(3)
+        iscsiEnabled(3),
                               -- iSCSI feature is enabled.
+        fourQueuesOnly(4),
+                              -- Reduced (4) QoS queues quantity avaliable.
+        egressAclEnabled(5),
+                              -- Egress ACL feature is enabled.
+        openflowEnabled(6),
+                              -- Openflow feature is enabled.
+        extendedOffsetListEnabled(7)
+                              -- Increased amount of user defined offsets
+                              -- is enabled
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -2014,7 +2023,7 @@ rlDependendFeaturesEnabled OBJECT-TYPE
         These features combinations may limit by
           A. The same resource (such as ASIC module).
           B. limitation of product or logic for combination
-          System limit is for up to 5 features
+          System limit is for up to 8 features
           First implemented with 3."
     ::= { rlDependendFeaturesEnableTuning 1 }
 
@@ -2027,8 +2036,17 @@ rlDependendFeaturesEnabledAfterReset OBJECT-TYPE
                               -- is enabled.
         qualityOfServiceEnables(2),
                               -- QOS feature is enabled.
-        iscsiEnabled(3)
+        iscsiEnabled(3),
                               -- iSCSI feature is enabled.
+        fourQueuesOnly(4),
+                              -- Reduced (4) QoS queues quantity avaliable.
+        egressAclEnabled(5),
+                              -- Egress ACL feature is enabled.
+        openflowEnabled(6),
+                              -- Openflow feature is enabled.
+        extendedOffsetListEnabled(7)
+                              -- Increased amount of user defined offsets
+                              -- is enabled
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -2038,7 +2056,7 @@ rlDependendFeaturesEnabledAfterReset OBJECT-TYPE
           A. The same resource (such as ASIC module).
           B. Limitation of product or logic for combination (one feature override the other).
           C. Per product some or all features status may not be changed.
-        System limit is for up to 5 features
+        System limit is for up to 8 features
         First implemented with 3."
     ::= { rlDependendFeaturesEnableTuning 2 }
 

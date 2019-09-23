@@ -8,7 +8,7 @@
  *
  * @package        observium
  * @subpackage     functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -49,6 +49,7 @@ function build_ports_where_array($vars)
         case 'ignore':
         case 'ifSpeed':
         case 'ifType':
+        case 'port_id':
           $where[] = generate_query_values($value, 'ports.'.$var);
           break;
         case 'hostname':
@@ -79,17 +80,36 @@ function build_ports_where_array($vars)
           }
           // do not break here
         case 'state':
-          if ($value == "down")
+          // Allowed multiple states as array
+          $state_where = [];
+          foreach ((array)$value as $state)
           {
-            $where[] = 'AND `ifAdminStatus` = "up" AND `ifOperStatus` IN ("lowerLayerDown", "down")';
+            if ($state == "down")
+            {
+              $state_where[] = '`ifAdminStatus` = "up" AND `ifOperStatus` IN ("lowerLayerDown", "down")';
+              //$state_where[] = generate_query_values('up', 'ifAdminStatus', NULL, FALSE) . generate_query_values(['down', 'lowerLayerDown'], 'ifOperStatus');
+            }
+            else if ($state == "up")
+            {
+              $state_where[] = '`ifAdminStatus` = "up" AND `ifOperStatus` IN ("up", "testing", "monitoring")';
+              //$state_where[] = generate_query_values('up', 'ifAdminStatus', NULL, FALSE) . generate_query_values(['up', 'testing', 'monitoring'], 'ifOperStatus');
+            }
+            else if ($state == "admindown" || $state == "shutdown")
+            {
+              $state_where[] = '`ifAdminStatus` = "down"';
+              //$state_where[] = generate_query_values('down', 'ifAdminStatus', NULL, FALSE);
+            }
           }
-          else if ($value == "up")
+          switch (count($state_where))
           {
-            $where[] = 'AND `ifAdminStatus` = "up" AND `ifOperStatus` IN ("up", "testing", "monitoring")';
-          }
-          else if ($value == "admindown" || $value == "shutdown")
-          {
-            $where[] = 'AND `ifAdminStatus` = "down"';
+            case 0:
+              // incorrect state passed, ignore
+              break;
+            case 1:
+              $where[] = ' AND ' . $state_where[0];
+              break;
+            default:
+              $where[] = ' AND ((' . implode(') OR (', $state_where) . '))';
           }
           break;
         case 'cbqos':
@@ -123,7 +143,7 @@ function generate_port_popup_header($port)
   // Push through processing function to set attributes
   humanize_port($port);
 
-  $contents .= generate_box_open();
+  $contents  = generate_box_open();
   $contents .= '<table class="'. OBS_CLASS_TABLE .'">
      <tr class="' . $port['row_class'] . '" style="font-size: 10pt;">
        <td class="state-marker"></td>
@@ -339,7 +359,8 @@ function generate_port_row($port, $vars = array())
       $port['tags'] .= '<a href="' . generate_port_url($port, array('view' => 'cbqos')) . '"><span class="label label-info">CBQoS</span></a>';
     }
   }
-  else if (dbFetchCell("SELECT COUNT(*) FROM `ports_cbqos` WHERE `port_id` = ?", array($port['port_id'])))
+  //else if (dbFetchCell("SELECT COUNT(*) FROM `ports_cbqos` WHERE `port_id` = ?", array($port['port_id'])))
+  else if (dbExist('ports_cbqos', '`port_id` = ?', array($port['port_id'])))
   {
     $port['tags'] .= '<a href="' . generate_port_url($port, array('view' => 'cbqos')) . '"><span class="label label-info">CBQoS</span></a>';
   }
@@ -352,7 +373,8 @@ function generate_port_row($port, $vars = array())
       $port['tags'] .= '<a href="' . generate_port_url($port, array('view' => 'macaccounting')) . '"><span class="label label-info">MAC</span></a>';
     }
   }
-  else if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?", array($port['port_id'])))
+  //else if (dbFetchCell("SELECT COUNT(*) FROM `mac_accounting` WHERE `port_id` = ?", array($port['port_id'])))
+  else if (dbExist('mac_accounting', '`port_id` = ?', array($port['port_id'])))
   {
     $port['tags'] .= '<a href="' . generate_port_url($port, array('view' => 'macaccounting')) . '"><span class="label label-info">MAC</span></a>';
   }
@@ -625,15 +647,22 @@ function generate_port_row($port, $vars = array())
       {
         foreach (dbFetchRows('SELECT * FROM `neighbours` WHERE `port_id` = ?', array($port['port_id'])) as $neighbour)
         {
-          // print_r($link);
-          if ($neighbour['remote_port_id']) {
-            $int_links[$neighbour['remote_port_id']] = $neighbour['remote_port_id'];
-            $int_links_phys[$neighbour['remote_port_id']] = $neighbour['protocol'];
+          // print_r($neighbour);
+          if ($neighbour['remote_port_id'])
+          {
+            // Do not show some "non-physical" interfaces links,
+            // see: https://jira.observium.org/browse/OBS-2979
+            $remote_port = get_port_by_id_cache($neighbour['remote_port_id']);
+            if (!in_array($remote_port['ifType'], ['propVirtual', 'ieee8023adLag']))
+            {
+              $int_links[$neighbour['remote_port_id']] = $neighbour['remote_port_id'];
+              $int_links_phys[$neighbour['remote_port_id']] = $neighbour['protocol'];
+            }
           } else {
             $int_links_unknown[] = $neighbour;
           }
         }
-      } else {  }
+      } // else {  }
 
       // Populate links array for devices which share an IPv4 subnet
       if (!isset($cache['ports_option']['ipv4_addresses']) || in_array($port['port_id'], $cache['ports_option']['ipv4_addresses']))

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -211,7 +211,7 @@ register_html_resource('js', 'observium-entities.js');
     {
       $_SESSION['origusername'] = $_SESSION['username'];
       $_SESSION['username'] = $user_data['username'];
-      header('Location: '.$config['base_url']);
+      redirect_to_url($config['base_url']);
       dbInsert(array('user' => $_SESSION['origusername'], 'address' => $_SERVER["REMOTE_ADDR"], 'result' => 'Became ' . $_SESSION['username']), 'authlog');
 
       include($config['html_dir']."/includes/authenticate.inc.php");
@@ -233,7 +233,8 @@ register_html_resource('js', 'observium-entities.js');
         }
 
         $where = '`user_id` = ? AND `entity_type` = ?' . generate_query_values($vars['entity_id'], 'entity_id');
-        if (@dbFetchCell("SELECT COUNT(*) FROM `entity_permissions` WHERE " . $where, array($vars['user_id'], $vars['entity_type'])))
+        //if (@dbFetchCell("SELECT COUNT(*) FROM `entity_permissions` WHERE " . $where, array($vars['user_id'], $vars['entity_type'])))
+        if (dbExist('entity_permissions', $where, array($vars['user_id'], $vars['entity_type'])))
         {
           dbDelete('entity_permissions', $where, array($vars['user_id'], $vars['entity_type']));
         }
@@ -257,7 +258,8 @@ register_html_resource('js', 'observium-entities.js');
         {
           if (get_entity_by_id_cache($vars['entity_type'], $entry)) // Skip not exist entities
           {
-            if (!dbFetchCell("SELECT COUNT(*) FROM `entity_permissions` WHERE `user_id` = ? AND `entity_type` = ? AND `entity_id` = ?", array($vars['user_id'], $vars['entity_type'], $entry)))
+            //if (!dbFetchCell("SELECT COUNT(*) FROM `entity_permissions` WHERE `user_id` = ? AND `entity_type` = ? AND `entity_id` = ?", array($vars['user_id'], $vars['entity_type'], $entry)))
+            if (!dbExist('entity_permissions', '`user_id` = ? AND `entity_type` = ? AND `entity_id` = ?', array($vars['user_id'], $vars['entity_type'], $entry)))
             {
               dbInsert(array('entity_id' => $entry, 'entity_type' => $vars['entity_type'], 'user_id' => $vars['user_id']), 'entity_permissions');
             }
@@ -378,7 +380,8 @@ register_html_resource('js', 'observium-entities.js');
                                         'placeholder' => TRUE,
                                         'value'       => $user_data['descr']);
       $form['row'][5]['new_can_modify_passwd'] = array(
-                                        'type'        => 'checkbox',
+                                        'type'        => 'toggle',
+                                        'view'        => 'toggle',
                                         'fieldset'    => 'body',
                                         'placeholder' => 'Allow the user to change his password',
                                         'value'       => $user_data['can_modify_passwd']);

@@ -1,4 +1,16 @@
 <?php
+
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage graphs
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
+ *
+ */
+
 /*
   DS:shmemfragments:GAUGE:600:0:125000000000 \
   DS:shmemfreesize:GAUGE:600:0:125000000000 \
@@ -91,6 +103,6 @@ if (is_file($rrd_filename))
   $rrd_options .= " LINE1.25:".$iter."size#" . $colour . ":'$descr'";
   $rrd_options .= " GPRINT:".$iter."size:LAST:%6.2lf%sB";
   $rrd_options .= "\\\l";
-} else { echo("file missing: $file");  }
+} else { echo("file missing: $rrd_filename");  }
 
 // EOF

@@ -1,13 +1,14 @@
 -- =================================================================
--- Copyright (C) 2006 by HUAWEI-3Com TECHNOLOGIES. All rights reserved
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: RPR private MIB. Description of entity extend properties for
 -- IEEE-802DOT17-RPR-MIB
 -- Reference: IEEE-802DOT17-RPR-MIB
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --  V1.0 created by qinxia
 --  V1.1 modified by hexuefei,Add the RPR packet drop counters table.
+--  V1.2 2015-04-30 Bug fixed by songhao
 -- =================================================================
 H3C-RPR-MIB DEFINITIONS ::= BEGIN
 
@@ -20,18 +21,24 @@ H3C-RPR-MIB DEFINITIONS ::= BEGIN
             FROM IF-MIB
         SnmpAdminString
             FROM SNMP-FRAMEWORK-MIB
-        RowStatus, TruthValue
-            FROM SNMPv2-TC;
+        RowStatus, TruthValue, MacAddress, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Gauge32, Counter64, Integer32
+            FROM SNMPv2-SMI
+        InetAddress
+            FROM INET-ADDRESS-MIB;
 
         h3cRpr MODULE-IDENTITY
             LAST-UPDATED "200503161000Z"  -- March 16, 2005 at 10:18:41 GMT
             ORGANIZATION
-                "Huawei 3Com Technologies Co., Ltd."
+                "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-                "Platform Team Huawei 3Com Technologies Co., Ltd.
-                 Hai-Dian District Beijing P.R. China
-                 http://www.huawei-3com.com
-                 Zip:100085"
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
             DESCRIPTION
                 "This MIB manages RPR(Resilient Packet Ring)interfaces by
                  providing an operational table which controls parameters
@@ -1371,7 +1378,7 @@ H3C-RPR-MIB DEFINITIONS ::= BEGIN
 
 
     h3cRprDuplicateMacAddress NOTIFICATION-TYPE
-        OBJECTS { h3cRprTrapIfIndex, h3cRprTrapTopoMacAddress }
+        OBJECTS { h3cRprTrapIfIndex, h3cRprTrapTopoMacAddress}
         STATUS  current
         DESCRIPTION
             "The duplicate MAC address trap indicates that the mac address
@@ -1416,7 +1423,7 @@ H3C-RPR-MIB DEFINITIONS ::= BEGIN
         ::= { h3cRprTrap 9 }
 
     h3cRprExceedMaxReservRate NOTIFICATION-TYPE
-        OBJECTS { h3cRprTrapIfIndex,h3cRprTrapRinglet }
+        OBJECTS { h3cRprTrapIfIndex, h3cRprTrapRinglet }
         STATUS  current
         DESCRIPTION
             "The exceeded max reserved rate trap indicates that the rate
@@ -1434,7 +1441,7 @@ H3C-RPR-MIB DEFINITIONS ::= BEGIN
         ::= { h3cRprTrap 11 }
 
     h3cRprMiscabling NOTIFICATION-TYPE
-        OBJECTS { h3cRprTrapIfIndex,h3cRprTrapRinglet }
+        OBJECTS { h3cRprTrapIfIndex, h3cRprTrapRinglet }
         STATUS  current
         DESCRIPTION
             "The miscabling trap indicates that the miscabling event occurred."
@@ -1443,7 +1450,7 @@ H3C-RPR-MIB DEFINITIONS ::= BEGIN
         ::= { h3cRprTrap 12 }
 
     h3cRprBackPressure NOTIFICATION-TYPE
-        OBJECTS { h3cRprTrapIfIndex, h3cRprTrapRinglet, h3cRprPriority2ClassMap }
+        OBJECTS { h3cRprTrapIfIndex, h3cRprTrapRinglet, h3cRprPriority2ClassMap}
         STATUS  current
         DESCRIPTION
             "The back pressure trap indicates that the backpressure is generated

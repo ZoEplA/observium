@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -68,7 +68,7 @@ foreach (dbFetchRows('SELECT E.`device_id` AS `device_id`, `hostname`, `entPhysi
   }
 
 $form = array('type'  => 'rows',
-              'space' => '5px',
+              'space' => '10px',
               'submit_by_key' => TRUE,
               'url'   => generate_url($vars));
 
@@ -112,11 +112,57 @@ $form['row'][0]['serial']  = array(
 $form['row'][0]['description']  = array(
                                 'type'        => 'text',
                                 'name'        => 'Description',
-                                'grid'        => 3,
+                                'grid'        => 2,
                                 'width'       => '100%',
                                 'placeholder' => TRUE,
                                 'submit_by_key' => TRUE,
                                 'value'       => escape_html($vars['description']));
+/*
+$form['row'][0]['deleted']  = array(
+                                  'type'        => 'toggle',
+                                  'name'        => 'Removed',
+                                  'grid'        => 1,
+                                  'view'        => 'toggle',
+                                  'palette'     => 'red',
+                                  'size'        => 'large',
+                                  //'width'       => '100%',
+                                  //'label'       => 'Removed',
+                                  //'submit_by_key' => TRUE,
+                                  'value'       => $vars['deleted']);
+*/
+$form['row'][0]['deleted']  = array(
+                                  //'type'          => 'switch',
+                                  'type'          => 'switch-ng',
+                                  //'on-text'       => 'Removed',
+                                  'on-color'      => 'danger',
+                                  'on-icon'       => 'icon-trash',
+                                  //'off-text'      => 'Actual',
+                                  'off-icon'      => 'icon-sitemap',
+                                  'grid'          => 1,
+                                  //'size'          => 'large',
+                                  //'height'        => '15px',
+                                  'title'         => 'Show/Hide Removed',
+                                  //'placeholder'   => 'Removed',
+                                  //'readonly'      => TRUE,
+                                  //'disabled'      => TRUE,
+                                  //'submit_by_key' => TRUE,
+                                  'value'         => $vars['deleted']);
+/*
+$form['row'][0]['deleted']  = array(
+                                  //'type'        => 'switch',
+                                  'type'        => 'toggle',
+                                  //'on-text'     => 'Removed',
+                                  //'on-color'    => 'danger',
+                                  'on-icon'     => 'icon-sitemap',
+                                  //'off-text'    => 'Actual',
+                                  'off-icon'    => 'icon-trash',
+                                  'grid'        => 1,
+                                  //'size'        => 'mini',
+                                  //'height'      => '15px',
+                                  //'placeholder'       => 'Removed',
+                                  //'submit_by_key' => TRUE,
+                                  'value'       => $vars['deleted']);
+*/
 // search button
 $form['row'][0]['search']   = array(
                                 'type'        => 'submit',

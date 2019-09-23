@@ -7,12 +7,12 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $oids = snmpwalk_cache_multi_oid($device, 'brzaccVLNewAdbUnitName', array(), 'ALVARION-DOT11-WLAN-MIB', NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
-/// NOTE. New table preffer, because old use weird indexes
+/// NOTE. New table prefer, because old use weird indexes
 if ($oids)
 {
   //ALVARION-DOT11-WLAN-MIB::brzaccVLNewAdbUnitName.0.16.231.20.145.216 = "Kern Waste Tehachapi"
@@ -30,7 +30,8 @@ if ($oids)
     {
       $oid   = ".1.3.6.1.4.1.12394.1.1.11.5.1.3.1.26.$index";
       $value = $entry['brzaccVLNewAdbSNR'];
-      discover_sensor($valid['sensor'], 'snr', $device, $oid, $index, 'alvarion-dot11', "$descr (SNR)", 1, $value);
+      discover_sensor_ng($device,'snr', $mib, 'brzaccVLNewAdbSNR', $oid, $index, NULL, "$descr (SNR)", 1, $value, ['rename_rrd' => "alvarion-dot11.$index"]);
+
     }
 
     // Received signal strength indication
@@ -38,7 +39,7 @@ if ($oids)
     {
       $oid   = ".1.3.6.1.4.1.12394.1.1.11.5.1.3.1.54.$index";
       $value = $entry['brzaccVLNewAdbRSSI'];
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'alvarion-dot11', "$descr (RSSI)", 1, $value);
+      discover_sensor_ng($device,'dbm', $mib, 'brzaccVLNewAdbRSSI', $oid, $index, NULL, "$descr (RSSI)", 1, $value, ['rename_rrd' => "alvarion-dot11.$index"]);
     }
   }
 } else {
@@ -58,7 +59,7 @@ if ($oids)
     {
       $oid   = ".1.3.6.1.4.1.12394.1.1.11.5.1.2.1.5.$index";
       $value = $entry['brzaccVLAdbSNR'];
-      discover_sensor($valid['sensor'], 'snr', $device, $oid, $index, 'alvarion-dot11', "$descr (SNR)", 1, $value);
+      discover_sensor_ng($device,'snr', $mib, 'brzaccVLAdbSNR', $oid, $index, NULL, "$descr (SNR)", 1, $value, ['rename_rrd' => "alvarion-dot11.$index"]);
     }
 
     // Received signal strength indication
@@ -66,7 +67,8 @@ if ($oids)
     {
       $oid   = ".1.3.6.1.4.1.12394.1.1.11.5.1.2.1.46.$index";
       $value = $entry['brzaccVLAdbRSSI'];
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'alvarion-dot11', "$descr (RSSI)", 1, $value);
+      discover_sensor_ng($device,'dbm', $mib, 'brzaccVLAdbRSSI', $oid, $index, NULL, "$descr (RSSI)", 1, $value, ['rename_rrd' => "alvarion-dot11.$index"]);
+
     }
   }
 }
@@ -77,7 +79,8 @@ $average_snr = snmp_get($device, 'brzaccVLAverageReceiveSNR.0', '-OUqnv', 'ALVAR
 if (is_numeric($average_snr))
 {
   $oid = '.1.3.6.1.4.1.12394.1.1.11.1.0';
-  discover_sensor($valid['sensor'], 'snr', $device, $oid, 0, 'alvarion-dot11-average', 'Average SNR', 1, $average_snr);
+  discover_sensor_ng($device,'snr', $mib, 'brzaccVLAverageReceiveSNR', $oid, 0, NULL, "Average SNR", 1, $value, ['rename_rrd' => "alvarion-dot11-average.0"]);
+
 }
 
 //ALVARION-DOT11-WLAN-TST-MIB::brzLighteAvgRssiRecieved.0 = INTEGER: 0
@@ -85,7 +88,7 @@ $average_rssi = snmp_get($device, 'brzLighteAvgRssiRecieved.0', '-OUqnv', 'ALVAR
 if (is_numeric($average_rssi) && $average_rssi)
 {
   $oid = '.1.3.6.1.4.1.12394.3.2.3.2.1.0';
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid, 0, 'alvarion-dot11-average', 'Average RSSI', 1, $average_rssi);
+  discover_sensor_ng($device,'dbm', $mib, 'brzLighteAvgRssiRecieved', $oid, 0, NULL, "Average RSSI", 1, $value, ['rename_rrd' => "alvarion-dot11-average.0"]);
 }
 
 unset($oids, $oid, $value, $average_snr, $average_rssi, $descr);

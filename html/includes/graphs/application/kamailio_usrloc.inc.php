@@ -1,4 +1,16 @@
 <?php
+
+/**
+ * Observium
+ *
+ *   This file is part of Observium.
+ *
+ * @package    observium
+ * @subpackage graphs
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
+ *
+ */
+
 /*
   DS:usrlocloccontacts:GAUGE:600:0:125000000000 \
   DS:usrloclocusers:GAUGE:600:0:125000000000 \
@@ -24,7 +36,7 @@ if (is_file($rrd_filename))
     $rrd_list[$i]['ds'] = $ds;
     $i++;
   }
-} else { echo("file missing: $file");  }
+} else { echo("file missing: $rrd_filename");  }
 
 $colours   = "mixed";
 

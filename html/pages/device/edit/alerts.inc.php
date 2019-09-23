@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -78,13 +78,16 @@ $disable_notify = get_dev_attrib($device,'disable_notify');
                                       'min'         => 'current',
                                       'value'       => ($device['ignore_until'] ? $device['ignore_until'] : ''));
       $form['row'][1]['ignore_until_enable'] = array(
-                                      'type'        => 'switch',
+                                      'type'        => 'toggle',
+                                      'size'        => 'large',
                                       'readonly'    => $readonly,
                                       'onchange'    => "toggleAttrib('disabled', 'ignore_until')",
                                       'value'       => !empty($device['ignore_until']));
 
       $form['row'][2]['override_sysContact'] = array(
-                                      'type'        => 'checkbox',
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'yellow',
                                       'name'        => 'Override sysContact',
                                       //'fieldset'    => 'edit',
                                       'placeholder' => 'Use custom contact below',
@@ -101,10 +104,12 @@ $disable_notify = get_dev_attrib($device,'disable_notify');
                                       'disabled'    => !$override_sysContact_bool,
                                       'value'       => escape_html($override_sysContact_string));
       $form['row'][5]['disable_notify'] = array(
-                                      'type'        => 'checkbox',
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'red',
                                       'name'        => 'Disable alerts',
                                       //'fieldset'    => 'edit',
-                                      'placeholder' => 'Don\'t send alert mails (<i>but write to eventlog</i>)',
+                                      'placeholder' => 'Don\'t send alert mails (<em>but write to eventlog</em>)',
                                       'readonly'    => $readonly,
                                       'value'       => $disable_notify);
       $form['row'][7]['submit']    = array(

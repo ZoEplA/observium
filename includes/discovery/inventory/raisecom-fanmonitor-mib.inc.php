@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -29,7 +29,7 @@ foreach (explode(';', $serials) as $fan_card_serial)
       'entPhysicalParentRelPos' => -1,
       'entPhysicalMfgName'      => 'Raisecom'
     );
-    discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], $mib);
+    discover_inventory($device, $system_index, $inventory[$system_index], $mib);
   }
   $system_index++;
   $i++;

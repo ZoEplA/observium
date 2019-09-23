@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage db
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -175,7 +175,11 @@ function dbQuery($sql, $parameters = array(), $print_query = FALSE)
     if ($result === FALSE && (error_reporting() & 1))
     {
       $error_msg = 'Error in query: (' . dbError() . ') ' . dbErrorNo();
-      $debug_msg .= PHP_EOL . 'ERROR[%r'.$error_msg.'%n]';
+      $debug_msg .= PHP_EOL . 'SQL ERROR[%r'.$error_msg.'%n]';
+    }
+    if ($warnings = dbWarnings())
+    {
+      $debug_msg .= PHP_EOL . "SQL WARNINGS[\n %m" . implode("%n\n %m", $warnings) . "%n\n]";
     }
 
     if (is_cli())
@@ -296,10 +300,10 @@ function dbInsert($data, $table, $print_query = FALSE)
   return $id;
 }
 
-/*
+/**
  * Passed an array and a table name, it attempts to insert the data into the table.
  * Check for boolean false to determine whether insert failed
- * */
+ */
 function dbInsertMulti($data, $table, $columns = NULL, $print_query = FALSE)
 {
   global $fullSql;
@@ -400,6 +404,8 @@ function dbUpdate($data, $table, $where = NULL, $parameters = array(), $print_qu
 
   if ($where)
   {
+    // Remove WHERE clause at the beginning and ; at end
+    $where = preg_replace(array('/^\s*WHERE\s+/i', '/\s*;\s*$/'), '', $where);
     $sql .= ' WHERE ' . $where;
     $data = array_merge($data, $parameters);
   }
@@ -418,11 +424,117 @@ function dbUpdate($data, $table, $where = NULL, $parameters = array(), $print_qu
   return $return;
 }
 
+/**
+ * Passed an array and a table name, it attempts to update the data in the table.
+ * Check for boolean false to determine whether update failed
+ * This is really INSERT with ODKU update
+ * For key really better use only ID field!
+ * https://stackoverflow.com/questions/25674737/mysql-update-multiple-rows-with-different-values-in-one-query/25674827
+ */
+function dbUpdateMulti($data, $table, $columns = NULL, $print_query = FALSE)
+{
+  global $fullSql;
+
+  // the following block swaps the parameters if they were given in the wrong order.
+  // it allows the method to work for those that would rather it (or expect it to)
+  // follow closer with SQL convention:
+  // insert into the TABLE this DATA
+  if (is_string($data) && is_array($table))
+  {
+    $tmp = $data;
+    $data = $table;
+    $table = $tmp;
+
+    print_debug('Parameters passed to dbUpdateMulti() were in reverse order.');
+  }
+
+  // Detect if data is multiarray
+  $first_data = reset($data);
+  if (!is_array($first_data))
+  {
+    $first_data = $data;
+    $data = array($data);
+  }
+
+  // Columns, if not passed use keys from first element
+  $all_columns = array_keys($first_data); // All columns data and UNIQUE indexes
+  if (!empty($columns))
+  {
+    // Update only passed columns from param
+    $update_columns = $columns;
+  } else {
+    // Fallbak for all columns (also indexes),
+    // this is normal, UNIQUE indexes not updated anyway
+    $update_columns = $all_columns;
+  }
+
+  // Columns which will updated
+  foreach ($update_columns as $key)
+  {
+    $update_keys[] = '`'.$key.'`=VALUES(`'.$key.'`)';
+  }
+
+  $values = array();
+  // Multiarray data
+  foreach ($data as $entry)
+  {
+    $entry = dbPrepareData($entry); // Escape data
+
+    // Keep same columns order as in first entry
+    $entries = array();
+    foreach ($all_columns as $column)
+    {
+      $entries[$column] = $entry[$column];
+    }
+
+    $values[] = '(' . implode(',', $entries) . ')';
+  }
+
+  $sql = 'INSERT INTO `' . $table . '` (`' . implode('`,`', $all_columns) . '`)  VALUES ' . implode(',', $values);
+
+  // This is only way for update multiple rows at once
+  $sql .= ' ON DUPLICATE KEY UPDATE ' . implode(',', $update_keys);
+ 
+  $time_start = microtime(true);
+  //dbBeginTransaction();
+  if (dbQuery($sql, NULL, $print_query))
+  {
+    $return = dbAffectedRows(); // This value should be divided into two for innodb
+  } else {
+    $return = FALSE;
+  }
+
+  $time_end = microtime(true);
+  $GLOBALS['db_stats']['update_sec'] += number_format($time_end - $time_start, 8);
+  $GLOBALS['db_stats']['update']++;
+
+  return $return;
+}
+
+function dbExist($table, $where = NULL, $parameters = array(), $print_query = FALSE)
+{
+  $sql = 'SELECT EXISTS (SELECT 1 FROM `' . $table . '`';
+  if ($where)
+  {
+    // Remove WHERE clause at the beginning and ; at end
+    $where = preg_replace(array('/^\s*WHERE\s+/i', '/\s*;\s*$/'), '', $where);
+    $sql .= ' WHERE ' . $where;
+  }
+  $sql .= ')';
+
+  $return = dbFetchCell($sql, $parameters, $print_query);
+  //print_vars($return);
+
+  return (bool)$return;
+}
+
 function dbDelete($table, $where = NULL, $parameters = array(), $print_query = FALSE)
 {
   $sql = 'DELETE FROM `' . $table.'`';
   if ($where)
   {
+    // Remove WHERE clause at the beginning and ; at end
+    $where = preg_replace(array('/^\s*WHERE\s+/i', '/\s*;\s*$/'), '', $where);
     $sql .= ' WHERE ' . $where;
   }
 
@@ -572,10 +684,11 @@ function dbPlaceHolders($values)
  * This function generates WHERE condition string from array with values
  * NOTE, value should be exploded by comma before use generate_query_values(), for example in get_vars()
  *
- * @param mixed $value
- * @param string $column
- * @param string $condition
- * @return string
+ * @param mixed  $value       Values
+ * @param string $column      Table column name
+ * @param string $condition   Compare condition, known: =, !=, NOT, NULL, NOT NULL, LIKE (and variants %LIKE%, %LIKE, LIKE%)
+ * @param bool   $leading_and Add leading AND to result query
+ * @return string             Generated query
  */
 function generate_query_values($value, $column, $condition = NULL, $leading_and = TRUE)
 {
@@ -583,7 +696,7 @@ function generate_query_values($value, $column, $condition = NULL, $leading_and 
   if (!is_array($value)) { $value = array((string)$value); }
   $column = '`' . str_replace(array('`', '.'), array('', '`.`'), $column) . '`'; // I.column -> `I`.`column`
   $condition = ($condition === TRUE ? 'LIKE' : strtoupper(trim($condition)));
-  if (strpos($condition, 'NOT') === 0 || strpos($condition, '!=') === 0)
+  if (str_contains($condition, ['NOT', '!=']))
   {
     $negative  = TRUE;
     $condition = str_replace(array('NOT', '!=', ' '), '', $condition);
@@ -633,6 +746,17 @@ function generate_query_values($value, $column, $condition = NULL, $leading_and 
         // Empty values
         $where  = ' AND ';
         $where .= $negative ? '1' : '0';
+      }
+      break;
+    // Use NULL condition
+    case 'NULL':
+      $value = array_shift($value);
+      $value = ($negative) ? !$value : (bool)$value; // When required negative null condition (NOT NULL), reverse $value sign
+      //r($value);
+      if ($value) {
+        $where = ' AND ' . $column . ' IS NULL';
+      } else {
+        $where = ' AND ' . $column . ' IS NOT NULL';
       }
       break;
     // Use IN condition

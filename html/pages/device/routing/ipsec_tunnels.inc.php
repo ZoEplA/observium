@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -123,10 +123,10 @@ foreach (dbFetchRows($query, array($device['device_id'], '')) as $tunnel)
   <td>' . generate_popup_link('ip', $tunnel['peer_addr']) . '</td>
   <td>' . $tunnel['tunnel_name'] . '</td>
   <td><span class="text-nowrap">' . $tunnel_endpoint . '</span></td>
-  <td><span>' . generate_tooltip_link(NULL, formatUptime($tunnel['tunnel_lifetime'], 'short-3'), $tunnel['tunnel_lifetime'] . ' sec') . '</span></td>
+  <td><span>' . generate_tooltip_link(NULL, format_uptime($tunnel['tunnel_lifetime'], 'short-3'), $tunnel['tunnel_lifetime'] . ' sec') . '</span></td>
   <td><span class="label '.$tunnel['ike_label_class'].'">' . $tunnel['tunnel_ike_alive'] . '</span></td>
-  <td><span>' . generate_tooltip_link(NULL, formatUptime($tunnel['tunnel_ike_lifetime'], 'short-3'), $tunnel['tunnel_ike_lifetime'] . ' sec') . '</span></td>
-  <td><span>' . generate_tooltip_link(NULL, formatUptime($timediff, "short-3"). ' ago', format_unixtime($tunnel['tunnel_added'])) . '</span></td>
+  <td><span>' . generate_tooltip_link(NULL, format_uptime($tunnel['tunnel_ike_lifetime'], 'short-3'), $tunnel['tunnel_ike_lifetime'] . ' sec') . '</span></td>
+  <td><span>' . generate_tooltip_link(NULL, format_uptime($timediff, "short-3"). ' ago', format_unixtime($tunnel['tunnel_added'])) . '</span></td>
   </tr>');
 
   switch ($vars['graph'])

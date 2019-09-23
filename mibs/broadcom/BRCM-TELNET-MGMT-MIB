@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2006 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -48,7 +48,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-MGMT-MIB;
                 
 telnetMgmt MODULE-IDENTITY
-    LAST-UPDATED "200602020000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -64,21 +64,31 @@ telnetMgmt MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom telnet management MIB"
-    REVISION      "200303060000Z"
+        "Broadcom proprietary MIB for runtime management and configuration
+         of objects related to telnet."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
-    REVISION      "200506080000Z"
-    DESCRIPTION
-            "Deprecated telnetSessionIp in favor of telnetSessionAddressType
-             and telnetSessionAddress objects which are IPv6 friendly.  Also
-             added telnetHackerTable."
-    REVISION      "200602020000Z"
-    DESCRIPTION
-            "Added object telnetSessionInactivityTimeout."
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected.
+         - Changed access of objects telnetHackerAddressType and 
+           telnetHackerAddress from not-accessible to accessible-for-notify
+           so that they may legally be included in the object list for
+           the telnetHackerTrap notification."
     REVISION      "200609290000Z"
     DESCRIPTION
-            "Added object telnetHackerInactivityTimeout."
+        "Added object telnetHackerInactivityTimeout."
+    REVISION      "200602020000Z"
+    DESCRIPTION
+        "Added object telnetSessionInactivityTimeout."
+    REVISION      "200506080000Z"
+    DESCRIPTION
+        "Deprecated telnetSessionIp in favor of telnetSessionAddressType
+         and telnetSessionAddress objects which are IPv6 friendly.  Also
+         added telnetHackerTable."        
+    REVISION      "200303060000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataMgmtBase 1 }
     
 telnetIpStackInterfaces OBJECT-TYPE
@@ -207,7 +217,7 @@ TelnetHackerEntry ::=
 
 telnetHackerAddressType OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "The type of internet address used for telnetHackerAddress."
@@ -215,7 +225,7 @@ telnetHackerAddressType OBJECT-TYPE
     
 telnetHackerAddress OBJECT-TYPE
     SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "The address of an device which has unsuccessfully attempted to log in 

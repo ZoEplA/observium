@@ -1,8 +1,8 @@
 -- =======================================================================
--- Copyright (C) 2002-2004 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002-2004 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description:user-interfaces management mib
--- Reference:huawei enterprise mib
+-- Description: User-interfaces management mib
+-- Reference:
 -- Version: V1.6
 -- History:
 --  V1.0 Initial version 2002-12-20
@@ -38,13 +38,13 @@ IMPORTS
 h3cUIMgt MODULE-IDENTITY
     LAST-UPDATED "200404081405Z"            -- April 08, 2004 at 14:05 GMT
     ORGANIZATION
-        "huawei-3com Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Comware Team Huawei-3com Technologies co.,Ltd.
-        Shang-Di Information Industry Base,
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
-        http://www.huawei-3com.com
-        Zip:100085"
+        http://www.h3c.com
+        Zip:100085
+        "
     DESCRIPTION
         "User interfaces management MIB"
     ::= { h3cCommon 2 }

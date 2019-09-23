@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -15,6 +15,9 @@ global $agent_sensors;
 
 if ($agent_data['hddtemp'] != '|')
 {
+
+  $agent_data['hddtemp'] = str_replace("\x10\x80", '', $agent_data['hddtemp']);
+
   $disks = explode('||',trim($agent_data['hddtemp'],'|'));
 
   if (count($disks))
@@ -27,7 +30,7 @@ if ($agent_data['hddtemp'] != '|')
       # Device name itself is just as useless as the actual position however.
       # In case of change in index, please provide an rrd-rename upgrade-script.
       ++$diskcount;
-      discover_sensor($valid['sensor'], 'temperature', $device, '', $diskcount, 'hddtemp', "$blockdevice: $descr", 1, $value, array(), 'agent');
+      discover_sensor('temperature', $device, '', $diskcount, 'hddtemp', "$blockdevice: $descr", 1, $value, array(), 'agent');
       $agent_sensors['temperature']['hddtemp'][$diskcount] = array('description' => "$blockdevice: $descr", 'current' => $value, 'index' => $diskcount);
     }
     echo "\n";

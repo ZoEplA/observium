@@ -4,11 +4,11 @@
 -- Tuesday, June 03, 2014 at 14:55:30
 --
 --  ==================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Hierarchy Quality Of Service MIB
 -- Reference:
--- Version: V2.33
+-- Version: V2.45
 -- History:
 -- <author>,  <date>,  <contents>
 -- CaiLi,LiuJun   2006-05-13
@@ -39,7 +39,7 @@
 	
 
 		hwHQOS MODULE-IDENTITY 
-                                                     LAST-UPDATED "201610121400Z"        -- August 17, 2016 at 20:00:30
+                                                     LAST-UPDATED "201807091002Z"        -- July 09, 2018 at 10:02:00
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -53,6 +53,42 @@
 			DESCRIPTION 
 				"mib of Hierarchy Quality Of Service module
 				the huawei-hqos-mib is only defined about statistic information now. "
+    REVISION "201807091002Z"
+      DESCRIPTION
+     "MOD hwhqosUserQueueStatisticsSlotNumber and hwhqosUserQueueStatisticsExtSlotNumber"  
+    REVISION "201807031443Z"
+      DESCRIPTION
+     "ADD hwhqosUserQueueStatisticsExtTable"  
+     REVISION "201803212035Z"
+      DESCRIPTION
+     "MOD hwhqosProfileUserQueueStatisticsPassBytesRate"  
+      REVISION "201801291900Z"
+      DESCRIPTION
+     "ADD ALARM NODE"         
+      REVISION "201801151900Z"
+      DESCRIPTION
+     "MOD hwhqosPortQueueArithmetic" 
+      REVISION "201711101900Z"
+      DESCRIPTION
+     "MOD hwhqosProfileUserQueueStatisticsTable" 
+      REVISION "201710161900Z"
+      DESCRIPTION
+     "ADD ALARM NODE" 
+      REVISION "201709201900Z"
+      DESCRIPTION
+     "ADD ALARM NODE" 
+      REVISION "201706171900Z"
+      DESCRIPTION
+     "ADD ALARM NODE"     
+     REVISION "201704251500Z"
+      DESCRIPTION
+     "ADD ALARM NODE"
+      REVISION "201703211500Z"
+      DESCRIPTION
+     "ADD hwhqosPortQueueTempName"
+     REVISION "201702231600Z"
+      DESCRIPTION
+     "MOD hwhqosGroupName and hwhqosProfileDescription "
      REVISION "201610121400Z"
       DESCRIPTION
      "MOD hwHQoSPwifScheduleTreeCreateFailAlarm"
@@ -71,12 +107,21 @@
       REVISION "201605231400Z"
       DESCRIPTION
       "MOD hwhqosBandwidthEntry"
+      REVISION"201603021558Z"
+      DESCRIPTION
+      "MOD ALARM NODE"
       REVISION"201602021400Z"
       DESCRIPTION
       "ADD ALARM NODE"     
       REVISION"201511281126Z"
       DESCRIPTION
       "ADD ALARM NODE"     
+      REVISION"201412221558Z"
+      DESCRIPTION
+      "ADD ALARM NODE"
+      REVISION"201408041558Z"
+      DESCRIPTION
+      "ADD ALARM NODE"
       REVISION "201408041558Z"
       DESCRIPTION
       "MOD hwhqosUserQueueShapeAllTrafficEntry"				
@@ -89,13 +134,10 @@
       REVISION "201405061915Z"                -- May 06, 2014 at 19:15:34
       DESCRIPTION
       "DELETE CIR LEAF OF HQOS CONFIG NODE"
-      REVISION "201304241443Z"
-      DESCRIPTION
-      "MOD hwhqosProfileName NODE"
       REVISION "201403251433Z"		-- March 25, 2014 at 14:33 GMT
       DESCRIPTION
       "ADD IF USER QUEUE NODE"
-      REVISION "201311201443Z"
+       REVISION "201311201443Z"
       DESCRIPTION
       "MOD VALUE-RANGE"
       REVISION "201309301443Z"
@@ -107,18 +149,15 @@
       REVISION "201307291443Z"
       DESCRIPTION
       "ADD ALARM TABLE"
+     REVISION "201304241443Z"
+      DESCRIPTION
+      "MOD hwhqosProfileName NODE"
       REVISION "201304101443Z"
       DESCRIPTION
       "ADD ALARM NODE"
-      REVISION"201408041558Z"
-      DESCRIPTION
-      "ADD ALARM NODE"
-      REVISION"201412221558Z"
-      DESCRIPTION
-      "ADD ALARM NODE"
-      REVISION"201603021558Z"
-      DESCRIPTION
-      "MOD ALARM NODE"
+
+
+
 
 
 
@@ -167,7 +206,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Table of Hierarchy QoS's statistic information."
+				"This table is used to display the statistics of user queue."
 			::= { hwhqosStat 1 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.1.1
@@ -227,7 +266,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the index of an interface. The interface can be a physical interface or a logical interface.
+				"This object indicates the interface index.
 				"
 			::= { hwhqosIfStatEntry 1 }
 		
@@ -252,7 +291,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the outer identifier of a user group.
+				"This object indicates the outer user group ID.
 				"
 			::= { hwhqosIfStatEntry 3 }
 		
@@ -272,10 +311,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the queue index of a user. Each user has multiple queues and the index indicates the queues for each user.
-				Each user of the NE40E has eight queues.
-				If this object does not exist, you can set it to 0.
-				                "
+				"This object indicates the queue index."
 			::= { hwhqosIfStatEntry 5 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.1.1.6
@@ -294,7 +330,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the bytes forwarded in the queue. If this object is not supported, fill 0.
+				"This object indicates the number of forwarded queue bytes.
 				"
 			::= { hwhqosIfStatEntry 7 }
 		
@@ -355,7 +391,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the packet forwarding rate in the queue, in pps."
+				"This object indicates the queue packet forwarding rate, in pps."
 			::= { hwhqosIfStatEntry 13 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.1.1.14
@@ -364,7 +400,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte forwarding rate in the queue, in bps."
+				"This object indicates the queue byte forwarding rate, in bps."
 			::= { hwhqosIfStatEntry 14 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.1.1.15
@@ -373,7 +409,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the packet discarding rate in the queue, in pps."
+				"This object indicates the queue packet discarding rate, in pps."
 			::= { hwhqosIfStatEntry 15 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.1.1.16
@@ -382,7 +418,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte discarding rate in the queue, in bps."
+				"This object indicates the queue byte discarding rate, in bps."
 			::= { hwhqosIfStatEntry 16 }
 		
 --                 ATM PVC table
@@ -595,7 +631,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Table of configuration about a port-queue."
+				"This table is used to query the queue on an interface."
 			::= { hwhqosStat 3 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.3.1
@@ -627,7 +663,9 @@
 				hwhqosPortQueuePbsValue
 					Integer32,
 				hwhqosPortQueueRowStatus
-					RowStatus
+					RowStatus,
+				hwhqosPortQueueTempName
+                	                                                                                     OCTET STRING	
 			 }
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.3.1.1
@@ -678,11 +716,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the queue scheduling arithmetic.
-				The value can be any of the following:
-				portqueuePQ(1)
-				portqueueWFQ(2)
-				portqueueLPQ(3)"
+				"This object indicates the queue scheduling mode. The value can be one of the following: portqueuePQ (1), portqueueWFQ (2), and portqueueLPQ (3)."
 			::= { hwhqosPortQueueEntry 11 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.3.1.12
@@ -700,7 +734,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the bandwidth allocated to the queue."
+				"This object indicates the bandwidth allocated to a queue."
 			::= { hwhqosPortQueueEntry 13 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.3.1.14
@@ -718,8 +752,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"This object indicates the name of the Weighted Random Early Detection (WRED) template.
-				The object is a string of 1 to 31 characters."
+				"This object indicates the name of an interface WRED profile."
 			::= { hwhqosPortQueueEntry 15 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.3.1.16
@@ -737,8 +770,18 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"This object indicates the row status."
+				"This object indicates the row status flag."
 			::= { hwhqosPortQueueEntry 51 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.3.1.52
+                                          hwhqosPortQueueTempName OBJECT-TYPE
+                                                                SYNTAX OCTET STRING (SIZE (1..31))
+                                                                MAX-ACCESS read-create
+                                                                STATUS current
+                                                                DESCRIPTION
+                                                                                      "This object indicates the name of the port queue template.
+                                                                                      The object is a string of 1 to 31 characters."
+                                                               ::= { hwhqosPortQueueEntry 52 }	
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.4
 		hwhqosWredTable OBJECT-TYPE
@@ -1561,7 +1604,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileTable "
+				" This object indicates the table of QoS profile."
 			::= { hwhqosStat 10 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.10.1
@@ -1570,7 +1613,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileEntry "
+				" This object indicates the entry of QoS profile. "
 			INDEX { hwhqosProfileName }
 			::= { hwhqosProfileTable 1 }
 		
@@ -1596,11 +1639,11 @@
 -- END: mod by l00248629, 2014/03/21
 -- 1.3.6.1.4.1.2011.5.25.132.1.10.1.2
 		hwhqosProfileDescription OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (1..63))
+			SYNTAX OCTET STRING (SIZE (0..63))
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileDescription "
+				" The value of this object identifies the description of a QoS profile."
 			::= { hwhqosProfileEntry 2 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.10.1.50
@@ -1987,7 +2030,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileApplyTable "
+				" This object indicates the table of QoS profile applied."
 			::= { hwhqosStat 14 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.14.1
@@ -1996,7 +2039,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileApplyEntry "
+				" This object indicates the entry of QoS profile applied.  "
 			INDEX { hwhqosProfileInterfaceIndex, hwhqosProfileApplyDirection, hwhqosProfileApplyPevid, hwhqosProfileApplyCevid }
 			::= { hwhqosProfileApplyTable 1 }
 		
@@ -2090,7 +2133,7 @@
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.14.1.7
 		hwhqosGroupName OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (1..31))
+			SYNTAX OCTET STRING (SIZE (0..31))
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
@@ -3226,7 +3269,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileUserQueueStatisticsTable "
+				" This table is used to query the statistics on the user queue of a QoS profile on an interface. "
 			::= { hwhqosStat 29 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1
@@ -3277,7 +3320,23 @@
 				hwhqosProfileUserQueueStatisticsConfiguredCir
 					Unsigned32,     
 				hwhqosProfileUserQueueStatisticsConfiguredPir
-					Unsigned32
+					Unsigned32,
+				hwhqosProfileUserQueueStatisticsPassPacketsRate30s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsPassBitsRate30s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsDropPacketsRate30s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsDropBitsRate30s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsPassPacketsRate300s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsPassBitsRate300s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsDropPacketsRate300s
+					Counter64,
+				hwhqosProfileUserQueueStatisticsDropBitsRate300s
+					Counter64
 			 }
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.1
@@ -3299,7 +3358,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the direction where a QoS profile is applied."
+				"This object indicates the traffic direction to which the QoS profile is applied."
 			::= { hwhqosProfileUserQueueStatisticsEntry 2 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.3
@@ -3317,7 +3376,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the CE VID (inner tag value) or the VLAN ID of a QoS profile."
+				"This object indicates the CE-VID (inner tag value) or VLAN ID to which the QoS profile applies."
 			::= { hwhqosProfileUserQueueStatisticsEntry 4 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.5
@@ -3346,7 +3405,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the priority of the user queue whose statistics are queried."
+				"This object indicates the priority of a flow queue."
 			::= { hwhqosProfileUserQueueStatisticsEntry 6 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.7
@@ -3375,7 +3434,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed bytes."
+				"This object indicates the number of forwarded bytes in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 9 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.10
@@ -3385,7 +3444,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded packets."
+				"This object indicates the number of discarded packets in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 10 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.11
@@ -3395,7 +3454,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded bytes."
+				"This object indicates the number of discarded bytes in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 11 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.12
@@ -3405,17 +3464,17 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the packet pass rate."
+				"This object indicates the rate at which packets are forwarded in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 12 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.13
 		hwhqosProfileUserQueueStatisticsPassBytesRate OBJECT-TYPE
 			SYNTAX Counter64
-			UNITS "bps"
+			UNITS "Bps"
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte pass rate."
+				"This object indicates the rate at which bytes are forwarded in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 13 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.14
@@ -3425,23 +3484,23 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the packet discarding rate."
+				"This object indicates the rate at which packets are discarded in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 14 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.15
 		hwhqosProfileUserQueueStatisticsDropBytesRate OBJECT-TYPE
 			SYNTAX Counter64
-			UNITS "bps"
+			UNITS "Bps"
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte discarding rate."
+				"This object indicates the rate at which bytes are discarded in the QoS profile statistics."
 			::= { hwhqosProfileUserQueueStatisticsEntry 15 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.16
 		hwhqosProfileUserQueueStatisticsTrafficTowardsThisInterface OBJECT-TYPE
 			SYNTAX Counter64
-			UNITS "bps"
+			UNITS "Bps"
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -3455,7 +3514,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the configured CIR."
+				"This object indicates that CIR has been configured."
 			::= { hwhqosProfileUserQueueStatisticsEntry 17 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.29.1.18
@@ -3467,6 +3526,85 @@
 			DESCRIPTION
 				"This object indicates the configured PIR."
 			::= { hwhqosProfileUserQueueStatisticsEntry 18 }
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.19
+		hwhqosProfileUserQueueStatisticsPassPacketsRate30s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "pps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 30 seconds packet pass rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 19 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.20
+		hwhqosProfileUserQueueStatisticsPassBitsRate30s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "bps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 30 seconds bit pass rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 20 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.21
+		hwhqosProfileUserQueueStatisticsDropPacketsRate30s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "pps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 30 seconds packet discarding rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 21 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.22
+		hwhqosProfileUserQueueStatisticsDropBitsRate30s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "bps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 30 seconds bit discarding rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 22 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.23
+		hwhqosProfileUserQueueStatisticsPassPacketsRate300s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "pps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 300 seconds packet pass rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 23 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.24
+		hwhqosProfileUserQueueStatisticsPassBitsRate300s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "bps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 300 seconds bit pass rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 24 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.25
+		hwhqosProfileUserQueueStatisticsDropPacketsRate300s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "pps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 300 seconds packet discarding rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 25 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.29.1.26
+		hwhqosProfileUserQueueStatisticsDropBitsRate300s OBJECT-TYPE
+			SYNTAX Counter64
+			UNITS "bps"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last 300 seconds bit discarding rate."
+			::= { hwhqosProfileUserQueueStatisticsEntry 26 }
 		
 -- ******************************************************************
 -- 
@@ -3479,7 +3617,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosProfileCarStatisticsTable "
+				"This table is used to query the statistics on the CAR and suppression configured in a QoS profile on an interface."
 			::= { hwhqosStat 30 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1
@@ -3555,7 +3693,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the PE VID (outer tag value) of a QoS profile."
+				"This object indicates the PE-VID (outer tag value) to which the QoS profile is applied."
 			::= { hwhqosProfileCarStatisticsEntry 3 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1.4
@@ -3579,7 +3717,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the type of the statistics on the CAR or suppression to be queried."
+				"This object indicates the CAR or suppression type."
 			::= { hwhqosProfileCarStatisticsEntry 5 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1.6
@@ -3597,7 +3735,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"This object indicates the resetting of statistics."
+				"This object indicates the flag of clearing the statistics."
 			::= { hwhqosProfileCarStatisticsEntry 7 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1.8
@@ -3615,7 +3753,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed bytes."
+				"This object indicates the number of forwarded bytes."
 			::= { hwhqosProfileCarStatisticsEntry 9 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1.10
@@ -3633,7 +3771,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded bytes."
+				"This object indicates the number of dropped bytes."
 			::= { hwhqosProfileCarStatisticsEntry 11 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1.12
@@ -3651,7 +3789,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte pass rate."
+				"This object indicates the rate at which bytes are forwarded."
 			::= { hwhqosProfileCarStatisticsEntry 13 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.30.1.14
@@ -3669,7 +3807,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte discarding rate."
+				"This object indicates the rate at which bytes are discarded."
 			::= { hwhqosProfileCarStatisticsEntry 15 }
 		
 -- ******************************************************************
@@ -3683,7 +3821,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserQueueStatisticsTable "
+				" This table is used to query HQoS statistics about user queues. "
 			::= { hwhqosStat 31 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.31.1
@@ -3783,7 +3921,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"This object indicates the resetting of statistics."
+				"This object indicates the flag of clearing the statistics."
 			::= { hwhqosUserQueueStatisticsEntry 5 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.31.1.6
@@ -3801,7 +3939,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed bytes."
+				"This object indicates the number of forwarded bytes."
 			::= { hwhqosUserQueueStatisticsEntry 7 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.31.1.8
@@ -3819,7 +3957,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded bytes."
+				"This object indicates the number of dropped bytes."
 			::= { hwhqosUserQueueStatisticsEntry 9 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.31.1.10
@@ -3846,7 +3984,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the packet discarding rate."
+				"This object indicates the rate at which packets are discarded."
 			::= { hwhqosUserQueueStatisticsEntry 12 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.31.1.13
@@ -3855,7 +3993,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte discarding rate."
+				"This object indicates the rate at which bytes are discarded."
 			::= { hwhqosUserQueueStatisticsEntry 13 }
 		
 --  ******************************************************************
@@ -3869,7 +4007,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserQueueStatisticsTable "
+				" This table is used to query user queue statistics of a traffic behavior. "
 			::= { hwhqosStat 32 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1
@@ -3934,12 +4072,12 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the direction where a policy is applied."
+				"This object indicates the traffic direction to which the policy applies."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 2 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1.3
 		hwhqosUserQueueClassifierStatisticsClassifierName OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (1..31))
+			SYNTAX OCTET STRING (SIZE (1..127))
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
@@ -3952,7 +4090,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the number of the slot where the interface for applying a policy is located."
+				"This object indicates the ID of the slot where the interface to which the policy is applied resides."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 4 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1.5
@@ -3981,7 +4119,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"This object indicates the resetting of statistics."
+				"This object indicates the flag of clearing statistics."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 6 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1.7
@@ -3999,7 +4137,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed bytes."
+				"This object indicates the number of forwarded bytes."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 8 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1.9
@@ -4017,7 +4155,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded bytes."
+				"This object indicates the number of dropped bytes."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 10 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1.11
@@ -4035,7 +4173,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte pass rate."
+				"This object indicates the rate at which bytes are forwarded."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 12 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.32.1.13
@@ -4053,7 +4191,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the byte discarding rate."
+				"This object indicates the rate at which bytes are discarded."
 			::= { hwhqosUserQueueClassifierStatisticsEntry 14 }
 		
 --  ******************************************************************
@@ -4067,7 +4205,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueStatisticsTable "
+				" This table is used to query the statistics of user group queues."
 			::= { hwhqosStat 33 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1
@@ -4129,7 +4267,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the direction where a user group queue template is applied."
+				"This object indicates the traffic direction to which the user group queue profile is applied."
 			::= { hwhqosUserGroupQueueStatisticsEntry 2 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.3
@@ -4158,7 +4296,8 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueStatisticsQueueIndex "
+				"This object indicates the index of a user group queue.
+"
 			::= { hwhqosUserGroupQueueStatisticsEntry 4 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.5
@@ -4176,7 +4315,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed packets."
+				"This object indicates the number of forwarded packets."
 			::= { hwhqosUserGroupQueueStatisticsEntry 6 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.7
@@ -4185,7 +4324,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed bytes."
+				"This object indicates the number of forwarded bytes."
 			::= { hwhqosUserGroupQueueStatisticsEntry 7 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.8
@@ -4203,7 +4342,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded bytes."
+				"This object indicates the number of dropped bytes."
 			::= { hwhqosUserGroupQueueStatisticsEntry 9 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.10
@@ -4212,7 +4351,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueStatisticsPassPacketsRate."
+				" This object indicates the rate at which packets are forwarded."
 			::= { hwhqosUserGroupQueueStatisticsEntry 10 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.11
@@ -4221,7 +4360,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueStatisticsPassBytesRate."
+				"This object indicates the rate at which bytes are forwarded."
 			::= { hwhqosUserGroupQueueStatisticsEntry 11 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.12
@@ -4230,7 +4369,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueStatisticsDropPacketsRate."
+				"This object indicates the rate at which packets are dropped."
 			::= { hwhqosUserGroupQueueStatisticsEntry 12 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.33.1.13
@@ -4240,7 +4379,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueStatisticsDropBytesRate."
+				" This object indicates the rate at which bytes are discarded."
 			::= { hwhqosUserGroupQueueStatisticsEntry 13 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.34
@@ -5432,7 +5571,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This table is used to query the statistics of a specified user ID."
 			::= { hwhqosStat 52 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1
@@ -5479,7 +5618,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"The value of this object identifies an HQoS user ID."
 			::= { hwhqosUseridStatEntry 1 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.2
@@ -5499,7 +5638,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates a queue."
 			::= { hwhqosUseridStatEntry 2 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.3
@@ -5512,7 +5651,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"The value of this object identifies the direction of the traffic to which HQoS applies."
 			::= { hwhqosUseridStatEntry 3 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.4
@@ -5521,7 +5660,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the number of forwarded user traffic bytes."
 			::= { hwhqosUseridStatEntry 4 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.5
@@ -5530,7 +5669,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the number of dropped bytes."
 			::= { hwhqosUseridStatEntry 5 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.6
@@ -5539,7 +5678,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the number of forwarded user traffic packets."
 			::= { hwhqosUseridStatEntry 6 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.7
@@ -5548,7 +5687,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the number of dropped packets."
 			::= { hwhqosUseridStatEntry 7 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.8
@@ -5557,7 +5696,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the rate at which user traffic packets are forwarded."
 			::= { hwhqosUseridStatEntry 8 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.9
@@ -5566,7 +5705,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the rate at which packets are dropped."
 			::= { hwhqosUseridStatEntry 9 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.10
@@ -5575,7 +5714,7 @@
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the flag of clearing the statistics."
 			::= { hwhqosUseridStatEntry 10 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.11
@@ -5584,7 +5723,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the rate at which bytes are forwarded."
 			::= { hwhqosUseridStatEntry 11 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.52.1.12
@@ -5593,7 +5732,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This object indicates the rate at which bytes are dropped."
 			::= { hwhqosUseridStatEntry 12 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.53
@@ -7091,7 +7230,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				" hwhqosUserGroupQueueInterfaceStatisticsTable "
+				"This table is used to collect statistics on user group queues."
 			::= { hwhqosStat 71 }
 		
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1
@@ -7144,7 +7283,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the index of an interface."
+				"This object indicates the interface index of the user group queue information."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 1 }
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.2
@@ -7157,7 +7296,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the direction where a user group queue template is applied."
+				"This object indicates the upstream and downstream flags of the user group queue."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 2 }
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.3
@@ -7166,7 +7305,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the pevid of an interface."
+				"This object indicates the VLAN ID of a PE (outer tag value)."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 3 }
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.4
@@ -7175,7 +7314,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"The value of this object identifies the cevid of an interface."
+				"This object indicates the VLAN ID of a CE (inner tag value)."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 4 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.5
@@ -7204,7 +7343,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"hwhqosUserGroupQueueInterfaceStatisticsQueueIndex"
+				"This object indicates the index of a flow queue."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 6 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.7
@@ -7222,7 +7361,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of passed packets."
+				"This object indicates the number of forwarded GQ user queue packets."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 8 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.9
@@ -7240,7 +7379,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the number of discarded packets."
+				"This object indicates the number of discarded GQ user queue packets."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 10 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.11
@@ -7258,7 +7397,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"hwhqosUserGroupQueueInterfaceStatisticsPassPacketsRate."
+				"This object indicates the rate at which GQ user queue packets are forwarded."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 12 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.13
@@ -7267,7 +7406,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"hwhqosUserGroupQueueInterfaceStatisticsPassBytesRate."
+				"This object indicates the rate at which bytes are forwarded."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 13 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.14
@@ -7276,7 +7415,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"hwhqosUserGroupQueueInterfaceStatisticsDropPacketsRate."
+				"This object indicates the rate at which GQ user queue packets are discarded."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 14 }
 						
 -- 1.3.6.1.4.1.2011.5.25.132.1.71.1.15
@@ -7285,7 +7424,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"hwhqosUserGroupQueueInterfaceStatisticsDropBytesRate."
+				"This object indicates the rate at which bytes are dropped."
 			::= { hwhqosUserGroupQueueInterfaceStatisticsEntry 15 }	
 
 -- 1.3.6.1.4.1.2011.5.25.132.1.72
@@ -7334,6 +7473,276 @@
 				The value of this object identifies the interval of queue statistics.
 				"
 			::= { hwhqosIfProfileUserQueueStatisticsIntervalEntry 2 }					    	
+
+-- 1.3.6.1.4.1.2011.5.25.132.1.73
+        hwhqosUserQueueStatisticsExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwhqosUserQueueStatisticsExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " This table is used to query HQoS statistics about user queues. "
+            ::= { hwhqosStat 73 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.31.1
+        hwhqosUserQueueStatisticsExtEntry OBJECT-TYPE
+            SYNTAX HwhqosUserQueueStatisticsExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " hwhqosUserQueueStatisticsExtEntry "
+            INDEX { hwhqosUserQueueStatisticsExtInterfaceIndex, hwhqosUserQueueStatisticsExtDirection, hwhqosUserQueueStatisticsExtSlotNumber, hwhqosUserQueueStatisticsExtQueueIndex }
+            ::= { hwhqosUserQueueStatisticsExtTable 1 }
+        
+        HwhqosUserQueueStatisticsExtEntry ::=
+            SEQUENCE { 
+                hwhqosUserQueueStatisticsExtInterfaceIndex
+                    InterfaceIndex,
+                hwhqosUserQueueStatisticsExtDirection
+                    INTEGER,
+                hwhqosUserQueueStatisticsExtSlotNumber
+                    Integer32,
+                hwhqosUserQueueStatisticsExtQueueIndex
+                    INTEGER,
+                hwhqosUserQueueStatisticsExtReset
+                    INTEGER,
+                hwhqosUserQueueStatisticsExtPassPacketsLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassPacketsHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassBytesLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassBytesHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropPacketsLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropPacketsHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropBytesLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropBytesHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassPacketsRateLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassPacketsRateHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassBytesRateLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtPassBytesRateHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropPacketsRateLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropPacketsRateHigh
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropBytesRateLow
+                    Unsigned32,
+                hwhqosUserQueueStatisticsExtDropBytesRateHigh
+                    Unsigned32
+             }
+
+--     1.3.6.1.4.1.2011.5.25.132.1.73.1.1
+        hwhqosUserQueueStatisticsExtInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index."
+            ::= { hwhqosUserQueueStatisticsExtEntry 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.2
+        hwhqosUserQueueStatisticsExtDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inbound(1),
+                outbound(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the direction where a user queue is applied."
+            ::= { hwhqosUserQueueStatisticsExtEntry 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.3
+        hwhqosUserQueueStatisticsExtSlotNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..128)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the number of the slot where the interface for applying a user queue is located."
+            ::= { hwhqosUserQueueStatisticsExtEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.4
+        hwhqosUserQueueStatisticsExtQueueIndex OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8),
+                total(9)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the priority of a user queue."
+            ::= { hwhqosUserQueueStatisticsExtEntry 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.5
+        hwhqosUserQueueStatisticsExtReset OBJECT-TYPE
+            SYNTAX INTEGER { reset(1) }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the flag of clearing the statistics."
+            ::= { hwhqosUserQueueStatisticsExtEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.6
+        hwhqosUserQueueStatisticsExtPassPacketsLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of passed packets, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.7
+        hwhqosUserQueueStatisticsExtPassPacketsHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of passed packets, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 7 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.8
+        hwhqosUserQueueStatisticsExtPassBytesLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of forwarded bytes, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 8 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.9
+        hwhqosUserQueueStatisticsExtPassBytesHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of forwarded bytes, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 9 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.10
+        hwhqosUserQueueStatisticsExtDropPacketsLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of discarded packets, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 10 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.11
+        hwhqosUserQueueStatisticsExtDropPacketsHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of discarded packets, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 11 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.12
+        hwhqosUserQueueStatisticsExtDropBytesLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of dropped bytes, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 12 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.13
+        hwhqosUserQueueStatisticsExtDropBytesHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of dropped bytes, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 13 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.14
+        hwhqosUserQueueStatisticsExtPassPacketsRateLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the packet pass rate, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 14 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.15
+        hwhqosUserQueueStatisticsExtPassPacketsRateHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the packet pass rate, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 15 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.16
+        hwhqosUserQueueStatisticsExtPassBytesRateLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the byte pass rate, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 16 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.17
+        hwhqosUserQueueStatisticsExtPassBytesRateHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the byte pass rate, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 17 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.18
+        hwhqosUserQueueStatisticsExtDropPacketsRateLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate at which packets are discarded, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 18 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.19
+        hwhqosUserQueueStatisticsExtDropPacketsRateHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate at which packets are discarded, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 19 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.20
+        hwhqosUserQueueStatisticsExtDropBytesRateLow OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate at which bytes are discarded, which is lower 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 20 }
+
+        -- 1.3.6.1.4.1.2011.5.25.132.1.73.1.21
+        hwhqosUserQueueStatisticsExtDropBytesRateHigh OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the rate at which bytes are discarded, which is upper 32 bits of the total number."
+            ::= { hwhqosUserQueueStatisticsExtEntry 21 }
+
 -- ******************************************************************        
 -- 1.3.6.1.4.1.2011.5.25.132.2
 		hwhqosObjects OBJECT IDENTIFIER ::= { hwHQOS 2 }
@@ -7390,8 +7799,38 @@
                                           "The pool of alarmed HQoS which user applied." 
                                           ::= { hwhqosObjects 5 } 
 
-
-		
+-- 1.3.6.1.4.1.2011.5.25.132.2.6
+                                          hwhqosUserQueueChipld OBJECT-TYPE
+                                          SYNTAX Integer32
+                                          MAX-ACCESS read-only
+                                          STATUS current
+                                          DESCRIPTION
+                                          "hwhqosUserQueueChipld"
+                                          ::= { hwhqosObjects 6 }
+-- 1.3.6.1.4.1.2011.5.25.132.2.7
+                                          hwhqosBufferAlarmSlotId OBJECT-TYPE
+                                          SYNTAX OCTET STRING (SIZE (0..15))
+                                          MAX-ACCESS read-only
+                                          STATUS current
+                                          DESCRIPTION
+                                          "Slot ID."
+                                          ::= { hwhqosObjects 7 }
+-- 1.3.6.1.4.1.2011.5.25.132.2.8
+                                          hwhqosBufferAlarmChipId OBJECT-TYPE
+                                          SYNTAX OCTET STRING (SIZE (0..7))
+                                          MAX-ACCESS read-only
+                                          STATUS current
+                                          DESCRIPTION
+                                          "Chip ID."
+                                          ::= { hwhqosObjects 8 }
+-- 1.3.6.1.4.1.2011.5.25.132.2.9
+                                          hwhqosBufferAlarmBufferSize OBJECT-TYPE
+                                          SYNTAX OCTET STRING (SIZE (0..63))
+                                          MAX-ACCESS read-only
+                                          STATUS current
+                                          DESCRIPTION
+                                          " Queue Buffer Size."
+                                          ::= { hwhqosObjects 9 }
 -- 1.3.6.1.4.1.2011.5.25.132.3
 		hwhqosTraps OBJECT IDENTIFIER ::= { hwHQOS 3 }
 		
@@ -7482,6 +7921,85 @@
 		"Failed to create scheduling tree clear alarm."
 		::= { hwhqosTraps 10 } 
 
+-- 1.3.6.1.4.1.2011.5.25.132.3.11
+                hwXQoS4QueueResouceOverAlarmTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the downstream four-flow-queue user-queue resources are insufficient."
+                ::= { hwhqosTraps 11 }
+		
+-- 1.3.6.1.4.1.2011.5.25.132.3.12
+                hwXQoS4QueueResouceOverAlarmCancelTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the downstream four-flow-queue user-queue resources are sufficient."
+                ::= { hwhqosTraps 12 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.13
+                hwXQoS4QueueResoucePreAlarmTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the usage of the downstream four-flow-queue user-queue resources exceeds 90%."
+                ::= { hwhqosTraps 13 }
+		
+-- 1.3.6.1.4.1.2011.5.25.132.3.14
+                hwXQoS4QueueResoucePreAlarmCancelTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the usage of the downstream four-flow-queue user-queue resources does not exceed 90%."
+                ::= { hwhqosTraps 14 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.15
+                hwXQoS8QueueResouceOverAlarmTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the downstream eight-flow-queue user-queue resources are insufficient."
+                ::= { hwhqosTraps 15 }
+		
+-- 1.3.6.1.4.1.2011.5.25.132.3.16
+                hwXQoS8QueueResouceOverAlarmCancelTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the downstream eight-flow-queue user-queue resources are sufficient."
+                ::= { hwhqosTraps 16 }
+
+-- 1.3.6.1.4.1.2011.5.25.132.3.17
+                hwXQoS8QueueResoucePreAlarmTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "This object indicates that the usage of the downstream eight-flow-queue user-queue resources exceeds 90%."
+                ::= { hwhqosTraps 17 }
+		
+-- 1.3.6.1.4.1.2011.5.25.132.3.18
+                hwXQoS8QueueResoucePreAlarmCancelTrap NOTIFICATION-TYPE
+                OBJECTS { entPhysicalName, hwhqosUserQueueChipld}
+                STATUS current
+                DESCRIPTION 
+                "The usage of the outgoing user-queue resources in eight-flow-queue mode fell below 90%."
+                ::= { hwhqosTraps 18 }
+--begin add for hwhqosBufferAlarm
+-- 1.3.6.1.4.1.2011.5.25.132.3.19
+		hwhqosBufferAlarmTrap NOTIFICATION-TYPE 
+		OBJECTS { hwhqosBufferAlarmSlotId, hwhqosBufferAlarmChipId, hwhqosBufferAlarmBufferSize} 
+		STATUS current 
+		DESCRIPTION 
+		"The queue buffer usage exceeded 90% of the threshold." 
+		::= { hwhqosTraps 19 } 
+-- 1.3.6.1.4.1.2011.5.25.132.3.20
+		hwhqosBufferAlarmClearTrap NOTIFICATION-TYPE 
+		OBJECTS { hwhqosBufferAlarmSlotId, hwhqosBufferAlarmChipId, hwhqosBufferAlarmBufferSize} 
+		STATUS current 
+		DESCRIPTION 
+		"The queue buffer usage fell below 90% of the threshold." 
+		::= { hwhqosTraps 20 } 
+--end add for hwhqosBufferAlarm
  -- 1.3.6.1.4.1.2011.5.25.132.4
 		hwhqosConformance OBJECT IDENTIFIER ::= { hwHQOS 4 }
 		

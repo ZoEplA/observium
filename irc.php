@@ -9,7 +9,7 @@
  * @package    observium
  * @subpackage ircbot
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -132,7 +132,7 @@ class observiumbot
     {
       $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, "Error: Bad or Missing hostname, use .listdevices to show all devices.");
     } else {
-      if ($device['status'] == 1) { $status = "Up " . formatUptime($device['uptime'] . " "); } else { $status = "Down "; }
+      if ($device['status'] == 1) { $status = "Up " . format_uptime($device['uptime'] . " "); } else { $status = "Down "; }
       if ($device['ignore']) { $status = "*Ignored*"; }
       if ($device['disabled']) { $status = "*Disabled*"; }
 

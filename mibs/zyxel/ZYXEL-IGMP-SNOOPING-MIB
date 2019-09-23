@@ -285,6 +285,13 @@ ZYXEL-IGMP-SNOOPING-MIB DEFINITIONS ::= BEGIN
 		 update the forwarding table for the port. (200..6348800)"
         ::= { zyxelIgmpSnoopingPortEntry 7 }     
         
+        zyIgmpSnoopingLeaveProxyState OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Enable/Disable IGMP Snooping leave-proxy mode."
+        ::= { zyxelIgmpSnoopingSetup 10 } 
         
 --  zyxelIgmpSnoopingRecordTable
         

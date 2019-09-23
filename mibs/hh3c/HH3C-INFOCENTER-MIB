@@ -1,14 +1,17 @@
 -- ==========================================================================
--- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description: Info center MIB
--- Reference: RFC3164
--- Version: V1.0
+-- Description: Infomation center MIB
+-- Reference: RFC5424
+-- Version: V1.1
 -- History:
 --   V1.0 Initial version 2012-03-07 by shuaixiaojuan
---        2012-11-03 
+--        2012-11-03
 --        add hh3cICLogbufferContTable, hh3cICLogbufferContEntry,
 --        hh3cICLogbufferContIndex, hh3cICLogbufferContDescription by chenkaiping
+--   V1.1 2014-09-05 by SongHao
+--        Added isoWithTimezone(5) to ICTimeStampType.
+--        Modified description of hh3cICLogTimestampType.
 -- ==========================================================================
 HH3C-INFOCENTER-MIB DEFINITIONS ::= BEGIN
 
@@ -25,17 +28,25 @@ IMPORTS
         FROM IF-MIB;
 
 hh3cInfoCenter MODULE-IDENTITY
-    LAST-UPDATED "201203071900Z"
+    LAST-UPDATED "201409050325Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
     DESCRIPTION
         "All the configuration of the info center can be managed
         by info center MIB."
+    REVISION "201409050325Z"
+    DESCRIPTION
+        "Added isoWithTimezone(5) to ICTimeStampType.
+        Modified description of hh3cICLogTimestampType."
+    REVISION "201211031900Z"
+    DESCRIPTION
+        "Add hh3cICLogbufferContTable, hh3cICLogbufferContEntry,
+        hh3cICLogbufferContIndex, hh3cICLogbufferContDescription."
     REVISION "201203071900Z"        -- Mar 07, 2012 at 19:00 GMT
     DESCRIPTION
         "The initial version of this MIB module."
@@ -100,19 +111,26 @@ ICTimeStampType ::= TEXTUAL-CONVENTION
         "Specify operation types on time stamp of message.
         date: the time stamp type of message is date.
         boot: the time stamp type of message is the time from
-            uptime of system.
+              uptime of system.
         iso: the time stamp type of message is ISO date with
              format YYYY-MM-ddThh:mm:ss.
         dateWithoutYear: the time stamp type of message is date
-            without year information.
-        none: no time stamp information in message."
+                         without year information.
+        none: no time stamp information in message.
+        isoWithTimezone: the time stamp type of message is ISO date
+                         with timezone offset.
+                         Example YYYY-MM-ddThh:mm:ss-04:00
+                                 or
+                                 YYYY-MM-ddThh:mm:ssZ
+        "
     SYNTAX INTEGER
         {
             date(0),
             boot(1),
             iso(2),
             dateWithoutYear(3),
-            none(4)
+            none(4),
+            isoWithTimezone(5)
         }
 
 --
@@ -279,7 +297,7 @@ hh3cICLoghostIpaddressType OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "The IP address type of loghost."
+        "The address type of loghost."
     DEFVAL { ipv4 }
     ::= { hh3cICLoghostEntry 2 }
 
@@ -288,7 +306,7 @@ hh3cICLoghostIpaddress OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "The IP address of loghost."
+        "The address of loghost."
     ::= { hh3cICLoghostEntry 3 }
 
 hh3cICLoghostVPNName OBJECT-TYPE
@@ -443,7 +461,8 @@ hh3cICLogTimestampType OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Time stamp type of log message."
+        "Time stamp type of log message.
+        Note that isoWithTimezone is not supported."
     DEFVAL { date }
     ::= { hh3cICLogObjects 2 }
 

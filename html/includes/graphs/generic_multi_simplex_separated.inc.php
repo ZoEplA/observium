@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -68,8 +68,7 @@ foreach ($rrd_list as $i => $rrd)
 
   $rrd_options .= " DEF:".$rrd['ds'].$i."=".$rrd['filename'].":".$rrd['ds'].":AVERAGE ";
 
-  $rrd_multi['aggregate'][]  = $rrd['ds'].$i.",UN,0," . $rrd['ds'].$i . ",IF";
-
+  $rrd_multi['aggregate'][]  = $rrd['ds'].$i;
 
   if ($simple_rrd)
   {
@@ -85,7 +84,7 @@ foreach ($rrd_list as $i => $rrd)
     $rrd_options .= " DEF:".$i . "X=".$rrd['filename'].":".$rrd['ds'].":AVERAGE:start=".$prev_from.":end=".$from;
     $rrd_options .= " SHIFT:".$i . "X:$period";
 
-    $rrd_multi['thingX'][] = $i . "X,UN,0," . $i . "X,IF";
+    $rrd_multi['thingX'][] = $i . "X";
   }
 
   // Suppress totalling?
@@ -145,17 +144,15 @@ foreach ($rrd_list as $i => $rrd)
 
 if ($vars['previous'] == "yes")
 {
-  $thingX  = implode(',', $rrd_multi['thingX']);
-  $plusesX = str_repeat(',+', count($rrd_multi['thingX']) - 1);
   if (is_numeric($multiplier))
   {
-    $rrd_options .= " CDEF:X=" . $thingX . $plusesX.",".$multiplier. ",*";
+    $rrd_options .= " CDEF:X=" . rrd_aggregate_dses($rrd_multi['thingX']) . "," . $multiplier . ",*";
   }
   else if (is_numeric($divider))
   {
-    $rrd_options .= " CDEF:X=" . $thingX . $plusesX.",".$divider. ",/";
+    $rrd_options .= " CDEF:X=" . rrd_aggregate_dses($rrd_multi['thingX']) . "," . $divider . ",/";
   } else {
-    $rrd_options .= " CDEF:X=" . $thingX . $plusesX;
+    $rrd_options .= " CDEF:X=" . rrd_aggregate_dses($rrd_multi['thingX']);
   }
 
   $rrd_options .= " AREA:X#99999999:";
@@ -167,7 +164,7 @@ $rrd_options .= $rrd_optionsb;
 
 if($show_aggregate == TRUE)
 {
-  $rrd_options .= " CDEF:aggregate=" . implode(',', $rrd_multi['aggregate']) . str_repeat(',+', count($rrd_multi['aggregate']) - 1);
+  $rrd_options .= " CDEF:aggregate=" . rrd_aggregate_dses($rrd_multi['aggregate']);
   $rrd_options .= " LINE1.5:aggregate#000000:'".rrdtool_escape("Aggregate", $descr_len)."'";
   $rrd_options .= " GPRINT:aggregate:LAST:%5.1lf%s GPRINT:aggregate:MIN:%5.1lf%s";
   $rrd_options .= " GPRINT:aggregate:MAX:%5.1lf%s GPRINT:aggregate:AVERAGE:%5.1lf%s";

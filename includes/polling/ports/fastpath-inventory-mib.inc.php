@@ -7,12 +7,12 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 // Get stack ports
-$stackports = snmpwalk_cache_oid($device, 'agentInventoryStackPortTable', array(), 'FASTPATH-INVENTORY-MIB', mib_dirs('dell','broadcom'));
+$stackports = snmpwalk_cache_oid($device, 'agentInventoryStackPortTable', array(), 'FASTPATH-INVENTORY-MIB', mib_dirs(array('dell','broadcom')));
 
 //            [agentInventoryStackPortUnit] => 1
 //            [agentInventoryStackPortTag] => 0/17

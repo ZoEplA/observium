@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -274,7 +274,7 @@ for ($slot_no = 1; $slot_no <= 16; $slot_no++)
             break;
         }
 
-        discover_sensor($valid['sensor'], $sensor['sensor_class'], $device, $oid_num, $full_index, $sensor_type, $descr, $scale, $value, $options);
+        discover_sensor($sensor['sensor_class'], $device, $oid_num, $full_index, $sensor_type, $descr, $scale, $value, $options);
 
       }
 
@@ -310,7 +310,7 @@ for ($slot_no = 1; $slot_no <= 16; $slot_no++)
           $sensor_type = 'oap-pseudo';
           $scale       = $sensor['scale'];
 
-          discover_sensor($valid['sensor'], $sensor['sensor_class'], $device, $oid_num, $full_index, $sensor_type, $descr, $scale, $value);
+          discover_sensor($sensor['sensor_class'], $device, $oid_num, $full_index, $sensor_type, $descr, $scale, $value);
 
         }
 

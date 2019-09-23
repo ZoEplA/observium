@@ -1097,7 +1097,7 @@
                      modes are enabled.
                      A value of (1) indicates that TFTP client is enabled on the switch.
                      A value of (2) indicates that TFTP client is disabled on the switch."
-        DEFVAL	     { enabled }
+        DEFVAL	     { enabled}
         ::= { hpicfDownload 12 }
 
        hpicfDownloadTftpClientBlkSize OBJECT-TYPE

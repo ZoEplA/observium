@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (C) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description: H3C capability of Quality of Service with system and interface
+-- Description: Capability of Quality of Service with system and interface
 --              Management Information Base.
 -- Reference: RFC 3291
--- Version: 1.2
+-- Version: 1.4
 -- History:
 -- V1.0 created by tangshun.
 -- V1.1 modified by ChenWei
@@ -12,6 +12,10 @@
 --   Modify the description of hh3cQoSCharacteristicsValue.
 -- V1.2 modified by MouXuanli
 --   Add hh3cQoSSysCapabilityTable and hh3cQoSIfCapabilityTable.
+-- V1.3 modified by LuZefeng
+--   Modify the description of hh3cQoSSysCapCharacteristicsValue
+-- V1.4 modified by gaomengfei
+--   Modify the description of hh3cQoSSysCapCharacteristicsValue
 -- ============================================================================
 HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
 
@@ -24,17 +28,23 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                 FROM SNMPv2-TC;
 
         hh3cQosCapability MODULE-IDENTITY
-            LAST-UPDATED "201302220000Z"            -- Feb. 22, 2013 at 00:00 GMT
+            LAST-UPDATED "201610250000Z"            -- Oct. 25, 2016 at 00:00 GMT
             ORGANIZATION
-                "Hangzhou H3C Tech. Co., Ltd."
+                "New H3C Tech. Co., Ltd."
             CONTACT-INFO
-                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                "Platform Team New H3C Tech. Co., Ltd.
                 Hai-Dian District Beijing P.R. China
                 http://www.h3c.com
                 Zip:100085
                 "
             DESCRIPTION
-                "H3C QoS management information base."
+                "QoS management information base."
+            REVISION "201610250000Z"        -- Oct 25, 2016 at 00:00 GMT
+            DESCRIPTION
+                "Modify the description of hh3cQoSSysCapCharacteristicsValue."
+            REVISION "201410280000Z"        -- Oct 28, 2014 at 00:00 GMT
+            DESCRIPTION
+                "Modify the description of hh3cQoSSysCapCharacteristicsValue."
             ::= { hh3cSNMPAgCpb 1 }
 
         hh3cQoSCapabilityMibObjects OBJECT IDENTIFIER ::= { hh3cQosCapability 1 }
@@ -53,7 +63,7 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                  intended to group together multiple chassis entities.  A
                  stack may be realized by a 'virtual' cable, a real
                  interconnect cable, attached to multiple chassis, or may in
-                 fact be comprised of multiple interconnect cables. A stack
+                 fact be comprised of multiple interconnect cables.  A stack
                  should not be modeled within any other physical entities,
                  but a stack may be contained within another stack.  Only
                  chassis entities should be contained within a stack.
@@ -1505,6 +1515,16 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             1, if supported.
                      44     car list min IP mask length
                                             The minimum length of IP mask (integer).
+                     45     car logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
 
                  gts module:
                      Index  Characteristic  Value
@@ -1606,6 +1626,16 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             of drop traffic is supported,
                                             bit 0 stands for counting by packet,
                                             bit 1 stands for counting by byte.
+                     28     logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
 
                  lr module:
                      Index  Characteristic  Value
@@ -1616,11 +1646,14 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             bit 0 stands for burst size,
                                             bit 1 stands for excess burst size,
                                             bit 2 stands for peak information rate.
-                     3      lr direction    If one of the last 2 bits of this object
+                     3      lr direction    If one of the last 5 bits of this object
                                             is set to 1, it indicates that the direction
                                             type is supported,
                                             bit 0 stands for inbound direction,
                                             bit 1 stands for outbound direction.
+                                            bit 2 stands for pw inbound direction,
+                                            bit 3 stands for pw outbound direction.
+                                            bit 4 stands for blade.
                      4      transmission statistics
                                             If one of the last 2 bits of this object
                                             is set to 1, it indicates that the counting
@@ -1638,6 +1671,16 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             of drop traffic is supported,
                                             bit 0 stands for counting by packet,
                                             bit 1 stands for counting by byte.
+                     7     lr logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
 
                  hardware queue module:
                      Index  Characteristic  Value
@@ -1761,6 +1804,7 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             The upper limit value of profile WFQ
                                             weight(integer).
                      27     low latency     1, if supported.
+                     28     sub interface   1, if supported.
 
                  software queue module:
                      Index  Characteristic  Value
@@ -1778,13 +1822,19 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             The default number of WFQ queues(integer).
                      4      wfq max queue number
                                             The max number of WFQ queues(integer).
-                     5      classifier-behaviour wfq
-                                            1, if supported.
-                     6      classifier-behaviour queue PCT
+                     5      classifier-behavior wfq
+                                            If one of the last 4 bits of this object
+                                            is set to 1, it indicates that the cbwfq
+                                            is supported,
+                                            bit 0 stands for WFQ,
+                                            bit 1 stands for QUEUE-NUMBER,
+                                            bit 2 stands for QUEUE-LENGTH,
+                                            bit 3 stands for SP.
+                     6      classifier-behavior queue PCT
                                             1, if supported.
                      7      min CBS ratio   The min ratio of burst size(integer).
                      8      max CBS ratio   The max ratio of burst size(integer).
-                     9      classifier-behaviour queue PIR
+                     9      classifier-behavior queue PIR
                                             1, if supported.
                      10     queue max length
                                             The max length of queue(integer).
@@ -1805,6 +1855,16 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             1, if supported.
                      22     remain assured forwarding
                                             1, if supported.
+                     23     software queue logic iftype
+                                            If one of the last 6 bits of this object
+                                            is set to 1, it indicates that the logic
+                                            iftype is supported,
+                                            bit 0 stands for matching vt,
+                                            bit 1 stands for matching tunnel,
+                                            bit 2 stands for matching vlan,
+                                            bit 3 stands for matching ragg,
+                                            bit 4 stands for matching bagg,
+                                            bit 5 stands for matching dialer.
 
                  wred module:
                      Index  Characteristic  Value
@@ -2036,8 +2096,20 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             bit 5 stands for dot11e,
                                             bit 6 stands for auto.
                      4      override        1, if supported.
-                     5      level 3 ethernet
-                                            1, if supported.
+                     5      port priority iftype
+                                            If one of the last 10 bits of this object
+                                            is set to 1, it indicates that the trust
+                                            mode is supported,
+                                            bit 0 stands for l2eth,
+                                            bit 1 stands for l3eth,
+                                            bit 2 stands for pos,
+                                            bit 3 stands for atm,
+                                            bit 4 stands for serial,
+                                            bit 5 stands for mp,
+                                            bit 6 stands for mrf,
+                                            bit 7 stands for rpr,
+                                            bit 8 stands for ids,
+                                            bit 9 stands for fc.
 
                  redirect&mirror module:
                      Index  Characteristic  Value
@@ -2111,19 +2183,24 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             policy is supported,
                                             bit 0 stands for inbound,
                                             bit 1 stands for outbound.
-                     5      copp policy     If one of the last 2 bits of this object
+                     5      copp policy     If one of the last 3 bits of this object
                                             is set to 1, it indicates that the COPP
                                             policy is supported,
                                             bit 0 stands for inbound,
-                                            bit 1 stands for outbound.
-                     6      interface type  If one of the last 5 bits of this object
+                                            bit 1 stands for outbound,
+                                            bit 2 stands for coppmp inbound.
+                     6      interface type  If one of the last 8 bits of this object
                                             is set to 1, it indicates that the interface
                                             type is supported,
                                             bit 0 stands for VT(Virtual-Template),
                                             bit 1 stands for tunnel,
                                             bit 2 stands for VLAN,
                                             bit 3 stands for RAGG,
-                                            bit 4 stands for BAGG.
+                                            bit 4 stands for BAGG,
+                                            bit 5 stands for dialer,
+                                            bit 6 stands for VPPP,
+                                            bit 7 stands for VSI.
+
                      7      system predefined
                                             1, if supported.
                      8      rate statistics 1, if supported.
@@ -2226,7 +2303,7 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             action is supported,
                                             bit 0 stands for nest VLAN ID,
                                             bit 1 stands for nest VLAN ID and COS.
-                     40     remark action   If one of the last 10 bits of this object
+                     40     remark action   If one of the last 15 bits of this object
                                             is set to 1, it indicates that the remark
                                             action is supported,
                                             bit 0 stands for DSCP,
@@ -2238,7 +2315,12 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             bit 6 stands for drop precedence,
                                             bit 7 stands for customer VLAN ID,
                                             bit 8 stands for service VLAN ID,
-                                            bit 9 stands for customer dot1p trust.
+                                            bit 9 stands for customer dot1p trust,
+                                            bit 10 stands for imposition MPLS-EXP,
+                                            bit 11 stands for fc,
+                                            bit 12 stands for atm clp,
+                                            bit 13 stands for fr de,
+                                            bit 14 stands for account level.
                      41     green packets remark action
                                             If one of the last 10 bits of this object
                                             is set to 1, it indicates that the green
@@ -2260,16 +2342,15 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                      44     nest policy action
                                             1, if supported.
                      45     classifier-behavior mode type
-                                            If one of the last 6 bits of this object
+                                            If one of the last 5 bits of this object
                                             is set to 1, it indicates that the
                                             classifier-behavior mode type is supported,
-                                            bit 0 stands for none,
-                                            bit 1 stands for dot1q-tag-manipulation
+                                            bit 0 stands for dot1q-tag-manipulation
                                             mode,
-                                            bit 2 stands for QPPB mode,
-                                            bit 3 stands for IP-source-guard mode,
-                                            bit 4 stands for voice-VLAN mode,
-                                            bit 5 stands for DCBX mode.
+                                            bit 1 stands for QPPB mode,
+                                            bit 2 stands for IP-source-guard mode,
+                                            bit 3 stands for voice-VLAN mode,
+                                            bit 4 stands for DCBX mode.
                      46     classifier-behavior statistics unit
                                             If one of the last 2 bits of this object
                                             is set to 1, it indicates that the
@@ -2396,13 +2477,13 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                      7      interface cbs granularity
                                             The value of interface burst size granularity(integer).
                      8      interface min ebs
-                                            The min value of interface exess burst
+                                            The min value of interface excess burst
                                             size(integer).
                      9      interface max ebs
-                                            The max value of interface exess burst
+                                            The max value of interface excess burst
                                             size(integer).
                      10     interface ebs granularity
-                                            The value of interface exess burst size
+                                            The value of interface excess burst size
                                             granularity(integer).
                      11     interface min pir
                                             The min value of interface peak information
@@ -2562,7 +2643,7 @@ HH3C-QOS-CAPABILITY-MIB DEFINITIONS ::= BEGIN
                                             bit 6 stands for auto.
                      4      default priority trust mode
                                             The default value of port priority trust
-                                            type. If one of the last 7 bits of this
+                                            type.  If one of the last 7 bits of this
                                             object is set to 1, it indicates that
                                             the default priority trust type on interface
                                             is supported.

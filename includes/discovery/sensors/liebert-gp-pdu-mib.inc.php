@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -44,7 +44,7 @@ foreach ($lgpPduPsEntry as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 0.1;
   $oid_name = 'lgpPduPsEntryEcNeutral';
@@ -55,7 +55,7 @@ foreach ($lgpPduPsEntry as $index => $entry)
   $options  = array('limit_high_warn' => $entry['lgpPduPsEntryEcNeutralThrshldOvrWarn']  * $entry['lgpPduPsEntryEcInputRated'] * 0.001,
                     'limit_high'      => $entry['lgpPduPsEntryEcNeutralThrshldOvrAlarm'] * $entry['lgpPduPsEntryEcInputRated'] * 0.001);
 
-  discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $scale    = 1;
   $oid_name = 'lgpPduPsEntryApTotal';
@@ -63,7 +63,7 @@ foreach ($lgpPduPsEntry as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 0.01;
   $oid_name = 'lgpPduPsEntryPfTotal';
@@ -73,7 +73,7 @@ foreach ($lgpPduPsEntry as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 }
 
@@ -108,7 +108,7 @@ foreach ($oids as $index => $entry)
     $value    = $entry[$oid_name];
   }
 
-  discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('voltage', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   if (isset($entry['lgpPduPsLineEntryEcHundredths']))
   {
@@ -128,7 +128,7 @@ foreach ($oids as $index => $entry)
   $options  = array('limit_high_warn' => $entry['lgpPduPsLineEntryEcThrshldOvrWarn']  * $lgpPduPsEntry[$pdu_index]['lgpPduPsEntryEcInputRated'] * 0.001,
                     'limit_high'      => $entry['lgpPduPsLineEntryEcThrshldOvrAlarm'] * $lgpPduPsEntry[$pdu_index]['lgpPduPsEntryEcInputRated'] * 0.001);
 
-  discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $scale    = 1;
   $oid_name = 'lgpPduPsLineEntryPwrLN';
@@ -136,7 +136,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 1;
   $oid_name = 'lgpPduPsLineEntryApLN';
@@ -144,7 +144,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 0.01;
   $oid_name = 'lgpPduPsLineEntryPfLN';
@@ -154,7 +154,7 @@ foreach ($oids as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 }
 
@@ -200,7 +200,7 @@ foreach ($oids as $index => $entry)
     $value    = $entry[$oid_name];
   }
 
-  discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('voltage', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   if (isset($entry['lgpPduRcpEntryEcHundredths']))
   {
@@ -220,7 +220,7 @@ foreach ($oids as $index => $entry)
   $options  = array('limit_high_warn' => $entry['lgpPduRcpEntryEcThrshldOverWarn']  * $lgpPduRbEntry[$rb_index]['lgpPduRbEntryEcRated'] * 0.001,
                     'limit_high'      => $entry['lgpPduRcpEntryEcThrshldOverAlarm'] * $lgpPduRbEntry[$rb_index]['lgpPduRbEntryEcRated'] * 0.001);
 
-  discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $scale    = 1;
   $oid_name = 'lgpPduRcpEntryPwrOut';
@@ -228,7 +228,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 1;
   $oid_name = 'lgpPduRcpEntryApOut';
@@ -236,7 +236,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 0.01;
   $oid_name = 'lgpPduRcpEntryPf';
@@ -246,7 +246,7 @@ foreach ($oids as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 
   $scale    = 0.01;
@@ -255,7 +255,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'crestfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('crestfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   $scale    = 0.1;
   $oid_name = 'lgpPduRcpEntryFreq';
@@ -263,7 +263,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'frequency', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('frequency', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   // FIXME, this operational/administrative states, need migrate to outlets status polling
   $oid_name = 'lgpPduRcpEntryPwrState';

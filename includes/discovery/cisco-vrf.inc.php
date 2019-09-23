@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -76,8 +76,12 @@ if ($config['enable_vrfs'])
       $vrf_oid = substr($t[0], 0, $dotpos);
       $port_id = substr($t[0], $dotpos+1);
 
-      if (empty($port_table[$vrf_oid])) { $port_table[$vrf_oid][0] = $port_id; }
-        else {array_push($port_table[$vrf_oid], $port_id);}
+      if (empty($port_table[$vrf_oid]))
+      {
+        $port_table[$vrf_oid][0] = $port_id;
+      } else {
+        array_push($port_table[$vrf_oid], $port_id);
+      }
     }
 
     foreach (explode("\n", $rds) as $oid)
@@ -97,14 +101,20 @@ if ($config['enable_vrfs'])
         echo "\n  [VRF $vrf_name] RD    - ".$vrf_rd;
         echo "\n  [VRF $vrf_name] DESC  - ".$descr_table[$vrf_oid];
 
-        if (dbFetchCell('SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ? AND `vrf_oid` = ?', array($device['device_id'], $vrf_oid)))
+        //if (dbFetchCell('SELECT COUNT(*) FROM `vrfs` WHERE `device_id` = ? AND `vrf_oid` = ?', array($device['device_id'], $vrf_oid)))
+        if (dbExist('vrfs', '`device_id` = ? AND `vrf_oid` = ?', array($device['device_id'], $vrf_oid)))
         {
-          $update_array = array('mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd);
+          $update_array = array('mplsVpnVrfDescription' => $descr_table[$vrf_oid],
+                                'mplsVpnVrfRouteDistinguisher' => $vrf_rd);
           dbUpdate($update_array, 'vrfs', '`device_id` = ? AND `vrf_oid` = ?', array($device['device_id'], $vrf_oid));
         }
         else
         {
-          $insert_array = array('device_id' => $device['device_id'], 'vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd);
+          $insert_array = array('device_id' => $device['device_id'],
+                                'vrf_oid' => $vrf_oid,
+                                'vrf_name' => $vrf_name,
+                                'mplsVpnVrfDescription' => $descr_table[$vrf_oid],
+                                'mplsVpnVrfRouteDistinguisher' => $vrf_rd);
           dbInsert($insert_array, 'vrfs');
         }
 

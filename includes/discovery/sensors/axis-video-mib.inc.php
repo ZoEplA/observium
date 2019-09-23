@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -57,19 +57,19 @@ foreach ($oids as $index => $entry)
   $scale      = 1;
   $oid_name   = 'tempSensorValue';
   $oid_num    = '.1.3.6.1.4.1.368.4.1.3.1.4.'.$index;
-  $type       = $mib . '-' . $oid_name;
   $value      = $entry[$oid_name];
 
   if ($value <= 0) { continue; }
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
+
+  discover_sensor_ng($device, 'temperature', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value);
 
   $oid_name = 'tempSensorStatus';
   $oid_num  = '.1.3.6.1.4.1.368.4.1.3.1.3.'.$index;
   $type     = 'axisStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'other'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'other'));
 }
 
 // Fan Sensor
@@ -107,7 +107,7 @@ foreach ($oids as $index => $entry)
   $type     = 'axisStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'fan'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'fan'));
 }
 
 // EOF

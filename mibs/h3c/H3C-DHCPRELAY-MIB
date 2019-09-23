@@ -1,5 +1,5 @@
 -- =====================================================================
--- Copyright (C) 2003 by HUAWEI 3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2003 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: DHCP Relay MIB.
 -- Reference:
@@ -31,13 +31,14 @@ H3C-DHCPRELAY-MIB DEFINITIONS ::= BEGIN
                 LAST-UPDATED
                         "200506080000Z"
                 ORGANIZATION
-                        "Huawei 3Com Technologies Co.,Ltd.  "
+                    "Hangzhou H3C Tech. Co., Ltd."
                 CONTACT-INFO
-                        "Platform Team Huawei 3Com Technologies Co.,Ltd.
-                                Hai-Dian District Beijing P.R. China
-                                http://www.huawei-3com.com
-                                Zip: 100085"
-                DESCRIPTION "HUAWEI-3COM DHCPR MIB"
+                    "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                    Hai-Dian District Beijing P.R. China
+                    http://www.h3c.com
+                    Zip:100085
+                    "
+                DESCRIPTION "DHCPR MIB"
                 REVISION
                         "200506080000Z"
                 DESCRIPTION

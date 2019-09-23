@@ -1,8 +1,8 @@
 ELTEX-MES-eltMesIpMulticast-MIB DEFINITIONS ::= BEGIN
 
 -- Title:      Eltex MES Multicast Ip Configuration
--- Version:    1.1
--- Date:       23 Jun 2015
+-- Version:    1.3
+-- Date:       20 Dec 2017
 
 IMPORTS
     InterfaceIndex                                       FROM IF-MIB
@@ -12,7 +12,8 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     Unsigned32, IpAddress                                FROM SNMPv2-SMI
     eltMesIpMulticast                                    FROM ELTEX-MES
-    igmpInterfaceEntry									 FROM IGMP-STD-MIB;
+    igmpInterfaceEntry                                   FROM IGMP-STD-MIB
+    InetAddressType                                      FROM INET-ADDRESS-MIB;
 
 --
 -- Profile table
@@ -353,7 +354,6 @@ eltIgmpMldSnoopIfProfileProfileIndex OBJECT-TYPE
         "Index of profile."
     ::= { eltIgmpMldSnoopIfProfileEntry 2 }
 
-
 --
 -- Interface max groups table
 --
@@ -393,6 +393,7 @@ eltIgmpMldSnoopIfMaxGroupsMaxCount OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-write
     STATUS current
+    DEFVAL { 0 }
     DESCRIPTION
         "Max groups count."
     ::= { eltIgmpMldSnoopIfMaxGroupsEntry 2 }
@@ -455,7 +456,7 @@ eltIgmpMldSnoopIfProfileExtRowStatus OBJECT-TYPE
     DESCRIPTION
         "Status of profile."
     ::= { eltIgmpMldSnoopIfProfileExtEntry 3 }
-
+    
 
 --
 -- Authentication table
@@ -463,7 +464,9 @@ eltIgmpMldSnoopIfProfileExtRowStatus OBJECT-TYPE
 
 EltIgmpMldSnoopAuthType  ::= TEXTUAL-CONVENTION
    STATUS current
-   DESCRIPTION    "Line service type.rlAAAServiceTypeDontCare must be the maximum value in the enum."
+   DESCRIPTION    "IGMP/MLD snooping authorization type.
+   					none   - no authorization;
+   					radius - authorization with radius server."
    SYNTAX INTEGER {
       none(0),
       radius(1)
@@ -471,7 +474,11 @@ EltIgmpMldSnoopAuthType  ::= TEXTUAL-CONVENTION
 
 EltIgmpMldSnoopAuthStatusType  ::= TEXTUAL-CONVENTION
    STATUS current
-   DESCRIPTION    "Line service type.rlAAAServiceTypeDontCare must be the maximum value in the enum."
+   DESCRIPTION    "Status of IGMP/MLD snooping authorization.
+   					waiting - wait response from server;
+   					forward - authorization is successfull;
+   					discard - access denied by server;
+   					timeout - timeout of response from server."
    SYNTAX INTEGER {
       waiting(0),
       forward(1),
@@ -484,7 +491,7 @@ eltIgmpMldSnoopIfAuthTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The table lists the igmp mld snooping profiles."
+        "The table lists the IGMP/MLD snooping authorization configuration."
     ::= { eltMesIpMulticast 8 }
 
 eltIgmpMldSnoopIfAuthEntry OBJECT-TYPE
@@ -492,7 +499,7 @@ eltIgmpMldSnoopIfAuthEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "An entry containing assignment of igmp mld snooping profile to interface."
+        "An entry containing assignment of IGMP/MLD snooping authorization config per interface."
     INDEX { eltIgmpMldSnoopAuthIfIndex }
     ::= { eltIgmpMldSnoopIfAuthTable 1 }
 
@@ -519,6 +526,7 @@ eltIgmpMldSnoopAuthEnable OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "Enable authentication."
+    DEFVAL { false }
     ::= { eltIgmpMldSnoopIfAuthEntry 2 }
 
 eltIgmpMldSnoopAuthRequired OBJECT-TYPE
@@ -526,7 +534,10 @@ eltIgmpMldSnoopAuthRequired OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Enable IGMP report if Radius server unavailable."
+        "If enabled - discard all IGMP report 
+        messages in case when all authorization 
+        servers are unavailable."
+    DEFVAL { false }
     ::= { eltIgmpMldSnoopIfAuthEntry 3 }
 
 eltIgmpMldSnoopAuthForwardFirst OBJECT-TYPE
@@ -534,7 +545,8 @@ eltIgmpMldSnoopAuthForwardFirst OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Forwarding first."
+        "Add IGMP/MLD snooping entry before recieve response from authorization server."
+    DEFVAL { false }
     ::= { eltIgmpMldSnoopIfAuthEntry 4 }
 
 eltIgmpMldSnoopAuthRowStatus OBJECT-TYPE
@@ -542,7 +554,7 @@ eltIgmpMldSnoopAuthRowStatus OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Status of auth table."
+        "Status of auth config entry."
     ::= { eltIgmpMldSnoopIfAuthEntry 5 }
 
 --
@@ -554,11 +566,11 @@ eltIgmpMldSnoopAuthCacheTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The table IGMP authorization cache."
+        "The table lists the IGMP/MLD snooping authorization cache information."
     ::= { eltMesIpMulticast 9 }
 
 EltIgmpMldSnoopAuthCacheEntry ::= SEQUENCE {
-        eltIgmpMldSnoopAuthCacheMac                      MacAddress,
+    eltIgmpMldSnoopAuthCacheMac                      MacAddress,
     eltIgmpMldSnoopAuthCacheIfIndex                  InterfaceIndex,
     eltIgmpMldSnoopAuthCacheGroup                    OCTET STRING,
     eltIgmpMldSnoopAuthCacheClientAddr               OCTET STRING,
@@ -574,7 +586,7 @@ eltIgmpMldSnoopAuthCacheEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "An entry containing IGMP authorization cache."
+        "An entry containing assignment of IGMP/MLD snooping entry authorization cache info."
     INDEX { eltIgmpMldSnoopAuthCacheMac, eltIgmpMldSnoopAuthCacheIfIndex,  eltIgmpMldSnoopAuthCacheGroup, eltIgmpMldSnoopAuthCacheClientAddr}
     ::= { eltIgmpMldSnoopAuthCacheTable 1 }
 
@@ -625,7 +637,7 @@ eltIgmpMldSnoopAutCacheTimeStamp OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Time of create entry in seconds from system startup."
+        "Time of creating entry in seconds since system startup."
     ::= { eltIgmpMldSnoopAuthCacheEntry 6 }
 
 eltIgmpMldSnoopAuthCacheStatus OBJECT-TYPE
@@ -633,7 +645,8 @@ eltIgmpMldSnoopAuthCacheStatus OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Access of IGMP report."
+        "Status of IGMP/MLD report authorization 
+        (see EltIgmpMldSnoopAuthStatusType descriprion)."
     ::= { eltIgmpMldSnoopAuthCacheEntry 7 }
 
 eltIgmpMldSnoopAuthRowCacheStatus OBJECT-TYPE
@@ -641,96 +654,91 @@ eltIgmpMldSnoopAuthRowCacheStatus OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Row status."
+        "Status of authorization entry."
     ::= { eltIgmpMldSnoopAuthCacheEntry 8 }
 
 eltIgmpMldSnoopAuthCacheTimeout  OBJECT-TYPE
-    SYNTAX  Unsigned32
+    SYNTAX  INTEGER(0..10000)
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION
-        "IGMP + Radius cache timeout in minutes."
+        " IGMP + Radius cache timeout in mins."
+    DEFVAL { 0 }
     ::= { eltMesIpMulticast 10 }
 
-eltMesIgmp OBJECT IDENTIFIER ::= { eltMesIpMulticast 11 }
+--
+-- IGMP proxy QoS params
+--
 
---------------------------------------------------------------------------------
--- eltIgmpInterfaceTable
---------------------------------------------------------------------------------
-
-eltIgmpInterfaceTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF EltIgmpInterfaceEntry
-    MAX-ACCESS	not-accessible
+eltIgmpMldProxyQosParamsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltIgmpMldProxyQosParamsEntry
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The (conceptual) table listing the interfaces on which IGMP is
-         enabled."
-    ::= { eltMesIgmp 1 }
+        "The table lists QoS params for IGMP-proxy interfaces."
+    ::= { eltMesIpMulticast 13 }
 
-eltIgmpInterfaceEntry OBJECT-TYPE
-    SYNTAX      EltIgmpInterfaceEntry
-    MAX-ACCESS	not-accessible
+eltIgmpMldProxyQosParamsEntry OBJECT-TYPE
+    SYNTAX      EltIgmpMldProxyQosParamsEntry
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table augments existing table igmpInterfaceTable"
-    AUGMENTS { igmpInterfaceEntry }
-    ::= { eltIgmpInterfaceTable 1 }
-
-EltIgmpInterfaceEntry ::= SEQUENCE {
-    eltIgmpInterfaceProxyCos 	INTEGER,
-    eltIgmpInterfaceProxyDscp   INTEGER
+        "An entry containing QoS params for IGMP-proxy interface."
+    INDEX    { eltIgmpMldProxyQosParamsIfIndex, eltIgmpMldProxyQosParamsType }
+    ::= { eltIgmpMldProxyQosParamsTable 1 }
+    
+EltIgmpMldProxyQosParamsEntry ::= SEQUENCE {
+    eltIgmpMldProxyQosParamsIfIndex      InterfaceIndex,
+    eltIgmpMldProxyQosParamsType         INTEGER,
+    eltIgmpMldProxyQosParamsCos          INTEGER,
+    eltIgmpMldProxyQosParamsDscp         INTEGER,
+    eltIgmpMldProxyQosParamsStatus       RowStatus
 }
 
-eltIgmpInterfaceProxyCos 	OBJECT-TYPE
-	SYNTAX  	INTEGER(0..7)
-    MAX-ACCESS  read-write
-    STATUS		current
-    DEFVAL 		{0}
+eltIgmpMldProxyQosParamsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
     DESCRIPTION
-    	"IEEE 802.1p traffic class of IGMP-packets sended by IGMP proxy to this
-         interface."
-    ::= { eltIgmpInterfaceEntry 1 }
+        "Interface index."
+    ::= { eltIgmpMldProxyQosParamsEntry 1 }
 
-eltIgmpInterfaceProxyDscp 	OBJECT-TYPE
-	SYNTAX  	INTEGER(0..63)
-    MAX-ACCESS  read-write
-    STATUS		current
-    DEFVAL 		{0}
+eltIgmpMldProxyQosParamsType OBJECT-TYPE
+    SYNTAX     INTEGER { ipv4(1), ipv6(2) }
+    MAX-ACCESS not-accessible
+    STATUS     current
     DESCRIPTION
-    	"The six bits of the DiffServ field in IGMP-packets sended by IGMP proxy to this
-         interface."
-    ::= { eltIgmpInterfaceEntry 2 }
+            "The address type of this interface."
+    ::= { eltIgmpMldProxyQosParamsEntry 2 }
 
-
-eltMesIgmpProxy OBJECT IDENTIFIER ::= { eltMesIpMulticast 12 }
-
---------------------------------------------------------------------------------
--- eltIgmpProxyCos
---------------------------------------------------------------------------------
-
-eltIgmpProxyCos OBJECT-TYPE
-    SYNTAX      INTEGER(0..7)
+eltIgmpMldProxyQosParamsCos OBJECT-TYPE
+    SYNTAX      INTEGER(0..7 | 255)
     MAX-ACCESS  read-write
     STATUS      current
-    DEFVAL 		{0}
+    DEFVAL      {255}
     DESCRIPTION
-        "IEEE 802.1p traffic class of IGMP-packets sended by IGMP proxy to
-         upstream interface."
-    ::= { eltMesIgmpProxy 1 }
+        "IEEE 802.1p traffic class of IGMP-packets sended by
+        IGMP proxy to this interface. 255 - no changed."
+    ::= { eltIgmpMldProxyQosParamsEntry 3 }
 
---------------------------------------------------------------------------------
--- eltIgmpProxyDscp
---------------------------------------------------------------------------------
-
-eltIgmpProxyDscp OBJECT-TYPE
-    SYNTAX      INTEGER(0..63)
+eltIgmpMldProxyQosParamsDscp OBJECT-TYPE
+    SYNTAX      INTEGER(0..63 | 255)
     MAX-ACCESS  read-write
     STATUS      current
-    DEFVAL 		{0}
+    DEFVAL      {255}
     DESCRIPTION
-        "The six bits of the DiffServ field in IGMP-packets sended by IGMP proxy to
-         upstream interface."
-    ::= { eltMesIgmpProxy 2 }
+        "The six bits of the DiffServ field in IGMP-packets sended by
+        IGMP proxy to this interface. 255 - no changed."
+    ::= { eltIgmpMldProxyQosParamsEntry 4 }
+    
+eltIgmpMldProxyQosParamsStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Status of QoS params entry."
+    ::= { eltIgmpMldProxyQosParamsEntry 5 }
+
 
 END
 

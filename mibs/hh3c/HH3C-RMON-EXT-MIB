@@ -1,5 +1,5 @@
 -- ==================================================================
--- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This file describes the hh3c MIB implementation of perormance
 -- Reference:   the content of this file include part description from RFC1757
@@ -49,9 +49,9 @@ IMPORTS
     hh3cperformance MODULE-IDENTITY
         LAST-UPDATED "200303150000Z"        -- March 19, 2003 at 16:05 GMT
         ORGANIZATION
-            "Hangzhou H3C Tech. Co., Ltd."
+            "New H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            "Platform Team New H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
             http://www.h3c.com
             Zip:100085

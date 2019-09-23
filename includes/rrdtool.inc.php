@@ -7,14 +7,14 @@
  *
  * @package    observium
  * @subpackage rrdtool
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 /**
  * Get full path for rrd file.
  *
- * @param array $device Device arrary
+ * @param array $device Device array
  * @param string $filename Base filename for rrd file
  * @return string Full rrd file path
  */
@@ -23,10 +23,18 @@ function get_rrd_path($device, $filename)
 {
   global $config;
 
-  $filename = safename(trim($filename));
+  $rrd_dir = trim($config['rrd_dir']) . '/';
+  $filename = trim($filename);
+  if (str_starts($filename, $rrd_dir))
+  {
+    // Already full path
+    return $filename;
+  }
+
+  $filename = safename($filename);
 
   // If filename empty, return base rrd dirname for device (for example in delete_device())
-  $rrd_file = trim($config['rrd_dir']) . '/';
+  $rrd_file = $rrd_dir;
   if (strlen($device['hostname']))
   {
     $rrd_file .= $device['hostname'] . '/';
@@ -58,16 +66,20 @@ function rename_rrd($device, $old_rrd, $new_rrd, $overwrite = FALSE)
 {
   $old_rrd = get_rrd_path($device, $old_rrd);
   $new_rrd = get_rrd_path($device, $new_rrd);
+  print_debug_vars($old_rrd);
+  print_debug_vars($new_rrd);
   if (is_file($old_rrd))
   {
     if (!$overwrite && is_file($new_rrd))
     {
       // If not forced overwrite file, return false
+      print_debug("RRD already exist new file: '$new_rrd'");
       $renamed = FALSE;
     } else {
       $renamed = rename($old_rrd, $new_rrd);
     }
   } else {
+    print_debug("RRD old file not found: '$old_rrd'");
     $renamed = FALSE;
   }
   if ($renamed)
@@ -125,6 +137,8 @@ function rename_rrd_entity($device, $entity, $old, $new, $overwrite = FALSE)
       print_debug("skipped unknown entity for rename rrd");
       return FALSE;
   }
+
+  $old_rrd = safename($old_rrd);
 
   return rename_rrd($device, $old_rrd, $new_rrd, $overwrite);
 }
@@ -330,9 +344,8 @@ function rrdtool_graph($graph_file, $options)
  * @param string command
  * @param string filename
  * @param string options
- * @global config
- * @global debug
- * @global rrd_pipes
+ * @global array $config
+ * @global mixed $rrd_pipes
  */
 // TESTME needs unit testing
 function rrdtool($command, $filename, $options)
@@ -340,7 +353,7 @@ function rrdtool($command, $filename, $options)
   global $config, $rrd_pipes;
 
   // We now require rrdcached 1.5.5
-  if ($config['rrdcached'] && (OBS_RRD_NOLOCAL || $command != 'create'))
+  if ($config['rrdcached'] && (OBS_RRD_NOLOCAL || !in_array($command, ['create', 'tune'])))
   {
     $filename = str_replace($config['rrd_dir'].'/', '', $filename);
     if (OBS_RRD_NOLOCAL && $command == 'create')
@@ -363,7 +376,7 @@ function rrdtool($command, $filename, $options)
     return NULL;
   }
 
-  if (in_array($command, array('fetch', 'last', 'lastupdate')))
+  if (in_array($command, array('fetch', 'last', 'lastupdate', 'tune')))
   {
     // This commands require exact STDOUT, skip use pipes
     $command = $config['rrdtool'] . ' ' . $cmd;
@@ -477,14 +490,31 @@ function rrdtool_create($device, $filename, $ds, $options = '')
 }
 
 /**
- * Generates RRD filename from templated string.
+ * Generates RRD filename from definition
  *
- * @param string filename       Original filename, using %index% (or %custom% %keys%) as placeholder for indexes
- * @param string/array index    Index, if RRD type is indexed (or array of multiple indexes)
+ * @param string/array $def    Original filename, using %index% (or %custom% %keys%) as placeholder for indexes
+ * @param string/array $index  Index, if RRD type is indexed (or array of multiple indexes)
+ * @return string              Filename of RRD
  */
 // TESTME needs unit testing
-function rrdtool_generate_filename($filename, $index)
+function rrdtool_generate_filename($def, $index)
 {
+  if (is_string($def))
+  {
+    // Compat with old
+    $filename = $def;
+  }
+  elseif (isset($def['file']))
+  {
+    $filename = $def['file'];
+  }
+  elseif (isset($def['entity_type']))
+  {
+    // Entity specific filename by ID, ie for sensor/status/counter
+    $entity_id = $index;
+    return get_entity_rrd_by_id($def['entity_type'], $entity_id);
+  }
+
   // Generate warning for indexed filenames containing %index% - does not help if you use custom field names for indexing
   if (strstr($filename, '%index%') !== FALSE)
   {
@@ -501,7 +531,7 @@ function rrdtool_generate_filename($filename, $index)
   // Replace %index% by $index['index'], %foo% by $index['foo'] etc.
   $filename = array_tag_replace($index, $filename);
 
-  return $filename;
+  return safename($filename);
 }
 
 /**
@@ -509,13 +539,15 @@ function rrdtool_generate_filename($filename, $index)
  * Only creates the file if it does not exist yet.
  * Should most likely not be called on its own, as an update call will check for existence.
  *
- * @param array        device   Device array
- * @param string/array type     rrd file type from $config['rrd_types'] or actual config array
- * @param string/array index    Index, if RRD type is indexed (or array of multiple indexes)
- * @param string       options  RRA options to pass (defaults to $config['rrd']['rra'])
+ * @param array        $device   Device array
+ * @param string/array $type     rrd file type from $config['rrd_types'] or actual config array
+ * @param string/array $index    Index, if RRD type is indexed (or array of multiple tags)
+ * @param array        $options  Options for create RRD, like STEP, RRA, MAX or SPEED
+ *
+ * @return string
  */
 // TESTME needs unit testing
-function rrdtool_create_ng($device, $type, $index = NULL, $options = NULL)
+function rrdtool_create_ng($device, $type, $index = NULL, $options = [])
 {
   global $config;
 
@@ -532,7 +564,7 @@ function rrdtool_create_ng($device, $type, $index = NULL, $options = NULL)
     $definition = $type;
   }
 
-  $filename = rrdtool_generate_filename($definition['file'], $index);
+  $filename = rrdtool_generate_filename($definition, $index);
 
   $fsfilename = get_rrd_path($device, $filename);
 
@@ -551,12 +583,31 @@ function rrdtool_create_ng($device, $type, $index = NULL, $options = NULL)
     return FALSE; // Bail out if the file exists already
   }
 
-  if ($options === NULL)
-  {
-    $options = preg_replace('/\s+/', ' ', $config['rrd']['rra']);
-  }
+  // Set RRA option
+  $rra = isset($options['rra']) ? $options['rra'] : $config['rrd']['rra'];
+  $rra = preg_replace('/\s+/', ' ', $rra);
 
-  $step = '--step ' . $config['rrd']['step'];
+  // Set step
+  $step = isset($options['step']) ? $options['step'] : $config['rrd']['step'];
+
+  // Create tags, for use in replace
+  $tags = [];
+  if (strlen($index))
+  {
+    $tags['index'] = $index;
+  }
+  if (isset($options['speed']))
+  {
+    print_debug("Passed speed: ".$options['speed']);
+    $options['speed'] = intval(unit_string_to_numeric($options['speed']) / 8); // Detect passed speed value (converted to bits)
+    $tags['speed']    = max($options['speed'], $config['max_port_speed']);     // But result select maximum between passed and default!
+    print_debug("   RRD speed: ".$options['speed'].PHP_EOL.
+                "     Default: ".$config['max_port_speed'].PHP_EOL.
+                "         Max: ".$tags['speed']);
+  } else {
+    // Default speed
+    $tags['speed'] = $config['max_port_speed'];
+  }
 
   // Create DS parameter based on the definition
   $ds = array();
@@ -568,15 +619,16 @@ function rrdtool_create_ng($device, $type, $index = NULL, $options = NULL)
     // Set defaults for missing attributes
     if (!isset($def['type']))      { $def['type'] = 'COUNTER'; }
     if (!isset($def['max']))       { $def['max'] = 'U'; }
+    else                           { $def['max'] = array_tag_replace($tags, $def['max']); } // can use %speed% tag, speed must passed by $options['speed']
     if (!isset($def['min']))       { $def['min'] = 'U'; }
-    if (!isset($def['heartbeat'])) { $def['heartbeat'] = 2 * $config['rrd']['step']; }
+    if (!isset($def['heartbeat'])) { $def['heartbeat'] = 2 * $step; }
 
     // Create DS string to pass on the command line
     $ds[] = "DS:$name:" . $def['type'] . ':' . $def['heartbeat'] . ':' . $def['min'] . ':' . $def['max'];
   }
 
 
-  return rrdtool('create', $fsfilename, implode(' ', $ds) . " $step $options");
+  return rrdtool('create', $fsfilename, implode(' ', $ds) . " --step $step $rra");
 
 }
 
@@ -617,15 +669,17 @@ function rrd_exists($device, $filename)
  * Updates an rrd database at $filename using $options
  * Where $options is an array, each entry which is not a number is replaced with "U"
  *
- * @param array        device  Device array
- * @param string/array type    RRD file type from $config['rrd_types'] or actual config array
- * @param array        ds      DS data (key/value)
- * @param string/array index   Index, if RRD type is indexed (or array of multiple indexes)
- * @param bool         create  Create RRD file if it does not exist
- * @param string       options Options to pass to create function if file does not exist
+ * @param array        $device  Device array
+ * @param string/array $type    RRD file type from $config['rrd_types'] or actual config array
+ * @param array        $ds      DS data (key/value)
+ * @param string/array $index   Index, if RRD type is indexed (or array of multiple indexes)
+ * @param bool         $create  Create RRD file if it does not exist
+ * @param array        $options Options to pass to create function if file does not exist
+ *
+ * @return string
  */
 // TESTME needs unit testing
-function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE)
+function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE, $options = [])
 {
   global $config, $graphs;
 
@@ -648,7 +702,7 @@ function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE)
     $definition = $type;
   }
 
-  $filename = rrdtool_generate_filename($definition['file'], $index);
+  $filename = rrdtool_generate_filename($definition, $index);
 
   $fsfilename = get_rrd_path($device, $filename);
 
@@ -700,13 +754,14 @@ function rrdtool_update_ng($device, $type, $ds, $index = NULL, $create = TRUE)
  * Where $options is an array, each entry which is not a number is replaced with "U"
  * DEPRECATED: use rrdtool_update_ng(), this will disappear and ng will be renamed when conversion is complete.
  *
- * @param array  device
- * @param string filename
- * @param array  options
+ * @param array   $device
+ * @param string  $filename
+ * @param array   $options
+ * @return string
  */
 function rrdtool_update($device, $filename, $options)
 {
-  // Do some sanitisation on the data if passed as an array.
+  // Do some sanitization on the data if passed as an array.
   if (is_array($options))
   {
     $values[] = "N";
@@ -726,7 +781,8 @@ function rrdtool_update($device, $filename, $options)
 
   $fsfilename = get_rrd_path($device, $filename);
 
-  if ( $config['influxdb']['enabled'] ) {
+  if ($GLOBALS['config']['influxdb']['enabled'])
+  {
     influxdb_update( $device, $filename, $options );
   }
 
@@ -770,10 +826,10 @@ function rrdtool_lastupdate($filename, $options = '')
 /**
  * Renames a DS inside an RRD file
  *
- * @param array Device
- * @param string Filename
- * @param string Current DS name
- * @param string New DS name
+ * @param array  $device   Device
+ * @param string $filename Filename
+ * @param string $oldname  Current DS name
+ * @param string $newname  New DS name
  */
 function rrdtool_rename_ds($device, $filename, $oldname, $newname)
 {
@@ -783,18 +839,27 @@ function rrdtool_rename_ds($device, $filename, $oldname, $newname)
   if ($config['norrd'])
   {
     print_message('[%gRRD Disabled%n] ');
+    return $return;
   }
-  else if (OBS_RRD_NOLOCAL)
+
+  // rrdtool tune rename DS supported since v1.4
+  $version = get_versions();
+  if (version_compare($version['rrdtool_version'], '1.4', '>='))
   {
-    ///FIXME Currently unsupported on remote rrdcached
+    $fsfilename = get_rrd_path($device, $filename);
+    print_debug("RRD DS renamed, file $fsfilename: '$oldname' -> '$newname'");
+    return rrdtool('tune', $filename, "--data-source-rename $oldname:$newname");
+  }
+
+  // Comparability with old version (but we support only >= v1.5.5, this not required)
+  if (OBS_RRD_NOLOCAL)
+  {
     print_message('[%gRRD REMOTE UNSUPPORTED%n] ');
   } else {
     $fsfilename = get_rrd_path($device, $filename);
     if (is_file($fsfilename))
     {
       // this function used in discovery, where not exist rrd pipes
-      // FIXME shouldn't we fix that then? either pipes in discovery, or make the generic function aware of the lack of pipes?
-      //rrdtool("tune", $fsfilename, "--data-source-rename $oldname:$newname");
       $command = $config['rrdtool'] . " tune $fsfilename --data-source-rename $oldname:$newname";
       $return  = external_exec($command);
       //print_vars($GLOBALS['exec_status']);
@@ -826,21 +891,27 @@ function rrdtool_add_ds($device, $filename, $add)
   if ($config['norrd'])
   {
     print_message("[%gRRD Disabled%n] ");
+    return $return;
   }
-  else if (OBS_RRD_NOLOCAL)
+
+  // rrdtool tune add DS supported since v1.4
+  $version = get_versions();
+  if (version_compare($version['rrdtool_version'], '1.4', '>='))
   {
-    ///FIXME Currently unsupported on remote rrdcached
+    $fsfilename = get_rrd_path($device, $filename);
+    print_debug("RRD DS added, file ".$fsfilename.": '".$add."'");
+    return rrdtool('tune', $filename, "DS:$add");
+  }
+
+  // Comparability with old version (but we support only >= v1.5.5, this not required)
+  if (OBS_RRD_NOLOCAL)
+  {
     print_message('[%gRRD REMOTE UNSUPPORTED%n] ');
   } else {
     $fsfilename = get_rrd_path($device, $filename);
     if (is_file($fsfilename))
     {
       // this function used in discovery, where not exist rrd pipes
-      //rrdtool("tune", $fsfilename, "--data-source-rename $oldname:$newname");
-      //$command = $config['rrdtool'] . " tune $fsfilename --data-source-rename $oldname:$newname";
-      // $return  = external_exec($command);
-
-      // FIXME -- in future do this via rrdtool tune -- requires 1.5, so not for old versions.
 
       $fsfilename = get_rrd_path($device, $filename);
 
@@ -1011,6 +1082,18 @@ function rrdtool_file_info($file)
   }
 
   return $info;
+}
+
+// Creates a string of X number of ,ADDNAN. Used when aggregating things.
+function rrd_addnan($count)
+{
+  return str_repeat(',ADDNAN', $count);
+}
+
+// creates an rpn string to add an array of DSes together
+function rrd_aggregate_dses($ds_list)
+{
+  return implode(',', $ds_list) . rrd_addnan(count($ds_list) - 1);
 }
 
 // EOF

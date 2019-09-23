@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI DHCP SNOOPING MIB
 -- Reference:
--- Version: V2.05
+-- Version: V2.06
 -- History:
 --    wangcheng 60005987 initial    16/02/2006
 --  hexiaoqin 60020960 modified   25/12/2006
@@ -82,7 +82,7 @@
 -- Module Identifier                
 --
     hwDhcpSnpMib MODULE-IDENTITY 
-        LAST-UPDATED "201610280000Z"            -- Oct 28th, 2016 at 21:00 GMT
+        LAST-UPDATED "201708170000Z"            -- Aug 17th, 2017 at 16:47 GMT
         ORGANIZATION 
              "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -90,6 +90,9 @@
 
        DESCRIPTION
             "Change the DHCP Snooping Conformance."
+       REVISION "201708170000Z" 	
+       DESCRIPTION
+            "Modify the description of hwDhcpSnpChaddrAlarm."
        REVISION "201610280000Z" 
 	
        DESCRIPTION
@@ -962,8 +965,7 @@
                MAX-ACCESS read-only
                STATUS current
                DESCRIPTION 
-                   "The false packets(chaddr in DHCP packets is not same with source Mac-address in
-                   Ethernet frame) count."
+                   "This object indicates that the number of received DHCP packets in which the source MAC address carried in the CHADDR field is incorrect exceeds the configured threshold. An attacker may attack a target by continuously changing its MAC address."
                ::= { hwDhcpSnpFalsePktStatisticEntry 3 }
     
           
@@ -1449,7 +1451,7 @@
             OBJECTS { hwDhcpSnpStatisticIfDescr,hwDhcpSnpStatisticVlanId,hwChaddrNomatchSrcMacDhcpPktNum } 
             STATUS current     
             DESCRIPTION 
-                "CHADDR in Dhcp packets do not match source Mac-address in Ethernet frame. "
+                "This object indicates that the ARP packet does not match the binding table."
             ::= { hwDhcpSnpTraps 1 }
                   
     hwArpNomatchSnpBindTblPktAlarm NOTIFICATION-TYPE

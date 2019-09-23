@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -26,11 +26,12 @@ switch ($device['os'])
     {
       if ($agent_data['dmi']['system-product-name'])
       {
-        $hw = ($agent_data['dmi']['system-manufacturer'] ? $agent_data['dmi']['system-manufacturer'] . ' ' : '') . $agent_data['dmi']['system-product-name'];
-
-        // Clean up "Dell Computer Corporation" and "Intel Corporation"
-        $hw = str_replace(' Computer Corporation', '', $hw);
-        $hw = str_replace(' Corporation', '', $hw);
+        $hw = $agent_data['dmi']['system-product-name'];
+      }
+      if ($agent_data['dmi']['system-manufacturer'])
+      {
+        // Cleanup Vendor name
+        $vendor = rewrite_vendor($agent_data['dmi']['system-manufacturer']);
       }
 
       // If these exclude lists grow any further we should move them to definitions...
@@ -175,6 +176,115 @@ switch ($device['os'])
       $version  = $data[0]['swFirmwareRunning'];
     }
     break;
+
+  case 'osix':
+    //Linux me-sg199-ch-zur-acc-1 4.1.39_1-osix- #1 SMP Mon May 7 17:35:37 MEST 2018 x86_64
+    //
+    //me: the customer company code letters
+    //sg:  device type code letters
+    //
+    //        sg             = "Security Gateway"          exp: me-sg001-ch-gla-1
+    //                sg * dns  = "DNS Server"                     exp: me-sg005-ch-gla-dns-1
+    //                sg * mep = "Mobile Entry Point"         exp:  me-sg007-ch-gla-mep-1
+    //
+    //                bgp      = "BGP Router"                            exp: me-bgp001-ch-gla-1
+    //                aut         = "Authentication Passport"    exp: me-aut001-ch-gla-1
+    //                cvp       = "Client-VPN"                              exp: me-cvp001-ch-gla-1
+    //                fw           = "Firewall"                                    exp: me-fw001-ch-gla-1
+    //                mx         = "Email Gateway"                     exp: me-mx001-ch-gla-1
+    //                prx         = "Internet Proxy"                        exp: me-prx001-ch-gla-1
+    //                rpx         = "R-proxy (WAF)"                     exp: me-rpx002-ch-gla-1
+    //                sw          = "Managed Switch"                  exp: me-sw012-ch-gla-1
+    //
+    //199:  device number. It's unique regarding device type
+    // ch:    2 letter ISO code for country location
+    // zur:   3 first letter from the location / city name
+    // acc:   optional or sub-segment, like dns and mep
+    // 1:        Device number in the same clusters for High availability
+    if (preg_match('/^Linux\ +\w+\-(?<hw>(?<hw1>[a-z]+)0*\d+)\-\w+\-\w+\-(?:(?<hw2>\w+)\-)?\d+/', $poll_device['sysDescr'], $matches))
+    {
+      switch ($matches['hw1'])
+      {
+        case 'sg':
+          if (isset($matches['hw2']) && $matches['hw2'] == 'dns')
+          {
+            $hw = 'DNS Server';
+            $type = 'server';
+          }
+          else if (isset($matches['hw2']) && $matches['hw2'] == 'mep')
+          {
+            $hw = 'Mobile Entry Point';
+            $type = 'network';
+          } else {
+            $hw = 'Security Gateway';
+            $type = 'security';
+          }
+          break;
+
+        case 'bgp':
+          $hw = 'BGP Router';
+          $type = 'network';
+          break;
+
+        case 'aut':
+          $hw = 'Authentication Passport';
+          $type = 'security';
+          break;
+
+        case 'cvp':
+          $hw = 'Client-VPN';
+          $type = 'security';
+          break;
+
+        case 'fw':
+          $hw = 'Firewall';
+          $type = 'firewall';
+          break;
+
+        case 'mx':
+          $hw = 'Email Gateway';
+          $type = 'server';
+          break;
+
+        case 'prx':
+          $hw = 'Internet Proxy';
+          $type = 'security';
+          break;
+
+        case 'rpx':
+          $hw = 'R-proxy (WAF)';
+          $type = 'security';
+          break;
+
+        case 'sw':
+          $hw = 'Managed Switch';
+          $type = 'network';
+          break;
+
+        case 'ids':
+          $hw = 'Network Security Monitoring';
+          $type = 'security';
+          break;
+
+        case 'apm':
+          $hw = 'Application Performance Management';
+          $type = 'server';
+          break;
+
+        case 'par':
+          $hw = 'Partner Security Gateway';
+          $type = 'security';
+          break;
+      }
+    }
+
+    if (empty($hw))
+    {
+      $hw = 'OSAG Hardware';
+    }
+    //$hardware = $hw . ' (' . strtoupper($matches['hw']) . ')';
+    $hardware = rewrite_unix_hardware($poll_device['sysDescr'], $hw);
+    break;
 }
 
 // Has 'distro' script data already been returned via the agent?
@@ -223,6 +333,28 @@ if (isset($agent_data['distro']) && isset($agent_data['distro']['SCRIPTVER']))
   } else {
     // Old distro, not supported now: "Ubuntu 12.04"
     list($distro, $distro_ver) = explode(' ', $os_data);
+  }
+}
+
+// Hardware/vendor "extend" support
+if (is_device_mib($device, 'UCD-SNMP-MIB'))
+{
+  $hw = snmp_get_oid($device, '.1.3.6.1.4.1.2021.7890.2.3.1.1.8.104.97.114.100.119.97.114.101', 'UCD-SNMP-MIB');
+  if (strlen($hw))
+  {
+    $hardware = rewrite_unix_hardware($poll_device['sysDescr'], $hw);
+    $vendor = snmp_get_oid($device, '.1.3.6.1.4.1.2021.7890.3.3.1.1.6.118.101.110.100.111.114', 'UCD-SNMP-MIB');
+    if (!snmp_status())
+    {
+      // Alternative with manufacturer
+      $vendor = snmp_get_oid($device, '.1.3.6.1.4.1.2021.7890.3.3.1.1.12.109.97.110.117.102.97.99.116.117.114.101.114', 'UCD-SNMP-MIB');
+    }
+    $serial = snmp_get_oid($device, '.1.3.6.1.4.1.2021.7890.4.3.1.1.6.115.101.114.105.97.108', 'UCD-SNMP-MIB');
+    if (str_contains($serial, 'denied') ||
+        $serial == '0123456789' || $serial == '............' || $serial == 'Not Specified')
+    {
+      unset($serial);
+    }
   }
 }
 

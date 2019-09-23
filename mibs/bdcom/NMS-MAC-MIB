@@ -327,6 +327,31 @@ mac	MODULE-IDENTITY
               ::= { vlanDisableLearningEntry 2 }
 
 
+-- fdbStatistic（mac地址表统计）1.3.6.1.4.1.3320.152.5
+
+               fdbStatistic         OBJECT IDENTIFIER ::= { mac 5 }
+
+               fdbStatisticEntry         OBJECT IDENTIFIER ::= { fdbStatistic 1 }
+
+          fdbGlobalCurrentNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Current entry number in mac address table."
+              ::= { fdbStatisticEntry 1 }
+
+          fdbGlobalMaxNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+              DESCRIPTION
+                      "Max entry number in mac address table."
+              ::= { fdbStatisticEntry 2 }
+
+
 
 
 

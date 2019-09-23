@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -35,7 +35,7 @@ foreach (dbFetchRows("SELECT * FROM storage where device_id = ?", array($device[
   $colour=$config['graph_colours'][$colours][$iter];
 
   $descr = rrdtool_escape($storage['storage_descr'], $descr_len);
-  $rrd = get_rrd_path($device, "storage-".$storage['storage_mib']."-".$storage['storage_descr'].".rrd");
+  $rrd = get_rrd_path($device, "storage-".strtolower($storage['storage_mib'])."-".$storage['storage_descr'].".rrd");
   if (is_file($rrd))
   {
     $rrd_options .= " DEF:".$storage['storage_id']."used=$rrd:used:AVERAGE";

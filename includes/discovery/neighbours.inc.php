@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -24,7 +24,7 @@ if (OBS_DEBUG > 1 && count($GLOBALS['cache']['discovery-protocols']))
 }
 
 $table_rows = array();
-$neighbours_db = dbFetchRows('SELECT * FROM `neighbours` LEFT JOIN `ports` USING(`port_id`) WHERE `device_id` = ?', array($device['device_id']));
+$neighbours_db = dbFetchRows('SELECT * FROM `neighbours` WHERE `device_id` = ?', array($device['device_id']));
 foreach ($neighbours_db as $neighbour)
 {
   $local_port_id   = $neighbour['port_id'];

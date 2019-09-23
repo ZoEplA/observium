@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -35,7 +35,7 @@ $menu_start = utime();
                    <?php
 
                    //////////// Build main "globe" menu
-                   $navbar['observium'] = array('url' => generate_url(array('page' => 'overview')), 'icon' => $config['icon']['globe']);
+                   $navbar['observium'] = array('url' => generate_url(array('page' => 'dashboard')), 'icon' => $config['icon']['globe']);
 
 
                    // Dashboards
@@ -45,26 +45,26 @@ $menu_start = utime();
 
                       $dashboards = dbFetchRows("SELECT * FROM `dashboards`");
 
+                      $entries = array();
+
                       if (count($dashboards))
                       {
-                         $navbar['observium']['dash']['text'] = "Dashboards";
-
-                         $entries = array();
-
+                         //$navbar['observium']['dash']['text'] = "Dashboards";
                          foreach ($dashboards as $dash)
                          {
-                            $entries[] = array('text' => $dash['dash_name'], 'url' => generate_url($vars, array('page' => "dashboard", 'dash' => $dash['dash_id'])));
+                            $entries[] = array('text' => $dash['dash_name'], 'url' => generate_url(array('page' => "dashboard", 'dash' => $dash['dash_id'])), 'icon' => $config['icon']['overview']);
                          }
-
-                         //$navbar['observium']['entries'][] = array('title' => 'Dashboards', 'url' => generate_url(array('page' => 'overview')), 'icon' => $config['icon']['overview'], 'entries' => $entries);
-                         //$navbar['observium']['entries'][] = array('divider' => TRUE);
-                         //unset($entries);
-
                       }
+
+                     $entries[] = array('divider' => TRUE);
+
+
+                     $entries[] = array('title' => 'Create Dashboard', 'url' => generate_url(array('page' => 'dashboard_add')), 'icon' => $config['icon']['plus']);
+
                    }
 
 
-                   $navbar['observium']['entries'][] = array('title' => 'Overview', 'url' => generate_url(array('page' => 'overview')), 'icon' => $config['icon']['overview'], 'entries' => $entries);
+                   $navbar['observium']['entries'][] = array('title' => 'Dashboard', 'url' => generate_url(array('page' => 'dashboard')), 'icon' => $config['icon']['overview'], 'entries' => $entries);
                    $navbar['observium']['entries'][] = array('divider' => TRUE);
 
                    unset($entries);
@@ -203,7 +203,11 @@ $menu_start = utime();
                    //////////// Build devices menu
                    $navbar['devices'] = array('url' => generate_url(array('page' => 'devices')), 'icon' => $config['icon']['devices'], 'title' => 'Devices');
 
-                   $navbar['devices']['entries'][] = array('title' => 'All Devices', 'count' => $cache['devices']['stat']['count'], 'url' => generate_url(array('page' => 'devices')), 'icon' => $config['icon']['devices']);
+                   $navbar['devices']['entries'][] = array('title'       => 'All Devices',
+                                                           'count'       => $cache['devices']['stat']['count'],
+                                                           'count_array' => $cache['devices']['stat'],
+                                                           'url'         => generate_url(array('page' => 'devices')),
+                                                           'icon'        => $config['icon']['devices']);
 
                    if (count($entity_group_menu['device']))
                    {
@@ -289,7 +293,11 @@ $menu_start = utime();
                    {
                       if (in_array($devtype['type'], array_keys($cache['device_types'])))
                       {
-                         $navbar['devices']['entries'][] = array('title' => $devtype['text'], 'icon' => $devtype['icon'], 'count' => $cache['device_types'][$devtype['type']], 'url' => generate_url(array('page' => 'devices', 'type' => $devtype['type'])));
+                         $navbar['devices']['entries'][] = array('title' => $devtype['text'],
+                                                                 'icon' => $devtype['icon'],
+                                                                 'count_array' =>  $cache['devices']['types'][$devtype['type']],
+                                                                 'count' => $cache['device_types'][$devtype['type']],
+                                                                 'url' => generate_url(array('page' => 'devices', 'type' => $devtype['type'])));
                       }
                    }
 
@@ -298,15 +306,15 @@ $menu_start = utime();
                       $navbar['devices']['entries'][] = array('divider' => TRUE);
                       if ($cache['devices']['stat']['down'])
                       {
-                         $navbar['devices']['entries'][] = array('url' => generate_url(array('page' => 'devices', 'status' => '0')), 'icon' => $config['icon']['exclamation'], 'title' => 'Down', count => $cache['devices']['stat']['down']);
+                         $navbar['devices']['entries'][] = array('url' => generate_url(array('page' => 'devices', 'status' => '0')), 'icon' => $config['icon']['exclamation'], 'title' => 'Down', 'count_array' => ['down' => $cache['devices']['stat']['down']]);
                       }
                       if ($cache['devices']['stat']['ignored'])
                       {
-                         $navbar['devices']['entries'][] = array('url' => generate_url(array('page' => 'devices', 'ignore' => '1')), 'icon' => $config['icon']['ignore'], 'title' => 'Ignored', count => $cache['devices']['stat']['ignored']);
+                         $navbar['devices']['entries'][] = array('url' => generate_url(array('page' => 'devices', 'ignore' => '1')), 'icon' => $config['icon']['ignore'], 'title' => 'Ignored', 'count_array' => ['ignored' => $cache['devices']['stat']['ignored']]);
                       }
                       if ($cache['devices']['stat']['disabled'])
                       {
-                         $navbar['devices']['entries'][] = array('url' => generate_url(array('page' => 'devices', 'disabled' => '1')), 'icon' => $config['icon']['shutdown'], 'title' => 'Disabled', count => $cache['devices']['stat']['disabled']);
+                         $navbar['devices']['entries'][] = array('url' => generate_url(array('page' => 'devices', 'disabled' => '1')), 'icon' => $config['icon']['shutdown'], 'title' => 'Disabled', 'count_array' => ['disabled' => $cache['devices']['stat']['disabled']]);
                       }
                    }
 
@@ -477,12 +485,17 @@ $menu_start = utime();
 
                    if ($cache['status']['count'])
                    {
-                      $health_items['status'] = array('text' => 'Status', 'icon' => $config['entities']['status']['icon']);
+                      $health_items['status'] = array('text' => 'Status', 'icon' => $config['entities']['status']['icon'], 'count_array' => $cache['statuses']['stat']);
+                   }
+
+                   if ($cache['counter']['count'])
+                   {
+                     $health_items['counter'] = array('text' => 'Counter', 'icon' => $config['entities']['counter']['icon'], 'count_array' => $cache['counters']['stat']);
                    }
 
                    foreach ($health_items as $item => $item_data)
                    {
-                      $navbar['health']['entries'][] = array('url' => generate_url(array('page' => 'health', 'metric' => $item)), 'icon' => $item_data['icon'], 'title' => $item_data['text']);
+                      $navbar['health']['entries'][] = array('url' => generate_url(array('page' => 'health', 'metric' => $item)), 'icon' => $item_data['icon'], 'title' => $item_data['text'], 'count_array' => $item_data['count_array']);
                       unset($menu_sensors[$item]);
                       $sep++;
                    }
@@ -491,7 +504,7 @@ $menu_start = utime();
 
                    $menu_items[0] = array('fanspeed', 'humidity', 'temperature', 'airflow');
                    $menu_items[1] = array('current', 'voltage', 'power', 'apower', 'rpower', 'frequency');
-                   $menu_items[2] = array_diff(array_keys($cache['sensor_types']), $menu_items[0], $menu_items[1]);
+                   $menu_items[2] = array_diff(array_keys($cache['sensors']['types']), $menu_items[0], $menu_items[1]);
 
                    foreach ($menu_items as $items)
                    {
@@ -499,17 +512,22 @@ $menu_start = utime();
 
                       foreach ($items as $item)
                       {
-                         if ($cache['sensor_types'][$item])
+                         if ($cache['sensors']['types'][$item])
                          {
-                             if(is_array($config['sensor_types'][$item]))
+                             if (is_array($cache['sensors']['types'][$item]))
                              {
                                if ($sep)
                                {
                                  $navbar['health']['entries'][] = array('divider' => TRUE);
                                  $sep = 0;
                                }
-                               $alert_icon = ($cache['sensor_types'][$item]['alert'] ? '<i class="' . $config['icon']['flag'] . ' mini-icon"></i>' : '');
-                               $navbar['health']['entries'][] = array('url' => generate_url(array('page' => 'health', 'metric' => $item)), 'count' => $cache['sensor_types'][$item]['count'], 'alert_count' => $cache['sensor_types'][$item]['alert'], 'icon' => $config['sensor_types'][$item]['icon'], 'title' => nicecase($item));
+                               //$alert_icon = ($cache['sensor_types'][$item]['alert'] ? '<i class="' . $config['icon']['flag'] . ' mini-icon"></i>' : '');
+                               $navbar['health']['entries'][] = array('url' => generate_url(array('page' => 'health', 'metric' => $item)),
+                                                                      'count_array' => $cache['sensors']['types'][$item],
+                                                                      'count' => $cache['sensors']['types'][$item]['count'],
+                                                                      'alert_count' => $cache['sensors']['types'][$item]['alert'],
+                                                                      'icon' => $config['sensor_types'][$item]['icon'],
+                                                                      'title' => nicecase($item));
                              }
                          }
                       }
@@ -570,10 +588,24 @@ $menu_start = utime();
 
                       $separator = 0;
 
+                      if (count($entity_group_menu['bgp_peer']) || count($entity_group_menu['bgp_peer_af']))
+                      {
+			 if (count($entity_group_menu['bgp_peer']))
+                            $navbar['routing']['entries'][] = array('title' => 'BGP Peer Groups', 'url' => generate_url(array('page' => 'groups', 'entity_type' => 'bgp_peer')), 'icon' => $config['icon']['group'], 'count' => count($entity_group_menu['bgp_peer']), 'entries' => array_merge($entity_group_menu['bgp_peer']));
+			 if (count($entity_group_menu['bgp_peer_af']))
+                            $navbar['routing']['entries'][] = array('title' => 'BGP Peer (AFI/SAFI) Groups', 'url' => generate_url(array('page' => 'groups', 'entity_type' => 'bgp_peer_af')), 'icon' => $config['icon']['group'], 'count' => count($entity_group_menu['bgp_peer_af']), 'entries' => array_merge($entity_group_menu['bgp_peer_af']));
+                         $separator = 1;
+                      }
+
                       if ($cache['routing']['vrf']['count'])
                       {
+                         if ($separator)
+                         {
+                            $navbar['routing']['entries'][] = array('divider' => TRUE);
+                            $separator                      = 0;
+                         }
                          $navbar['routing']['entries'][] = array('url' => generate_url(array('page' => 'routing', 'protocol' => 'vrf')), 'icon' => $config['icon']['vrf'], 'title' => 'VRFs', 'count' => $cache['routing']['vrf']['count']);
-                         $separator++;
+
                       }
 
                       if ($cache['routing']['cef']['count'])
@@ -664,12 +696,9 @@ $menu_start = utime();
 
                       foreach ($dropdown['entries'] as $entry)
                       {
-                         if (count($entry['entries']))
-                         {
+                         if (count($entry['entries'])) {
                             navbar_submenu($entry);
-                         }
-                         else
-                         {
+                         } else {
                             navbar_entry($entry);
                          }
                       }
@@ -758,7 +787,7 @@ $(function() {
                          $ua['previous_browser'] = detect_browser($ua['previous_session']['user_agent']);
                          $ua['content']          .= '<hr><span class="small">Previous session from&nbsp;<em class="pull-right">' . ($_SESSION['userlevel'] > 5 ? $ua['previous_session']['address'] : preg_replace('/^\d+/', '*', $ua['previous_session']['address'])) . '</em></span>';
                          $ua['content']          .= '<br /><span class="small pull-right"><em> at ' . format_timestamp($ua['previous_session']['datetime']) . '</span>';
-                         $ua['content']          .= '<br /><span class="small pull-right"><i class="' . $ua['previous_browser']['icon'] . '"></i>&nbsp;' . $ua['previous_browser']['browser_full'] . ' (' . $ua['previous_browser']['platform'] . ')' . '</em></span>';
+                         $ua['content']          .= '<br /><span class="small pull-right">' . get_icon($ua['previous_browser']['icon']) . '&nbsp;' . $ua['previous_browser']['browser_full'] . ' (' . $ua['previous_browser']['platform'] . ')' . '</em></span>';
                       }
                    }
 
@@ -787,7 +816,7 @@ $(function() {
                               }
                               else
                               {
-                                 echo('    <li class="' . $refresh_class . '"><a href="' . generate_url($vars, array('refresh' => $refresh_time)) . '"><i class="' . $config['icon']['refresh'] . '"></i> Every ' . formatUptime($refresh_time, 'longest') . '</a></li>');
+                                 echo('    <li class="' . $refresh_class . '"><a href="' . generate_url($vars, array('refresh' => $refresh_time)) . '"><i class="' . $config['icon']['refresh'] . '"></i> Every ' . format_uptime($refresh_time, 'longest') . '</a></li>');
                               }
                            }
                            echo('  </ul>');

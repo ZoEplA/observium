@@ -47,12 +47,12 @@ temperatureSensorReleasE	NOTIFICATION-TYPE
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 1 }
 
-signalContact3Alarm	NOTIFICATION-TYPE
+signalContactDIAAlarm	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 2 }
 
-signalContact3Ok	NOTIFICATION-TYPE
+signalContactDIAOk	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 3 }
@@ -67,32 +67,32 @@ voltageSignalOk		NOTIFICATION-TYPE
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 5 }
 
-anySensorSignal1contact4Alarm	NOTIFICATION-TYPE
+anySensorSignal1contactDI1Alarm	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 6 }
 
-anySensorSignal1contact4Ok		NOTIFICATION-TYPE
+anySensorSignal1contactDI1Ok		NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 7 }
 
-anySensorSignal2contact7Alarm	NOTIFICATION-TYPE
+anySensorSignal2contactDI2Alarm	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 8 }
 
-anySensorSignal2contact7Ok		NOTIFICATION-TYPE
+anySensorSignal2contactDI2Ok		NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 9 }
 
-anySensorSignal3contact9Alarm	NOTIFICATION-TYPE
+anySensorSignal3contactDI3Alarm	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 10 }
 
-anySensorSignal3contact9Ok	NOTIFICATION-TYPE
+anySensorSignal3contactDI3Ok	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 11 }
@@ -107,17 +107,17 @@ voltageOk					NOTIFICATION-TYPE
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 13 }
 
-remoteControlContact8ON		NOTIFICATION-TYPE
+remoteControlContactDO2ON		NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 14 }
 
-remoteControlContact8OFF	NOTIFICATION-TYPE
+remoteControlContactDO2OFF	NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 15 }
 
-resetedSmartContact6		NOTIFICATION-TYPE
+resetedSmartContactDO1		NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Check the text of message"		
 ::= { erd2Traps 16 }
@@ -187,7 +187,7 @@ ipForTrap		OBJECT-TYPE
 
 -- resetsSet
 
-resetSmartContact6	OBJECT-TYPE
+resetSmartContactDO1	OBJECT-TYPE
 	SYNTAX		INTEGER  
 			{
 				reset	(1),
@@ -206,7 +206,7 @@ numberOfResetPositives	OBJECT-TYPE
 ::= { resetsSet 2 }
 
 
-remoteControlContact8	OBJECT-TYPE
+remoteControlContactDO2	OBJECT-TYPE
 	SYNTAX		INTEGER 
 			{
 				termostatSetON	(3),
@@ -225,7 +225,7 @@ remoteControlContact8	OBJECT-TYPE
 
 -- sensesSet1
 
-monitorAlarmSignalContact3	OBJECT-TYPE
+monitorAlarmSignalContactDIA	OBJECT-TYPE
 	SYNTAX			INTEGER 
 				{
 					sensorOn	(3),
@@ -245,7 +245,7 @@ numberOfAlarmPositives		OBJECT-TYPE
 	DESCRIPTION		"qwerty"
 ::= { sensesSet1 2 }
 
-monitorAnySensorSignal1contact4	OBJECT-TYPE
+monitorAnySensorSignal1contactDI1	OBJECT-TYPE
 	SYNTAX			INTEGER 
 				{
 					sensorOn	(3),
@@ -258,7 +258,7 @@ monitorAnySensorSignal1contact4	OBJECT-TYPE
 	DESCRIPTION		"qwerty"
 ::= { sensesSet1 3 }
 
-monitorAnySensorSignal2contact7	OBJECT-TYPE
+monitorAnySensorSignal2contactDI2	OBJECT-TYPE
 	SYNTAX			INTEGER 
 				{
 					sensorOn	(3),
@@ -271,7 +271,7 @@ monitorAnySensorSignal2contact7	OBJECT-TYPE
 	DESCRIPTION		"qwerty"
 ::= { sensesSet1 4 }
 
-monitorAnySensorSignal3contact9	OBJECT-TYPE
+monitorAnySensorSignal3contactDI3	OBJECT-TYPE
 	SYNTAX			INTEGER 
 				{
 					sensorOn	(3),
@@ -307,7 +307,7 @@ temperatureSensor		OBJECT-TYPE
 	DESCRIPTION		"qwerty"
 ::= { sensesSet2 1 }
 
-voltageSensorContact10		OBJECT-TYPE
+voltageSensorContactADCIN		OBJECT-TYPE
 	SYNTAX			INTEGER 
 	MAX-ACCESS		read-only
 	STATUS			current
@@ -321,6 +321,12 @@ sysVoltageAlarm			OBJECT-TYPE
 	DESCRIPTION		"qwerty"
 ::= { sensesSet2 3 }
 
+humiditySensor		OBJECT-TYPE
+	SYNTAX			INTEGER 
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION		"qwerty"
+::= { sensesSet2 4 }
 
 -- commS
 

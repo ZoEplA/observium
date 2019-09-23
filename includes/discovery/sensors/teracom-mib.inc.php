@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -30,7 +30,7 @@ for ($i = 1; $i <= 8; $i++)
   $scale = 0.1;
   $limits = array('limit_low' => $data[0]['s'.$i.'1MINx10Int'] * $scale,
                   'limit_high' => $data[0]['s'.$i.'1MAXx10Int'] * $scale);
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, 's'.$i.'1x10Int.0', 'teracom', $descr, $scale, $value, $limits);
+  discover_sensor('temperature', $device, $oid, 's'.$i.'1x10Int.0', 'teracom', $descr, $scale, $value, $limits);
 }
 
 // Analog inputs
@@ -60,7 +60,7 @@ for ($i = 1; $i <= 4; $i++)
   $scale = 0.1;
   $limits = array('limit_low' => $data[0]['voltage'.$i.'min'] * $scale,
                   'limit_high' => $data[0]['voltage'.$i.'max'] * $scale);
-  discover_sensor($valid['sensor'], $type, $device, $oid, 'voltage'.$i.'x10Int.0', 'teracom', $descr, $scale, $value, $limits);
+  discover_sensor($type, $device, $oid, 'voltage'.$i.'x10Int.0', 'teracom', $descr, $scale, $value, $limits);
 }
 
 // Digital inputs
@@ -70,7 +70,7 @@ for ($i = 1; $i <= 4; $i++)
   $descr = $data[0]['digitalInput'.$i.'description'];
   $oid   = ".1.3.6.1.4.1.38783.1.3.3.$i.0";
   $value = $data[0]['digitalInput'.$i.'State'];
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'digitalInput'.$i.'State.0', 'teracom-digitalin-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+  discover_status($device, $oid, 'digitalInput'.$i.'State.0', 'teracom-digitalin-state', $descr, $value, array('entPhysicalClass' => 'other'));
 }
 
 // Relay outputs
@@ -80,7 +80,7 @@ for ($i = 1; $i <= 4; $i++)
   $descr = $data[0]['relay'.$i.'description'];
   $oid   = ".1.3.6.1.4.1.38783.1.3.4.$i.1.0";
   $value = $data[0]['relay'.$i.'State'];
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'relay'.$i.'State.0', 'teracom-relay-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+  discover_status($device, $oid, 'relay'.$i.'State.0', 'teracom-relay-state', $descr, $value, array('entPhysicalClass' => 'other'));
 }
 
 // Status FIXME definition-based
@@ -89,7 +89,7 @@ if ($value !== '')
 {
   $descr = 'Status';
   $oid   = '.1.3.6.1.4.1.38783.1.3.8.0';
-  discover_sensor($valid['sensor'], 'state', $device, $oid, 'hardwareErr.0', 'teracom-alarm-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+  discover_status($device, $oid, 'hardwareErr.0', 'teracom-alarm-state', $descr, $value, array('entPhysicalClass' => 'other'));
 }
 
 unset($data, $oid, $descr, $limits, $value);

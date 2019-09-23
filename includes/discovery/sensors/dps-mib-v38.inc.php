@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -45,7 +45,7 @@ foreach ($oids as $index => $entry)
   {
     if (str_icontains($descr, $class))
     {
-      discover_sensor($valid['sensor'], $class, $device, $oid_num, $index, $type, $descr, 1, $value);
+      discover_sensor($class, $device, $oid_num, $index, $type, $descr, 1, $value);
       break; // stop foreach
     }
   }
@@ -56,7 +56,7 @@ foreach ($oids as $index => $entry)
   $type     = 'dpsThresholds';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'other'));
+  discover_status_ng($device, $mib, 'thresholds', $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'other'));
 
 }
 

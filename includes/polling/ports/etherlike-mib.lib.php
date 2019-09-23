@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -28,7 +28,22 @@ function process_port_etherlike(&$this_port, $device, $port)
   if (isset($this_port['dot3StatsDuplexStatus']))
   {
     // echo("dot3Duplex, ");
-    $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
+    // FIX for issue when device report incorrect type:
+    // EtherLike-MIB::dot3StatsDuplexStatus.1 = Wrong Type (should be INTEGER): Counter32: 2
+    switch ($this_port['dot3StatsDuplexStatus'])
+    {
+      case '1':
+        $this_port['ifDuplex'] = 'unknown';
+        break;
+      case '2':
+        $this_port['ifDuplex'] = 'halfDuplex';
+        break;
+      case '3':
+        $this_port['ifDuplex'] = 'fullDuplex';
+        break;
+      default:
+        $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
+    }
   }
 
   if ($this_port['ifType'] == "ethernetCsmacd" && isset($this_port['dot3StatsIndex']))

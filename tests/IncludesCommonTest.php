@@ -1,6 +1,6 @@
 <?php
 
-//define('OBS_DEBUG', 1);
+//define('OBS_DEBUG', 2);
 
 $base_dir = realpath(dirname(__FILE__) . '/..');
 $config['install_dir'] = $base_dir;
@@ -36,7 +36,7 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
       array('1.5w',                     907200),
       array(-886732,                         0),
       array('Star Wars',                     0),
-      // common formatUptime strings
+      // common format_uptime() strings
       array('2 years, 1 day, 1h 1m 1s', 63162061),
       array('1 year, 1 day, 1h 1m 1s',  31626061),
       array('2 hours 2 minutes 2 seconds',  7322)
@@ -385,6 +385,8 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
       array('178:23:06:59.03', FALSE,   15462419),
       array('1:2:34:56.78',    FALSE,      95696),
       array('0:0:00:00.00',    FALSE,          0),
+      // Non standard with years
+      array('05:314:02:06:26', FALSE,  184817186),
       // Main, return float
       array('178:23:06:59.03', TRUE, 15462419.03),
       array('1:2:34:56.78',    TRUE,    95696.78),
@@ -429,7 +431,7 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
    */
   public function testFormatUptime($value, $format, $result)
   {
-    $this->assertSame($result, formatUptime($value, $format));
+    $this->assertSame($result, format_uptime($value, $format));
   }
 
   public function providerFormatUptime()
@@ -670,7 +672,7 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
       array('temperature',   'C',      0,    0.0),
       array('temperature',   'C',    100,  100.0),
       array(         NULL, 'psi',      0,    0.0),
-      array(   'pressure', 'psi',      1, 6894.757),
+      array(   'pressure', 'psi',      1, 6894.75729),
       array(   'pressure', 'psi',   -0.1, -689.4757),
 
       array(        'dbm',   'W', 0.00001, -20.0),
@@ -680,6 +682,19 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
       array(      'power', 'dBm',     -30,   0.000001),
       array(      'power', 'dBm',       0,   0.001),
       array(      'power', 'dBm',      50, 100.0),
+
+      // derp ekinops
+      array(        'dbm', 'ekinops_dbm1',          0,     0.0),
+      array(        'dbm', 'ekinops_dbm1',         30,     0.3),
+      array(        'dbm', 'ekinops_dbm1',      64551,   -9.85),
+      array(        'dbm', 'ekinops_dbm1',      65537,   FALSE),
+      array(        'dbm', 'ekinops_dbm2',       4285, -3.6805),
+      array(        'dbm', 'ekinops_dbm2',      14546,  1.6274),
+      // derp Accuview (different types, but same unit)
+      array(    'voltage',   'accuenergy', 1116881392, 73.1288), // 429241f0
+      array(    'current',   'accuenergy', 1116881392, 73.1288),
+      array(     'apower',   'accuenergy', 1116881392, 73.1288),
+      array(      'power',   'accuenergy',          0, 5.8774E-39),
     );
   }
 
@@ -776,9 +791,9 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
   public function providerSafename()
   {
     return array(
-      array('aA0,._-',  'aA0,._-'), // all good
+      array('aA0._-',  'aA0._-'), // all good
       array('\\\'',     '__'),
-      array('`~!@#$%^&*()=+{}[]|";:/?<>',  '__________________________'),
+      array('`~!@#$%^&*()=+{}[]|";:,/?<>',  '___________________________'),
     );
   }
 
@@ -1078,8 +1093,19 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
   public function providerFormatUnixtime()
   {
     return array(
-      array(1409397693,  NULL, '2014-08-30 11:21:33'),
-      array(1409397693,  DATE_RFC2822, 'Sat, 30 Aug 2014 11:21:33 +0000'),
+      array(1409397693,                NULL, '2014-08-30 11:21:33'),
+      array(1409397693,        DATE_RFC2822, 'Sat, 30 Aug 2014 11:21:33 +0000'),
+      array(1551607499,        DATE_RFC2822, 'Sun, 03 Mar 2019 10:04:59 +0000'),
+      array(1551607499.3878,   DATE_RFC2822, 'Sun, 03 Mar 2019 10:04:59 +0000'),
+      array(1551607499.3878,      'H:i:s.u', '10:04:59.387800'),
+      array(1551607499.3878,      'H:i:s.v', '10:04:59.387'),
+      array(1551607499.387867,    'H:i:s.u', '10:04:59.387867'),
+      array('1551607499.387867',  'H:i:s.u', '10:04:59.387867'),
+      array('1551607499.3878679', 'H:i:s.u', '10:04:59.387868'),
+      // Wrong data
+      array('0',   'r',       ''),
+      array('',    'H:i:s.u', ''),
+      array(FALSE, 'H:i:s.u', ''),
     );
   }
 
@@ -1096,6 +1122,9 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
   {
     $results = array(
       array('Sweet',                             'Sweet'), // String should stay string
+      array(array('1'),                       array('1')), // Array should stay array
+      array(TRUE,                                   TRUE), // Boolean should stay boolean
+      array(NULL,                                   NULL), // NULL should stay NULL
       array('5',                                     5.0), // Numeric string should become int
       array('5.3',                                   5.3), // Numeric string should become float
       array('12b',                                  12.0),
@@ -2046,6 +2075,10 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
    */
   public function testReformatUSDate($value, $result)
   {
+    // Keep always default
+    $GLOBALS['config']['timestamp_format']  = 'Y-m-d H:i:s';
+    $GLOBALS['config']['date_format']       = 'Y-m-d';
+
     $this->assertSame($result, reformat_us_date($value));
   }
 
@@ -2053,9 +2086,12 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
   {
     return array(
       array('07/01/12',   '2012-07-01'),
+      array('7/1/12',     '2012-07-01'),
       array('12/06/99',   '1999-12-06'),
       array('03/05/2012', '2012-03-05'),
       array('02/14/1995', '1995-02-14'),
+      array('05/30/2011 00:12:17', '2011-05-30 00:12:17'),
+      array('05/30/2011 00:12',    '2011-05-30 00:12:00'),
       array('Banana',     'Banana'),
       array('Ob-servium', 'Ob-servium'),
     );
@@ -2087,264 +2123,6 @@ class IncludesCommonTest extends \PHPUnit\Framework\TestCase
       array('http://somewrong.test',       FALSE, FALSE, 408), // Unknown host
       array('http://observium.org/404',    FALSE, FALSE, 404), // OK, not found
     );
-  }
-
-  /**
-   * @dataProvider providerDefinitionPatterns
-   * @group definitions
-   */
-  public function testDefinitionPatterns($pattern, $string, $result, $match = NULL)
-  {
-    $test = preg_match($pattern, $string, $matches);
-    //var_dump($matches);
-    $this->assertSame($result, (bool)$test);
-    if ($test)
-    {
-      // Validate $match
-      $this->assertSame($match, $matches[1]);
-    }
-  }
-
-  public function providerDefinitionPatterns()
-  {
-    $array = array();
-
-    $pattern = OBS_PATTERN_IPV4_FULL;
-    // IPv4 valid
-    $array[] = array($pattern, '1.2.3.4',           TRUE, '1.2.3.4');
-    $array[] = array($pattern, '255.255.255.255',   TRUE, '255.255.255.255');
-    // IPv4 invalid
-    $array[] = array($pattern, '1.2.3',             FALSE);
-    $array[] = array($pattern, '1.2.3.',            FALSE);
-    $array[] = array($pattern, '.1.2.3',            FALSE);
-    $array[] = array($pattern, '1.2.3.4.5.6.7.8',   FALSE);
-    $array[] = array($pattern, '999.999.999.999',   FALSE);
-    $array[] = array($pattern, '299.299.299.299',   FALSE);
-    $array[] = array($pattern, '001.002.003.004',   FALSE);
-    // IPv4 in strings
-    $array[] = array($pattern, '"1.2.3.4"',         TRUE, '1.2.3.4');
-    $array[] = array($pattern, '(1.2.3.4)',         TRUE, '1.2.3.4');
-    $array[] = array($pattern, '(1.2.3.4, tprrrr)', TRUE, '1.2.3.4');
-    $array[] = array($pattern, 'PING is1.nic.local (192.168.10.110): 56 data bytes', TRUE, '192.168.10.110');
-    $array[] = array($pattern, '64 bytes from 192.168.10.110: icmp_seq=0 ttl=122 time=10.643 ms', TRUE, '192.168.10.110');
-    $array[] = array($pattern, 'Invalid user test from 213.149.105.28',     TRUE, '213.149.105.28');
-    $array[] = array($pattern, 'Invalid user test from 213.149.105.28 hs',  TRUE, '213.149.105.28');
-    $array[] = array($pattern, 'Invalid user test from 213.149.105.28sss',  FALSE);
-
-    $pattern = OBS_PATTERN_IPV4_NET_FULL;
-    // IPv4 network valid
-    $array[] = array($pattern, '1.2.3.4/0',         TRUE, '1.2.3.4/0');
-    $array[] = array($pattern, '1.2.3.4/29',        TRUE, '1.2.3.4/29');
-    $array[] = array($pattern, '1.2.3.4/32',        TRUE, '1.2.3.4/32');
-    // IPv4 network with netmask valid
-    $array[] = array($pattern, '1.2.3.4/0.0.0.0',         TRUE, '1.2.3.4/0.0.0.0');
-    $array[] = array($pattern, '1.2.3.4/255.255.255.248', TRUE, '1.2.3.4/255.255.255.248');
-    $array[] = array($pattern, '1.2.3.4/255.255.255.255', TRUE, '1.2.3.4/255.255.255.255');
-    // IPv4 network with Cisco inverse netmask valid
-    $array[] = array($pattern, '1.2.3.4/0.0.63.255',      TRUE, '1.2.3.4/0.0.63.255');
-    $array[] = array($pattern, '1.2.3.4/0.0.0.1',         TRUE, '1.2.3.4/0.0.0.1');
-    $array[] = array($pattern, '1.2.3.4/127.255.255.255', TRUE, '1.2.3.4/127.255.255.255');
-    // IPv4 network invalid
-    $array[] = array($pattern, '1.2.3.4/-1',        FALSE);
-    $array[] = array($pattern, '1.2.3.4/33',        FALSE);
-    $array[] = array($pattern, '1.2.3.4/123',       FALSE);
-    // IPv4 network with invalid netmask
-    $array[] = array($pattern, '1.2.3.4/1.2.3.4',         FALSE);
-    $array[] = array($pattern, '1.2.3.4/128.128.128.300', FALSE);
-    // IPv4 address (without prefix) also invalid
-    $array[] = array($pattern, '1.2.3.4',           FALSE);
-
-    $pattern = OBS_PATTERN_IPV6_FULL;
-    // IPv6 valid
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18',     TRUE, '1762:0:0:0:0:B03:1:AF18');
-    $array[] = array($pattern, 'FE80:FFFF:0:FFFF:129:144:52:38', TRUE, 'FE80:FFFF:0:FFFF:129:144:52:38');
-    $array[] = array($pattern, 'FF01:0:0:0:CA:0:0:2',         TRUE, 'FF01:0:0:0:CA:0:0:2');
-    $array[] = array($pattern, '0:0:0:0:0:0:0:1',             TRUE, '0:0:0:0:0:0:0:1');
-    $array[] = array($pattern, '0:0:0:0:0:0:0:0',             TRUE, '0:0:0:0:0:0:0:0');
-    $array[] = array($pattern, '1762::B03:1:AF18',            TRUE, '1762::B03:1:AF18');
-    $array[] = array($pattern, 'FF01:7:CA:0::',               TRUE, 'FF01:7:CA:0::');
-    $array[] = array($pattern, '::FF01:7:CA:0',               TRUE, '::FF01:7:CA:0');
-    $array[] = array($pattern, '::1',                         TRUE, '::1');
-    $array[] = array($pattern, '1::',                         TRUE, '1::');
-    $array[] = array($pattern, '::',                          TRUE, '::');
-    $array[] = array($pattern, '::1:2:3:4:5:6:7',             TRUE, '::1:2:3:4:5:6:7');
-    $array[] = array($pattern, '1:2:3:4:5:6:7::',             TRUE, '1:2:3:4:5:6:7::');
-    $array[] = array($pattern, '0:0:0:0:0:0:127.32.67.15',    TRUE, '0:0:0:0:0:0:127.32.67.15');
-    $array[] = array($pattern, '0:0:0:0:0:FFFF:127.32.67.15', TRUE, '0:0:0:0:0:FFFF:127.32.67.15');
-    $array[] = array($pattern, '::127.32.67.15',              TRUE, '::127.32.67.15');
-    $array[] = array($pattern, '::FFFF:127.32.67.15',         TRUE, '::FFFF:127.32.67.15');
-    $array[] = array($pattern, 'FFFF::127.32.67.15',          TRUE, 'FFFF::127.32.67.15');
-    $array[] = array($pattern, '::1:2:3:4:5:127.32.67.15',    TRUE, '::1:2:3:4:5:127.32.67.15');
-    // IPv6 invalid
-    $array[] = array($pattern, '1762:0:0:0:0:B03G:1:AF18',    FALSE);
-    $array[] = array($pattern, ':127.32.67.15',               FALSE);
-    $array[] = array($pattern, ':1234:127.32.67.15',          FALSE);
-    $array[] = array($pattern, ':1234:1234:1234',             FALSE);
-    $array[] = array($pattern, '1234:1234:1234:',             FALSE);
-    $array[] = array($pattern, '1234::234::234::2342',        FALSE);
-    $array[] = array($pattern, '1234:1234:1234:1234:1234:1234:1234:1234:1234:1234:1234',    FALSE);
-    $array[] = array($pattern, '1234:1234:1234:1234::1234:1234:1234:1234:1234:1234:1234',   FALSE);
-    $array[] = array($pattern, '1234:1234:1234:1234::1234:1234:1234:1234:1234::1234:1234',  FALSE);
-    // IPv6 in strings
-    $array[] = array($pattern, '"FF01:7:CA:0::"',             TRUE, 'FF01:7:CA:0::');
-    $array[] = array($pattern, '(FF01:7:CA:0::)',             TRUE, 'FF01:7:CA:0::');
-    $array[] = array($pattern, '(FF01:7:CA:0::, hoho)',       TRUE, 'FF01:7:CA:0::');
-    $array[] = array($pattern, 'PING6(56=40+8+8 bytes) 2a02:408:8093:fff2::4 --> 2a02:408:7722:41::150', TRUE, '2a02:408:8093:fff2::4');
-    $array[] = array($pattern, '16 bytes from 2a02:408:7722:41::150, icmp_seq=0 hlim=62 time=1.717 ms',  TRUE, '2a02:408:7722:41::150');
-    $array[] = array($pattern, 'RP/0/RSP0/CPU0:May 31 16:23:46.207 : bgp[1046]: %ROUTING-BGP-5-ADJCHANGE : neighbor 2a02:2090:e400:4400::9:2 Up (VRF: default) (AS: 43489)', TRUE, '2a02:2090:e400:4400::9:2');
-    $array[] = array($pattern, 'RP/0/RSP0/CPU0:May 31 16:23:46.207 : bgp[1046]: %ROUTING-BGP-5-ADJCHANGE : neighbor 2a02:2090:e400:4400::9:2',    TRUE, '2a02:2090:e400:4400::9:2');
-    $array[] = array($pattern, 'RP/0/RSP0/CPU0:May 31 16:23:46.207 : bgp[1046]: %ROUTING-BGP-5-ADJCHANGE : neighbor 2a02:2090:e400:4400::9:2Up',  FALSE);
-
-    $pattern = OBS_PATTERN_IPV6_NET_FULL;
-    // IPv6 network valid
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/0',     TRUE, '1762:0:0:0:0:B03:1:AF18/0');
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/29',    TRUE, '1762:0:0:0:0:B03:1:AF18/29');
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/99',    TRUE, '1762:0:0:0:0:B03:1:AF18/99');
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/119',   TRUE, '1762:0:0:0:0:B03:1:AF18/119');
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/128',   TRUE, '1762:0:0:0:0:B03:1:AF18/128');
-    // IPv6 network invalid
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/-1',    FALSE);
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18/129',   FALSE);
-    // IPv6 address (without prefix) also invalid
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18',       FALSE);
-
-    $pattern = OBS_PATTERN_IP_FULL;
-    // IPv4 OR IPv6 valid (combination of patterns)
-    $array[] = array($pattern, '1.2.3.4',           TRUE, '1.2.3.4');
-    $array[] = array($pattern, '1762:0:0:0:0:B03:1:AF18',     TRUE, '1762:0:0:0:0:B03:1:AF18');
-
-    $pattern = OBS_PATTERN_MAC_FULL;
-    // MAC valid
-    $array[] = array($pattern, '0026.22eb.3bef',    TRUE, '0026.22eb.3bef');    // Cisco
-    $array[] = array($pattern, '00-02-2D-11-55-4D', TRUE, '00-02-2D-11-55-4D'); // Windows
-    $array[] = array($pattern, '00 0D 93 13 51 1A', TRUE, '00 0D 93 13 51 1A'); // Old Unix
-    $array[] = array($pattern, '0x000E7F0D81D6',    TRUE, '0x000E7F0D81D6');    // HP-UX
-    $array[] = array($pattern, '0004E25AA118',      TRUE, '0004E25AA118');      // DOS, RAW
-    $array[] = array($pattern, '00:08:C7:1B:8C:02', TRUE, '00:08:C7:1B:8C:02'); // Unix/Linux
-    $array[] = array($pattern, '8:0:86:b6:82:9f',   TRUE, '8:0:86:b6:82:9f');   // SNMP, Solaris
-    // MAC invalid
-    $array[] = array($pattern, 'F1:0:0:0:CA:0:0:2',   FALSE); // IPv6
-    $array[] = array($pattern, '0026.22eb.3be',       FALSE);
-    $array[] = array($pattern, '00-2-2D-11-55-4D',    FALSE);
-    $array[] = array($pattern, '00 D 93 13 51 1A',    FALSE);
-    $array[] = array($pattern, '0x00E7F0D81D6',       FALSE);
-    $array[] = array($pattern, '004E25AA118',         FALSE);
-    $array[] = array($pattern, '00:0G:C7:1B:8C:02',   FALSE);
-    $array[] = array($pattern, '8::86:b6:82:9f',      FALSE);
-    $array[] = array($pattern, '00 0D-93 13 51 1A',   FALSE);
-    $array[] = array($pattern, '00 0D 93:13 51 1A',   FALSE);
-    $array[] = array($pattern, '00 0D.93 13.51 1A',   FALSE);
-    $array[] = array($pattern, '0x901b',              FALSE);
-
-    $array[] = array($pattern, '08-00-27-00-5049',    FALSE);
-    $array[] = array($pattern, '08:00:27:00:5049',    FALSE);
-    $array[] = array($pattern, '08-00-27-00-50--49',  FALSE);
-    $array[] = array($pattern, '08:00:27:00:50::49',  FALSE);
-    $array[] = array($pattern, '08-00-27-00-50-49-',  FALSE);
-    $array[] = array($pattern, '08:00:27:00:50:49:',  FALSE);
-    $array[] = array($pattern, '-08-00-27-00-50-49',  FALSE);
-    $array[] = array($pattern, ':08:00:27:00:50:49',  FALSE);
-    $array[] = array($pattern, ':080027005049',       FALSE);
-    // MAC in strings
-    $array[] = array($pattern, '"0026.22eb.3bef"',         TRUE, '0026.22eb.3bef');
-    $array[] = array($pattern, '(0026.22eb.3bef)',         TRUE, '0026.22eb.3bef');
-    $array[] = array($pattern, '(0026.22eb.3bef, qu-qu)',  TRUE, '0026.22eb.3bef');
-    $array[] = array($pattern, 'wevent.ubnt_custom_event(): EVENT_STA_IP ath3: 9c:4f:da:73:5c:cc / 10.10.35.16',     TRUE, '9c:4f:da:73:5c:cc');
-    $array[] = array($pattern, 'ath0: STA 44:d9:e7:f7:18:f2 DRIVER: Sead AUTH addr=9c:4f:da:73:5c:cc status_code=0', TRUE, '44:d9:e7:f7:18:f2');
-    $array[] = array($pattern, 'wevent.ubnt_custom_event(): EVENT_STA_IP ath3: 9c:4f:da:73:5c:cccc',  FALSE);
-    $array[] = array($pattern, 'Host 0016.3e2e.2b98 in vlan 400 is flapping between port Gi1/0/25 and port Te1/0/1', TRUE, '0016.3e2e.2b98');
-
-    $pattern = OBS_PATTERN_FQDN_FULL;
-    // Domain name valid
-    $array[] = array($pattern, 'observium.org',               TRUE, 'observium.org');
-    $array[] = array($pattern, 'my.host-name.test',           TRUE, 'my.host-name.test');
-    $array[] = array($pattern, 'qq.ff.ee.my.host-name.test',  TRUE, 'qq.ff.ee.my.host-name.test');
-    $array[] = array($pattern, 'localhost',                   TRUE, 'localhost');
-    //                          1234567890123456789012345678901234567890123456789012345678901234
-    $array[] = array($pattern, 'my-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-63char.name', TRUE, 'my-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-63char.name');
-    $array[] = array($pattern, 'external.asd1230-123.asd_internal.asd.gm-_ail.com',                    TRUE, 'external.asd1230-123.asd_internal.asd.gm-_ail.com');
-    // Domain name IDN
-    $array[] = array($pattern, 'xn--b1agh1afp.xn--p1ai',      TRUE, 'xn--b1agh1afp.xn--p1ai'); // привет.рф
-    $array[] = array($pattern, 'привет.рф',                   TRUE, 'привет.рф');              // привет.рф
-    // Domain name invalid
-    $array[] = array($pattern, '::127.32.67.15',              FALSE);
-    $array[] = array($pattern, '1.2.3',                       FALSE);
-    $array[] = array($pattern, '1.2.3.4',                     FALSE);
-    $array[] = array($pattern, '.1.2.3',                      FALSE);
-    $array[] = array($pattern, '1.2.3.4.5.6.7.8',             FALSE);
-    $array[] = array($pattern, '999.999.999.999',             FALSE);
-    $array[] = array($pattern, '299.299.299.299',             FALSE);
-    $array[] = array($pattern, '001.002.003.004',             FALSE);
-    $array[] = array($pattern, 'test',                        FALSE);
-    $array[] = array($pattern, 'example..com',                FALSE);
-    $array[] = array($pattern, 'http://example.com',          FALSE);
-    $array[] = array($pattern, 'subdomain.-example.com',      FALSE);
-    $array[] = array($pattern, 'example.com/parameter',       FALSE);
-    $array[] = array($pattern, 'example.com?anything',        FALSE);
-    $array[] = array($pattern, 'GigabitEthernet0/1.ServiceInstance.206', FALSE);
-    //                          1234567890123456789012345678901234567890123456789012345678901234
-    $array[] = array($pattern, 'my-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-64char.name', FALSE);
-    // Domain name in strings
-    $array[] = array($pattern, '"my.host-name.test"',         TRUE, 'my.host-name.test');
-    $array[] = array($pattern, '(my.host-name.test)',         TRUE, 'my.host-name.test');
-    $array[] = array($pattern, '(my.host-name.test, help)',   TRUE, 'my.host-name.test');
-    $array[] = array($pattern, 'Invalid user test from my.host-name.test',     TRUE, 'my.host-name.test');
-    $array[] = array($pattern, 'Invalid user test from my.host-name.test hs',  TRUE, 'my.host-name.test');
-    $array[] = array($pattern, 'Invalid user test from my.host-name.test.',    FALSE);
-
-    $pattern = OBS_PATTERN_EMAIL_FULL;
-    // Email valid
-    $array[] = array($pattern, 'president@whitehouse.gov',            TRUE, 'president@whitehouse.gov');
-    $array[] = array($pattern, 'pharaoh@egyptian.museum',             TRUE, 'pharaoh@egyptian.museum');
-    $array[] = array($pattern, 'john.doe+test@ee.my.host-name.test',  TRUE, 'john.doe+test@ee.my.host-name.test');
-    $array[] = array($pattern, 'Mike.O\'Dell@ireland.com',            TRUE, 'Mike.O\'Dell@ireland.com');
-    $array[] = array($pattern, '"Mike\\\\ O\'Dell"@ireland.com',      TRUE, '"Mike\\\\ O\'Dell"@ireland.com');
-    //                          1234567890123456789012345678901234567890123456789012345678901234
-    $array[] = array($pattern, 'user-----------------------------------------------------63char@my-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-63char.name', TRUE,
-                               'user-----------------------------------------------------63char@my-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy-63char.name');
-    //$array[] = array($pattern, 'external.asd1230-123.asd_internal.asd.gm-_ail.com',                    TRUE, 'external.asd1230-123.asd_internal.asd.gm-_ail.com');
-    // Email IDN
-    $array[] = array($pattern, 'mike@xn--b1agh1afp.xn--p1ai',         TRUE, 'mike@xn--b1agh1afp.xn--p1ai'); // mike@привет.рф
-    $array[] = array($pattern, 'майк@привет.рф',                      TRUE, 'майк@привет.рф');              // майк@привет.рф
-    // Email invalid
-    $array[] = array($pattern, '1024x768@60Hz',                       FALSE);
-    $array[] = array($pattern, 'not.a.valid.email',                   FALSE);
-    $array[] = array($pattern, 'john@example...com',                  FALSE);
-    $array[] = array($pattern, 'joe@ha!ha!.com',                      FALSE);
-    //                          1234567890123456789012345678901234567890123456789012345678901234
-    $array[] = array($pattern, 'joe@a_domain_name_with_more_than_sixty-four_characters_is_invalid_6465.com',  FALSE);
-    $array[] = array($pattern, 'a_local_part_with_more_than_sixty-four_characters_is_invalid_6465@mail.com',  FALSE);
-    //$array[] = array($pattern, 'the_total_length_of_an_email_address_is_limited@two-hundred-fifty-four-characters.because-the-SMTP-protocol-for-sending-email.does-not-support-more-than-that.really-hard-to-come-up-with-a-bogus-address-as-long-as-this.still-not-long-enough.too-long-now.com', FALSE);
-    // Email in strings
-    $array[] = array($pattern, '"test@domain.name"',                  TRUE, 'test@domain.name');
-    $array[] = array($pattern, '(test@domain.name)',                  TRUE, 'test@domain.name');
-    $array[] = array($pattern, '(test@domain.name, help)',            TRUE, 'test@domain.name');
-    $array[] = array($pattern, 'The email address president@whitehouse.gov is valid.',  TRUE, 'president@whitehouse.gov');
-    $array[] = array($pattern, 'fabio@disapproved.solutions has a long TLD',            TRUE, 'fabio@disapproved.solutions');
-
-    $pattern = OBS_PATTERN_EMAIL_LONG_FULL;
-    // Email valid
-    $array[] = array($pattern, '<test@domain.name>',                  TRUE, '<test@domain.name>');
-    $array[] = array($pattern, 'Pharaoh <pharaoh@egyptian.museum>',   TRUE, 'Pharaoh <pharaoh@egyptian.museum>');
-    $array[] = array($pattern, 'in Egypt "Pharaoh" <pharaoh@egyptian.museum>',          TRUE, '"Pharaoh" <pharaoh@egyptian.museum>');
-    $array[] = array($pattern, 'Pharaoh of Egypt <pharaoh@egyptian.museum>',            TRUE, 'Pharaoh of Egypt <pharaoh@egyptian.museum>');
-    $array[] = array($pattern, '"Mike O\'Dell" <Mike.O\'Dell@ireland.com>',             TRUE, '"Mike O\'Dell" <Mike.O\'Dell@ireland.com>');
-    // Email invalid
-    $array[] = array($pattern, '<domain.name>',                       FALSE);
-    $array[] = array($pattern, 'Pharaoh <pharaoh@>',                  FALSE);
-    $array[] = array($pattern, 'Test Title test@example.com',         FALSE);
-
-    /*
-    $pattern = OBS_PATTERN_URL_FULL;
-    // URL IDN
-    $array[] = array($pattern, 'https://www.get.no/v3/bredb%C3%A5nd/tr%C3%A5dl%C3%B8st-modem', TRUE,
-                               'https://www.get.no/v3/bredb%C3%A5nd/tr%C3%A5dl%C3%B8st-modem');
-    // URL in string
-    $array[] = array($pattern, '<a href="https://www.get.no/v3/bredb%C3%A5nd/tr%C3%A5dl%C3%B8st-modem" rel="nofollow">https://www.get.no/v3/bredbånd/trådløst-modem</a>', TRUE,
-                               'https://www.get.no/v3/bredb%C3%A5nd/tr%C3%A5dl%C3%B8st-modem');
-    */
-
-    return $array;
   }
 
 }

@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -48,7 +48,7 @@ foreach ($vars['id'] as $storage_id)
 
    $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_id` = ?", array($storage_id));
    $device = device_by_id_cache($storage['device_id']);
-   $rrd_filename = get_rrd_path($device, "storage-".$storage['storage_mib']."-".$storage['storage_descr'].".rrd");
+   $rrd_filename = get_rrd_path($device, "storage-".strtolower($storage['storage_mib'])."-".$storage['storage_descr'].".rrd");
 
    if (!$config['graph_colours'][$colours][$iter]) { $iter = 0; }
    $colour=$config['graph_colours'][$colours][$iter];
@@ -58,16 +58,18 @@ foreach ($vars['id'] as $storage_id)
 
    if (is_file($rrd_filename))
    {
-      $rrd_options .= " DEF:".$storage['storage_id']."used=$rrd_filename:used:AVERAGE";
-      $rrd_options .= " DEF:".$storage['storage_id']."free=$rrd_filename:free:AVERAGE";
-      $rrd_options .= " CDEF:".$storage['storage_id']."size=".$storage['storage_id']."used,".$storage['storage_id']."free,+";
-      $rrd_options .= " CDEF:".$storage['storage_id']."perc=".$storage['storage_id']."used,".$storage['storage_id']."size,/,100,*";
-      $rrd_options .= " AREA:".$storage['storage_id']."perc#" . $colour . ":'".$descr."':STACK";
-      $rrd_options .= " GPRINT:".$storage['storage_id']."size:LAST:%6.2lf%sB";
-      $rrd_options .= " GPRINT:".$storage['storage_id']."used:LAST:%6.2lf%sB";
-      $rrd_options .= " GPRINT:".$storage['storage_id']."perc:LAST:%5.2lf%%\\l";
-      $iter++;
-   } else { echo($rrd_filename); }
+     $rrd_options .= " DEF:" . $storage['storage_id'] . "used=$rrd_filename:used:AVERAGE";
+     $rrd_options .= " DEF:" . $storage['storage_id'] . "free=$rrd_filename:free:AVERAGE";
+     $rrd_options .= " CDEF:" . $storage['storage_id'] . "size=" . $storage['storage_id'] . "used," . $storage['storage_id'] . "free,+";
+     $rrd_options .= " CDEF:" . $storage['storage_id'] . "perc=" . $storage['storage_id'] . "used," . $storage['storage_id'] . "size,/,100,*";
+     $rrd_options .= " AREA:" . $storage['storage_id'] . "perc#" . $colour . ":'" . $descr . "':STACK";
+     $rrd_options .= " GPRINT:" . $storage['storage_id'] . "size:LAST:%6.2lf%sB";
+     $rrd_options .= " GPRINT:" . $storage['storage_id'] . "used:LAST:%6.2lf%sB";
+     $rrd_options .= " GPRINT:" . $storage['storage_id'] . "perc:LAST:%5.2lf%%\\l";
+     $iter++;
+   } else {
+     //echo($rrd_filename);
+   }
 }
 
 // EOF

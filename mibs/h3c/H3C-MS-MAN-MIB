@@ -1,7 +1,7 @@
 -- ====================================================================
 -- Copyright (C) 2007 by H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: H3C MS(Media Switch Server) Configuration management MIB
+-- Description: MS(Media Switch Server) Configuration management MIB
 -- Reference:
 -- Version: V1.0
 -- History:
@@ -20,13 +20,13 @@ IMPORTS
 h3cMSMan MODULE-IDENTITY
     LAST-UPDATED "200708130000Z"  -- August 13, 2007  GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Surveillance Network Management Team H3C Technologies Co.,Ltd.
-        East-Com Information Industry Base,
-        Bing-Jiang District Hangzhou P.R. China
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
         http://www.h3c.com
-        Zip:100085"
+        Zip:100085
+        "
     DESCRIPTION
         "This MIB is defined to manage MS components
         according to specific capability."

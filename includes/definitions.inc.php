@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage definitions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -30,18 +30,22 @@ define('OBS_QUOTES_TRIM',          2); // Trim quotes only from begin/end of str
 define('OBS_ESCAPE',               4); // Escape strings or output
 define('OBS_DECODE_UTF8',          8); // Decode ascii coded chars in string as correct UTF-8
 
-// Bits 4-11 snmp flags
+// Bits 4-15 snmp flags
 define('OBS_SNMP_NUMERIC',        16); // Use numeric OIDs  (-On)
 define('OBS_SNMP_NUMERIC_INDEX',  32); // Use numeric index (-Ob)
-define('OBS_SNMP_CONCAT',         64); // Concatinate multiline snmp variable (newline chars removed)
+define('OBS_SNMP_CONCAT',         64); // Concatenate multiline snmp variable (newline chars removed)
 define('OBS_SNMP_ENUM',          128); // Don't enumerate SNMP values
 define('OBS_SNMP_HEX',           256); // Force HEX output (-Ox) and disable use of DISPLAY-HINT information when assigning values (-Ih).
 define('OBS_SNMP_TABLE',         512); // Force Program Like output (-OX)
 define('OBS_SNMP_DISPLAY_HINT', 1024); // Disables the use of DISPLAY-HINT information when assigning values (-Ih). This would then require providing the raw value.
 define('OBS_SNMP_TIMETICKS',    2048); // Force TimeTicks values as raw numbers (-Ot)
-
+define('OBS_SNMP_ASCII',        4096); // Force all string values as ASCII strings
+#define('OBS_',                 8192); // Reserved
+#define('OBS_',                16384); // Reserved
+#define('OBS_',                32768); // Reserved
 define('OBS_SNMP_ALL',               OBS_QUOTES_TRIM | OBS_QUOTES_STRIP);    // Set of common snmp options
-define('OBS_SNMP_ALL_MULTILINE',     OBS_QUOTES_TRIM | OBS_SNMP_CONCAT);     // Set of common snmp options with concatinate multiline snmp variable
+define('OBS_SNMP_ALL_MULTILINE',     OBS_QUOTES_TRIM | OBS_SNMP_CONCAT);     // Set of common snmp options with concatenate multiline snmp variable
+define('OBS_SNMP_ALL_ASCII',         OBS_QUOTES_TRIM | OBS_SNMP_ASCII);      // Set of common snmp options with forcing string values as ASCII strings
 define('OBS_SNMP_ALL_HEX',           OBS_SNMP_ALL | OBS_SNMP_HEX);           // Set of common snmp options forcing HEX output
 define('OBS_SNMP_ALL_ENUM',          OBS_SNMP_ALL | OBS_SNMP_ENUM);          // Set of common snmp options without enumerating values
 define('OBS_SNMP_ALL_NUMERIC',       OBS_SNMP_ALL | OBS_SNMP_NUMERIC);       // Set of common snmp options with numeric OIDs
@@ -49,19 +53,19 @@ define('OBS_SNMP_ALL_NUMERIC_INDEX', OBS_SNMP_ALL | OBS_SNMP_NUMERIC_INDEX); // 
 define('OBS_SNMP_ALL_TABLE',         OBS_SNMP_ALL | OBS_SNMP_TABLE);         // Set of common snmp options with Program Like (help for MAC parse in indexes)
 define('OBS_SNMP_ALL_TIMETICKS',     OBS_SNMP_ALL | OBS_SNMP_TIMETICKS);     // Set of common snmp options with TimeTicks as raw numbers
 
-// Bits 12-15 network flags
-define('OBS_DNS_A',             4096); // Use only IPv4 dns queries
-define('OBS_DNS_AAAA',          8192); // Use only IPv6 dns queries
-define('OBS_DNS_ALL',  OBS_DNS_A | OBS_DNS_AAAA); // Use both IPv4/IPv6 dns queries
-define('OBS_PING_SKIP',        16384); // Skip device isPingable checks
-#define('OBS_',                32768); // Reserved
+// Bits 16-19 network flags
+define('OBS_DNS_A',            65536); // Use only IPv4 dns queries
+define('OBS_DNS_AAAA',        131072); // Use only IPv6 dns queries
+define('OBS_DNS_ALL',          OBS_DNS_A | OBS_DNS_AAAA); // Use both IPv4/IPv6 dns queries
+define('OBS_PING_SKIP',       262144); // Skip device isPingable checks
+#define('OBS_',               524288); // Reserved
 
-// Bits 16- permissions flags
-define('OBS_PERMIT_ACCESS',    65536); // Can access (ie: logon)
-define('OBS_PERMIT_READ',     131072); // Can read basic data
-define('OBS_PERMIT_SECURE',   262144); // Can read secure data
-define('OBS_PERMIT_EDIT',     524288); // Can edit
-define('OBS_PERMIT_ADMIN',   1048576); // Can add/remove
+// Permission levels flags
+define('OBS_PERMIT_ACCESS',        1); // Can access (ie: logon)
+define('OBS_PERMIT_READ',          2); // Can read basic data
+define('OBS_PERMIT_SECURE',        4); // Can read secure data
+define('OBS_PERMIT_EDIT',          8); // Can edit
+define('OBS_PERMIT_ADMIN',        16); // Can add/remove
 define('OBS_PERMIT_ALL', OBS_PERMIT_ACCESS | OBS_PERMIT_READ | OBS_PERMIT_SECURE | OBS_PERMIT_EDIT | OBS_PERMIT_ADMIN); // Permit all
 
 // Configuration view levels
@@ -149,15 +153,15 @@ else if (check_extension_exists('mcrypt'))
 ini_set('serialize_precision', -1);
 
 // Use more accurate math
-if (defined('GMP_VERSION'))
-{
-  // GMP
-  define('OBS_MATH', 'gmp');
-}
-else if (function_exists('bcadd'))
+if (function_exists('bcadd'))
 {
   // BC Math
   define('OBS_MATH', 'bc');
+}
+elseif (defined('GMP_VERSION'))
+{
+  // GMP (gmp have troubles with convert float numbers)
+  define('OBS_MATH', 'gmp');
 } else {
   // Fallback to php math
   define('OBS_MATH', 'php');
@@ -282,8 +286,7 @@ $definition_files = array('os',           // OS definitions
                           'rewrites',     // Rewriting array definitions
                           'mibs',         // MIB definitions
                           'models',       // Hardware model definitions (leave it after os and rewrites)
-                          //'sensors',      // Sensors definitions (moved to entities/ dir)
-                          //'status',       // Status definitions (moved to entities/ dir)
+                          'vendors',      // Vendor/manufacturer definitions
                           'geo',          // Geolocation api definitions
                           'vm',           // Virtual Machine definitions
                           'transports',   // Alerting transport definitions
@@ -529,10 +532,15 @@ $config['rancid']['os_map_3.5']['edgemax']             = 'edgemax';
 // Rancid v3.7+ specific os map
 $config['rancid']['os_map_3.7']['ciscosb']             = 'cisco-sb';
 //$config['rancid']['os_map_3.7']['wlc']                 = 'cisco-wlc8';
-$config['rancid']['os_map_3.7']['timos']               = 'sros';
+$config['rancid']['os_map_3.7']['timos']               = 'sros'; // Classic CLI (TiMOS)
 // Rancid v3.8+ specific os map
 $config['rancid']['os_map_3.8']['cisco-firepower']     = 'fxos';
 $config['rancid']['os_map_3.8']['vrp']                 = 'vrp';
+//$config['rancid']['os_map_3.8']['f5']                  = 'bigip13'; // v13+
+//$config['rancid']['os_map_3.8']['timos']               = 'sros-md'; // MD-CLI (TiMOS) 7750 SR and 7950 XRS routers
+// Rancid v3.9+ specific os map
+//$config['rancid']['os_map_3.9']['arrcus']                 = 'arcos'; // We not support this OS
+
 
 # Enable these (in config.php) if you added the powerconnect addon to your RANCID install
 #$config['rancid']['os_map']['powerconnect-fastpath'] = 'dell';
@@ -551,6 +559,7 @@ switch ($config['db_extension'])
 {
   case 'mysql':
     define('OBS_DB_EXTENSION', $config['db_extension']);
+    print_error("MySQL extension is deprecated since PHP 5.5, we unsupported it anymore. Use mysqli extension instead!");
     break;
   case 'mysqli':
   default:
@@ -652,11 +661,6 @@ $config['time']['year']       = $config['time']['now'] - 31536000; //time() - (3
 $config['time']['twoyear']    = $config['time']['now'] - 63072000; //time() - (2 * 365 * 24 * 60 * 60);
 $config['time']['threeyear']  = $config['time']['now'] - 94608000; //time() - (3 * 365 * 24 * 60 * 60);
 
-$config['printersupplies']['types'] = array(
-  'toner', 'tonerCartridge', 'wasteToner', 'ink', 'inkCartridge', 'wasteInk',
-  'opc', 'transferUnit', 'cleanerUnit', 'fuser', 'developer', 'other'
-);
-
 
 // Obsolete config variables
 // Note, for multiarray config options use conversion with '->'
@@ -683,9 +687,10 @@ $config['obsolete_config'][] = array('old' => 'search_modules',      'new' => 'w
 $config['obsolete_config'][] = array('old' => 'discovery_modules->ipv4-addresses', 'new' => 'discovery_modules->ip-addresses', 'info' => 'changed since r7565');
 $config['obsolete_config'][] = array('old' => 'discovery_modules->ipv6-addresses', 'new' => 'discovery_modules->ip-addresses', 'info' => 'changed since r7565');
 $config['obsolete_config'][] = array('old' => 'location_map',        'new' => 'location->map',       'info' => 'changed since r8021');
+$config['obsolete_config'][] = array('old' => 'geocoding->api_key',  'new' => 'geo_api->google->key', 'info' => 'DEPRECATED since 19.8.10000');
 
 // Here whitelist of base definitions keys which can be overridden by config.php file
 // Note, this required only for override already exist definitions, for additions not required
-$config['definitions_whitelist'] = array('os', 'mibs', 'device_types', 'rancid', 'remote_api', 'geo_api', 'search_modules', 'rewrites', 'nicecase', 'wui');
+$config['definitions_whitelist'] = array('os', 'mibs', 'device_types', 'rancid', 'geo_api', 'search_modules', 'rewrites', 'nicecase', 'wui');
 
 // End of includes/definitions.inc.php

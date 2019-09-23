@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -58,7 +58,7 @@ foreach ($oid_data as $ip_address => $entry)
       break;
     default:
       print_debug("Detected unknown IPv4 address: $ip_address");
-      continue;
+      continue 2;
   }
   $ip_mask_fix = explode('.', $entry['ipAdEntNetMask']);
   if ($ip_mask_fix[0] < 255 && $ip_mask_fix[1] <= '255' && $ip_mask_fix[2] <= '255' && $ip_mask_fix[3] == '255')

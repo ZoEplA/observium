@@ -1,5 +1,5 @@
 -- =====================================================================
--- Copyright (c) 2004-2011 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2011 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Device Link Detection Protocol (DLDP) MIB.
 -- Reference:
@@ -22,9 +22,9 @@ hh3cDldp2 MODULE-IDENTITY
     LAST-UPDATED
         "201112261530Z"
     ORGANIZATION
-        "Hangzhou H3C Technologies. Co., Ltd."
+        "New H3C Technologies. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies. Co., Ltd.
+        "Platform Team New H3C Technologies. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip: 100085"

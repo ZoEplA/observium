@@ -30,7 +30,7 @@ IMPORTS
     FROM TRIPPLITE;
 
 tlPowerAlert MODULE-IDENTITY
-  LAST-UPDATED "201507290000Z"
+  LAST-UPDATED "201702281600Z"
   ORGANIZATION "Tripp Lite"
   CONTACT-INFO
     "Software Engineering
@@ -41,6 +41,9 @@ tlPowerAlert MODULE-IDENTITY
     "This MIB module defines MIB objects which provide mechanisms for
     remote management capabilities of Tripplite PowerAlert and related
     software."
+  REVISION "201702281600Z"
+  DESCRIPTION
+    "Corrected spelling errors"
   REVISION "201507290000Z"
   DESCRIPTION
     "Removed obsolete legacy PowerAlert 11 sections"
@@ -2049,7 +2052,7 @@ tlCoolingCondOutletTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The condenser outlet air stream temperature in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The condenser outlet air stream temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 1 }
 
 tlCoolingCondInletTemp OBJECT-TYPE
@@ -2057,7 +2060,7 @@ tlCoolingCondInletTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The condenser inlet air stream temperature in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The condenser inlet air stream temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 2 }
   
 tlCoolingRefrigerantTemp OBJECT-TYPE
@@ -2065,7 +2068,7 @@ tlCoolingRefrigerantTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The temperature of the refrigerant in the suction line.  This is displayed in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The temperature of the refrigerant in the suction line.  This is displayed in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 3 }
   
 tlCoolingEvapSurfaceTemp OBJECT-TYPE
@@ -2073,7 +2076,7 @@ tlCoolingEvapSurfaceTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The surface temperature of the evaporator in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The surface temperature of the evaporator in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 4}
   
 tlCoolingSuctionPressure OBJECT-TYPE
@@ -2162,7 +2165,7 @@ tlCoolingReturnAirTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The return air temperature in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The return air temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 14 }
 
 tlCoolingSuctionTemp OBJECT-TYPE
@@ -2170,7 +2173,7 @@ tlCoolingSuctionTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The temperature of the compressor suction line in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The temperature of the compressor suction line in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 15 }
 
 tlCoolingSupplyAirTemp OBJECT-TYPE
@@ -2178,7 +2181,7 @@ tlCoolingSupplyAirTemp OBJECT-TYPE
   MAX-ACCESS read-only
   STATUS current
   DESCRIPTION
-    "The supply air temperature in tenths of degrees in the units Celcius/Fahrenheit as specified in tlCoolingDisplayUnits."
+    "The supply air temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
   ::= { tlCoolingStatus 16 }
 
 tlCoolingRunTimes OBJECT IDENTIFIER   ::= { tlCoolingEnvironment 3 }
@@ -2248,7 +2251,7 @@ tlCoolingSetPointTemp OBJECT-TYPE
   MAX-ACCESS read-write
   STATUS current
   DESCRIPTION
-    "The set point temperature the unit will control the temperature to in tenths of degrees in Celcius or Fahrenheit based upon tleCoolDisplayUnits."
+    "The set point temperature the unit will control the temperature to in tenths of degrees in Celsius or Fahrenheit based upon tleCoolDisplayUnits."
   ::= { tlCoolingConfig 2 }
 
 tlCoolingAutoStart OBJECT-TYPE
@@ -2290,7 +2293,7 @@ tlCoolingCurrentRemoteTemp OBJECT-TYPE
   MAX-ACCESS read-write
   STATUS current
   DESCRIPTION
-    "The external remote temperature in tenths of degrees in Celcius or Fahrenheit depending upon value of tlCoolingDisplayUnits"
+    "The external remote temperature in tenths of degrees in Celsius or Fahrenheit depending upon value of tlCoolingDisplayUnits"
   ::= { tlCoolingConfig 6 }
 
 tlCoolingDisplayUnits OBJECT-TYPE

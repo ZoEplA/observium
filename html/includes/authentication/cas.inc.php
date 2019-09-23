@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -113,8 +113,8 @@ function cas_adduser($username, $password, $level, $email = "", $realname = "", 
 {
   if (!cas_auth_user_exists($username))
   {
-    $encrypted = crypt($password,'$1$' . strgen(8).'$');
-    return dbInsert(array('username' => $username, 'password' => $encrypted, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    return dbInsert(array('username' => $username, 'password' => $hash, 'level' => $level, 'email' => $email, 'realname' => $realname, 'can_modify_passwd' => $can_modify_passwd, 'descr' => $description), 'users');
   } else {
     return FALSE;
   }

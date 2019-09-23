@@ -68,8 +68,8 @@ AutoNegCapabilitiesBits ::= TEXTUAL-CONVENTION
         gigaHalf(6),
         gigaFull(7),
         tenGigaFull(8),
-		fiveGigaFull(9),
-		twoPointFiveGigaFull(10)
+        fiveGigaFull(9),
+        twoPointFiveGigaFull(10)
     }
 
 --
@@ -140,8 +140,8 @@ SwIfEntry ::= SEQUENCE {
         swIfAdminComboMode                                      INTEGER,
         swIfOperComboMode                                       INTEGER,
         swIfAutoNegotiationMasterSlavePreference                INTEGER,
-		swIfPortCapabilities									AutoNegCapabilitiesBits
-	}
+        swIfPortCapabilities                                    AutoNegCapabilitiesBits
+        }
 
 
 swIfIndex OBJECT-TYPE
@@ -288,7 +288,8 @@ swIfType  OBJECT-TYPE
         eth20G(7),
         eth40G(8),
         eth100G(9),
-        unknown(10)
+        eth25G(10),	
+        unknown(11)
     }
     MAX-ACCESS  read-only
     STATUS      current

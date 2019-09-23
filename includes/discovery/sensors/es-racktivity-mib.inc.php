@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -44,7 +44,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "mTemperature.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
+      discover_sensor('temperature', $device, $oid, "mTemperature.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
     }
   }
 }
@@ -67,7 +67,7 @@ $options = array('limit_high'      => (isset($entry['mMaxTemperatureWarning']) ?
 
 if ($value != 0)
 {
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, "mTemperature.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
+  discover_sensor('temperature', $device, $oid, "mTemperature.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
 }
 
 $oids = snmpwalk_cache_twopart_oid($device, 'ePowerTable', array(), 'ES-RACKTIVITY-MIB');
@@ -106,7 +106,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "pVoltage.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
+      discover_sensor('voltage', $device, $oid, "pVoltage.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
     }
 
     // pTemperature.1.0 = Gauge32: 293.2 K
@@ -124,7 +124,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "pTemperature.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
+      discover_sensor('temperature', $device, $oid, "pTemperature.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
     }
 
     // pBigCurrent.1.0 = Gauge32: 30370 A
@@ -140,7 +140,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "pBigCurrent.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value, $options);
+      discover_sensor('current', $device, $oid, "pBigCurrent.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value, $options);
     }
 
     // pBigPower.1.0 = Gauge32: 479.410 W
@@ -156,7 +156,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "pBigPower.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
+      discover_sensor('power', $device, $oid, "pBigPower.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale, $options);
     }
 
     // pActiveEnergy.1.0 = Gauge32: 181.180 kWh
@@ -172,7 +172,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'frequency', $device, $oid, "pFrequency.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale);
+      discover_sensor('frequency', $device, $oid, "pFrequency.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale);
     }
 
     // pPowerFactor.1.0 = Gauge32: 68 %
@@ -188,7 +188,7 @@ foreach ($oids as $modIndex => $module_entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, "pBigApparentPower.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale);
+      discover_sensor('apower', $device, $oid, "pBigApparentPower.$modIndex.$index", 'es-racktivity-mib', $descr, $scale, $value / $scale);
     }
   }
 }

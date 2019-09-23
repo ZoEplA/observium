@@ -3,7 +3,7 @@
 -- 
 -- Description: HUAWEI ALARM MIB
 -- Reference:
--- Version: V2.13
+-- Version: V2.15
 -- History: 
 --  V1.0      2009-03-20   publish
 -- ==================================================================
@@ -23,7 +23,7 @@
     
     
         hwAlarmMIB MODULE-IDENTITY 
-            LAST-UPDATED "201702160943Z"        -- February 16, 2017 at 9:43 GMT
+            LAST-UPDATED "201709200950Z"        -- September 20, 2017 at 9:50 GMT
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
                 "Huawei Industrial Base
@@ -35,6 +35,12 @@
             DESCRIPTION 
                 "The MIB module for creating and deleting bulk files of
                 SNMP data for file transfer."
+            REVISION "201709200950Z"        -- September 20, 2017 at 9:50 GMT
+            DESCRIPTION
+                "Add hwAlarmVNFCName for trap."
+            REVISION "201707141136Z"        -- July 14, 2017 at 11:36 GMT
+            DESCRIPTION
+                "Revert to the revision 2.10."
             REVISION "201702160943Z"        -- February 16, 2017 at 9:43 GMT
             DESCRIPTION
                 "Revert to the revision 2.10."
@@ -68,7 +74,7 @@
             STATUS current
             DESCRIPTION
                 "The entry of the extended snmp target address table."
-            INDEX { hwSnmpTargetAddrExtIndex }
+            INDEX { IMPLIED hwSnmpTargetAddrExtIndex }
             ::= { hwSnmpTargetAddrExtTable 1 }
         
         HwSnmpTargetAddrExtEntry ::=
@@ -457,7 +463,15 @@
             DESCRIPTION
                 "Alarm severity."
             ::= { hwAlarmObjects 25 }        
-               
+ 
+        hwAlarmVNFCName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " Alarm VNFC name."
+            ::= { hwAlarmObjects 26 }
+
         hwSnmpTargetSyncIndexTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwSnmpTargetSyncIndexEntry
             MAX-ACCESS not-accessible

@@ -24,6 +24,8 @@ IMPORTS
         InetAddressType,
         InetAddress
 
+
+
              FROM INET-ADDRESS-MIB;    -- [RFC4001]
 
    docsBpi2MIB    MODULE-IDENTITY
@@ -73,6 +75,8 @@ IMPORTS
 
              Copyright (C) The Internet Society (2005).  This
 
+
+
              version of this MIB module is part of RFC 4131; see
              the RFC itself for full legal notices."
 
@@ -121,6 +125,9 @@ DocsBpkmSAType ::= TEXTUAL-CONVENTION
         The values of the named-numbers are associated
         with the BPKM SA-Type attributes:
         'primary' corresponds to code '1', 'static' to code '2',
+
+
+
         and 'dynamic' to code '3'.
         The 'none' value must only be used if the SA type has yet
         to be determined."
@@ -170,6 +177,8 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
 
    docsBpi2MIBObjects  OBJECT IDENTIFIER ::= { docsBpi2MIB 1 }
 
+
+
    -- Cable Modem Group
 
    docsBpi2CmObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 1 }
@@ -218,6 +227,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         docsBpi2CmSAMapWaitTimeout          Integer32,
         docsBpi2CmSAMapMaxRetries           Integer32,
         docsBpi2CmAuthentInfos              Counter32,
+
+
+
         docsBpi2CmAuthRequests              Counter32,
         docsBpi2CmAuthReplies               Counter32,
         docsBpi2CmAuthRejects               Counter32,
@@ -249,6 +261,7 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         RSAPublicKey ASN.1 type string, as defined in the RSA
         Encryption Standard (PKCS #1), corresponding to the
         public key of the CM."
+
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Section 4.2.2.4."
@@ -265,6 +278,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
                   }
         MAX-ACCESS     read-only
         STATUS         current
+
+
+
         DESCRIPTION
              "The value of this object is the state of the CM
         authorization FSM.  The start state indicates that FSM is
@@ -314,6 +330,8 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         Sections 4.2.1.2 and 4.2.2.9."
         ::= { docsBpi2CmBaseEntry 6 }
 
+
+
    docsBpi2CmAuthReset OBJECT-TYPE
         SYNTAX         TruthValue
         MAX-ACCESS     read-write
@@ -361,6 +379,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Appendix A.1.1.1.6."
         ::= { docsBpi2CmBaseEntry 9 }
+
+
+
 
    docsBpi2CmAuthWaitTimeout     OBJECT-TYPE
         SYNTAX         Integer32 (1..30)
@@ -410,6 +431,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
              "The value of this object is the Rekey Wait Timeout
         in seconds."
         REFERENCE
+
+
+
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Appendix A.1.1.1.5."
         ::= { docsBpi2CmBaseEntry 13 }
@@ -458,6 +482,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         SYNTAX         Counter32
         MAX-ACCESS     read-only
         STATUS         current
+
+
+
         DESCRIPTION
              "The value of this object is the number of times
         the CM has transmitted an Authentication Information
@@ -506,6 +533,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         SYNTAX         Counter32
         MAX-ACCESS     read-only
         STATUS         current
+
+
+
         DESCRIPTION
              "The value of this object is the number of times the CM
         has received an Authorization Reject message.
@@ -554,6 +584,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         since reboot."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
+
+
+
         Sections 4.2.1.3 and 4.2.2.15."
         ::= { docsBpi2CmBaseEntry 22 }
 
@@ -603,6 +636,8 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         most recent Authorization Invalid message received by the
         CM.  This is a zero length string if no Authorization
 
+
+
         Invalid message has been received since reboot."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
@@ -651,6 +686,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         docsBpi2CmTEKKeyReplies            Counter32,
         docsBpi2CmTEKKeyRejects            Counter32,
         docsBpi2CmTEKInvalids              Counter32,
+
+
+
         docsBpi2CmTEKAuthPends             Counter32,
         docsBpi2CmTEKKeyRejectErrorCode    INTEGER,
         docsBpi2CmTEKKeyRejectErrorString  SnmpAdminString,
@@ -699,6 +737,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "The value of this object is the data authentication
         algorithm for this SAID."
         REFERENCE
@@ -747,6 +788,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         expiration of the immediate predecessor of the most recent
         TEK for this FSM.  If this FSM has only one TEK, then the
         value is the time of activation of this FSM."
+
+
+
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Sections 4.2.1.5 and 4.2.2.9."
@@ -775,6 +819,7 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         re-initialization of the management system, and at other
         times as indicated by the value of
         ifCounterDiscontinuityTime."
+
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Section 4.2.1.4."
@@ -794,6 +839,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         ifCounterDiscontinuityTime."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
+
+
+
         Section 4.2.1.5."
         ::= { docsBpi2CmTEKEntry 10 }
 
@@ -843,6 +891,8 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         re-initialization of the management system, and at other
         times as indicated by the value of
 
+
+
         ifCounterDiscontinuityTime."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
@@ -891,6 +941,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "The value of this object is the enumerated
         description of the Error-Code in the most recent TEK Invalid
         message received by the CM.  This has the value unknown(2) if
@@ -939,6 +992,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         ::= { docsBpi2CmMulticastObjects 1 }
 
    docsBpi2CmIpMulticastMapEntry OBJECT-TYPE
+
+
+
         SYNTAX         DocsBpi2CmIpMulticastMapEntry
         MAX-ACCESS     not-accessible
         STATUS         current
@@ -987,6 +1043,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "This object represents the IP multicast address
         to be mapped.  The type of this address is determined by
         the value of the docsBpi2CmIpMulticastAddressType object."
@@ -1036,6 +1095,8 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         re-initialization of the management system, and at other
         times as indicated by the value of
 
+
+
         ifCounterDiscontinuityTime."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
@@ -1084,6 +1145,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "The value of this object is the enumerated
         description of the Error-Code in the most recent SA Map
         Reject message sent in response to an SA Map Request for
@@ -1132,6 +1196,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
    docsBpi2CmDeviceCertEntry  OBJECT-TYPE
         SYNTAX              DocsBpi2CmDeviceCertEntry
         MAX-ACCESS          not-accessible
+
+
+
         STATUS              current
         DESCRIPTION
              "Each entry contains the device certificates of
@@ -1180,6 +1247,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
    -- CM Crypto Suite Table
    --
 
+
+
+
    docsBpi2CmCryptoSuiteTable    OBJECT-TYPE
         SYNTAX         SEQUENCE OF    DocsBpi2CmCryptoSuiteEntry
         MAX-ACCESS     not-accessible
@@ -1227,6 +1297,9 @@ DocsBpkmDataAuthentAlg ::= TEXTUAL-CONVENTION
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Section 4.2.2.20."
         ::= { docsBpi2CmCryptoSuiteEntry 2 }
+
+
+
 
    docsBpi2CmCryptoSuiteDataAuthentAlg     OBJECT-TYPE
         SYNTAX    DocsBpkmDataAuthentAlg
@@ -1277,6 +1350,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
 
    DocsBpi2CmtsBaseEntry ::= SEQUENCE {
 
+
+
         docsBpi2CmtsDefaultAuthLifetime              Integer32,
         docsBpi2CmtsDefaultTEKLifetime               Integer32,
         docsBpi2CmtsDefaultSelfSignedManufCertTrust  INTEGER,
@@ -1325,6 +1400,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         ::= { docsBpi2CmtsBaseEntry 2 }
 
    docsBpi2CmtsDefaultSelfSignedManufCertTrust  OBJECT-TYPE
+
+
+
         SYNTAX    INTEGER {
                   trusted (1),
                   untrusted (2)
@@ -1373,6 +1451,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         from any CM.
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system, and at other
+
+
 
         times as indicated by the value of
         ifCounterDiscontinuityTime."
@@ -1423,6 +1503,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
                 "The value of this object is the number of times the
         CMTS has transmitted an Authorization Reject message to any
 
+
+
         CM.
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system, and at other
@@ -1471,6 +1553,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "The value of this object is the number of times the
         CMTS has transmitted an SA Map Reply message to any CM.
         Discontinuities in the value of this counter can occur at
@@ -1519,6 +1604,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         SYNTAX              DocsBpi2CmtsAuthEntry
         MAX-ACCESS          not-accessible
         STATUS              current
+
+
+
         DESCRIPTION
              "Each entry contains objects describing attributes of
         one authorization association.  The CMTS MUST create one
@@ -1567,6 +1655,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
                          bpi (0),
                          bpiPlus (1)
                           }
+
+
+
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
@@ -1615,6 +1706,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "The value of this object is the actual clock time
         for expiration of the immediate predecessor of the most
         recent authorization key for this FSM.  If this FSM has only
@@ -1663,6 +1757,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
                             }
         MAX-ACCESS     read-write
         STATUS         current
+
+
+
         DESCRIPTION
              "Setting this object to invalidateAuth(2) causes the
         CMTS to invalidate the current CM authorization key(s), but
@@ -1712,6 +1809,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
              "The value of this object is the number of times the
         CMTS has received an Authorization Request message from
 
+
+
         this CM.
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system, and at other
@@ -1760,6 +1859,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         SYNTAX         Counter32
         MAX-ACCESS     read-only
         STATUS         current
+
+
+
         DESCRIPTION
              "The value of this object is the number of times the
         CMTS has transmitted an Authorization Invalid message to
@@ -1808,6 +1910,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         creation."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
+
+
+
         Sections 4.2.1.3 and 4.2.2.6."
         ::= { docsBpi2CmtsAuthEntry 15 }
 
@@ -1857,6 +1962,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
              "The value of this object is the Primary Security
         Association identifier.  For BPI mode, the value must be
 
+
+
         any unicast SID."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
@@ -1905,6 +2012,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
+
+
+
              "The X509 CM Certificate sent as part of a BPKM
         Authorization Request.
         Note: The zero-length OCTET STRING must be returned if the
@@ -1954,6 +2064,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         based on the receipt of a Key Request message, and MUST not
         delete the entry before the CM authorization for the SAID
 
+
+
         permanently expires."
         INDEX     { ifIndex, docsBpi2CmtsTEKSAId }
         ::= { docsBpi2CmtsTEKTable 1 }
@@ -2002,6 +2114,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         encoding."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
+
+
+
         Section 2.1.3."
         ::= { docsBpi2CmtsTEKEntry 2 }
 
@@ -2043,12 +2158,15 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         Section 4.2.1.5 and Appendix A.2."
         ::= { docsBpi2CmtsTEKEntry 5 }
 
+
    docsBpi2CmtsTEKKeySequenceNumber   OBJECT-TYPE
         SYNTAX              Integer32 (0..15)
         MAX-ACCESS          read-only
         STATUS              current
         DESCRIPTION
              "The value of this object is the most recent TEK
+
+
 
         key sequence number for this SAID."
         REFERENCE
@@ -2098,6 +2216,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         Section 4.1.3.3.5."
         ::= { docsBpi2CmtsTEKEntry 9 }
 
+
+
+
    docsBpi2CmtsKeyRequests  OBJECT-TYPE
         SYNTAX         Counter32
         MAX-ACCESS     read-only
@@ -2145,6 +2266,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
              "DOCSIS Baseline Privacy Plus Interface Specification,
         Section 4.2.1.6."
         ::= { docsBpi2CmtsTEKEntry 12 }
+
+
+
 
    docsBpi2CmtsTEKInvalids  OBJECT-TYPE
         SYNTAX         Counter32
@@ -2194,6 +2318,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         registration."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
+
+
+
         Sections 4.2.1.6 and 4.2.2.6."
         ::= { docsBpi2CmtsTEKEntry 15 }
 
@@ -2243,6 +2370,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
    -- docsBpi2CmtsIpMulticastIndex, and by ifIndex
    --
 
+
+
    docsBpi2CmtsIpMulticastMapTable         OBJECT-TYPE
         SYNTAX         SEQUENCE OF DocsBpi2CmtsIpMulticastMapEntry
         MAX-ACCESS     not-accessible
@@ -2291,6 +2420,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
 
    docsBpi2CmtsIpMulticastIndex       OBJECT-TYPE
         SYNTAX         Unsigned32 (1..4294967295)
+
+
+
         MAX-ACCESS     not-accessible
         STATUS         current
         DESCRIPTION
@@ -2339,6 +2471,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         Note: For IPv6, this object need not represent a
         contiguous netmask; e.g., to associate a SAID to a
         multicast group matching 'any' multicast scope.  The TC
+
+
 
         InetAddressPrefixLength is not used, as it only
         represents contiguous netmask."
@@ -2389,6 +2523,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         DESCRIPTION
              "The value of this object is the data authentication
 
+
+
         algorithm for this IP."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
@@ -2438,6 +2574,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system, and at other
 
+
+
         times as indicated by the value of
         ifCounterDiscontinuityTime."
         REFERENCE
@@ -2486,6 +2624,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         MAX-ACCESS     read-create
         STATUS         current
         DESCRIPTION
+
+
+
              "This object controls and reflects the IP multicast
         address mapping entry.  There is no restriction on the
         ability to change values in this row while the row is
@@ -2535,6 +2676,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
                docsBpi2CmtsMulticastAuthCmMacAddress }
         ::= { docsBpi2CmtsMulticastAuthTable 1 }
 
+
+
    DocsBpi2CmtsMulticastAuthEntry ::= SEQUENCE
         {
         docsBpi2CmtsMulticastAuthSAId                DocsSAId,
@@ -2583,6 +2726,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
    docsBpi2CmtsProvisionedCmCertTable OBJECT-TYPE
         SYNTAX         SEQUENCE OF
                         DocsBpi2CmtsProvisionedCmCertEntry
+
+
+
         MAX-ACCESS     not-accessible
         STATUS         current
         DESCRIPTION
@@ -2631,6 +2777,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
                           trusted(1),
                           untrusted(2)
                           }
+
+
+
         MAX-ACCESS     read-create
         STATUS    current
         DESCRIPTION
@@ -2679,6 +2828,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
              "An X509 DER-encoded Certificate Authority
         certificate.
         Note: The zero-length OCTET STRING must be returned, on
+
+
 
         reads, if the entire certificate is not retained in the
         CMTS."
@@ -2729,6 +2880,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         docsBpi2CmtsCACertThumbprint       OCTET STRING
    }
 
+
+
    docsBpi2CmtsCACertIndex OBJECT-TYPE
         SYNTAX         Unsigned32 (1.. 4294967295)
         MAX-ACCESS     not-accessible
@@ -2778,6 +2931,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         CommonName <CR><LF>
         countryName <CR><LF>
 
+
+
         stateOrProvinceName <CR><LF>
         localityName <CR><LF>
         organizationName <CR><LF>
@@ -2826,6 +2981,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
    docsBpi2CmtsCACertSource OBJECT-TYPE
         SYNTAX    INTEGER {
                   snmp (1),
+
+
+
                   configurationFile (2),
                   externalDatabase (3),
                   other (4),
@@ -2874,6 +3032,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         CMTS."
         REFERENCE
              "DOCSIS Baseline Privacy Plus Interface Specification,
+
+
+
         Section 9.2."
         ::= { docsBpi2CmtsCACertEntry 8 }
 
@@ -2923,6 +3084,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
             "The value indicates the result of the latest config
         file CVC verification, SNMP CVC verification, or code file
 
+
+
         verification."
         REFERENCE
             "DOCSIS Baseline Privacy Plus Interface Specification,
@@ -2971,6 +3134,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
 
    docsBpi2CodeMfgCvcAccessStart OBJECT-TYPE
         SYNTAX         DateAndTime (SIZE(11))
+
+
+
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION
@@ -3020,6 +3186,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
             "The value of this object is the co-signer's current
         cvcAccessStart value.  This value will always refer to
 
+
+
         Greenwich Mean Time (GMT), and the value format must contain
         TimeZone information (fields 8-10).
         If docsBpi2CodeCoSignerOrgName is a zero
@@ -3060,6 +3228,7 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
    docsBpi2Groups      OBJECT IDENTIFIER
         ::= { docsBpi2Conformance 2 }
 
+
    docsBpi2CmCompliance MODULE-COMPLIANCE
         STATUS         current
         DESCRIPTION
@@ -3067,6 +3236,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         implement the DOCSIS Baseline Privacy Interface Plus."
 
         MODULE  -- docsBpi2MIB
+
+
 
         -- unconditionally mandatory group
         MANDATORY-GROUPS {
@@ -3117,6 +3288,8 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
                                des56CbcMode(1),
                                des40CbcMode(2)
 
+
+
                   }
         DESCRIPTION
              "It is compliant to only support des56CbcMode(1)
@@ -3130,7 +3303,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
         DESCRIPTION
              "It is compliant to not support data message
         authentication algorithms."
+
    ::= { docsBpi2Compliances 1 }
+
 
    docsBpi2CmtsCompliance MODULE-COMPLIANCE
         STATUS         current
@@ -3163,6 +3338,9 @@ docsBpi2CmtsObjects OBJECT IDENTIFIER ::= { docsBpi2MIBObjects 2 }
    OBJECT    docsBpi2CmtsDefaultTEKLifetime
         SYNTAX    Integer32 (1800..604800)
         DESCRIPTION
+
+
+
             "The refined range corresponds to the minimum and
         maximum values in operational networks."
 
@@ -3211,6 +3389,9 @@ OBJECT docsBpi2CmtsTEKDataAuthentAlg
         SYNTAX      InetAddressType { ipv4(1) }
         MIN-ACCESS  read-only
         DESCRIPTION
+
+
+
             "Write access is not required.
         An implementation is only required to support IPv4
         addresses.  Support for other address types may be defined
@@ -3260,6 +3441,8 @@ OBJECT docsBpi2CmtsTEKDataAuthentAlg
             "Write access is not required.
         It is compliant to only support des56CbcMode(1)
 
+
+
         and des40CbcMode(2) for data encryption"
 
    -- constrain on access
@@ -3281,6 +3464,7 @@ OBJECT docsBpi2CmtsTEKDataAuthentAlg
         MIN-ACCESS  read-only
         DESCRIPTION
        "Write access is not required."
+
         ::= { docsBpi2Compliances 2 }
 
    docsBpi2CmGroup     OBJECT-GROUP
@@ -3307,6 +3491,9 @@ OBJECT docsBpi2CmtsTEKDataAuthentAlg
              docsBpi2CmAuthRejects,
              docsBpi2CmAuthInvalids,
              docsBpi2CmAuthRejectErrorCode,
+
+
+
              docsBpi2CmAuthRejectErrorString,
              docsBpi2CmAuthInvalidErrorCode,
              docsBpi2CmAuthInvalidErrorString,
@@ -3355,6 +3542,9 @@ OBJECT docsBpi2CmtsTEKDataAuthentAlg
              docsBpi2CmtsAuthentInfos,
              docsBpi2CmtsAuthRequests,
              docsBpi2CmtsAuthReplies,
+
+
+
              docsBpi2CmtsAuthRejects,
              docsBpi2CmtsAuthInvalids,
              docsBpi2CmtsSAMapRequests,
@@ -3403,6 +3593,9 @@ OBJECT docsBpi2CmtsTEKDataAuthentAlg
              docsBpi2CmtsIpMulticastSAType,
              docsBpi2CmtsIpMulticastDataEncryptAlg,
              docsBpi2CmtsIpMulticastDataAuthentAlg,
+
+
+
              docsBpi2CmtsIpMulticastSAMapRequests,
              docsBpi2CmtsIpMulticastSAMapReplies,
              docsBpi2CmtsIpMulticastSAMapRejects,

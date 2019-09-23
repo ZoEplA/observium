@@ -112,6 +112,40 @@ hmConfiguration MODULE-IDENTITY
     
 
 -- Textual Conventions
+HmLargeDisplayString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2048a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information taken from the NVT ASCII
+            character set, as defined in pages 4, 10-11 of RFC 854.
+
+            To summarize RFC 854, the NVT ASCII repertoire specifies:
+
+              - the use of character codes 0-127 (decimal)
+
+              - the graphics characters (32-126) are interpreted as
+                US ASCII
+
+              - NUL, LF, CR, BEL, BS, HT, VT and FF have the special
+                meanings specified in RFC 854
+
+              - the other 25 codes have no standard interpretation
+
+              - the sequence 'CR LF' means newline
+
+              - the sequence 'CR NUL' means carriage-return
+
+              - an 'LF' not preceded by a 'CR' means moving to the
+                same column on the next line.
+
+              - the sequence 'CR x' for any x other than LF or NUL is
+                illegal.  (Note that this also means that a string may
+                end with either 'CR LF' or 'CR NUL', but not with CR.)
+
+            Any object defined using this syntax may not exceed 2048
+            characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..2048))
+
 HmAgentLogSeverity ::= TEXTUAL-CONVENTION
         STATUS       current
     DESCRIPTION  "Severity code used in determining the SysLog Priority value."
@@ -359,6 +393,7 @@ hmSysProduct OBJECT-TYPE
 							  eagleone-mm-tx(562),
 							  eagleone-mm-mm(563),
 							  eagleone-tx-sm(564),
+							  eagleone-sm-tx(565),
 							  ms20-0800(600),
 							  ms20-2400(601),
 							  ms30-0802(620),
@@ -2198,6 +2233,55 @@ hmLEDRSRRelay2 OBJECT-TYPE
 		"Status from the Relay2 LED."
     ::= { hmLEDRSRGroup 6 }
     
+hmLEDMarGroup OBJECT IDENTIFIER ::= { hmLEDGroup 4 }
+
+hmLEDMarPowerSupply OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the PowerSupply LED."
+    ::= { hmLEDMarGroup 1 }
+
+hmLEDMarStandby OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Standby LED."
+    ::= { hmLEDMarGroup 2 }
+
+hmLEDMarRedundancyManager OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the RM LED."
+    ::= { hmLEDMarGroup 3 }
+
+hmLEDMarFault OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Fault LED."
+    ::= { hmLEDMarGroup 4 }
+
+hmLEDMarRelay1 OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Relay1 LED."
+    ::= { hmLEDMarGroup 5 }
+
+hmLEDMarRelay2 OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Relay2 LED."
+    ::= { hmLEDMarGroup 6 }
     
 hmDIPSwitchGroup OBJECT IDENTIFIER ::= { hmSystemTable 36 }
  
@@ -10038,7 +10122,7 @@ hmIEC61850MMSServerTechnicalKey  OBJECT-TYPE
 hmAgentLoginGroup OBJECT IDENTIFIER ::= { hmAgent 17 }
 
 hmAgentLoginBanner  OBJECT-TYPE
- 			 SYNTAX 		OCTET STRING (SIZE (0..255))			 
+ 			 SYNTAX 		HmLargeDisplayString (SIZE (0..255))			 
  			 MAX-ACCESS     read-write
  			 STATUS			current
  			 DESCRIPTION
@@ -10065,7 +10149,7 @@ hmAgentLoginBannerAdminStatus	OBJECT-TYPE
 			 ::= { hmAgentLoginGroup 2 }
 			 
 hmAgentCliBannerText  OBJECT-TYPE
-			 SYNTAX       OCTET STRING (SIZE (0..2048))			 
+			 SYNTAX       HmLargeDisplayString (SIZE (0..2048))			 
 			 MAX-ACCESS   read-write
 			 STATUS		  current
 			 DESCRIPTION

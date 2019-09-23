@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -58,10 +58,10 @@ foreach ($vars['idb'] as $ifid)
 if ($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 $in_thing   = implode(',', $rrd_multi['in_thing']);
 $out_thing  = implode(',', $rrd_multi['out_thing']);
-$pluses     = str_repeat(',+', count($rrd_multi['in_thing']) - 1);
+$pluses     = str_repeat(',ADDNAN', count($rrd_multi['in_thing']) - 1);
 $in_thingb  = implode(',', $rrd_multi['in_thingb']);
 $out_thingb = implode(',', $rrd_multi['out_thingb']);
-$plusesb    = str_repeat(',+', count($rrd_multi['in_thingb']) - 1);
+$plusesb    = str_repeat(',ADDNAN', count($rrd_multi['in_thingb']) - 1);
 $rrd_options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
 $rrd_options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
 $rrd_options .= " CDEF:".$in."octetsb=" . $in_thingb . $plusesb;

@@ -151,6 +151,15 @@ fsm7226rs               OBJECT IDENTIFIER ::= { stackswitch 11 }
 fsm7250rs               OBJECT IDENTIFIER ::= { stackswitch 12 }
 gsm7328se               OBJECT IDENTIFIER ::= { stackswitch 13 }
 gsm7352se               OBJECT IDENTIFIER ::= { stackswitch 14 }
+xsm7224s                OBJECT IDENTIFIER ::= { stackswitch 15 }
+
+m530028gpoe             OBJECT IDENTIFIER ::= { stackswitch 16 }
+m530052gpoe             OBJECT IDENTIFIER ::= { stackswitch 17 }
+m530028g3               OBJECT IDENTIFIER ::= { stackswitch 18 }
+m530052g3               OBJECT IDENTIFIER ::= { stackswitch 19 }
+m530028gf3              OBJECT IDENTIFIER ::= { stackswitch 20 }
+m530028g                OBJECT IDENTIFIER ::= { stackswitch 21 }
+m530052g                OBJECT IDENTIFIER ::= { stackswitch 22 }
 
 gsm7312v2               OBJECT IDENTIFIER ::= { l3switch 1 }
 gsm7324v2               OBJECT IDENTIFIER ::= { l3switch 2 }
@@ -163,6 +172,24 @@ gsm7224rp               OBJECT IDENTIFIER ::= { l2Rswitch 3 }
 gsm7248rp               OBJECT IDENTIFIER ::= { l2Rswitch 4 }
 gsm7224v2               OBJECT IDENTIFIER ::= { l2Rswitch 5 }
 gsm7248v2               OBJECT IDENTIFIER ::= { l2Rswitch 6 }
+
+gsm7212f                OBJECT IDENTIFIER ::= { l2Rswitch 7 }
+gsm5212p                OBJECT IDENTIFIER ::= { l2Rswitch 8 }
+gsm7212p                OBJECT IDENTIFIER ::= { l2Rswitch 9 }
+gsm7224p                OBJECT IDENTIFIER ::= { l2Rswitch 10 }
+
+m4100-26g               OBJECT IDENTIFIER ::= { l2Rswitch 16 }
+m4100-50g               OBJECT IDENTIFIER ::= { l2Rswitch 17 }
+m4100-26-poe            OBJECT IDENTIFIER ::= { l2Rswitch 18 }
+m4100-26g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 19 }
+m4100-50g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 20 }
+m4100-50-poe            OBJECT IDENTIFIER ::= { l2Rswitch 21 }
+m4100-d12g              OBJECT IDENTIFIER ::= { l2Rswitch 22 }
+m4100-d10-poe           OBJECT IDENTIFIER ::= { l2Rswitch 23 }
+m4100-12gf              OBJECT IDENTIFIER ::= { l2Rswitch 24 }
+m4100-d12g-poe          OBJECT IDENTIFIER ::= { l2Rswitch 25 }
+m4100-12g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 26 }
+m4100-24g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 27 }
 
 -- 
 -- GSM7324, GSM7312, FSM7326P, and GSM7224, are using two different styles
@@ -201,12 +228,28 @@ gs716tv2                OBJECT IDENTIFIER ::= { smartswitch 16 }
 gs724tv3                OBJECT IDENTIFIER ::= { smartswitch 17 }
 gs108tv2                OBJECT IDENTIFIER ::= { smartswitch 18 }
 gs110tp                 OBJECT IDENTIFIER ::= { smartswitch 19 }
+fs728tpv2               OBJECT IDENTIFIER ::= { smartswitch 20 }
+fs752tp	                OBJECT IDENTIFIER ::= { smartswitch 22 }
+gs110t                  OBJECT IDENTIFIER ::= { smartswitch 23 }
+gs510tp                 OBJECT IDENTIFIER ::= { smartswitch 24 }
+gs716tv3                OBJECT IDENTIFIER ::= { smartswitch 31 }
+gs724tv4                OBJECT IDENTIFIER ::= { smartswitch 32 }
+gs748tv5                OBJECT IDENTIFIER ::= { smartswitch 33 }
+xs712t                  OBJECT IDENTIFIER ::= { smartswitch 30 }
+
 
 fs728ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 1 }
 fs752ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 2 }
 fs752tps                OBJECT IDENTIFIER ::= { stacksmartswitch 3 }
 gs724ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 4 }
 gs748ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 5 }
+gs752tstps              OBJECT IDENTIFIER ::= { stacksmartswitch 8 }
+gs752txs                OBJECT IDENTIFIER ::= { stacksmartswitch 10 }
+gs728ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 11 }
+gs752ts                 OBJECT IDENTIFIER ::= { stacksmartswitch 12 }
+gs728tps                OBJECT IDENTIFIER ::= { stacksmartswitch 13 }
+gs752tps                OBJECT IDENTIFIER ::= { stacksmartswitch 14 }
+gs728txs                OBJECT IDENTIFIER ::= { stacksmartswitch 15 }
 
 ---
 --- new SNMP-enabled business router/firewall

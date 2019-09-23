@@ -1,10 +1,10 @@
 -- =========================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: This MIB file is used for management of hh3c Class Based
 --             QoS information.
 -- Reference:
--- Version: V2.1
+-- Version: V2.2
 -- History:
 -- V1.0 created by tangshun.
 -- V1.1 2006/01/17 modified by wangjinwang
@@ -92,6 +92,16 @@
 --   Add enumeration matchRuleMacAcl and matchRuleUserAcl to MatchRuleType.
 --   Modify the description of hh3cCBQoSMatchRuleStringValue.
 --   Modify the description of hh3cCBQoSMatchRuleIntValue1.
+-- V2.2 2016/2/24 modified by WanQing
+--   Add enumeration matchRuleVxlan to MatchRuleType.
+--   Modify the description of hh3cCBQoSMatchRuleStringValue.
+--   2017/03/02 modified by gaomengfei
+--   Add hh3cCBQoSCarClassName to hh3cCBQoSCarRunInfoEntry.
+--   2017/10/10 modified by gaomengfei
+--   Add hh3cCBQoSAccountingPktpps to Hh3cCBQoSAccountingRunInfoEntry.
+--   Add hh3cCBQoSAccountingPktbps to Hh3cCBQoSAccountingRunInfoEntry.
+--   2018/01/4 modified by gaomengfei
+--   Add hh3cCBQoSPolicyAccRunInfoTable.
 -- ==========================================================================
 HH3C-CBQOS2-MIB DEFINITIONS ::= BEGIN
 
@@ -106,11 +116,11 @@ IMPORTS
         FROM SNMPv2-TC;
 
 hh3cCBQos2 MODULE-IDENTITY
-    LAST-UPDATED "201207020000Z"            -- July 02, 2012 at 00:00 GMT
+    LAST-UPDATED "201801040000Z"            --January 4, 2018 at 00:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -198,9 +208,24 @@ hh3cCBQos2 MODULE-IDENTITY
             73:  hh3cCBQoSQueueRunInfoTable
             74:  hh3cCBQoSWredRunInfoTable
             75:  hh3cCBQoSAccountingRunInfoTable
-            76:  hh3cCBQoSApplyingStatusObjects
-            77:  hh3cCBQoSNotifications
+            76:  hh3cCBQoSPolicyAccRunInfoTable
+            77:  hh3cCBQoSApplyingStatusObjects
+            78:  hh3cCBQoSNotifications
         "
+    REVISION "201801040000Z"        --January 4, 2018 at 00:00 GMT
+    DESCRIPTION
+        "Add hh3cCBQoSPolicyAccRunInfoTable."
+    REVISION "201710100000Z"        --October 10, 2017 at 00:00 GMT
+    DESCRIPTION
+        "Add hh3cCBQoSAccountingPktpps to Hh3cCBQoSAccountingRunInfoEntry.
+         Add hh3cCBQoSAccountingPktbps to Hh3cCBQoSAccountingRunInfoEntry."
+    REVISION "201703020000Z"        --March 02, 2017 at 00:00 GMT
+    DESCRIPTION
+        "Add hh3cCBQoSCarClassName to hh3cCBQoSCarRunInfoEntry."
+    REVISION "201602240000Z"        -- Feb 24, 2016 at 00:00 GMT
+    DESCRIPTION
+        "Add enumeration matchRuleVxlan to MatchRuleType.
+         Modify the description of hh3cCBQoSMatchRuleStringValue."
     REVISION "201207020000Z"        -- July 02, 2012 at 00:00 GMT
     DESCRIPTION
         "Modified to add new tables and new nodes."
@@ -254,7 +279,8 @@ MatchRuleType ::= TEXTUAL-CONVENTION
         matchRuleArpProtocol(30),
         matchRuleForwardingLayer(31),
         matchRuleMacAcl(32),
-        matchRuleUserAcl(33)
+        matchRuleUserAcl(33),
+        matchRuleVxlan(34)
     }
 --
 -- end of type definitions in the traffic classifier
@@ -658,6 +684,11 @@ hh3cCBQoSMatchRuleStringValue OBJECT-TYPE
                         'if-match mpls-label 1 11 111 1111';
                         1##1111 means the match rule is
                         'if-match mpls-label 1 to 1111';
+         VxlanID: SIZE(1..8) Vxlan ID or any
+           for example: 20 means the match rule is
+                        'if-match vxlan 20';
+                        any means the match rule is
+                        'if-match vxlan any';
          other types: Set is not permitted.  Zero-length string will
                       be returned when getting.
         "
@@ -6248,7 +6279,9 @@ Hh3cCBQoSCarRunInfoEntry ::=
         hh3cCBQoSCarYellowPackets
             Counter64,
         hh3cCBQoSCarYellowBytes
-            Counter64
+            Counter64,
+        hh3cCBQoSCarClassName
+            OCTET STRING
     }
 
 hh3cCBQoSCarGreenPackets OBJECT-TYPE
@@ -6298,6 +6331,14 @@ hh3cCBQoSCarYellowBytes OBJECT-TYPE
     DESCRIPTION
         "Number of yellow bytes."
     ::= { hh3cCBQoSCarRunInfoEntry 6 }
+
+hh3cCBQoSCarClassName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of classifier."
+    ::= { hh3cCBQoSCarRunInfoEntry 7 }
 
 -- GTS statistics
 
@@ -6591,6 +6632,10 @@ Hh3cCBQoSAccountingRunInfoEntry ::=
         hh3cCBQoSAccountingPackets
             Counter64,
         hh3cCBQoSAccountingBytes
+            Counter64,
+        hh3cCBQoSAccountingPktpps
+            Counter64,
+        hh3cCBQoSAccountingPktbps
             Counter64
     }
 
@@ -6609,6 +6654,72 @@ hh3cCBQoSAccountingBytes OBJECT-TYPE
     DESCRIPTION
         "Number of bytes matching a class in QoS policy."
     ::= { hh3cCBQoSAccountingRunInfoEntry 2 }
+
+hh3cCBQoSAccountingPktpps OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average number of packets matching a class in QoS policy
+         per second in the last interval.
+         Unit: pps."
+    ::= { hh3cCBQoSAccountingRunInfoEntry 3 }
+
+hh3cCBQoSAccountingPktbps OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average bits of packets matching a class in QoS policy
+         per second in the last interval.
+         Unit: bps."
+    ::= { hh3cCBQoSAccountingRunInfoEntry 4 }
+
+--
+-- Policy Accounting RunInfo
+--
+hh3cCBQoSPolicyAccRunInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cCBQoSPolicyAccRunInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of running statistics for account on a QoS apply
+         object."
+    ::= { hh3cCBQoSStaticsObjects 9 }
+
+hh3cCBQoSPolicyAccRunInfoEntry OBJECT-TYPE
+    SYNTAX Hh3cCBQoSPolicyAccRunInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Policy account statistics entry."
+    INDEX { hh3cCBQoSApplyObjectIndex }
+    ::= { hh3cCBQoSPolicyAccRunInfoTable 1 }
+
+Hh3cCBQoSPolicyAccRunInfoEntry ::=
+    SEQUENCE
+    {
+        hh3cCBQoSPolicyAccPackets
+            Counter64,
+        hh3cCBQoSPolicyAccBytes
+            Counter64
+    }
+
+hh3cCBQoSPolicyAccPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of packets matching a QoS policy."
+    ::= { hh3cCBQoSPolicyAccRunInfoEntry 1 }
+
+hh3cCBQoSPolicyAccBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of bytes matching a QoS policy."
+    ::= { hh3cCBQoSPolicyAccRunInfoEntry 2 }
 
 -- Policy applying status
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -64,11 +64,12 @@ if (is_array($hrDevice_array))
   {
     $hr_total = $hr_total / $hr_cpus;
     discover_processor($valid['processor'], $device, 1, 1, 'hr-average', 'Average', 1, $usage);
-    $ucd_count = @dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ? AND `processor_type` = 'ucd-old'", array($device['device_id']));
-    if ($ucd_count)
+    //$ucd_count = @dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ? AND `processor_type` = 'ucd-old'", array($device['device_id']));
+    //if ($ucd_count)
+    if (dbExist('processors', '`device_id` = ? AND `processor_type` = ?', array($device['device_id'], 'ucd-old')))
     {
       $GLOBALS['module_stats']['processors']['deleted']++; //echo('-');
-      dbDelete('processors', "`device_id` = ? AND `processor_type` = 'ucd-old'", array($device['device_id'])); // Heh, this is because UCD-SNMP-MIB run earlier
+      dbDelete('processors', "`device_id` = ? AND `processor_type` = ?", array($device['device_id'], 'ucd-old')); // Heh, this is because UCD-SNMP-MIB run earlier
     }
   }
 

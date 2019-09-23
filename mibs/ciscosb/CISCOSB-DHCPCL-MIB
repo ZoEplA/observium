@@ -578,7 +578,8 @@ RlDhcpClInformationEntry ::= SEQUENCE {
     rlDhcpClInformationTftpServerName     DisplayString,
     rlDhcpClInformationTftpFileName       DisplayString,
     rlDhcpClInformationTimeZone           DisplayString,
-    rlDhcpClInformationTftpImageName      DisplayString
+    rlDhcpClInformationTftpImageName      DisplayString,
+    rlDhcpClInformationPnpData            DisplayString
 }
 
 rlDhcpClInformationIfIndex          OBJECT-TYPE
@@ -670,6 +671,14 @@ rlDhcpClInformationTftpImageName OBJECT-TYPE
     DESCRIPTION
         "Image filename to use in autoupdate process received by DHCP client."
     ::= { rlDhcpClInformationEntry 12 }
+
+rlDhcpClInformationPnpData   OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE (0..160))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The pnp string received by DHCP client."
+    ::= { rlDhcpClInformationEntry 13 }
 
 -- rlDhcpClInformationDnsServerListEntry --
 

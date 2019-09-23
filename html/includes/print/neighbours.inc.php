@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -74,7 +74,10 @@ function print_neighbours($vars)
       }
       $string .= '    <td><span class="entity">'.generate_port_link($entry) . '</span><br />' . $entry['ifAlias'] . '</td>' . PHP_EOL;
       $string .= '    <td><i class="icon-resize-horizontal text-success"></i></td>' . PHP_EOL;
-      if (is_numeric($entry['remote_port_id']) && $entry['remote_port_id'])
+
+      // r($entry['remote_port_id']); r($entry['remote_port']);
+
+      if (isset($entry['remote_port_id']) && is_numeric($entry['remote_port_id']))
       {
         $remote_port   = get_port_by_id_cache($entry['remote_port_id']);
         $remote_device = device_by_id_cache($remote_port['device_id']);
@@ -107,7 +110,7 @@ function print_neighbours($vars)
  * pagination, pageno, pagesize
  * device, port
  */
-function get_neighbours_array(&$vars)
+function get_neighbours_array($vars)
 {
   $array = array();
 
@@ -152,11 +155,11 @@ function get_neighbours_array(&$vars)
           $where .= generate_query_values($value, 'remote_version');
           break;
         case 'remote_port_id':
-          if ($value != 0)
+          if ($value == 'NULL' || $value == 0)
           {
-            $where .= ' AND `remote_port_id` != 0';
+            $where .= ' AND isnull(`remote_port_id`)';
           } else {
-            $where .= generate_query_values($value, 'remote_port_id');
+            $where .= ' AND !isnull(`remote_port_id`)';
           }
           break;        
       }
@@ -164,15 +167,12 @@ function get_neighbours_array(&$vars)
   }
 
   // Show neighbours only for permitted devices and ports
-  $query_permitted = $GLOBALS['cache']['where']['ports_permitted'];
+  //$query_permitted = $GLOBALS['cache']['where']['ports_permitted'];
+  $query_permitted = generate_query_permitted(array('ports', 'devices'));
 
-  $query = 'FROM `neighbours` LEFT JOIN `ports` USING(`port_id`) ';
-  $query .= $where . $query_permitted;
-  //$query_count = 'SELECT COUNT(*) '.$query;
-
-  $query = 'SELECT * '.$query;
-  //$query .= ' ORDER BY `event_id` DESC ';
-  //$query .= " LIMIT $start,$pagesize";
+  $query  = 'SELECT * ';
+  $query .= 'FROM `neighbours` LEFT JOIN `ports` USING(`port_id`,`device_id`) ';
+  $query .= $where . ' ' . $query_permitted;
 
   // Query neighbours
   $array['entries'] = dbFetchRows($query, $param);

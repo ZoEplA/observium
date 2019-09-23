@@ -10,7 +10,7 @@ IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY, Counter32, Counter64, TimeTicks, Unsigned32       FROM SNMPv2-SMI
     TruthValue, RowStatus                                                           FROM SNMPv2-TC
     VlanIndex, PortList, dot1qFdbId                                                 FROM Q-BRIDGE-MIB
-    MacAddress                                                                      FROM BRIDGE-MIB
+    MacAddress                                                                      FROM SNMPv2-TC
     SnmpAdminString                                                                 FROM SNMP-FRAMEWORK-MIB
     PaeControlledPortStatus, dot1xAuthSessionStatsEntry, dot1xPaePortNumber         FROM IEEE8021-PAE-MIB
 	ieee8021XPaePortNumber                                                          FROM IEEE8021X-PAE-MIB;
@@ -1541,5 +1541,77 @@ rldot1xSupplicantConfigurationEapTimeout OBJECT-TYPE
          response from the Radius server (SUCCESS or FAIL) before restarts authentication."
     DEFVAL { 30 }
     ::= { rldot1xSupplicantConfigurationEntry 2 }
+
+rldot1xMacAuthEapEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies in MAC-Based authentication method 
+		 if the EAP MD5-Challenge authentication is used or
+		 that only Radius (without EAP) authentication with the Service-Type 
+		 attribute equals to Call-Check(10) is used."
+    ::= { rldot1x 35 }			
+
+rldot1xMacAuthUserGroupsize OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    one(1),
+                    two(2),
+                    four(4),
+					twelve(12)
+                }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the numbers of ASCII characters between delimiters 
+		 in usename format that is MAC address in MAC-Based authentication method."
+    ::= { rldot1x 36 }
+	
+rldot1xMacAuthUserSeparator OBJECT-TYPE
+    SYNTAX      INTEGER {
+					hyphen(1),
+                    colon(2),
+                    dot(3)                   
+                }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies the delimiter in usename format that is 
+		 MAC address in MAC-Based authentication method."
+    ::= { rldot1x 37 }			
+
+rldot1xMacAuthUserLowercase OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Specifies that the username is coded in the lower case or in the upper case 
+		 in usename format that is MAC address in MAC-Based authentication method."
+    ::= { rldot1x 38 }	
+	
+rldot1xMacAuthPassword OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "specify a password that will be used for MAC-Based authentication
+          instead of the host MAC address."
+    ::= { rldot1x 39 }
+	
+rldot1xMacAuthApplyReauthentication OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "specify if try to apply reauthentication on MAC-Based authentication users."
+    ::= { rldot1x 40 }		
+	
+rldot1xMacAuthPasswordMD5 OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "The MD5 of the rldot1xMacAuthPassword."
+    ::= { rldot1x 41 }			
 
 END

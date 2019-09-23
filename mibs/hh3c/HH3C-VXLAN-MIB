@@ -1,11 +1,13 @@
 -- =============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description: The VXLAN(Virtual eXtended Local Area Network) MIB
+-- Description: The VXLAN(Virtual eXtensible Local Area Network) MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
---   V1.0 2013-11-21 Initial version Created by Neng Yan
+--   V1.0 2013-11-21 Initial version created by Neng Yan
+--   V1.1 2015-02-11 Modified by Neng Yan.  Values 'unknown(0)', 'openflow(4)',
+--                   and 'ovsdb(5)' were added for data type 'hh3cVxlanMacType'
 -- =============================================================================
 HH3C-VXLAN-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -26,16 +28,21 @@ IMPORTS
 -- =============================================================================
 hh3cVxlan MODULE-IDENTITY
     LAST-UPDATED
-        "201311210900Z"        -- Nov 21, 2013 at 09:00 GMT
+        "201502110900Z"        -- Feb 11, 2015 at 09:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
     DESCRIPTION
         "The overlay MIB."
+    REVISION
+        "201502110900Z"   -- Feb 11, 2015 at 09:00 GMT
+    DESCRIPTION
+        "Values 'unknown(0)', 'openflow(4)', and 'ovsdb(5)' were added
+         for data type 'hh3cVxlanMacType'."
     REVISION
         "201311210900Z"   -- Nov 21, 2013 at 09:00 GMT
     DESCRIPTION
@@ -352,14 +359,24 @@ hh3cVxlanMacTunnelID    OBJECT-TYPE
 
 hh3cVxlanMacType    OBJECT-TYPE
     SYNTAX      INTEGER{
+                 unknown (0),
                  selfLearned (1),
                  staticConfigured (2),
-                 protocolLearned (3)
+                 protocolLearned (3),
+                 openflow (4),
+                 ovsdb (5)
                  }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The type of an MAC address."
+        "The type of an MAC address.
+
+        selfLearned: Unicast address dynamically learned in the data plane.
+        staticConfigured: Unicast address manually added.
+        protocolLearned: Unicast address advertised through VXLAN IS-IS or BGP.
+               Support for VXLAN IS-IS and BGP depends on the software version.
+        openflow: Unicast address issued by a controller through OpenFlow.
+        ovsdb: Unicast address issued by a controller through OVSDB."
     ::= { hh3cVxlanMacEntry 3 }
 
 -- =============================================================================

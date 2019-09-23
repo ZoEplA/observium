@@ -295,16 +295,37 @@ nmsIfObjects   OBJECT IDENTIFIER ::= { nmsIfMIB 1 }
                  SEQUENCE {
                      IfIndex
                          INTEGER,
-                     txPower
+                     txPower1
                          INTEGER,
-                     rxPower
+                     rxPower1
                          INTEGER,   
                      temperature
                          INTEGER,
                      vlotage
                          INTEGER,
-                     curr
-                         INTEGER                           
+                     curr1
+                         INTEGER,
+                     vendname
+                         OCTET STRING,
+                     txPower2
+                         INTEGER,
+                     rxPower2
+                         INTEGER,   
+                     curr2
+                         INTEGER,
+                     txPower3
+                         INTEGER,
+                     rxPower3
+                         INTEGER,   
+                     curr3
+                         INTEGER,
+                     txPower4
+                         INTEGER,
+                     rxPower4
+                         INTEGER,   
+                     curr4
+                         INTEGER
+                         
                  }
 
              IfIndex OBJECT-TYPE
@@ -315,20 +336,20 @@ nmsIfObjects   OBJECT IDENTIFIER ::= { nmsIfMIB 1 }
                          "The only diid of port in System."
                  ::= { ifSfpParameterEntry 1 } 
         
-             txPower OBJECT-TYPE
+             txPower1 OBJECT-TYPE
                  SYNTAX  INTEGER
                  ACCESS  read-only
                  STATUS  mandatory
                  DESCRIPTION
-                         "The tx power of optical module. The unit is 0.1DBm."
+                         "The tx power 1 of optical module. The unit is 1DBm."
                  ::= { ifSfpParameterEntry 2 } 
     
-             rxPower OBJECT-TYPE
+             rxPower1 OBJECT-TYPE
                  SYNTAX  INTEGER
                  ACCESS  read-only
                  STATUS  mandatory
                  DESCRIPTION
-                         "The rx power of optical module. The unit is 0.1DBm."
+                         "The rx power 1 of optical module. The unit is 1DBm."
                  ::= { ifSfpParameterEntry 3 } 
      
              temperature OBJECT-TYPE
@@ -347,14 +368,151 @@ nmsIfObjects   OBJECT IDENTIFIER ::= { nmsIfMIB 1 }
                          "Sfp module volt. The unit is 0.1mV."
                  ::= { ifSfpParameterEntry 5 } 
     
-             curr OBJECT-TYPE
+             curr1 OBJECT-TYPE
                  SYNTAX  INTEGER
                  ACCESS  read-only
                  STATUS  mandatory
                  DESCRIPTION
-                         "Sfp module bias current. The unit is 2mA."
+                         "Sfp module bias current 1. The unit is 2uA."
                  ::= { ifSfpParameterEntry 6 }
-              
+  
+             vendname OBJECT-TYPE
+                 SYNTAX  OCTET STRING
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module vend name."
+                 ::= { ifSfpParameterEntry 7 }
+            txPower2 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx 2 power of optical module. The unit is 1DBm."
+                 ::= { ifSfpParameterEntry 8 } 
+            rxPower2 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx 2 power of optical module. The unit is 1DBm."
+                 ::= { ifSfpParameterEntry 9 } 
+            curr2 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 2. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 10 }
+            txPower3 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx 3 power of optical module. The unit is 1DBm."
+                 ::= { ifSfpParameterEntry 11 } 
+            rxPower3 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx 3 power of optical module. The unit is 1DBm."
+                 ::= { ifSfpParameterEntry 12 } 
+            curr3 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 3. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 13 }
+            txPower4 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The tx 4 power  of optical module. The unit is 1DBm."
+                 ::= { ifSfpParameterEntry 14 } 
+            rxPower4 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The rx 4 power of optical module. The unit is 1DBm."
+                 ::= { ifSfpParameterEntry 15 } 
+            curr4 OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "Sfp module bias current 4. The unit is 2uA."
+                 ::= { ifSfpParameterEntry 16 }    
+                               
+ --cableDiagnoseTable
+             cableDiagnoseTable OBJECT-TYPE
+                 SYNTAX  SEQUENCE OF CableDiagnoseEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A interface list of cable diagnose table entries."
+                 ::= { nmsIfObjects 8 }
+
+             cableDiagnoseEntry OBJECT-TYPE
+                 SYNTAX CableDiagnoseEntry
+                 ACCESS  not-accessible
+                 STATUS  mandatory
+                 DESCRIPTION
+                          "A collection of cable diagnose objects in the
+                          interface table."
+                 INDEX { ifIndex }
+             ::= { cableDiagnoseTable 1 }
+
+             CableDiagnoseEntry ::=
+                 SEQUENCE {
+                     ifIndex
+                         INTEGER,
+                     enable
+                         INTEGER,
+                     period
+                         INTEGER,   
+                     description 
+                         OCTET STRING                      
+                 }
+
+             ifIndex OBJECT-TYPE
+                 SYNTAX  INTEGER
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "The only diid of port in System."
+                 ::= { cableDiagnoseEntry 1 } 
+        
+             enable OBJECT-TYPE
+                 SYNTAX  INTEGER{
+                                enable(1),
+                                disable(2)
+                                }
+                 ACCESS  read-write
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "enable=1,disable=2."
+                 ::= { cableDiagnoseEntry 2 } 
+    
+             period OBJECT-TYPE
+                 SYNTAX  INTEGER(0..32767)
+                 ACCESS  read-write
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "period=0 means manual scanning, the range of auto scanning period is 1-32767."
+                 ::= { cableDiagnoseEntry 3 } 
+        
+             description OBJECT-TYPE
+                 SYNTAX  OCTET STRING 
+                 ACCESS  read-only
+                 STATUS  mandatory
+                 DESCRIPTION
+                         "cable diagnoisis descpription."
+                 ::= { cableDiagnoseEntry 4 } 
+        
               
               
                  

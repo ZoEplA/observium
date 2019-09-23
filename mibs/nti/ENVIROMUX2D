@@ -7,7 +7,7 @@ IMPORTS
    DisplayString                                FROM  SNMPv2-TC;
       
 enviromux2D MODULE-IDENTITY
-     LAST-UPDATED "201712101600Z"
+     LAST-UPDATED "201810011600Z"
      ORGANIZATION "Network Technologies Inc."
      CONTACT-INFO 
          "Network Technologies Inc.
@@ -23,7 +23,12 @@ enviromux2D MODULE-IDENTITY
 	 
      DESCRIPTION 
          "ENVIROMUX-2D MIB file." 
-
+     REVISION     "201810011600Z" 
+         DESCRIPTION  "Rev. 1.18 - Added ALDS Sensor and fixed MIB file errors"  
+     REVISION     "201804141500Z" 
+         DESCRIPTION  "Rev. 1.16 - Enable network security"  
+     REVISION     "201803051000Z" 
+         DESCRIPTION  "Rev. 1.15 - software reset/network config"  
      REVISION     "201712101600Z" 
          DESCRIPTION  "Rev. 1.14 - add writable sensor threshold"    
      REVISION     "201711281600Z" 
@@ -50,9 +55,9 @@ enviromux2D MODULE-IDENTITY
          DESCRIPTION  "Rev. 1.03 - Changes for high accuracy temperature humidity sensor"                                
     REVISION     "201302040000Z" 
          DESCRIPTION  "Rev. 1.02 - Changes for REV C pcb;Added Smoke Detectors"                                
-    REVISION     "201211121400Z" 
+    REVISION     "201212121400Z" 
          DESCRIPTION  "Rev. 1.01 - added remote inputs and remote relays;Added Events and Smart Alerts"
-    REVISION     "201212200000Z" 
+    REVISION     "201211200000Z" 
          DESCRIPTION  "Rev. 1.00 - Initial version"
      ::= { hardware 9 }
 
@@ -86,12 +91,13 @@ tacSensors              OBJECT IDENTIFIER ::= { masterUnit 15 }
 ipSensors               OBJECT IDENTIFIER ::= { masterUnit 16 }
 aux2Sensors             OBJECT IDENTIFIER ::= { masterUnit 17 }
 msgRegisters            OBJECT IDENTIFIER ::= { masterUnit 18 }
+netConfRegisters        OBJECT IDENTIFIER ::= { masterUnit 20 }
 envGroups               OBJECT IDENTIFIER ::= { masterUnit 200 }
 
 -- groups
 
 sysGroup                OBJECT-GROUP
-    OBJECTS             { sysTime, sysEnterpriseName, sysEnterpriseLocation, sysEnterpriseContact, sysEnterprisePhone, sysEnterpriseVersion}
+    OBJECTS             { sysTime, sysEnterpriseName, sysEnterpriseLocation, sysEnterpriseBranch, sysEnterpriseContact, sysEnterpriseRack, sysEnterpriseContact, sysEnterprisePhone, firmwareVersion, deviceModel, sysReset, devSerialNum, devHardwareRev, devManufacturer}
     STATUS              current
     DESCRIPTION         "System parameters group"
     ::= {envGroups 1}
@@ -184,7 +190,14 @@ msgRegistersGrp         OBJECT-GROUP
     STATUS              current
     DESCRIPTION         "message registers group"
     ::= {envGroups 16}
-    
+
+netConfRegistersGrp     OBJECT-GROUP
+    OBJECTS             { netConfIPv4Mode, netConfIPv4Addr, netConfIPv4Mask, netConfIPv4Gateway, netConfPreDNS, netConfAltDNS, netConfDNSTimeout, 
+						  netConfIPv6Mode, netConfIPv6Addr, netConfIPv6Gateway, netConfEnable6to4Tunnel, netConfLocalIPAddr, netConfRemoteIPv4Addr, netConfVlanEnabled, netConfVlanID, netConfSave, netConfEnableSecurity}
+    STATUS              current
+    DESCRIPTION         "network configure registers group"
+    ::= {envGroups 18}
+	
 -- hostSystem subtree
 
 sysTime					OBJECT-TYPE
@@ -235,13 +248,48 @@ sysEnterprisePhone  	OBJECT-TYPE
 	STATUS				current
 	DESCRIPTION		    "Enterprise Phone"
 	::= { hostSystem 7 }
-sysEnterpriseVersion  	OBJECT-TYPE
+
+firmwareVersion  		OBJECT-TYPE
 	SYNTAX				DisplayString
 	MAX-ACCESS  		read-only
 	STATUS				current
 	DESCRIPTION		    "Firmware Version"
 	::= { hostSystem 8 }
 
+deviceModel  			OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION		    "Device Model"
+	::= { hostSystem 9 }
+
+sysReset				OBJECT-TYPE
+	SYNTAX				INTEGER {normal(0), reboot(1)}
+	MAX-ACCESS			read-write
+	STATUS				current
+	DESCRIPTION		    "Initiates system reboot. Normal value: 0, set 1 to reboot"
+	::= { hostSystem 10 }
+
+devSerialNum 			OBJECT-TYPE
+	SYNTAX				DisplayString		
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION		    "Serial Number"
+	::= { hostSystem 11 }
+
+devHardwareRev			OBJECT-TYPE
+	SYNTAX				DisplayString		
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION		    "Hardware Revision"
+	::= { hostSystem 12 }
+
+devManufacturer			OBJECT-TYPE
+	SYNTAX				DisplayString		
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION		    "Device Manufacturer"
+	::= { hostSystem 13 }
 
 -- internal sensors description
 
@@ -291,14 +339,14 @@ IntSensorEntry ::=
 	}
 
 intSensorIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the internal sensor entry 1..3"
 	::= { intSensorEntry 1 }
 
 intSensorType		    OBJECT-TYPE
-	SYNTAX				INTEGER {  undefined(0), temperature(1), humidity(2), power(3), lowVoltage(4), current(5), aclmvVoltage(6), aclmpVoltage(7), aclmpPower(8),water(9), smoke(10), vibration(11), motion(12), glass(13), door(14), keypad(15), panicButton(16), keyStation(17), digInput(18), light(22), rmsVoltage(41), rmsCurrent(42), activePower(43), reactivePower(44), tempHum(513), custom(32767), temperatureCombo(32769), humidityCombo(32770), tempHum(540)  }
+	SYNTAX				INTEGER {  undefined(0), temperature(1), humidity(2), power(3), lowVoltage(4), current(5), aclmvVoltage(6), aclmpVoltage(7), aclmpPower(8),water(9), smoke(10), vibration(11), motion(12), glass(13), door(14), keypad(15), panicButton(16), keyStation(17), digInput(18), light(22), rmsVoltage(41), rmsCurrent(42), activePower(43), reactivePower(44), tempHum(513), custom(32767), temperatureCombo(32769), humidityCombo(32770), tempHum2(540)  }
 	MAX-ACCESS  		read-only
 	STATUS				current
 	DESCRIPTION	        "Sensor Type"
@@ -431,14 +479,14 @@ AuxSensorEntry ::=
 	}
 
 auxSensorIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the auxiliary sensor entry 1..2"
 	::= { auxSensorEntry 1 }
 
 auxSensorType		    OBJECT-TYPE
-	SYNTAX				INTEGER {  undefined(0), dewPoint(24), frequency(35), acVoltage(36), acCurrent(37), dcVoltage(38), dcCurrent(39), rmsVoltage(41), rmsCurrent(42), activePower(43), reactivePower(44) }
+	SYNTAX				INTEGER {  undefined(0), dewPoint(24), frequency(35), acVoltage(36), acCurrent(37), dcVoltage(38), dcCurrent(39), rmsVoltage(41), rmsCurrent(42), activePower(43), reactivePower(44) , aldsTotalLength(47) }
 	MAX-ACCESS  		read-only
 	STATUS				current
 	DESCRIPTION	        "Auxiliary Sensor Type"
@@ -494,7 +542,7 @@ auxSensorUnitName   	OBJECT-TYPE
 	::= { auxSensorEntry 9 }
 	
 auxSensorStatus			OBJECT-TYPE
-	SYNTAX				INTEGER {notconnected(0), normal(1), prealert(2), alert(3), acknowledged(4), dismissed(5), disconnected(6) }
+	SYNTAX				INTEGER {notconnected(0), normal(1), prealert(2), alert(3), acknowledged(4), dismissed(5), disconnected(6), notApplicable(11) }
 	MAX-ACCESS			read-write
 	STATUS				current
 	DESCRIPTION	        "The status of the auxiliary sensor"
@@ -579,7 +627,7 @@ Aux2SensorEntry ::=
 	}
 
 aux2SensorIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the auxiliary 2 sensor entry 1..96"
@@ -727,14 +775,14 @@ ExtSensorEntry ::=
 	}
 
 extSensorIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the external sensor entry 1..4"
 	::= { extSensorEntry 1 }
 
 extSensorType		    OBJECT-TYPE
-	SYNTAX				INTEGER {  undefined(0), temperature(1), humidity(2), power(3), lowVoltage(4), current(5), aclmvVoltage(6), aclmpVoltage(7), aclmpPower(8),water(9), smoke(10), vibration(11), motion(12), glass(13), door(14), keypad(15), panicButton(16), keyStation(17), digInput(18), light(22), tacDio(26), rmsVoltage(41), rmsCurrent(42), activePower(43), reactivePower(44), tempHum(513), custom(32767), temperatureCombo(32769), humidityCombo(32770)  }
+	SYNTAX				INTEGER {  undefined(0), temperature(1), humidity(2), power(3), lowVoltage(4), current(5), aclmvVoltage(6), aclmpVoltage(7), aclmpPower(8),water(9), smoke(10), vibration(11), motion(12), glass(13), door(14), keypad(15), panicButton(16), keyStation(17), digInput(18), light(22), tacDio(26), rmsVoltage(41), rmsCurrent(42), activePower(43), reactivePower(44), aldsLeakLocation(45), aldsContinuity(46), tempHum(513), custom(32767), temperatureCombo(32769), humidityCombo(32770)  }
 	MAX-ACCESS  		read-only
 	STATUS				current
 	DESCRIPTION	        "Sensor Type"
@@ -769,7 +817,7 @@ extSensorGroup          OBJECT-TYPE
 	::= { extSensorEntry 6 }
     
 extSensorValue			OBJECT-TYPE
-	SYNTAX				INTEGER { closed(0), open(1) }
+	SYNTAX				INTEGER { closed(0), open(1), normal(2), break(3) }
 	MAX-ACCESS			read-only
 	STATUS				current
 	DESCRIPTION	        "The value of the external sensor reading. For temperature, voltage, current or low voltage,  it is presented in tenths of degrees/volts"
@@ -967,7 +1015,7 @@ TacSensorEntry ::=
 	}
 
 tacSensorIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the Tac sensor entry 1..4"
@@ -1106,7 +1154,7 @@ DryContactEntry ::=
 	}
 
 digInputIndex		OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the external sensor entry 1..4"
@@ -1209,7 +1257,7 @@ RemoteInputEntry ::=
 	}
 
 remoteInputIndex		OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the remote input entry 1..4"
@@ -1312,7 +1360,7 @@ IpDeviceEntry ::=
 	}
 
 ipDeviceIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the IP Device entry 1..8"
@@ -1402,7 +1450,7 @@ OutRelayEntry ::=
     }
 
 outRelayIndex           OBJECT-TYPE
-    SYNTAX              Integer32 
+    SYNTAX              Integer32 (0..10000)
     MAX-ACCESS          accessible-for-notify
     STATUS              current
     DESCRIPTION         "The index of relay"
@@ -1452,7 +1500,7 @@ RemoteRelayEntry ::=
     }
 
 remoteRelayIndex           OBJECT-TYPE
-    SYNTAX              Integer32 
+    SYNTAX              Integer32 (0..10000)
     MAX-ACCESS          accessible-for-notify
     STATUS              current
     DESCRIPTION         "The index of relay"
@@ -1498,7 +1546,7 @@ PwrSupplyEntry ::=
     }
 
 pwrSupplyIndex          OBJECT-TYPE
-    SYNTAX              Integer32 
+    SYNTAX              Integer32 (0..10000)
     MAX-ACCESS          accessible-for-notify
     STATUS              current
     DESCRIPTION         "The index of power supply"
@@ -1539,7 +1587,7 @@ EventEntry ::=
     }
 
 eventIndex              OBJECT-TYPE
-    SYNTAX              Integer32 
+    SYNTAX              Integer32 (0..10000)
     MAX-ACCESS          accessible-for-notify
     STATUS              current
     DESCRIPTION         "The index of the event"
@@ -1587,7 +1635,7 @@ SmartAlertEntry ::=
     }
 
 smartAlertIndex         OBJECT-TYPE
-    SYNTAX              Integer32 
+    SYNTAX              Integer32 (0..10000)
     MAX-ACCESS          accessible-for-notify
     STATUS              current
     DESCRIPTION         "The index of the smartAlert"
@@ -1639,7 +1687,7 @@ SmokeDetectorEntry ::=
     }
 
 smokeDetectorIndex		OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the smoke detector entry 1..8"
@@ -1721,7 +1769,7 @@ IpSensorEntry ::=
     }
 
 ipSensorIndex			OBJECT-TYPE
-	SYNTAX				Integer32 
+	SYNTAX				Integer32 (0..10000)
 	MAX-ACCESS			accessible-for-notify
 	STATUS				current
 	DESCRIPTION	        "The index of the external sensor entry 1..88"
@@ -1858,6 +1906,135 @@ msgRegistersStatus      OBJECT-TYPE
     STATUS              current
     DESCRIPTION         "The status of the message register"
     ::= { msgRegistersEntry 3 }    
+
+--Network Configure
+
+netConfIPv4Mode  	OBJECT-TYPE
+	SYNTAX				INTEGER {dhcp(0), static(1)}
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Method of acquiring IP settings"
+	::= { netConfRegisters 1 }
+
+netConfIPv4Addr  	OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Statically assigned IPv4 address"
+	::= { netConfRegisters 2 }
+
+
+netConfIPv4Mask      OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Statically assigned IPv4 subnet mask"
+	::= { netConfRegisters 3 }
+
+
+netConfIPv4Gateway   OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Statically assigned IPv4 default gateway"
+	::= { netConfRegisters 4 }
+
+
+netConfPreDNS        OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Preferred DNS server"
+	::= { netConfRegisters 5 }
+
+netConfAltDNS        OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Alternate DNS server"
+	::= { netConfRegisters 6 }
+
+netConfDNSTimeout  	OBJECT-TYPE
+	SYNTAX				Integer32
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Timeout for DNS request in sec"
+	::= { netConfRegisters 7}
+
+netConfIPv6Mode  	OBJECT-TYPE
+	SYNTAX				INTEGER { autoconf(0), dhcp(1), static(2), disabled(3)}
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Method of acquiring IPv6 settings"
+	::= { netConfRegisters 8 }
+
+
+netConfIPv6Addr        OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "IPv6 Address"
+	::= { netConfRegisters 9 }
+
+
+netConfIPv6Gateway        OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "IPv6 Default Gateway"
+	::= { netConfRegisters 10 }
+
+
+netConfEnable6to4Tunnel  	OBJECT-TYPE
+	SYNTAX				INTEGER { disabled(0), enabled(1)}
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Enable ipv6 to ipv4 Tunneling"
+	::= { netConfRegisters 11 }
+
+netConfLocalIPAddr        OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "IPv4 Address of local interface for 6to4 tunnel"
+	::= { netConfRegisters 12 }
+
+
+netConfRemoteIPv4Addr    OBJECT-TYPE
+	SYNTAX					DisplayString
+	MAX-ACCESS  			read-write
+	STATUS					current
+	DESCRIPTION				"IPv4 Address of Remote interface for 6to4 tunnel"
+	::= { netConfRegisters 13 }
+
+
+netConfVlanEnabled  	OBJECT-TYPE
+	SYNTAX				INTEGER { disabled(0), enabled(1)}
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Enable 802.1Q VLAN. Warning: Disables Regular LAN"
+	::= { netConfRegisters 14 }
+
+netConfVlanID  		OBJECT-TYPE
+	SYNTAX				Integer32
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "VLAN ID of Tagged Packets (0-4095)"
+	::= { netConfRegisters 15}
+
+netConfSave			OBJECT-TYPE
+	SYNTAX				INTEGER { normal(0), save(1)}
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "To Save Network Parameters: Must be set if there is any change of parameters"
+	::= { netConfRegisters 16 }
+
+netConfEnableSecurity	OBJECT-TYPE
+	SYNTAX				INTEGER { disable(0), enable(1)}
+	MAX-ACCESS  		read-write
+	STATUS				current
+	DESCRIPTION		    "Enable Network Security"
+	::= { netConfRegisters 17 }
 
 -- Trap Definitions
 intSensorsTraps         OBJECT IDENTIFIER ::= { envTraps 3 }

@@ -23,14 +23,14 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-CONF
         Unsigned32
             FROM SNMPv2-SMI
-        DisplayString, RowStatus,TruthValue
+        DisplayString, RowStatus, TruthValue, DateAndTime
             FROM SNMPv2-TC
         hpSwitch
-            FROM HP-ICF-OID
-        ;
+            FROM HP-ICF-OID;
+        
 
     hpicfJobSchedulerMIB MODULE-IDENTITY
-        LAST-UPDATED "201508270000Z"  -- Aug 27, 2015
+        LAST-UPDATED "201605040000Z"  -- May 04, 2016
 
         ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett-Packard Company
@@ -38,6 +38,13 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
                       Roseville, CA 95747"
         DESCRIPTION  "This MIB module contains HP proprietary objects used to
                       configure Job Scheduling."
+
+        REVISION     "201605040000Z"  -- May 04, 2016
+        DESCRIPTION  "Added Object hpicfJobSchedulerSkipCount "
+
+        REVISION     "201604190000Z"  -- Apr 19, 2016
+        DESCRIPTION  "Added objects hpicfJobSchedulerRunningStatus,
+                      hpicfJobSchedulerLastRunTime"
 
         REVISION     "201508270000Z"  -- Aug 27, 2015
         DESCRIPTION  "Changed description for the object hpicfJobSchedulerStatus "
@@ -94,7 +101,10 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
             hpicfJobSchedulerCalendarMinute     BITS,
             hpicfJobSchedulerDelay              Unsigned32,
             hpicfJobSchedulerCount              Unsigned32,
-            hpicfJobSchedulerStatus             TruthValue
+            hpicfJobSchedulerStatus             TruthValue,
+            hpicfJobSchedulerRunningStatus      INTEGER,
+            hpicfJobSchedulerLastRunTime        DateAndTime,
+            hpicfJobSchedulerSkipCount          Unsigned32
         }
 
     hpicfJobSchedulerName OBJECT-TYPE
@@ -320,6 +330,38 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
                      otherwise the object has value false(2) if job is disabled. "
         ::= { hpicfJobSchedulerEntry 16 }
 
+    hpicfJobSchedulerRunningStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        active(1),
+                        inactive(2),
+                        expired(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates whether the job running status is Active,
+                     Inactive or Expired. If the job is running,
+                     the status becomes Active. If the count has Expired,
+                     the status becomes Expired and if the job is
+                     Disabled, the running status becomes Inactive."
+        ::= { hpicfJobSchedulerEntry 17 }
+
+    hpicfJobSchedulerLastRunTime OBJECT-TYPE
+        SYNTAX      DateAndTime  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the Last Run date and time of the
+                     scheduled job.When job has not run even for once,
+                     it will show value as 0."
+        ::= { hpicfJobSchedulerEntry 18 }
+
+    hpicfJobSchedulerSkipCount OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..1000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object indicates the number of times this job is skipped for execution. If no job is skipped, the value of this object is set to 0. "
+        ::= { hpicfJobSchedulerEntry 19 }
+
+
 
 -- ****************************************************************************
 -- Conformance Information  
@@ -365,10 +407,61 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
             hpicfJobSchedulerCount,
             hpicfJobSchedulerStatus
         }
-        STATUS      current
+        STATUS      deprecated
         DESCRIPTION "A collection of objects providing configuration
                      of scheduled jobs."
         ::= { hpicfJobSchedulerMIBGroups 2 }
+
+    hpicfJobSchedulerGroup2 OBJECT-GROUP
+       OBJECTS {
+            hpicfJobSchedulerRowStatus,
+            hpicfJobSchedulerCommand,
+            hpicfJobSchedulerConfigSave,
+            hpicfJobSchedulerRunCount,
+            hpicfJobSchedulerErrorCount,
+            hpicfJobSchedulerLastOutput,
+            hpicfJobSchedulerEvent,
+            hpicfJobSchedulerCalendarMonth,
+            hpicfJobSchedulerCalendarDayOfMonth,
+            hpicfJobSchedulerCalendarDayOfWeek,
+            hpicfJobSchedulerCalendarHour,
+            hpicfJobSchedulerCalendarMinute,
+            hpicfJobSchedulerDelay,
+            hpicfJobSchedulerCount,
+            hpicfJobSchedulerStatus,
+            hpicfJobSchedulerRunningStatus,
+            hpicfJobSchedulerLastRunTime
+        }
+        STATUS      deprecated
+        DESCRIPTION "A collection of objects providing configuration
+                     of scheduled jobs."
+        ::= { hpicfJobSchedulerMIBGroups 3 }
+
+    hpicfJobSchedulerGroup3 OBJECT-GROUP
+       OBJECTS {
+            hpicfJobSchedulerRowStatus,
+            hpicfJobSchedulerCommand,
+            hpicfJobSchedulerConfigSave,
+            hpicfJobSchedulerRunCount,
+            hpicfJobSchedulerErrorCount,
+            hpicfJobSchedulerLastOutput,
+            hpicfJobSchedulerEvent,
+            hpicfJobSchedulerCalendarMonth,
+            hpicfJobSchedulerCalendarDayOfMonth,
+            hpicfJobSchedulerCalendarDayOfWeek,
+            hpicfJobSchedulerCalendarHour,
+            hpicfJobSchedulerCalendarMinute,
+            hpicfJobSchedulerDelay,
+            hpicfJobSchedulerCount,
+            hpicfJobSchedulerStatus,
+            hpicfJobSchedulerRunningStatus,
+            hpicfJobSchedulerLastRunTime,
+            hpicfJobSchedulerSkipCount
+        }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing configuration
+                     of scheduled jobs."
+        ::= { hpicfJobSchedulerMIBGroups 4 }
  
     hpicfJobSchedulerMIBCompliances OBJECT IDENTIFIER ::= { hpicfJobSchedulerConformance 1 }
     hpicfJobSchedulerMIBGroups      OBJECT IDENTIFIER ::= { hpicfJobSchedulerConformance 2 }
@@ -386,7 +479,7 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
         ::= { hpicfJobSchedulerMIBCompliances 1 }
 
     hpicfJobSchedulerMIBCompliance1 MODULE-COMPLIANCE
-        STATUS      current
+        STATUS      deprecated
         DESCRIPTION "The compliance statement for device support of
                      HP-ICF-JOB-SCHEDULER-MIB."
         MODULE -- This Module
@@ -394,5 +487,25 @@ HP-ICF-JOB-SCHEDULER-MIB DEFINITIONS ::= BEGIN
             hpicfJobSchedulerGroup1
         }
         ::= { hpicfJobSchedulerMIBCompliances 2 }
+
+    hpicfJobSchedulerMIBCompliance2 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for device support of
+                     HP-ICF-JOB-SCHEDULER-MIB."
+        MODULE -- This Module
+        MANDATORY-GROUPS {
+            hpicfJobSchedulerGroup2
+        }
+        ::= { hpicfJobSchedulerMIBCompliances 3 }
+
+    hpicfJobSchedulerMIBCompliance3 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for device support of
+                     HP-ICF-JOB-SCHEDULER-MIB."
+        MODULE -- This Module
+        MANDATORY-GROUPS {
+            hpicfJobSchedulerGroup3
+        }
+        ::= { hpicfJobSchedulerMIBCompliances 4 }
 
 END

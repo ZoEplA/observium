@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -25,7 +25,7 @@ foreach ($oids as $index => $entry)
                    'limit_low'        => $entry['wwpLeosPortXcvrLowBiasAlarmThreshold'],
                    'entPhysicalIndex' => $index);
 
-  discover_sensor($valid['sensor'], 'current', $device, $entry['oid'], $index, 'ciena-dom', $entry['descr'], 1, $entry['current'], $options);
+  discover_sensor('current', $device, $entry['oid'], $index, 'ciena-dom', $entry['descr'], 1, $entry['current'], $options);
 }
 
 # WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrRxDbmPower.11 = INTEGER: -10679 dBm
@@ -45,7 +45,7 @@ foreach ($oids as $index => $entry)
                    'limit_low'        => $entry['wwpLeosPortXcvrLowRxDbmPwAlarmThreshold']  * $scale,
                    'entPhysicalIndex' => $index);
 
-  discover_sensor($valid['sensor'], 'dbm', $device, $entry['oid'], $index, 'ciena-dom-rx', $entry['descr'], $scale, $entry['current'], $options);
+  discover_sensor('dbm', $device, $entry['oid'], $index, 'ciena-dom-rx', $entry['descr'], $scale, $entry['current'], $options);
 }
 
 # WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTxDbmPower.11 = INTEGER: -10679 dBm
@@ -65,7 +65,7 @@ foreach ($oids as $index => $entry)
                    'limit_low'        => $entry['wwpLeosPortXcvrLowTxDbmPwAlarmThreshold']  * $scale,
                    'entPhysicalIndex' => $index);
 
-  discover_sensor($valid['sensor'], 'dbm', $device, $entry['oid'], $index, 'ciena-dom-tx', $entry['descr'], $scale, $entry['current'], $options);
+  discover_sensor('dbm', $device, $entry['oid'], $index, 'ciena-dom-tx', $entry['descr'], $scale, $entry['current'], $options);
 }
 
 # WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTemperature (Transceiver temp)
@@ -86,7 +86,7 @@ foreach ($oids as $index => $entry)
                    'limit_low'        => $entry['wwpLeosPortXcvrLowTempAlarmThreshold'],
                    'entPhysicalIndex' => $index);
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $entry['oid'], $index, 'ciena-dom-temp', $entry['descr'], 1, $entry['current'], $options);
+  discover_sensor('temperature', $device, $entry['oid'], $index, 'ciena-dom-temp', $entry['descr'], 1, $entry['current'], $options);
 }
 
 # WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrHighVccAlarmThreshold
@@ -107,7 +107,7 @@ foreach ($oids as $index => $entry)
                    'limit_low'        => $entry['wwpLeosPortXcvrLowVccAlarmThreshold'],
                    'entPhysicalIndex' => $index);
 
-  discover_sensor($valid['sensor'], 'voltage', $device, $entry['oid'], $index, 'ciena-dom-volt', $entry['descr'], 1, $entry['current'], $options);
+  discover_sensor('voltage', $device, $entry['oid'], $index, 'ciena-dom-volt', $entry['descr'], 1, $entry['current'], $options);
 }
 
 // EOF

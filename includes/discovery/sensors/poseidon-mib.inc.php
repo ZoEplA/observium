@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -161,7 +161,7 @@ foreach ($oids as $index => $entry)
     } else {
       $limits = array();
     }
-    discover_sensor($valid['sensor'], $type, $device, $oid, "poseidonSensor.$index", 'poseidon', $descr, $scale, $value, $limits);
+    discover_sensor($type, $device, $oid, "poseidonSensor.$index", 'poseidon', $descr, $scale, $value, $limits);
   }
 }
 

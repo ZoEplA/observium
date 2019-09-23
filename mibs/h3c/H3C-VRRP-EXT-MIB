@@ -1,5 +1,5 @@
 -- =========================================================================
--- Copyright (C) 2001,2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2001,2002 by  H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: This file describes various common MIB objects implemented 
 -- by both Routers and Switches.
@@ -31,14 +31,14 @@ H3C-VRRP-EXT-MIB DEFINITIONS ::= BEGIN
  h3cVrrpExt MODULE-IDENTITY
      LAST-UPDATED 
          "200412090000Z"
-     ORGANIZATION 
-         "Huawei-3Com Technologies Co.,Ltd."
-     CONTACT-INFO 
-         "Huawei-3Com Technologies Co.,Ltd.
-         Shang-Di Information Industry Base,
+     ORGANIZATION
+         "Hangzhou H3C Tech. Co., Ltd."
+     CONTACT-INFO
+         "Platform Team Hangzhou H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
-         Zip:100085 
-         Http://www.huawei-3com.com" 
+         http://www.h3c.com
+         Zip:100085
+         "
      DESCRIPTION
          "This MIB describes objects used for managing Virtual Router
          Redundancy Protocol (VRRP) routers."

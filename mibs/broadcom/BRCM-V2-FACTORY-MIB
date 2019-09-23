@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2002 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -48,7 +48,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-FACTORY-MIB;
                 
 v2Factory MODULE-IDENTITY
-    LAST-UPDATED "0404090000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -64,22 +64,29 @@ v2Factory MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom V2 factory MIB"
-    REVISION      "0209120000Z"
+        "Broadcom proprietary MIB for factory management and configuration
+         of objects common to the V2 software architecture."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
-    REVISION      "0304160000Z"
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected.
+         - Range restriction was added to objects v2NonVolIndex and v2FwIndex."
+    REVISION      "200404090000Z"
     DESCRIPTION
-            "Added cmpLZMA to enumerated BITS list for 
-             v2BootloaderCompressionSupport and v2FwControl objects."
-    REVISION      "0307110000Z"
+        "Added objects v2NonVolIsManufacturedPermanent, 
+         v2NonVolMfgHintPermanent, v2NonVolIsManufacturedDynamic, and 
+         v2NonVolMfgHintDynamic."
+    REVISION      "200307110000Z"
     DESCRIPTION
-             "Eliminate 1024 byte size limit on v2NonVolRawData."
-    REVISION      "0404090000Z"
+        "Eliminate 1024 byte size limit on v2NonVolRawData."
+    REVISION      "200304160000Z"
     DESCRIPTION
-             "Added objects v2NonVolIsManufacturedPermanent, 
-              v2NonVolMfgHintPermanent, v2NonVolIsManufacturedDynamic, and 
-              v2NonVolMfgHintDynamic."
+        "Added cmpLZMA to enumerated BITS list for 
+         v2BootloaderCompressionSupport and v2FwControl objects."
+    REVISION      "200209120000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataFactory 4 }
 
 -- v2FactoryNonVol: objects to control V2 specific non-vol storage
@@ -119,7 +126,7 @@ V2FactNonVolEntry ::=
     }
     
 v2NonVolIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..4096)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -502,7 +509,7 @@ V2FirmwareEntry ::=
     }
 
 v2FwIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..2)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION

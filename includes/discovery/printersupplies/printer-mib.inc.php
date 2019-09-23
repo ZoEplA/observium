@@ -7,12 +7,12 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$prt_supplies = snmpwalk_cache_oid($device, 'prtMarkerSuppliesTable', array(), 'Printer-MIB');
-$prt_colorant = snmpwalk_cache_twopart_oid($device, 'prtMarkerColorantTable', array(), 'Printer-MIB');
+$prt_supplies = snmpwalk_cache_oid($device, 'prtMarkerSuppliesTable', array(), 'Printer-MIB', NULL, OBS_SNMP_ALL_ASCII);
+$prt_colorant = snmpwalk_cache_twopart_oid($device, 'prtMarkerColorantTable', array(), 'Printer-MIB', NULL, OBS_SNMP_ALL_ASCII);
 //print_vars($prt_supplies);
 //print_vars($prt_colorant);
 
@@ -63,7 +63,8 @@ foreach ($prt_supplies as $index => $entry)
   // prtMarkerColorantValue.1.1 = "cyan"
   // prtMarkerColorantTonality.1.1 = 256
 
-  $descr        = snmp_hexstring($entry['prtMarkerSuppliesDescription']); // Some HPs return a Hex-string.
+  //$descr        = snmp_hexstring($entry['prtMarkerSuppliesDescription']); // Some HPs return a Hex-string.
+  $descr        = $entry['prtMarkerSuppliesDescription']; // Forced ASCII
   $oid          = ".1.3.6.1.2.1.43.11.1.1.9.$index";
   $capacity_oid = ".1.3.6.1.2.1.43.11.1.1.8.$index";
 
@@ -127,7 +128,8 @@ foreach ($prt_supplies as $index => $entry)
     $entry = array_merge($entry, $prt_colorant[$hrDeviceIndex][$entry['prtMarkerSuppliesColorantIndex']]);
     if (isset($entry['prtMarkerColorantValue']))
     {
-      $update_array['colour'] = snmp_hexstring($entry['prtMarkerColorantValue']);
+      //$update_array['colour'] = snmp_hexstring($entry['prtMarkerColorantValue']);
+      $update_array['colour'] = $entry['prtMarkerColorantValue']; // Forced ASCII
     }
   }
 

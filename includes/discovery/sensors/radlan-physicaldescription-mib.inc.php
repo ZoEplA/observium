@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -87,7 +87,7 @@ RADLAN-Physicaldescription-old-MIB::rlPhdUnitEnvParamTempSensor5Status.1 = INTEG
       $value    = $entry[$oid_name];
       if ($value != 0)
       {
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
+        discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
       }
     }
 
@@ -177,7 +177,7 @@ RlPhdUnitEnvParamEntry ::= SEQUENCE {
     $options['limit_high']      = $entry['rlPhdUnitEnvParamTempSensorCriticalThresholdValue'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
     }
 
     // Skip other if sensors detected by RADLAN-HWENVIROMENT

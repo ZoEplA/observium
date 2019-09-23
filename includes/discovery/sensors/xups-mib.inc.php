@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -37,7 +37,7 @@ foreach ($xups_array as $index => $entry)
     if ($value != 0 &&
         !isset($valid['sensor']['voltage']['mge-ups'][100+$index]))
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "xupsInputEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('voltage', $device, $oid, "xupsInputEntry.".$index, 'xups', $descr, 1, $value);
     }
 
     ## Input current
@@ -47,7 +47,7 @@ foreach ($xups_array as $index => $entry)
     if ($value != 0 && $value < 10000 &&  // xupsInputCurrent.1 = 136137420 ? really? You're nuts.
         !isset($valid['sensor']['current']['mge-ups'][100+$index]))
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "xupsInputEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('current', $device, $oid, "xupsInputEntry.".$index, 'xups', $descr, 1, $value);
     }
 
     ## Input power
@@ -55,7 +55,7 @@ foreach ($xups_array as $index => $entry)
     $value = $entry['xupsInputWatts'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "xupsInputEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('power', $device, $oid, "xupsInputEntry.".$index, 'xups', $descr, 1, $value);
     }
   }
 
@@ -74,7 +74,7 @@ foreach ($xups_array as $index => $entry)
     if ($value != 0 &&
         !isset($valid['sensor']['voltage']['mge-ups'][$index]))
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "xupsOutputEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('voltage', $device, $oid, "xupsOutputEntry.".$index, 'xups', $descr, 1, $value);
     }
 
     ## Output current
@@ -83,7 +83,7 @@ foreach ($xups_array as $index => $entry)
     if ($value != 0 &&
         !isset($valid['sensor']['current']['mge-ups'][$index]))
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "xupsOutputEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('current', $device, $oid, "xupsOutputEntry.".$index, 'xups', $descr, 1, $value);
     }
 
     ## Output power
@@ -91,7 +91,7 @@ foreach ($xups_array as $index => $entry)
     $value = $entry['xupsOutputWatts'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "xupsOutputEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('power', $device, $oid, "xupsOutputEntry.".$index, 'xups', $descr, 1, $value);
     }
   }
 
@@ -109,7 +109,7 @@ foreach ($xups_array as $index => $entry)
     $value = $entry['xupsBypassVoltage'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "xupsBypassEntry.".$index, 'xups', $descr, 1, $value);
+      discover_sensor('voltage', $device, $oid, "xupsBypassEntry.".$index, 'xups', $descr, 1, $value);
     }
   }
 }
@@ -123,7 +123,7 @@ $value = $entry['xupsInputFrequency'];
 if ($value != 0 &&
     !isset($valid['sensor']['frequency']['mge-ups'][101]))
 {
-  discover_sensor($valid['sensor'], 'frequency', $device, $oid, "xupsInputFrequency.0", 'xups', "Input", $scale, $value);
+  discover_sensor('frequency', $device, $oid, "xupsInputFrequency.0", 'xups', "Input", $scale, $value);
 }
 
 ## Output Load
@@ -132,7 +132,7 @@ $descr = "Output Load";
 $value = $entry['xupsOutputLoad'];
 if (!isset($valid['sensor']['load']['mge-ups']['mgoutputLoadPerPhase.1']))
 {
-  discover_sensor($valid['sensor'], 'load', $device, $oid, "xupsOutputLoad.0", 'xups', $descr, 1, $value);
+  discover_sensor('load', $device, $oid, "xupsOutputLoad.0", 'xups', $descr, 1, $value);
 }
 
 ## Output Frequency
@@ -141,7 +141,7 @@ $value = $entry['xupsOutputFrequency'];
 if ($value != 0 &&
     !isset($valid['sensor']['frequency']['mge-ups'][1]))
 {
-  discover_sensor($valid['sensor'], 'frequency', $device, $oid, "xupsOutputFrequency.0", 'xups', "Output", $scale, $value);
+  discover_sensor('frequency', $device, $oid, "xupsOutputFrequency.0", 'xups', "Output", $scale, $value);
 }
 
 ## Bypass Frequency
@@ -149,7 +149,7 @@ $oid   = ".1.3.6.1.4.1.534.1.5.1.0"; # XUPS-MIB::xupsBypassFrequency.0
 $value = $entry['xupsBypassFrequency'];
 if ($value != 0)
 {
-  discover_sensor($valid['sensor'], 'frequency', $device, $oid, "xupsBypassFrequency.0", 'xups', "Bypass", $scale, $value);
+  discover_sensor('frequency', $device, $oid, "xupsBypassFrequency.0", 'xups', "Bypass", $scale, $value);
 }
 
 // xupsInputSource
@@ -183,7 +183,7 @@ if (isset($entry['xupsBatTimeRemaining']) &&
   $scale = 1/60;
   $value = $entry['xupsBatTimeRemaining'];
 
-  discover_sensor($valid['sensor'], 'runtime', $device, $oid, "xupsBatTimeRemaining.0", 'xups', "Battery Runtime Remaining", $scale, $value);
+  discover_sensor('runtime', $device, $oid, "xupsBatTimeRemaining.0", 'xups', "Battery Runtime Remaining", $scale, $value);
 }
 
 if (isset($entry['xupsBatCapacity']) &&
@@ -192,7 +192,7 @@ if (isset($entry['xupsBatCapacity']) &&
   $oid   = ".1.3.6.1.4.1.534.1.2.4.0"; # XUPS-MIB::xupsBatCapacity.0
   $value = $entry['xupsBatCapacity'];
 
-  discover_sensor($valid['sensor'], 'capacity', $device, $oid, "xupsBatCapacity.0", 'xups', "Battery Capacity", 1, $value);
+  discover_sensor('capacity', $device, $oid, "xupsBatCapacity.0", 'xups', "Battery Capacity", 1, $value);
 }
 
 if (isset($entry['xupsBatCurrent']))
@@ -203,7 +203,7 @@ if (isset($entry['xupsBatCurrent']))
   if ($value != 0 &&
       !isset($valid['sensor']['current']['mge']['upsmgBatteryCurrent.0']))
   {
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "xupsBatCurrent.0", 'xups', "Battery", 1, $value);
+    discover_sensor('current', $device, $oid, "xupsBatCurrent.0", 'xups', "Battery", 1, $value);
   }
 }
 
@@ -215,7 +215,7 @@ if (isset($entry['xupsBatVoltage']))
   if ($value != 0 &&
       !isset($valid['sensor']['voltage']['mge']['upsmgBatteryVoltage.0']))
   {
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "xupsBatVoltage.0", 'xups', "Battery", 1, $value);
+    discover_sensor('voltage', $device, $oid, "xupsBatVoltage.0", 'xups', "Battery", 1, $value);
   }
 }
 
@@ -238,7 +238,7 @@ if (isset($entry['xupsEnvAmbientTemp']))
 
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "xupsEnvAmbientTemp.0", 'xups', "Ambient", 1, $value, $limits);
+    discover_sensor('temperature', $device, $oid, "xupsEnvAmbientTemp.0", 'xups', "Ambient", 1, $value, $limits);
   }
 }
 

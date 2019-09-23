@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -26,9 +26,13 @@ if (is_array($hrDevices))
   {
     if (is_array($hrDevice) && is_numeric($hrDevice['hrDeviceIndex']))
     {
-      if (dbFetchCell("SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?",array($device['device_id'], $hrDevice['hrDeviceIndex'])))
+      //if (dbFetchCell("SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?",array($device['device_id'], $hrDevice['hrDeviceIndex'])))
+      if (dbExist('hrDevice', '`device_id` = ? AND `hrDeviceIndex` = ?', array($device['device_id'], $hrDevice['hrDeviceIndex'])))
       {
-        if (($hrDevice['hrDeviceType'] == "hrDeviceProcessor") && empty($hrDevice['hrDeviceDescr'])) { $hrDevice['hrDeviceDescr'] = "Processor"; }
+        if (($hrDevice['hrDeviceType'] == "hrDeviceProcessor") && empty($hrDevice['hrDeviceDescr']))
+        {
+          $hrDevice['hrDeviceDescr'] = "Processor";
+        }
         $update_array = array('hrDeviceType'   => $hrDevice['hrDeviceType'],
                               'hrDeviceDescr'  => $hrDevice['hrDeviceDescr'],
                               'hrDeviceStatus' => $hrDevice['hrDeviceStatus'],

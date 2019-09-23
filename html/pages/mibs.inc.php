@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -17,12 +17,26 @@ if ($_SESSION['userlevel'] <= 7)
   return;
 }
 
-// Fetch all MIBs we support for specific OSes
+$mibs = array();
+
+// Fetch defined MIBs
+foreach ($config['mibs'] as $mib => $data)
+{
+  if (isset($data['mib_dir']))
+  {
+    $mibs[$mib] = 'def';
+  }
+}
+
+// Fetch MIBs we support for specific OSes
 foreach ($config['os'] as $os => $data)
 {
   foreach ($data['mibs'] as $mib)
   {
-    $mibs[$mib]['oses'][$os] = TRUE;
+    if (!isset($mibs[$mib]))
+    {
+      $mibs[$mib] = 'os';
+    }
   }
 }
 
@@ -31,13 +45,15 @@ foreach ($config['os_group'] as $os => $data)
 {
   foreach ($data['mibs'] as $mib)
   {
-    $mibs[$mib]['oses'][$os] = TRUE;
+    if (!isset($mibs[$mib]))
+    {
+      $mibs[$mib] = 'group';
+    }
   }
 }
 
 ksort($mibs);
 
-$obs_attribs    = get_obs_attribs('mib_');
 $defined_config = get_defined_settings(); // Used defined configs in config.php
 
 // r($vars);
@@ -48,22 +64,14 @@ if ($vars['toggle_mib'] && isset($mibs[$vars['toggle_mib']]) &&
   $mib = $vars['toggle_mib'];
 
   $mib_disabled = isset($config['mibs'][$mib]['enable']) && !$config['mibs'][$mib]['enable'];
-  $set_attrib   = $mib_disabled ? 1 : 0;
+  $set_mib      = $mib_disabled ? 1 : 0;
 
-  if (isset($obs_attribs['mib_'.$mib]))
-  {
-    del_obs_attrib('mib_' . $mib);
-  } else {
-    set_obs_attrib('mib_' . $mib, $set_attrib);
-  }
-
-  $obs_attribs = get_obs_attribs('mib_');
-
+  $key          = 'mibs|'.$mib.'|enable';
+  set_sql_config($key, $set_mib);
+  $config['mibs'][$mib]['enable'] = $set_mib; // one time override config var on page
 }
 
 print_message("This page allows you to globally disable individual MIBs. This configuration disables all discovery and polling using this MIB.");
-
-// r($obs_attribs);
 
 ?>
 
@@ -86,6 +94,7 @@ print_message("This page allows you to globally disable individual MIBs. This co
     <tr>
       <th>Module</th>
       <th>Description</th>
+      <th></th>
       <th style="width: 60px;">Status</th>
       <th></th>
     </tr>
@@ -94,13 +103,15 @@ print_message("This page allows you to globally disable individual MIBs. This co
 
 <?php
 
+$db_config = dbFetchColumn('SELECT `config_key` FROM `config` WHERE `config_key` LIKE ?', ['mibs|%']);
+//r($db_config);
 foreach ($mibs as $mib => $data)
 {
+  $key     = 'mibs|'.$mib.'|enable';
+  $mib_set = in_array($key, $db_config);
+  $class = $mib_set ? ' class="warning"' : '';
 
-  $attrib_set = isset($obs_attribs['mib_'.$mib]);
-  $class = $attrib_set ? ' class="warning"' : '';
-
-  echo('<tr' . $class . '><td><strong>'.$mib.'</strong></td>');
+  echo('<tr' . $class . '><td><strong><a href="https://mibs.observium.org/mib/'.$mib.'/">'.$mib.'</strong></td>');
 
   if (isset($config['mibs'][$mib])) { $descr = $config['mibs'][$mib]['descr']; } else { $descr = ''; }
 
@@ -116,6 +127,10 @@ $config[\'mibs\'][ $mib ][\'descr\']   = "";
 
   echo '<td>'.$descr.'</td>';
 
+  // Highlight not defined MIBs
+  $label_class = ($data != 'def') ? 'label label-warning' : 'label';
+  echo '<td><span class="'.$label_class.'">'.strtoupper($data).'</span></td>';
+
   echo '<td>';
 
   $readonly = FALSE;
@@ -130,8 +145,7 @@ $config[\'mibs\'][ $mib ][\'descr\']   = "";
     $btn_tooltip   = 'Disabled in config.php, see: <mark>$config[\'mibs\'][\'' . $mib . '\'][\'enable\']</mark>';
     $readonly      = TRUE;
   }
-  else if (($attrib_set && $obs_attribs['mib_'.$mib] == 0) ||
-           (!$attrib_set && isset($config['mibs'][$mib]['enable']) && !$config['mibs'][$mib]['enable']))
+  else if (isset($config['mibs'][$mib]['enable']) && !$config['mibs'][$mib]['enable'])
   {
     // Disabled in definitions or manually, can be re-enabled
     $attrib_status = '<span class="label label-danger">disabled</span>';

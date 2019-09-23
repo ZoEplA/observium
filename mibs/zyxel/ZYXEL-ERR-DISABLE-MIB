@@ -5,6 +5,12 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-ERR-DISABLE-MIB.mib $ 
+-- Revision 1.9  2015/02/16 07:09:45  Kevin 
+-- clear warning, renaming identifier name for SMI.V2 
+-- Revision 1.8  2015/02/09 08:14:12  Bruno 
+-- support zuld 
+-- Revision 1.7  2014/12/09 02:57:06  jenting 
+-- Support anti-arpscan & bpduguard. 
 -- Revision 1.6  2013/12/06 07:04:30  ccho 
 -- remove uncessary imports 
 -- Revision 1.5  2013/11/20 06:51:01  ccho 
@@ -98,10 +104,13 @@ ZYXEL-ERR-DISABLE-MIB DEFINITIONS ::= BEGIN
 
         zyErrdisableRecoveryReasonType OBJECT-TYPE
         SYNTAX  INTEGER {
-        		loopguard(0), 
+        		loopGuard(0), 
         		arp(1),
         		bpdu(2),
-				igmp(3)
+				igmp(3),
+				antiArpScan(4),
+				bpduGuard(5),
+				zuld(6)
         }
         MAX-ACCESS  not-accessible
         STATUS  current
@@ -220,10 +229,13 @@ ZYXEL-ERR-DISABLE-MIB DEFINITIONS ::= BEGIN
 
         zyErrdisableRecoveryType OBJECT-TYPE
         SYNTAX  INTEGER {
-        	loopguard(0),    
+        	loopGuard(0),    
         	arp(1),
         	bpdu(2),
-			igmp(3)
+			igmp(3),
+			antiArpScan(4),
+			bpduGuard(5),
+			zuld(6)
         }
         MAX-ACCESS  not-accessible
         STATUS  current
@@ -261,10 +273,13 @@ ZYXEL-ERR-DISABLE-MIB DEFINITIONS ::= BEGIN
     zyErrdisableTrapReasonType OBJECT-TYPE
         SYNTAX  INTEGER
         {
-        	loopguard(0),
+        	loopGuard(0),
 			arp(1),
 			bpdu(2),
-			igmp(3)
+			igmp(3),
+			antiArpScan(4),
+			bpduGuard(5),
+			zuld(6)
         }
         MAX-ACCESS  read-only
         STATUS  current

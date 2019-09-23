@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -171,6 +171,19 @@ if (!$auth)
       dbUpdate(array('widget_config' => json_encode($add_array)), 'dash_widgets', '`widget_id` = ?', array($vars['dash_add_widget']));
       if(dbAffectedRows() == 1) { print_message("Widget updated.", 'info'); }
       unset($vars['dash_add_widget']);
+    }
+
+    $navbar['options_right']['export']['text'] = "Export Data";
+
+    foreach($config['graph_formats'] as $format => $entry)
+    {
+
+      $export_array = $graph_array;
+      $export_array['format'] = $format;
+
+      $navbar['options_right']['export']['suboptions'][$format]['text'] = $entry['descr'];
+      $navbar['options_right']['export']['suboptions'][$format]['url'] = generate_graph_url($export_array);
+      $navbar['options_right']['export']['suboptions'][$format]['link_opts'] = 'target="_blank"';
     }
 
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -42,7 +42,7 @@ foreach ($lgpEnvTemperature as $index => $entry)
     $limits     = array('limit_high' => (isset($entry['lgpEnvTemperatureHighThresholdTenthsDegC']) ? $entry['lgpEnvTemperatureHighThresholdTenthsDegC'] * $scale : NULL),
                         'limit_low'  => (isset($entry['lgpEnvTemperatureLowThresholdTenthsDegC'])  ? $entry['lgpEnvTemperatureLowThresholdTenthsDegC']  * $scale : NULL));
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "lgpEnvTemperatureMeasurementTenthsDegC.$index", 'liebert', $descr, $scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid, "lgpEnvTemperatureMeasurementTenthsDegC.$index", 'liebert', $descr, $scale, $value, $limits);
   }
   else if (isset($entry['lgpEnvTemperatureMeasurementDegC']) &&
            $entry['lgpEnvTemperatureMeasurementDegC'] >= 0 && $entry['lgpEnvTemperatureMeasurementDegC'] < 2147483647)
@@ -52,7 +52,7 @@ foreach ($lgpEnvTemperature as $index => $entry)
     $limits     = array('limit_high' => (isset($entry['lgpEnvTemperatureHighThresholdDegC']) ? $entry['lgpEnvTemperatureHighThresholdDegC'] : NULL),
                         'limit_low'  => (isset($entry['lgpEnvTemperatureLowThresholdDegC'])  ? $entry['lgpEnvTemperatureLowThresholdDegC']  : NULL));
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "lgpEnvTemperatureMeasurementDegC.$index", 'liebert', $descr, 1, $value, $limits);
+    discover_sensor('temperature', $device, $oid, "lgpEnvTemperatureMeasurementDegC.$index", 'liebert', $descr, 1, $value, $limits);
   }
 }
 
@@ -81,7 +81,7 @@ foreach ($lgpEnvHumidity as $index => $entry)
     $limits     = array('limit_high' => (isset($entry['lgpEnvHumidityHighThresholdRelTenths']) ? $entry['lgpEnvHumidityHighThresholdRelTenths'] * $scale : NULL),
                         'limit_low'  => (isset($entry['lgpEnvHumidityLowThresholdRelTenths'])  ? $entry['lgpEnvHumidityLowThresholdRelTenths']  * $scale : NULL));
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "lgpEnvHumidityMeasurementRel.$index", 'liebert', $descr, $scale, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "lgpEnvHumidityMeasurementRel.$index", 'liebert', $descr, $scale, $value, $limits);
   }
   else if (isset($entry['lgpEnvHumidityMeasurementRel']) && $entry['lgpEnvHumidityMeasurementRel'] >= 0)
   {
@@ -90,7 +90,7 @@ foreach ($lgpEnvHumidity as $index => $entry)
     $limits     = array('limit_high' => (isset($entry['lgpEnvHumidityHighThresholdRel']) ? $entry['lgpEnvHumidityHighThresholdRel'] : NULL),
                         'limit_low'  => (isset($entry['lgpEnvHumidityLowThresholdRel'])  ? $entry['lgpEnvHumidityLowThresholdRel']  : NULL));
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "lgpEnvHumidityMeasurementRel.$index", 'liebert', $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "lgpEnvHumidityMeasurementRel.$index", 'liebert', $descr, 1, $value, $limits);
   }
 }
 
@@ -139,7 +139,7 @@ foreach ($lgpEnvState[0] as $name => $value)
     {
       case 'capacity':
         // Capacity
-        discover_sensor($valid['sensor'], 'capacity', $device, $oid, "$name.0", 'liebert', $descr, 1, $value);
+        discover_sensor('capacity', $device, $oid, "$name.0", 'liebert', $descr, 1, $value);
         break;
       default:
         // Statuses

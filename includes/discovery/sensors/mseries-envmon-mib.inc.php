@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -55,7 +55,7 @@ foreach ($oids as $index => $entry)
                    'limit_high_warn' => 50,
                    'limit_low_warn'  => 5);
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'mseries-envmon', $descr, 1, $current, $limits);
+  discover_sensor('temperature', $device, $oid, $index, 'mseries-envmon', $descr, 1, $current, $limits);
 }
 
 // EOF

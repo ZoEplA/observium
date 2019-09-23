@@ -1,13 +1,8 @@
 --     =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:  The HUAWEI-E-TRUNK-MIB.mib provides information about E-Trunk 
 -- Reference:
--- Version:     V2.06 
--- History: 
---              liwei, 2015-7-30. 
---              1. Add E-Trunk expected state trap. 
-
 -- Version:     V2.05 
 -- History: 
 --              wangguojin, 2014-10-29. 
@@ -23,7 +18,7 @@
 --                 hwETrunkAutoBFDEnable, hwETrunkAutoBFDTrackIfIndex, 
 --                 hwETrunkAutoBFDTxInterval, hwETrunkAutoBFDRxInterval, 
 --                 hwETrunkAutoBFDDetectMultiplier. 
--- Version:     V1.0
+-- Version:     V1.0 
 -- History: 
 --              zhenghebin,2008.11.25,publish 
  
@@ -46,7 +41,7 @@
 
 
         hwETrunkMIB MODULE-IDENTITY 
-            LAST-UPDATED "201507221448Z"
+            LAST-UPDATED "201410291522Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -57,9 +52,6 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                  "
-            DESCRIPTION
-                "Add hwETrunkExpectStateChange and hwETrunkExpectStateResume."     
-            REVISION "201507221448Z"        
             DESCRIPTION 
                 "The HUAWEI-E-TRUNK-MIB.mib provides information about E-Trunk."
             REVISION "201410291522Z"        
@@ -197,9 +189,6 @@
                     
                 hwETrunkAutoBFDDetectMultiplier
                     Integer32,
-
-                hwETrunkExpectStatus
-                    INTEGER, 
                                  
                 hwETrunkRowStatus
                     RowStatus
@@ -488,20 +477,6 @@
                 "The detect multiplier of E-Trunk auto BFD session. The default is 3."
             ::= { hwETrunkEntry 28}         
 
-        hwETrunkExpectStatus OBJECT-TYPE
-            SYNTAX INTEGER
-                {
-                    backup(1),
-                    master(2)
-                }
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION
-                "The expect status of the E-Trunk. 
-                 1:backup. 
-                 2:master. "
-            ::= { hwETrunkEntry 29 }   
-
         hwETrunkRowStatus OBJECT-TYPE
             SYNTAX RowStatus
             MAX-ACCESS read-create
@@ -786,20 +761,6 @@
                 "The trap is generated when the status of the memeber is changed or the status reason of the memeber is changed."
             ::= { hwETrunkTraps 2 }   
         
-        hwETrunkExpectStateChange  NOTIFICATION-TYPE
-            OBJECTS { hwETrunkExpectStatus, hwETrunkStatusReason}
-            STATUS  current
-            DESCRIPTION
-                 "The trap is generated when the status of the E-Trunk is inconsistant with expected state ." 
-            ::= { hwETrunkTraps 3 }   
-		     
-        hwETrunkExpectStateResume  NOTIFICATION-TYPE
-            OBJECTS { hwETrunkExpectStatus, hwETrunkStatusReason }
-            STATUS  current
-            DESCRIPTION
-                 "The expected state trap of E-Trunk resumed." 
-            ::= { hwETrunkTraps 4 }    
-
                    
         hwETrunkConformance OBJECT IDENTIFIER ::= { hwETrunkMIB 3 }
 
@@ -849,7 +810,6 @@
                 hwETrunkAutoBFDTxInterval,
                 hwETrunkAutoBFDRxInterval,
                 hwETrunkAutoBFDDetectMultiplier,
-                hwETrunkExpectStatus,
                 hwETrunkRowStatus        
             }
             STATUS current
@@ -872,7 +832,7 @@
             ::= { hwETrunkGroups 2 }
 
         hwETrunkNotificationGroup NOTIFICATION-GROUP
-            NOTIFICATIONS { hwETrunkStatusChange, hwETrunkMemberStatusChange,hwETrunkExpectStateChange,hwETrunkExpectStateResume  }
+            NOTIFICATIONS { hwETrunkStatusChange, hwETrunkMemberStatusChange }
             STATUS current
             DESCRIPTION 
                 "Description."

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -59,10 +59,7 @@ foreach($groups AS $id => $group)
   $ds = $rrd['ds']."_".$i;
   $orig_ds = $ds;
 
-  $rrd_options .= " DEF:o_".$ds."=".$rrd['filename'].":".$rrd['ds'].":AVERAGE ";
-  $rrd_options .= " CDEF:" . $ds . "=o_" . $ds . ",UN,0,o_" . $ds . ",IF";
-
-
+  $rrd_options .= " DEF:".$ds."=".$rrd['filename'].":".$rrd['ds'].":AVERAGE ";
 
   # if we've been passed a multiplier we must make a CDEF based on it!
   if (is_numeric($multiplier) || is_numeric($divider) || is_numeric($divisor))
@@ -80,13 +77,12 @@ foreach($groups AS $id => $group)
   }
 
   // Create Aggreage
-  $group['aggregate'][]  = $ds.",UN,0," . $ds . ",IF";
+  $group['aggregate'][]  = $ds;
   $group['ds_list'][] = $ds;
 
  }
 
  $group_ds     = $id;
- //$rrd_options .= " CDEF:" . $group_ds . "=" . implode(',', $group['aggregate']) . str_repeat(',+', count($group['aggregate']) - 1);
 
   if ($rrd['colour'])
   {
@@ -97,7 +93,7 @@ foreach($groups AS $id => $group)
     $colour_iter++;
   }
 
- $rrd_options .= " CDEF:" . $group_ds . "=" . implode(',', $group['ds_list']). str_repeat(',+', count($group['ds_list']) - 1);
+ $rrd_options .= " CDEF:" . $group_ds . "=" . rrd_aggregate_dses($group['ds_list']);
 
 
  if ($rrd['invert'])
@@ -124,7 +120,7 @@ foreach($groups AS $id => $group)
 if ($vars['previous'] == "yes")
 {
   $thingX  = implode(',', $rrd_multi['thingX']);
-  $plusesX = str_repeat(',+', count($rrd_multi['thingX']) - 1);
+  $plusesX = str_repeat(',ADDNAN', count($rrd_multi['thingX']) - 1);
   if (is_numeric($multiplier))
   {
     $rrd_options .= " CDEF:X=" . $thingX . $plusesX.",".$multiplier. ",*";

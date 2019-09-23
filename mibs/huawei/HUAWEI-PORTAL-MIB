@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:The HUAWEI-PORTAL-MIB  provides information about portal server
 -- Reference:
--- Version: V2.18
+-- Version: V2.22
 -- History:
 --     
 -- =================================================================
@@ -28,7 +28,7 @@
     
     
         hwPortal MODULE-IDENTITY 
-            LAST-UPDATED"201610211331Z" 
+            LAST-UPDATED"201801151519Z" 
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -39,7 +39,25 @@
                     Website: http://www.huawei.com
                     Email: support@huawei.com
                     "
+            DESCRIPTION
+                "Add hwWebAuthServerSourceInterface."
+
+            REVISION "201801151519Z"              -- Jan 15, 2018 at 22:07 GMT
             DESCRIPTION 
+                "Modify hwPortalConfigSecretKeyTable hwPortalServerTable hwPortalUserTable hwPortalServerUp hwPortalServerDown." 
+
+            REVISION "201705081519Z"              -- May 8, 2017 at 15:19 GMT
+            DESCRIPTION 
+                "Add hwWebAuthServerSourceInterface." 
+
+            REVISION "201704130930Z"              -- April 13, 2017 at 09:30 GMT
+            DESCRIPTION 
+                "Modify hwWebAuthServerProtocol." 
+
+
+            REVISION "201703012059Z"              -- Mar 1, 2017 at 20:59 GMT
+
+             DESCRIPTION 
                 "The MIB contains objects of module PORTAL." 
 			
 			REVISION "201610211331Z"              -- Oct 21, 2016 at 13:21 GMT
@@ -72,7 +90,15 @@
 
            REVISION "201507302040Z"              -- JULY 30, 2015 at 20:40 GMT
             DESCRIPTION
-                "Modify hwWebAuthServerServerDetectInterval hwWebAuthServerServerDetectMaxTimes add value 0 "  
+                "Modify hwWebAuthServerServerDetectInterval hwWebAuthServerServerDetectMaxTimes add value 0 " 
+
+            REVISION "201503262210Z"
+            DESCRIPTION
+            "Add hwPortalUserAlarmPercentageLower, hwPortalUserAlarmPercentageUpper and hwPortalCaptiveBypassEnable"  
+
+           REVISION "201409231425Z"              -- JULY 23, 2014 at 19:36 GMT
+            DESCRIPTION
+                "Add  hwPortalFreeRuleACLID."      
 
            REVISION "201408231936Z"              -- August 23, 2014 at 19:36 GMT
             DESCRIPTION
@@ -80,7 +106,15 @@
 
            REVISION "201407291650Z"              -- July 29, 2014 at 16:50 GMT
             DESCRIPTION
-                "Modify  hwPortalUserSlot ."    
+                "Modify  hwPortalUserSlot ." 
+   
+           REVISION "201311281725Z"              -- NOV 28, 2013 at 17:25 GMT
+            DESCRIPTION
+                "The MIB contains objects of module PORTAL."    
+  
+            REVISION "201306291150Z"              -- JUNE 26, 2013 at 11:50 GMT
+            DESCRIPTION
+                "The MIB contains objects of module PORTAL."   
 
            REVISION "201304011650Z"              -- April 01, 2013 at 16:50 GMT
             DESCRIPTION
@@ -96,21 +130,7 @@
            
             REVISION "201301101150Z"              -- January 11, 2013 at 11:50 GMT
             DESCRIPTION
-                "The MIB contains objects of module PORTAL."       
-            REVISION "201306291150Z"              -- JUNE 26, 2013 at 11:50 GMT
-            DESCRIPTION
                 "The MIB contains objects of module PORTAL." 
-            REVISION "201311281725Z"              -- NOV 28, 2013 at 17:25 GMT
-            DESCRIPTION
-                "The MIB contains objects of module PORTAL."     
-
-            REVISION "201409231425Z"              -- JULY 23, 2014 at 19:36 GMT
-            DESCRIPTION
-                "Add  hwPortalFreeRuleACLID."     
-
-            REVISION "201503262210Z"
-            DESCRIPTION
-            "Add hwPortalUserAlarmPercentageLower, hwPortalUserAlarmPercentageUpper and hwPortalCaptiveBypassEnable"  
             ::= { huaweiMgmt 4 }
 
 
@@ -222,7 +242,7 @@
            ::= { hwPortalConfigPara 9 }
 		   
         hwWebServerHTTPPortNumber  OBJECT-TYPE
-            SYNTAX Integer32 (0 | 1024..65535)           
+            SYNTAX Integer32 (0 | 1025..65535)           
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -230,7 +250,7 @@
            ::= { hwPortalConfigPara 10 } 
                                          
         hwWebServerHTTPSPortNumber OBJECT-TYPE
-            SYNTAX Integer32 (0 | 1024..65535)           
+            SYNTAX Integer32 (0 | 1025..65535)           
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -256,10 +276,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The time of system startup time, statistics of start time.
-                 When clear the statistics data, it will be reset.
-                 If power off, the data would not be saved.
-                "
+                "This object indicates the time when status statistics collection starts."
             ::= { hwPortalPacketStatisticsPara 1 }
         
         hwPortalPacketStatisticsAuthenticatorError OBJECT-TYPE
@@ -267,8 +284,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total packet number of validate failure.
-                 "
+                "This object indicates the number of packets that fail to be authenticated."
             ::= { hwPortalPacketStatisticsPara 2 }
         
         hwPortalPacketStatisticsAccessReqError OBJECT-TYPE
@@ -276,7 +292,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                " The total number of access request error packet."
+                "This object indicates the number of access request error packets."
             ::= { hwPortalPacketStatisticsPara 3 }
         
         hwPortalPacketStatisticsLogoutReqError OBJECT-TYPE
@@ -284,7 +300,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                " The total number of logout request error packet."
+                " This object indicates the number of logout request error packets."
             ::= { hwPortalPacketStatisticsPara 4 }
         
         hwPortalPacketStatisticsInquiryReqError OBJECT-TYPE
@@ -292,8 +308,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of inquiry request error packet.
-                "
+                "This object indicates the number of query request error packets."
             ::= { hwPortalPacketStatisticsPara 5 }
         
         hwPortalPacketStatisticsLoginConfirmError OBJECT-TYPE
@@ -301,8 +316,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of login confirm error packet.
-                "
+                "This object indicates the number of login acknowledgement error packets."
             ::= { hwPortalPacketStatisticsPara 6 }
         
         hwPortalPacketStatisticsAccessReqReceived OBJECT-TYPE
@@ -310,8 +324,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of received access request packet.
-                "
+                "This object indicates the number of received challenge request packets."
             ::= { hwPortalPacketStatisticsPara 7 }
         
         hwPortalPacketStatisticsLoginReqReceived OBJECT-TYPE
@@ -319,8 +332,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of received login request packet.
-                "
+                "This object indicates the number of received login request packets."
             ::= { hwPortalPacketStatisticsPara 8 }
         
         hwPortalPacketStatisticsLogoutReqReceived OBJECT-TYPE
@@ -328,8 +340,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of received logout request packet.
-                "
+                "This object indicates the number of received logout request packets."
             ::= { hwPortalPacketStatisticsPara 9 }
         
         hwPortalPacketStatisticsInquiryReqReceived OBJECT-TYPE
@@ -337,7 +348,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of received inquiry request packet. "
+                "This object indicates the number of received inquiry request packet. "
             ::= { hwPortalPacketStatisticsPara 10 }
         
         hwPortalPacketStatisticsLoginConfirmReceived OBJECT-TYPE
@@ -345,7 +356,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of received login confirm packet. "
+                "This object indicates the number of received login confirm packet. "
             ::= { hwPortalPacketStatisticsPara 11 }
         
         hwPortalPacketStatisticsAccessACKFailed OBJECT-TYPE
@@ -353,7 +364,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of access ack failure packet.  "
+                "This object indicates the number of access acknowledgement failure packets. "
             ::= { hwPortalPacketStatisticsPara 12 }
         
         hwPortalPacketStatisticsLoginACKFailed OBJECT-TYPE
@@ -361,7 +372,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of login ack failure packet. "
+                "This object indicates the number of login acknowledgement failure packets."
             ::= { hwPortalPacketStatisticsPara 13 }
         
         hwPortalPacketStatisticsLogoutACKFailed OBJECT-TYPE
@@ -369,7 +380,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of logout ack failure packet.  "
+                "This object indicates the number of logout acknowledgement failure packets. "
             ::= { hwPortalPacketStatisticsPara 14 }
         
         hwPortalPacketStatisticsInquiryACKFailed OBJECT-TYPE
@@ -377,7 +388,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of inquiry ack failure packet.  "
+                "This object indicates the number of query acknowledgement failure packets. "
             ::= { hwPortalPacketStatisticsPara 15 }
         
         hwPortalPacketStatisticsAccessAckSent OBJECT-TYPE
@@ -385,7 +396,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of sending access ack packet. "
+                "This object indicates the number of sent access acknowledgement packets."
             ::= { hwPortalPacketStatisticsPara 16 }
         
         hwPortalPacketStatisticsLoginAckSent OBJECT-TYPE
@@ -393,7 +404,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of sending login ack packet. "
+                "This object indicates the number of sent login acknowledgement packets."
             ::= { hwPortalPacketStatisticsPara 17 }
         
         hwPortalPacketStatisticsLogoutAckSent OBJECT-TYPE
@@ -401,7 +412,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of sending logout ack packet.  "
+                "This object indicates the number of sent logout acknowledgement packets. "
             ::= { hwPortalPacketStatisticsPara 18 }
         
         hwPortalPacketStatisticsInquiryAckSent OBJECT-TYPE
@@ -409,7 +420,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of sending inquiry ack packet.  "
+                "This object indicates the number of sent query acknowledgement packets. "
             ::= { hwPortalPacketStatisticsPara 19 }
         
     --  ============== hwPortalPacketStatisticsPara  define end ==============         
@@ -421,8 +432,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The shared secret key table, realizing the config of shared secret key.
-                "
+                "hwPortalConfigSecretKeyTable is used to configure a shared key of the portal server."
             ::= { hwPortalMibObjects 3 }
         
         hwPortalConfigSecretKeyEntry OBJECT-TYPE
@@ -430,7 +440,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The entry of shared secret key table. "
+                "The indexes of this table are mplsVpnVrfName and hwPortalConfigPortalServerIpAddress."
             INDEX { mplsVpnVrfName, hwPortalConfigPortalServerIpAddress }
             ::= { hwPortalConfigSecretKeyTable 1 }
         
@@ -460,7 +470,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The IP address of PORTAL server. "
+                "This object indicates the IP address of the portal server"
             ::= { hwPortalConfigSecretKeyEntry 1 }
         
         hwPortalConfigPortalServerIpMask OBJECT-TYPE
@@ -468,7 +478,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The IP mask of PORTAL server. "
+                "This object indicates the IP mask of PORTAL server. "
             ::= { hwPortalConfigSecretKeyEntry 2 }
 
         hwPortalConfigSecretKey OBJECT-TYPE
@@ -476,8 +486,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The secret key of PORTAL server.
-                "
+                "This object indicates the shared key of the web authentication server. It applies to portal V2.0 or a higher version. The value is a string of 0 to 16 characters."
             ::= { hwPortalConfigSecretKeyEntry 3 }
         
         hwPortalConfigPortalServerPort OBJECT-TYPE
@@ -485,7 +494,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The port of PORTAL server."
+                "This object indicates the port number of the Notification packet received by the web authentication server.  The value is an integer ranging from 1 to 65535. The default value is 50100."
             ::= { hwPortalConfigSecretKeyEntry 4 }
 
         hwPortalConfigPortalServerNasip OBJECT-TYPE
@@ -548,7 +557,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The entry of statistics table of PORTAL server."
+                "The index of this table is hwPortalUserMACAddress."
             INDEX { mplsVpnVrfName, hwPortalServerIpAddress }
             ::= { hwPortalServerTable 1 }
         
@@ -565,7 +574,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The IP address of PORTAL server."
+                "This object indicates the IP address of the portal server."
             ::= { hwPortalServerEntry 1 }
         
         hwPortalServerUserNum     OBJECT-TYPE
@@ -573,9 +582,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The total number of access users on PORTAL server.
-                "
+                "This object indicates the number of users that go online through the portal server."
             ::= { hwPortalServerEntry 2 }
 
     --  ============== hwPortalServerTable  define end ==============         
@@ -597,7 +604,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The entry of PORTAL user table."
+                "The index of this table is hwPortalUserMACAddress."
             INDEX { hwPortalUserMACAddress }
             ::= { hwPortalUserTable 1 }
         
@@ -626,9 +633,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The MAC address of users.
-                "
+                "This object indicates the MAC address of the portal user."
             ::= { hwPortalUserEntry 1 }
         
         hwPortalUserIpAddress OBJECT-TYPE
@@ -636,9 +641,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The IP address of users.
-                "
+                "This object indicates the IP address of the portal user."
             ::= { hwPortalUserEntry 2 }
 
         hwPortalUserPort OBJECT-TYPE
@@ -646,9 +649,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The port number of users.
-                "
+                "This object indicates the port number of the portal user."
             ::= { hwPortalUserEntry 3 }
 
         hwPortalUserUpFlow OBJECT-TYPE
@@ -656,9 +657,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The upstream flow, unit is bytes.
-                "
+                "This object indicates the upstream traffic of the portal user."
             ::= { hwPortalUserEntry 4 }
 
         hwPortalUserDownFlow OBJECT-TYPE
@@ -666,9 +665,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The downstream flow, unit is bytes.
-                "
+                "This object indicates the downstream traffic of the portal user."
             ::= { hwPortalUserEntry 5 }
 
         hwPortalUserName OBJECT-TYPE
@@ -676,9 +673,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The username.
-                "
+                "This object indicates the name of the portal user."
             ::= { hwPortalUserEntry 6 }
 
         hwPortalUserLoginTime OBJECT-TYPE
@@ -686,9 +681,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "
-                The login time of user.
-                "
+                "This object indicates the login time of the portal user."
             ::= { hwPortalUserEntry 7 }
 
         hwPortalUserServerIpAddress OBJECT-TYPE
@@ -696,7 +689,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The IP address of PORTAL server."
+                "This object indicates the IP address of the portal server."
             ::= { hwPortalUserEntry 8 }
 
     --  ============== hwPortalUserTable  define end ==============         
@@ -1218,6 +1211,8 @@
 		hwWebAuthServerLogoutFailResponseRedirectURL
 			OCTET STRING,
 		hwWebAuthServerLogoutFailResponseMsg
+			OCTET STRING,
+		hwWebAuthServerSourceInterface
 			OCTET STRING
 		 }
 
@@ -1414,7 +1409,8 @@
 	SYNTAX INTEGER
 		{
 		portal(1),
-		httpORhttps(2)
+		httpORhttps(2),
+		haca(3)
 		}
 	MAX-ACCESS read-create
 	STATUS current
@@ -1616,6 +1612,14 @@
 	DESCRIPTION
 		"Description."
 	::= { hwWebAuthServerCfgEntry 44 }
+
+   	hwWebAuthServerSourceInterface OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..63))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"Description."
+	::= { hwWebAuthServerCfgEntry 45 }
 	
 	hwWebAuthServerIpCfgTable OBJECT-TYPE
 	SYNTAX SEQUENCE OF HwWebAuthServerIpCfgEntry
@@ -2010,24 +2014,14 @@
             OBJECTS { hwStateChangePortalServerIp, hwStateChangePortalServerVrf }
             STATUS current
             DESCRIPTION
-                "
-                1 Notice/Trap name:  Portal server up
-                2 Notice/Trap generation cause:  Portal server up 
-                3 Repair suggestions:
-                    Check portal server status .                
-                "
+                "This object indicates that the portal server is Up."
             ::= { hwPortalServerTraps 1 }
             
         hwPortalServerDown NOTIFICATION-TYPE
             OBJECTS { hwStateChangePortalServerIp, hwStateChangePortalServerVrf }
             STATUS current
             DESCRIPTION
-                "
-                1 Notice/Trap name:  Portal server down
-                2 Notice/Trap generation cause:  Portal server down 
-                3 Repair suggestions:
-                    Check portal server status .
-                "
+                "This object indicates that the portal server is Down."
             ::= { hwPortalServerTraps 2 }
             
         hwPortalMaxUserAlarm NOTIFICATION-TYPE

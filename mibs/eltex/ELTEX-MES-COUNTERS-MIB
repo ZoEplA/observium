@@ -1,9 +1,9 @@
 ELTEX-MES-COUNTERS-MIB DEFINITIONS ::= BEGIN
 
 -- Title:         Eltex MES Counters Configuration
--- Version:       1.1
--- Creation date: 23 Dec 2015
--- Last update:   29 Mar 2016
+-- Version:       1.0
+-- Creation date: 30 Aug 2017
+-- Last update:   30 Aug 2017
 -- 29-Mar-2016 Added mibs for Qos Statistics
 
 IMPORTS
@@ -141,13 +141,13 @@ eltCountersQosIfQueueEntry OBJECT-TYPE
 	::= { eltCountersQosIfQueueTable 1 }
 
 EltCountersQosIfQueueEntry ::= SEQUENCE {
-	eltCountersQosIfIndex             InterfaceIndex,
-	eltCountersQosQueueIndex          INTEGER,
-	eltCountersQosDP                  INTEGER,
+	eltCountersQosIfIndex              InterfaceIndex,
+	eltCountersQosQueueIndex           INTEGER,
+	eltCountersQosDP                   INTEGER,
 	eltCountersQosOctetsDroppedCounter Counter64,
 	eltCountersQosPktsDroppedCounter   Counter64,
-	eltCountersQosOctetsPassedCounter Counter64,
-	eltCountersQosPktsPassedCounter   Counter64
+	eltCountersQosOctetsPassedCounter  Counter64,
+	eltCountersQosPktsPassedCounter    Counter64
 	}
 
 eltCountersQosIfIndex OBJECT-TYPE

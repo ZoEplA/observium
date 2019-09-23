@@ -82,7 +82,12 @@
                        onuUniIfTrunkvlans
                            BIT STRING,
                        onuUniIfSpeedLimitIngress
+                       	   INTEGER,
+                       onuUniIfctcLoopbackDetect
+                       	   INTEGER,
+                       onuUniIfctcNotifyLoopback
                        	   INTEGER
+                      
 		}	             
 
                onuLlidDiid OBJECT-TYPE
@@ -273,6 +278,41 @@
                    DESCRIPTION
                            "Configure ONU UNI interface ingress rate limit. Default value is 0, that means disable."
                    ::= { nmsEponOnuIfEntry 21 } 
+
+               onuUniMacBindMode OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  disable(0),
+                                  enable(1)
+                                  }
+                   
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI interface MAC bind mode. Default value is 0, that means disable."
+                   ::= { nmsEponOnuIfEntry 22 } 
+
+               onuUniIfctcLoopbackDetect OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  disable(0),
+                                  enable(1)
+                                  }
+                   
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port CTC loopback detect:disable(0),enable(1),default value is 0."
+                   ::= { nmsEponOnuIfEntry 23 } 
+
+               onuUniIfctcNotifyLoopback OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                  disable(0),
+                                  enable(1)
+                                  }
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "ONU UNI port CTC notify loopback :disable(0),enable(1),default value is 0."
+                   ::= { nmsEponOnuIfEntry 24 } 
 
 
 

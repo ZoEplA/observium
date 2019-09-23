@@ -1,4 +1,5 @@
 WebGraph-AnalogIn-57642-US-MIB DEFINITIONS ::= BEGIN
+-- adama@observium.org fixed typo 2018-10-24
 ----------------------------------------------------------------
 -- Revison: 1.29
 ----------------------------------------------------------------
@@ -249,7 +250,7 @@ WebGraph-AnalogIn-57642-US-MIB DEFINITIONS ::= BEGIN
     wtWebGraphAnalogIn57642Datalogger	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Device 4 }	
     wtWebGraphAnalogIn57642Alarm	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Device 5 }
     wtWebGraphAnalogIn57642Graphics 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Device 6 }	
-    
+
 --  wtWebGraphAnalogIn57642TimeDate Tree
 
     wtWebGraphAnalogIn57642TimeZone	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642TimeDate 1 }
@@ -266,11 +267,11 @@ WebGraph-AnalogIn-57642-US-MIB DEFINITIONS ::= BEGIN
     wtWebGraphAnalogIn57642Syslog	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Basic 6 }
     wtWebGraphAnalogIn57642FTP		OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Basic 7 }
 
---  wtWebGraphAnalogIn57641Graphics Tree
+--  wtWebGraphAnalogIn57642Graphics Tree
     
-    wtWebGraphAnalogIn57642GraphicsBase 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57641Graphics 1 }
-    wtWebGraphAnalogIn57642GraphicsSelect 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57641Graphics 2 }
-    wtWebGraphAnalogIn57642GraphicsScale 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57641Graphics 3 }
+    wtWebGraphAnalogIn57642GraphicsBase 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Graphics 1 }
+    wtWebGraphAnalogIn57642GraphicsSelect 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Graphics 2 }
+    wtWebGraphAnalogIn57642GraphicsScale 	OBJECT IDENTIFIER ::= { wtWebGraphAnalogIn57642Graphics 3 }
     
        
 -- wtWebGraphAnalogIn57642Inventory Group

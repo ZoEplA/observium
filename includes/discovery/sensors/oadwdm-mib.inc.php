@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -33,7 +33,7 @@ foreach ($oids as $index => $entry)
 
     if ($value <> 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'lambdadriver', $descr, 1, $value);
+      discover_sensor('temperature', $device, $oid, $index, 'lambdadriver', $descr, 1, $value);
     }
   }
 
@@ -43,7 +43,7 @@ foreach ($oids as $index => $entry)
     $oid   = ".1.3.6.1.4.1.6926.1.41.1.10.1.2.1.5.$index";
     $value = $entry['oaLdDevPSOperStatus'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, 'oadwdm-powersupply-state', $descr, NULL, $value, array('entPhysicalClass' => 'powerSupply'));
+    discover_status($device, $oid, $index, 'oadwdm-powersupply-state', $descr, $value, array('entPhysicalClass' => 'powerSupply'));
   }
 
   if ($entry['oaLdDevFANOperStatus'] != 'empty')
@@ -52,7 +52,7 @@ foreach ($oids as $index => $entry)
     $oid   = ".1.3.6.1.4.1.6926.1.41.1.10.3.2.1.5.$index";
     $value = $entry['oaLdDevFANOperStatus'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, 'oadwdm-fan-state', $descr, NULL, $value, array('entPhysicalClass' => 'fan'));
+    discover_status($device, $oid, $index, 'oadwdm-fan-state', $descr, $value, array('entPhysicalClass' => 'fan'));
   }
 }
 

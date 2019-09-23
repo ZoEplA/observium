@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage authentication
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -292,7 +292,7 @@ function radius_auth_user_level($username)
 
 /**
  * Retrieve user id for specified user.
- * Always returns -1, currently.
+ * Returns a hash of the username.
  *
  * @param string $username Username to retrieve the ID for
  * @return int User's ID

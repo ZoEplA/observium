@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 if (!isset($cache_discovery['timetra-chassis-mib']))
 {
-  $cache_discovery['timetra-chassis-mib'] = snmpwalk_cache_twopart_oid($device, 'tmnxHwTable', NULL, 'TIMETRA-CHASSIS-MIB');
+  $cache_discovery['timetra-chassis-mib'] = snmp_cache_table($device, 'tmnxHwTable', NULL, 'TIMETRA-CHASSIS-MIB');
 }
 
 foreach ($cache_discovery['timetra-chassis-mib'] as $chassis => $entries)
@@ -36,7 +36,7 @@ foreach ($cache_discovery['timetra-chassis-mib'] as $chassis => $entries)
     {
       $inventory[$index]['entPhysicalName'] .= ' '.$chassis;
     }
-    discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'timetra-chassis-mib');
+    discover_inventory($device, $index, $inventory[$index], $mib);
   }
 }
 

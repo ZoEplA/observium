@@ -6,9 +6,9 @@
 	-- not included in this file.                               --
 	-- =======================================================  --
 
-	-- Version 2.6, October 2016 (See NOTE below)
+	-- Version 2.8, October 2017 (See NOTE below)
 
-	-- Copyright (c) 1995-2016 NetApp, Inc.
+	-- Copyright (c) 1995-2017 NetApp, Inc.
 	-- All rights reserved.
 
 	-- This NetApp SNMP Management Information Base
@@ -93,7 +93,7 @@
 		        FROM SNMP-FRAMEWORK-MIB;
 
         netappModuleId  MODULE-IDENTITY
-	LAST-UPDATED      "201610200000Z"
+	LAST-UPDATED      "201710090000Z"
         ORGANIZATION      "NetApp"
         CONTACT-INFO      "www.netapp.com"
         DESCRIPTION       "The mib module for NetApp SNMPv2 entities"
@@ -198,6 +198,13 @@
 	netappOnCommand OBJECT IDENTIFIER ::= { netapp 5 }
 
 	--
+	-- This is the tree under which values for the netapp metrocluster
+	-- are allocated
+	--
+
+        netappMcc OBJECT IDENTIFIER ::= { netapp 6 }
+
+	--
 	-- We distinguish between filers and NetCaches.
 	--
 
@@ -208,6 +215,14 @@
 	netappCluster	OBJECT IDENTIFIER ::= { netappProducts 5 }
 	netappVserver	OBJECT IDENTIFIER ::= { netappProducts 6 }
 
+	--
+	-- This is the tree under which values for the netapp metrocluster
+	-- Tiebreaker software are allocated.
+	-- Those values are defined in sepearate MCCTB MIB file, distributed
+        -- with MCCTB product.
+	--
+
+        netappMcctb OBJECT IDENTIFIER ::= { netappMcc 1 }
 
 	-- top-level netapp groups
 
@@ -30731,7 +30746,13 @@
 		sisIsDataCompactionEnabled
 		    Boolean,
 		sisIsCrossVolumeInlineDedupeEnabled
-		    Boolean
+		    Boolean,
+		sisIsCrossVolumeBackgroundDedupeEnabled
+		    Boolean,
+		sisApplicationIOSize
+		    INTEGER,
+		sisCompressionType
+		    INTEGER
 	    }
 
 	sisIndex                        OBJECT-TYPE
@@ -30755,7 +30776,7 @@
 	SYNTAX                          INTEGER {
                                              disabled(1),
                                              enabled(2)
-                                        }	
+                                        }
         MAX-ACCESS                      read-only
         STATUS                          current
 	DESCRIPTION
@@ -31072,6 +31093,16 @@
 
 	::= { sisEntry 33 }
 
+        sisIsCrossVolumeBackgroundDedupeEnabled    OBJECT-TYPE
+        SYNTAX                                     Boolean
+        MAX-ACCESS                                 read-only
+        STATUS                                     current
+        DESCRIPTION
+                "Indicates whether cross volume background deduplication is enabled
+                 on the volume or not"
+
+        ::= { sisEntry 34 }
+
 	sisIsDataCompactionEnabled      OBJECT-TYPE
 	SYNTAX                          Boolean
 	MAX-ACCESS                      read-only
@@ -31080,8 +31111,33 @@
 		"Indicates whether data compaction is enabled on
 		the volume or not"
 
-	::= { sisEntry 34 }
+	::= { sisEntry 35 }
 
+	sisApplicationIOSize            OBJECT-TYPE
+	SYNTAX                          INTEGER {
+						  default(0),
+						  size8k(1),
+						  size16k(2),
+					          size32k(3)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+				"Indicates the Application IO Size used for compression."
+	::= { sisEntry 36 }
+
+	sisCompressionType            OBJECT-TYPE
+	SYNTAX                          INTEGER {
+						  default(0),
+						  secondary(1),
+						  adaptive(2)
+                                        }
+        MAX-ACCESS                      read-only
+        STATUS                          current
+	DESCRIPTION
+				"Indicates the Compression Type used by the volume."
+	::= { sisEntry 37 }
+	
 	-- -- -- -- -- -- -- -- --
 	-- the compression group
 	-- -- -- -- -- -- -- -- --
@@ -31453,7 +31509,9 @@
             qosWorkloadFile              DisplayString,
             qosWorkloadQtree             FileOrDirectoryString,
             qosWorkloadReadAhead         DisplayString,
-            qosWorkloadCache          	 DisplayString
+            qosWorkloadCache          	 DisplayString,
+            qosWorkloadMinThroughput     DisplayString,
+            qosWorkloadMaxThroughput     DisplayString
         }
 
         qosWorkloadUuid                  OBJECT-TYPE
@@ -31569,6 +31627,22 @@
         ::= { qosWorkloadEntry  12 }
 
 
+	qosWorkloadMinThroughput	 OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Minimum Throughput"
+        ::= { qosWorkloadEntry  13 }
+
+	qosWorkloadMaxThroughput	 OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Maximum Throughput"
+        ::= { qosWorkloadEntry  14 }
+
 -- qos Policy Group
         qosPolicyGroupTable     OBJECT-TYPE
         SYNTAX                  SEQUENCE OF QosPolicyGroupEntry
@@ -31593,7 +31667,8 @@
             qosPolicyGroupClass                 INTEGER,
             qosPolicyGroupMaxThroughput         DisplayString,
             qosPolicyGroupVserver               DisplayString,
-	    qosPolicyGroupMinThroughput         DisplayString
+	    qosPolicyGroupMinThroughput         DisplayString,
+            qosPolicyGroupShared                Boolean
         }
 
         qosPolicyGroupUuid               OBJECT-TYPE
@@ -31660,6 +31735,14 @@
         DESCRIPTION
                       "Minimum Throughput"
         ::= { qosPolicyGroupEntry  7 }
+
+        qosPolicyGroupShared             OBJECT-TYPE
+        SYNTAX                           Boolean
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Whether or not the policy group is shared"
+        ::= { qosPolicyGroupEntry  8 }
 
     --qos  Read Ahead
     qosReadaheadSettingsTable OBJECT-TYPE
@@ -31975,6 +32058,135 @@
 	DESCRIPTION
 		"Minimum filesize for Histogram-based predictions (blocks)"
 	::= { qosReadaheadSettingsEntry 31 }
+
+
+-- qos Adaptive Policy Group
+        qosAdaptivePolicyGroupTable         OBJECT-TYPE
+        SYNTAX                              SEQUENCE OF QosAdaptivePolicyGroupEntry
+        MAX-ACCESS                          not-accessible
+        STATUS                              current
+        DESCRIPTION                         "QoS Adaptive Policy Group Table."
+        ::= { qos 4 }
+
+        qosAdaptivePolicyGroupEntry          OBJECT-TYPE
+        SYNTAX                              QosAdaptivePolicyGroupEntry
+        MAX-ACCESS                          not-accessible
+        STATUS                              current
+        DESCRIPTION                         "Entry for a QoS Adaptive Policy Group."
+        INDEX { IMPLIED qosAdaptivePolicyGroupName }
+        ::= { qosAdaptivePolicyGroupTable 1 }
+
+        QosAdaptivePolicyGroupEntry ::=
+        SEQUENCE {
+            qosAdaptivePolicyGroupUuid                  DisplayString,
+            qosAdaptivePolicyGroupName                  DisplayString,
+            qosAdaptivePolicyGroupPgid                  Counter32,
+            qosAdaptivePolicyGroupVserver               DisplayString,
+            qosAdaptivePolicyGroupPeakIops              DisplayString,
+            qosAdaptivePolicyGroupExpectedIops          DisplayString,
+            qosAdaptivePolicyGroupAbsoluteMinIops       DisplayString,
+            qosAdaptivePolicyGroupPeakIopsAllocation    INTEGER,
+	    qosAdaptivePolicyGroupExpectedIopsAllocation INTEGER,
+            qosAdaptivePolicyGroupBlockSize             INTEGER
+        }
+
+        qosAdaptivePolicyGroupUuid       OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Adaptive Policy Group Uuid"
+        ::= { qosAdaptivePolicyGroupEntry  1 }
+
+
+        qosAdaptivePolicyGroupName       OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Adaptive Policy Group Name"
+        ::= { qosAdaptivePolicyGroupEntry  2 }
+
+
+        qosAdaptivePolicyGroupPgid       OBJECT-TYPE
+        SYNTAX                           Counter32
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Adaptive Policy Group ID"
+        ::= { qosAdaptivePolicyGroupEntry  3 }
+
+
+        qosAdaptivePolicyGroupVserver    OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Vserver that the QoS Adaptive Policy Group belongs to"
+        ::= { qosAdaptivePolicyGroupEntry  4 }
+
+        qosAdaptivePolicyGroupPeakIops   OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Peak IOPS"
+        ::= { qosAdaptivePolicyGroupEntry  5 }
+
+        qosAdaptivePolicyGroupExpectedIops OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Expected IOPS"
+        ::= { qosAdaptivePolicyGroupEntry  6 }
+
+        qosAdaptivePolicyGroupAbsoluteMinIops OBJECT-TYPE
+        SYNTAX                           DisplayString
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Minimum IOPS"
+        ::= { qosAdaptivePolicyGroupEntry  7 }
+
+        qosAdaptivePolicyGroupPeakIopsAllocation OBJECT-TYPE
+        SYNTAX                            INTEGER {
+                                            allocated-space(0),
+                                            used-space(1)
+                                          }
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Peak IOPS Allocation"
+        ::= { qosAdaptivePolicyGroupEntry  8 }
+
+        qosAdaptivePolicyGroupExpectedIopsAllocation  OBJECT-TYPE
+        SYNTAX                            INTEGER {
+                                            used-space(0),
+                                            allocated-space(1)
+                                          }
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Expected IOPS Allocation"
+        ::= { qosAdaptivePolicyGroupEntry  9 }
+
+        qosAdaptivePolicyGroupBlockSize             OBJECT-TYPE
+        SYNTAX                          INTEGER {
+                                           any(0),
+                                           size4K(1),
+                                           size8K(2),
+                                           size16K(3),
+                                           size32K(4),
+                                           size64K(5),
+                                           size128K(6)
+                                        }
+        MAX-ACCESS                       read-only
+        STATUS                           current
+        DESCRIPTION
+                      "Block Size"
+        ::= { qosAdaptivePolicyGroupEntry  10 }
+
 
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
@@ -34720,6 +34932,16 @@
              is reenabled, SNMPv3 users cannot be created, SNMPv3 traphosts cannot
              be added and SNMPv3 packets will not be processed."
      ::= { netapp 0 1194 }
+
+     snmpFipsObjsDelFailed               NOTIFICATION-TYPE
+     OBJECTS                             {productTrapData, productSerialNum}
+     STATUS                              current
+     DESCRIPTION
+             "The system failed to delete SNMP traphosts and users that were not
+             FIPS compliant. It tried to automatically delete them when FIPS was
+             configured in the cluster. The SNMP traphosts and users that are
+             left have become inoperable."
+     ::= { netapp 0 1204 }
 
 	-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 	-- End of NetApp trap definitions

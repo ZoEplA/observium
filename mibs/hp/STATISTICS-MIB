@@ -1750,6 +1750,79 @@ STATISTICS-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION "The number of packets dropped for a particular egress port queue."
         ::= { hpSwitchEgressQueueDropStatsEntry 3 }
 
+    hpSwitchEgressQueueStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchEgressQueueStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains statistic information about
+                    Egress Queue packets on the switch."
+        ::= { hpSwitchCosStats 3 }
+
+    hpSwitchEgressQueueStatsEntry OBJECT-TYPE
+        SYNTAX      HpSwitchEgressQueueStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with each row in the
+                    Egress packets per Queue Statistics Table."
+        INDEX       { hpSwitchEgressQueueStatsPortIndex,hpSwitchEgressQueueStatsQueueIndex }
+        ::= { hpSwitchEgressQueueStatsTable 1 }
+
+    HpSwitchEgressQueueStatsEntry ::=
+        SEQUENCE {
+            hpSwitchEgressQueueStatsPortIndex         INTEGER,
+            hpSwitchEgressQueueStatsQueueIndex        INTEGER,
+            hpSwitchEgressQueueTxPkts                 Counter64,
+            hpSwitchEgressQueueTxDropPkts             Counter64,
+            hpSwitchEgressQueueTxBytes                Counter64,
+            hpSwitchEgressQueueTxDropBytes            Counter64
+        }
+
+    hpSwitchEgressQueueStatsPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+         DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpSwitchEgressQueueStatsEntry 1 }
+
+    hpSwitchEgressQueueStatsQueueIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The specific value which uniquely identifies a specific port queue."
+        ::= { hpSwitchEgressQueueStatsEntry 2 }
+
+    hpSwitchEgressQueueTxPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of tx packets for a particular egress port queue."
+        ::= { hpSwitchEgressQueueStatsEntry 3 }
+
+    hpSwitchEgressQueueTxDropPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This object returns the number of packets that were dropped 
+                     in the specified egress queue of the specified physical port."
+        ::= { hpSwitchEgressQueueStatsEntry 4 }
+
+    hpSwitchEgressQueueTxBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of tx byte for a particular egress port queue."
+        ::= { hpSwitchEgressQueueStatsEntry 5 }
+    
+    hpSwitchEgressQueueTxDropBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This object returns the number of bytes that 
+                     were dropped in the specified egress
+                     queue of the specified physical port."
+        ::= { hpSwitchEgressQueueStatsEntry 6 }
+
     hpGarpStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 21 }
 
     hpGarpStatsTable OBJECT-TYPE

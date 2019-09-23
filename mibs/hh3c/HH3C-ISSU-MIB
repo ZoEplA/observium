@@ -1,14 +1,15 @@
 -- ===========================================================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: ISSU MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --  Revision 1.0 2012-12-20 created by Wang Feng
 --               2013-4-20 modified by Zhu Liuxing
 --  Revision 1.1 2014-01-10 change hh3cIssuUpgradeImageIndex and
 --               hh3cIssuUpgradeImageURL range by z03030
+--  Revision 1.2 2018-04-08 change hh3cIssuUpgradeImageType by l07660
 -- ============================================================================================================
 
 HH3C-ISSU-MIB DEFINITIONS ::= BEGIN
@@ -24,9 +25,9 @@ IMPORTS
 hh3cIssuUpgrade MODULE-IDENTITY
     LAST-UPDATED "201301151536Z"        -- January 15, 2013 at 15:36 GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Haidian District Beijing P.R. China
         http://www.h3c.com
         Zip:_100085"
@@ -123,21 +124,23 @@ hh3cIssuUpgradeImageType OBJECT-TYPE
         boot(1),
         system(2),
         feature(3),
-        ipe(4)
+        ipe(4),
+        patch(5)
         }
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
         "Types of images that the system can run.  The value of
-        this object has four image variables names
-        - 'boot', 'system', 'feature' and 'ipe'.  This table will then
-        list these four strings as follows:
+        this object has five image variable names:
+        'boot', 'system', 'feature', 'ipe' and 'patch'.  This table will then
+        list these five strings as follows:
 
               hh3cIssuUpgradeImageType
                   boot
                   system
                   feature
                   IPE
+                  patch
 
               The user can assign images (using hh3cIssuUpgradeImageURL)
               to these variables and the system will use the assigned

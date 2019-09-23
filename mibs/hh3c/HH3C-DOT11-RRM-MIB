@@ -1,10 +1,10 @@
 -- ==========================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The purpose of this MIB file is to provide object definition
 --              of WLAN radio resource management (RRM).
 -- Reference:
--- Version: V1.8
+-- Version: V1.9
 -- History:
 -- V1.0 2008-07-16 Initial version, created by ChenWei
 -- V1.1 2009-04-16 modified by WangChunsheng
@@ -39,6 +39,9 @@
 --      to hh3cDot11RRMGlobalCfgPara
 -- V1.8 2014-05-07 Modified by yubo
 --      Change SYNTAX of hh3cDot11RRMCfgIntrfThres.
+-- V1.9 2017-05-22 Modified by weizhiguang
+--      Add new node hh3cDot11RrmNbrSNR, hh3cDot11RrmNbrNF
+--      to Hh3cDot11RRMNbrInfoEntry
 -- ==========================================================================
 HH3C-DOT11-RRM-MIB DEFINITIONS ::= BEGIN
 
@@ -57,11 +60,11 @@ IMPORTS
         FROM HH3C-DOT11-REF-MIB;
 
 hh3cDot11RRM MODULE-IDENTITY
-    LAST-UPDATED "201009251800Z"        -- Sep 25, 2010 at 18:00 GMT
+    LAST-UPDATED "201705221600Z"        -- May 22, 2017 at 16:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R.China
          Http://www.h3c.com
          Zip: 100085"
@@ -69,6 +72,9 @@ hh3cDot11RRM MODULE-IDENTITY
         "This MIB file is to provide the object definition of
         WLAN radio resource management (RRM)."
 
+    REVISION "201705221600Z"        -- May 22, 2017 at 16:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
     REVISION "201009251800Z"        -- Sep 25, 2010 at 18:00 GMT
     DESCRIPTION
         "Modified to add new nodes."
@@ -888,7 +894,11 @@ Hh3cDot11RRMNbrInfoEntry ::=
         hh3cDot11RrmNbrType
             INTEGER,
         hh3cDot11RrmNbrSSID
-            Hh3cDot11SSIDStringType
+            Hh3cDot11SSIDStringType,
+        hh3cDot11RrmNbrSNR
+            Integer32,
+        hh3cDot11RrmNbrNF
+            Integer32
      }
 
 hh3cDot11RrmNbrBSSID OBJECT-TYPE
@@ -944,6 +954,24 @@ hh3cDot11RrmNbrSSID OBJECT-TYPE
     DESCRIPTION
         "SSID of the Neighbor."
     ::= { hh3cDot11RRMNbrInfoEntry 6 }
+
+hh3cDot11RrmNbrSNR OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "dB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Signal to noise ratio of the AP in dB."
+    ::= { hh3cDot11RRMNbrInfoEntry 7 }
+
+hh3cDot11RrmNbrNF OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Noise floor of the AP in dBm."
+    ::= { hh3cDot11RRMNbrInfoEntry 8 }
 
 hh3cDot11RRMHistoryTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Hh3cDot11RRMHistoryEntry

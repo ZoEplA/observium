@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
 
 
 CIENA-TC DEFINITIONS ::= BEGIN
@@ -70,17 +70,17 @@ CienaGlobalState  ::=  TEXTUAL-CONVENTION
 		DESCRIPTION
 			"This textual convention enumerates the severity levels."
 		SYNTAX	INTEGER {
-					   none       (0), 
+                       none              (0), 
                        cleared           (1), 
-                       intermediate      (2), 
-                       critical           (3),  
-                       major         (4),  
-                       minor          (5),
-                       warning			(6), 
-                       config			(7),
-                       info            (8),  -- informational
-                       debug           (9),  -- debug-level messages
-                       internal           (10)  -- None of the above
+                       indeterminate     (2), 
+                       critical          (3),  
+                       major             (4),  
+                       minor             (5),
+                       warning           (6), 
+                       config            (7),
+                       info              (8),  -- informational
+                       debug             (9),  -- debug-level messages
+                       internal          (10)  -- None of the above
 					}
 
   CienaStatsClear ::= TEXTUAL-CONVENTION

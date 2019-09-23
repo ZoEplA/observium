@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V2.7
+-- Version: V2.8
 -- History:
 --  V1.0 Initial version 2004-07-13
 --  V1.1 2004-10-12 updated by gaolong
@@ -35,6 +35,9 @@
 --       Modify hh3cUserRole
 --  V2.7 2013-04-25 updated by q04356
 --       Modified the description of hh3cIdleCut
+--  V2.8 2016-11-19 updated by y06401
+--       Modified the description of hh3cUserGroup
+--       Modified the SYNTAX of hh3cUserGroupName
 -- =================================================================
 HH3C-USER-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -46,11 +49,11 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 hh3cUser MODULE-IDENTITY
-    LAST-UPDATED "201210110000Z"            -- October 11, 2012 at 00:00 GMT
+    LAST-UPDATED "201611190000Z"            -- November 19, 2016 at 00:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -61,6 +64,10 @@ hh3cUser MODULE-IDENTITY
         Manage configuration and Monitor running state
         for userlog feature.
         "
+    REVISION "201611190000Z"        -- November 19, 2016 at 00:00 GMT
+    DESCRIPTION
+        "Modified description of hh3cUserGroup.
+        Modified SYNTAX of hh3cUserGroupName"
     ::= { hh3cCommon 12 }
 
 
@@ -126,7 +133,7 @@ Hh3cUserInfoEntry ::= SEQUENCE
 
 
 hh3cUserName OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      DisplayString(SIZE(1..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -136,7 +143,7 @@ hh3cUserName OBJECT-TYPE
     ::= { hh3cUserInfoEntry 1 }
 
 hh3cUserPassword OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      DisplayString(SIZE(0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -197,7 +204,7 @@ hh3cUserInfoRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        The status of this conceptual row. Now only support CreateAndGo and
+        The status of this conceptual row.  Now only support CreateAndGo and
         Destroy and Active.
         "
     ::= { hh3cUserInfoEntry 6 }
@@ -496,7 +503,7 @@ hh3cExpirationDate OBJECT-TYPE
     ::= { hh3cUserAttributeEntry 16 }
 
 hh3cUserGroup      OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      DisplayString(SIZE(0..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -504,7 +511,6 @@ hh3cUserGroup      OBJECT-TYPE
         The user group that user belongs to.
         Any user must belong to a user group.
         The default group is the 'system' group.
-        The maximum length of the group name is 80.
         "
     ::= { hh3cUserAttributeEntry 17 }
 
@@ -598,7 +604,7 @@ hh3cUserIfIndex OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        Set local user's interface index. A value of 0 means that the interface
+        Set local user's interface index.  A value of 0 means that the interface
         index has not been assigned or the interface assigned not exist.
         The default value is 0.
         "
@@ -635,8 +641,8 @@ hh3cUserIndexIndicator OBJECT-TYPE
         "
         This object contains an appropriate value to
         be used for hh3cUserIndex when creating entries in the
-        hh3cUserInfoTable. The value 0 indicates that no unassigned
-        entries are available. To obtain the
+        hh3cUserInfoTable.  The value 0 indicates that no unassigned
+        entries are available.  To obtain the
         hh3cUserIndex value for a new
         entry, the manager issues a management
         protocol retrieval operation to obtain the
@@ -748,7 +754,7 @@ Hh3cUserGroupInfoEntry ::= SEQUENCE
     }
 
 hh3cUserGroupName OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(1..80))
+    SYNTAX      DisplayString(SIZE(1..255))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION

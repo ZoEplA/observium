@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -39,6 +39,7 @@ foreach ($vars['id'] as $port_id)
 $colours='mixed';
 
 $scale_min = "0";
+$scale_max = "100";
 $nototal = 1;
 $simple_rrd = TRUE;
 

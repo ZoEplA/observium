@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -81,7 +81,7 @@ foreach ($cpu_oids as $stat => $data)
     $rrd_filename = get_rrd_path($device, "ucd_".$stat.".rrd");
 
     $rrd_options .= " DEF:". $stat . "=".$rrd_filename.":value:AVERAGE";
-    $totals[]  = $stat.",UN,0," . $stat . ",IF";
+    $totals[]  = $stat;
     $rrd_options_b .= " CDEF:". $stat . "_perc=".$stat.",total,/,100,*";
 
     $rrd_optionsc .= " AREA:".$stat."_perc#".$colour.":'".rrdtool_escape(str_replace("ssCpuRaw", "", $stat), $descr_len)."'$bstack";
@@ -92,9 +92,7 @@ foreach ($cpu_oids as $stat => $data)
 
 }
 
-$pluses    = str_repeat(',+', count($totals) - 1);
-$totals  = implode(',', $totals);
-$rrd_options .= " CDEF:total=" . $totals . $pluses;
+$rrd_options .= " CDEF:total=" . rrd_aggregate_dses($totals);
 $rrd_options .= $rrd_options_b;
 $rrd_options .= " HRULE:0#555555";
 $rrd_options .= $rrd_optionsc;

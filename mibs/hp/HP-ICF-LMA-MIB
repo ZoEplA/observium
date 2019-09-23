@@ -1,34 +1,62 @@
+--**MOD+***********************************************************************
+--* Module: hpicfLma.mib
+--*
+--* Copyright (C) 2016 Hewlett Packard Enterprise Development Company LP
+--* All Right Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett Packard Enterprise Development Company LP.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett Packard Enterprise Development Company LP.
+--*
+--*Purpose: This file contains MIB definition of HP-ICF-LMA-MIB
+--*
+--**MOD-**************************************************************************
+
 HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
         hpSwitch
             FROM HP-ICF-OID
         InterfaceIndex
-            FROM IF-MIB       
+            FROM IF-MIB            
         VidList
             FROM HP-ICF-TC
         OBJECT-GROUP, MODULE-COMPLIANCE
-            FROM SNMPv2-CONF    
+            FROM SNMPv2-CONF
         Integer32, Unsigned32, OBJECT-TYPE, Counter32, MODULE-IDENTITY
-                    FROM SNMPv2-SMI
+            FROM SNMPv2-SMI
         TruthValue, MacAddress, RowStatus, DisplayString
-            FROM SNMPv2-TC;
-        
+            FROM SNMPv2-TC
+        HpAutzUserRoleName
+            FROM HP-AUTZ-MIB;
+                    
     hpicfLmaMIB MODULE-IDENTITY
     
-        LAST-UPDATED "201304100900Z"
+        LAST-UPDATED "201810300000Z"
         ORGANIZATION "HP Networking"
         CONTACT-INFO 
-             "Hewlett-Packard Company
-             8000 Foothills Blvd.
-             Roseville, CA 95747"
-	DESCRIPTION
-	   "This MIB module describes objects for managing
+           "Hewlett-Packard Enterprise Company
+            8000 Foothills Blvd.
+            Roseville, CA 95747"
+        DESCRIPTION
+           "This MIB module describes objects for managing
             the Local MAC Authentication feature of devices 
-	    in the HP Integrated Communication Facility
-	    product line."
+            in the HP Integrated Communication Facility
+            product line."
+	REVISION     "201810300000Z"  -- October 30, 2018
+	DESCRIPTION
+	   "Added hpicfLmaUnauthVidLLDPNwkPolicy."
+        REVISION     "201706280710Z"     -- June 28, 2017 at 00:00 GMT
+        DESCRIPTION
+           "Added mac-pinning related MIB Object."
 
-	REVISION     "201304100900Z"     -- April 10, 2013  at 09:00 GMT
+        REVISION     "201602120710Z"     -- February 12, 2016 at 07:10 GMT
+        DESCRIPTION
+           "Added user role support."
+
+        REVISION     "201304100900Z"     -- April 10, 2013  at 09:00 GMT
         DESCRIPTION
            "Initial version of Local MAC Authentication MIB module."
 
@@ -56,17 +84,17 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS      not-accessible
             STATUS          current
             DESCRIPTION
-	 	"This table is to create MAC group, which is 
+                "This table is to create MAC group, which is 
                  a collection Of MAC address/MAC OUI/MAC mask.
                  There can be a maximum of 256 MAC groups."
-	        ::= { hpicfLmaConfigObjects 2}
+            ::= { hpicfLmaConfigObjects 2}
 
     hpicfLmaMacGrpEntry OBJECT-TYPE
             SYNTAX          HpicfLmaMacGrpEntry
             MAX-ACCESS      not-accessible
             STATUS          current
             DESCRIPTION
-	        "This table is to create MAC group, which is 
+                "This table is to create MAC group, which is 
                  a collection Of MAC address/MAC OUI/MAC mask.
                  There can be a maximum of 256 MAC groups."
             INDEX           { hpicfLmaMacGrpName }
@@ -77,15 +105,15 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
                 DisplayString,
             hpicfLmaMacGrpRowStatus
                 RowStatus
-   }
+    }
    
     hpicfLmaMacGrpName  OBJECT-TYPE
             SYNTAX          DisplayString (SIZE (1..32))
             MAX-ACCESS      not-accessible
             STATUS          current
             DESCRIPTION
-		"Name of the MAC group. A name can have maximum 32
-		 characters."
+                "Name of the MAC group. A name can have maximum 32
+                 characters."
             ::= { hpicfLmaMacGrpEntry 1 }
 
     hpicfLmaMacGrpRowStatus OBJECT-TYPE
@@ -93,7 +121,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS      read-create
             STATUS          current
             DESCRIPTION 
-		"Status of this row, by which new entries may be created
+                "Status of this row, by which new entries may be created
                  or existing entries deleted from this table."
             ::= { hpicfLmaMacGrpEntry 2}
 
@@ -107,25 +135,25 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION
-	    "This table stores MAC address/MAC OUI/MAC mask bound to
-	     a MAC group.A MAC group can be associated to a maximum of
-	     120 entries, Each entry is equivalent to one record in
+            "This table stores MAC address/MAC OUI/MAC mask bound to
+             a MAC group.A MAC group can be associated to a maximum of
+             120 entries, Each entry is equivalent to one record in
              hpicfLmaMacTable and there can be a maximum of 256 
-	     records."
-     	::= { hpicfLmaConfigObjects 3}
+             records."
+        ::= { hpicfLmaConfigObjects 3}
 
     hpicfLmaMacEntry OBJECT-TYPE
         SYNTAX          HpicfLmaMacEntry
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION
-	    "This table stores MAC address/MAC OUI/MAC mask bound to
+            "This table stores MAC address/MAC OUI/MAC mask bound to
              a MAC group.A MAC group can be associated to a maximum of
              120 entries, Each entry is equivalent to one record in
              hpicfLmaMacTable and there can be a maximum of 256 
              records."
-	INDEX  { hpicfLmaMacGrpName, hpicfLmaMacType, hpicfLmaMacValue }   
-	::= { hpicfLmaMacTable 1 }
+        INDEX  { hpicfLmaMacGrpName, hpicfLmaMacType, hpicfLmaMacValue }   
+        ::= { hpicfLmaMacTable 1 }
 
     HpicfLmaMacEntry ::= SEQUENCE {
         hpicfLmaMacType
@@ -145,7 +173,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION 
-	    "This object specifies whether the type of MAC Address is:
+            "This object specifies whether the type of MAC Address is:
 
                      macAddress(1) 
                          Fully qualified MAC address. 
@@ -163,7 +191,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS     not-accessible
         STATUS         current
         DESCRIPTION    
-	    "This is to specify the value for the hpicfLmaMacType, 
+            "This is to specify the value for the hpicfLmaMacType, 
              value should be in conjunction with MAC Type."
         ::= { hpicfLmaMacEntry 2}
 
@@ -172,7 +200,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS      read-create
             STATUS          current
             DESCRIPTION     
-		"Status of this row, by which new entries may be created
+                "Status of this row, by which new entries may be created
                  or existing entries deleted from this table."
             ::= { hpicfLmaMacEntry 3 }
 
@@ -180,16 +208,18 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
 -- to MAC Clients.
 -- Profile can have set of attributes such as untagged vlanid, list 
 -- of tagged vlans CoS value.maximum allowed tagged vlan in a profile
--- is 50.
+-- is 50. Profiles are not applied when hpSwitchAutzUserRoleEnabled
+-- is true.
 
     hpicfLmaProfileTable OBJECT-TYPE
         SYNTAX          SEQUENCE OF HpicfLmaProfileEntry
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This is to create the profile which can be associated to
-	     a MAC group/MAC address/MAC OUI/MAC mask.A profile
-      	     is a collection of attributes."
+            "This is to create the profile which can be associated to
+             a MAC group/MAC address/MAC OUI/MAC mask. A profile
+             is a collection of attributes. Profiles are not applied
+             when hpSwitchAutzUserRoleEnabled is true."
         ::= { hpicfLmaConfigObjects 4}
 
     hpicfLmaProfileEntry OBJECT-TYPE
@@ -197,7 +227,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This is to create the profile which can be associated
+            "This is to create the profile which can be associated
              to a MAC group/MAC address/MAC OUI/MAC mask.A profile
              is a collection of attributes."
         INDEX           { hpicfLmaProfileName }
@@ -224,7 +254,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS          current
         DESCRIPTION 
              "This object contains the name of Local MAC 
-	      Authentication profile."                
+              Authentication profile."                
         ::= { hpicfLmaProfileEntry 1 }
 
     hpicfLmaProfileUntaggedVid  OBJECT-TYPE
@@ -232,8 +262,8 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS     read-create
         STATUS         current
         DESCRIPTION    
-	    "Untagged VLAN ID.A value of 0 implies that untagged VLAN
-	     ID is not configured for this profile.Only one untagged
+            "Untagged VLAN ID.A value of 0 implies that untagged VLAN
+             ID is not configured for this profile.Only one untagged
              VLAN ID can be associated with the profile."
         DEFVAL         { 0 }
         ::= { hpicfLmaProfileEntry 2 }
@@ -243,8 +273,8 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      read-create
         STATUS          current
         DESCRIPTION     
-	    "Tagged VLANs.A maximum of 50 tagged VLANs can be
-	     can be associated with the profile."
+            "Tagged VLANs.A maximum of 50 tagged VLANs can be
+             can be associated with the profile."
 
         ::= { hpicfLmaProfileEntry 3 }
 
@@ -253,9 +283,9 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      read-create
         STATUS          current
         DESCRIPTION     
-	    "CoS value to be associated with this profile.A value of
-	     -1 indicates that CoS is not configured for this 
-   	     profile."
+            "CoS value to be associated with this profile.A value of
+             -1 indicates that CoS is not configured for this 
+             profile."
         ::= { hpicfLmaProfileEntry 4 }
 
     hpicfLmaProfileIsAssociated  OBJECT-TYPE
@@ -263,10 +293,10 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION    
-	    "This object is to check whether any MAC is associated
-	     to this profile.A value of TRUE indicates that it is
-	     associated to MAC entry and FALSE indicates that it is
-	     not associated to any of the MAC entry."
+            "This object is to check whether any MAC is associated
+             to this profile.A value of TRUE indicates that it is
+             associated to MAC entry and FALSE indicates that it is
+             not associated to any of the MAC entry."
         ::= { hpicfLmaProfileEntry 5 }
 
     hpicfLmaProfileRowStatus OBJECT-TYPE
@@ -274,8 +304,8 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      read-create
         STATUS          current
         DESCRIPTION     
-	    "Status of this row, by which new entries may be created
-	     or existing entries deleted from this table."
+            "Status of this row, by which new entries may be created
+             or existing entries deleted from this table."
         ::= { hpicfLmaProfileEntry 6}
 
     hpicfLmaAssociationTable OBJECT-TYPE
@@ -283,8 +313,9 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This is association table between profile and MAC 
-	     entries."
+            "This is association table between profile and MAC 
+             entries. This table is not used when 
+             hpSwitchAutzUserRoleEnabled is true."
         ::= { hpicfLmaConfigObjects 5}
 
     hpicfLmaAssociationEntry OBJECT-TYPE
@@ -292,16 +323,16 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This is association table between the profile and MAC 
-	     entries."
-        INDEX 	    { hpicfLmaProfileName, hpicfLmaAssociationMacType,
-						 hpicfLmaAssociationMacValue } 
- 		::= { hpicfLmaAssociationTable 1 }
+            "This is association table between the profile and MAC 
+             entries."
+        INDEX       { hpicfLmaProfileName, hpicfLmaAssociationMacType,
+                      hpicfLmaAssociationMacValue } 
+        ::= { hpicfLmaAssociationTable 1 }
 
     HpicfLmaAssociationEntry ::= SEQUENCE {
-		hpicfLmaAssociationMacType
+        hpicfLmaAssociationMacType
             INTEGER,
-    	hpicfLmaAssociationMacValue
+        hpicfLmaAssociationMacValue
             OCTET STRING,
         hpicfLmaAssociationRowStatus
             RowStatus
@@ -309,7 +340,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
              
     hpicfLmaAssociationMacType    OBJECT-TYPE
         SYNTAX   INTEGER {
-		    macGrp(0),
+                    macGrp(0),
                     macAddress(1),
                     macMask (2),
                     macOui(3)
@@ -317,15 +348,15 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION   
-	    "This object specifies whether the type of MAC address is:
-			macGrp(0)
-			   MAC group which contains a group of MAC 
-			   Entry.
+            "This object specifies whether the type of MAC address is:
+                        macGrp(0)
+                           MAC group which contains a group of MAC 
+                           Entry.
                         macAddress(1) 
                            Fully qualified MAC address. 
                         macMask(2) 
                            MAC address prefix. Only 32 & 40 bits are
-			   allowed.
+                           allowed.
                         macOUI(3)
                            24 bit organizationally unique identifier."
         ::= { hpicfLmaAssociationEntry 2 }
@@ -335,16 +366,16 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS     not-accessible
         STATUS         current
         DESCRIPTION    
-	    "This object specifies the MAC value. This value should 
-	     be in conjunction with hpicfLmaAssociationMacType."
-           ::= { hpicfLmaAssociationEntry 4}
+            "This object specifies the MAC value. This value should 
+             be in conjunction with hpicfLmaAssociationMacType."
+        ::= { hpicfLmaAssociationEntry 4}
 
     hpicfLmaAssociationRowStatus OBJECT-TYPE
         SYNTAX          RowStatus
         MAX-ACCESS      read-create
         STATUS          current
         DESCRIPTION  
-	    "Status of this row, by which new entries may be created
+            "Status of this row, by which new entries may be created
              or existing entries deleted from this table."
         ::= { hpicfLmaAssociationEntry 5 }      
         
@@ -358,7 +389,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "A table that contains the configuration objects for
              Local MAC based Authentication associated with each port.
-	     An entry appears in this table for each port that may
+             An entry appears in this table for each port that may
              authenticate access to itself."
         ::= { hpicfLmaConfigObjects 6 }
   
@@ -368,7 +399,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-	    "A table that contains the configuration objects for
+            "A table that contains the configuration objects for
              Local MAC based Authentication associated with each port.
              An entry appears in this table for each port that may
              authenticate access to itself."
@@ -378,14 +409,14 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
   
     HpicfLmaConfigEntry ::=
         SEQUENCE {   
-	    hpicfLmaPortNumber
-	        InterfaceIndex,
+            hpicfLmaPortNumber
+                InterfaceIndex,
             hpicfLmaClientLimit
                 Integer32,
             hpicfLmaQuietPeriod
                 Integer32,
             hpicfLmaLogoffPeriod
-     		Integer32,
+                Integer32,
             hpicfLmaAuthVid
                 Integer32,
             hpicfLmaUnauthVid
@@ -393,7 +424,11 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             hpicfLmaUnAuthPeriod
                 Integer32,
             hpicfLmaReauthenticate
-            TruthValue
+                TruthValue,
+            hpicfLmaMacPin
+                TruthValue,
+	    hpicfLmaUnauthVidLLDPNwkPolicy 
+                TruthValue
         }
   
     hpicfLmaPortNumber OBJECT-TYPE
@@ -444,7 +479,10 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Specifies the port VID (PVID) that should be used for
-             an authenticated client."
+             an authenticated client. When hpSwitchAutzUserRoleEnabled
+             is true, this value may be superseded by the value of
+             hpSwitchAutzUserRoleVlanId or hpSwitchAutzUserRoleVlanName
+             from the client's assigned role.  "
         ::= { hpicfLmaConfigEntry 7 }
     
     hpicfLmaUnauthVid OBJECT-TYPE
@@ -453,7 +491,10 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Specifies the port VID (PVID) that should be used for
-             an unauthenticated client."
+             an unauthenticated client. When hpSwitchAutzUserRoleEnabled
+             is true, this value may be superseded by the value of
+             hpSwitchAutzUserRoleVlanId or hpSwitchAutzUserRoleVlanName
+             from the role identified by hpSwitchAutzUserRoleInitialRoleName."
           ::= { hpicfLmaConfigEntry 8 }
   
     hpicfLmaUnAuthPeriod OBJECT-TYPE
@@ -463,7 +504,9 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Specifies the period, in seconds, at which a client will be
-            placed into guest vlan if it fails authentication."
+             placed into guest vlan, or assigned the role identified by 
+             hpSwitchAutzUserRoleInitialRoleName when
+             hpSwitchAutzUserRoleEnabled is true, if it fails authentication."
         DEFVAL { 0 }
         ::= { hpicfLmaConfigEntry 9 }
  
@@ -473,11 +516,117 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The reauthentication control for this port. Setting this 
-            attribute TRUE forces all authenticated clients to 
-            re-authenticate themselves. Setting this attribute FALSE
-            has no effect. This attribute always returns FALSE
-            when read."
+             attribute TRUE forces all authenticated clients to 
+             re-authenticate themselves. Setting this attribute FALSE
+             has no effect. This attribute always returns FALSE
+             when read."
         ::= { hpicfLmaConfigEntry 10 } 
+
+    hpicfLmaMacPin OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enables MAC-Pinning on this port. Setting this
+             attribute TRUE pins the authenticated MAC 
+             addresses to the Mac address table. 
+             Authenticated clients  will not be 
+             de-authenticated even when clients are inactive 
+             throughout the logoff period."
+        DEFVAL { 2 }
+        ::= { hpicfLmaConfigEntry 11 }
+
+    hpicfLmaUnauthVidLLDPNwkPolicy OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "Setting this attribute TRUE(1) will suppress
+                      the transmission of LLDP Network Policy TLV
+                      from port when an unauthorized client is placed
+                      in unauth VLAN during Local MAC authentication."
+        DEFVAL { false }
+        ::= { hpicfLmaConfigEntry 12 }
+
+-- hpicfLmaUserRoleAssociationTable : A table of associations between user
+-- role and MAC entries.
+
+    hpicfLmaUserRoleAssociationTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF HpicfLmaUserRoleAssociationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "A table of associations between user role and MAC entries."
+        ::= { hpicfLmaConfigObjects 7 }
+
+    hpicfLmaUserRoleAssociationEntry OBJECT-TYPE
+        SYNTAX          HpicfLmaUserRoleAssociationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The association table entry."
+        INDEX       { hpicfLmaUserRoleAssociationName, hpicfLmaUserRoleAssociationMacType,
+                      hpicfLmaUserRoleAssociationMacValue } 
+        ::= { hpicfLmaUserRoleAssociationTable 1 }
+
+    HpicfLmaUserRoleAssociationEntry ::= SEQUENCE {
+    	hpicfLmaUserRoleAssociationName
+            HpAutzUserRoleName,
+        hpicfLmaUserRoleAssociationMacType
+            INTEGER,
+        hpicfLmaUserRoleAssociationMacValue
+            OCTET STRING,
+        hpicfLmaUserRoleAssociationRowStatus
+            RowStatus
+    }
+	
+    hpicfLmaUserRoleAssociationName OBJECT-TYPE
+        SYNTAX      HpAutzUserRoleName
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The name of this user role."
+        ::= { hpicfLmaUserRoleAssociationEntry 1 }
+             
+    hpicfLmaUserRoleAssociationMacType    OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    macGrp(0),
+                    macAddress(1),
+                    macMask (2),
+                    macOui(3)
+            }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION   
+            "This object specifies whether the type of MAC address is:
+                        macGrp(0)
+                           MAC group which contains a group of MAC 
+                           Entry.
+                        macAddress(1) 
+                           Fully qualified MAC address. 
+                        macMask(2) 
+                           MAC address prefix. Only 32 & 40 bits are
+                           allowed.
+                        macOUI(3)
+                           24 bit organizationally unique identifier."
+        ::= { hpicfLmaUserRoleAssociationEntry 2 }
+
+    hpicfLmaUserRoleAssociationMacValue OBJECT-TYPE
+        SYNTAX         OCTET STRING(SIZE (1..32))
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    
+            "This object specifies the MAC value. This value should 
+             be used in conjunction with the
+             hpicfLmaUserRoleAssociationMacType."
+        ::= { hpicfLmaUserRoleAssociationEntry 3 }
+
+    hpicfLmaUserRoleAssociationRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION  
+            "Status of this row, by which new entries may be created
+             or existing entries deleted from this table."
+        ::= { hpicfLmaUserRoleAssociationEntry 4 }      
 
 
   -- hpicfLmaAssocActiveTable : Display Active MAC clients associated
@@ -488,21 +637,21 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This is an association table to display all the MAC clients
-	     which are active for a given profile."
+            "This is an association table to display all the MAC clients
+             that are active for a given profile."
 
-       ::= { hpicfLmaStatsObjects 2 }
+        ::= { hpicfLmaStatsObjects 2 }
 
     hpicfLmaAssocActiveEntry OBJECT-TYPE
         SYNTAX          HpicfLmaAssocActiveEntry
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This is an association table to display all the MAC 
-	     clients which are active for a given profile."
+            "This is an association table to display all the MAC 
+             clients that are active for a given profile."
         INDEX           { hpicfLmaAssocActiveProfileName, 
-				hpicfLmaAssocActiveMacAddress }
-            ::= { hpicfLmaAssocActiveTable 1 }
+                          hpicfLmaAssocActiveMacAddress }
+        ::= { hpicfLmaAssocActiveTable 1 }
 
     HpicfLmaAssocActiveEntry ::= SEQUENCE {
             hpicfLmaAssocActiveProfileName
@@ -516,8 +665,8 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION     
-	    "This object contains the name of Local MAC
-	     authentication profile."
+            "This object contains the name of Local MAC
+             authentication profile."
         ::= { hpicfLmaAssocActiveEntry 1 }
 
     hpicfLmaAssocActiveMacAddress OBJECT-TYPE
@@ -525,8 +674,8 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS     read-only
         STATUS         current
         DESCRIPTION    
-	    "This object specifies the MAC address of the client."
-           ::= { hpicfLmaAssocActiveEntry 2 }
+            "This object specifies the MAC address of the client."
+        ::= { hpicfLmaAssocActiveEntry 2 }
 
                                                  
   -- LMA client Session Statistics Table
@@ -568,7 +717,9 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             hpicfLmaSessionUnauthVid
                 Integer32,
             hpicfLmaSessionUsrNumberCnt
-                Counter32
+                Counter32,
+            hpicfLmaSessionUserRole
+                HpAutzUserRoleName
         }
      
     hpicfLmaSessionMacAddr OBJECT-TYPE
@@ -589,7 +740,9 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             authReqRejectNoVlan(4),
             authReqRejectUnauthVlan(5),
             authReqTimeoutNoVlan(6),
-            authReqTimeoutUnauthVlan(7)
+            authReqTimeoutUnauthVlan(7),
+            initialRole(8),
+            initialRoleFailed(9)
             }
         MAX-ACCESS read-only
         STATUS current
@@ -604,7 +757,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             'authReqRejectNoVlan'      - credentials invalid; client
                                          does not have access to
                                          unauthenticated VLAN
-            'authReqRejectUnauthVlan   - credentials invalid; client
+            'authReqRejectUnauthVlan'  - credentials invalid; client
                                          does have access to
                                          unauthenticated VLAN
             'authReqTimeoutNoVlan'     - credentials could not be
@@ -616,7 +769,10 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
                                          verified; client is still
                                          unauthenticated, but has
                                          access to unauthenticated
-                                         VLAN"
+                                         VLAN
+            'initialRole'              - client is assigned the initial role
+            'initialRoleFailed'        - initial role could not be applied; client
+                                         does not have access to the network"
         ::= { hpicfLmaSessionStatsEntry 2 }
   
  
@@ -636,7 +792,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "This object specifies the PVID that the authenticated 
-	     client is utilizing. If the client is unauthenticated,
+             client is utilizing. If the client is unauthenticated,
              this object has no meaning."
         ::= { hpicfLmaSessionStatsEntry 4 }
   
@@ -647,7 +803,7 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "This object specifies the PVID that the unauthenticated
-	     client is utilizing. If the client is authenticated,
+             client is utilizing. If the client is authenticated,
              this object has no meaning." 
         ::= { hpicfLmaSessionStatsEntry 5 }
   
@@ -663,6 +819,14 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
         DEFVAL { 0 }
         ::= { hpicfLmaSessionStatsEntry 6 }
 
+    hpicfLmaSessionUserRole OBJECT-TYPE
+        SYNTAX HpAutzUserRoleName
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "When hpSwitchAutzUserRoleEnabled is true, specifies the user
+            role of the client."
+        ::= { hpicfLmaSessionStatsEntry 7 }
 
 -- ------------------------------------------------------------
 -- Conformance
@@ -674,30 +838,63 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
 -- Compliance Statements
 
     hpicfLmaCompliance1 MODULE-COMPLIANCE
+        STATUS          deprecated
+        DESCRIPTION     "The compliance statement"
+        MODULE          -- this module
+        MANDATORY-GROUPS {
+                          hpicfLmaMacGroup,
+                          hpicfLmaConfigGroup,
+                          hpicfLmaSessionStatsGroup
+                         }
+        ::= { hpicfLmaCompliances 1 }
+
+    hpicfLmaCompliance2 MODULE-COMPLIANCE
+        STATUS          deprecated 
+        DESCRIPTION     "The compliance statement"
+        MODULE          -- this module
+        MANDATORY-GROUPS {
+                          hpicfLmaMacGroup1,
+                          hpicfLmaConfigGroup1,
+                          hpicfLmaSessionStatsGroup1
+                         }
+        ::= { hpicfLmaCompliances 2 }
+
+    hpicfLmaCompliance3 MODULE-COMPLIANCE
+        STATUS          deprecated
+        DESCRIPTION     "The compliance statement"
+        MODULE          -- this module
+        MANDATORY-GROUPS {
+                          hpicfLmaMacGroup1,
+                          hpicfLmaConfigGroup2,
+                          hpicfLmaSessionStatsGroup1
+                         }
+        ::= { hpicfLmaCompliances 3 }
+
+    hpicfLmaCompliance4 MODULE-COMPLIANCE
         STATUS          current
         DESCRIPTION     "The compliance statement"
         MODULE          -- this module
         MANDATORY-GROUPS {
-        		  hpicfLmaMacGroup,
-                          hpicfLmaConfigGroup,
-			  hpicfLmaSessionStatsGroup
+                          hpicfLmaMacGroup1,
+                          hpicfLmaConfigGroup3,
+                          hpicfLmaSessionStatsGroup1
                          }
-        ::= { hpicfLmaCompliances 1 }
+        ::= { hpicfLmaCompliances 4 }
 
 -- units of conformance
 
     hpicfLmaMacGroup OBJECT-GROUP
         OBJECTS         {
                          hpicfLmaMacGrpRowStatus,
-			 hpicfLmaMacRowStatus,
+                         hpicfLmaMacRowStatus,
                          hpicfLmaProfileUntaggedVid,
                          hpicfLmaProfileTaggedVids,
                          hpicfLmaProfileCoS,
-		         hpicfLmaProfileIsAssociated,
+                         hpicfLmaProfileIsAssociated,
                          hpicfLmaProfileRowStatus,
                          hpicfLmaAssociationRowStatus
                         }
-        STATUS    current
+        STATUS deprecated
         DESCRIPTION
             "These objects are used for managing Local MAC
              Authentication configuration parameters."
@@ -705,8 +902,8 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
             
             
     hpicfLmaConfigGroup OBJECT-GROUP
- 	OBJECTS    {
-    	            hpicfLmaClientLimit,
+        OBJECTS    {
+                    hpicfLmaClientLimit,
                     hpicfLmaQuietPeriod,
                     hpicfLmaLogoffPeriod,
                     hpicfLmaAuthVid,
@@ -714,39 +911,114 @@ HP-ICF-LMA-MIB DEFINITIONS ::= BEGIN
                     hpicfLmaUnAuthPeriod,
                     hpicfLmaReauthenticate
                    }
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "A collection of objects providing configuration
             objects for Local MAC authentication associated with
             each port."
        ::= { hpicfLmaGroups 2 }   
        
-                   
--- LMA Stats Group
-
    hpicfLmaSessionStatsGroup OBJECT-GROUP
-    	OBJECTS { 
-	     hpicfLmaAssocActiveMacAddress,
+    OBJECTS { 
+             hpicfLmaAssocActiveMacAddress,
              hpicfLmaSessionState,
              hpicfLmaSessionStateTime,
              hpicfLmaSessionAuthVid,
              hpicfLmaSessionUnauthVid,
              hpicfLmaSessionUsrNumberCnt
             }
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "A collection of objects providing statistics about
          current sessions for Local MAC authentication."
     ::= { hpicfLmaGroups 3 }
-   	
+
+    hpicfLmaMacGroup1 OBJECT-GROUP
+        OBJECTS         {
+                         hpicfLmaMacGrpRowStatus,
+                         hpicfLmaMacRowStatus,
+                         hpicfLmaProfileUntaggedVid,
+                         hpicfLmaProfileTaggedVids,
+                         hpicfLmaProfileCoS,
+                         hpicfLmaProfileIsAssociated,
+                         hpicfLmaProfileRowStatus,
+                         hpicfLmaAssociationRowStatus,
+                         hpicfLmaUserRoleAssociationRowStatus
+                        }
+        STATUS current
+        DESCRIPTION
+            "These objects are used for managing Local MAC
+             Authentication configuration parameters."
+        ::= { hpicfLmaGroups 4 }
+
+    hpicfLmaConfigGroup1 OBJECT-GROUP
+        OBJECTS    {
+                    hpicfLmaClientLimit,
+                    hpicfLmaQuietPeriod,
+                    hpicfLmaLogoffPeriod,
+                    hpicfLmaAuthVid,
+                    hpicfLmaUnauthVid,
+                    hpicfLmaUnAuthPeriod,
+                    hpicfLmaReauthenticate
+                   }
+       STATUS deprecated
+       DESCRIPTION
+           "A collection of objects providing configuration
+            objects for Local MAC authentication associated with
+            each port."
+    ::= { hpicfLmaGroups 5 }
+
+   hpicfLmaSessionStatsGroup1 OBJECT-GROUP
+    OBJECTS { 
+             hpicfLmaAssocActiveMacAddress,
+             hpicfLmaSessionState,
+             hpicfLmaSessionStateTime,
+             hpicfLmaSessionAuthVid,
+             hpicfLmaSessionUnauthVid,
+             hpicfLmaSessionUsrNumberCnt,
+             hpicfLmaSessionUserRole
+            }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing statistics about
+         current sessions for Local MAC authentication."
+    ::= { hpicfLmaGroups 6 }
+
+    hpicfLmaConfigGroup2 OBJECT-GROUP
+        OBJECTS    {
+                    hpicfLmaClientLimit,
+                    hpicfLmaQuietPeriod,
+                    hpicfLmaLogoffPeriod,
+                    hpicfLmaAuthVid,
+                    hpicfLmaUnauthVid,
+                    hpicfLmaUnAuthPeriod,
+                    hpicfLmaReauthenticate,
+                    hpicfLmaMacPin 
+                   }
+       STATUS deprecated
+       DESCRIPTION
+           "A collection of objects providing configuration
+            objects for Local MAC authentication associated with
+            each port."
+    ::= { hpicfLmaGroups 7 }
+    
+    hpicfLmaConfigGroup3 OBJECT-GROUP
+        OBJECTS    {
+                    hpicfLmaClientLimit,
+                    hpicfLmaQuietPeriod,
+                    hpicfLmaLogoffPeriod,
+                    hpicfLmaAuthVid,
+                    hpicfLmaUnauthVid,
+                    hpicfLmaUnAuthPeriod,
+                    hpicfLmaReauthenticate,
+                    hpicfLmaMacPin,
+		    hpicfLmaUnauthVidLLDPNwkPolicy
+                   }
+       STATUS current
+       DESCRIPTION
+           "A collection of objects providing configuration
+            objects for Local MAC authentication associated with
+            each port."
+    ::= { hpicfLmaGroups 8 }
 END
-
-
-
-
-
-
-
-
-
 

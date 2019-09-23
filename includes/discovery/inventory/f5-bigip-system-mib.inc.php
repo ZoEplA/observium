@@ -28,7 +28,7 @@ $inventory[$index] = array(
     'entPhysicalParentRelPos' => -1,
     'entPhysicalMfgName'      => 'F5'
 );
-discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+discover_inventory($device, $index, $inventory[$index], $mib);
 
 if (!isset($cache_discovery['f5-bigip-system-mib']))
 {
@@ -78,7 +78,7 @@ foreach ($cache_discovery['f5-bigip-system-mib']['chassis'] as $type => $cache)
     'entPhysicalParentRelPos' => $chassis_pos,
     'entPhysicalMfgName'      => 'F5'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
 
   $pos = 0;
   foreach ($cache as $id => $entry)
@@ -102,7 +102,7 @@ foreach ($cache_discovery['f5-bigip-system-mib']['chassis'] as $type => $cache)
       'entPhysicalMfgName'      => 'F5',
       'ifIndex'                 => $ifindex
     );
-    discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+    discover_inventory($device, $index, $inventory[$index], $mib);
     unset($ifIndex);
   }
 }
@@ -142,7 +142,7 @@ foreach ($slots as $slot => $sensors)
     'entPhysicalParentRelPos' => $chassis_pos,
     'entPhysicalMfgName'      => 'F5'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
 
   foreach ($sensors as $type => $entry)
   {
@@ -162,7 +162,7 @@ foreach ($slots as $slot => $sensors)
         'entPhysicalParentRelPos' => $pos,
         'entPhysicalMfgName'      => 'F5',
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
     }
     else if ($type == 'cpu')
     {
@@ -177,7 +177,7 @@ foreach ($slots as $slot => $sensors)
         'entPhysicalParentRelPos' => $pos,
         'entPhysicalMfgName'      => 'F5'
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
       $index++;
       $name = $entry['sysCpuSensorName'].' Temperature';
       $inventory[$index] = array(
@@ -189,7 +189,7 @@ foreach ($slots as $slot => $sensors)
         'entPhysicalParentRelPos' => 1,
         'entPhysicalMfgName'      => 'F5',
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
       $index++;
       $name = $entry['sysCpuSensorName'].' Fan';
       $inventory[$index] = array(
@@ -201,7 +201,7 @@ foreach ($slots as $slot => $sensors)
         'entPhysicalParentRelPos' => 2,
         'entPhysicalMfgName'      => 'F5',
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
     }
     else if ($type == 'temp')
     {
@@ -216,7 +216,7 @@ foreach ($slots as $slot => $sensors)
         'entPhysicalParentRelPos' => $pos,
         'entPhysicalMfgName'      => 'F5'
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
 
       foreach ($entry as $temp_index => $temp_sensor)
       {
@@ -230,7 +230,7 @@ foreach ($slots as $slot => $sensors)
           'entPhysicalParentRelPos' => $temp_index,
           'entPhysicalMfgName'      => 'F5',
         );
-        discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+        discover_inventory($device, $index, $inventory[$index], $mib);
       }
     }
     else if ($type == 'voltage')
@@ -246,7 +246,7 @@ foreach ($slots as $slot => $sensors)
         'entPhysicalParentRelPos' => $pos,
         'entPhysicalMfgName'      => 'F5'
       );
-      discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+      discover_inventory($device, $index, $inventory[$index], $mib);
 
       $volt_pos = 0;
       foreach ($entry as $volt_index => $volt_sensor)
@@ -261,7 +261,7 @@ foreach ($slots as $slot => $sensors)
           'entPhysicalParentRelPos' => $volt_pos,
           'entPhysicalMfgName'      => 'F5',
         );
-        discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'f5-bigip-system-mib');
+        discover_inventory($device, $index, $inventory[$index], $mib);
       }
     }
   }

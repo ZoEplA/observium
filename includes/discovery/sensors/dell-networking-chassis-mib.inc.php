@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -35,14 +35,14 @@ foreach ($oids as $index => $entry)
   $scale    = 1;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value);
 
   $oid_name = 'dellNetStackUnitStatus';
   $oid_num  = ".1.3.6.1.4.1.6027.3.26.1.3.4.1.8.{$index}";
   $type     = 'dellNetStackUnitStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr . ' Status', $value, array('entPhysicalClass' => 'device'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr . ' Status', $value, array('entPhysicalClass' => 'device'));
 }
 
 $oids = snmpwalk_cache_oid($device, "dellNetFanTrayOperStatus",   array(), "DELL-NETWORKING-CHASSIS-MIB", NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
@@ -65,14 +65,14 @@ foreach ($oids as $index => $entry)
   $type     = 'dellNetOperStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr . ' Fan '. $tray, $value, array('entPhysicalClass' => 'fan'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr . ' Fan '. $tray, $value, array('entPhysicalClass' => 'fan'));
 
   $oid_name = 'dellNetPowerSupplyOperStatus';
   $oid_num  = ".1.3.6.1.4.1.6027.3.26.1.4.6.1.4.{$index}";
   $type     = 'dellNetOperStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr . ' PowerSupply '. $tray, $value, array('entPhysicalClass' => 'powersupply'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr . ' PowerSupply '. $tray, $value, array('entPhysicalClass' => 'powersupply'));
 
   $oid_name = 'dellNetPowerSupplyUsage';
   $oid_num  = ".1.3.6.1.4.1.6027.3.26.1.4.6.1.10.{$index}";
@@ -82,7 +82,7 @@ foreach ($oids as $index => $entry)
 
   if ($value > 0)
   {
-    discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr . ' PowerSupply '. $tray, $scale, $value);
+    discover_sensor_ng($device,'power', $mib, $oid_name, $oid_num, $index, NULL, $descr . ' PowerSupply '. $tray, $scale, $value);
   }
 }
 
@@ -129,7 +129,7 @@ if (count($oids))
       $scale    = 0.01;
       $value    = $entry[$oid_name] * 100; // Yes, multiple here, because here used inside-mib convert
 
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device,'dbm', $mib, $oid_num, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
 
     if (is_numeric($entry['dellNetSysIfXfpTxPower']))
@@ -142,7 +142,7 @@ if (count($oids))
       $scale    = 0.01;
       $value    = $entry[$oid_name] * 100; // Yes, multiple here, because here used inside-mib convert
 
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
 
     if (is_numeric($entry['dellNetSysIfXfpRecvTemp']))
@@ -155,7 +155,7 @@ if (count($oids))
       $scale    = 1;
       $value    = $entry[$oid_name] * 100; // Yes, multiple here, because here used inside-mib convert
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
   }
 }

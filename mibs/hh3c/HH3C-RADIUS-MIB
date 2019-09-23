@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:
 --
@@ -9,7 +9,7 @@
 -- traps supported to notify client the RADIUS Server's down and up state.
 --
 -- Reference: RFC2866, RADIUS-AUTH-CLIENT-MIB, RADIUS-ACC-CLIENT-MIB
--- Version: V2.4
+-- Version: V2.5
 -- History:
 --  V1.0 Initial version 2004-07-13
 --  V1.1 2004-10-12 updated by gaolong
@@ -101,6 +101,9 @@
 --  V2.4 2014-06-07, Modified by liubo
 --       Modified description of hh3cRdSecondaryAuthRowStatus
 --       Modified description of hh3cRdSecondaryAccRowStatus
+--  V2.5 2016-11-03, Modified by yemingxia
+--       Modified the value range of hh3cRdAccRealTime
+--       Added node of hh3cRdAccRealTimeUnit
 -- =================================================================
 HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -121,11 +124,11 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
             FROM RADIUS-ACC-CLIENT-MIB;
 
     hh3cRadius MODULE-IDENTITY
-    LAST-UPDATED "201406071800Z"            -- June 7, 2014 at 18:00 GMT
+    LAST-UPDATED "201611031800Z"            -- June 7, 2014 at 18:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -134,6 +137,10 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         "The HH3C-RADIUS-MIB contains objects to
         Manage configuration and Monitor running state
         for RADIUS feature."
+    REVISION "201611031800Z"        -- November 3, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified the value range of hh3cRdAccRealTime.
+        Added node of hh3cRdAccRealTimeUnit"
     REVISION "201406071800Z"        -- June 7, 2014 at 18:00 GMT
     DESCRIPTION
         "Modified description of hh3cRdSecondaryAuthRowStatus.
@@ -491,7 +498,8 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         hh3cRdSecAccVpnName          DisplayString,
         hh3cRdAccNasIpAddrType       InetAddressType,
         hh3cRdAccNasIpAddr           IpAddress,
-        hh3cRdAccNasIpv6Addr         Ipv6Address
+        hh3cRdAccNasIpv6Addr         Ipv6Address,
+        hh3cRdAccRealTimeUnit        INTEGER
         }
 
     hh3cRdAccGroupName OBJECT-TYPE
@@ -659,13 +667,14 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { hh3cRdAccInfoEntry 15 }
 
     hh3cRdAccRealTime OBJECT-TYPE
-        SYNTAX Integer32 (0..60)
+        SYNTAX Integer32 (0..71582)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-        "Interval of realtime-accounting packets.  The unit is minute.
+        "Interval of realtime-accounting packets.
+        The unit is defined by hh3cRdAccRealTimeUnit.
         When the value is 0, the device doesn't send realtime-accounting
-        packets.  Default value is 12."
+        packets.  Default value is 12 minutes."
     ::= { hh3cRdAccInfoEntry 16 }
 
     hh3cRdAccRealTimeRetry OBJECT-TYPE
@@ -839,6 +848,20 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         server."
     ::= { hh3cRdAccInfoEntry 31 }
 
+    hh3cRdAccRealTimeUnit OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            minute(0),
+            second(1)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The interval unit of realtime-accounting packets.
+        0  - minute.
+        1  - second."
+        DEFVAL { minute }
+    ::= { hh3cRdAccInfoEntry 32 }
 
 -- ***********************************************************************
 --

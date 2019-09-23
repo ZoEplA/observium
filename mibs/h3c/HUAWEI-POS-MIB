@@ -1,8 +1,8 @@
 -- ==========================================================================
--- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2004 by  H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: The purpose of this MIB file is to provide the define of
---              POS MIB of HUAWEI quidway serial router.
+--              POS MIB of serial router.
 -- Reference:
 -- Version: V1.1
 -- History:
@@ -37,14 +37,14 @@ IMPORTS
 
 pos     MODULE-IDENTITY 
         LAST-UPDATED "200410150000Z"
-        ORGANIZATION 
-                "Huawei-3Com Tech, Inc."
-        CONTACT-INFO 
-                "
-                Cai Zibin, 01541.
-                H3C PLAT APPLICATION, SOFTWARE.
-                E-mail: zibinc@huawei-3com.com
-                "
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION 
                 "The POS MIB module is used to manage 
                  POS-Access. " 

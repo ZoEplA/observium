@@ -1,24 +1,26 @@
 -- ============================================================================
--- Copyright (c) 2004-2009 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The purpose of this MIB file is to provide the definition of
 --              the MAC Information general configuration.
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 -- V1.0 2007-12-28
 --   Initial version, created by gejianzhuang
 -- V1.1 2009-08-13
 --   Add 'h3cMACInformationTrapObjectsExt' by gejianzhuang
+-- V1.2 2013-05-02
+--   Add 'h3cMACInformationMovedTrap' by yangjie
 -- ============================================================================
 H3C-MAC-INFORMATION-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
         h3cCommon
     FROM HUAWEI-3COM-OID-MIB
-        Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
     FROM SNMPv2-SMI
-        TEXTUAL-CONVENTION
+        TEXTUAL-CONVENTION, MacAddress
     FROM SNMPv2-TC
         ifIndex
     FROM IF-MIB;
@@ -298,7 +300,7 @@ h3cMACInfoTrapMsg OBJECT-TYPE
         6 - 802.1x
         7 - MAC authentication
         8 - Voice VLAN
-        9 - WAPI
+        9 - Reserved
 
         <ifIndex> is the index of the interface where the MAC
         address is learnt or removed and has size of 2 octets."
@@ -330,6 +332,21 @@ h3cMACInformationChangedTrapExt NOTIFICATION-TYPE
         generated even h3cMACInformationEnabled is set to enabled(1) and
         the feature is enabled on interface."
     ::= { h3cMACInformationTrapsExt 1 }
+
+h3cMACInformationMovedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            h3cMACInfoTrapMsgMovedAddress,
+            h3cMACInfoTrapMsgMovedVlan,
+            h3cMACInfoTrapMsgMovedFromIf,
+            h3cMACInfoTrapMsgMovedToIf,
+            h3cMACInfoTrapMsgMovedCount
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the MAC address has been moved to another interface, trap
+        is generated and is sent to the remote monitoring device."
+    ::= { h3cMACInformationTrapsExt 2 }
 
 h3cMACInformationTrapObjectsExt OBJECT IDENTIFIER  ::= { h3cMACInformationMibTrapExt 2 }
 
@@ -393,10 +410,51 @@ h3cMACInfoTrapMsgExt OBJECT-TYPE
         6 - 802.1x
         7 - MAC authentication
         8 - Voice VLAN
-        9 - WAPI
+        9 - Reserved
 
         <ifIndex> is the index of the interface where the MAC
         address is learnt or removed and has size of 4 octets."
     ::= { h3cMACInformationTrapObjectsExt 4 }
+
+h3cMACInfoTrapMsgMovedAddress   OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "The MAC address that is moved between interfaces."
+        ::= { h3cMACInformationTrapObjectsExt  5 }
+
+h3cMACInfoTrapMsgMovedVlan OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The VLAN number in which the MAC address is moved."
+        ::= { h3cMACInformationTrapObjectsExt  6}
+
+h3cMACInfoTrapMsgMovedFromIf OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The index of the interface from which the MAC address is moved."
+        ::= { h3cMACInformationTrapObjectsExt  7 }
+
+h3cMACInfoTrapMsgMovedToIf OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The index of the interface to which the MAC address is moved."
+        ::= { h3cMACInformationTrapObjectsExt  8 }
+
+h3cMACInfoTrapMsgMovedCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The times for which the MAC address has been moved between the
+        interfaces."
+        ::= { h3cMACInformationTrapObjectsExt  9 }
 
 END

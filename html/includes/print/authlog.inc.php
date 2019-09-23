@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -144,17 +144,17 @@ function generate_authlog_where($vars)
     switch ($var)
     {
       case "user_id":
-        if ($value == '') { continue; }
+        if ($value == '') { continue 2; }
         $value = auth_username_by_id($value);
         //break;
       case "user":
       case "username":
-        if ($value == '') { continue; }
+        if ($value == '') { continue 2; }
         $sql .= generate_query_values($value, 'user');
         break;
       case "address":
       case "ip":
-        if ($value == '') { continue; }
+        if ($value == '') { continue 2; }
         $sql .= generate_query_values($value, 'address', '%LIKE%');
         break;
       case "useragent":

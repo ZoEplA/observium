@@ -1,5 +1,5 @@
 -- ==========================================================================
--- Copyright (C) 2006 by Huawei-3Com Technologies. All rights reserved.
+-- Copyright (C) 2006 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: The voice AAA client MIB for remote dialing users'
 --              Authentication, Authorization and Accounting.
@@ -11,7 +11,8 @@
 --      Created by XiangZongxin
 -- ==========================================================================
 H3C-VOAAACLIENT-MIB DEFINITIONS ::= BEGIN
-    IMPORTS
+    
+IMPORTS
         OBJECT-TYPE, MODULE-IDENTITY, Integer32
             FROM SNMPv2-SMI
         RowStatus,TruthValue
@@ -21,14 +22,14 @@ H3C-VOAAACLIENT-MIB DEFINITIONS ::= BEGIN
 
     h3cVoiceAAAClient MODULE-IDENTITY
         LAST-UPDATED "200603270000Z"   -- Mar 27, 2006  GMT
-        ORGANIZATION
-            "Huawei-3Com Technologies Co., Ltd."
-        CONTACT-INFO
-            "PLAT Team Huawei-3Com Technologies Co.,Ltd.
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
-            Zip:100085"
+        ORGANIZATION                                   
+            "Hangzhou H3C Tech. Co., Ltd."             
+        CONTACT-INFO                                   
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China       
+            http://www.h3c.com                         
+            Zip:100085                                 
+            "                                          
         DESCRIPTION
             "This MIB file defines the voice AAA client MIB for remote
             dialing users' Authentication, Authorization and Accounting."

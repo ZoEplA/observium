@@ -1,7 +1,7 @@
 -- =============================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: This file describes the huawei mib implementation of dlsw
+-- Description: This MIB describes the implementation of dlsw
 -- Reference:  extracted from RFC2024 and modified.
 -- Version: V1.3
 -- History:
@@ -16,7 +16,7 @@
 --        Adding dlswTrapsV2 object for compatible with SNMPv1 trap.
 --   V1.2 lizhiyong 2004-10-29
 --        add MODULE-IDENTITY
---        delete huawei from IMPORTS clause
+--        delete hw from IMPORTS clause
 --   V1.3 shejunquan 2006-06-28
 --        Modify range of 4 nodes. Including
 --          dlswNodeConnTimeout,
@@ -53,13 +53,16 @@ IMPORTS
 
 dlsw MODULE-IDENTITY
      LAST-UPDATED "200410301551Z"
-     ORGANIZATION "Huawei-3com Technologies co.,Ltd."   
-     CONTACT-INFO 			
-            "Platform Team Beijing Institute Huawei-3com Tech, Inc.
-			Http://www.huawei-3com.com                                       
-			E-mail:support@huawei-3com.com "  
+     ORGANIZATION
+         "Hangzhou H3C Tech. Co., Ltd."
+     CONTACT-INFO
+         "Platform Team Hangzhou H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+         "
      DESCRIPTION
-            "private mib for dlsw"     
+            "private MIB for dlsw"     
      ::= { products 34 }       
             			
 --======================================
@@ -1396,7 +1399,7 @@ dlswSdlcLsStatus   OBJECT-TYPE
     STATUS     current
     DESCRIPTION
        " This object is used by the manager to create
-        or delete the row entry in the DlswSdlcLsTable
+        or delete the row entry in the dlswSdlcLsTable
         following the EntryStatus textual convention."
     ::= { dlswSdlcLsEntry 6 }
 

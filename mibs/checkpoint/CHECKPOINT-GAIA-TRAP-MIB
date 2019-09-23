@@ -138,7 +138,7 @@ DESCRIPTION
  
 -- textual conventions
 
-    DisplayString ::=
+DisplayString ::=
             OCTET STRING
         -- This data type is used to model textual information taken
         -- from the NVT ASCII character set.  By convention, objects
@@ -146,29 +146,29 @@ DESCRIPTION
         --
         --      SIZE (0..255)
 
-    checkpoint      			OBJECT IDENTIFIER ::= { enterprises 2620 }
-	products        			OBJECT IDENTIFIER ::= { checkpoint 1 }
-	chkpntTrap      	   		OBJECT IDENTIFIER ::= { products 3000 } 
-	chkpntTrapInfo				OBJECT IDENTIFIER ::= { chkpntTrap 0 } 
-    chkpntTrapHWSensor			OBJECT IDENTIFIER ::= { chkpntTrap 5 }
+checkpoint      	OBJECT IDENTIFIER ::= { enterprises 2620 }
+        products        	OBJECT IDENTIFIER ::= { checkpoint 1 }
+        chkpntTrap         	OBJECT IDENTIFIER ::= { products 3000 } 
+	chkpntTrapInfo		OBJECT IDENTIFIER ::= { chkpntTrap 0 } 
+chkpntTrapHWSensor		OBJECT IDENTIFIER ::= { chkpntTrap 5 }
 	chkpntTrapConfiguration		OBJECT IDENTIFIER ::= { chkpntTrap 10 }
-	chkpntTrapDisk				OBJECT IDENTIFIER ::= { chkpntTrap 2 }
-
-	svn							OBJECT IDENTIFIER ::= { products 6 } 
-	svnPerf						OBJECT IDENTIFIER ::= { svn 7 }
-	sensorInfo					OBJECT IDENTIFIER ::= { svnPerf 8 }
-	tempertureSensorTable		OBJECT IDENTIFIER ::= { sensorInfo 1 }
-	tempertureSensorEntry		OBJECT IDENTIFIER ::= { tempertureSensorTable 1 }
-	fanSpeedSensorTable			OBJECT IDENTIFIER ::= { sensorInfo 2 }
-	fanSpeedSensorEntry			OBJECT IDENTIFIER ::= { fanSpeedSensorTable 1 }
-	voltageSensorTable			OBJECT IDENTIFIER ::= { sensorInfo 3 }
-	voltageSensorEntry			OBJECT IDENTIFIER ::= { voltageSensorTable 1 }
-	powerSupplyInfo				OBJECT IDENTIFIER ::= { svnPerf 9 }
-	powerSupplyTable			OBJECT IDENTIFIER ::= { powerSupplyInfo 1 }
-	powerSupplyEntry			OBJECT IDENTIFIER ::= { powerSupplyTable 1 }
-	raidInfo					OBJECT IDENTIFIER ::= { svnPerf 6 }
-	raidVolumeTable				OBJECT IDENTIFIER ::= { raidInfo 1 }
-	raidVolumeEntry				OBJECT IDENTIFIER ::= { raidVolumeTable 1 }
+	chkpntBios		OBJECT IDENTIFIER ::= { chkpntTrap 20 }
+	chkpntTrapDisk		OBJECT IDENTIFIER ::= { chkpntTrap 2 }
+	svn					OBJECT IDENTIFIER ::= { products 6 } 
+	svnPerf				OBJECT IDENTIFIER ::= { svn 7 }
+	sensorInfo			OBJECT IDENTIFIER ::= { svnPerf 8 }
+	tempertureSensorTable	OBJECT IDENTIFIER ::= { sensorInfo 1 }
+	tempertureSensorEntry	OBJECT IDENTIFIER ::= { tempertureSensorTable 1 }
+	fanSpeedSensorTable	OBJECT IDENTIFIER ::= { sensorInfo 2 }
+	fanSpeedSensorEntry	OBJECT IDENTIFIER ::= { fanSpeedSensorTable 1 }
+	voltageSensorTable	OBJECT IDENTIFIER ::= { sensorInfo 3 }
+	voltageSensorEntry	OBJECT IDENTIFIER ::= { voltageSensorTable 1 }
+	powerSupplyInfo		OBJECT IDENTIFIER ::= { svnPerf 9 }
+	powerSupplyTable	OBJECT IDENTIFIER ::= { powerSupplyInfo 1 }
+	powerSupplyEntry	OBJECT IDENTIFIER ::= { powerSupplyTable 1 }
+	raidInfo			OBJECT IDENTIFIER ::= { svnPerf 6 }
+	raidVolumeTable		OBJECT IDENTIFIER ::= { raidInfo 1 }
+	raidVolumeEntry		OBJECT IDENTIFIER ::= { raidVolumeTable 1 }
 
 -- ******************************************
 -- HW Sensor Traps
@@ -259,6 +259,20 @@ DESCRIPTION
                           DESCRIPTION
                           "System configuration was saved"
                           ::= { chkpntTrapSystemConfiguration 2 }
+	
+-- ******************************************
+-- Bios Trap
+-- ******************************************	
+
+	  chkpntBiosTrap NOTIFICATION-TYPE
+                          OBJECTS
+                                {
+                                chkpntTrapMsgText
+                                }
+                          STATUS        current 
+                          DESCRIPTION
+                          "BIOS status"
+                          ::= { chkpntBios 1 }
 	
 -- ******************************************
 -- RAID Traps

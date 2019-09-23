@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -37,7 +37,7 @@ foreach ($config['device_types'] as $entry)
 
 // Generate array with form elements
 $form_items = array();
-foreach (array('os', 'hardware', 'version', 'features', 'type', 'distro') as $entry)
+foreach (array('os', 'hardware', 'vendor', 'version', 'features', 'type', 'distro') as $entry)
 {
   $query  = "SELECT `$entry` FROM `devices`";
   if (isset($where_array[$entry]))
@@ -85,6 +85,7 @@ foreach (get_type_groups('device') as $entry)
 }
 
 $form_items['sort'] = array('hostname' => 'Hostname',
+                            'domain'   => 'Hostname in Domain Order',
                             'location' => 'Location',
                             'os'       => 'Operating System',
                             'version'  => 'Version',
@@ -122,6 +123,12 @@ $form['row'][0]['hardware'] = array(
                                 'width'       => '100%', //'180px',
                                 'value'       => $vars['hardware'],
                                 'values'      => $form_items['hardware']);
+$form['row'][0]['vendor']   = array(
+                                'type'        => 'multiselect',
+                                'name'        => 'Select Vendor',
+                                'width'       => '100%', //'180px',
+                                'value'       => $vars['vendor'],
+                                'values'      => $form_items['vendor']);
 $form['row'][0]['group']    = array(
                                 'type'        => 'multiselect',
                                 'name'        => 'Select Groups',
@@ -129,13 +136,13 @@ $form['row'][0]['group']    = array(
                                 'value'       => $vars['group'],
                                 'values'      => $form_items['group']);
 // Select sort pull-rigth
-$form['row'][0]['sort']     = array(
-                                'type'        => 'select',
-                                'icon'        => $config['icon']['sort'],
-                                'right'       => TRUE,
-                                'width'       => '100%', //'150px',
-                                'value'       => $vars['sort'],
-                                'values'      => $form_items['sort']);
+//$form['row'][0]['sort']     = array(
+//                                'type'        => 'select',
+//                                'icon'        => $config['icon']['sort'],
+//                                'right'       => TRUE,
+//                                'width'       => '100%', //'150px',
+//                                'value'       => $vars['sort'],
+//                                'values'      => $form_items['sort']);
 
 // Second row
 $form['row'][1]['sysname']  = array(
@@ -168,6 +175,14 @@ $form['row'][1]['type']     = array(
                                 'width'       => '100%', //'180px',
                                 'value'       => $vars['type'],
                                 'values'      => $form_items['type']);
+// Select sort pull-rigth
+$form['row'][1]['sort']     = array(
+                                'type'        => 'select',
+                                'icon'        => $config['icon']['sort'],
+                                'right'       => TRUE,
+                                'width'       => '100%', //'150px',
+                                'value'       => $vars['sort'],
+                                'values'      => $form_items['sort']);
 
 // Third row
 $form['row'][2]['sysDescr']  = array(
@@ -221,30 +236,31 @@ $panel_form = array('type'          => 'rows',
                     'submit_by_key' => TRUE,
                     'url'           => generate_url($vars));
 
-$panel_form['row'][] = array('hostname'      => $form['row'][0]['hostname'],
-                             'sysname'       => $form['row'][1]['sysname']);
+$panel_form['row'][0] = array('hostname'      => $form['row'][0]['hostname'],
+                              'sysname'       => $form['row'][1]['sysname']);
 
-$panel_form['row'][] = array('sysDescr'      => $form['row'][2]['sysDescr'],
-                             'purpose'       => $form['row'][2]['purpose']);
+$panel_form['row'][1] = array('sysDescr'      => $form['row'][2]['sysDescr'],
+                              'purpose'       => $form['row'][2]['purpose']);
 
-$panel_form['row'][] = array('sysContact'    => $form['row'][2]['sysContact'],
-                             'serial'        => $form['row'][2]['serial']);
+$panel_form['row'][2] = array('sysContact'    => $form['row'][2]['sysContact'],
+                              'serial'        => $form['row'][2]['serial']);
 
-$panel_form['row'][] = array('location'      => $form['row'][0]['location'],
-                             'location_text' => $form['row'][1]['location_text']);
+$panel_form['row'][3] = array('location'      => $form['row'][0]['location'],
+                              'location_text' => $form['row'][1]['location_text']);
 
 
 $panel_form['row'][4]['os']            = $form['row'][0]['os'];
 $panel_form['row'][4]['version']       = $form['row'][1]['version'];
-$panel_form['row'][4]['distro']      = $form['row'][2]['distro'];
+$panel_form['row'][4]['distro']        = $form['row'][2]['distro'];
 
 $panel_form['row'][5]['hardware']      = $form['row'][0]['hardware'];
-$panel_form['row'][5]['features']      = $form['row'][1]['features'];
+$panel_form['row'][5]['vendor']        = $form['row'][0]['vendor'];
 
-$panel_form['row'][6]['group']         = $form['row'][0]['group'];
 $panel_form['row'][6]['type']          = $form['row'][1]['type'];
+$panel_form['row'][6]['features']      = $form['row'][1]['features'];
 
-$panel_form['row'][7]['sort']          = $form['row'][0]['sort'];
+$panel_form['row'][7]['group']         = $form['row'][0]['group'];
+$panel_form['row'][7]['sort']          = $form['row'][1]['sort'];
 $panel_form['row'][7]['search']        = $form['row'][2]['search'];
 
 // Register custom panel
@@ -406,7 +422,18 @@ $count = dbFetchCell("SELECT COUNT(*) FROM `devices` ".$where.$query_permitted);
 
 $sort = build_devices_sort($vars);
 
-$query = "SELECT * FROM `devices` ";
+if (isset($vars['sort']) && $vars['sort'] == 'domain')
+{
+  // Special Domain sort, require additional pseudo fields
+  $query  = "SELECT *,";
+  $query .= " SUBSTRING_INDEX(SUBSTRING_INDEX(`hostname`,'.',-3),'.',1) AS `leftmost`,";
+  $query .= " SUBSTRING_INDEX(SUBSTRING_INDEX(`hostname`,'.',-2),'.',1) AS `middle`,";
+  $query .= " SUBSTRING_INDEX(`hostname`,'.',-1) AS `rightmost`";
+  $query .= " FROM `devices` ";
+} else {
+  $query = "SELECT * FROM `devices` ";
+}
+
 if ($config['geocoding']['enable'])
 {
   $query .= " LEFT JOIN `devices_locations` USING (`device_id`) ";
@@ -416,17 +443,18 @@ $query .= $where . $query_permitted . $sort;
 // Pagination
 $pagination_html = '';
 if (isset($vars['pagination']) && (!$vars['pagination'] || $vars['pagination'] == 'no')) {} // Skip if pagination set to false
-else if ($count)
+elseif ($count)
 {
   pagination($vars, 0, TRUE); // Get default pagesize/pageno
   $start = $vars['pagesize'] * $vars['pageno'] - $vars['pagesize'];
-  $query .= 'LIMIT '.$start.','.$vars['pagesize'];
+  $query .= ' LIMIT '.$start.','.$vars['pagesize'];
   $pagination_html = pagination($vars, $count);
 }
 
 list($format, $subformat) = explode("_", $vars['format'], 2);
 
 $devices = dbFetchRows($query);
+//$devices = dbFetchRows($query, NULL, TRUE);
 
 if (count($devices))
 {

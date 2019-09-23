@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -15,7 +15,8 @@ register_html_title("Search");
 
 $sections = array('ipv4' => 'IPv4 Address', 'ipv6' => 'IPv6 Address', 'mac' => 'MAC Address', 'arp' => 'ARP/NDP Tables', 'fdb' => 'FDB Tables');
 
-if (dbFetchCell("SELECT COUNT(wifi_session_id) FROM wifi_sessions") > '0')
+//if (dbFetchCell("SELECT COUNT(wifi_session_id) FROM wifi_sessions") > '0')
+if (dbExist('wifi_sessions'))
 {
   $sections['dot1x'] = '.1x Sessions'; // Can be extended to include all dot1x sessions
 }

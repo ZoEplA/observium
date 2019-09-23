@@ -1,18 +1,46 @@
---**************************************************************************
---                                                                          
---    Copyright 2002 Broadcom Corporation                                   
---    All Rights Reserved                                                   
---    No portions of this material may be reproduced in any form without the
---    written permission of:                                                
---             Broadcom Corporation                                         
---             16251 Laguna Canyon Road                                     
---             Irvine, California  92618                                    
---    All information contained in this document is Broadcom Corporation    
---    company private, proprietary, and trade secret.                       
---                                                                          
---                                                                          
---                                                                          
---**************************************************************************
+--****************************************************************************
+--
+-- Copyright (c) 2002-2008 Broadcom Corporation
+--
+-- This program is the proprietary software of Broadcom Corporation and/or
+-- its licensors, and may only be used, duplicated, modified or distributed
+-- pursuant to the terms and conditions of a separate, written license
+-- agreement executed between you and Broadcom (an "Authorized License").
+-- Except as set forth in an Authorized License, Broadcom grants no license
+-- (express or implied), right to use, or waiver of any kind with respect to
+-- the Software, and Broadcom expressly reserves all rights in and to the
+-- Software and all intellectual property rights therein.  IF YOU HAVE NO
+-- AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE IN ANY WAY,
+-- AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE ALL USE OF THE
+-- SOFTWARE.  
+--
+-- Except as expressly set forth in the Authorized License,
+--
+-- 1.     This program, including its structure, sequence and organization,
+-- constitutes the valuable trade secrets of Broadcom, and you shall use all
+-- reasonable efforts to protect the confidentiality thereof, and to use this
+-- information only in connection with your use of Broadcom integrated circuit
+-- products.
+--
+-- 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED
+-- "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES, REPRESENTATIONS
+-- OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+-- RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY DISCLAIMS ANY AND ALL
+-- IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR
+-- A PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+-- ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. YOU ASSUME
+-- THE ENTIRE RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+--
+-- 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL BROADCOM
+-- OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL, INCIDENTAL, SPECIAL,
+-- INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER ARISING OUT OF OR IN ANY WAY
+-- RELATING TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE EVEN IF BROADCOM
+-- HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN
+-- EXCESS OF THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR U.S. $1,
+-- WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING ANY
+-- FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.
+--
+--****************************************************************************
 --    Filename: brcm-80211-factory.mib
 --    Author:   Kevin O'Neal
 --    Creation Date: 19-september-2002
@@ -36,11 +64,13 @@ IMPORTS
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
     cableDataFactory
         FROM BRCM-CABLEDATA-FACTORY-MIB;
                 
 ieee802dot11Factory MODULE-IDENTITY
-    LAST-UPDATED "0209190000Z"
+    LAST-UPDATED "200807010000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -56,18 +86,26 @@ ieee802dot11Factory MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata private MIB for 802.11 configuration and 
-         diagnostics"
-    REVISION      "0209190000Z"
+            "Broadcom proprietary MIB for factory management and configuration
+             of objects related to the wi-fi network interface."
+    REVISION      "200807010000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
-    REVISION      "0304280000Z"
+            "dot11IsoCountry added and dot11Country deprecated."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Added dot11DiagWlCmd object."
-    REVISION      "0308220000Z"
+            "Module description was updated. 
+             Compilability issues were cleaned up: 
+             - Chronological order of revision history was corrected."
+    REVISION      "200308220000Z"
     DESCRIPTION
             "Added dot11Country, dot11PAParameters, dot11IdleTSSI, and 
-             dot11AntennaGain objects."
+             dot11AntennaGain objects."     
+    REVISION      "200304280000Z"
+    DESCRIPTION
+            "Added dot11DiagWlCmd object."     
+    REVISION      "200209190000Z"
+    DESCRIPTION
+            "Initial version of this MIB module."
     ::= { cableDataFactory 5 }
 
 -- dot11FactoryCfg: configure 802.11 setup objects
@@ -118,7 +156,7 @@ dot11Country OBJECT-TYPE
                 allChannels(8)
     }
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Restricts the channel set based on country requirements."
     ::= { dot11FactoryCfg 5 }
@@ -150,6 +188,34 @@ dot11AntennaGain OBJECT-TYPE
          algorithm."
     ::= { dot11FactoryCfg 8 }
 
+dot11SromWrite OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets Srom parameter in Wifi Permanent Nonvol. Syntax is offset/value pairing
+		 with the offset (into SROM) being a word (two bytes) and the value being a multiple of words.
+		 Reading this object will always return a null string."
+    ::= { dot11FactoryCfg 9 }
+
+dot11SromRead OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Read Srom parameters in Wifi Permanent Nonvol. Syntax on a write is offset/length pairing
+		 with the offset (into the SROM) being a word (two bytes) and the length 
+		 being a multiple of words. A read of this object will the Srom values that were specifed by
+		 offset/lenght paring from the last write of this object."
+    ::= { dot11FactoryCfg 10 }
+
+dot11IsoCountry OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets country code in ISO 3166 format."
+    ::= { dot11FactoryCfg 11 }
 
 -- dot11FactoryDiagnostics: various objects for 802.11 diagnostics
 dot11FactoryDiagnostics OBJECT IDENTIFIER ::= { ieee802dot11Factory 2 }
@@ -213,12 +279,74 @@ dot11DiagWirelessLanCmd OBJECT-TYPE
     ::= { dot11FactoryDiagnostics 5 }
     
 dot11DiagWirelessLanOutput OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Reports the console output (if any) generated by the last set of the 
          dot11DiagWirelessLanCmd object."
     ::= { dot11FactoryDiagnostics 6 }
-    
+   
+
+-- dot11FactoryWPSSettings: various objects for 802.11 WPS Configurations Settings
+dot11FactoryWPSSettings OBJECT IDENTIFIER ::= { ieee802dot11Factory 3 }
+
+dot11WPSBoardNum OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPS Board  Serial Number"
+    ::= { dot11FactoryWPSSettings 1 }
+ 
+dot11WPSDeviceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPS Device Name"
+    ::= { dot11FactoryWPSSettings 2 }
+
+dot11WPSDevicePin OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPS Device Pin, must be ascii numerical characters"
+    ::= { dot11FactoryWPSSettings 3 }
+
+dot11WPSMfgName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPS Manufacturer Name"
+    ::= { dot11FactoryWPSSettings 4 }
+
+dot11WPSModelName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPS Model Name"
+    ::= { dot11FactoryWPSSettings 5 }
+
+dot11WPSModelNum OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the WPS Model Number"
+    ::= { dot11FactoryWPSSettings 6 }
+
+dot11WPSUUID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets WPS Universal Unique Identifier"
+    ::= { dot11FactoryWPSSettings 7 }
+
+
+
 END

@@ -9,7 +9,7 @@ IMPORTS
     sysContact, sysName, sysLocation FROM RFC1213-MIB;
 
 raritan MODULE-IDENTITY
-    LAST-UPDATED "201711130000Z"      -- November 13, 2017
+    LAST-UPDATED "201810160000Z"      -- October 16, 2018
     ORGANIZATION "Raritan"
     CONTACT-INFO
            "Author:       Raritan Americas, Inc.
@@ -21,6 +21,86 @@ raritan MODULE-IDENTITY
     DESCRIPTION
            "This MIB describes the SNMP functions of the Raritan PX2, PX3
             and BCM2 series power distribution units by Raritan."
+
+    REVISION     "201810160000Z"      -- October 16, 2018
+    DESCRIPTION
+           "PX2/PX3 release 3.5.0:
+            1) deviceCascadeType access read-only
+            2) Added the following to unitConfigurationTable:
+                peripheralDevicePackageCount
+                outletGroupCount
+            3) Added tables:
+                hwFailureTable
+                outletGroupConfigurationTable
+                outletGroupSensorConfigurationTable
+                outletGroupSensorLogTable
+                outletGroupSensorMeasurementsTable
+                outletGroupSwitchControlTable
+                outletGroupSensorControlTable
+                serverPowerControlTable
+            4) Added traps:
+                rawConfigurationDownloaded
+                rawConfigurationUpdated
+                hwFailureStatusChanged
+                outletGroupAdded
+                outletGroupModified
+                outletGroupDeleted
+                outletGroupSensorStateChange
+                outletGroupSensorReset
+                outletGroupPowerControl
+                serverPowerControlInitiated
+                serverPowerControlCompleted
+            5) Changed MAX-ACCESS of trapInformationTable to accessible-for-notify
+            6) Marked the following as deprecated:
+                inletPlug
+                outletReceptacle
+            7) Marked the following as obsolete:
+                wireCount
+                wireConfigurationTable
+                wireSensorConfigurationTable
+                wireSensorLogTable
+                wireSensorMeasurementsTable
+                wireSensorStateChange trap
+            8) Declare and correct ranges for integer OIDs
+            9) Added the following to trapInformationGroup:
+                outletGroupNumber
+                serverPowerOperation
+                serverPowerResult"
+
+    REVISION     "201805070000Z"      -- May 7, 2018
+    DESCRIPTION
+           "PX2/PX3 release 3.4.20:
+            1) unitDeviceCapabilities: Added
+                activePower(4)
+                activeEnergy(7)
+            2) Added the following to trapInformationGroup, smartCardInserted
+               and smartCardRemoved:
+                smartCardReaderManufacturer
+                smartCardReaderProduct
+                smartCardReaderSerialNumber
+                smartCardReaderChannel"
+
+    REVISION     "201803050000Z"      -- March 5, 2018
+    DESCRIPTION
+           "PX2/PX3 release 3.4.10:
+                - Support for residual DC current sensor
+
+            1) SensorTypeEnumeration: Added
+                residualDcCurrent(36)
+            2) inletDeviceCapabilities: Added
+                displacementPowerFactor(34)
+                residualDcCurrent(35)
+            3) inletPoleCapabilities: Added
+                residualCurrent(25)
+                rcmState(26)
+                residualDcCurrent(35)
+            4) outletDeviceCapabilities: Added
+                reactivePower(28)
+                displacementPowerFactor(34)
+            5) outletPoleCapabilities: Added
+                phaseAngle(23)
+                reactivePower(28)
+                displacementPowerFactor(34)"
 
     REVISION     "201711130000Z"      -- November 13, 2017
     DESCRIPTION
@@ -788,6 +868,7 @@ wires                               OBJECT IDENTIFIER ::= { configuration 8 }
 transferSwitch                      OBJECT IDENTIFIER ::= { configuration 9 }
 powerMeter                          OBJECT IDENTIFIER ::= { configuration 10 }
 circuit                             OBJECT IDENTIFIER ::= { configuration 11 }
+outletGroups                        OBJECT IDENTIFIER ::= { configuration 12 }
 
 outletControl                       OBJECT IDENTIFIER ::= { control 1 }
 externalSensorControl               OBJECT IDENTIFIER ::= { control 2 }
@@ -798,6 +879,9 @@ inletSensorControl                  OBJECT IDENTIFIER ::= { control 6 }
 outletSensorControl                 OBJECT IDENTIFIER ::= { control 7 }
 unitSensorControl                   OBJECT IDENTIFIER ::= { control 8 }
 circuitSensorControl                OBJECT IDENTIFIER ::= { control 9 }
+outletGroupControl                  OBJECT IDENTIFIER ::= { control 10 }
+outletGroupSensorControl            OBJECT IDENTIFIER ::= { control 11 }
+serverPowerControl                  OBJECT IDENTIFIER ::= { control 12 }
 
 measurementsUnit                    OBJECT IDENTIFIER ::= { measurements 1 }
 measurementsInlet                   OBJECT IDENTIFIER ::= { measurements 2 }
@@ -807,6 +891,7 @@ measurementsExternalSensor          OBJECT IDENTIFIER ::= { measurements 5 }
 measurementsWire                    OBJECT IDENTIFIER ::= { measurements 6 }
 measurementsTransferSwitch          OBJECT IDENTIFIER ::= { measurements 7 }
 measurementsCircuit                 OBJECT IDENTIFIER ::= { measurements 8 }
+measurementsOutletGroup             OBJECT IDENTIFIER ::= { measurements 9 }
 
 logUnit                             OBJECT IDENTIFIER ::= { log 1 }
 logInlet                            OBJECT IDENTIFIER ::= { log 2 }
@@ -816,9 +901,11 @@ logExternalSensor                   OBJECT IDENTIFIER ::= { log 5 }
 logWire                             OBJECT IDENTIFIER ::= { log 6 }
 logTransferSwitch                   OBJECT IDENTIFIER ::= { log 7 }
 logCircuit                          OBJECT IDENTIFIER ::= { log 8 }
+logOutletGroup                      OBJECT IDENTIFIER ::= { log 9 }
 
 reliabilityData                     OBJECT IDENTIFIER ::= { reliability 1 }
 reliabilityErrorLog                 OBJECT IDENTIFIER ::= { reliability 2 }
+reliabilityHardwareHealth           OBJECT IDENTIFIER ::= { reliability 3 }
 
 compliances                         OBJECT IDENTIFIER ::= { conformance 1 }
 groups                              OBJECT IDENTIFIER ::= { conformance 2 }
@@ -915,14 +1002,6 @@ complianceRev1 MODULE-COMPLIANCE
     DESCRIPTION
            "old (deprecated) configuration data"
 
-    GROUP oldLogGroup
-    DESCRIPTION
-           "old (deprecated) logging data"
-
-    GROUP oldMeasurementsGroup
-    DESCRIPTION
-           "old (deprecated) measurement data"
-
     GROUP oldTrapsGroup
     DESCRIPTION
            "old (deprecated) traps"
@@ -977,7 +1056,6 @@ configGroup OBJECT-GROUP
               unitSensorSignedUpperWarningThreshold,
               inletLabel,
               inletName,
-              inletPlug,
               inletPoleCount,
               inletRatedVoltage,
               inletRatedCurrent,
@@ -1056,7 +1134,6 @@ configGroup OBJECT-GROUP
               overCurrentProtectorPowerSource,
               outletLabel,
               outletName,
-              outletReceptacle,
               outletPoleCount,
               outletRatedVoltage,
               outletRatedCurrent,
@@ -1276,7 +1353,31 @@ configGroup OBJECT-GROUP
               activeDNSServerCount,
               activeNTPServerAddressType,
               activeNTPServerAddress,
-              activeNTPServerCount }
+              activeNTPServerCount,
+              peripheralDevicePackageCount,
+              outletGroupCount,
+              outletGroupName,
+              outletGroupCapabilities,
+              outletGroupMembers,
+              outletGroupSensorLogAvailable,
+              outletGroupSensorUnits,
+              outletGroupSensorDecimalDigits,
+              outletGroupSensorResolution,
+              outletGroupSensorMaximum,
+              outletGroupSensorMinimum,
+              outletGroupSensorHysteresis,
+              outletGroupSensorStateChangeDelay,
+              outletGroupSensorLowerCriticalThreshold,
+              outletGroupSensorLowerWarningThreshold,
+              outletGroupSensorUpperCriticalThreshold,
+              outletGroupSensorUpperWarningThreshold,
+              outletGroupSensorEnabledThresholds,
+              outletGroupSensorSignedMaximum,
+              outletGroupSensorSignedMinimum,
+              outletGroupSensorSignedLowerCriticalThreshold,
+              outletGroupSensorSignedLowerWarningThreshold,
+              outletGroupSensorSignedUpperCriticalThreshold,
+              outletGroupSensorSignedUpperWarningThreshold }
     STATUS current
     DESCRIPTION
            "A collection of objects representing configuration data."
@@ -1297,7 +1398,35 @@ ipAddressGroup OBJECT-GROUP
 
 obsoleteObjectsGroup OBJECT-GROUP
     OBJECTS { useDHCPProvidedNTPServer,
-              inletRCMResidualOperatingCurrent }
+              inletRCMResidualOperatingCurrent,
+              wireSensorAccuracy,
+              wireSensorTolerance,
+              wireCount,
+              wireLabel,
+              wireCapabilities,
+              wireSensorLogAvailable,
+              wireSensorUnits,
+              wireSensorDecimalDigits,
+              wireSensorResolution,
+              wireSensorMaximum,
+              wireSensorMinimum,
+              wireSensorHysteresis,
+              wireSensorStateChangeDelay,
+              wireSensorLowerCriticalThreshold,
+              wireSensorLowerWarningThreshold,
+              wireSensorUpperCriticalThreshold,
+              wireSensorUpperWarningThreshold,
+              wireSensorEnabledThresholds,
+              wirePowerSource,
+              logWireSensorDataAvailable,
+              logWireSensorState,
+              logWireSensorAvgValue,
+              logWireSensorMaxValue,
+              logWireSensorMinValue,
+              measurementsWireSensorIsAvailable,
+              measurementsWireSensorState,
+              measurementsWireSensorValue,
+              measurementsWireSensorTimeStamp }
     STATUS obsolete
     DESCRIPTION
            "A collection of obsolete objects."
@@ -1319,33 +1448,16 @@ oldConfigGroup OBJECT-GROUP
               overCurrentProtectorSensorTolerance,
               externalSensorAccuracy,
               externalSensorTolerance,
-              wireSensorAccuracy,
-              wireSensorTolerance,
               transferSwitchSensorAccuracy,
               transferSwitchSensorTolerance,
-              wireCount,
-              wireLabel,
-              wireCapabilities,
-              wireSensorLogAvailable,
-              wireSensorUnits,
-              wireSensorDecimalDigits,
-              wireSensorResolution,
-              wireSensorMaximum,
-              wireSensorMinimum,
-              wireSensorHysteresis,
-              wireSensorStateChangeDelay,
-              wireSensorLowerCriticalThreshold,
-              wireSensorLowerWarningThreshold,
-              wireSensorUpperCriticalThreshold,
-              wireSensorUpperWarningThreshold,
-              wireSensorEnabledThresholds,
-              wirePowerSource,
               inletRatedFrequency,
               inletRatedVA,
               pxMACAddress,
               networkInterfaceType,
               activeDNSServerAddressSource,
-              activeNTPServerAddressSource }
+              activeNTPServerAddressSource,
+              inletPlug,
+              outletReceptacle }
     STATUS deprecated
     DESCRIPTION
            "A collection of objects representing old (deprecated) configuration data."
@@ -1433,23 +1545,20 @@ logGroup OBJECT-GROUP
               logCircuitPoleSensorMinValue,
               logCircuitPoleSensorSignedAvgValue,
               logCircuitPoleSensorSignedMaxValue,
-              logCircuitPoleSensorSignedMinValue }
+              logCircuitPoleSensorSignedMinValue,
+              logOutletGroupSensorDataAvailable,
+              logOutletGroupSensorState,
+              logOutletGroupSensorAvgValue,
+              logOutletGroupSensorMaxValue,
+              logOutletGroupSensorMinValue,
+              logOutletGroupSensorSignedAvgValue,
+              logOutletGroupSensorSignedMaxValue,
+              logOutletGroupSensorSignedMinValue }
     STATUS current
     DESCRIPTION
            "A collection of objects providing logging (history of readings) capabilities
             about the PDU."
     ::= { groups 2 }
-
-oldLogGroup OBJECT-GROUP
-    OBJECTS { logWireSensorDataAvailable,
-              logWireSensorState,
-              logWireSensorAvgValue,
-              logWireSensorMaxValue,
-              logWireSensorMinValue }
-    STATUS deprecated
-    DESCRIPTION
-           "A collection of objects representing old (deprecated) logging data."
-    ::= { groups 14 }
 
 measurementsGroup OBJECT-GROUP
     OBJECTS { measurementsUnitSensorIsAvailable,
@@ -1500,22 +1609,17 @@ measurementsGroup OBJECT-GROUP
               measurementsCircuitPoleSensorState,
               measurementsCircuitPoleSensorValue,
               measurementsCircuitPoleSensorTimeStamp,
-              measurementsCircuitPoleSensorSignedValue }
+              measurementsCircuitPoleSensorSignedValue,
+              measurementsOutletGroupSensorIsAvailable,
+              measurementsOutletGroupSensorState,
+              measurementsOutletGroupSensorValue,
+              measurementsOutletGroupSensorTimeStamp,
+              measurementsOutletGroupSensorSignedValue }
     STATUS current
     DESCRIPTION
            "A collection of objects providing measurements (most recent data) capabilities.
             about the PDU."
     ::= { groups 3 }
-
-oldMeasurementsGroup OBJECT-GROUP
-    OBJECTS { measurementsWireSensorIsAvailable,
-              measurementsWireSensorState,
-              measurementsWireSensorValue,
-              measurementsWireSensorTimeStamp }
-    STATUS  deprecated
-    DESCRIPTION
-           "A collection of objects representing old (deprecated) measurement data."
-    ::= { groups 15 }
 
 controlGroup OBJECT-GROUP
     OBJECTS { switchingOperation,
@@ -1530,7 +1634,10 @@ controlGroup OBJECT-GROUP
               inletSensorResetValue,
               outletSensorResetValue,
               unitSensorResetValue,
-              circuitSensorResetValue }
+              circuitSensorResetValue,
+              outletGroupSwitchingOperation,
+              outletGroupSensorResetValue,
+              serverPowerControlOperation }
     STATUS current
     DESCRIPTION
            "A collection of objects providing the ability to control various components
@@ -1566,7 +1673,14 @@ trapInformationGroup  OBJECT-GROUP
               smartCardTimestamp,
               smartCardType,
               smartCardId,
-              suspectedTripCauseLabel }
+              suspectedTripCauseLabel,
+              smartCardReaderManufacturer,
+              smartCardReaderProduct,
+              smartCardReaderSerialNumber,
+              smartCardReaderChannel,
+              outletGroupNumber,
+              serverPowerOperation,
+              serverPowerResult }
     STATUS current
     DESCRIPTION
            "A collection of objects providing information in the traps."
@@ -1643,21 +1757,38 @@ trapsGroup NOTIFICATION-GROUP
                     powerMeterModified,
                     smsMessageTransmissionFailure,
                     smartCardInserted,
-                    smartCardRemoved }
+                    smartCardRemoved,
+                    rawConfigurationDownloaded,
+                    rawConfigurationUpdated,
+                    hwFailureStatusChanged,
+                    outletGroupAdded,
+                    outletGroupModified,
+                    outletGroupDeleted,
+                    outletGroupSensorStateChange,
+                    outletGroupSensorReset,
+                    outletGroupPowerControl,
+                    serverPowerControlInitiated,
+                    serverPowerControlCompleted }
     STATUS current
     DESCRIPTION
            "A collection of traps."
     ::= { groups 9 }
 
 oldTrapsGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { wireSensorStateChange,
-                    pduSensorStateChange,
+    NOTIFICATIONS { pduSensorStateChange,
                     rfCodeTagConnected,
                     rfCodeTagDisconnected }
     STATUS deprecated
     DESCRIPTION
            "A collection of objects representing old (deprecated) traps."
     ::= { groups 16 }
+
+obsoleteTrapsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { wireSensorStateChange }
+    STATUS obsolete
+    DESCRIPTION
+           "A collection of objects representing obsolete traps."
+    ::= { groups 17 }
 
 reliabilityGroup OBJECT-GROUP
     OBJECTS { reliabilityId,
@@ -1675,7 +1806,13 @@ reliabilityGroup OBJECT-GROUP
               reliabilityErrorLogRawLowerBytes,
               reliabilityErrorLogPOH,
               reliabilityErrorLogTime,
-              reliabilityDataTableSequenceNumber }
+              reliabilityDataTableSequenceNumber,
+              hwFailureComponentId,
+              hwFailureType,
+              hwFailureAsserted,
+              hwFailureLastAssertTimeStamp,
+              hwFailureLastDeassertTimeStamp,
+              hwFailureAssertCount }
     STATUS current
     DESCRIPTION
            "A collection of objects providing reliability data."
@@ -1722,6 +1859,7 @@ SensorTypeEnumeration ::= TEXTUAL-CONVENTION
                      overloadStatus(33),
                      overheatStatus(34),
                      displacementPowerFactor(35),
+                     residualDcCurrent(36),
                      fanStatus(37),
                      inletPhaseSyncAngle(38),
                      inletPhaseSync(39),
@@ -1800,13 +1938,19 @@ SensorStateEnumeration ::= TEXTUAL-CONVENTION
 --   surgeProtectorStatus       unavailable,ok,fault
 --   frequency                  unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
 --   phaseAngle                 unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
+--   rmsVoltageLN               unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
+--   residualCurrent            unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
+--   rcmState                   unavailable,normal,warning,critical,selfTest,fail
+--   absoluteHumidity           unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
+--   reactivePower              unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
+--   other                      unavailable
+--   none                       unavailable
 --   powerQuality               unavailable,normal,warning,critical
 --   overloadStatus             unavailable,ok,fault
 --   overheatStatus             unavailable,ok,fault
+--   displacementPowerFactor    unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
+--   residualDcCurrent          unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
 --   fanStatus                  unavailable,ok,fault
---   residualCurrent            unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
---   rcmState                   unavailable,normal,warning,critical,selfTest,fail
---   reactivePower              unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
 --   inletPhaseSyncAngle        unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
 --   inletPhaseSync             unavailable,inSync,outOfSync
 --   operatingState             unavailable,normal,standby,nonRedundant,off
@@ -1814,14 +1958,12 @@ SensorStateEnumeration ::= TEXTUAL-CONVENTION
 --   illuminance                unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
 --   doorContact                unavailable,open,closed
 --   tamperDetection            unavailable,normal,alarmed
---   motionDetection            unavailable,??
+--   motionDetection            unavailable,normal,alarmed
 --   i1smpsStatus               unavailable,ok,fault
 --   i2smpsStatus               unavailable,ok,fault
 --   switchStatus               unavailable,ok,i1OpenFault,i1ShortFault,i2OpenFault,i2ShortFault
---   displacementPowerFactor    unavailable,belowLowerCritical,belowLowerWarning,normal,aboveUpperWarning,aboveUpperCritical
 --   doorLockState              unavailable,open,closed
 --   doorHandleLock             unavailable,open,closed
---   doorHandleSwitch           unavailable,open,closed
 
 
 PlugTypeEnumeration ::= TEXTUAL-CONVENTION
@@ -2158,6 +2300,35 @@ AddressSourceEnumeration ::= TEXTUAL-CONVENTION
                      dhcp(2),
                      dhcpv6(3) }
 
+HwFailureTypeEnumeration ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+           "The hardware failure type."
+    SYNTAX INTEGER { networkDeviceNotDetected(1),
+                     i2cBusStuck(2),
+                     slaveCtrlNotReachable(3),
+                     slaveCtrlMalfunction(4),
+                     outletPowerStateInconsistent(5) }
+
+ServerPowerStateEnumeration ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+           "The server power control state."
+    SYNTAX INTEGER { unknown(0),
+                     on(1),
+                     off(2),
+                     shuttingDown(3) }
+
+ServerPowerControlResultEnumeration ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+           "The result of a server power control operation."
+    SYNTAX INTEGER { noError(0),
+                     shutdownCmdFailed(1),
+                     switchingOffFailed(2),
+                     switchingOnFailed(3),
+                     powerCheckTimeout(4) }
+
 -- Global OIDs
 
 pduCount OBJECT-TYPE
@@ -2350,11 +2521,13 @@ UnitConfigurationEntryStruct ::= SEQUENCE {
         frontPanelActuatorControl                TruthValue,
         circuitCount                             Integer32,
         activeDNSServerCount                     Integer32,
-        activeNTPServerCount                     Integer32
+        activeNTPServerCount                     Integer32,
+        peripheralDevicePackageCount             Integer32,
+        outletGroupCount                         Integer32
     }
 
 inletCount OBJECT-TYPE
-    SYNTAX     Integer32(1..256)
+    SYNTAX     Integer32(0..256)
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -2370,7 +2543,7 @@ overCurrentProtectorCount OBJECT-TYPE
     ::= { unitConfigurationEntry 3 }
 
 outletCount OBJECT-TYPE
-    SYNTAX     Integer32(1..256)
+    SYNTAX     Integer32(0..256)
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -2478,7 +2651,9 @@ externalSensorsZCoordinateUnits OBJECT-TYPE
     ::= { unitConfigurationEntry 34 }
 
 unitDeviceCapabilities OBJECT-TYPE
-    SYNTAX     BITS{ i1smpsStatus(45),
+    SYNTAX     BITS{ activePower(4),
+                     activeEnergy(7),
+                     i1smpsStatus(45),
                      i2smpsStatus(46) }
     MAX-ACCESS read-only
     STATUS     current
@@ -2487,15 +2662,15 @@ unitDeviceCapabilities OBJECT-TYPE
     ::= { unitConfigurationEntry 35 }
 
 outletSequencingDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(100..10000)
     MAX-ACCESS read-write
     STATUS     deprecated
     DESCRIPTION
-           "It is deprecated. This is an alias for  inrushGuardDelay"
+           "This OID is deprecated, it is an alias for inrushGuardDelay"
     ::= { unitConfigurationEntry 36 }
 
 globalOutletPowerCyclingPowerOffPeriod OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(1..3600)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -2532,7 +2707,7 @@ outletPowerupSequence OBJECT-TYPE
     ::= { unitConfigurationEntry 39 }
 
 pduPowerCyclingPowerOffPeriod OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(1..3600)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -2619,13 +2794,13 @@ serverCount OBJECT-TYPE
     ::= { unitConfigurationEntry 56 }
 
 inrushGuardDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(100..10000)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
            "The time interval between switching on two outlets;
             specified in milliseconds;
-            100 <= value <= 100000 milliseconds."
+            100 <= value <= 10000 milliseconds."
     ::= { unitConfigurationEntry 57 }
 
 cascadedDeviceConnected OBJECT-TYPE
@@ -2706,7 +2881,7 @@ secondNTPServerAddress OBJECT-TYPE
 wireCount OBJECT-TYPE
     SYNTAX     Integer32(0..255)
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The number of wire objects in the PDU topology. This feature is no
             longer used, the returned value is always 0."
@@ -2746,7 +2921,7 @@ relayBehaviorOnPowerLoss OBJECT-TYPE
 
 deviceCascadeType OBJECT-TYPE
     SYNTAX     DeviceCascadeTypeEnumeration
-    MAX-ACCESS read-write
+    MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
            "The type of network cascade this device is part of (none, bridging
@@ -2796,7 +2971,7 @@ frontPanelActuatorControl OBJECT-TYPE
     ::= { unitConfigurationEntry 75 }
 
 circuitCount OBJECT-TYPE
-    SYNTAX     Integer32
+    SYNTAX     Integer32(0..96)
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -2818,6 +2993,22 @@ activeNTPServerCount OBJECT-TYPE
     DESCRIPTION
            "The number of active NTP servers"
     ::= { unitConfigurationEntry 78 }
+
+peripheralDevicePackageCount OBJECT-TYPE
+    SYNTAX     Integer32(0..256)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of peripheral device packages."
+    ::= { unitConfigurationEntry 79 }
+
+outletGroupCount OBJECT-TYPE
+    SYNTAX     Integer32(0..128)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of configured outlet groups"
+    ::= { unitConfigurationEntry 80 }
 
 -- activeDNSServerTable: information about active DNS servers
 
@@ -3057,7 +3248,7 @@ measurementPeriod OBJECT-TYPE
     ::= { logConfigurationEntry 2 }
 
 measurementsPerLogEntry OBJECT-TYPE
-    SYNTAX     Integer32
+    SYNTAX     Integer32(1..600)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -3079,7 +3270,10 @@ dataLoggingEnableForAllSensors OBJECT-TYPE
     DESCRIPTION
            "Operation to control data logging for all sensors:
             - when set to true, all *SensorLogAvailable OIDs are set to true
-            - when set to false, all *SensorLogAvailable OIDs are set to false"
+            - when set to false, all *SensorLogAvailable OIDs are set to false
+            This OID is supposed to be written only. When reading it, it returns
+            the last written value, or false if it was never written since
+            device startup."
     ::= { logConfigurationEntry 5 }
 
 -- Information objects used exclusively in traps
@@ -3113,7 +3307,7 @@ TrapInformationEntryStruct ::= SEQUENCE {
 
 userName OBJECT-TYPE
     SYNTAX     DisplayString
-    MAX-ACCESS read-only
+    MAX-ACCESS accessible-for-notify
     STATUS     current
     DESCRIPTION
            "The user currently logged in."
@@ -3121,7 +3315,7 @@ userName OBJECT-TYPE
 
 targetUser OBJECT-TYPE
     SYNTAX     DisplayString
-    MAX-ACCESS read-only
+    MAX-ACCESS accessible-for-notify
     STATUS     current
     DESCRIPTION
            "The user added, deleted, or modified."
@@ -3129,7 +3323,7 @@ targetUser OBJECT-TYPE
 
 imageVersion OBJECT-TYPE
     SYNTAX     DisplayString
-    MAX-ACCESS read-only
+    MAX-ACCESS accessible-for-notify
     STATUS     current
     DESCRIPTION
            "The version of the upgrade image."
@@ -3137,7 +3331,7 @@ imageVersion OBJECT-TYPE
 
 roleName OBJECT-TYPE
     SYNTAX     DisplayString
-    MAX-ACCESS read-only
+    MAX-ACCESS accessible-for-notify
     STATUS     current
     DESCRIPTION
            "The role added, deleted, or modified."
@@ -3145,7 +3339,7 @@ roleName OBJECT-TYPE
 
 smtpMessageRecipients OBJECT-TYPE
     SYNTAX     DisplayString
-    MAX-ACCESS read-only
+    MAX-ACCESS accessible-for-notify
     STATUS     current
     DESCRIPTION
            "Comma separated list of SMTP message recipients"
@@ -3153,7 +3347,7 @@ smtpMessageRecipients OBJECT-TYPE
 
 smtpServer OBJECT-TYPE
     SYNTAX     DisplayString
-    MAX-ACCESS read-only
+    MAX-ACCESS accessible-for-notify
     STATUS     current
     DESCRIPTION
            "The IP address/host name of the SMTP server"
@@ -3357,6 +3551,66 @@ suspectedTripCauseLabel OBJECT-TYPE
             if it can be determined."
     ::= { trapInformation 28 }
 
+smartCardReaderManufacturer OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The manufacturer of a smartcard reader."
+    ::= { trapInformation 29 }
+
+smartCardReaderProduct OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The product name of a smartcard reader."
+    ::= { trapInformation 30 }
+
+smartCardReaderSerialNumber OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The serial number of a smartcard reader."
+    ::= { trapInformation 31 }
+
+smartCardReaderChannel OBJECT-TYPE
+    SYNTAX     Integer32(-1..256)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The channel number of a smartcard reader.
+            The channel number is used to differentiate multiple readers
+            implemented in the same physical package. It will be -1 for
+            single-channel readers."
+    ::= { trapInformation 32 }
+
+outletGroupNumber OBJECT-TYPE
+    SYNTAX     Integer32(1..256)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The ID of the outlet group."
+    ::= { trapInformation 33 }
+
+serverPowerOperation OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The power control operation that was initiated on the server
+            (on/off)"
+    ::= { trapInformation 34 }
+
+serverPowerResult OBJECT-TYPE
+    SYNTAX     ServerPowerControlResultEnumeration
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The result of the server power control operation."
+    ::= { trapInformation 35 }
+
 -- unitSensorConfigurationTable: information and settings for unit-level sensors
 
 unitSensorConfigurationTable OBJECT-TYPE
@@ -3508,7 +3762,7 @@ unitSensorHysteresis OBJECT-TYPE
     ::= { unitSensorConfigurationEntry 13 }
 
 unitSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -3738,7 +3992,7 @@ inletName OBJECT-TYPE
 inletPlug OBJECT-TYPE
     SYNTAX     PlugTypeEnumeration
     MAX-ACCESS read-only
-    STATUS     current
+    STATUS     deprecated
     DESCRIPTION
            "The type of plug/receptacle wired to the inlet.
             Note: PlugTypeEnumeration is no longer updated, unlisted plugs will be
@@ -3815,7 +4069,9 @@ inletDeviceCapabilities OBJECT-TYPE
                       residualCurrent(25),
                       rcmState(26),
                       reactivePower(28),
-                      powerQuality(31) }
+                      powerQuality(31),
+                      displacementPowerFactor(34),
+                      residualDcCurrent(35) }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -3833,8 +4089,11 @@ inletPoleCapabilities OBJECT-TYPE
                       apparentEnergy(8),
                       phaseAngle(23),
                       rmsVoltageLN(24),
+                      residualCurrent(25),
+                      rcmState(26),
                       reactivePower(28),
-                      displacementPowerFactor(34) }
+                      displacementPowerFactor(34),
+                      residualDcCurrent(35) }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -4059,7 +4318,7 @@ inletSensorHysteresis OBJECT-TYPE
     ::= { inletSensorConfigurationEntry 13 }
 
 inletSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -4377,7 +4636,7 @@ inletPoleSensorHysteresis OBJECT-TYPE
     ::= { inletPoleSensorConfigurationEntry 13 }
 
 inletPoleSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -4862,7 +5121,7 @@ overCurrentProtectorSensorHysteresis OBJECT-TYPE
     ::= { overCurrentProtectorSensorConfigurationEntry 13 }
 
 overCurrentProtectorSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -5096,7 +5355,7 @@ outletName OBJECT-TYPE
 outletReceptacle OBJECT-TYPE
     SYNTAX     ReceptacleTypeEnumeration
     MAX-ACCESS read-only
-    STATUS     current
+    STATUS     deprecated
     DESCRIPTION
            "The receptacle type.
             Note: ReceptacleTypeEnumeration is no longer updated, unlisted receptacles
@@ -5148,7 +5407,9 @@ outletDeviceCapabilities OBJECT-TYPE
                       apparentEnergy(8),
                       onOff(13),
                       frequency(22),
-                      phaseAngle(23) }
+                      phaseAngle(23),
+                      reactivePower(28),
+                      displacementPowerFactor(34) }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -5164,7 +5425,10 @@ outletPoleCapabilities OBJECT-TYPE
                       powerFactor(6),
                       activeEnergy(7),
                       apparentEnergy(8),
-                      rmsVoltageLN(24) }
+                      phaseAngle(23),
+                      rmsVoltageLN(24),
+                      reactivePower(28),
+                      displacementPowerFactor(34) }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
@@ -5172,7 +5436,7 @@ outletPoleCapabilities OBJECT-TYPE
     ::= { outletConfigurationEntry 11 }
 
 outletPowerCyclingPowerOffPeriod OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(1..3600)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -5227,7 +5491,7 @@ outletNonCritical OBJECT-TYPE
     ::= { outletConfigurationEntry 30 }
 
 outletSequenceDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..3600)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -5451,7 +5715,7 @@ outletSensorHysteresis OBJECT-TYPE
     ::= { outletSensorConfigurationEntry 13 }
 
 outletSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -5769,7 +6033,7 @@ outletPoleSensorHysteresis OBJECT-TYPE
     ::= { outletPoleSensorConfigurationEntry 13 }
 
 outletPoleSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -6166,7 +6430,7 @@ externalSensorHysteresis OBJECT-TYPE
     ::= { externalSensorConfigurationEntry 23 }
 
 externalSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -6280,7 +6544,7 @@ externalSensorUseDefaultThresholds OBJECT-TYPE
     ::= { externalSensorConfigurationEntry 38 }
 
 externalSensorAlarmedToNormalDelay OBJECT-TYPE
-    SYNTAX     Integer32
+    SYNTAX     Integer32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -6332,7 +6596,7 @@ externalSensorTypeDefaultHysteresis OBJECT-TYPE
     ::= { externalSensorTypeDefaultThresholdsEntry 3 }
 
 externalSensorTypeDefaultStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -6454,7 +6718,7 @@ serverPingEnabled OBJECT-TYPE
 wireConfigurationTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF WireConfigurationEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A list of wire configuration entries. The number of
             entries is given by the value of wireCount for the PDU.
@@ -6464,7 +6728,7 @@ wireConfigurationTable OBJECT-TYPE
 wireConfigurationEntry OBJECT-TYPE
     SYNTAX     WireConfigurationEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "An entry containing objects for a particular wire."
     INDEX { pduId, wireId }
@@ -6480,7 +6744,7 @@ WireConfigurationEntryStruct ::= SEQUENCE {
 wireId OBJECT-TYPE
     SYNTAX     Integer32(1..256)
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A unique value for each wire. Its value
             ranges between 1 and the value of wireCount."
@@ -6489,7 +6753,7 @@ wireId OBJECT-TYPE
 wireLabel OBJECT-TYPE
     SYNTAX     DisplayString
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The label on the PDU identifying the wire."
     ::= { wireConfigurationEntry 2 }
@@ -6505,7 +6769,7 @@ wireCapabilities OBJECT-TYPE
                       activeEnergy(7),
                       apparentEnergy(8) }
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A bit string indicating which wire sensors are available."
     ::= { wireConfigurationEntry 3 }
@@ -6513,7 +6777,7 @@ wireCapabilities OBJECT-TYPE
 wirePowerSource OBJECT-TYPE
     SYNTAX     RowPointer
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "This object allows discovery of how the PDU is wired. It indicates the
             wire's power source which can one of the following:
@@ -6541,7 +6805,7 @@ wirePowerSource OBJECT-TYPE
 wireSensorConfigurationTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF WireSensorConfigurationEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A list of wire sensor configuration entries.
             Note: This feature is no longer used, the table is always empty."
@@ -6550,7 +6814,7 @@ wireSensorConfigurationTable OBJECT-TYPE
 wireSensorConfigurationEntry OBJECT-TYPE
     SYNTAX     WireSensorConfigurationEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "An wireSensor entry containing objects for a particular wire Sensor."
     INDEX { pduId, wireId, sensorType }
@@ -6577,7 +6841,7 @@ WireSensorConfigurationEntryStruct ::= SEQUENCE {
 wireSensorLogAvailable OBJECT-TYPE
     SYNTAX     TruthValue
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "Is data logging enabled for this sensor?"
     ::= { wireSensorConfigurationEntry 4 }
@@ -6585,7 +6849,7 @@ wireSensorLogAvailable OBJECT-TYPE
 wireSensorUnits OBJECT-TYPE
     SYNTAX     SensorUnitsEnumeration
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The unit in which the sensor reading is reported.
             This parameter does not apply to sensors without numerical reading."
@@ -6594,7 +6858,7 @@ wireSensorUnits OBJECT-TYPE
 wireSensorDecimalDigits OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The number of digits displayed to the right of the decimal point.
             This parameter does not apply to sensors without numerical reading."
@@ -6603,7 +6867,7 @@ wireSensorDecimalDigits OBJECT-TYPE
 wireSensorAccuracy OBJECT-TYPE
     SYNTAX     HundredthsOfAPercentage
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The accuracy: the maximum relative difference (in percent) between
             measurement and the actual value.
@@ -6613,7 +6877,7 @@ wireSensorAccuracy OBJECT-TYPE
 wireSensorResolution OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The resolution: the minimum difference between any two measured values
             The value of this OID variable should be scaled by
@@ -6625,7 +6889,7 @@ wireSensorResolution OBJECT-TYPE
 wireSensorTolerance OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The tolerance: the maximum difference between measurement and the
             actual value. The value of this OID variable should be scaled by
@@ -6637,7 +6901,7 @@ wireSensorTolerance OBJECT-TYPE
 wireSensorMaximum OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The largest possible value
             The value of this OID variable should be scaled by
@@ -6649,7 +6913,7 @@ wireSensorMaximum OBJECT-TYPE
 wireSensorMinimum OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The smallest possible value
             The value of this OID variable should be scaled by
@@ -6661,7 +6925,7 @@ wireSensorMinimum OBJECT-TYPE
 wireSensorHysteresis OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The hysteresis used when crossing a threshold towards the normal state.
             The value of this OID variable should be scaled by
@@ -6671,9 +6935,9 @@ wireSensorHysteresis OBJECT-TYPE
     ::= { wireSensorConfigurationEntry 13 }
 
 wireSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The delay measured in samples before a state is asserted.
             If the value is zero, then the state is asserted as soon as
@@ -6686,7 +6950,7 @@ wireSensorStateChangeDelay OBJECT-TYPE
 wireSensorLowerCriticalThreshold OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The lower critical threshold
             The value of this OID variable should be scaled by
@@ -6698,7 +6962,7 @@ wireSensorLowerCriticalThreshold OBJECT-TYPE
 wireSensorLowerWarningThreshold OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The lower non-critical (warning) threshold
             The value of this OID variable should be scaled by
@@ -6710,7 +6974,7 @@ wireSensorLowerWarningThreshold OBJECT-TYPE
 wireSensorUpperCriticalThreshold OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The upper critical  threshold
             The value of this OID variable should be scaled by
@@ -6722,7 +6986,7 @@ wireSensorUpperCriticalThreshold OBJECT-TYPE
 wireSensorUpperWarningThreshold OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The upper non-critical (warning) threshold
             The value of this OID variable should be scaled by
@@ -6737,7 +7001,7 @@ wireSensorEnabledThresholds OBJECT-TYPE
                       upperWarning(2),
                       upperCritical(3) }
     MAX-ACCESS read-write
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A bit string indicating which thresholds are enabled.
             This parameter does not apply to sensors without numerical reading."
@@ -6830,7 +7094,7 @@ transferSwitchAutoReTransferEnabled OBJECT-TYPE
     ::= { transferSwitchConfigurationEntry 20 }
 
 transferSwitchAutoReTransferWaitTime OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(1..180)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -7108,7 +7372,7 @@ transferSwitchSensorHysteresis OBJECT-TYPE
     ::= { transferSwitchSensorConfigurationEntry 13 }
 
 transferSwitchSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -7706,7 +7970,7 @@ circuitSensorHysteresis OBJECT-TYPE
     ::= { circuitSensorConfigurationEntry 13 }
 
 circuitSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -7990,7 +8254,7 @@ circuitPoleSensorHysteresis OBJECT-TYPE
     ::= { circuitPoleSensorConfigurationEntry 13 }
 
 circuitPoleSensorStateChangeDelay OBJECT-TYPE
-    SYNTAX     Unsigned32
+    SYNTAX     Unsigned32(0..300)
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -8154,6 +8418,352 @@ circuitPoleSensorSignedUpperWarningThreshold OBJECT-TYPE
             Integer32 range (-2147483648 .. 2147483647).
             This parameter does not apply to sensors without numerical reading."
     ::= { circuitPoleSensorConfigurationEntry 31 }
+
+-- outletGroupConfigurationTable: Outlet group information
+
+outletGroupConfigurationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF OutletGroupConfigurationEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of outlet group configuration entries."
+    ::= { outletGroups 2 }
+
+outletGroupConfigurationEntry OBJECT-TYPE
+    SYNTAX     OutletGroupConfigurationEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing configuration objects for outlet groups."
+    INDEX { outletGroupId }
+    ::= { outletGroupConfigurationTable 1 }
+
+OutletGroupConfigurationEntryStruct ::= SEQUENCE {
+        outletGroupId               Integer32,
+        outletGroupName             DisplayString,
+        outletGroupCapabilities     BITS,
+        outletGroupMembers          DisplayString
+    }
+
+outletGroupId OBJECT-TYPE
+    SYNTAX     Integer32(1..128)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A unique value for each outlet group."
+    ::= { outletGroupConfigurationEntry 1 }
+
+outletGroupName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The user-defined name."
+    ::= { outletGroupConfigurationEntry 2 }
+
+outletGroupCapabilities OBJECT-TYPE
+    SYNTAX     BITS { activePower(4),
+                      activeEnergy(7) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "A bit string indicating which sensors are available for the outlet group."
+    ::= { outletGroupConfigurationEntry 3 }
+
+outletGroupMembers OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The list of member outlets of this group.
+            String must consist of a comma separated sequence of the outlet identifiers in
+            the format PDUID-OUTLETID.
+            Example: 1-1,1-5,2-2."
+    ::= { outletGroupConfigurationEntry 4 }
+
+-- outletGroupSensorConfigurationTable: information and settings for outlet group sensors
+
+outletGroupSensorConfigurationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF OutletGroupSensorConfigurationEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of configuration entries for an outlet group sensor."
+    ::= { outletGroups 3 }
+
+outletGroupSensorConfigurationEntry OBJECT-TYPE
+    SYNTAX     OutletGroupSensorConfigurationEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing objects for configuring an outlet group sensor."
+    INDEX { outletGroupId, sensorType }
+    ::= { outletGroupSensorConfigurationTable 1 }
+
+OutletGroupSensorConfigurationEntryStruct ::= SEQUENCE {
+        outletGroupSensorLogAvailable                   TruthValue,
+        outletGroupSensorUnits                          SensorUnitsEnumeration,
+        outletGroupSensorDecimalDigits                  Unsigned32,
+        outletGroupSensorResolution                     Unsigned32,
+        outletGroupSensorMaximum                        Unsigned32,
+        outletGroupSensorMinimum                        Unsigned32,
+        outletGroupSensorHysteresis                     Unsigned32,
+        outletGroupSensorStateChangeDelay               Unsigned32,
+        outletGroupSensorLowerCriticalThreshold         Unsigned32,
+        outletGroupSensorLowerWarningThreshold          Unsigned32,
+        outletGroupSensorUpperCriticalThreshold         Unsigned32,
+        outletGroupSensorUpperWarningThreshold          Unsigned32,
+        outletGroupSensorEnabledThresholds              BITS,
+        outletGroupSensorSignedMaximum                  Integer32,
+        outletGroupSensorSignedMinimum                  Integer32,
+        outletGroupSensorSignedLowerCriticalThreshold   Integer32,
+        outletGroupSensorSignedLowerWarningThreshold    Integer32,
+        outletGroupSensorSignedUpperCriticalThreshold   Integer32,
+        outletGroupSensorSignedUpperWarningThreshold    Integer32
+    }
+
+outletGroupSensorLogAvailable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Is data logging enabled for the sensor?"
+    ::= { outletGroupSensorConfigurationEntry 4 }
+
+outletGroupSensorUnits OBJECT-TYPE
+    SYNTAX     SensorUnitsEnumeration
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The unit in which the sensor reading is reported.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 6 }
+
+outletGroupSensorDecimalDigits OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of digits displayed to the right of the decimal point.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 7 }
+
+outletGroupSensorResolution OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The resolution: the minimum difference between any two measured values
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 9 }
+
+outletGroupSensorMaximum OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The largest possible reading as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is clamped if the scaled maximum exceeds 4294967295. It
+            is undefined for sensors which can have negative readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 11 }
+
+outletGroupSensorMinimum OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The smallest possible reading as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is undefined for sensors which can have negative readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 12 }
+
+outletGroupSensorHysteresis OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The hysteresis used when crossing a threshold towards the normal state.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 13 }
+
+outletGroupSensorStateChangeDelay OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The delay measured in samples before a state is asserted.
+            If the value is zero, then the state is asserted as soon as
+            it is detected; if it is non-zero, say n, then the assertion
+            condition must exist for n+1 consecutive samples before the
+            event is reported.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 14 }
+
+outletGroupSensorLowerCriticalThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The lower critical threshold as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is clamped if the scaled threshold exceeds 4294967295. It
+            is undefined for sensors which can have negative readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 21 }
+
+outletGroupSensorLowerWarningThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The lower warning threshold as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is clamped if the scaled threshold exceeds 4294967295. It
+            is undefined for sensors which can have negative readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 22 }
+
+outletGroupSensorUpperCriticalThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The upper critical threshold as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is clamped if the scaled threshold exceeds 4294967295. It
+            is undefined for sensors which can have negative readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 23 }
+
+outletGroupSensorUpperWarningThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The upper warning threshold as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is clamped if the scaled threshold exceeds 4294967295. It
+            is undefined for sensors which can have negative readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 24 }
+
+outletGroupSensorEnabledThresholds OBJECT-TYPE
+    SYNTAX     BITS { lowerCritical(0),
+                      lowerWarning(1),
+                      upperWarning(2),
+                      upperCritical(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "A bit string indicating which thresholds are enabled.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 25 }
+
+outletGroupSensorSignedMaximum OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The largest possible reading as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 26 }
+
+outletGroupSensorSignedMinimum OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The smallest possible reading as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value determines whether to use the signed or unsigned threshold
+            and value columns: If the minimum is below zero the sensor can have
+            negative readings and the signed columns should be used.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 27 }
+
+outletGroupSensorSignedLowerCriticalThreshold OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The lower critical threshold as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 28 }
+
+outletGroupSensorSignedLowerWarningThreshold OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The lower warning threshold as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 29 }
+
+outletGroupSensorSignedUpperCriticalThreshold OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The upper critical threshold as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 30 }
+
+outletGroupSensorSignedUpperWarningThreshold OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The upper warning threshold as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            The value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorConfigurationEntry 31 }
 
 -- peripheralDevicePackageTable: peripheral device package information
 
@@ -9235,7 +9845,7 @@ logExternalSensorMinValue OBJECT-TYPE
 wireSensorLogTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF WireSensorLogEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A list of wire sensor entries in the log.
             Note: This feature is no longer used, the table is always empty."
@@ -9244,7 +9854,7 @@ wireSensorLogTable OBJECT-TYPE
 wireSensorLogEntry OBJECT-TYPE
     SYNTAX     WireSensorLogEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "An entry containing log objects for a wire sensor."
     INDEX { pduId, wireId, sensorType, logIndex }
@@ -9261,7 +9871,7 @@ WireSensorLogEntryStruct ::= SEQUENCE {
 logWireSensorDataAvailable OBJECT-TYPE
     SYNTAX     TruthValue
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "Is data available for this sensor during this measurement period?"
     ::= { wireSensorLogEntry 2 }
@@ -9269,7 +9879,7 @@ logWireSensorDataAvailable OBJECT-TYPE
 logWireSensorState OBJECT-TYPE
     SYNTAX     SensorStateEnumeration
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The most critical sensor state during this measurement period."
     ::= { wireSensorLogEntry 3 }
@@ -9277,7 +9887,7 @@ logWireSensorState OBJECT-TYPE
 logWireSensorAvgValue OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The sensor reading average value.
             The value of this OID variable should be scaled by
@@ -9290,7 +9900,7 @@ logWireSensorAvgValue OBJECT-TYPE
 logWireSensorMaxValue OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The sensor reading maximum value.
             The value of this OID variable should be scaled by
@@ -9303,7 +9913,7 @@ logWireSensorMaxValue OBJECT-TYPE
 logWireSensorMinValue OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The sensor reading minimum value.
             The value of this OID variable should be scaled by
@@ -9711,6 +10321,139 @@ logCircuitPoleSensorSignedMinValue OBJECT-TYPE
             Integer32 range (-2147483648 .. 2147483647).
             This object does not apply to sensors without numerical reading."
     ::= { circuitPoleSensorLogEntry 9 }
+
+-- outletGroupSensorLogTable: Outlet group sensor log data
+
+outletGroupSensorLogTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF OutletGroupSensorLogEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of  outlet group sensor entries in the log."
+    ::= { logOutletGroup 3 }
+
+outletGroupSensorLogEntry OBJECT-TYPE
+    SYNTAX     OutletGroupSensorLogEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing log objects for an outlet group sensor."
+    INDEX { outletGroupId, sensorType, logIndex }
+    ::= { outletGroupSensorLogTable 1 }
+
+OutletGroupSensorLogEntryStruct ::= SEQUENCE {
+        logOutletGroupSensorDataAvailable   TruthValue,
+        logOutletGroupSensorState           SensorStateEnumeration,
+        logOutletGroupSensorAvgValue        Unsigned32,
+        logOutletGroupSensorMaxValue        Unsigned32,
+        logOutletGroupSensorMinValue        Unsigned32,
+        logOutletGroupSensorSignedAvgValue  Integer32,
+        logOutletGroupSensorSignedMaxValue  Integer32,
+        logOutletGroupSensorSignedMinValue  Integer32
+    }
+
+logOutletGroupSensorDataAvailable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Is data available for this sensor during this measurement period?"
+    ::= { outletGroupSensorLogEntry 2 }
+
+logOutletGroupSensorState OBJECT-TYPE
+    SYNTAX     SensorStateEnumeration
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The most critical sensor state during this measurement period."
+    ::= { outletGroupSensorLogEntry 3 }
+
+logOutletGroupSensorAvgValue OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The average sensor reading for the log period as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value will wrap around if the scaled sensor reading exceeds
+            4294967295. It is undefined for sensors which can have negative
+            readings.
+            This object does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorLogEntry 4 }
+
+logOutletGroupSensorMaxValue OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The maximum sensor reading for the log period as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value will wrap around if the scaled sensor reading exceeds
+            4294967295. It is undefined for sensors which can have negative
+            readings.
+            This object does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorLogEntry 5 }
+
+logOutletGroupSensorMinValue OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The minimum sensor reading for the log period as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value will wrap around if the scaled sensor reading exceeds
+            4294967295. It is undefined for sensors which can have negative
+            readings.
+            This object does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorLogEntry 6 }
+
+logOutletGroupSensorSignedAvgValue OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The average sensor reading for the log period as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This object does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorLogEntry 7 }
+
+logOutletGroupSensorSignedMaxValue OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The maximum sensor reading for the log period as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This object does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorLogEntry 8 }
+
+logOutletGroupSensorSignedMinValue OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The minimum sensor reading for the log period as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This object does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorLogEntry 9 }
 
 -- unitSensorMeasurementsTable: unit-level sensor readings
 
@@ -10262,7 +11005,7 @@ measurementsExternalSensorTimeStamp OBJECT-TYPE
 wireSensorMeasurementsTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF WireSensorMeasurementsEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "A list of wire sensor entries.
             Note: This feature is no longer used, the table is always empty."
@@ -10271,7 +11014,7 @@ wireSensorMeasurementsTable OBJECT-TYPE
 wireSensorMeasurementsEntry OBJECT-TYPE
     SYNTAX     WireSensorMeasurementsEntryStruct
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "An entry containing measurement objects for a wire."
     INDEX { pduId, wireId, sensorType }
@@ -10287,7 +11030,7 @@ WireSensorMeasurementsEntryStruct ::= SEQUENCE {
 measurementsWireSensorIsAvailable OBJECT-TYPE
     SYNTAX     TruthValue
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "Is the sensor available?"
     ::= { wireSensorMeasurementsEntry 2 }
@@ -10295,7 +11038,7 @@ measurementsWireSensorIsAvailable OBJECT-TYPE
 measurementsWireSensorState OBJECT-TYPE
     SYNTAX     SensorStateEnumeration
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The sensor state."
     ::= { wireSensorMeasurementsEntry 3 }
@@ -10303,7 +11046,7 @@ measurementsWireSensorState OBJECT-TYPE
 measurementsWireSensorValue OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The sensor value.
              The value of this OID variable should be scaled by
@@ -10316,7 +11059,7 @@ measurementsWireSensorValue OBJECT-TYPE
 measurementsWireSensorTimeStamp OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS read-only
-    STATUS     deprecated
+    STATUS     obsolete
     DESCRIPTION
            "The timestamp."
     ::= { wireSensorMeasurementsEntry 5 }
@@ -10560,6 +11303,86 @@ measurementsCircuitPoleSensorSignedValue OBJECT-TYPE
             Integer32 range (-2147483648 .. 2147483647).
             This parameter does not apply to sensors without numerical reading."
     ::= { circuitPoleSensorMeasurementsEntry 6 }
+
+-- outletGroupSensorMeasurementsTable: Outlet group sensor readings
+
+outletGroupSensorMeasurementsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF OutletGroupSensorMeasurementsEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of outlet group sensor entries."
+    ::= { measurementsOutletGroup 3 }
+
+outletGroupSensorMeasurementsEntry OBJECT-TYPE
+    SYNTAX     OutletGroupSensorMeasurementsEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing measurement objects for an outlet group sensor."
+    INDEX { outletGroupId, sensorType }
+    ::= { outletGroupSensorMeasurementsTable 1 }
+
+OutletGroupSensorMeasurementsEntryStruct ::= SEQUENCE {
+        measurementsOutletGroupSensorIsAvailable    TruthValue,
+        measurementsOutletGroupSensorState          SensorStateEnumeration,
+        measurementsOutletGroupSensorValue          Unsigned32,
+        measurementsOutletGroupSensorTimeStamp      Unsigned32,
+        measurementsOutletGroupSensorSignedValue    Integer32
+    }
+
+measurementsOutletGroupSensorIsAvailable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Is the sensor available?"
+    ::= { outletGroupSensorMeasurementsEntry 2 }
+
+measurementsOutletGroupSensorState OBJECT-TYPE
+    SYNTAX     SensorStateEnumeration
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The sensor state."
+    ::= { outletGroupSensorMeasurementsEntry 3 }
+
+measurementsOutletGroupSensorValue OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The sensor reading as an unsigned integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value will wrap around if the scaled sensor reading exceeds
+            4294967295. It is undefined for sensors which can have negative
+            readings.
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorMeasurementsEntry 4 }
+
+measurementsOutletGroupSensorTimeStamp OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The timestamp."
+    ::= { outletGroupSensorMeasurementsEntry 5 }
+
+measurementsOutletGroupSensorSignedValue OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The sensor reading as a signed integer.
+            The value of this OID variable should be scaled by
+            outletGroupSensorDecimalDigits.  For example, if the value is 1 and
+            outletGroupSensorDecimalDigits is 2, then actual value is 0.01.
+            This value is undefined for sensors whose range exceeds the
+            Integer32 range (-2147483648 .. 2147483647).
+            This parameter does not apply to sensors without numerical reading."
+    ::= { outletGroupSensorMeasurementsEntry 6 }
 
 -- outletSwitchControlTable: objects for controlling outlets
 
@@ -10897,6 +11720,109 @@ circuitSensorResetValue OBJECT-TYPE
             This variable will always read as 0."
     ::= { circuitSensorControlEntry 1 }
 
+-- outletGroupSwitchControlTable: objects for controlling outlet groups
+
+outletGroupSwitchControlTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF OutletGroupSwitchControlEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of outlet groups. The number of
+            entries is given by the value of outletGroupCount."
+    ::= { outletGroupControl  2 }
+
+outletGroupSwitchControlEntry OBJECT-TYPE
+    SYNTAX     OutletGroupSwitchControlEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry for implementing switching operations on an outlet group."
+    INDEX { outletGroupId }
+    ::= { outletGroupSwitchControlTable 1 }
+
+OutletGroupSwitchControlEntryStruct ::= SEQUENCE {
+        outletGroupSwitchingOperation        OutletSwitchingOperationsEnumeration
+    }
+
+outletGroupSwitchingOperation OBJECT-TYPE
+    SYNTAX     OutletSwitchingOperationsEnumeration
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The switching operation: switch on, switch off or power-cycle."
+    ::= { outletGroupSwitchControlEntry 2 }
+
+-- outletGroupSensorControlTable: objects for controlling outlet group sensors
+
+outletGroupSensorControlTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF OutletGroupSensorControlEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of control entries for the sensors of an outlet group. The set
+            of valid indices is defined by the value of outletGroupCount and the
+            outletGroupCapabilities entry for the selected group."
+    ::= { outletGroupSensorControl 1 }
+
+outletGroupSensorControlEntry OBJECT-TYPE
+    SYNTAX     OutletGroupSensorControlEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry used for controlling an outlet group sensor."
+    INDEX { outletGroupId, sensorType }
+    ::= { outletGroupSensorControlTable 1 }
+
+OutletGroupSensorControlEntryStruct ::= SEQUENCE {
+        outletGroupSensorResetValue Integer32
+    }
+
+outletGroupSensorResetValue OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Writing to this variable sets a new value for the addressed sensor. Only
+            accumulating sensors (e.g. energy counters) can be reset, and currently
+            the only supported value is 0. Writing any other value returns an error.
+            This variable will always read as 0."
+    ::= { outletGroupSensorControlEntry 1 }
+
+-- serverPowerControlTable: objects for power controlling servers
+
+serverPowerControlTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ServerPowerControlEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of server entries. The number of entries is given by the
+            value of serverCount for the PDU."
+    ::= { serverPowerControl  1 }
+
+serverPowerControlEntry OBJECT-TYPE
+    SYNTAX     ServerPowerControlEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry for implementing power control operations on a server."
+    INDEX { pduId, serverID }
+    ::= { serverPowerControlTable 1 }
+
+ServerPowerControlEntryStruct ::= SEQUENCE {
+        serverPowerControlOperation    ServerPowerStateEnumeration
+    }
+
+serverPowerControlOperation OBJECT-TYPE
+    SYNTAX     ServerPowerStateEnumeration
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Reading the variable returns the current power state of the server. Writing
+             on(1) or off(2) results in a power control operation, switching the configured
+             power target on or initiating a graceful shutdown. Writing any other value
+             results in an error."
+    ::= { serverPowerControlEntry 1 }
+
 -- reliabilityData table: PDU reliability data
 
 reliabilityDataTableSequenceNumber OBJECT-TYPE
@@ -10980,7 +11906,15 @@ reliabilityId OBJECT-TYPE
               Number of failed switching operations on relay <num> on the controller
               board with serial number <serial> and bus address <addr> in the last
               hour. It depends on the specific controller board hardware  and what
-              error conditions are detected."
+              error conditions are detected.
+
+            CTRL.<serial>.<addr>.EMRSTCNT
+              Number of energy-meter resets on the controller board with serial
+              number <serial> and bus address <addr>.
+
+            CTRL.<serial>.<addr>.RSTCNT
+              Number of resets of the controller board with serial number <serial>
+              and bus address <addr>."
     ::= { reliabilityDataEntry 2 }
 
 reliabilityDataValue OBJECT-TYPE
@@ -11174,6 +12108,94 @@ reliabilityErrorLogTime OBJECT-TYPE
     DESCRIPTION
            "The UTC time of occurrence of the event"
     ::= { reliabilityErrorLogEntry 10 }
+
+-- hwFailureTable: table with hardware failure statistic
+
+hwFailureTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwFailureEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A list of hardware failure entries."
+    ::= { reliabilityHardwareHealth 1 }
+
+HwFailureEntryStruct ::= SEQUENCE {
+        hwFailureIndex                  Integer32,
+        hwFailureComponentId            DisplayString,
+        hwFailureType                   HwFailureTypeEnumeration,
+        hwFailureAsserted               TruthValue,
+        hwFailureLastAssertTimeStamp    Unsigned32,
+        hwFailureLastDeassertTimeStamp  Unsigned32,
+        hwFailureAssertCount            Unsigned32
+    }
+
+hwFailureEntry OBJECT-TYPE
+    SYNTAX     HwFailureEntryStruct
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A hardware failure entry."
+    INDEX { pduId, hwFailureIndex }
+    ::= { hwFailureTable 1 }
+
+hwFailureIndex OBJECT-TYPE
+    SYNTAX     Integer32(1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Index of the entry in the hardware failure table."
+    ::= { hwFailureEntry 1 }
+
+hwFailureComponentId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The id of the affected hardware component."
+    ::= { hwFailureEntry 2 }
+
+hwFailureType OBJECT-TYPE
+    SYNTAX     HwFailureTypeEnumeration
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The hardware failure type."
+    ::= { hwFailureEntry 3 }
+
+hwFailureAsserted OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Reflects whether the failure state is asserted(true) or not(false)."
+    ::= { hwFailureEntry 4 }
+
+hwFailureLastAssertTimeStamp OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The timestamp indicating when the failure was last asserted.
+            It is measured in seconds since January 1, 1970 UTC."
+    ::= { hwFailureEntry 5 }
+
+hwFailureLastDeassertTimeStamp OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The timestamp indicating when the failure was last deasserted.
+            It is measured in seconds since January 1, 1970 UTC.
+            If the failure is currently asserted then this has no meaning and is reported as 0."
+    ::= { hwFailureEntry 6 }
+
+hwFailureAssertCount OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of times the failure was asserted."
+    ::= { hwFailureEntry 7 }
 
 -- Definition of SNMP traps that can be sent by the PDU
 -- All traps contain the pxInetIPAddressType and  pxInetIPAddress fields.
@@ -12016,7 +13038,7 @@ wireSensorStateChange NOTIFICATION-TYPE
               sysName,
               sysLocation,
               pduSerialNumber }
-    STATUS deprecated
+    STATUS obsolete
     DESCRIPTION
            "Wire sensor state change."
     ::= { traps 85 }
@@ -12530,7 +13552,11 @@ smartCardInserted NOTIFICATION-TYPE
               sysContact,
               sysName,
               sysLocation,
-              pduSerialNumber }
+              pduSerialNumber,
+              smartCardReaderManufacturer,
+              smartCardReaderProduct,
+              smartCardReaderSerialNumber,
+              smartCardReaderChannel }
     STATUS current
     DESCRIPTION
            "A smartcard was inserted into a card reader."
@@ -12548,10 +13574,208 @@ smartCardRemoved NOTIFICATION-TYPE
               sysContact,
               sysName,
               sysLocation,
-              pduSerialNumber }
+              pduSerialNumber,
+              smartCardReaderManufacturer,
+              smartCardReaderProduct,
+              smartCardReaderSerialNumber,
+              smartCardReaderChannel }
     STATUS current
     DESCRIPTION
            "A smartcard was removed from a card reader."
     ::= { traps 114 }
+
+rawConfigurationDownloaded NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "The raw configuration was downloaded from the device."
+    ::= { traps 115 }
+
+rawConfigurationUpdated NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "A raw configuration update was applied on the device."
+    ::= { traps 116 }
+
+hwFailureStatusChanged NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber,
+              hwFailureComponentId,
+              hwFailureType,
+              hwFailureAsserted }
+    STATUS current
+    DESCRIPTION
+           "A hardware component's failure state has changed."
+    ::= { traps 117 }
+
+outletGroupAdded NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              outletGroupNumber,
+              outletGroupName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "A new outlet group has been configured"
+    ::= { traps 118 }
+
+outletGroupModified NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              outletGroupNumber,
+              outletGroupName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "A configured outlet group has been modified"
+    ::= { traps 119 }
+
+outletGroupDeleted NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              outletGroupNumber,
+              outletGroupName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "A configured outlet group has been deleted"
+    ::= { traps 120 }
+
+outletGroupSensorStateChange NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              outletGroupNumber,
+              outletGroupName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              typeOfSensor,
+              measurementsOutletGroupSensorTimeStamp,
+              measurementsOutletGroupSensorValue,
+              measurementsOutletGroupSensorState,
+              measurementsOutletGroupSensorSignedValue,
+              oldSensorState,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "Outlet group sensor state change.
+            Which value field to use depends on the metadata of the sensor.
+            measurementsOutletGroupSensorValue is undefined for sensors which can
+            have negative readings, measurementsOutletGroupSensorSignedValue is
+            undefined for sensors whose range exceeds the Integer32 range.
+            Both fields do not apply to sensors without numerical readings."
+    ::= { traps 121 }
+
+outletGroupSensorReset NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              outletGroupNumber,
+              outletGroupName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              typeOfSensor,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "An outlet group sensor was reset."
+    ::= { traps 122 }
+
+outletGroupPowerControl NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              userName,
+              outletGroupNumber,
+              outletGroupName,
+              outletGroupSwitchingOperation,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "An outlet group switching operation has been performed."
+    ::= { traps 123 }
+
+serverPowerControlInitiated NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              userName,
+              serverIPAddress,
+              serverPowerOperation,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "A server power control operation was initiated."
+    ::= { traps 124 }
+
+serverPowerControlCompleted NOTIFICATION-TYPE
+    OBJECTS { pduName,
+              pxInetAddressType,
+              pxInetIPAddress,
+              agentInetPortNumber,
+              serverIPAddress,
+              serverPowerResult,
+              sysContact,
+              sysName,
+              sysLocation,
+              pduSerialNumber }
+    STATUS current
+    DESCRIPTION
+           "A server power control operation has completed."
+    ::= { traps 125 }
 
 END

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2005 by HUAWEI-3COM TECHNOLOGIES.  All rights reserved.
+-- Copyright (c) 2004-2010 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description:  HUAWEI-3COM ACFP MIB
+-- Description: ACFP MIB
 -- Reference:
--- Version: V1.2
+-- Version: V1.5
 -- History:
 --   V1.0 2006-07-04 Created by Wang Haidong
 --   V1.1 2007-03-23 Modified by Hao Chunbo
@@ -21,6 +21,13 @@
 --        Modify the description of h3cAcfpRuleRowStatus.
 --        Modify the status of h3cAcfpRuleEstablish.
 --        Modify the value of h3cAcfpRuleTCPFlag.
+--   V1.5 2009-11-30 Modified by Zhu Dengfeng
+--        Add a new node for h3cAcfpRuleSrcIPV6Address
+--        Add a new node for h3cAcfpRuleSrcPrefixLen
+--        Add a new node for h3cAcfpRuleDstIPV6Address
+--        Add a new node for h3cAcfpRuleDstPrefixLen
+--        Add a new node for h3cAcfpRuleTrafficType
+--        Add a new node for h3cAcfpRuleTypeOrLen
 -- ==================================================================
 H3C-ACFP-MIB DEFINITIONS ::= BEGIN
 
@@ -29,6 +36,10 @@ IMPORTS
         FROM SNMPv2-SMI
     RowStatus, TruthValue, MacAddress, DisplayString
         FROM SNMPv2-TC
+    Ipv6Address
+        FROM IPV6-TC
+    InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
     h3cCommon
         FROM HUAWEI-3COM-OID-MIB;
 
@@ -39,11 +50,11 @@ IMPORTS
 h3cAcfp MODULE-IDENTITY
     LAST-UPDATED "200607041936Z"
     ORGANIZATION
-        "Huawei 3Com Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Huawei 3Com Technologies Co., Ltd.
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
-        Http://www.huawei-3com.com
+        Http://www.h3c.com
         Zip:100085"
     DESCRIPTION
         "This MIB module defines a set of basic objects for
@@ -242,7 +253,7 @@ h3cAcfpClientRowStatus OBJECT-TYPE
         Nodes that do not support modification: h3cAcfpClientMode.
         Nodes that support modification: h3cAcfpClientDescription,
         h3cAcfpClientHwVersion, h3cAcfpClientOSVersion,
-        h3cAcfpClientAppVersion and h3cAcfpClientIP. 
+        h3cAcfpClientAppVersion and h3cAcfpClientIP.
         If the row to be modified does not exist, error returns directly.
 
         Deletion Operation Restriction:
@@ -426,19 +437,19 @@ h3cAcfpPolicyRowStatus OBJECT-TYPE
         Nodes h3cAcfpPolicyTimeStart and h3cAcfpPolicyTimeEnd are
         bound together, and h3cAcfpPolicyTimeEnd must be greater than
         h3cAcfpPolicyTimeStart.
-        The number of rows created on an incoming/outgoing interface 
+        The number of rows created on an incoming/outgoing interface
         cannot exceed the upper limit.
         The number of rows created cannot exceed the upper limit for each client.
         A packet matches a policy in the following order:
-        - It first matches the policy with the highest priority. 
-        - For two policies with the same priority, 
+        - It first matches the policy with the highest priority.
+        - For two policies with the same priority,
           it matches the one with the smallest client index.
-        - For two policies with the same client index, 
+        - For two policies with the same client index,
           it matches the one with the smallest policy index.
 
         Modification Operation Restriction:
         Nodes that do not support modification: h3cAcfpPolicyInIfIndex,
-        h3cAcfpPolicyOutIfIndex, h3cAcfpPolicyDestIfIndex, 
+        h3cAcfpPolicyOutIfIndex, h3cAcfpPolicyDestIfIndex,
         h3cAcfpPolicyDestIfFailAction, h3cAcfpPolicyPriority.
         Nodes that support modification: h3cAcfpPolicyAdminStatus,
         h3cAcfpPolicyLifetime, h3cAcfpPolicyTimeStart and h3cAcfpPolicyTimeEnd.
@@ -544,7 +555,13 @@ H3cAcfpRuleEntry ::= SEQUENCE
         h3cAcfpRuleFragment        TruthValue,
         h3cAcfpRulePacketRate      Integer32,
         h3cAcfpRuleRowStatus       RowStatus,
-        h3cAcfpRuleTCPFlag         Integer32
+        h3cAcfpRuleTCPFlag         Integer32,
+        h3cAcfpRuleSrcIPV6Address  Ipv6Address,
+        h3cAcfpRuleSrcPrefixLen    InetAddressPrefixLength,
+        h3cAcfpRuleDstIPV6Address  Ipv6Address,
+        h3cAcfpRuleDstPrefixLen    InetAddressPrefixLength,
+        h3cAcfpRuleTrafficType     BITS,
+        h3cAcfpRuleTypeOrLen       Integer32
     }
 
 h3cAcfpRuleIndex OBJECT-TYPE
@@ -869,20 +886,20 @@ h3cAcfpRuleRowStatus OBJECT-TYPE
         mutually exclusive.
         Nodes h3cAcfpRuleSrcIP and h3cAcfpRuleSrcIPMask are bound together,
         otherwise, the source IP address is neglected.
-        The restriction over h3cAcfpRuleDstIP and h3cAcfpRuleDstIPMask is the 
+        The restriction over h3cAcfpRuleDstIP and h3cAcfpRuleDstIPMask is the
         same as h3cAcfpRuleSrcIP and h3cAcfpRuleSrcIPMask.
         Nodes h3cAcfpRuleDscp and h3cAcfpRulePrecedence, h3cAcfpRuleTos are
         mutually exclusive.
-        If the node h3cAcfpRuleSrcOp is bound to range(5), 
-        h3cAcfpRuleSrcStartPort and h3cAcfpRuleSrcEndPort must be bound together, 
+        If the node h3cAcfpRuleSrcOp is bound to range(5),
+        h3cAcfpRuleSrcStartPort and h3cAcfpRuleSrcEndPort must be bound together,
         and h3cAcfpRuleSrcEndPort must be greater than h3cAcfpRuleSrcStartPort.
-        If the node h3cAcfpRuleSrcOp is bound to equal(1), notEqual(2), 
-        lessThan(3) or greaterThan(4), h3cAcfpRuleSrcStartPort must be bound 
+        If the node h3cAcfpRuleSrcOp is bound to equal(1), notEqual(2),
+        lessThan(3) or greaterThan(4), h3cAcfpRuleSrcStartPort must be bound
         together, and h3cAcfpRuleSrcEndPort is neglected.
-        The restriction over h3cAcfpRuleDstOp, h3cAcfpRuleDstStartPort and 
-        h3cAcfpRuleDstEndPort is the same as h3cAcfpRuleSrcOp, 
+        The restriction over h3cAcfpRuleDstOp, h3cAcfpRuleDstStartPort and
+        h3cAcfpRuleDstEndPort is the same as h3cAcfpRuleSrcOp,
         h3cAcfpRuleSrcStartPort and h3cAcfpRuleSrcEndPort.
-        If the node h3cAcfpRuleAction is bound to redirect(3) or mirror(4), 
+        If the node h3cAcfpRuleAction is bound to redirect(3) or mirror(4),
         the destination interfaces of the policy the rule belonging to must exist;
         The number of rows created cannot exceed the upper limit for each policy,
         each inbound interface and each outbound interface.
@@ -900,10 +917,10 @@ h3cAcfpRuleTCPFlag OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "TCP Flag.  
+        "TCP Flag.
         <0>       don't care for TCP flag to match packets
-        <1-65535> care for TCP flag to match packets, 
-                  the value is combination of next list. 
+        <1-65535> care for TCP flag to match packets,
+                  the value is combination of next list.
                   URG_VALID (1 << 13)
                   URG_SET   (1 << 5)
                   ACK_VALID (1 << 12)
@@ -917,12 +934,68 @@ h3cAcfpRuleTCPFlag OBJECT-TYPE
                   FIN_VALID (1 << 8)
                   FIN_SET   1
 
-        Matches the TCP packets with the URG and/or 
-        ACK and/or PSH and/or RST and/or SYN and/or FIN flag, 
+        Matches the TCP packets with the URG and/or
+        ACK and/or PSH and/or RST and/or SYN and/or FIN flag,
         including the TCP packets of these
         types: SYN+ACK, ACK, FIN+ACK, RST, RST+ACK."
     DEFVAL { 0 }
     ::= { h3cAcfpRuleEntry 27 }
+
+h3cAcfpRuleSrcIPV6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IPv6 address of this rule."
+    ::= { h3cAcfpRuleEntry 28 }
+
+h3cAcfpRuleSrcPrefixLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source IPv6 address prefix length of this rule. Eg. 64."
+    ::= { h3cAcfpRuleEntry 29 }
+
+h3cAcfpRuleDstIPV6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IPv6 address of this rule."
+    ::= { h3cAcfpRuleEntry 30 }
+
+h3cAcfpRuleDstPrefixLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Destination IPv6 address prefix length of this rule. Eg. 64."
+    ::= { h3cAcfpRuleEntry 31 }
+
+h3cAcfpRuleTrafficType OBJECT-TYPE
+    SYNTAX      BITS
+        {
+            unicast(0),
+            multicast(1),
+            broadcast(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Traffic type of this rule. When retrieved, this object
+        returns a set of bits indicating the traffic type."
+    ::= { h3cAcfpRuleEntry 32 }
+
+h3cAcfpRuleTypeOrLen OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type or length of ethernet packet.
+        For Ethernet II encapsulation, it stands for packet type.
+        For 802.3 encapsulation, it stands for packet length."
+    ::= { h3cAcfpRuleEntry 33 }
 
 -- Notifications.  The definition of h3cAcfpNotifications makes notification
 -- registrations reversible (see STD 58, RFC 2578, section 8.5).
@@ -1035,7 +1108,7 @@ h3cAcfpLifetimeExpireEvent NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "This notification is sent 
+        "This notification is sent
          when the time of the policy existed exceeds its lifetime."
     ::= { h3cAcfpNotifications 10 }
 

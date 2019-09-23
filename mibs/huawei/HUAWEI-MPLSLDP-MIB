@@ -1,9 +1,9 @@
 -- ===================================================================
--- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This MIB contains private managed object and notification 
 --              trap definitions for MPLS LDP.
 -- Reference:
--- Version: V2.46
+-- Version: V2.48
 -- ===================================================================
 
 
@@ -32,7 +32,7 @@
     
     
         hwMplsLdp MODULE-IDENTITY 
-            LAST-UPDATED "201411061640Z"        -- Nov 6, 2014 at 16:40:00 GMT            
+            LAST-UPDATED "201711231800Z"        -- Nov 9, 2017 at 18:00:00 GMT           
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -49,6 +49,14 @@
 --
 -- Revision history
 -- 
+        REVISION    "201711231800Z"   
+        DESCRIPTION "V2.48, modify description of hwMplsLdpSessionTable."
+
+
+         REVISION    "201709211800Z"   
+        DESCRIPTION "V2.47, add  hwMplsLdpMultiLinkCfgInconsistent and hwMplsLdpMultiLinkCfgInconsistentClear, and add table hwLdpMultiLinkCfgTable include objects belong to it."
+
+	
         REVISION    "201411061640Z"   
         DESCRIPTION "V2.46, delete LDP GR timer  range's validity check, include hwLdpGrNeighborLivenessTimer,hwLdpGrReconnectTimer,hwLdpGrRecoveryTimer."
 
@@ -199,9 +207,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object is used to display the session parameters and session age.
-                 The index of this table is hwMplsLdpSessionPeerLsrId.
-                "
+                "This table describes LDP session parameters, including the index of an interface of a session, the cause for a session Down event, and time elapsed since a session was established."
             ::= { hwMplsLdpInfo 7 }
         
         hwMplsLdpSessionEntry OBJECT-TYPE
@@ -2013,6 +2019,135 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
                 "This object indicates the total number of LDP operational sessions."
             ::= { hwLdpSessionStatistics 4 } 
  
+           hwLdpMultiLinkCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpMultiLinkCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that MPLS LDP multi-link (include local and remote coexist) configurations are inconsistent.
+                 The index of this entry is hwMplsLdpVrfIndex,hwMplsLdpPeerLdpId,hwMplsLdpLocalLdpId,hwMplsLdpConfigIfIndex, hwMplsLdpConfigRemotePeerIP and hwMplsLdpConfigType.
+                "
+            ::= { hwMplsLdpInfo 74 }
+        
+        hwLdpMultiLinkCfgEntry OBJECT-TYPE
+            SYNTAX HwLdpMultiLinkCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that MPLS LDP multi-link (include local and remote coexist) configurations are inconsistent.
+                 The index of this entry is hwMplsLdpVrfIndex,hwMplsLdpPeerLdpId,hwMplsLdpLocalLdpId,hwMplsLdpConfigIfIndex, hwMplsLdpConfigRemotePeerIP and hwMplsLdpConfigType.
+                "
+            INDEX { hwMplsLdpVrfIndex, hwMplsLdpPeerLdpId, hwMplsLdpLocalLdpId, hwMplsLdpConfigIfIndex, hwMplsLdpConfigRemotePeerIP, hwMplsLdpConfigType }
+            ::= { hwLdpMultiLinkCfgTable 1 }
+        
+        HwLdpMultiLinkCfgEntry ::=
+            SEQUENCE { 
+                hwMplsLdpVrfIndex
+                    Integer32,
+                hwMplsLdpPeerLdpId
+                    MplsLdpIdentifier,
+                hwMplsLdpLocalLdpId
+                    MplsLdpIdentifier,
+                hwMplsLdpConfigIfIndex
+                    Integer32,
+                hwMplsLdpConfigRemotePeerIP
+                    InetAddress,
+                hwMplsLdpConfigType
+                   OCTET STRING,
+                hwMplsLdpConsistentState
+                    INTEGER,
+                hwMplsLdpEffectKeepAlive
+                    Integer32,
+                hwMplsLdpEffectTransportAddr
+                    InetAddress,
+                hwMplsLdpEffectLabelAdvertisementMode
+                    OCTET STRING
+             }
+ 
+        hwMplsLdpVrfIndex OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS  not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the vrfIndex."
+            ::= { hwLdpMultiLinkCfgEntry 1 }
+            
+        hwMplsLdpPeerLdpId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the peer LDP ID."
+            ::= { hwLdpMultiLinkCfgEntry 2 }
+            
+        hwMplsLdpLocalLdpId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the local LDP ID."
+            ::= { hwLdpMultiLinkCfgEntry 3 } 
+            
+        hwMplsLdpConfigIfIndex OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the inconsistent interface."
+            ::= { hwLdpMultiLinkCfgEntry 4}
+ 
+         hwMplsLdpConfigRemotePeerIP  OBJECT-TYPE
+            SYNTAX        InetAddress
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the rempte ip.
+                 Range: 1-32 characters"
+            ::= { hwLdpMultiLinkCfgEntry 5}
+
+        hwMplsLdpConfigType OBJECT-TYPE
+            SYNTAX      OCTET STRING
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the inconsistent configuration type."
+            ::= { hwLdpMultiLinkCfgEntry 6 }
+            
+       hwMplsLdpConsistentState OBJECT-TYPE
+            SYNTAX      INTEGER {
+                       consistent(1),
+                       inconsistent(2)
+                    }
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the the state is inconsistent or consistent."
+            ::= { hwLdpMultiLinkCfgEntry 7 }
+            
+        hwMplsLdpEffectKeepAlive OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the value of effect keepalive time."
+            ::= { hwLdpMultiLinkCfgEntry 8 } 
+            
+        hwMplsLdpEffectTransportAddr OBJECT-TYPE
+            SYNTAX        InetAddress
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the value of effect transport address."
+            ::= { hwLdpMultiLinkCfgEntry 9 }
+            
+        hwMplsLdpEffectLabelAdvertisementMode OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the value of effect label advertisement mode."
+            ::= { hwLdpMultiLinkCfgEntry 10}
+
         hwMplsLdpTrap OBJECT IDENTIFIER ::= { hwMplsLdp 2 }
         
         hwMplsLdpSessionDown NOTIFICATION-TYPE
@@ -2044,6 +2179,21 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             DESCRIPTION 
                 "A trap is sent when all the ingress lsp of a specified FEC went down."
             ::= { hwMplsLdpTrap 4 }
+
+        hwMplsLdpMultiLinkCfgInconsistent NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpConsistentState, hwMplsLdpEffectKeepAlive, hwMplsLdpEffectTransportAddr, hwMplsLdpEffectLabelAdvertisementMode }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that MPLS LDP multi-link configurations are Inconsistent."
+            ::= { hwMplsLdpTrap 5 }
+
+        hwMplsLdpMultiLinkCfgInconsistentClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpConsistentState, hwMplsLdpEffectKeepAlive, hwMplsLdpEffectTransportAddr, hwMplsLdpEffectLabelAdvertisementMode }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that MPLS LDP multi-link configurations are consistent."
+            ::= { hwMplsLdpTrap 6 }
+
 
         hwMplsLdpConformance OBJECT IDENTIFIER ::= { hwMplsLdp 3 }
         
@@ -2174,7 +2324,21 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "Information about Ldp Session Statistics."
-            ::= { hwMplsLdpGroup 17}  
+            ::= { hwMplsLdpGroup 17} 
+
+        hwMplsLdpMultiLinkCfgGroup OBJECT-GROUP
+            OBJECTS {  hwMplsLdpConsistentState, hwMplsLdpEffectKeepAlive, hwMplsLdpEffectTransportAddr, hwMplsLdpEffectLabelAdvertisementMode }
+            STATUS current
+            DESCRIPTION
+                "Information about MPLS LDP multi-link configurations."
+            ::= { hwMplsLdpGroup 18} 
+
+         hwMplsLdpMultiLinkCfgNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpMultiLinkCfgInconsistent,  hwMplsLdpMultiLinkCfgInconsistentClear}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP multi-link configurations."
+            ::= { hwMplsLdpGroup 19 }
     END
 
 --

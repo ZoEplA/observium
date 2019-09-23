@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -91,7 +91,7 @@ foreach ($oids as $index => $entry)
   $value    = $entry[$oid_name];
   $limits   = array('limit_low' => $entry['shelfFanLowSpeedThreshold']);
 
-  discover_sensor($valid['sensor'], 'fanspeed', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
+  discover_sensor('fanspeed', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
 }
 
 //ZHONE-SHELF-MONITOR-MIB::shelfTemperature.1.1 = INTEGER: 29
@@ -114,7 +114,7 @@ foreach ($oids as $index => $entry)
   $limits   = array('limit_high' => $entry['shelfTemperatureHighThreshold'],
                     'limit_low'  => $entry['shelfTemperatureLowThreshold']);
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
+  discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
 }
 
 // EOF

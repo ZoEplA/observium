@@ -446,7 +446,7 @@ rlEmWebServiceEnable  OBJECT-TYPE
     ::=  { rlEmWebServiceEntry 3 }
 
 rlEmWebServicePort OBJECT-TYPE
-    SYNTAX  INTEGER (0..65535)
+    SYNTAX  INTEGER (0..59999)
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION

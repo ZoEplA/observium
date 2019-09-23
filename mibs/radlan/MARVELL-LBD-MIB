@@ -14,12 +14,15 @@ IMPORTS
 
 
 rlLbd  MODULE-IDENTITY
-       LAST-UPDATED "200711070000Z"
+       LAST-UPDATED "201505290000Z"
        ORGANIZATION "Marvell Semiconductor, Inc."
        CONTACT-INFO
                 "www.marvell.com"
        DESCRIPTION
                 "The private MIB module definition for Loopback Detection MIB."
+       REVISION "201505290000Z"
+       DESCRIPTION
+                "Add multicast-mac-addr value for rlLbdMode."
        REVISION "200711070000Z"
        DESCRIPTION
                 "Initial version of this MIB."
@@ -38,7 +41,7 @@ rlLbdEnable OBJECT-TYPE
 
 -------------------------------------------------------------------------------
 rlLbdDetectionInterval OBJECT-TYPE
-    SYNTAX      INTEGER(10..60)
+    SYNTAX      INTEGER(1..60)
     UNITS       "seconds"
     MAX-ACCESS  read-write
     STATUS      current
@@ -53,7 +56,8 @@ rlLbdMode OBJECT-TYPE
     SYNTAX  INTEGER {
         source-mac-addr (1),
         base-mac-addr (2),
-        broadcast-mac-addr (3)
+        multicast-mac-addr (3),
+        broadcast-mac-addr (4)
     }
     MAX-ACCESS  read-write
     STATUS      current

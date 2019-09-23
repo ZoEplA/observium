@@ -1,11 +1,11 @@
 -- =================================================================
--- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: The HUAWEI-TCP-MIB provides information about TCP. 
 --              Now only trap for MD5 authentication failures is provided 
 --              
 -- Reference:
--- Version:     V1.0
+-- Version:     V1.02
 -- History:
 --              xujin,2004.6.26,publish 
 -- =================================================================
@@ -27,7 +27,7 @@
     
 
         hwTCP MODULE-IDENTITY 
-            LAST-UPDATED "200406260000Z"        -- June 26, 2004 at 00:00 GMT
+            LAST-UPDATED "201711100908Z"        -- Aug 18, 2017 at 00:00 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -43,6 +43,17 @@
                 which include local address, local port, remote address, remote 
                 port. When MD5 authentication fails, the trap will send."
                 
+              REVISION     "201711100908Z"
+                            DESCRIPTION  
+                            "
+                            Modify the description.
+                            "  
+			  REVISION     "201708170908Z"
+                            DESCRIPTION  
+                            "
+                            Modify the description.
+                            "     
+
                 REVISION     "200406090908Z"
                             DESCRIPTION  
                             "

@@ -1262,7 +1262,7 @@ rlSntpAuthenticationKeyID OBJECT-TYPE
         ::=  {rlSntpAuthenticationEntry 1}
 
 rlSntpAuthenticationKeyValue OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(1..8))
+        SYNTAX      DisplayString (SIZE(1..32))
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "Key value."

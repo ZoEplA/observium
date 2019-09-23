@@ -13,13 +13,18 @@ HpicfHighAvailability-MIB DEFINITIONS ::= BEGIN
          FROM HP-ICF-OID;   
 
    hpicfHighAvailability MODULE-IDENTITY
-      LAST-UPDATED "201205150000Z"  -- May 15 , 2012
+      LAST-UPDATED "201701050000Z" -- Jan 05 , 2017
       ORGANIZATION "HP Networking"
       CONTACT-INFO "Hewlett-Packard Company
                     8000 Foothills Blvd.
                     Roseville, CA 95747"
       DESCRIPTION  "Management information for configuring Redundant 
                     Management module on Hewlett-Packard network devices."
+
+      REVISION     "201701050000Z" -- Jan 05 , 2017
+      DESCRIPTION  "Added hpicfHAPreferredActiveManagement to hpicfHAConfigObjects.
+                    And added hpicfHAConfigGroup1 and deprecated
+                    hpicfHAConfigGroup and hpicfHACompliance"
 
       REVISION     "201205150000Z"  -- May 15 , 2012
       DESCRIPTION  "Added hpicfHAMgmtModuleBackUpState to the table 
@@ -90,6 +95,22 @@ HpicfHighAvailability-MIB DEFINITIONS ::= BEGIN
                    the equivalent state within this time."
       DEFVAL { 300 }
       ::= { hpicfHAConfigObjects 2 }
+   
+    hpicfHAPreferredActiveManagement OBJECT-TYPE
+      SYNTAX       INTEGER {
+                        none                    (0),
+                        management-module1      (1),
+                        management-module2      (2)
+                   }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Specify management module priority to specify
+                   Active management module across several reboot.
+                   The module is likely to become Active post reboot and
+                   Not instantaneously. The setting is applied to the
+                   running-configuration"
+      DEFVAL { 0 }
+      ::= { hpicfHAConfigObjects 3 }
    
 -- The HP ICF High Availability status group       
     
@@ -382,10 +403,15 @@ hpicfHAMgmtModuleBackUpState OBJECT-TYPE
    
 -- compliance statements
    hpicfHACompliance MODULE-COMPLIANCE
-      STATUS      current
+      STATUS      deprecated
       DESCRIPTION
-                  "The compliance statement for SNMP entities which implement
-                   the hpicfHighAvailability MIB."
+                  "*********** THIS COMPLIANCE IS DEPRECATED ************
+
+                  The compliance statement for SNMP entities which implement
+                  the hpicfHighAvailability MIB.
+
+                  This compliance section has been deprecated and replaced
+                  with hpicfHACompliance3"
       MODULE  -- this module
       MANDATORY-GROUPS { 
                            hpicfHAConfigGroup, 
@@ -422,16 +448,33 @@ hpicfHAMgmtModuleBackUpState OBJECT-TYPE
                         }
       ::= { hpicfHACompliances 3 }
 
+   hpicfHACompliance3 MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+                  "The compliance statement for SNMP entities which implement
+                   the hpicfHighAvailability MIB."
+      MODULE  -- this module
+      MANDATORY-GROUPS { 
+                           hpicfHAConfigGroup1, 
+                           hpicfHAStatusGroup 
+                        }
+      ::= { hpicfHACompliances 4 }
+
 -- MIB groupings
    hpicfHAConfigGroup OBJECT-GROUP
       OBJECTS     { 
                     hpicfHARedundancyManagementModuleMode,
                     hpicfHAContinuousFwdingTime
                   }
-      STATUS      current
+      STATUS      deprecated
       DESCRIPTION
-                  "The collection of objects which are used to configure the
-                   Redundancy Management Module."
+                  "********** THIS GROUP IS DEPRECATED ***************
+                  
+                  The collection of objects which are used to configure the
+                  Redundancy Management Module.
+                   
+                  This group has been deprecated and replaced with
+                  hpicfHAConfigGroup1 ."
       ::= { hpicfHAGroups 1 }
 
    hpicfHAStatusGroup OBJECT-GROUP
@@ -491,4 +534,15 @@ hpicfHAMgmtModuleGroup1 OBJECT-GROUP
                    management module specific information."
     ::= { hpicfHAGroups 5 }
 
+   hpicfHAConfigGroup1 OBJECT-GROUP
+      OBJECTS     { 
+                    hpicfHARedundancyManagementModuleMode,
+                    hpicfHAContinuousFwdingTime,
+                    hpicfHAPreferredActiveManagement
+                  }
+      STATUS      current
+      DESCRIPTION
+                  "The collection of objects which are used to configure the
+                   Redundancy Management Module."
+      ::= { hpicfHAGroups 6 }
 END

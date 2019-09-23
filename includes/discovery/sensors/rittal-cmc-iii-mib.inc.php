@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -132,6 +132,7 @@ foreach ($sensors as $name => $sensor)
     else if (str_contains($unit, 'l/min'))
     {
       $type = "waterflow";
+      $options['sensor_unit'] = 'l/min';
     }
     else if (str_ends($unit, 'W'))
     {
@@ -166,7 +167,9 @@ foreach ($sensors as $name => $sensor)
         }
       }
 
-      discover_sensor($valid['sensor'], $type, $device, $oid_num, "cmcIIIVarTable.$index", "Rittal-CMC-III", $descr, $scale, $value, $options);
+      $options['rename_rrd'] = "Rittal-CMC-III-cmcIIIVarTable.$index";
+      $object = 'cmcIIIVarValueInt';
+      discover_sensor_ng($device, $type, $mib, $object, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
   }
 
@@ -194,7 +197,9 @@ foreach ($sensors as $name => $sensor)
     $value = $entry['cmcIIIVarValueInt'];
     $oid_num = '.1.3.6.1.4.1.2606.7.4.2.2.1.11.'.$index;
 
-    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid_num, "cmcIIIVarTable.$index", "Rittal-CMC-III", $descr, $scale, $value);
+    $object = 'cmcIIIVarValueInt';
+
+    discover_sensor_ng($device,'fanspeed', $mib, $object, $oid_num, $index, NULL, $descr, $scale, $value, ['rename_rrd' => "Rittal-CMC-III-cmcIIIVarTable.$index"]);
   }
 
   if (isset($sensor['status']))

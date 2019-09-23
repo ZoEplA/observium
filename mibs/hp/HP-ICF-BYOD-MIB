@@ -69,7 +69,7 @@ HP-ICF-BYOD-MIB DEFINITIONS ::= BEGIN
         STATUS          current
         DESCRIPTION 
 	    "An entry in the hpicfByodPortalTable."
-        INDEX { hpicfByodPortalName }
+        INDEX           { hpicfByodPortalName }
         ::= { hpicfByodPortalTable 1 }
 
     HpicfByodPortalEntry ::= SEQUENCE {
@@ -168,7 +168,7 @@ HP-ICF-BYOD-MIB DEFINITIONS ::= BEGIN
         STATUS          current
         DESCRIPTION 
 	    "An entry in the hpicfByodFreeRuleTable."
-        INDEX { hpicfByodFreeRuleNumber }
+        INDEX           { hpicfByodFreeRuleNumber }
         ::= { hpicfByodFreeRuleTable 1 }
 
     HpicfByodFreeRuleEntry ::= SEQUENCE {

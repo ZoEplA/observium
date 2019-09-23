@@ -1,13 +1,17 @@
 -- ==================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Multicast Snooping MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 -- V1.0 2014-06-17 Created by Huang Yun
--- ==================================================================
--- ==================================================================
+-- V1.1 2017-09-26 Modified by meihaitao and yangjingdong
+--      Added hh3cMcsVUProxyEnabled and hh3cMcsVUQuerierElection to hh3cMcsVirtualUnitConfigTable.
+--      Modified the description of object hh3cMcsL2EntryIfIndex.
+--      Added 'tunnel(6)', 'mtunnel(7)' to object hh3cMcsL2EntryPortType.
+--      Added 'b(6)', 'e(7)', 'de(8)', 'ee(9)', 'suc(10)', 'f(11)' to object hh3cMcsL2EntryPortAttribute.
+--      Modified the description of object hh3cMcsL2EntryPortAttribute.
 -- ==================================================================
 --
 -- Variables and types be imported
@@ -34,17 +38,25 @@ IMPORTS
         FROM IF-MIB;
 
 hh3cMulticastSnoop MODULE-IDENTITY
-    LAST-UPDATED "201405141700Z"
+    LAST-UPDATED "201709260950Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
         "
     DESCRIPTION
         "IGMP/MLD Snooping Management MIB"
+    -- Revision history.
+    REVISION "201709260950Z"
+    DESCRIPTION
+        "Added hh3cMcsVUProxyEnabled and hh3cMcsVUQuerierElection to hh3cMcsVirtualUnitConfigTable.
+        Modified the description of object hh3cMcsL2EntryIfIndex.
+        Added 'tunnel(6)', 'mtunnel(7)' to object hh3cMcsL2EntryPortType.
+        Added 'b(6)', 'e(7)', 'de(8)', 'ee(9)', 'suc(10)', 'f(11)' to object hh3cMcsL2EntryPortAttribute.
+        Modified the description of object hh3cMcsL2EntryPortAttribute."
     REVISION "201405141700Z"
     DESCRIPTION
         "The initial version of this MIB file."
@@ -209,7 +221,9 @@ Hh3cMcsVirtualUnitConfigEntry ::=
         hh3cMcsVUGeneQuerierSourceAddress InetAddress,
         hh3cMcsVUSpecQuerierSourceAddress InetAddress,
         hh3cMcsVULeaveSourceAddress       InetAddress,
-        hh3cMcsVUReportSourceAddress      InetAddress
+        hh3cMcsVUReportSourceAddress      InetAddress,
+        hh3cMcsVUProxyEnabled             TruthValue,
+        hh3cMcsVUQuerierElection          TruthValue
     }
 
 hh3cMcsVUType  OBJECT-TYPE
@@ -373,6 +387,24 @@ hh3cMcsVUReportSourceAddress OBJECT-TYPE
         when not configured."
     ::= { hh3cMcsVirtualUnitConfigEntry 17 }
 
+hh3cMcsVUProxyEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the proxy feature is enabled in the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  18 }
+
+hh3cMcsVUQuerierElection OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the querier election feature is enabled in the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  19 }
+
 hh3cMcsL2EntryTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF Hh3cMcsL2EntryEntry
     MAX-ACCESS not-accessible
@@ -458,8 +490,9 @@ hh3cMcsL2EntryIfIndex  OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-        "IfIndex value of the port that joined the Layer 2 IP multicast
-        group entry."
+        "In the VLAN, interface index of the port that joined the Layer 2 IP
+        multicast group.  In the VSI, link ID of the AC, PW, or tunnel that
+        joined the Layer 2 IP multicast group."
     ::= { hh3cMcsL2EntryEntry 6 }
 
 hh3cMcsL2EntryPortType  OBJECT-TYPE
@@ -469,7 +502,9 @@ hh3cMcsL2EntryPortType  OBJECT-TYPE
                    ac(2),
                    npw(3),
                    upw(4),
-                   trill(5)
+                   trill(5),
+                   tunnel(6),
+                   mtunnel(7)
                }
     MAX-ACCESS read-only
     STATUS     current
@@ -485,15 +520,26 @@ hh3cMcsL2EntryPortAttribute  OBJECT-TYPE
         p(2),
         k(3),
         r(4),
-        w(5)
+        w(5),
+        b(6),
+        e(7),
+        de(8),
+        ee(9),
+        suc(10),
+        f(11)
     }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
         "Attribute of the port.  'd' means learned from IGMP/MLD packets,
-        's' means configured statically, 'p' means learned from PIM snooping,
+        's' means configured statically, 'p' means learned from PIM packets,
         'k' means obtained from the kernel, 'r' means learned from (*, *)
-        entries, 'w' means learned from (*, G) entries."
+        entries, 'w' means learned from (*, G) entries,
+        'b' means broadcast port, 'e' means learned from EVPN BGP route,
+        'de' means learned from IGMP/MLD packets in Exclude filter mode,
+        'ee' means learned from EVPN BGP routein Exclude filter mode,
+        'suc' means processing has succeeded,
+        'f' means processing has failed."
     ::= { hh3cMcsL2EntryEntry 8 }
 
 hh3cMcsPacketStatisticsTable OBJECT-TYPE

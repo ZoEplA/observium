@@ -314,6 +314,10 @@ a [class*=" icon-"] {
   clear: both;
 }
 
+.no-width {
+  width: 0 !important;
+}
+
 /* FIXME, Not sure why empty elements here?
 .viewing-only
 {
@@ -368,6 +372,19 @@ button.btn-icon [class^="icon-"], button.btn-icon [class*=" icon-"],
 button.btn-icon [class^="oicon-"], button.btn-icon [class*=" oicon-"],
 button.btn-icon [class^="sprite-"], button.btn-icon [class*=" sprite-"] {
   margin: 0px;
+}
+
+/** TinyToggle **/
+
+[class^="tt-label"], [class*=" tt-label"] {
+  line-height: 20px !important;
+  font-size: 14px !important;
+  vertical-align: bottom !important;
+  color: #595959;
+}
+
+.tt-disabled .tt-icon {
+  cursor: not-allowed;
 }
 
 /** Dyngraph **/
@@ -591,9 +608,6 @@ form.pagination
 
 .grid-stack>.grid-stack-item>.grid-stack-item-content
 {
-    border-radius: 3px;
-    background: #ffffff;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.24);
 }
 
 .grid-stack>.grid-stack-item>.grid-stack-item-content:hover {

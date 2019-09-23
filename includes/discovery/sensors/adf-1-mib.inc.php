@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -26,28 +26,46 @@ $oid_defs[9]  = array('name' => 'currentN',      'class' => 'current',        's
 $oid_defs[10] = array('name' => 'voltageL1L2',   'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L1L2');
 $oid_defs[11] = array('name' => 'voltageL2L3',   'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L2L3');
 $oid_defs[12] = array('name' => 'voltageL3L1',   'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L3L1');
-$oid_defs[13] = array('name' => 'voltageL1N1',   'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L1N1');
-$oid_defs[14] = array('name' => 'voltageL2N1',   'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L2N1');
-$oid_defs[15] = array('name' => 'voltageL3N1',   'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L3N1');
+$oid_defs[13] = array('name' => 'voltageL1N',    'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L1N1');
+$oid_defs[14] = array('name' => 'voltageL2N',    'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L2N1');
+$oid_defs[15] = array('name' => 'voltageL3N',    'class' => 'voltage',        'scale' => '0.1',      'descr' =>  'L3N1');
 
 $i=1;
-while($i < 25)
+while($i < 29)
 {
-   foreach($oid_defs as $n => $x)
+
+   if($i == 25 || $i == 26) {  } else
    {
-      $x['index']    = $n + (($i - 1) * 15);
-      $x['oid_num']  = '.1.3.6.1.4.1.49314.1.1.1.4.9.'.$x['index'];
-      $x['oid_text'] = $x['name'].$i;
-      $x['descr']    = 'Feed ' .$i. (strlen($config['custom']['adf-1-mib'][$i]['descr']) ? ' ('.$config['custom']['adf-1-mib'][$i]['descr'].')' : '') . ' ' . $x['descr'];
-      $x['value']    = $oids[$x['oid_text']] * $x['scale'];
 
-      //print_r($x);
-
-      if(is_numeric($oids[$x['oid_text']]))
+      foreach ($oid_defs as $n => $x)
       {
-        discover_sensor($valid['sensor'], $x['class'], $device, $x['oid_num'], $x['index'], 'adf01', $x['descr'], $x['scale'], $oids[$x['oid_text']]);
-      } else { }
+         $x['index'] = $n + (($i - 1) * 15);
+
+         if ($i > 26)
+         {
+            $x['index'] -= 10;
+         }
+
+         $x['oid_num']  = '.1.3.6.1.4.1.49314.1.1.1.4.9.' . $x['index'];
+         $x['oid_text'] = $x['name'] . $i;
+         $x['descr']    = 'Feed ' . $i . (strlen($config['custom']['adf-1-mib'][$i]['descr']) ? ' (' . $config['custom']['adf-1-mib'][$i]['descr'] . ')' : '') . ' ' . $x['descr'];
+         $x['value']    = $oids[$x['oid_text']] * $x['scale'];
+
+         echo $x['oid_num'].'  '.$x['oid_text'].PHP_EOL;
+
+         //print_r($x);
+
+         if (is_numeric($oids[$x['oid_text']]))
+         {
+            discover_sensor_ng($device, $x['class'], $mib, $x['name'], $x['oid_num'], $x['index'], 'adf01', $x['descr'], $x['scale'], $oids[$x['oid_text']]);
+         }
+         else
+         {
+         }
+      }
+
    }
+
    $i++;
 }
 
@@ -79,7 +97,7 @@ foreach(array(25, 26) AS $i)
 
     if(is_numeric($oids[$x['oid_text']]))
     {
-      discover_sensor($valid['sensor'], $x['class'], $device, $x['oid_num'], $x['index'], 'adf01', $x['descr'], $x['scale'], $oids[$x['oid_text']]);
+      discover_sensor_ng( $device, $x['class'], $mib, $x['name'], $x['oid_num'], $x['index'], 'adf01', $x['descr'], $x['scale'], $oids[$x['oid_text']]);
     } else { }
   }
 }

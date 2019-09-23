@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -22,7 +22,7 @@
 unset ($mac_table);
 
 // Caching ifIndex
-$query = 'SELECT port_id, ifIndex FROM ports WHERE device_id = ? GROUP BY port_id';
+$query = 'SELECT `port_id`, `ifIndex` FROM `ports` WHERE `device_id` = ? GROUP BY `port_id`';
 foreach (dbFetchRows($query, array($device['device_id'])) as $entry)
 {
   $entry_if = $entry['ifIndex'];

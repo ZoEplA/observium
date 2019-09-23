@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -55,7 +55,7 @@ foreach ($data as $index_a => $entries)
       $options['warn_high']   = NULL;
       $options['limig_high']  = NULL;
 
-      discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'coolingDeviceReading', $descr, 1, $entry['coolingDeviceReading'], $options);
+      discover_sensor('fanspeed', $device, $oid, $index, 'coolingDeviceReading', $descr, 1, $entry['coolingDeviceReading'], $options);
     }
 
     // Add the status indicator
@@ -113,7 +113,7 @@ foreach ($data as $index_a => $entries)
       if (isset($entry['temperatureProbeUpperNonCriticalThreshold'])) { $options['warn_high']  = $entry['temperatureProbeUpperNonCriticalThreshold']; }
       if (isset($entry['temperatureProbeUpperCriticalThreshold']))    { $options['limit_high'] = $entry['temperatureProbeUpperCriticalThreshold']; }
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'temperatureProbeReading', $descr, 0.1, $entry['temperatureProbeReading'], $options);
+      discover_sensor('temperature', $device, $oid, $index, 'temperatureProbeReading', $descr, 0.1, $entry['temperatureProbeReading'], $options);
     }
 
   }

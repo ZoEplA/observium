@@ -938,7 +938,7 @@ IpsoDiskDriveEntry ::= SEQUENCE {
                 "The drive index used to identify a particular row in table. "
         ::= { ipsoDiskDriveEntry 1 } 
  
-        ipsoSysDiskDriveIndex OBJECT-TYPE
+        ipsoDiskSysDriveIndex OBJECT-TYPE
         SYNTAX Integer32 (1..2147483647)  
         MAX-ACCESS read-only
         STATUS current
@@ -972,8 +972,8 @@ IpsoDiskDriveEntry ::= SEQUENCE {
 
 ipsoLicenseGroup OBJECT-GROUP
 	OBJECTS {
-        ipsofeaturename,
-        noofdaystoexpire
+        ipsoFeatureName,
+        ipsoDaysToExpire
 	}
 	STATUS current
 	DESCRIPTION 

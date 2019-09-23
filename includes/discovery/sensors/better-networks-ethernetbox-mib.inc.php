@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -69,7 +69,7 @@ foreach ($oids as $index => $entry)
   }
   if ($sensor_type)
   {
-    discover_sensor($valid['sensor'], $sensor_type, $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor_ng($device, $sensor_type, $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
   }
 
 }

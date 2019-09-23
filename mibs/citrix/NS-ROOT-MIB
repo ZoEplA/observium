@@ -10,7 +10,7 @@ IMPORTS
 		FROM INET-ADDRESS-MIB;
 
 netScaler MODULE-IDENTITY
-	LAST-UPDATED "201609250000Z"
+	LAST-UPDATED "201809120000Z"
 	ORGANIZATION "Citrix Systems, Inc."
 	CONTACT-INFO  "Citrix Technical Assistance Center
 			Postal: Citrix Systems, Inc.
@@ -19,7 +19,7 @@ netScaler MODULE-IDENTITY
 				United States
 			Tel: +1-800-4-CITRIX (+1-800-424-8749)
 			E-mail: customercare@citrix.com"
-	DESCRIPTION "The enterprise specific MIB for Netscaler NS11.1."
+	DESCRIPTION "The enterprise specific MIB for Netscaler NS12.0."
 	::= { enterprises 5951 }
 
 nsRoot OBJECT IDENTIFIER
@@ -4441,7 +4441,7 @@ cpeeNetmask OBJECT-TYPE
     ::= { cpeExprConfigStatsEntry 9 }
 
 EntityProtocolType ::=
-	INTEGER{ http(0), ftp(1), tcp(2), udp(3), sslBridge(4), monitor(5), monitorUdp(6), nntp(7), httpserver(8), httpclient(9), rpcserver(10), rpcclient(11), nat(12), any(13), ssl(14), dns(16), adns(17), snmp(18), ha(19), monitorPing(20), sslOtherTcp(21), aaa(22), secureMonitor(23), sslvpnUdp(24), rip(25), dnsClient(26), rpcServer(27), rpcClient(28), dhcrpa(36), sipudp(39), siptcp(40), siptls(41), dnstcp(48), adnstcp(49), rtsp(50), push(52), sslPush(53), dhcpClient(54), radius(55), rdp(61), mysql(62), mssql(63), diameter(73), sslDiameter(74), tftp(75), tftp(90), pptp(91), gre(92), fix(95), sslFix(96), serviceUnknown(99) }
+	INTEGER{ http(0), ftp(1), tcp(2), udp(3), sslBridge(4), monitor(5), monitorUdp(6), nntp(7), httpserver(8), httpclient(9), rpcserver(10), rpcclient(11), nat(12), any(13), ssl(14), dns(16), adns(17), snmp(18), ha(19), monitorPing(20), sslOtherTcp(21), aaa(22), secureMonitor(23), sslvpnUdp(24), rip(25), dnsClient(26), rpcServer(27), rpcClient(28), dhcrpa(36), sipudp(39), siptcp(40), siptls(41), dnstcp(48), adnstcp(49), rtsp(50), push(52), sslPush(53), dhcpClient(54), radius(55), rdp(61), mysql(62), mssql(63), diameter(73), sslDiameter(74), tftp(75), tftp(90), pptp(91), gre(92), fix(95), sslFix(96), userTcp(104), userSslTcp(105), serviceUnknown(111) }
 
 EntityState ::=
 	INTEGER{ down(1), unknown(2), busy(3), outOfService(4), transitionToOutOfService(5), up(7), transitionToOutOfServiceDown(8) }
@@ -4495,7 +4495,7 @@ LbPolicy ::=
 	INTEGER{ weightedRoundRobin(1), leastConnections(2), leastResponse(3), asynchronousMAC(4), urlHashed(5), domainHashed(6), destinationIPHashed(7), sourceIPHashed(8), leastBandwidth(9), leastPackets(10), customLoad(11), token(12), staticProximity(13), rdp(14), leastreq(15), rtt(16), sourceIPDestinationIPHashed(17), sourceIPSourcePort(18), lrtm(19), callIDHashed(20) }
 
 PersistanceType ::=
-	INTEGER{ none(0), sourceIp(1), cookieInsert(2), cookieDelete(3), cookieRead(4), cookieHash(5), sessionId(6), server(7), rule(8), urlPassive(9), customServerID(10), groupSourceID(11), groupCookieInsert(12), groupRule(13), destinationIP(14), spillOver(15), sourceIPdestinationIP(16), callerID(17), gslbBackup(18), rtspSessionID(19), diameter(20), fixSession(21) }
+	INTEGER{ none(0), sourceIp(1), cookieInsert(2), cookieDelete(3), cookieRead(4), cookieHash(5), sessionId(6), server(7), rule(8), urlPassive(9), customServerID(10), groupSourceID(11), groupCookieInsert(12), groupRule(13), destinationIP(14), spillOver(15), sourceIPdestinationIP(16), callerID(17), gslbBackup(18), rtspSessionID(19), diameter(20), fixSession(21), userSession(22) }
 
 ActionType ::=
 	INTEGER{ ns(1), acs(2), noAction(3) }
@@ -5923,14 +5923,14 @@ haCurState  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"State of the HA node, based on its health, in a high availability setup. Possible values are: 
-UP – Indicates that the node is accessible and can function as either a primary or secondary node.
-DISABLED – Indicates that the high availability status of the node has been manually disabled. Synchronization and propagation cannot take place between the peer nodes.
-INIT – Indicates that the node is in the process of becoming part of the high availability configuration. 
-PARTIALFAIL – Indicates that one of the high availability monitored interfaces has failed because of a card or link failure. This state triggers a failover.
-COMPLETEFAIL – Indicates that all the interfaces of the node are unusable, because the interfaces on which high availability monitoring is enabled are not connected or are manually disabled. This state triggers a failover.
-DUMB – Indicates that the node is in listening mode. It does not participate in high availability transitions or transfer configuration from the peer node. This is a configured value, not a statistic.
-PARTIALFAILSSL – Indicates that the SSL card has failed. This state triggers a failover.
-ROUTEMONITORFAIL – Indicates that the route monitor has failed. This state triggers a failover."
+UP - Indicates that the node is accessible and can function as either a primary or secondary node.
+DISABLED - Indicates that the high availability status of the node has been manually disabled. Synchronization and propagation cannot take place between the peer nodes.
+INIT - Indicates that the node is in the process of becoming part of the high availability configuration. 
+PARTIALFAIL - Indicates that one of the high availability monitored interfaces has failed because of a card or link failure. This state triggers a failover.
+COMPLETEFAIL - Indicates that all the interfaces of the node are unusable, because the interfaces on which high availability monitoring is enabled are not connected or are manually disabled. This state triggers a failover.
+DUMB - Indicates that the node is in listening mode. It does not participate in high availability transitions or transfer configuration from the peer node. This is a configured value, not a statistic.
+PARTIALFAILSSL - Indicates that the SSL card has failed. This state triggers a failover.
+ROUTEMONITORFAIL - Indicates that the route monitor has failed. This state triggers a failover."
 	::= { nsHighAvailabilityGroup 24 }
 
 haPeerInetAddrType  OBJECT-TYPE
@@ -8333,7 +8333,7 @@ mptcpErrInvalCookie  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP invalid cookie received on mp capable final ack."
+		"MPTCP invalid cookie received on MP_CAPABLE final ACK."
 	::= { nsTcpStatsGroup 99 }
 
 mptcpErrUnknownToken  OBJECT-TYPE
@@ -8341,7 +8341,7 @@ mptcpErrUnknownToken  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP invalid token received on mp join request."
+		"MPTCP invalid token received on MP_JOIN request."
 	::= { nsTcpStatsGroup 100 }
 
 mptcpErrAddridExist  OBJECT-TYPE
@@ -8349,7 +8349,7 @@ mptcpErrAddridExist  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Mp join request on existing address id."
+		"MPTCP MP_JOIN request on existing address id."
 	::= { nsTcpStatsGroup 101 }
 
 mptcpErrMaxSF  OBJECT-TYPE
@@ -8357,7 +8357,7 @@ mptcpErrMaxSF  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP new mp join request after maximum configured subflows are established."
+		"MPTCP new MP_JOIN request after maximum configured subflows are established."
 	::= { nsTcpStatsGroup 102 }
 
 mptcpErrInvalMAC  OBJECT-TYPE
@@ -8365,7 +8365,7 @@ mptcpErrInvalMAC  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP invalid MAC on mp join final ack."
+		"MPTCP invalid MAC on MP_JOIN final ACK."
 	::= { nsTcpStatsGroup 103 }
 
 mptcpErrBadCksum  OBJECT-TYPE
@@ -8381,7 +8381,7 @@ mptcpErrAddrId0  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Mp join request on address id 0."
+		"MPTCP MP_JOIN request on address id 0."
 	::= { nsTcpStatsGroup 105 }
 
 mptcpErrfastclose  OBJECT-TYPE
@@ -8397,7 +8397,7 @@ mptcpErrJoinThreshold  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Global pending mp join threshold limit is reached, new mp join request will be dropped sending RST"
+		"MPTCP Global pending MP_JOIN threshold limit is reached, new MP_JOIN request will be dropped sending RST"
 	::= { nsTcpStatsGroup 107 }
 
 mptcpErrInvalOpts  OBJECT-TYPE
@@ -8421,7 +8421,7 @@ mptcpErrVersionNotSupported  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Mp capable request from unsupported mptcp client."
+		"MPTCP MP_CAPABLE request from unsupported mptcp client."
 	::= { nsTcpStatsGroup 110 }
 
 mptcpErrCryptoNotSupported  OBJECT-TYPE
@@ -8437,7 +8437,7 @@ mptcpErrExtnFlagSet  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Mp capable extension flag is set on mp capable request."
+		"Extension flag is set on MP_CAPABLE request."
 	::= { nsTcpStatsGroup 112 }
 
 mptcpErrResFlagSet  OBJECT-TYPE
@@ -8445,7 +8445,7 @@ mptcpErrResFlagSet  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP One or more reserved bits are set on mp capable request."
+		"MPTCP One or more reserved bits are set on MP_CAPABLE request."
 	::= { nsTcpStatsGroup 113 }
 
 mptcpErrJoinAfterFallback  OBJECT-TYPE
@@ -8453,7 +8453,7 @@ mptcpErrJoinAfterFallback  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP New join request received after fallback to regular tcp."
+		"MPTCP New MP_JOIN request received after fallback to regular tcp."
 	::= { nsTcpStatsGroup 114 }
 
 mptcpErrDataFinpassive  OBJECT-TYPE
@@ -8477,7 +8477,7 @@ mptcpErrFastClose  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Fast close received on a subflow."
+		"MPTCP FAST_CLOSE received on a subflow."
 	::= { nsTcpStatsGroup 117 }
 
 mptcpErrFastCloseKey  OBJECT-TYPE
@@ -8485,7 +8485,7 @@ mptcpErrFastCloseKey  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Fast close received with invalid key and the packet is dropped."
+		"MPTCP FAST_CLOSE received with invalid key and the packet is dropped."
 	::= { nsTcpStatsGroup 118 }
 
 mptcpPlainackFallback  OBJECT-TYPE
@@ -8493,7 +8493,7 @@ mptcpPlainackFallback  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Fallback to regular tcp on receiving plain ack for DSS."
+		"MPTCP Fallback to regular tcp on receiving plain ACK for DSS."
 	::= { nsTcpStatsGroup 119 }
 
 mptcpPlainackRST  OBJECT-TYPE
@@ -8501,7 +8501,7 @@ mptcpPlainackRST  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Sent RST on receiving plain ack for DSS."
+		"MPTCP Sent RST on receiving plain ACK for DSS."
 	::= { nsTcpStatsGroup 120 }
 
 mptcpMPFailSent  OBJECT-TYPE
@@ -8509,7 +8509,7 @@ mptcpMPFailSent  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Total mp fail sent due to checksum failure."
+		"MPTCP Total MP_FAIL sent due to checksum failure."
 	::= { nsTcpStatsGroup 121 }
 
 mptcpMPFailRecvd  OBJECT-TYPE
@@ -8517,7 +8517,7 @@ mptcpMPFailRecvd  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Total mpfail received and fallback to regular tcp."
+		"MPTCP Total MP_FAIL received and fallback to regular TCP."
 	::= { nsTcpStatsGroup 122 }
 
 mptcpInfiniteMapRecvd  OBJECT-TYPE
@@ -8525,7 +8525,7 @@ mptcpInfiniteMapRecvd  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Received and set infinite map and fallen back to regular tcp."
+		"MPTCP Received and set infinite map and fallen back to regular TCP."
 	::= { nsTcpStatsGroup 123 }
 
 mptcpTotMpCapSyn  OBJECT-TYPE
@@ -8533,7 +8533,7 @@ mptcpTotMpCapSyn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP total mpcapable syn received"
+		"MPTCP total MP_CAPABLE received"
 	::= { nsTcpStatsGroup 124 }
 
 mptcpTotMpJoinSyn  OBJECT-TYPE
@@ -8541,7 +8541,7 @@ mptcpTotMpJoinSyn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP total mpjoin syn received"
+		"MPTCP total MP_JOIN syn received"
 	::= { nsTcpStatsGroup 125 }
 
 mptcpTotMpcapSession  OBJECT-TYPE
@@ -8549,7 +8549,7 @@ mptcpTotMpcapSession  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP total mpcapable session created"
+		"MPTCP total sessions created"
 	::= { nsTcpStatsGroup 126 }
 
 mptcpTotSFConn  OBJECT-TYPE
@@ -8557,7 +8557,7 @@ mptcpTotSFConn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP total mpjoin connections created"
+		"MPTCP total Subflow connections created"
 	::= { nsTcpStatsGroup 127 }
 
 mptcpTotEstSFReplaced  OBJECT-TYPE
@@ -8565,7 +8565,7 @@ mptcpTotEstSFReplaced  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Total established subflows replaced due to new join."
+		"MPTCP Total established subflows replaced due to new MP_JOIN."
 	::= { nsTcpStatsGroup 128 }
 
 mptcpTotPendSFReplaced  OBJECT-TYPE
@@ -8573,7 +8573,7 @@ mptcpTotPendSFReplaced  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"MPTCP Total pending subflows replaced due to new join."
+		"MPTCP Total pending subflows replaced due to new MP_JOIN."
 	::= { nsTcpStatsGroup 129 }
 
 mptcpCurSessWithoutSFs  OBJECT-TYPE
@@ -8599,6 +8599,366 @@ tcpOptimizationBypassed  OBJECT-TYPE
 	DESCRIPTION
 		"Total number of connections that bypassed TCP optimzation."
 	::= { nsTcpStatsGroup 132 }
+
+mptcpTotTxSfFin  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP total subflow close requests."
+	::= { nsTcpStatsGroup 133 }
+
+mptcpTotMpcapSteered  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total MP_CAPABLE sessions steered"
+	::= { nsTcpStatsGroup 134 }
+
+mptcpTotConnEst  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total MP_CAPABLE sessions created."
+	::= { nsTcpStatsGroup 135 }
+
+mptcpTotMpcapSynackSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MP_CAPABLE SYN/ACKs sent."
+	::= { nsTcpStatsGroup 136 }
+
+mptcpTotMpcapFackRecvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MP_CAPABLE Final ACKs received."
+	::= { nsTcpStatsGroup 137 }
+
+mptcpTotAddrRemoved  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of addresses removed from MPTCP connection with REMOVE_ADDR option"
+	::= { nsTcpStatsGroup 138 }
+
+mptcpTotMpjoinSteered  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total MP_JOIN subflows steered"
+	::= { nsTcpStatsGroup 139 }
+
+mptcpTotMpjoinSynackSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total MP_JOIN SYN/ACKs sent."
+	::= { nsTcpStatsGroup 140 }
+
+mptcpTotMpjoinFackRecvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MP_JOIN Final ACKs"
+	::= { nsTcpStatsGroup 141 }
+
+mptcpTotMpjoin4thackSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of Subflow final ACK from peer in 3 way handshake validated with 4th ACK."
+	::= { nsTcpStatsGroup 142 }
+
+mptcpTotFreshAckFrwd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Fresh ACK recieved on a subflow"
+	::= { nsTcpStatsGroup 143 }
+
+mptcpTotDss  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of Data Sequence Signal packets."
+	::= { nsTcpStatsGroup 144 }
+
+mptcpTotRxDss  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Total Data Sequence Signal packets received."
+	::= { nsTcpStatsGroup 145 }
+
+mptcpTotTxDSS  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MMPTCP Total Data Sequence Signal packets sent"
+	::= { nsTcpStatsGroup 146 }
+
+mptcpTotDssA  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Data Sequence Signal packets during data transfer with DATA_ACK"
+	::= { nsTcpStatsGroup 147 }
+
+mptcpTotDSSa  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Data Sequence Signal packets during data transfer with 8 octet DATA_ACK"
+	::= { nsTcpStatsGroup 148 }
+
+mptcpTotDssFreshAck  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP total Data Sequence Signal packets during  data transfer with fresh ACK"
+	::= { nsTcpStatsGroup 149 }
+
+mptcpTotDssM  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP total data Sequence Signal packets with Data Sequence Mapping and checksum"
+	::= { nsTcpStatsGroup 150 }
+
+mptcpTotDssm  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP total data Sequence Signal packets with 8 octet Data Sequence Mapping and checksum"
+	::= { nsTcpStatsGroup 151 }
+
+mptcpTotDataLessthanDatalen  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Map amount of data not yet received."
+	::= { nsTcpStatsGroup 152 }
+
+mptcpPrioBackupRx  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Subflow used as backup path."
+	::= { nsTcpStatsGroup 153 }
+
+mptcpPrioClearBackupRx  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Subflow earlier used only as a backup subflow, changes to regular subflow with MP_PRIO option"
+	::= { nsTcpStatsGroup 154 }
+
+mptcpTotInfiniteMapFrwd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP received Data Sequence Signal with  infinite map flag (Fallback to regular TCP)."
+	::= { nsTcpStatsGroup 155 }
+
+mptcpTotTxDataFin  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total MPTCP connection close requests sent"
+	::= { nsTcpStatsGroup 156 }
+
+mptcpTotRxDataFin  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total MPTCP connection close(DATA_FIN) requests received."
+	::= { nsTcpStatsGroup 157 }
+
+mptcpErrOptionDiscarded  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Invalid subtype in MPTCP option field and hence discarded."
+	::= { nsTcpStatsGroup 158 }
+
+mptcpErrOptsNoSession  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP options sent on non existing connection/subflow PCBs."
+	::= { nsTcpStatsGroup 159 }
+
+mptcpErrRemaddrSelf  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP remove address request for self address."
+	::= { nsTcpStatsGroup 160 }
+
+mptcpErrRssfFail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Add RSS filter to steer traffic to right node on established MPTCP session failed."
+	::= { nsTcpStatsGroup 161 }
+
+mptcpErrOptsSendRst  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP sent RST on receiving improper option field."
+	::= { nsTcpStatsGroup 162 }
+
+mptcpErrNoPayloadlenPkt  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Payload length not specified in packet."
+	::= { nsTcpStatsGroup 163 }
+
+mptcpErrUnsupportedMssNegotiated  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Unsupported MSS negotiated error."
+	::= { nsTcpStatsGroup 164 }
+
+mptcpErrNomapPktRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Packet received with no Data Sequence Mapping."
+	::= { nsTcpStatsGroup 165 }
+
+mptcpTotMoreDataRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP More data received than the available Data Sequence Mapping."
+	::= { nsTcpStatsGroup 166 }
+
+mptcpErrBadmapConnDrop  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Drop the session incase of invalid Data Sequence map."
+	::= { nsTcpStatsGroup 167 }
+
+mptcpErrDupmapRecvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP Duplicate maps in Data Sequence map table."
+	::= { nsTcpStatsGroup 168 }
+
+mptcpErrInvalidSfn  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP subflow map doesn't exactly match MPTCP session mapping."
+	::= { nsTcpStatsGroup 169 }
+
+mptcpErrMapExists  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP sequence map already exists."
+	::= { nsTcpStatsGroup 170 }
+
+mptcpErrRetxPktRcvd  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Retransmitted Data Recevied on MPTCP session."
+	::= { nsTcpStatsGroup 171 }
+
+mptcpErrSfSessionAllocfail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Attaching the subflow to MPTCP session failed due to failure in allocating memory to subflow map table."
+	::= { nsTcpStatsGroup 172 }
+
+mptcpErrMpcapSessionAllocfail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Creating a MPTCP connection failed due to failure in allocating memory to MPTCP connection management structure."
+	::= { nsTcpStatsGroup 173 }
+
+mptcpTotMpcapSfpcbAlloc  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Allocating memory to TCP protocol control block(PCB) for subflow failed."
+	::= { nsTcpStatsGroup 174 }
+
+mptcpTotMpcbAllocfailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Allocating memory to MPTCP protocol control block failed."
+	::= { nsTcpStatsGroup 175 }
+
+mptcpErrNsbAllocFailed  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Failed to allocate memory to output MPTCP packet."
+	::= { nsTcpStatsGroup 176 }
+
+mptcpErrNosfFreensb  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"MPTCP output a packet without any subflow PCB."
+	::= { nsTcpStatsGroup 177 }
 
 nsSslStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 47 }
@@ -10384,7 +10744,7 @@ sslTotOffloadDHKeyExchanges  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of DH key exchanges offloaded to the cryptography card.d"
+		"Number of DH key exchanges offloaded to the cryptography card."
 	::= { nsSslStatsGroup 247 }
 
 sslTotOffloadSignRSA  OBJECT-TYPE
@@ -10784,7 +11144,7 @@ sslTotHwEncBE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes encrypted in hardware on the back end."
+		"Number of bytes encrypted in hardware on the back-end."
 	::= { nsSslStatsGroup 308 }
 
 sslTotDec  OBJECT-TYPE
@@ -10800,7 +11160,7 @@ sslTotSwEncFE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes encrypted in software on the front end."
+		"Number of bytes encrypted in software on the front-end."
 	::= { nsSslStatsGroup 310 }
 
 sslTotEncFE  OBJECT-TYPE
@@ -10808,7 +11168,7 @@ sslTotEncFE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes encrypted on the front end."
+		"Number of bytes encrypted on the front-end."
 	::= { nsSslStatsGroup 311 }
 
 sslTotEnc  OBJECT-TYPE
@@ -10832,7 +11192,7 @@ sslTotSwDecBE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes decrypted in software on back-end"
+		"Number of bytes decrypted in software on the back-end"
 	::= { nsSslStatsGroup 314 }
 
 sslTotHwDecFE  OBJECT-TYPE
@@ -10840,7 +11200,7 @@ sslTotHwDecFE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes decrypted in hardware on the front end."
+		"Number of bytes decrypted in hardware on the front-end."
 	::= { nsSslStatsGroup 315 }
 
 sslTotEncHw  OBJECT-TYPE
@@ -10864,7 +11224,7 @@ sslTotSwEncBE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes encrypted in software on the back end."
+		"Number of bytes encrypted in software on the back-end."
 	::= { nsSslStatsGroup 318 }
 
 sslTotEncSw  OBJECT-TYPE
@@ -10880,7 +11240,7 @@ sslTotSwDecFE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes decrypted in software on the front end."
+		"Number of bytes decrypted in software on the front-end."
 	::= { nsSslStatsGroup 320 }
 
 sslTotEncBE  OBJECT-TYPE
@@ -10888,7 +11248,7 @@ sslTotEncBE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes encrypted on the back end."
+		"Number of bytes encrypted on the back-end."
 	::= { nsSslStatsGroup 321 }
 
 sslTotDecBE  OBJECT-TYPE
@@ -10896,7 +11256,7 @@ sslTotDecBE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes decrypted on the back end."
+		"Number of bytes decrypted on the back-end."
 	::= { nsSslStatsGroup 322 }
 
 sslTotHwDecBE  OBJECT-TYPE
@@ -10904,7 +11264,7 @@ sslTotHwDecBE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes decrypted in hardware on the back end."
+		"Number of bytes decrypted in hardware on the back-end."
 	::= { nsSslStatsGroup 323 }
 
 sslTotDecFE  OBJECT-TYPE
@@ -10912,7 +11272,7 @@ sslTotDecFE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes decrypted on the front end."
+		"Number of bytes decrypted on the front-end."
 	::= { nsSslStatsGroup 324 }
 
 sslTotHwEncFE  OBJECT-TYPE
@@ -10920,7 +11280,7 @@ sslTotHwEncFE  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Number of bytes encrypted in hardware on the front end."
+		"Number of bytes encrypted in hardware on the front-end."
 	::= { nsSslStatsGroup 325 }
 
 sslTotRSA4096keyExchanges  OBJECT-TYPE
@@ -11240,7 +11600,7 @@ sslCryptoUtilization  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Utilization of the hardware crypto resource. Only valid values are 0-100%. Only works for platform with N3 chips A value of 4294967295 is displayed for a platform without a N3 chip"
+		"Utilization of the hardware crypto resource. Only valid values are 0-100%. Only works on platforms with Nitrox-3 chips. A value of 4294967295 is displayed on other platforms."
 	::= { nsSslStatsGroup 365 }
 
 sslTotECDSAAuthorizations  OBJECT-TYPE
@@ -11250,6 +11610,142 @@ sslTotECDSAAuthorizations  OBJECT-TYPE
 	DESCRIPTION
 		"Total number of times ECDSA authorization is used on the NetScaler appliance."
 	::= { nsSslStatsGroup 366 }
+
+sslNumCardsUPSecondary  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of Add on SSL cards that are UP."
+	::= { nsSslStatsGroup 367 }
+
+sslCardsSecondary  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of secondary SSL crypto cards present on the NetScaler appliance."
+	::= { nsSslStatsGroup 368 }
+
+sslCardStatusSecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Status of the secondary SSL card(s). The value should be interpreted in binary form, with each set bit indicates a card as UP."
+	::= { nsSslStatsGroup 369 }
+
+sslCryptoUtilizationSecondary  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Utilization of the hardware crypto resource. Only valid values are 0-100%. Only works on N3FIPS+N3 hybrid platform. A value of 4294967295 is displayed on other platforms."
+	::= { nsSslStatsGroup 370 }
+
+sslTotEncHwSecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted in hardware on secondary card."
+	::= { nsSslStatsGroup 371 }
+
+sslTotHwEncFEsecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted on the front-end in hardware on secondary card."
+	::= { nsSslStatsGroup 372 }
+
+sslTotHwEncBEsecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes encrypted on the back-end in hardware on secondary card."
+	::= { nsSslStatsGroup 373 }
+
+sslTotDecHwSecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted in hardware on secondary card."
+	::= { nsSslStatsGroup 374 }
+
+sslTotHwDecFEsecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted on the front-end in hardware on secondary card."
+	::= { nsSslStatsGroup 375 }
+
+sslTotHwDecBEsecondary  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes decrypted on the back-end in hardware on secondary card."
+	::= { nsSslStatsGroup 376 }
+
+sslBeTotECDSAAuthorizations  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of back-end ECDSA authentications on the NetScaler appliance."
+	::= { nsSslStatsGroup 377 }
+
+sslTotSHA256Mac  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SHA256 hashes on the NetScaler appliance."
+	::= { nsSslStatsGroup 378 }
+
+sslTotSHA384Mac  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of SHA384 hashes on the NetScaler appliance."
+	::= { nsSslStatsGroup 379 }
+
+sslBeTotSHA256Mac  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of back-end SHA256 hashes on the NetScaler appliance."
+	::= { nsSslStatsGroup 380 }
+
+sslBeTotSHA384Mac  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of back-end SHA384 hashes on the NetScaler appliance."
+	::= { nsSslStatsGroup 381 }
+
+sslTotBkendCipherAESGCM128  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Back-end AES-GCM 128-bit cipher encryptions on the NetScaler appliance."
+	::= { nsSslStatsGroup 382 }
+
+sslTotBkendCipherAESGCM256  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Back-end AES-GCM 256-bit cipher encryptions on the NetScaler appliance."
+	::= { nsSslStatsGroup 383 }
 
 nsHttpStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 48 }
@@ -15106,7 +15602,8 @@ CrPolicyMapConfigEntry ::= SEQUENCE {
 	crMapSrcName  OCTET STRING,
 	crMapDstName  OCTET STRING,
 	crMapSrcUrl  OCTET STRING,
-	crMapDstUrl  OCTET STRING
+	crMapDstUrl  OCTET STRING,
+	crMapFullName  OCTET STRING
 }
 
 crMapName  OBJECT-TYPE
@@ -15148,6 +15645,14 @@ crMapDstUrl  OBJECT-TYPE
 	DESCRIPTION
 		"The Url after mapping."
 	::= { crPolicyMapConfigEntry 5 }
+
+crMapFullName  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Full name of the Map policy."
+	::= { crPolicyMapConfigEntry 6 }
 
 monitorCount  OBJECT-TYPE
 	SYNTAX  Integer32
@@ -16351,6 +16856,14 @@ dtlsStaPostResponseError  OBJECT-TYPE
 		"Number of errors during STA Validations on DTLS"
 	::= { nsSslVpnStatsGroup 51 }
 
+vpnLicenseFail  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of users not able to login because of license unavailability."
+	::= { nsSslVpnStatsGroup 52 }
+
 nsAaaStatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 67 }
 
@@ -16407,7 +16920,7 @@ aaaTotSessions  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Count of all AAA sessions."
+		"Count of all SmartAccess AAA sessions."
 	::= { nsAaaStatsGroup 7 }
 
 aaaTotSessionTimeout  OBJECT-TYPE
@@ -16423,7 +16936,7 @@ aaaCurSessions  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Count of current AAA sessions."
+		"Count of current SmartAccess AAA sessions."
 	::= { nsAaaStatsGroup 9 }
 
 aaaCurICASessions  OBJECT-TYPE
@@ -16431,7 +16944,7 @@ aaaCurICASessions  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Count of current ICA only sessions."
+		"Count of current Basic ICA only sessions."
 	::= { nsAaaStatsGroup 10 }
 
 aaaCurTMSessions  OBJECT-TYPE
@@ -16455,7 +16968,7 @@ aaaCurICAOnlyConn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Count of current ICA only connections."
+		"Count of current Basic ICA only connections."
 	::= { nsAaaStatsGroup 13 }
 
 aaaCurICAConn  OBJECT-TYPE
@@ -16463,7 +16976,7 @@ aaaCurICAConn  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Count of current ICA connections."
+		"Count of current SmartAccess ICA connections."
 	::= { nsAaaStatsGroup 14 }
 
 nsGlobalConfigSettings OBJECT IDENTIFIER
@@ -17094,6 +17607,57 @@ inatTotpktsent  OBJECT-TYPE
 	DESCRIPTION
 		"INAT total Packets Sent"
 	::= { nsInatPerNatStatsEntry 7 }
+
+nsInatSessionGlobalStats OBJECT IDENTIFIER
+	::= { nsInatStatsGroup 4 }
+
+globalInatHits  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total INAT Session hits"
+	::= { nsInatSessionGlobalStats 1 }
+
+globalInatCurSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total INAT current sessions"
+	::= { nsInatSessionGlobalStats 2 }
+
+globalInatReceiveBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total INAT Received Bytes"
+	::= { nsInatSessionGlobalStats 3 }
+
+globalInatTotSentBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total INAT Sent Bytes"
+	::= { nsInatSessionGlobalStats 4 }
+
+globalInatPktReceived  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total INAT Packets Received"
+	::= { nsInatSessionGlobalStats 5 }
+
+globalInatPktSent  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total INAT Packets Sent"
+	::= { nsInatSessionGlobalStats 6 }
 
 nsNat64StatsGroup OBJECT IDENTIFIER
 	::= { nsSysGroup 75 }
@@ -18175,73 +18739,73 @@ nsvPathStatsGroup OBJECT IDENTIFIER
 vPathTotL2DataRx  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of non-fragmented vPath data packets decapsulated in L2 adjacency"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 1 }
 
 vPathTotL3DataRx  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of non-fragmented vPath data packets decapsulated in L3 adjacency"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 2 }
 
 vPathTotL2CntrlPkts  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of vPath control packets received in L2 adjacency"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 3 }
 
 vPathTotL3CntrlPkts  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of vPath control packets received in L3 adjacency"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 4 }
 
 vPathTotFragPkts  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of vPath fragments received"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 5 }
 
 vPathTotL2EncapPkts  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of L2 vPath encapsulated packets injected to VEM"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 6 }
 
 vPathTotL3EncapPkts  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Total number of L3 vPath encapsulated packets injected to VEM"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 7 }
 
 vPathTotFragEncapPkts  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of fragmented vPath packets transmitted"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 8 }
 
 vPathTotOffload  OBJECT-TYPE
 	SYNTAX  Counter64
 	MAX-ACCESS  read-only
-	STATUS  current
+	STATUS  obsolete
 	DESCRIPTION
-		"Number of offloaded vPath packets transmitted"
+		"This object is now obsolete"
 	::= { nsvPathStatsGroup 9 }
 
 nsLLDPGroup OBJECT IDENTIFIER
@@ -20414,6 +20978,465 @@ mcEncOther  OBJECT-TYPE
 		"Total number of encrypted video streams requested by non-Android and non-IOS devices"
 	::= { nsmcStatsGroup 36 }
 
+nsMapStatsGroup OBJECT IDENTIFIER
+	::= { nsSysGroup 85 }
+
+nsMapDomainStatsTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NsMapDomainStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This provides information about MAP-T domain specific statistics "
+	::= { nsMapStatsGroup 1 }
+
+nsMapDomainStatsEntry  OBJECT-TYPE
+	SYNTAX  NsMapDomainStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { mapDomainName     }
+	::= { nsMapDomainStatsTable 1 }
+
+NsMapDomainStatsEntry ::= SEQUENCE {
+	mapDomainName  OCTET STRING,
+	mapTotV6RxPkts  Counter64,
+	mapTotV6TxPkts  Counter64,
+	mapTotV6RxBytes  Counter64,
+	mapTotV6TxBytes  Counter64,
+	mapTotV4RxPkts  Counter64,
+	mapTotV4TxPkts  Counter64,
+	mapTotV4RxBytes  Counter64,
+	mapTotV4TxBytes  Counter64,
+	mapTotV6RxPktsTcp  Counter64,
+	mapTotV6TxPktsTcp  Counter64,
+	mapTotV6RxBytesTcp  Counter64,
+	mapTotV6TxBytesTcp  Counter64,
+	mapTotV4RxPktsTcp  Counter64,
+	mapTotV4TxPktsTcp  Counter64,
+	mapTotV4RxBytesTcp  Counter64,
+	mapTotV4TxBytesTcp  Counter64,
+	mapTotV6RxPktsUdp  Counter64,
+	mapTotV6TxPktsUdp  Counter64,
+	mapTotV6RxBytesUdp  Counter64,
+	mapTotV6TxBytesUdp  Counter64,
+	mapTotV4RxPktsUdp  Counter64,
+	mapTotV4TxPktsUdp  Counter64,
+	mapTotV4RxBytesUdp  Counter64,
+	mapTotV4TxBytesUdp  Counter64,
+	mapTotV6RxPktsIcmp  Counter64,
+	mapTotV6TxPktsIcmp  Counter64,
+	mapTotV6RxBytesIcmp  Counter64,
+	mapTotV6TxBytesIcmp  Counter64,
+	mapTotV4RxPktsIcmp  Counter64,
+	mapTotV4TxPktsIcmp  Counter64,
+	mapTotV4RxBytesIcmp  Counter64,
+	mapTotV4TxBytesIcmp  Counter64
+}
+
+mapDomainName  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The name of the LSN Group"
+	::= { nsMapDomainStatsEntry 1 }
+
+mapTotV6RxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V6 Recieved packets."
+	::= { nsMapDomainStatsEntry 2 }
+
+mapTotV6TxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V6 Transmitted packets."
+	::= { nsMapDomainStatsEntry 3 }
+
+mapTotV6RxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V6 Recieved Bytes."
+	::= { nsMapDomainStatsEntry 4 }
+
+mapTotV6TxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V6 Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 5 }
+
+mapTotV4RxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V4 Recieved packets."
+	::= { nsMapDomainStatsEntry 6 }
+
+mapTotV4TxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V4 Transmitted packets."
+	::= { nsMapDomainStatsEntry 7 }
+
+mapTotV4RxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V4 Recieved Bytes."
+	::= { nsMapDomainStatsEntry 8 }
+
+mapTotV4TxBytes  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T V4 Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 9 }
+
+mapTotV6RxPktsTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 TCP Recieved packets."
+	::= { nsMapDomainStatsEntry 10 }
+
+mapTotV6TxPktsTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 TCP Transmitted packets."
+	::= { nsMapDomainStatsEntry 11 }
+
+mapTotV6RxBytesTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 TCP Recieved Bytes."
+	::= { nsMapDomainStatsEntry 12 }
+
+mapTotV6TxBytesTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 TCP Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 13 }
+
+mapTotV4RxPktsTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 TCP Recieved packets."
+	::= { nsMapDomainStatsEntry 14 }
+
+mapTotV4TxPktsTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 TCP Transmitted packets."
+	::= { nsMapDomainStatsEntry 15 }
+
+mapTotV4RxBytesTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 TCP Recieved Bytes."
+	::= { nsMapDomainStatsEntry 16 }
+
+mapTotV4TxBytesTcp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 TCP Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 17 }
+
+mapTotV6RxPktsUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 UDP Recieved packets."
+	::= { nsMapDomainStatsEntry 18 }
+
+mapTotV6TxPktsUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 UDP Transmitted packets."
+	::= { nsMapDomainStatsEntry 19 }
+
+mapTotV6RxBytesUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 UDP Recieved Bytes."
+	::= { nsMapDomainStatsEntry 20 }
+
+mapTotV6TxBytesUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 UDP Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 21 }
+
+mapTotV4RxPktsUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 UDP Recieved packets."
+	::= { nsMapDomainStatsEntry 22 }
+
+mapTotV4TxPktsUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 UDP Transmitted packets."
+	::= { nsMapDomainStatsEntry 23 }
+
+mapTotV4RxBytesUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 UDP Recieved Bytes."
+	::= { nsMapDomainStatsEntry 24 }
+
+mapTotV4TxBytesUdp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 UDP Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 25 }
+
+mapTotV6RxPktsIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 ICMP Recieved packets."
+	::= { nsMapDomainStatsEntry 26 }
+
+mapTotV6TxPktsIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 ICMP Transmitted packets."
+	::= { nsMapDomainStatsEntry 27 }
+
+mapTotV6RxBytesIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 ICMP Recieved Bytes."
+	::= { nsMapDomainStatsEntry 28 }
+
+mapTotV6TxBytesIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv6 ICMP Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 29 }
+
+mapTotV4RxPktsIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 ICMP Recieved packets."
+	::= { nsMapDomainStatsEntry 30 }
+
+mapTotV4TxPktsIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 ICMP Transmitted packets."
+	::= { nsMapDomainStatsEntry 31 }
+
+mapTotV4RxBytesIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 ICMP Recieved Bytes."
+	::= { nsMapDomainStatsEntry 32 }
+
+mapTotV4TxBytesIcmp  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total number of MAP-T IPv4 ICMP Transmitted Bytes."
+	::= { nsMapDomainStatsEntry 33 }
+
+nsIpSecAlgProfTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NsIpSecAlgProfEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This table contains IPSec ALG information about seesions of the profile. "
+	::= { nsSysGroup 86 }
+
+nsIpSecAlgProfEntry  OBJECT-TYPE
+	SYNTAX  NsIpSecAlgProfEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { ipSecAlgProfName     }
+	::= { nsIpSecAlgProfTable 1 }
+
+NsIpSecAlgProfEntry ::= SEQUENCE {
+	ipSecAlgProfName  OCTET STRING,
+	ipSecAlgTotSessions  Counter64,
+	ipSecAlgTotDrSessions  Counter64,
+	ipSecAlgCurActSessions  Gauge32,
+	ipSecAlgCurBlkSessions  Gauge32,
+	ipSecAlgTotRxPkts  Counter64,
+	ipSecAlgTotTxPkts  Counter64
+}
+
+ipSecAlgProfName  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"The name of the IPSec ALG Profile"
+	::= { nsIpSecAlgProfEntry 1 }
+
+ipSecAlgTotSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total session for IPSec ALG."
+	::= { nsIpSecAlgProfEntry 2 }
+
+ipSecAlgTotDrSessions  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Dropped IPsec ALG sessions."
+	::= { nsIpSecAlgProfEntry 3 }
+
+ipSecAlgCurActSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Currently active IPsec ALG sessions."
+	::= { nsIpSecAlgProfEntry 4 }
+
+ipSecAlgCurBlkSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Currently blocked sessions on ESP Gate."
+	::= { nsIpSecAlgProfEntry 5 }
+
+ipSecAlgTotRxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Packets received during IPsec ALG sessions."
+	::= { nsIpSecAlgProfEntry 6 }
+
+ipSecAlgTotTxPkts  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Total Packets sent during IPsec ALG sessions."
+	::= { nsIpSecAlgProfEntry 7 }
+
+partitionTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF PartitionEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Admin partition related statistics table."
+	::= { nsSysGroup 88 }
+
+partitionEntry  OBJECT-TYPE
+	SYNTAX  PartitionEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"..."
+	INDEX { partitionName     }
+	::= { partitionTable 1 }
+
+PartitionEntry ::= SEQUENCE {
+	partitionName  OCTET STRING,
+	partitionCurrentBandwidth  Gauge32,
+	partitionCurrentConnections  Gauge32,
+	partitionMemoryUsagePcnt  Gauge32
+}
+
+partitionName  OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This is the partition name"
+	::= { partitionEntry 1 }
+
+partitionCurrentBandwidth  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current Bandwidth usage for the partition."
+	::= { partitionEntry 2 }
+
+partitionCurrentConnections  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Current Connections on this partition."
+	::= { partitionEntry 3 }
+
+partitionMemoryUsagePcnt  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"Memory usage(%) on this partition."
+	::= { partitionEntry 4 }
+
 nsSvcGroup OBJECT IDENTIFIER
 	::= { rs9000 2 }
 
@@ -20525,7 +21548,7 @@ svcState  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Current state of the server. Possible values are UP, DOWN, UNKNOWN, OFS(Out of Service), TROFS(Transition Out of Service), TROFS_DOWN(Down When going Out of Service)"
+		"Current state of the server. There are seven possible values: UP(7), DOWN(1), UNKNOWN(2), BUSY(3), OFS(Out of Service)(4), TROFS(Transition Out of Service)(5), TROFS_DOWN(Down When going Out of Service)(8)"
 	::= { serviceEntry 5 }
 
 svcMaxReqPerConn  OBJECT-TYPE
@@ -20886,7 +21909,7 @@ svcGslbState  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Effective state of the gslb service. Possible values are UP, DOWN, UNKNOWN, OFS(Out of Service), TROFS(Transition Out of Service), TROFS_DOWN(Down When going Out of Service)"
+		"Effective state of the gslb service. There are seven possible values: UP(7), DOWN(1), UNKNOWN(2), BUSY(3), OFS(Out of Service)(4), TROFS(Transition Out of Service)(5), TROFS_DOWN(Down When going Out of Service)(8)"
 	::= { serviceEntry 58 }
 
 svcCurSrvrConnections  OBJECT-TYPE
@@ -21595,7 +22618,7 @@ svcGrpMemberState  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Current state of the server. Possible values are UP, DOWN, UNKNOWN, OFS(Out of Service), TROFS(Transition Out of Service), TROFS_DOWN(Down When going Out of Service)"
+		"Current state of the server. There are seven possible values: UP(7), DOWN(1), UNKNOWN(2), BUSY(3), OFS(Out of Service)(4), TROFS(Transition Out of Service)(5), TROFS_DOWN(Down When going Out of Service)(8)"
 	::= { serviceGroupMemberEntry 6 }
 
 svcGrpMemberWeight  OBJECT-TYPE
@@ -22461,7 +23484,9 @@ VserverEntry ::= SEQUENCE {
 	vsvrCurTotalVpnUsers  Gauge32,
 	vsvrCurMptcpSessions  Gauge32,
 	vsvrCursubflowConn  Gauge32,
-	vsvrCurEffState  EntityState
+	vsvrCurEffState  EntityState,
+	vsvrCurPersistenceSessions  Gauge32,
+	vsvrCurBackupPersistenceSessions  Gauge32
 }
 
 vsvrName  OBJECT-TYPE
@@ -22501,7 +23526,7 @@ vsvrState  OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Current state of the server. Possible values are UP, DOWN, UNKNOWN, OFS(Out of Service), TROFS(Transition Out of Service), TROFS_DOWN(Down When going Out of Service)"
+		"Current state of the server. There are seven possible values: UP(7), DOWN(1), UNKNOWN(2), BUSY(3), OFS(Out of Service)(4), TROFS(Transition Out of Service)(5), TROFS_DOWN(Down When going Out of Service)(8)"
 	::= { vserverEntry 5 }
 
 vsvrMaxReqPerConn  OBJECT-TYPE
@@ -22967,6 +23992,22 @@ vsvrCurEffState  OBJECT-TYPE
 	DESCRIPTION
 		"Current Effective state of vserver"
 	::= { vserverEntry 75 }
+
+vsvrCurPersistenceSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"current vserver owned persistence sessions"
+	::= { vserverEntry 76 }
+
+vsvrCurBackupPersistenceSessions  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"current vserver owned backup persistence sessions"
+	::= { vserverEntry 77 }
 
 vserverServiceTable  OBJECT-TYPE
 	SYNTAX  SEQUENCE OF VserverServiceEntry
@@ -24612,6 +25653,38 @@ lsnNAT64SubscrIPV6  OBJECT-TYPE
 		"This represents the LSN Subscriber IPV6 address."
 	::= { snmpTrapVarBindOidsGroup 69 }
 
+lsnCurSharedPages  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the current shared pages in LSN Memory"
+	::= { snmpTrapVarBindOidsGroup 70 }
+
+lsnTotSharedPages  OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the total shared pages in LSN Memory"
+	::= { snmpTrapVarBindOidsGroup 71 }
+
+dnsCacheThreshold  OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the maximum DNS cache threshold that is configured."
+	::= { snmpTrapVarBindOidsGroup 72 }
+
+dnsCurCacheValue  OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"This represents the current DNS cache size used."
+	::= { snmpTrapVarBindOidsGroup 73 }
+
 netScalerEventsV2 OBJECT-IDENTITY
 	STATUS  current
 	DESCRIPTION
@@ -24798,7 +25871,7 @@ maxClientsNormal  NOTIFICATION-TYPE
 	::= { netScalerEventsV2 27 }
 
 netScalerConfigSave  NOTIFICATION-TYPE
-	OBJECTS  { nsUserName , sysIpAddress }
+	OBJECTS  { nsUserName , commandExecutionStatus , sysIpAddress }
 	STATUS  current
 	DESCRIPTION
 		"This trap is sent when the configuration on the NetScaler is saved."
@@ -25768,5 +26841,89 @@ gslbSiteMEPflap  NOTIFICATION-TYPE
 	DESCRIPTION
 		"This trap is sent when the GSLB site MEP flaps."
 	::= { netScalerEventsV2 166 }
+
+lsnMemRecoveryKickedin  NOTIFICATION-TYPE
+	OBJECTS  { lsnCurSharedPages , lsnTotSharedPages , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when a LSN Memory Recovery is kicked in"
+	::= { netScalerEventsV2 167 }
+
+dnsMaxNegCacheLimitHit  NOTIFICATION-TYPE
+	OBJECTS  { dnsCacheThreshold , dnsCurCacheValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the max negative cache allocated for DNS has reached. "
+	::= { netScalerEventsV2 168 }
+
+dnsMaxCacheLimitHit  NOTIFICATION-TYPE
+	OBJECTS  { dnsCacheThreshold , dnsCurCacheValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the max cache allocated for DNS has reached. "
+	::= { netScalerEventsV2 169 }
+
+partitionCONNThresholdReached  NOTIFICATION-TYPE
+	OBJECTS  { alarmHighThreshold , alarmCurrentValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the number of active connections for this partition has crossed its high threshold limit."
+	::= { netScalerEventsV2 170 }
+
+partitionCONNThresholdNormal  NOTIFICATION-TYPE
+	OBJECTS  { alarmNormalThreshold , alarmCurrentValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the current connection count for the partition is within normal threshold limit."
+	::= { netScalerEventsV2 171 }
+
+partitionBWThresholdReached  NOTIFICATION-TYPE
+	OBJECTS  { alarmHighThreshold , alarmCurrentValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when the bandwidth usage of the partition exceeds the high threshold limit."
+	::= { netScalerEventsV2 172 }
+
+partitionMEMThresholdReached  NOTIFICATION-TYPE
+	OBJECTS  { nsCPUname , alarmHighThreshold , alarmCurrentValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the memory usage of the partition has crossed its high threshold limit."
+	::= { netScalerEventsV2 173 }
+
+partitionMEMThresholdNormal  NOTIFICATION-TYPE
+	OBJECTS  { nsCPUname , alarmNormalThreshold , alarmCurrentValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the current memory usage of the partition is within normal threshold limit."
+	::= { netScalerEventsV2 174 }
+
+partitionMEMLimitExceeded  NOTIFICATION-TYPE
+	OBJECTS  { nsCPUname , alarmHighThreshold , alarmCurrentValue , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that the memory usage of the partition has exceeded the configured memory limit."
+	::= { netScalerEventsV2 175 }
+
+appfwSessionLimit  NOTIFICATION-TYPE
+	OBJECTS  { appfwLogMsg , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates that AppFirewall is operating at Max Session Limit."
+	::= { netScalerEventsV2 176 }
+
+tcpSynFloodAttack  NOTIFICATION-TYPE
+	OBJECTS  { unackSynCount , alarmHighThreshold , sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap indicates synflood attack."
+	::= { netScalerEventsV2 177 }
+
+nsLicenseExpiry  NOTIFICATION-TYPE
+	OBJECTS  { sysIpAddress }
+	STATUS  current
+	DESCRIPTION
+		"This trap is sent when NetScaler license has expired"
+	::= { netScalerEventsV2 178 }
 
 END -- end of module NS-ROOT-MIB.

@@ -1,8 +1,8 @@
 -- =====================================================================
 -- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description: HUAWEI 3COM device link detection protocol (DLDP) MIB.
--- Device Link Detection Protocol is Huawei 3Com private Layer2 protocol,
+-- Description: Device link detection protocol (DLDP) MIB.
+-- Device Link Detection Protocol is private Layer2 protocol,
 -- which is used for automatically detecting unidirectional link to
 -- prevent a loop communication.
 -- Reference:
@@ -11,7 +11,7 @@
 -- V1.0 2004-12-13 created by tangshun
 -- V1.1 2006-11-24 modify SYNTAX and DEFVAL of h3cDLDPInterval by yubo
 -- V1.2 2011-11-23 modify SYNTAX and DESCRIPTION of
-                   h3cDLDPAuthenticationPassword by zhangwei
+--                 h3cDLDPAuthenticationPassword by zhangwei
 -- =====================================================================
 H3C-DLDP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -33,13 +33,14 @@ h3cDldp MODULE-IDENTITY
     LAST-UPDATED
         "200412130000Z"
     ORGANIZATION
-        "Huawei 3Com Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Huawei 3Com Technologies Co., Ltd.
-         Hai-Dian District Beijing P.R. China
-         Http://www.huawei-3com.com
-         Zip:100085"
-    DESCRIPTION "HUAWEI-3COM DLDP (Device Link Detection Protocol) MIB"
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION "DLDP (Device Link Detection Protocol) MIB"
     REVISION
         "200412130000Z"
     DESCRIPTION

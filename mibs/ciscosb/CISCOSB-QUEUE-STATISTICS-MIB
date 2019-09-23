@@ -10,13 +10,13 @@ CISCOSB-QUEUE-STATISTICS-MIB DEFINITIONS ::= BEGIN
 -- -------------------------------------------------------------
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+	MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
     Counter64, Integer32                            FROM SNMPv2-SMI
     DisplayString, TEXTUAL-CONVENTION, TruthValue, 
     RowStatus                                       FROM SNMPv2-TC
     InterfaceIndex, InterfaceIndexOrZero            FROM IF-MIB
     StatisticsDPType                                FROM CISCOSB-POLICY-MIB
-    switch001                                       FROM CISCOSB-MIB;
+	switch001                                       FROM CISCOSB-MIB;
     
 ----------------------------------------------------
 --              MIBS definitions                  --
@@ -29,6 +29,9 @@ rlQueueStatistics MODULE-IDENTITY
            "Postal: 170 West Tasman Drive
          San Jose , CA 95134-1706
          USA
+		 
+		 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+		 
     DESCRIPTION
            "This private MIB module for Queue-Statistics"
     REVISION "201607070000Z"
@@ -84,7 +87,7 @@ rlInterfaceQueueStatisticsIfIndex OBJECT-TYPE
     SYNTAX InterfaceIndex 
     MAX-ACCESS not-accessible
     STATUS current
-    DESCRIPTION        "Interface index."
+    DESCRIPTION "Interface index."
     ::= { rlInterfaceQueueStatisticsEntry 1 }
 
 rlInterfaceQueueStatisticsQueue OBJECT-TYPE
@@ -130,4 +133,4 @@ rlInterfaceQueueStatisticsDroppedBytes OBJECT-TYPE
     ::= { rlInterfaceQueueStatisticsEntry 7 }
 
 END
-    
+

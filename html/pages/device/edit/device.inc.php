@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -88,9 +88,9 @@ if ($vars['editing'])
       $updated++;
     }
 
-    foreach (array('purpose', 'ignore', 'disabled') as $param)
+    foreach (array('purpose', 'ignore', 'disabled', 'poller_id') as $param)
     {
-      if ($param != 'purpose')
+      if (!in_array($param, array('purpose', 'poller_id')))
       {
         // Boolead params
         $vars[$param] = in_array($vars[$param], array('on', '1')) ? '1' : '0';
@@ -101,7 +101,6 @@ if ($vars['editing'])
         $updated++;
       }
     }
-    //$param = array('purpose' => $vars['descr'], 'type' => $vars['type'], 'ignore' => $vars['ignore'], 'disabled' => $vars['disabled']);
 
     if (count($update_array))
     {
@@ -202,35 +201,59 @@ else if ($update_message)
                                       'disabled'    => !$override_sysLocation_bool,
                                       'value'       => escape_html($override_sysLocation_string));
       $form['row'][3]['override_sysLocation'] = array(
-                                      'type'        => 'switch',
+                                      'type'        => 'toggle',
+                                      'size'        => 'large',
                                       //'fieldset'    => 'edit',
                                       //'placeholder' => 'Use custom location below.',
                                       'onchange'    => "toggleAttrib('disabled', 'sysLocation')",
                                       'readonly'    => $readonly,
                                       'value'       => $override_sysLocation_bool);
-      $form['row'][4]['ping_skip'] = array(
-                                      'type'        => 'checkbox',
+
+      $poller_list = array();
+      $poller_list[0] = 'Default Poller';
+      foreach(dbFetchRows("SELECT * FROM `pollers`") AS $poller)
+      {
+        $poller_list[$poller['poller_id']] = $poller['poller_name'];
+      }
+
+      $form['row'][4]['poller_id']      = array(
+                                      'type'        => 'select',
+                                      'name'        => 'Poller',
+                                      'width'       => '250px',
+                                      'readonly'    => $readonly,
+                                      'disabled'    => !(count($poller_list) > 1),
+                                      'values'      => $poller_list,
+                                      'value'       => $device['poller_id']);
+
+      $form['row'][5]['ping_skip'] = array(
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'yellow',
                                       'name'        => 'Skip ping',
                                       //'fieldset'    => 'edit',
                                       'placeholder' => 'Skip ICMP echo checks, only SNMP availability.',
                                       'readonly'    => $readonly,
                                       'value'       => $ping_skip);
       // FIXME (Mike): $device['ignore'] and get_dev_attrib($device,'disable_notify') it is same/redundant options?
-      $form['row'][5]['ignore'] = array(
-                                      'type'        => 'checkbox',
+      $form['row'][6]['ignore'] = array(
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'yellow',
                                       'name'        => 'Device ignore',
                                       //'fieldset'    => 'edit',
                                       'placeholder' => 'Ignore device for alerting and notifications.',
                                       'readonly'    => $readonly,
                                       'value'       => $device['ignore']);
-      $form['row'][6]['disabled'] = array(
-                                      'type'        => 'checkbox',
+      $form['row'][7]['disabled'] = array(
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'red',
                                       'name'        => 'Disable',
                                       //'fieldset'    => 'edit',
                                       'placeholder' => 'Disables polling and discovery.',
                                       'readonly'    => $readonly,
                                       'value'       => $device['disabled']);
-      $form['row'][7]['submit']    = array(
+      $form['row'][8]['submit']    = array(
                                       'type'        => 'submit',
                                       'name'        => 'Save Changes',
                                       'icon'        => 'icon-ok icon-white',

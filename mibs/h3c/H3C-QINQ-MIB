@@ -1,7 +1,7 @@
 -- ==================================================================
--- Copyright (C) 2003 by HUAWEI 3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2003 by H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: HUAWEI-3COM 802.1Q-in-Q and BPDU Tunnel MIB
+-- Description: 802.1Q-in-Q and BPDU Tunnel MIB
 -- Reference:
 -- Version: V1.1
 -- History:
@@ -33,14 +33,15 @@ H3C-QINQ-MIB DEFINITIONS ::= BEGIN
         LAST-UPDATED
             "200603100000Z"
         ORGANIZATION
-            "Huawei-3Com Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Huawei-3Com Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
-            Zip: 100085"
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
-            "HUAWEI-3COM 802.1Q-in-Q MIB"
+            "802.1Q-in-Q MIB"
         REVISION
             "200603100000Z"
         DESCRIPTION

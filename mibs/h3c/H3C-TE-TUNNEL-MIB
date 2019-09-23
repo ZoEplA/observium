@@ -1,5 +1,5 @@
--- ==================================================================
--- Copyright (c) 2004-2011 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- =================================================================
+-- Copyright (c) 2004-2011 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This MIB define objects for MPLS Te Tunnel.
 -- Reference:
@@ -28,9 +28,9 @@ h3cTeTunnel MODULE-IDENTITY
         "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
         "Platform Team Hangzhou H3C Tech. Co., Ltd.
-        Hai-Dian District Beijing P.R. China
-        http://www.h3c.com
-        Zip:100085"
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
     DESCRIPTION
         "This MIB contains managed object definitions for the
         Multiprotocol Label Switching (MPLS) Te Tunnel."
@@ -53,7 +53,7 @@ h3cTeTunnelMaxTunnelIndex OBJECT-TYPE
 h3cTeTunnelObjects OBJECT IDENTIFIER ::= { h3cTeTunnel 2 }
 
 h3cTeTunnelStaticCrlspTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF Hh3cTeTunnelStaticCrlspEntry
+    SYNTAX SEQUENCE OF H3cTeTunnelStaticCrlspEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -63,7 +63,7 @@ h3cTeTunnelStaticCrlspTable OBJECT-TYPE
     ::= { h3cTeTunnelObjects 1 }
 
 h3cTeTunnelStaticCrlspEntry OBJECT-TYPE
-    SYNTAX Hh3cTeTunnelStaticCrlspEntry
+    SYNTAX H3cTeTunnelStaticCrlspEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -71,7 +71,7 @@ h3cTeTunnelStaticCrlspEntry OBJECT-TYPE
     INDEX { h3cTeTunnelStaticCrlspInLabel }
     ::= { h3cTeTunnelStaticCrlspTable 1 }
 
-Hh3cTeTunnelStaticCrlspEntry ::=
+H3cTeTunnelStaticCrlspEntry ::=
     SEQUENCE {
         h3cTeTunnelStaticCrlspInLabel
             MplsLabel,
@@ -144,7 +144,7 @@ h3cTeTunnelStaticCrlspXCPointer OBJECT-TYPE
     ::= { h3cTeTunnelStaticCrlspEntry 5 }
 
 h3cTeTunnelCoTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF Hh3cTeTunnelCoEntry
+    SYNTAX SEQUENCE OF H3cTeTunnelCoEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -156,7 +156,7 @@ h3cTeTunnelCoTable OBJECT-TYPE
     ::= { h3cTeTunnelObjects 2 }
 
 h3cTeTunnelCoEntry OBJECT-TYPE
-    SYNTAX Hh3cTeTunnelCoEntry
+    SYNTAX H3cTeTunnelCoEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -165,7 +165,7 @@ h3cTeTunnelCoEntry OBJECT-TYPE
     INDEX { h3cTeTunnelCoIndex, h3cTeTunnelCoLspInstance, h3cTeTunnelCoIngressLSRId, h3cTeTunnelCoEgressLSRId }
     ::= { h3cTeTunnelCoTable 1 }
 
-Hh3cTeTunnelCoEntry ::=
+H3cTeTunnelCoEntry ::=
     SEQUENCE {
         h3cTeTunnelCoIndex
             MplsTunnelIndex,
@@ -259,7 +259,7 @@ h3cTeTunnelCoReverseLspXCPointer OBJECT-TYPE
     ::= { h3cTeTunnelCoEntry 7 }
 
 h3cTeTunnelPsTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF Hh3cTeTunnelPsEntry
+    SYNTAX SEQUENCE OF H3cTeTunnelPsEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -268,7 +268,7 @@ h3cTeTunnelPsTable OBJECT-TYPE
     ::= { h3cTeTunnelObjects 3 }
 
 h3cTeTunnelPsEntry OBJECT-TYPE
-    SYNTAX Hh3cTeTunnelPsEntry
+    SYNTAX H3cTeTunnelPsEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -277,7 +277,7 @@ h3cTeTunnelPsEntry OBJECT-TYPE
     INDEX { h3cTeTunnelPsIndex, h3cTeTunnelPsIngressLSRId, h3cTeTunnelPsEgressLSRId }
     ::= { h3cTeTunnelPsTable 1 }
 
-Hh3cTeTunnelPsEntry ::=
+H3cTeTunnelPsEntry ::=
     SEQUENCE {
         h3cTeTunnelPsIndex
             MplsTunnelIndex,

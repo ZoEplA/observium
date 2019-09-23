@@ -7,20 +7,20 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $ds_in = "TunInPkts";
 $ds_out = "TunOutPkts";
 
-$colour_area_in = "AA66AA";
-$colour_line_in = "330033";
-$colour_area_out = "FFDD88";
-$colour_line_out = "FF6600";
+$colour_area_in = $config['colours']['graphs']['pkts']['in_area'];
+$colour_line_in = $config['colours']['graphs']['pkts']['in_line'];
+$colour_area_out = $config['colours']['graphs']['pkts']['out_area'];
+$colour_line_out = $config['colours']['graphs']['pkts']['out_line'];
 
-$colour_area_in_max = "cc88cc";
-$colour_area_out_max = "FFefaa";
+$colour_area_in_max = $config['colours']['graphs']['pkts']['in_max'];
+$colour_area_out_max = $config['colours']['graphs']['pkts']['out_max'];
 
 $graph_max = 1;
 $unit_text = "Packets";

@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -324,10 +324,10 @@ function generate_pseudowire_row($pw, $vars)
     $out .= '<td>'. $pw['pwRemoteIfString'] .'</td>';
   }
   $out .= '<td>' . generate_entity_link('pseudowire', $pw, $mini_graph, NULL, FALSE) . '</td>';
-  $out .= '<td style="white-space: nowrap">' . generate_tooltip_link(NULL, formatUptime(($config['time']['now'] - $pw['last_change']), 'short-2') . ' ago', format_unixtime($pw['last_change'])) . '</td>';
+  $out .= '<td style="white-space: nowrap">' . generate_tooltip_link(NULL, format_uptime(($config['time']['now'] - $pw['last_change']), 'short-2') . ' ago', format_unixtime($pw['last_change'])) . '</td>';
   $out .= '<td style="text-align: right;"><strong>' . generate_tooltip_link('', $pw['event'], $pw['event_descr'], $pw['event_class']) . '</strong></td>';
   $out .= '<td style="text-align: right;"><strong>' . generate_tooltip_link('', $pw['pwOperStatus'], $pw['event_descr'], $pw['event_class']) . '</strong></td>';
-  $out .= '<td>' . formatUptime($pw['pwUptime'], 'short-2') . '</td>';
+  $out .= '<td>' . format_uptime($pw['pwUptime'], 'short-2') . '</td>';
   $out .= '</tr>';
 
   if ($vars['graph'] || $vars['view'] == "graphs" || $vars['id'] == $pw['pseudowire_id'])

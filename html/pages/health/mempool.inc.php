@@ -7,9 +7,11 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+print_mempool_form($vars);
 
 print_mempool_table($vars);
 

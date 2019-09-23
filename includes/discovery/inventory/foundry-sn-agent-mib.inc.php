@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -30,7 +30,7 @@ if ($snChasProductType)
     'entPhysicalMfgName'      => 'Brocade'
   );
 
-  discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], 'foundry-sn-agent-mib');
+  discover_inventory($device, $system_index, $inventory[$system_index], $mib);
 
   // Now fetch data for the rest of the hardware in the chassis
   $data = snmpwalk_cache_oid($device, 'snAgentBrdTable', array(), 'FOUNDRY-SN-AGENT-MIB');
@@ -62,7 +62,7 @@ if ($snChasProductType)
           'entPhysicalMfgName'      => 'Brocade'
         );
 
-        discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], 'foundry-sn-agent-mib');
+        discover_inventory($device, $system_index, $inventory[$system_index], $mib);
       }
     }
   }

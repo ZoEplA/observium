@@ -7896,8 +7896,6 @@ print-meter-impression-count	OBJECT-TYPE
 		supported/implemented on a given product.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers." 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 20 } 
 
@@ -7940,8 +7938,6 @@ print-meter-impression-copy-count OBJECT-TYPE
 		supported/implemented on a given product.This object will be 
 		enabled via feature authorization and will only be available 
 		to authorized customers." 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 26 } 
 
@@ -7984,8 +7980,6 @@ print-meter-impression-fax-count OBJECT-TYPE
 		supported/implemented for a given product.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers." 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 32 } 
 
@@ -8030,8 +8024,6 @@ print-meter-impression-count OBJECT-TYPE
 		supported/implemented for a given product.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers." 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed  
    ::= { printer-accounting 38 } 
 
@@ -8073,8 +8065,6 @@ print-meter-equivalent-impression-category-total OBJECT-TYPE
 		categories are supported/implemented for a given product.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers." 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 47 } 
    
@@ -8103,8 +8093,6 @@ print-meter-equivalent-impression-coverage OBJECT-TYPE
 		A4EquivalentImpressionsByMarkerColor counter group.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers." 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 59 } 
 
@@ -8138,8 +8126,6 @@ print-meter-equivalent-impression-coverage-bytime OBJECT-TYPE
 		A4EquivalentImpressionsByMarkerColor counter group.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers" 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 60 }
 
@@ -8155,8 +8141,6 @@ print-meter-equivalent-impression-coverage-bytime OBJECT-TYPE
 		will return a value of 30.This object will be 
 		enabled via feature authorization and will only be available
 		to authorized customers" 
-   INTERACTION "" 
-   OPERATION  "Not destructive." 
 -- STATUS     proposed 
    ::= { printer-accounting 61 }  
 

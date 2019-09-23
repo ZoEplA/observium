@@ -38,65 +38,65 @@ IMPORTS
 
 
 
-               cardResetTable OBJECT-TYPE
-                   SYNTAX  SEQUENCE OF CardResetTableEntry
+               slotStatusTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF cardStatusTableEntry
                    ACCESS  not-accessible
                    STATUS  mandatory
                    DESCRIPTION
                             "A list of cards reset entries."
                    ::= { cardOper 2 }
 
-               CardResetTableEntry OBJECT-TYPE
-                   SYNTAX  CardResetTableEntry
+               cardStatusTableEntry OBJECT-TYPE
+                   SYNTAX  cardStatusTableEntry
                    ACCESS  not-accessible
                    STATUS  mandatory
                    DESCRIPTION
                             "A collection of cards to be reset."
-                   INDEX { cardIndex }
-               ::= { cardResetTable 1 }
+                   INDEX { nmsSlotIndex }
+               ::= { slotStatusTable 1 }
 
-               CardResetTableEntry ::=
+               cardStatusTableEntry ::=
                    SEQUENCE {
-                       nmscardIndex
+                       nmsSlotIndex
                            INTEGER,
-                       nmscardType
+                       nmsCardType
                            INTEGER,
-                       nmscardDescr
+                       nmsCardDescr
                        	   DisplayString,
-                       nmscardReset
+                       nmsSlotOperation
                        	   INTEGER
                   }
 
 
-               nmscardIndex OBJECT-TYPE
+               nmsSlotIndex OBJECT-TYPE
                    SYNTAX  INTEGER
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
                            "Index into cardTable (not physical chassis
                            slot number), the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
-                   ::= { cardResetTableEntry 1 }
+                   ::= { cardStatusTableEntry 1 }
 
 
-               nmscardType OBJECT-TYPE
+               nmsCardType OBJECT-TYPE
                    SYNTAX  INTEGER
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
                            "Type of card, the same with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
-                   ::= { cardResetTableEntry 2 }
+                   ::= { cardStatusTableEntry 2 }
 
 
 
-               nmscardDescr OBJECT-TYPE
+               nmsCardDescr OBJECT-TYPE
                    SYNTAX  DisplayString
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
                            "Text description of this card, the same value with the nmscardIndex of nmscardTable in NMS-CHASSIS-MIB."
-                   ::= { cardResetTableEntry 3 }
+                   ::= { cardStatusTableEntry 3 }
 
-               nmscardReset OBJECT-TYPE
+               nmsSlotOperation OBJECT-TYPE
                    SYNTAX  INTEGER{ 
                                     no-reset(0),
                                     reset(1),
@@ -108,7 +108,7 @@ IMPORTS
                    STATUS  mandatory
                    DESCRIPTION
                            "When value is set to reset(1), that means card reset; when value is set to shutdown-slot(2), no-shutdown-slot(3), only shut down or no shut down the corresponding slot."
-                   ::= { cardResetTableEntry 4 }
+                   ::= { cardStatusTableEntry 4 }
                    
                    
                    

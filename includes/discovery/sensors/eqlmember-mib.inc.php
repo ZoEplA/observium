@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -44,7 +44,7 @@ if (is_numeric($eqlgrpmemid))
                       'limit_low_warn'  => $entry['eqlMemberHealthDetailsFanLowWarningThreshold']);
       if ($entry['eqlMemberHealthDetailsFanValue'] <> 0)
       {
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $entry['oid'], $numindex, 'equallogic',
+        discover_sensor('fanspeed', $device, $entry['oid'], $numindex, 'equallogic',
           $entry['eqlMemberHealthDetailsFanName'], 1, $entry['eqlMemberHealthDetailsFanValue'], $limits);
       }
     }
@@ -88,7 +88,7 @@ if (is_numeric($eqlgrpmemid))
                       'limit_low_warn'  => $entry['eqlMemberHealthDetailsTemperatureLowWarningThreshold']);
       if ($entry['eqlMemberHealthDetailsTemperatureValue'] <> 0)
       {
-        discover_sensor($valid['sensor'], 'temperature', $device, $entry['oid'], $numindex, 'equallogic',
+        discover_sensor('temperature', $device, $entry['oid'], $numindex, 'equallogic',
           $entry['eqlMemberHealthDetailsTemperatureName'], 1, $entry['eqlMemberHealthDetailsTemperatureValue'], $limits);
       }
     }

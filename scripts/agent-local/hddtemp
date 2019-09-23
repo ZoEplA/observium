@@ -1,42 +1,17 @@
 #!/bin/sh
 
-# Cache the file for 30 minutes
-# If you want to override this, put the command in cron.
-# We cache because it is a 1sec delay, which is painful for the poller
+# hddtemp sensor readings
+# needs hddtemp daemon listening on (at least) localhost
+# requires netcat to be installed and in the path
+# (c) 2012, Tom Laermans for Observium
 
-hddtemp=/usr/sbin/hddtemp
+hostname="localhost"
+port=7634
+nc=`which nc`
 
-if [ $? -eq 0 ]; then
-  DATE=$(date +%s)
-  FILE=/tmp/observium-agent-hddtemp
-
-  if [ ! -e $FILE ]; then
-    # HDD temperature
-    printf "|WDC_WD10EZEX|WCC6Y2PC4R61|" > /tmp/observium-agent-hddtemp.tmp
-    $hddtemp sata:/dev/disk/by-id/ata-WDC_WD10EZEX-08WN4A0_WD-WCC6Y2PC4R61 | cut -d':' -f3 | tr -dc '[:digit:]' >> /tmp/observium-agent-hddtemp.tmp
-    printf "|C|" >> /tmp/observium-agent-hddtemp.tmp
-
-    printf "|WDC_WD20EARX|WCAZAL461248|" >> /tmp/observium-agent-hddtemp.tmp
-    $hddtemp sata:/dev/disk/by-id/ata-WDC_WD20EARX-00PASB0_WD-WCAZAL461248 | cut -d':' -f3 | tr -dc '[:digit:]' >> /tmp/observium-agent-hddtemp.tmp
-    printf "|C|" >> /tmp/observium-agent-hddtemp.tmp
-
-    /bin/mv /tmp/observium-agent-hddtemp.tmp /tmp/observium-agent-hddtemp
-  fi
-  FILEMTIME=$(stat -c %Y $FILE)
-  FILEAGE=$(($DATE-$FILEMTIME))
-  if [ $FILEAGE -gt 1800 ]; then
-    # HDD temperature
-    printf "|WDC_WD10EZEX|WCC6Y2PC4R61|" > /tmp/observium-agent-hddtemp.tmp
-    $hddtemp sata:/dev/disk/by-id/ata-WDC_WD10EZEX-08WN4A0_WD-WCC6Y2PC4R61 | cut -d':' -f3 | tr -dc '[:digit:]' >> /tmp/observium-agent-hddtemp.tmp
-    printf "|C|" >> /tmp/observium-agent-hddtemp.tmp
-
-    printf "|WDC_WD20EARX|WCAZAL461248|" >> /tmp/observium-agent-hddtemp.tmp
-    $hddtemp sata:/dev/disk/by-id/ata-WDC_WD20EARX-00PASB0_WD-WCAZAL461248 | cut -d':' -f3 | tr -dc '[:digit:]' >> /tmp/observium-agent-hddtemp.tmp
-    printf "|C|" >> /tmp/observium-agent-hddtemp.tmp
-
-    /bin/mv /tmp/observium-agent-hddtemp.tmp /tmp/observium-agent-hddtemp
-  fi
+if [ $? -eq 0 ] && [ `$nc -zv $hostname $port 2>&1 | awk '{print $5}'` = "open" ]
+then
   echo '<<<hddtemp>>>'
-  cat $FILE
+  $nc $hostname $port
+  echo
 fi
-

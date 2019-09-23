@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -34,7 +34,7 @@ foreach ($cache['mge'] as $index => $entry)
     $value = $entry['mginputVoltage'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, 100+$index, 'mge-ups', $descr, $scale, $value);
+      discover_sensor('voltage', $device, $oid, 100+$index, 'mge-ups', $descr, $scale, $value);
     }
   }
 
@@ -44,7 +44,7 @@ foreach ($cache['mge'] as $index => $entry)
     $value = $entry['mginputCurrent'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, 100+$index, 'mge-ups', $descr, $scale, $value);
+      discover_sensor('current', $device, $oid, 100+$index, 'mge-ups', $descr, $scale, $value);
     }
   }
 
@@ -54,7 +54,7 @@ foreach ($cache['mge'] as $index => $entry)
     $value = $entry['mginputFrequency'];
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'frequency', $device, $oid, 100+$index, 'mge-ups', $descr, $scale, $value);
+      discover_sensor('frequency', $device, $oid, 100+$index, 'mge-ups', $descr, $scale, $value);
     }
   }
 }
@@ -216,27 +216,27 @@ foreach ($cache['mge'] as $index => $entry)
 
   $oid   = ".1.3.6.1.4.1.705.1.7.2.1.4.$index"; // MG-SNMP-UPS-MIB:mgoutputLoadPerPhase.$index
   $value = $entry['mgoutputLoadPerPhase'];
-  discover_sensor($valid['sensor'], 'load', $device, $oid, "mgoutputLoadPerPhase.$index", 'mge-ups', $descr . ' Load', 1, $value, array('limit_high' => 85, 'limit_high_warn' => 70));
+  discover_sensor('load', $device, $oid, "mgoutputLoadPerPhase.$index", 'mge-ups', $descr . ' Load', 1, $value, array('limit_high' => 85, 'limit_high_warn' => 70));
 
   $oid   = ".1.3.6.1.4.1.705.1.7.2.1.2.$index"; // MG-SNMP-UPS-MIB:mgoutputVoltage.$index
   $value = $entry['mgoutputVoltage'];
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'mge-ups', $descr, $scale, $value);
+    discover_sensor('voltage', $device, $oid, $index, 'mge-ups', $descr, $scale, $value);
   }
 
   $oid   = ".1.3.6.1.4.1.705.1.7.2.1.5.$index"; // MG-SNMP-UPS-MIB:mgoutputCurrent.$index
   $value = $entry['mgoutputCurrent'];
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'mge-ups', $descr, $scale, $value);
+    discover_sensor('current', $device, $oid, $index, 'mge-ups', $descr, $scale, $value);
   }
 
   $oid   = ".1.3.6.1.4.1.705.1.7.2.1.3.$index"; // MG-SNMP-UPS-MIB:mgoutputFrequency.$index
   $value = $entry['mgoutputFrequency'];
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, 'mge-ups', $descr, $scale, $value);
+    discover_sensor('frequency', $device, $oid, $index, 'mge-ups', $descr, $scale, $value);
   }
 }
 
@@ -262,7 +262,7 @@ foreach ($cache['mge'] as $index => $entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsmgBatteryVoltage.$index", 'mge', $descr, $scale, $value);
+      discover_sensor('voltage', $device, $oid, "upsmgBatteryVoltage.$index", 'mge', $descr, $scale, $value);
     }
   }
 
@@ -274,7 +274,7 @@ foreach ($cache['mge'] as $index => $entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "upsmgBatteryCurrent.$index", 'mge', $descr, $scale, $value);
+      discover_sensor('current', $device, $oid, "upsmgBatteryCurrent.$index", 'mge', $descr, $scale, $value);
     }
   }
 
@@ -286,7 +286,7 @@ foreach ($cache['mge'] as $index => $entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "upsmgBatteryTemperature.$index", 'mge', $descr, 1, $value);
+      discover_sensor('temperature', $device, $oid, "upsmgBatteryTemperature.$index", 'mge', $descr, 1, $value);
     }
   }
 
@@ -297,7 +297,7 @@ foreach ($cache['mge'] as $index => $entry)
     $limits    = array('limit_low' => snmp_get($device, "upsmgConfigLowBatteryLevel.0", "-Oqv", "MG-SNMP-UPS-MIB"));
     $value     = $entry['upsmgBatteryLevel'];
 
-    discover_sensor($valid['sensor'], 'capacity', $device, $oid, "upsmgBatteryLevel.$index", 'mge', $descr . ' Capacity', 1, $value, $limits);
+    discover_sensor('capacity', $device, $oid, "upsmgBatteryLevel.$index", 'mge', $descr . ' Capacity', 1, $value, $limits);
   }
 
   // MG-SNMP-UPS-MIB::upsmgBatteryRemainingTime.0 = INTEGER: 12180
@@ -312,7 +312,7 @@ foreach ($cache['mge'] as $index => $entry)
     // FIXME: Use this as limit?
     // MG-SNMP-UPS-MIB::upsmgConfigLowBatteryTime.0 = 180
 
-    discover_sensor($valid['sensor'], 'runtime', $device, $oid, "upsmgBatteryRemainingTime.$index", 'mge', $descr, $scale, $value);
+    discover_sensor('runtime', $device, $oid, "upsmgBatteryRemainingTime.$index", 'mge', $descr, $scale, $value);
   }
 
   // MG-SNMP-UPS-MIB::upsmgBatteryFaultBattery.0 = no
@@ -330,7 +330,7 @@ foreach ($cache['mge'] as $index => $entry)
     $descr = "Charger Fault";
     $oid   = ".1.3.6.1.4.1.705.1.5.15.$index";
     $value = $entry['upsmgBatteryChargerFault'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "upsmgBatteryChargerFault.$index", 'mge-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'battery'));
+    discover_status($device, $oid, "upsmgBatteryChargerFault.$index", 'mge-status-state', $descr, $value, array('entPhysicalClass' => 'battery'));
   }
 
   // MG-SNMP-UPS-MIB::upsmgBatteryLowBattery.0 = no
@@ -341,7 +341,7 @@ foreach ($cache['mge'] as $index => $entry)
     $descr = "Battery Low";
     $oid   = ".1.3.6.1.4.1.705.1.5.16.$index";
     $value = $entry['upsmgBatteryLowCondition'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "upsmgBatteryLowCondition.$index", 'mge-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'battery'));
+    discover_status($device, $oid, "upsmgBatteryLowCondition.$index", 'mge-status-state', $descr, $value, array('entPhysicalClass' => 'battery'));
   }
 
   // MG-SNMP-UPS-MIB::upsmgBatteryReplacement.0 = no
@@ -350,7 +350,7 @@ foreach ($cache['mge'] as $index => $entry)
     $descr = "Battery Replacement Needed";
     $oid   = ".1.3.6.1.4.1.705.1.5.11.$index";
     $value = $entry['upsmgBatteryReplacement'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "upsmgBatteryReplacement.$index", 'mge-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'battery'));
+    discover_status($device, $oid, "upsmgBatteryReplacement.$index", 'mge-status-state', $descr, $value, array('entPhysicalClass' => 'battery'));
   }
 
 }
@@ -378,7 +378,7 @@ foreach ($cache['mge'] as $index => $entry)
 
     if ($value != 0)
     { // Temp = 0 -> Sensor not available
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "upsmgEnvironAmbientTemp.$index", 'mge', $descr, $scale, $value);
+      discover_sensor('temperature', $device, $oid, "upsmgEnvironAmbientTemp.$index", 'mge', $descr, $scale, $value);
     }
 
     $oid             = ".1.3.6.1.4.1.705.1.8.2.$index";
@@ -388,7 +388,7 @@ foreach ($cache['mge'] as $index => $entry)
     { // Humidity = 0 -> Sensor not available
       // Should be /10 on all devices but apparently not on all, let's try to work around:
       if ($value > 100) { $scale = 0.1; } else { $scale = 1; }
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, "upsmgEnvironAmbientHumidity.$index", 'mge', $descr, $scale, $value);
+      discover_sensor('humidity', $device, $oid, "upsmgEnvironAmbientHumidity.$index", 'mge', $descr, $scale, $value);
     }
 }
 
@@ -444,7 +444,7 @@ foreach ($cache['mge'] as $index => $entry)
     { // Humidity = 0 -> Sensor not available
       // Should be /10 on all devices but apparently not on all, let's try to work around:
       if ($value > 100) { $scale = 0.1; } else { $scale = 1; }
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'mge', $descr, $scale, $value, $limits);
+      discover_sensor('humidity', $device, $oid, $index, 'mge', $descr, $scale, $value, $limits);
     }
 
     $scale           = 0.1;
@@ -459,7 +459,7 @@ foreach ($cache['mge'] as $index => $entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'mge', $descr, $scale, $value, $limits);
+      discover_sensor('temperature', $device, $oid, $index, 'mge', $descr, $scale, $value, $limits);
     }
   }
 }

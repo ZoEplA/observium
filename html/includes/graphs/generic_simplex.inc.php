@@ -7,11 +7,15 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 if (!isset($colour_area_max)) { $colour_area_max = "e5e5e5"; }
+
+if(!isset($colour_line)) { $colour_line = "FF4500"; }
+if(!isset($colour_area)) { $colour_area = "F0E68C"; }
+
 
 if ($config['old_graphs'])
 {

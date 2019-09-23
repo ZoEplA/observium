@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -79,7 +79,7 @@ foreach ($data as $index => $entry)
 //  $options['warn_high']  = $entry['cyanXcvrTxBiasHiWarnThres']  * 0.001;
 //  $options['warn_low']   = $entry['cyanXcvrTxBiasHiWarnThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'dbm', $device, ".1.3.6.1.4.1.28533.5.30.160.1.1.1.16." . $index, $index, 'cyanGEPortTxPwr', $descr. " RX Power", 0.001, $entry['cyanGEPortTxPwr'], $options);
+  discover_sensor('dbm', $device, ".1.3.6.1.4.1.28533.5.30.160.1.1.1.16." . $index, $index, 'cyanGEPortTxPwr', $descr. " RX Power", 0.001, $entry['cyanGEPortTxPwr'], $options);
 
   $options = array();
   if (isset($port_translates[$xcvr_string]['measured_entity'])) { $options['measured_entity'] = $port_translates[$xcvr_string]['measured_entity']; $options['measured_class'] = 'port'; }
@@ -89,7 +89,7 @@ foreach ($data as $index => $entry)
 //  $options['warn_high']  = $entry['cyanXcvrVccVoltHiWarnThres']  * 0.001;
 //  $options['warn_low']   = $entry['cyanXcvrVccVoltHiWarnThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'dbm', $device, ".1.3.6.1.4.1.28533.5.30.160.1.1.1.13." . $index, $index, 'cyanGEPortRxPwr', $descr . " TX Power", 0.001, $entry['cyanGEPortRxPwr'], $options);
+  discover_sensor('dbm', $device, ".1.3.6.1.4.1.28533.5.30.160.1.1.1.13." . $index, $index, 'cyanGEPortRxPwr', $descr . " TX Power", 0.001, $entry['cyanGEPortRxPwr'], $options);
 
 }
 

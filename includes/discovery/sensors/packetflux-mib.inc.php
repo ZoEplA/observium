@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -60,7 +60,8 @@ foreach ($oids as $index => $data)
 
    if (is_array($data))
    {
-      discover_sensor($valid['sensor'], $data['class'], $device, $data['oid'], 'packetflux-analog-' . $index, 'packetflux', $data['analogInputDescr'], $data['scale'], $data['analogInputValue']);
+      // energy and charge will forced to discover_counter()
+      discover_sensor_ng($device, $data['class'], $mib, 'analogInputValue', $data['oid'], $index, NULL, $data['analogInputDescr'], $data['scale'], $data['analogInputValue'], ['rename_rrd' => "packetflux-packetflux-analog-$index"]);
    }
 
 }

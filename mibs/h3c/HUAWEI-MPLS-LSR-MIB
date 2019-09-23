@@ -1,8 +1,8 @@
 -- =========================================================================
--- Copyright (C) 2001,2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2001,2002 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description:This file describes the mib implementation of mpls lsr.
--- Reference:Huawei-3com enterprise MIB
+-- Description:This file describes the MIB implementation of mpls lsr.
+-- Reference:
 -- Version: V1.0
 -- History:
 -- 	    V1.0 6th Mar 2004
@@ -37,30 +37,14 @@ IMPORTS
 
 hwMplsLsr MODULE-IDENTITY
    LAST-UPDATED "200007121200Z"  -- 12 July 2000 12:00:00 EST
-   ORGANIZATION "Multiprotocol Label Switching (MPLS) Working Group"
+   ORGANIZATION
+       "Hangzhou H3C Tech. Co., Ltd."
    CONTACT-INFO
-       "        Cheenu Srinivasan
-        Postal: Tachion Networks, Inc.
-                Monmouth Park Corporate Center I
-                Building C, 185 Monmouth Parkway
-                West Long Branch, NJ 07764
-        Tel:    +1-732-542-7750 x1234
-        Email:  cheenu@tachion.com
-       
-                Arun Viswanathan
-        Postal: Force10 Networks, Inc.
-                1440 McCarthy Blvd
-                Milpitas, CA 95035
-        Tel:    +1-408-571-3516
-        Email:  arun@force10networks.com
-       
-                Thomas D. Nadeau
-        Postal: Cisco Systems, Inc.
-                250 Apollo Drive
-                Chelmsford, MA 01824
-        Tel:    +1-978-244-3051
-        Email:  tnadeau@cisco.com"
-   
+       "Platform Team Hangzhou H3C Tech. Co., Ltd.
+       Hai-Dian District Beijing P.R. China
+       http://www.h3c.com
+       Zip:100085
+       "
    DESCRIPTION
        "This MIB contains managed object definitions for the
         Multiprotocol Label Switching (MPLS) Router as
@@ -245,7 +229,7 @@ mplsInterfaceConfIndex OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "This is a unique index for an entry in the
-        MplsInterfaceConfTable.  A non-zero index for an
+        mplsInterfaceConfTable.  A non-zero index for an
         entry indicates the ifIndex for the corresponding
         interface entry in of the MPLS-layer in the ifTable.
         Note that the per-platform label space may apply to
@@ -491,7 +475,7 @@ mplsInSegmentIfIndex OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "This is a unique index for an entry in the
-        MplsInSegmentTable.  This value represents the
+        mplsInSegmentTable.  This value represents the
         interface index for the incoming MPLS interface.  A
         value of zero represents an incoming label from the
         per-platform label space.  In this case, the

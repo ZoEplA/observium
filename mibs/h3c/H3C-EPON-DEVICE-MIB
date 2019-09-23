@@ -1,6 +1,6 @@
 --===========================================================
--- Copyright (C) 2003 by  HUAWEI 3Com TECHNOLOGIES. All rights reserved.  
--- Description: This mib is excerpted from the draft-ietf-hubmib-efm-epon-mib-02 directly
+-- Copyright (C) 2003 by  H3C TECHNOLOGIES. All rights reserved.  
+-- Description: This MIB is excerpted from the draft-ietf-hubmib-efm-epon-mib-02 directly
 ---             only changed the object name,added the h3c as prefix.
 -- Reference:  
 -- Version: V1.0
@@ -27,39 +27,21 @@ H3C-EPON-DEVICE-MIB DEFINITIONS ::= BEGIN
 
    h3cEponDeviceMIB MODULE-IDENTITY
        LAST-UPDATED "200409210000Z"  -- September 21, 2004
-       ORGANIZATION "IETF Ethernet Interfaces and Hub MIB Working
-                     Group"
+       ORGANIZATION
+           "Hangzhou H3C Tech. Co., Ltd."
        CONTACT-INFO
-                    "WG charter:
-                  http://www.ietf.org/html.charters/hubmib-charter.html
-                     Mailing Lists:
-                       General Discussion: hubmib@ietf.org
-                       To Subscribe: hubmib-request@ietf.org
-                       In Body: subscribe your_email_address
-                     Chair: Dan Romascanu
-                     Postal: Avaya Inc.
-                             Atidim Technology Park, Bldg. 3
-                             Tel Aviv 61131
-                             Israel
-                        Tel: +972-3-645-8414
-                     E-mail: dromasca@avaya.com
-
-                     Editor: Lior Khermosh
-                     Postal: Passave Technologies Inc.
-                             Ackerstein Towers, Tower A, 6th floor,
-                             9 Hamenofim St.
-                             Hertzliya Pituach 46725,
-                             ISRAEL
-                     P.O.Box 2089 Hertzliya Pituach 46120 Israel
-                     Tel:    +972-9-9717600 Ext: 7181
-                     E-mail: lior.khermosh@passave.com"
+           "Platform Team Hangzhou H3C Tech. Co., Ltd.
+           Hai-Dian District Beijing P.R. China
+           http://www.h3c.com
+           Zip:100085
+           "
        DESCRIPTION
                "The objects in this MIB module are used to manage
                 Ethernet Passive Optical Network (EPON) devices which
                 are based on the Ethernet in the First Mile (EFM) PON
                 as defined in IEEE Draft P802.3ah/D3.0 clause 60,64,65.
                                                                         
-                This mib is excerpted from the draft files directly,only 
+                This MIB is excerpted from the draft files directly,only 
                 changed the object name,added the h3c as prefix.  
                                                                       
                 The following reference is used throughout this MIB
@@ -445,7 +427,7 @@ H3C-EPON-DEVICE-MIB DEFINITIONS ::= BEGIN
                "This table defines the list of statistics counters of
                 EPON devices. The attributes are relevant for an OLT and
                 an ONU."
-       ::= { h3cEponDeviceStatObjects 1}
+       ::= { h3cEponDeviceStatObjects 1 }
 
    h3cEponDeviceStatEntry OBJECT-TYPE
        SYNTAX     H3cEponDeviceStatEntry
@@ -540,7 +522,7 @@ H3C-EPON-DEVICE-MIB DEFINITIONS ::= BEGIN
                 The -Queue-3- marking matched the REPORT MPCP message
                 Queue-3 field, as defined in [802.3ah] clause 64.
                 This counter is mandatory for an ONU."
-           ::= { h3cEponDeviceStatEntry 4 }
+       ::= { h3cEponDeviceStatEntry 4 }
 
    h3cEponDeviceStatTxFramesQueue4 OBJECT-TYPE
        SYNTAX  Counter32
@@ -784,7 +766,7 @@ H3C-EPON-DEVICE-MIB DEFINITIONS ::= BEGIN
                 the REPORT MPCP message Queue-3 field, as defined in
                 [802.3ah] clause 64.
                 This counter is mandatory for an ONU."
-       ::= { h3cEponDeviceStatEntry 20 }
+       ::= { h3cEponDeviceStatEntry 20}
 
    h3cEponDeviceStatDroppedFramesQueue4 OBJECT-TYPE
        SYNTAX  Counter32

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -52,14 +52,12 @@ foreach ($oids as $meter => $entry1)
       case 'l':
         $sensor_type = 'volume';
         break;
-      /* FIXME. Wh should be counters, disabled for now
       case 'kwh':
         $scale       = si_to_scale($entry['mtvalExp'] + 3); // Convert to Wh
         // not break here
       case 'wh':
         $sensor_type = 'energy';
         break;
-      */
       case 'kw':
         $scale       = si_to_scale($entry['mtvalExp'] + 3); // Convert to W
         // not break here
@@ -73,19 +71,25 @@ foreach ($oids as $meter => $entry1)
         $sensor_type = 'current';
         break;
       case '':
-        if (stristr($entry['mtvalName'], 'Power factor'))
+        if (str_icontains($entry['mtvalName'], 'Power factor'))
         {
           $sensor_type = 'powerfactor';
         }
-        else if (stristr($entry['mtvalName'], 'counter'))
+        elseif (str_icontains($entry['mtvalName'], 'counter'))
         {
           $sensor_type = 'counter';
         }
         break;
     }
-    if ($sensor_type)
+    if (in_array($sensor_type, ['counter', 'energy']))
     {
-      discover_sensor($valid['sensor'], $sensor_type, $device, $oid_num, $index, $type, $descr, $scale, $value);
+      // Counters
+      discover_counter($device, $sensor_type, $mib, $oid_name, $oid_num, $index, $descr, $scale, $value);
+    }
+    elseif ($sensor_type)
+    {
+      // FIXME convert to discover_sensor_ng()
+      discover_sensor($sensor_type, $device, $oid_num, $index, $type, $descr, $scale, $value);
     }
 
     $oid_name = 'mtvalAlarmState';
@@ -93,6 +97,7 @@ foreach ($oids as $meter => $entry1)
     $type     = 'mtvalAlarmState';
     $value    = $entry[$oid_name];
 
+    // FIXME convert to discover_status_ng()
     discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'other'));
   }
 }

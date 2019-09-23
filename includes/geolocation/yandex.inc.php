@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage geolocation
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -19,41 +19,55 @@
 
   if (isset($data['response']))
   {
-    $try_new = FALSE;
+    // Detect if required second request
+    $try_second = FALSE;
     if ($data['response']['GeoObjectCollection']['metaDataProperty']['GeocoderResponseMetaData']['found'] > 0)
     {
       $data = $data['response']['GeoObjectCollection']['featureMember'][0];
-      if ($data['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'] == 'other')
+      print_debug_vars($data);
+      if ($geo_type == 'forward' && $data['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'] == 'other')
       {
-        $try_new = TRUE;
+        $try_second = TRUE;
       }
-    } else {
-      $try_new = TRUE;
     }
-    if ($try_new && strpos($address, ','))
+    elseif ($geo_type == 'forward')
     {
-      // It might be that the first element of the address is a business name.
-      // Lets drop the first element and see if we get anything better!
-      list(, $address_new) = explode(',', $address, 2);
-      //$request_new = $url.urlencode($address);
-      $param = $api_params['request_params']['address'];
-      $params[$param] = urlencode($address_new);
-      $request_new = build_request_url($url, $params, $api_params['method']);
-      $mapresponse = get_http_request($request_new, NULL, $ratelimit);
-      $data_new = json_decode($mapresponse, TRUE);
-      if ($data_new['response']['GeoObjectCollection']['metaDataProperty']['GeocoderResponseMetaData']['found'] > 0 &&
-          $data_new['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'] != 'other')
+      $try_second = TRUE;
+    }
+
+    // Make second request (address_second passed from main function get_geolocation()
+    if ($try_second && strlen($address_second) > 4)
+    {
+      // Re-Generate geolocation tags, override location
+      $tags['location'] = $address_second;
+
+      // Generate context/options with encoded data and geo specific api headers
+      $options_new = generate_http_context($geo_def[$geo_type], $tags);
+
+      // API URL to POST to
+      $url_new = generate_http_url($geo_def[$geo_type], $tags);
+
+      // Second request
+      $mapresponse = get_http_request($url_new, $options_new, $ratelimit);
+      if (test_http_request($geo_def[$geo_type], $mapresponse))
       {
-        $request = $request_new;
-        $data    = $data_new['response']['GeoObjectCollection']['featureMember'][0];
+        // Valid response
+        $data_new = json_decode($mapresponse, TRUE);
+        if ($data_new['response']['GeoObjectCollection']['metaDataProperty']['GeocoderResponseMetaData']['found'] > 0 &&
+            $data_new['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['precision'] != 'other')
+        {
+          $url  = $url_new;
+          $data = $data_new['response']['GeoObjectCollection']['featureMember'][0];
+        }
       }
     }
 
-    if (!$reverse)
+    if ($geo_type == 'forward')
     {
       // If using reverse queries, do not change lat/lon
       list($location['location_lon'], $location['location_lat']) = explode(' ', $data['GeoObject']['Point']['pos']);
     }
+
     $data = $data['GeoObject']['metaDataProperty']['GeocoderMetaData']['AddressDetails'];
     $location['location_country'] = strtolower($data['Country']['CountryNameCode']);
     $location['location_state']   = $data['Country']['AdministrativeArea']['AdministrativeAreaName'];

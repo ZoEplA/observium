@@ -1,5 +1,5 @@
 -- ====================================================================
--- Copyright (c) 2004-2011 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: IPv4 address MIB
 -- Reference:
@@ -36,9 +36,9 @@ H3C-IP-ADDRESS-MIB DEFINITIONS ::= BEGIN
     h3cIpAddrMIB MODULE-IDENTITY
         LAST-UPDATED "200511220000Z"
         ORGANIZATION
-            "H3C Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team H3C Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
             http://www.h3c.com
             Zip:100085

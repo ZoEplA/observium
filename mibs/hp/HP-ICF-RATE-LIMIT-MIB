@@ -13,13 +13,23 @@ HP-ICF-RATE-LIMIT-MIB DEFINITIONS ::= BEGIN
         ;
 
     hpicfRateLimitMIB MODULE-IDENTITY
-         LAST-UPDATED "201509040000Z"  -- September 04, 2015
+         LAST-UPDATED "201710130000Z"  -- October 13, 2017
          ORGANIZATION "HP Networking"
          CONTACT-INFO "Hewlett Packard Company
                        8000 Foothills Blvd.
                        Roseville, CA 95747"
          DESCRIPTION  "This MIB module describes HP rate limit 
                        information."
+         
+         REVISION     "201710130000Z"  -- October 13, 2017
+         DESCRIPTION  "The maximum value of
+                       hpUnknownUnicastLimitPortSingleControlKbps
+                       has been modified to 100,000,000."
+
+         REVISION     "201608030000Z"  -- August 03, 2016
+         DESCRIPTION  "The description of below MIBs are modified:
+                       hpEgressRateLimitPortControlMode,
+                       hpIngressRateLimitPortControlMode."
 
 	 REVISION     "201509040000Z"  -- September 04, 2015
          DESCRIPTION  "The hpICMPRateLimitPortKbps modified."
@@ -440,19 +450,14 @@ HP-ICF-RATE-LIMIT-MIB DEFINITIONS ::= BEGIN
                     entire port. If egressRateLimitPerQueue is configured, the 
                     values for each of the queues indicate the maximum
                     percentage of port traffic that may be transmitted by that
-                    queue. If egressRateLimitPerPortOnlyBpsMode is configured, 
-                    there will be a single maximum bits-per-second rate for 
-                    the entire port. If egressRateLimitPerPortOnlyKbpsMode is
+                    queue. If egressRateLimitPerPortOnlyKbpsMode is
                     configured, there will be a single maximum 
-                    kilobits-per-second rate for the entire port. If 
-                    egressRateLimitPerQueueBpsMode is configured, the maximum 
-                    transmission-rate values for each of the queues will be 
-                    expressed in bits-per-second (again, the sum of these 
-                    values must not exceed the maximum Bytes-per-second 
-                    capability of the network link). The queues are defined 
-                    under hpEgressRateLimitPortPrctTable.  When egress 
+                    kilobits-per-second rate for the entire port. The queues 
+                    are defined under hpEgressRateLimitPortPrctTable. When egress 
                     rate-limiting is disabled, there are no maximum controls 
-                    on egress for this port."
+                    on egress for this port.
+                    NOTE : Currently, egressRateLimitPerPortOnlyBpsMode and
+                    egressRateLimitPerQueueBpsMode are not supported."
         DEFVAL { disabled }
         ::= { hpEgressRateLimitPortConfigEntry 2 }
 
@@ -730,23 +735,17 @@ HP-ICF-RATE-LIMIT-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION "The mode by which this port will be Rate-Limited on
                     ingress. If ingressRateLimitPerPortOnly is configured, 
-		    there will be a single maximum percentage-based rate for 
+                    there will be a single maximum percentage-based rate for 
                     the entire port. If ingressRateLimitPerQueue is 
                     configured, the values for each of the queues indicate the 
                     maximum percentage of port traffic that may be transmitted 
-                    by that queue. If ingressRateLimitPerPortOnlyBpsMode is 
-                    configured, there will be a single maximum bits-per-second 
-                    rate for the entire port. If 
-                    ingressRateLimitPerPortOnlyKbpsMode is configured, there
-                    will be a single maximum kilobits-per-second rate for the
-                    entire port. If ingressRateLimitPerQueueBpsMode is 
-                    configured, the maximum transmission-rate values for each 
-                    of the queues will be expressed in bits-per-second (again, 
-                    the sum of these values must not exceed the maximum 
-                    Bytes-per-second capability of the network link). The 
-                    queues are defined under hpIngressRateLimitPortPrctTable.  
-                    When ingress rate-limiting is disabled, there are no 
-                    maximum controls on ingress for this port."
+                    by that queue. If ingressRateLimitPerPortOnlyKbpsMode is 
+                    configured, there will be a single maximum kilobits-per-second 
+                    rate for the entire port. The queues are defined under 
+                    hpIngressRateLimitPortPrctTable. When ingress rate-limiting 
+                    is disabled, there are no maximum controls on ingress for this port.
+                    NOTE : Currently, IngressRateLimitPerPortOnlyBpsMode and  
+                    ingressRateLimitPerQueueBpsMode are not supported."
         DEFVAL { disabled }
         ::= { hpIngressRateLimitPortConfigEntry 2 }
 
@@ -1124,8 +1123,8 @@ HP-ICF-RATE-LIMIT-MIB DEFINITIONS ::= BEGIN
              percentage of the current line rate."
         ::= { hpUnknownUnicastLimitConfigEntry 3 }
 
-     hpUnknownUnicastLimitPortSingleControlKbps OBJECT-TYPE
-        SYNTAX      Integer32 (0..10000000)
+    hpUnknownUnicastLimitPortSingleControlKbps OBJECT-TYPE
+        SYNTAX      Integer32 (0..100000000)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION

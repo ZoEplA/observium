@@ -1,5 +1,5 @@
 -- =============================================================================
--- Copyright (C) 2002-2003 by  H3C TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002-2003 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:MPLS-BGP-VPN-MIB 
 -- Reference:This MIB was extracted from draft-ietf-mpls-arch-06.txt
@@ -38,9 +38,9 @@ IMPORTS
 hh3cMplsVpn MODULE-IDENTITY
    LAST-UPDATED "200107201200Z"  -- 20 July 2001 12:00:00 GMT
    ORGANIZATION
-       "Hangzhou H3C Tech. Co., Ltd."
+       "New H3C Tech. Co., Ltd."
    CONTACT-INFO
-       "Platform Team Hangzhou H3C Tech. Co., Ltd.
+       "Platform Team New H3C Tech. Co., Ltd.
        Hai-Dian District Beijing P.R. China
        http://www.h3c.com
        Zip:100085

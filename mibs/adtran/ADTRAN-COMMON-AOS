@@ -50,10 +50,11 @@
       adGenAOSMux                OBJECT IDENTIFIER ::= { adGenAOSCommon 5 }
       adGenAOSFileSystem         OBJECT IDENTIFIER ::= { adGenAOSCommon 6 }
       adGenAosIfPerfHistory      OBJECT IDENTIFIER ::= { adGenAOSCommon 7 }
-      adGenAOSFan  			     OBJECT IDENTIFIER ::= { adGenAOSCommon 8 }
+      adGenAOSFan                OBJECT IDENTIFIER ::= { adGenAOSCommon 8 }
       adGenAOSNetSync            OBJECT IDENTIFIER ::= { adGenAOSCommon 9 }
       adGenAOSOverTempProtection OBJECT IDENTIFIER ::= { adGenAOSCommon 10 }
       adGenAOSDyingGasp          OBJECT IDENTIFIER ::= { adGenAOSCommon 11 }
+      adGenAOSSfp                OBJECT IDENTIFIER ::= { adGenAOSCommon 12 }
 
     --
     -- adGenAOS
@@ -128,11 +129,17 @@
     -- Contains notifications for over-temperature events.
     -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.10
     --
-        --
+    --
     -- AOS Common Section - adGenAOSDyingGasp
     --
     -- Contains notifications for dying gasp events.
     -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.11
     --
-       END
+    --
+    -- AOS Common Section - adGenAOSSfp 
+    --
+    -- Contains notifications for Sfp for AdtranOS.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1.12
+    --
+      END
 

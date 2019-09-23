@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V1.5
+-- Version: V1.7
 -- History:
 -- V1.0 created by liujingya.
 --    Initial version of the MIB
@@ -18,7 +18,9 @@
 -- V1.4 2011-12-28 Added hh3cHPEOCCltLinkState by gaoguangping.
 --      2012-03-14 Added hh3cHPEOCCltLoopbackDetect by gaoguangping.
 -- V1.5 2013-08-20 Added hh3cHPEOCTemplate,hh3cHPEOCCnuAccess by xujun
---      2013-09-16 Added hh3cHPEOCTemplateEnable by xujun 
+--      2013-09-16 Added hh3cHPEOCTemplateEnable by xujun
+-- V1.6 2015-04-30 Bug fixed by songhao
+-- V1.7 2016-09-02 Bug fixed by gaoguangping
 -- =================================================================
 HH3C-HPEOC-MIB DEFINITIONS ::= BEGIN
 
@@ -37,10 +39,11 @@ IMPORTS
 hh3cHPEOC MODULE-IDENTITY
     LAST-UPDATED "200708281008Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "SMB EOC Team H3C Technologies Co., Ltd.
-        310 Liuhe Road, Zhijiang Science Park, Hangzhou, P.R.China
+        "SMB EOC Team New H3C Technologies Co., Ltd.
+        Shang-Di Information Industry Base,
+        Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:310053."
     DESCRIPTION
@@ -619,7 +622,7 @@ hh3cHPEOCTemplate OBJECT IDENTIFIER ::= { hh3cHPEOC 3 }
 --
 
 hh3cHPEOCTemplateGlobalTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF hh3cHPEOCTemplateGlobalEntry
+    SYNTAX      SEQUENCE OF Hh3cHPEOCTemplateGlobalEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -630,7 +633,7 @@ hh3cHPEOCTemplateGlobalTable OBJECT-TYPE
     ::= { hh3cHPEOCTemplate 1 }
 
 hh3cHPEOCTemplateGlobalEntry OBJECT-TYPE
-    SYNTAX      hh3cHPEOCTemplateGlobalEntry
+    SYNTAX      Hh3cHPEOCTemplateGlobalEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -643,7 +646,7 @@ hh3cHPEOCTemplateGlobalEntry OBJECT-TYPE
         }
     ::= { hh3cHPEOCTemplateGlobalTable 1 }
 
-hh3cHPEOCTemplateGlobalEntry ::= SEQUENCE
+Hh3cHPEOCTemplateGlobalEntry ::= SEQUENCE
     {
         hh3cHPEOCTemplateIndex            Integer32,
         hh3cHPEOCTemplateType             Integer32,
@@ -668,7 +671,7 @@ hh3cHPEOCTemplateIndex OBJECT-TYPE
     ::= { hh3cHPEOCTemplateGlobalEntry 1 }
 
 hh3cHPEOCTemplateType OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      INTEGER
         {
             switch(1),
             gateway(2)
@@ -777,7 +780,7 @@ hh3cHPEOCTemplateRowStatus OBJECT-TYPE
 --
 
 hh3cHPEOCTemplateSwitchTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF hh3cHPEOCTemplateSwitchEntry
+    SYNTAX      SEQUENCE OF Hh3cHPEOCTemplateSwitchEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -788,7 +791,7 @@ hh3cHPEOCTemplateSwitchTable OBJECT-TYPE
     ::= { hh3cHPEOCTemplate 2 }
 
 hh3cHPEOCTemplateSwitchEntry OBJECT-TYPE
-    SYNTAX      hh3cHPEOCTemplateSwitchEntry
+    SYNTAX      Hh3cHPEOCTemplateSwitchEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -798,11 +801,11 @@ hh3cHPEOCTemplateSwitchEntry OBJECT-TYPE
     INDEX
         {
             hh3cHPEOCTemplateIndex,
-            hh3cHPEOCTemplateUniIndex      
+            hh3cHPEOCTemplateUniIndex
         }
     ::= { hh3cHPEOCTemplateSwitchTable 1 }
 
-hh3cHPEOCTemplateSwitchEntry ::= SEQUENCE
+Hh3cHPEOCTemplateSwitchEntry ::= SEQUENCE
     {
         hh3cHPEOCTemplateUniIndex            Integer32,
         hh3cHPEOCTemplateUniSpeed            INTEGER,
@@ -930,7 +933,7 @@ hh3cHPEOCTemplateUniVLANType OBJECT-TYPE
     SYNTAX     INTEGER
         {
             access(1),
-            Trunk(2),
+            trunk(2),
             hybrid(3)
         }
     MAX-ACCESS read-write
@@ -984,7 +987,7 @@ hh3cHPEOCCnuAccess OBJECT IDENTIFIER ::= { hh3cHPEOC 4 }
 --
 
 hh3cHPEOCCnuAccessTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF hh3cHPEOCCnuAccessEntry
+    SYNTAX      SEQUENCE OF Hh3cHPEOCCnuAccessEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -995,7 +998,7 @@ hh3cHPEOCCnuAccessTable OBJECT-TYPE
     ::= { hh3cHPEOCCnuAccess 1 }
 
 hh3cHPEOCCnuAccessEntry OBJECT-TYPE
-    SYNTAX      hh3cHPEOCCnuAccessEntry
+    SYNTAX      Hh3cHPEOCCnuAccessEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -1009,7 +1012,7 @@ hh3cHPEOCCnuAccessEntry OBJECT-TYPE
     ::= { hh3cHPEOCCnuAccessTable 1 }
 
 
-hh3cHPEOCCnuAccessEntry ::= SEQUENCE
+Hh3cHPEOCCnuAccessEntry ::= SEQUENCE
     {
         hh3cHPEOCCnuAccessIndex        Integer32,
         hh3cHPEOCCnuHFID               DisplayString,
@@ -1027,10 +1030,10 @@ hh3cHPEOCCnuAccessIndex OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "
-        The index value which uniquely identifies the 
+        The index value which uniquely identifies the
         manuinfo of the CNU.
         "
-    ::= { hh3cHPEOCCnuAccessEntry 1 }  
+    ::= { hh3cHPEOCCnuAccessEntry 1 }
 
 hh3cHPEOCCnuHFID OBJECT-TYPE
     SYNTAX     DisplayString
@@ -1049,13 +1052,13 @@ hh3cHPEOCManuInfo OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "
-        The Cnu's manufactory infofamiont. 
+        The Cnu's manufactory infofamiont.
         Length: 0 to 63 characters.
         "
     ::= { hh3cHPEOCCnuAccessEntry 3 }
-    
+
 hh3cHPEOCCnuType OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      INTEGER
         {
             switch(1),
             gateway(2)
@@ -1066,14 +1069,14 @@ hh3cHPEOCCnuType OBJECT-TYPE
         "
         The Cnu's function type.
         "
-    ::= { hh3cHPEOCCnuAccessEntry 4 }   
-   
+    ::= { hh3cHPEOCCnuAccessEntry 4 }
+
 hh3cHPEOCCnuSwitchType OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      INTEGER
         {
             rtl8306e(1),
             ar8236(2),
-            mv6061(3)
+            mv6061(3),
             mv6031(4)
         }
     MAX-ACCESS  read-write

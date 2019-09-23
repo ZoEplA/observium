@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -244,25 +244,24 @@ function navbar_location_menu($array)
   {
     foreach ($array['entries'] as $entry => $entry_data)
     {
-      $image = '<i class="'.$config['icon']['location'].'"></i>';
+      $image = get_icon('location');
       if ($entry_data['level'] == "location_country")
       {
-        $code = $entry;
         $entry = country_from_code($entry);
-        $image = '<i class="flag flag-'.$code.'"></i>';
+        $image = get_icon_country($entry);
       }
-      else if ($entry_data['level'] == "location")
+      elseif ($entry_data['level'] == "location")
       {
         $name = ($entry === '' ? OBS_VAR_UNSET : escape_html($entry));
-        echo('            <li>' . generate_menu_link(generate_location_url($entry), '<i class="'.$config['icon']['location'].'"></i>&nbsp;' . $name, $entry_data['count']) . '</li>');
+        echo('            <li>' . generate_menu_link(generate_location_url($entry), $image . '&nbsp;' . $name, $entry_data['count']) . '</li>');
         continue;
       }
 
       if ($entry_data['level'] == "location_country")
       {
-        $url = $code;
+        $url = $entry;
         // Attach country code to sublevel
-        $entry_data['country'] = strtolower($code);
+        $entry_data['country'] = $entry;
       } else {
         $url = $entry;
         // Attach country code to sublevel
@@ -283,16 +282,16 @@ function navbar_location_menu($array)
 
     foreach ($array['entries'] as $new_entry => $new_entry_data)
     {
+      $image = get_icon('location');
       if ($new_entry_data['level'] == "location_country")
       {
-        $code = $new_entry;
         $new_entry = country_from_code($new_entry);
-        $image = '<i class="flag flag-'.$code.'"></i> ';
+        $image = get_icon_country($new_entry);
       }
       elseif ($new_entry_data['level'] == "location")
       {
         $name = ($new_entry === '' ? OBS_VAR_UNSET : escape_html($new_entry));
-        echo('            <li>' . generate_menu_link(generate_location_url($new_entry), '<i class="' . $entry['icon']['location'] . '"></i>&nbsp;' . $name, $new_entry_data['count']) . '</li>');
+        echo('            <li>' . generate_menu_link(generate_location_url($new_entry), $image . '&nbsp;' . $name, $new_entry_data['count']) . '</li>');
         continue;
       }
 
@@ -305,11 +304,11 @@ function navbar_location_menu($array)
                               $sub_entry_data['level'] => var_encode($sub_entry));
           if (isset($array['country'])) { $link_array['location_country'] = var_encode($array['country']); }
 
-          echo('<li class="dropdown-submenu">' . generate_menu_link(generate_url($link_array), '<i class="' . $entry['icon']['location'] . '"></i>&nbsp;' . $sub_entry, $sub_entry_data['count']));
+          echo('<li class="dropdown-submenu">' . generate_menu_link(generate_url($link_array), $image.'&nbsp;' . $sub_entry, $sub_entry_data['count']));
           navbar_location_menu($sub_entry_data);
         } else {
           $name = ($sub_entry === '' ? OBS_VAR_UNSET : escape_html($sub_entry));
-          echo('            <li>' . generate_menu_link(generate_location_url($sub_entry), '<i class="' . $entry['icon']['location'] . '"></i>&nbsp;' . $name, $sub_entry_data['count']) . '</li>');
+          echo('            <li>' . generate_menu_link(generate_location_url($sub_entry), $image.'&nbsp;' . $name, $sub_entry_data['count']) . '</li>');
         }
       }
     }
@@ -368,6 +367,7 @@ function navbar_entry($entry, $level = 1)
     echo(str_pad('',($level-1)*2) . '                </li>' . PHP_EOL);
   } else {
     //$entry_text = '<i class="menu-icon ' . $entry['icon'] . '"></i> ';
+    $entry_text = '';
 
     if (isset($entry['image']))
     {
@@ -383,7 +383,7 @@ function navbar_entry($entry, $level = 1)
       $entry_text .= '<img src="' . $entry['image'] . '"' . $srcset . ' alt="" /> ';
     }
 
-    if(isset($entry['title']))
+    if (isset($entry['title']))
     {
       $entry_text .= $entry['title'];
     } elseif (isset($entry['text'])) {

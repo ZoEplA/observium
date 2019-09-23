@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 EXTREME-VM-MIB DEFINITIONS ::= BEGIN
@@ -24,11 +18,24 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
                 InetAddressType, InetAddress FROM INET-ADDRESS-MIB;
 
         extremeVM MODULE-IDENTITY
-                LAST-UPDATED "201202270000Z"
+                LAST-UPDATED "201504080000Z"
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION 
                              "Extreme Network Virtual Machine Management MIB"
+
+                REVISION     "201504070000Z"
+                DESCRIPTION
+                             "Updated description of extremeVMVPPName field."
+
+                REVISION     "201403140000Z"
+                DESCRIPTION
+                             "obsolete extremeVMFTPPolicyDir
+                             obsolete extremeVMVPP2PolicyTable
+                             obsolete extremeVMMappingIngressVPPName
+                             obsolete extremeVMMappingEgressVPPName
+                             obsolete extremeVMDetectedIngrssVPPName
+                             obsolete extremeVMDetectedEgressVPPName"
 
                 REVISION     "201104180000Z"
                 DESCRIPTION 
@@ -52,6 +59,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
                              extremeVMMappingVPPName
                              removed DEFVAL from extremeVMFTPPathName
                              Added new enumeration for extremeVMMappingStatus"
+
                 REVISION     "201002030000Z"
                 DESCRIPTION 
                              "Initial Revision"
@@ -208,7 +216,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
        extremeVMFTPPolicyDir    OBJECT-TYPE
                 SYNTAX          DisplayString (SIZE(1..32))     
                 MAX-ACCESS 	read-write
-                STATUS	        deprecated
+                STATUS	        obsolete
                 DESCRIPTION
                         "The server directory name for the policies to be synchronized.  
                          A value of '/' will be used by default"
@@ -372,7 +380,9 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
                 MAX-ACCESS	accessible-for-notify
                 STATUS	        current
                 DESCRIPTION
-                        "The name of the Port VPP.  VPP names must be alpha-numeric and must start with an alpha character."
+                        "The name of the Port VPP.  VPP names must be alpha-numeric and must start with an alpha character.
+                         When received as part of extremeVMVPPSyncFailed notification, ignore this field if the value of
+                         extremeVMVPPSynchType is global(1)."
                 ::= { extremeVMVPPEntry 2 }
 
         extremeVMVPPControl  OBJECT-TYPE
@@ -496,7 +506,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMMappingIngressVPPName  OBJECT-TYPE
                 SYNTAX	        DisplayString
                 MAX-ACCESS 	read-create
-                STATUS	        deprecated
+                STATUS	        obsolete
                 DESCRIPTION
                         "The ingress policy associated with the VM/MAC address.  Note that this may refer to a policy without
                          a corresponding entry in the extremeVMVPPTable if a network policy mapping refers to a non-existent policy.
@@ -509,7 +519,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMMappingEgressVPPName  OBJECT-TYPE
                 SYNTAX	        DisplayString
                 MAX-ACCESS 	read-create
-                STATUS	        deprecated
+                STATUS	        obsolete
                 DESCRIPTION
                         "The egress policy associated with the VM/MAC address.  Note that this may refer to a policy without
                          a corresponding entry in the extremeVMVPPTable if a network policy mapping refers to a non-existent policy.
@@ -599,7 +609,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
 	extremeVMVPP2PolicyTable	OBJECT-TYPE
 		SYNTAX	SEQUENCE OF ExtremeVMVPP2PolicyEntry
 		MAX-ACCESS  not-accessible
-        STATUS	        deprecated
+        STATUS	        obsolete
 		DESCRIPTION
 			"This table contains the mapping of a VPP to individual Policies."
 		::= { extremeVMVPP 3 }
@@ -607,7 +617,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
 	extremeVMVPP2PolicyEntry	OBJECT-TYPE
 		SYNTAX	        ExtremeVMVPP2PolicyEntry
 		MAX-ACCESS	not-accessible
-		STATUS	        current
+		STATUS	        obsolete
 		DESCRIPTION
 			"An individual mapping of VPP to Policy."
 		INDEX { extremeVMVPP2PolicyVPPName, extremeVMVPP2PolicyPolicyName, extremeVMVPP2PolicyType}
@@ -624,7 +634,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMVPP2PolicyVPPName OBJECT-TYPE
                 SYNTAX          DisplayString (SIZE(1..32))
                 MAX-ACCESS	not-accessible
-                STATUS	        current
+                STATUS	        obsolete
                 DESCRIPTION
                         "The name of the VPP"
                 ::= { extremeVMVPP2PolicyEntry 1 }
@@ -632,7 +642,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMVPP2PolicyPolicyName OBJECT-TYPE
                 SYNTAX          DisplayString (SIZE(1..32))
                 MAX-ACCESS	not-accessible
-                STATUS	        current
+                STATUS	        obsolete
                 DESCRIPTION
                         "The name of the local policy"
                 ::= { extremeVMVPP2PolicyEntry 2 }
@@ -643,7 +653,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
                                   dynamicACL(2)
                                 }
                 MAX-ACCESS	not-accessible
-                STATUS	        current
+                STATUS	        obsolete
                 DESCRIPTION
                         "The type of policy"
                 ::= { extremeVMVPP2PolicyEntry 3 }
@@ -651,7 +661,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMVPP2PolicyOrder OBJECT-TYPE
                 SYNTAX          Integer32
                 MAX-ACCESS	read-create
-                STATUS	        current
+                STATUS	        obsolete
                 DESCRIPTION
                         "The order in which this policy will be executed"
                 ::= { extremeVMVPP2PolicyEntry 4 }
@@ -659,18 +669,18 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMVPP2PolicyRowStatus OBJECT-TYPE
                 SYNTAX          RowStatus
                 MAX-ACCESS	read-create
-                STATUS	        current
+                STATUS	        obsolete
                 DESCRIPTION
                         "The row status for this mapping."
                 ::= { extremeVMVPP2PolicyEntry 5 }
 
-        extremeVMDetectedNumber  OBJECT-TYPE
+	extremeVMDetectedNumber  OBJECT-TYPE
 		SYNTAX	        Gauge32
-                MAX-ACCESS 	read-only
-                STATUS	        current
-                DESCRIPTION
-                        "The number of virtual machines detected on this switch."
-                ::= { extremeVMDetected 1 }
+		MAX-ACCESS 	read-only
+		STATUS	        current
+		DESCRIPTION
+			"The number of virtual machines detected on this switch."
+        ::= { extremeVMDetected 1 }
   
 	extremeVMDetectedTable	OBJECT-TYPE
 		SYNTAX	SEQUENCE OF ExtremeVMDetectedEntry
@@ -728,7 +738,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
          extremeVMDetectedIngressVPPName OBJECT-TYPE
                 SYNTAX          DisplayString
                 MAX-ACCESS	read-only
-                STATUS	        deprecated
+                STATUS	        obsolete
                 DESCRIPTION
                         "The name of the policy applied (or attempted to apply) to this virtual machine."
                 ::= { extremeVMDetectedEntry 3 }
@@ -736,7 +746,7 @@ EXTREME-VM-MIB DEFINITIONS ::= BEGIN
         extremeVMDetectedEgressVPPName OBJECT-TYPE
                 SYNTAX          DisplayString
                 MAX-ACCESS	read-only
-                STATUS	        deprecated
+                STATUS	        obsolete
                 DESCRIPTION
                         "The name of the policy applied (or attempted to apply) to this virtual machine."
                 ::= { extremeVMDetectedEntry 4 }

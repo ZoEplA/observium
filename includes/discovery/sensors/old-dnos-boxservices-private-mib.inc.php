@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -66,12 +66,12 @@ foreach ($oids as $index => $entry)
     'entPhysicalClass' => 'temperature',
   );
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, "boxServicesStackTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
+  discover_sensor('temperature', $device, $oid, "boxServicesStackTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
 
   $oid   = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.9.1.4.$index";
   $value = $entry['boxServicesStackTempSensorState'];
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "boxServicesStackTempSensorState.$index", 'fastpath-boxservices-private-temp-state', $descr, 1, $value, array('entPhysicalClass' => 'temperature'));
+  discover_status($device, $oid, "boxServicesStackTempSensorState.$index", 'fastpath-boxservices-private-temp-state', $descr, $value, array('entPhysicalClass' => 'temperature'));
 }
 
 if (!$boxServicesStackTempSensorsTable)
@@ -96,12 +96,12 @@ if (!$boxServicesStackTempSensorsTable)
       'entPhysicalClass' => 'temperature',
     );
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "boxServicesTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
+    discover_sensor('temperature', $device, $oid, "boxServicesTempSensorTemperature.$index", 'fastpath-boxservices-private-mib', $descr, 1, $value, $options);
 
     $oid   = ".1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.3.$index";
     $value = $entry['boxServicesTempSensorState'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "boxServicesTempSensorState.$index", 'fastpath-boxservices-private-temp-state', $descr, 1, $value, array('entPhysicalClass' => 'temperature'));
+    discover_status($device, $oid, "boxServicesTempSensorState.$index", 'fastpath-boxservices-private-temp-state', $descr, $value, array('entPhysicalClass' => 'temperature'));
   }
 }
 
@@ -142,7 +142,7 @@ foreach ($oids as $index => $entry)
     {
       // FIXME - could add a fan speed sensor here, but none of my devices have non-zero values.
       // duty level is most likely a percentage?
-       discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, "boxServicesFanSpeed.$index", 'fastpath-boxservices-private-mib', $descr, 1, $entry['boxServicesFanSpeed'], array('entPhysicalClass' => 'fan'));
+       discover_sensor('fanspeed', $device, $oid, "boxServicesFanSpeed.$index", 'fastpath-boxservices-private-mib', $descr, 1, $entry['boxServicesFanSpeed'], array('entPhysicalClass' => 'fan'));
     }
   }
 }

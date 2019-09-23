@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -92,7 +92,7 @@ foreach ($oids as $index => $entry)
     $options['limit_high']      = $entry['pduUnitConfigUpperCriticalThreshold'] * $scale;
   }
 
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   // pduUnitStatusApparentPower
   $descr    = "$name Apparent Power";
@@ -101,7 +101,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+  discover_sensor('apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
   // pduUnitStatusEnergy
   // FIXME. Need discover_counter()
@@ -199,7 +199,7 @@ foreach ($oids as $unit => $entry1)
       $options['limit_high']      = $entry['pduInputPhaseConfigCurrentUpperCriticalThreshold'] * $scale_current;
     }
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale_current, $value, $options);
+    discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale_current, $value, $options);
 
     // pduInputPhaseStatusVoltage
     $descr    = "$name Voltage";
@@ -234,7 +234,7 @@ foreach ($oids as $unit => $entry1)
       $options['limit_high']      = $entry['pduInputPhaseConfigVoltageUpperCriticalThreshold'] * $scale;
     }
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor('voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
     // pduInputPhaseStatusActivePower
     $descr    = "$name Active Power";
@@ -243,7 +243,7 @@ foreach ($oids as $unit => $entry1)
     $type     = $mib . '-' . $oid_name;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
     // pduInputPhaseStatusApparentPower
     $descr    = "$name Apparent Power";
@@ -252,7 +252,7 @@ foreach ($oids as $unit => $entry1)
     $type     = $mib . '-' . $oid_name;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], 'apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('apower', $device, $oid_num, $index, $type, $descr, $scale, $value);
 
     // pduInputPhaseStatusPowerFactor
     $descr    = "$name Power Factor";
@@ -261,7 +261,7 @@ foreach ($oids as $unit => $entry1)
     $type     = $mib . '-' . $oid_name;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], 'powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('powerfactor', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 }
 
@@ -323,7 +323,7 @@ foreach ($oids as $unit => $entry1)
       $options['limit_high']      = $entry['pduCircuitBreakerConfigUpperCriticalThreshold'] * $scale_current;
     }
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale_current, $value, $options);
+    discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale_current, $value, $options);
   }
 }
 
@@ -421,7 +421,7 @@ foreach ($oids as $unit => $entry1)
         $sensor_class = 'velocity';
         break;
       default:
-        continue;
+        continue 2;
     }
     if ($entry['pduExternalSensorNamePlateUnits'] == 'degreeF')
     {
@@ -440,7 +440,7 @@ foreach ($oids as $unit => $entry1)
     $type     = $mib . '-' . $oid_name;
     $value    = $entry[$oid_name];
 
-    discover_sensor($valid['sensor'], $sensor_class, $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor($sensor_class, $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
   }
 }
 

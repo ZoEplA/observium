@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  
 -- Reference:  
--- Version: V2.08
+-- Version: V2.11
 -- History:
 -- Created by hexingjian  2008-12-30 
 -- modified by xuxuguang  2009-12-10
@@ -12,6 +12,9 @@
 -- modified by shafangzhou 2016-06-23
 -- modified by shafangzhou 2016-08-16
 -- modified by shafangzhou 2016-10-11
+-- modified by liuzhongmiao 2017-06-23
+-- modified by wangchuang 2017-11-04
+-- modified by wangxiaodan 2018-03-12
 -- ============================================================================
          
 HUAWEI-L2MULTICAST-MIB DEFINITIONS ::= BEGIN
@@ -41,7 +44,9 @@ IMPORTS
             FROM HUAWEI-MIB
         
     Ipv6Address			
-            FROM IPV6-TC; 
+            FROM IPV6-TC
+    InetAddress, InetAddressType         
+            FROM INET-ADDRESS-MIB;
         
             
 VlanIdOrAnyOrNone ::= TEXTUAL-CONVENTION
@@ -60,7 +65,7 @@ VlanIdOrAnyOrNone ::= TEXTUAL-CONVENTION
     SYNTAX       Integer32 (0 | 1..4094 | 4095)
     
 hwL2MultiCastMIB MODULE-IDENTITY 
-    LAST-UPDATED "201610110000Z" 
+    LAST-UPDATED "201803120000Z" 
     ORGANIZATION "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
              "Huawei Industrial Base
@@ -82,6 +87,39 @@ hwL2MultiCastMIB MODULE-IDENTITY
          the hosts and router, then provides selective transmission of 
          multicast traffic based on multicast mac destination address
          or multicast group address."   
+   
+    REVISION "201803120000Z"-- 12 Mar 2018
+    DESCRIPTION 
+        "Add hwL2mcReportListeningThresholdExceed, hwL2mcReportListeningThresholdResume
+         and create 3 params including
+                 hwL2mcNotificationsSlot,
+                 hwL2mcNotificationsExceedCurrent,
+                 hwL2mcNotificationsExceedThreshold"
+   
+    REVISION "201711040000Z"-- 04 Nov 2017
+    DESCRIPTION 
+        "Modify MAX-ACCESS of hwMldFwdVlanIndex,
+         	hwMldFwdVsiName,
+		hwMldFwdGroupAddress,
+		hwMldFwdSourceAddress,
+		hwMldFwdPortType,
+		hwMldFwdPortIfIndex,
+		hwMldFwdPortPeId,
+		hwMldFwdPortCeId,
+		hwMldFwdPeerAddress,
+		hwMldFwdVcOrSiteId,
+		hwL2mcGroupRowStatus,
+		hwL2mcDTGroupRowStatus."
+
+    REVISION "201706230000Z"-- 10 Oct 2016
+    DESCRIPTION 
+        "Add hwL2mcReportListeningGrpExceed ,
+         and create 5 params including                 
+                 hwL2mcNotificationsAddressType, 
+                 hwL2mcNotificationsExceedLimit, 
+                 hwL2mcNotificationsExceedGroupAddress, 
+                 hwL2mcNotificationsExceedSourceAddress, 
+                 hwL2mcNotificationsPortUserMac "
 
     REVISION "201610110000Z"-- 10 Oct 2016
     DESCRIPTION 
@@ -1082,7 +1120,7 @@ hwMldFwdEntry OBJECT-TYPE
 
 hwMldFwdVlanIndex OBJECT-TYPE
 	SYNTAX VlanIdOrAny
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The VLAN ID, which is the configuration index in a VLAN. If a VSI is specified, the value is 4095.
@@ -1092,7 +1130,7 @@ hwMldFwdVlanIndex OBJECT-TYPE
 
 hwMldFwdVsiName OBJECT-TYPE
 	SYNTAX DisplayString (SIZE (0..31))
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The name of a VSI. If a VLAN is specified, the value is 32."
@@ -1100,7 +1138,7 @@ hwMldFwdVsiName OBJECT-TYPE
 
 hwMldFwdGroupAddress OBJECT-TYPE
 	SYNTAX Ipv6Address
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The group address of a multicast group. In the case of MAC forwarding, the group address is the smallest of 32 IP addresses."
@@ -1108,7 +1146,7 @@ hwMldFwdGroupAddress OBJECT-TYPE
 
 hwMldFwdSourceAddress OBJECT-TYPE
 	SYNTAX Ipv6Address
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The source IP address of a multicast group."
@@ -1116,7 +1154,7 @@ hwMldFwdSourceAddress OBJECT-TYPE
 
 hwMldFwdPortType OBJECT-TYPE
 	SYNTAX HWPortType
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The interface type:
@@ -1133,7 +1171,7 @@ hwMldFwdPortType OBJECT-TYPE
 
 hwMldFwdPortIfIndex OBJECT-TYPE
 	SYNTAX InterfaceIndexOrZero
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The interface index. The value 0 indicates that the interface index is invalid."
@@ -1141,7 +1179,7 @@ hwMldFwdPortIfIndex OBJECT-TYPE
 
 hwMldFwdPortPeId OBJECT-TYPE
 	SYNTAX VlanIdOrAny
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The PE VID of an interface.
@@ -1152,7 +1190,7 @@ hwMldFwdPortPeId OBJECT-TYPE
 
 hwMldFwdPortCeId OBJECT-TYPE
 	SYNTAX VlanIdOrAny
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The CE VID of an interface.
@@ -1163,14 +1201,14 @@ hwMldFwdPortCeId OBJECT-TYPE
 
 hwMldFwdPeerAddress OBJECT-TYPE
 	SYNTAX Ipv6Address
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The peer IP address of a PW interface. The value 0.0.0.0 indicates that the IP address is invalid."
 	::= { hwMldFwdEntry 9 }
 hwMldFwdVcOrSiteId OBJECT-TYPE
 	SYNTAX Unsigned32 (1..4294967295)
-	MAX-ACCESS not-accessible
+	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
 		"The VC ID or SITE ID of a PW interface."
@@ -1488,7 +1526,7 @@ hwL2mcGroupHostFlag2 OBJECT-TYPE
     
 hwL2mcGroupRowStatus OBJECT-TYPE
     SYNTAX       RowStatus
-    MAX-ACCESS   read-only
+    MAX-ACCESS   read-create
     STATUS       current
     DESCRIPTION
         "The row status."
@@ -3861,7 +3899,7 @@ hwL2mcDTGroupHostFlag2 OBJECT-TYPE
     
 hwL2mcDTGroupRowStatus OBJECT-TYPE
     SYNTAX       RowStatus
-    MAX-ACCESS   read-only
+    MAX-ACCESS   read-create
     STATUS       current
     DESCRIPTION
         "The row status."
@@ -5398,6 +5436,67 @@ hwL2mcNotificationsPortIfName OBJECT-TYPE
         "The name of the interface."
     ::= { hwL2mcGeneralNotificationsObject 9 }         
     
+hwL2mcNotificationsAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "The address type of the multicast group and source address. If this object is set to
+            unknown(0) indicates that the multicast group and source address is invalid."
+	::= { hwL2mcGeneralNotificationsObject 10 }
+hwL2mcNotificationsExceedLimit OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4294967295)
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "Limit value."
+	::= { hwL2mcGeneralNotificationsObject 11 }
+hwL2mcNotificationsExceedGroupAddress OBJECT-TYPE
+	SYNTAX InetAddress
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "Excess group address. The InetAddressType is given by the 
+                  hwL2mcNotificationsAddressType object.
+                  The value 0.0.0.0 indicates that the multicast entry is invalid."
+	::= { hwL2mcGeneralNotificationsObject 12 }
+hwL2mcNotificationsExceedSourceAddress OBJECT-TYPE
+	SYNTAX InetAddress
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "Excess source address.The InetAddressType is given by the 
+                  hwL2mcNotificationsAddressType object.
+                  The value 0.0.0.0 indicates that the multicast entry is (*, G)."
+	::= { hwL2mcGeneralNotificationsObject 13 }
+hwL2mcNotificationsPortUserMac OBJECT-TYPE
+	SYNTAX MacAddress
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "User MAC address. The value 0000-0000-0000 indicates that the MAC address is invalid."
+	::= { hwL2mcGeneralNotificationsObject 14 }
+hwL2mcNotificationsSlot OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..64))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The name of the slot."
+    ::= { hwL2mcGeneralNotificationsObject 15 } 
+hwL2mcNotificationsExceedCurrent OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4294967295)
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "The value of the current number."
+	::= { hwL2mcGeneralNotificationsObject 16 }
+hwL2mcNotificationsExceedThreshold OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4294967295)
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+                 "The value of the threshold."
+	::= { hwL2mcGeneralNotificationsObject 17 }
 --
 --  The l2 multicast Notifications.
 --
@@ -5422,7 +5521,48 @@ hwL2mcPortOtherQuerierTimeout NOTIFICATION-TYPE
              This notification should be generated when the other querier timer expires, and the router
             has no other querier on the same interface with the same IP version."
     ::= { hwL2mcGeneralNotifications 1 }        
-        
+
+hwL2mcReportListeningGrpExceed NOTIFICATION-TYPE
+    OBJECTS { hwL2mcNotificationsAddressType, 
+    hwL2mcNotificationsPortIfIndex, 
+    hwL2mcNotificationsPortIfName, 
+    hwL2mcNotificationsExceedLimit, 
+    hwL2mcNotificationsExceedGroupAddress,
+    hwL2mcNotificationsExceedSourceAddress, 
+    hwL2mcNotificationsPortVsiName, 
+    hwL2mcNotificationsPortPeId, 
+    hwL2mcNotificationsPortCeId, 
+    hwL2mcNotificationsPortUserMac
+		 }
+    STATUS current
+    DESCRIPTION 
+		"The hwL2mcReportListeningGrpExceed notification indicates that the number of multicast groups has exceeded the limit of a board. 
+		This notification is generated when the number of multicast groups exceeds the limit."
+	::= { hwL2mcGeneralNotifications 2 }        
+hwL2mcReportListeningThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwL2mcNotificationsAddressType, 
+    hwL2mcNotificationsSlot,
+    hwL2mcNotificationsExceedCurrent,
+    hwL2mcNotificationsExceedLimit,
+    hwL2mcNotificationsExceedThreshold
+		 }
+    STATUS current
+    DESCRIPTION 
+		"The hwL2mcReportListeningThresholdExceed notification indicates that the number of multicast groups has exceeded the threshold of a board.
+		This notification is generated when the number of multicast groups exceeds the threshold."
+	::= { hwL2mcGeneralNotifications 3 }
+hwL2mcReportListeningThresholdResume NOTIFICATION-TYPE
+    OBJECTS { hwL2mcNotificationsAddressType, 
+    hwL2mcNotificationsSlot,
+    hwL2mcNotificationsExceedCurrent,
+    hwL2mcNotificationsExceedLimit,
+    hwL2mcNotificationsExceedThreshold
+		 }
+    STATUS current
+    DESCRIPTION 
+		"The hwL2mcReportListeningThresholdResume notification indicates that the number of multicast groups has fell blew the threshold of a board.
+		This notification is generated when the number of multicast groups falls below the threshold."
+	::= { hwL2mcGeneralNotifications 4 }    
 --
 -- Conformance Information
 --
@@ -5794,7 +5934,15 @@ hwL2mcGeneralNotificationObjectGroup OBJECT-GROUP
  	         hwL2mcNotificationsPortCeId,          
 	         hwL2mcNotificationsPortPeerAddress,   
                  hwL2mcNotificationsPortVcOrSiteId,
-                 hwL2mcNotificationsPortIfName
+                 hwL2mcNotificationsPortIfName, 
+                 hwL2mcNotificationsAddressType, 
+                 hwL2mcNotificationsExceedLimit, 
+                 hwL2mcNotificationsExceedGroupAddress, 
+                 hwL2mcNotificationsExceedSourceAddress, 
+                 hwL2mcNotificationsPortUserMac,
+                 hwL2mcNotificationsSlot,
+                 hwL2mcNotificationsExceedCurrent,
+                 hwL2mcNotificationsExceedThreshold
                }
         STATUS current                            
         DESCRIPTION                               
@@ -5802,7 +5950,11 @@ hwL2mcGeneralNotificationObjectGroup OBJECT-GROUP
         ::= { hwL2mcMibGroups 28 } 
         
 hwL2mcGeneralNotificationGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { hwL2mcPortOtherQuerierTimeout
+    NOTIFICATIONS { 
+                    hwL2mcPortOtherQuerierTimeout,
+                    hwL2mcReportListeningGrpExceed,
+                    hwL2mcReportListeningThresholdExceed,
+                    hwL2mcReportListeningThresholdResume
                   }
         STATUS current                            
         DESCRIPTION                               

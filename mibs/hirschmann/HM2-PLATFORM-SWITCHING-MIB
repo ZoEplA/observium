@@ -1852,10 +1852,12 @@ VlanList ::= TEXTUAL-CONVENTION
               Unsigned32,
          hm2AgentPortMirrorReflectorPort
               InterfaceIndexOrZero,
-         hm2AgentPortMirrorReset
-         	  INTEGER,
          hm2AgentPortMirrorAllowMgmtMode
-         	  HmEnabledStatus
+         	  HmEnabledStatus,
+		 hm2AgentPortMirrorReset
+         	  INTEGER,
+         hm2AgentPortMirrorDestinationPortSecondary
+         	  InterfaceIndexOrZero
          }
 
     hm2AgentPortMirrorSessionNum OBJECT-TYPE
@@ -1958,6 +1960,15 @@ VlanList ::= TEXTUAL-CONVENTION
                      "Removes, reset(2) the configuration for this session.
                       Returns always other(1) when read."
          ::= { hm2AgentPortMirrorEntry 248 }
+         
+	hm2AgentPortMirrorDestinationPortSecondary OBJECT-TYPE
+         SYNTAX      InterfaceIndexOrZero
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The secondary port which traffic from the mirrored
+                     ports will be sent to."
+         ::= { hm2AgentPortMirrorEntry 249 }
 
 hm2AgentPortMirrorTypeTable OBJECT-TYPE
          SYNTAX      SEQUENCE OF Hm2AgentPortMirrorTypeEntry
@@ -2411,7 +2422,7 @@ hm2AgentPortMirrorTypeTable OBJECT-TYPE
 
 
     hm2AgentPortVoiceVlanID OBJECT-TYPE
-         SYNTAX      Integer32 (0..4093)
+         SYNTAX      Integer32 (0|1..4042)
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
@@ -3060,7 +3071,9 @@ hm2AgentPortMirrorTypeTable OBJECT-TYPE
          hm2AgentStpCstPortTCNGuard
                  HmEnabledStatus,
          hm2AgentStpCstPortLoopGuard
-                 HmEnabledStatus
+                 HmEnabledStatus,
+         hm2AgentStpCstPortBpduFilterState
+         		 HmEnabledStatus
          }
 
     hm2AgentStpCstPortOperEdge OBJECT-TYPE
@@ -3279,6 +3292,17 @@ hm2AgentPortMirrorTypeTable OBJECT-TYPE
          DEFVAL { disable }
          ::= { hm2AgentStpCstPortEntry 19 }
          
+    hm2AgentStpCstPortBpduFilterState OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This command displays the BPDU Filter state on the port.
+
+                     enable(1)  - BPDU Filter Mode is active on the port.
+                     disable(2) - BPDU Filter Mode is inactive on the port."
+         ::= { hm2AgentStpCstPortEntry 248 }
+   
     --**************************************************************************************
     -- hm2AgentStpMstTable
     --**************************************************************************************
@@ -3471,7 +3495,7 @@ hm2AgentPortMirrorTypeTable OBJECT-TYPE
          hm2AgentStpMstAutoPortPathCost
                  INTEGER,
          hm2AgentStpMstPortReceivedRegionalRPC
-                 INTEGER
+                 Unsigned32
          }
 
     hm2AgentStpMstPortForwardingState OBJECT-TYPE
@@ -3750,6 +3774,20 @@ hm2AgentPortMirrorTypeTable OBJECT-TYPE
                          "Interface index of the second interface."
         DEFVAL           { 0 }
         ::= { hm2AgentStpSwitchConfigGroup 250 }
+
+    hm2AgentStpTrapMode OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The spanning tree trap status.
+
+                     enable(1)  - enables spanning tree traps on the switch.
+                     disable(2) - disables spanning tree traps on the switch.
+
+                     The default status is enabled."
+         DEFVAL { enable }            
+         ::= { hm2AgentStpSwitchConfigGroup 251 }
 
 	--**************************************************************************************
     -- 	hm2AgentStpMstSNMPExtensionGroup
@@ -5300,6 +5338,109 @@ hm2AgentSystemGroup                             OBJECT IDENTIFIER ::= { hm2Platf
                      "The Voice Device Mac address"
          ::= { hm2AgentSwitchVoiceVlanDeviceEntry 2 }
          
+   
+    --**************************************************************************************
+    -- hm2AgentSwitchAddresConflictGroup
+    --
+    --**************************************************************************************
+
+    hm2AgentSwitchAddressConflictGroup       OBJECT IDENTIFIER ::= { hm2AgentSwitchConfigGroup 26 }
+
+    hm2AgentSwitchAddressConflictDetectionStatus OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Displays if an address conflict was detected on the switch
+                     since the last reset of the status. Set to 'true'
+                     if detected, 'false' otherwise."
+         ::= { hm2AgentSwitchAddressConflictGroup 1 }
+
+    hm2AgentSwitchAddressConflictDetectionStatusReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+                     none(0),
+                     reset(1)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Clear the last address conflict detection status in the switch.
+                     A value of reset(1) is used to reset the status. A read on this
+                     object always returns the value none (0). The value none (0) cannot
+                     be forcibly set by the administrator."
+        ::= { hm2AgentSwitchAddressConflictGroup 2 }
+
+   hm2AgentSwitchLastConflictingIPAddr OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                     "The reported conflicting IP address on the switch since the last
+                     reset of the conflict detection status."
+        ::= { hm2AgentSwitchAddressConflictGroup 3 }
+
+    hm2AgentSwitchLastConflictingMacAddr OBJECT-TYPE
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                     "The MAC address of the host corresponding to the reported 
+                     conflicting IP address on the switch since the last reset of
+                     the conflict detection status."
+        ::= { hm2AgentSwitchAddressConflictGroup 4 }
+
+    hm2AgentSwitchLastConflictReportedTime OBJECT-TYPE
+        SYNTAX       TimeTicks
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                     "Time since the last address conflict was detected. It is displayed
+                     in days, hours, minutes and seconds. It is set to a valid value only
+                     when the conflict detection status is 'true'."
+        ::= { hm2AgentSwitchAddressConflictGroup 5 }
+
+    hm2AgentSwitchConflictIPAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+                     "The IP address on the switch reported to have a conflict with
+                     another host's IP address."
+        ::= { hm2AgentSwitchAddressConflictGroup 6 }
+
+    hm2AgentSwitchConflictMacAddr OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+                     "The MAC address of the host that has an IP address conflicting
+                     with the IP address on the switch."
+        ::= { hm2AgentSwitchAddressConflictGroup 7 }
+
+    hm2AgentSwitchAddressConflictDetectionRun OBJECT-TYPE
+        SYNTAX       INTEGER {
+                     none(0),
+                     run(1)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+                     "Trigger the action to run the active address conflict detection.
+                     A value of run(1) is used to issue the action command. A read on
+                     this object always returns the value none(0). The value none (0)
+                     cannot be forcibly set by the administrator."
+        ::= { hm2AgentSwitchAddressConflictGroup 8 }
+   
+    hm2AgentSwitchAddressConflictTrap OBJECT-TYPE
+         SYNTAX      HmEnabledStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable the sending of conflict traps."
+         DEFVAL { enable }
+         ::= { hm2AgentSwitchAddressConflictGroup 248 }
+   
+   
          
 --*******************************************************************************************
 
@@ -5518,6 +5659,19 @@ hm2AgentSystemGroup                             OBJECT IDENTIFIER ::= { hm2Platf
               incoming packet rate exceeded configured rate limit during a
               burst-interval."
          ::= { hm2PlatformSwitchingTraps 18 }
+         
+         
+    hm2AgentSwitchIpAddressConflictTrap NOTIFICATION-TYPE
+        OBJECTS {
+                    hm2AgentSwitchConflictIPAddr,
+                    hm2AgentSwitchConflictMacAddr
+                }
+        STATUS             current
+        DESCRIPTION
+             "IP address conflict trap signifies the reception of an ARP from
+              another host in the LAN that has conflicting IP address."
+        ::= { hm2PlatformSwitchingTraps 20 }
+     
          
      hm2PlatformStpCstBpduGuardTrap NOTIFICATION-TYPE
 		 OBJECTS {

@@ -11,11 +11,7 @@ your network. Its design goals include collecting as much historical data about 
  as possible, being completely autodiscovered with little or no manual intervention,
 and having a very intuitive interface.
 
-Observium is not intended to replace an up/down alerting system, but rather to
-complement it with an easy to manage, intuitive representation of historical and
-current performance statistics, configuration visualisation and syslog capture.
-
 Installation
 ------------
 
-Please see http://www.observium.org, in particular the install guide and FAQ.
+Please see https://docs.observium.org, in particular the install guide and FAQ.

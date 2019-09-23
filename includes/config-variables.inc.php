@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage config
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -166,7 +166,7 @@ $config_variable[$setting]['shortdesc']  = 'PHP file to use as Observium front p
 $setting = 'frontpage|order';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Frontpage';
-$config_variable[$setting]['name']       = 'Frontpage Modules';
+$config_variable[$setting]['name']       = 'Frontpage Modules (DEPRECATED)';
 $config_variable[$setting]['type']       = 'enum-freeinput';
 $config_variable[$setting]['params']['map']                 = array('name' => 'Map');
 $config_variable[$setting]['params']['alert_table']         = array('name' => 'Alert Table');
@@ -213,9 +213,9 @@ $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Frontpage Map';
 $config_variable[$setting]['name']       = 'Map API';
 $config_variable[$setting]['type']       = 'enum';
-$config_variable[$setting]['params']['carto']     = array('name' => 'Carto (Leaflet)');
-$config_variable[$setting]['params']['google-mc'] = array('name' => 'Google',  'subtext' => 'REQUIRED to use Maps API KEY', 'desc' => 'Request a KEY <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key" target="_blank">here</a>');
-$config_variable[$setting]['params']['google']    = array('name' => 'Google (old)',  'subtext' => 'REQUIRED to use Maps API KEY', 'desc' => 'Request a KEY <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key" target="_blank">here</a>');
+$config_variable[$setting]['params']['leaflet']     = array('name' => 'Leaflet');
+//$config_variable[$setting]['params']['google-mc'] = array('name' => 'Google',  'subtext' => 'REQUIRED to use Maps API KEY', 'desc' => 'Request a KEY <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key" target="_blank">here</a>');
+//$config_variable[$setting]['params']['google']    = array('name' => 'Google (old)',  'subtext' => 'REQUIRED to use Maps API KEY', 'desc' => 'Request a KEY <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key" target="_blank">here</a>');
 $config_variable[$setting]['shortdesc']  = 'Map provider on the front page';
 
 $setting = 'frontpage|map|tiles';
@@ -225,6 +225,11 @@ $config_variable[$setting]['name']       = 'Map Tiles (except Google)';
 $config_variable[$setting]['type']       = 'enum';
 $config_variable[$setting]['params']['carto-base-light']   = array('name' => 'Carto Basemap Light');
 $config_variable[$setting]['params']['carto-base-dark']    = array('name' => 'Carto Basemap Dark');
+$config_variable[$setting]['params']['esri-worldgraycanvas']    = array('name' => 'ESRI World Gray Canvas');
+$config_variable[$setting]['params']['opentopomap'] = array('name' => 'OpenTopoMap');
+$config_variable[$setting]['params']['wikimedia'] = array('name' => 'Wikimedia');
+$config_variable[$setting]['params']['nasa-night'] = array('name' => 'NASA (Night)');
+//$config_variable[$setting]['params']['osm-mapnik'] = array('name' => 'OpenStreetMap Mapnik');
 $config_variable[$setting]['shortdesc']  = 'Map tiles used when building the map on the front page.';
 
 $setting = 'frontpage|map|height';
@@ -449,6 +454,19 @@ $config_variable[$setting]['shortdesc']  = 'When device provide port DOM power s
 $section = 'alerting';
 $config_sections[$section]['text'] = 'Alerting';
 
+$setting = 'alerts|interval';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Notification';
+$config_variable[$setting]['name']       = 'Interval for re-send alerted notifications';
+$config_variable[$setting]['type']       = 'enum';
+$config_variable[$setting]['params'][0]      = array('name' => 'Disable re-send');
+$config_variable[$setting]['params'][21600]  = array('name' => '6 hours');
+$config_variable[$setting]['params'][43200]  = array('name' => '12 hours');
+$config_variable[$setting]['params'][86400]  = array('name' => '1 day');
+$config_variable[$setting]['params'][172800] = array('name' => '2 days');
+$config_variable[$setting]['params'][604800] = array('name' => '1 week');
+$config_variable[$setting]['shortdesc']  = 'How frequently to re-send a notification for a continuing alert condition. Default is 1 day.';
+
 $setting = 'alerts|disable|all';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Notification';
@@ -465,21 +483,21 @@ $config_variable[$setting]['shortdesc']  = 'Causes all failed alerts to be place
 
 $setting = 'email|default';
 $config_variable[$setting]['section']    = $section;
-$config_variable[$setting]['subsection'] = 'Notification';
+$config_variable[$setting]['subsection'] = 'Email transport';
 $config_variable[$setting]['name']       = 'Default Notification Email';
 $config_variable[$setting]['type']       = 'string';
 $config_variable[$setting]['shortdesc']  = 'Email address to send notifications to as default. Only used when no contact matches the alert.';
 
 $setting = 'email|from';
 $config_variable[$setting]['section']    = $section;
-$config_variable[$setting]['subsection'] = 'Notification';
+$config_variable[$setting]['subsection'] = 'Email transport';
 $config_variable[$setting]['name']       = 'Email from: address';
 $config_variable[$setting]['type']       = 'string';
 $config_variable[$setting]['shortdesc']  = 'Email address used in the from: field for Observium-generated emails.';
 
 $setting = 'email|default_only';
 $config_variable[$setting]['section']    = $section;
-$config_variable[$setting]['subsection'] = 'Notification';
+$config_variable[$setting]['subsection'] = 'Email transport';
 $config_variable[$setting]['name']       = 'Default Email Only';
 $config_variable[$setting]['type']       = 'bool';
 $config_variable[$setting]['shortdesc']  = "When no contact matches, use only the default notification email. Don't use the device's sysContact.";
@@ -1093,8 +1111,6 @@ $config_variable[$setting]['shortdesc']  = 'Specifies the password to be used to
 
 $config['autodiscovery']['snmpscan']       = TRUE; // Autodiscover hosts via SNMP scanning
 ^ NOT IMPLEMENTED
-$config['discover_services']               = FALSE; // Autodiscover services via SNMP on devices of type 'server'
-^ DEPRECATED
 
 $config['autodiscovery']['ping_skip']      = FALSE; // Skip icmp echo checks during autodiscovery (beware timeouts during discovery!)
 
@@ -1127,21 +1143,47 @@ $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'GEO Coding';
 $config_variable[$setting]['name']       = 'GEO API to use';
 $config_variable[$setting]['type']       = 'enum';
+$config_variable[$setting]['params']['geocodefarm']   = array('name' => 'Geocode.Farm', 'allowed'  => 'geo_api|geocodefarm|key', 'subtext' => 'Free users have 250 req/day and 4 req/sec limit (IP based). Allowed to use GEO API KEY', 'desc' => 'Request a KEY <a href="https://geocode.farm/" target="_blank">here</a>');
 $config_variable[$setting]['params']['openstreetmap'] = array('name' => 'OpenStreetMap', 'subtext' => 'Rate limit 150 req/day', 'desc' => 'See the usage limits <a href="http://wiki.openstreetmap.org/wiki/Nominatim_usage_policy" target="_blank">here</a>');
-$config_variable[$setting]['params']['yahoo']         = array('name' => 'Yahoo',    'subtext' => 'Rate limit 2000 req/day');
-$config_variable[$setting]['params']['google']        = array('name' => 'Google',   'allowed'  => 'geocoding|api_key', 'subtext' => 'Allowed to use GEO API KEY', 'desc' => 'Request a KEY <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key" target="_blank">here</a>');
-$config_variable[$setting]['params']['yandex']        = array('name' => 'Yandex',   'allowed'  => 'geocoding|api_key', 'subtext' => 'Allowed to use GEO API KEY', 'desc' => 'Request a KEY <a href="https://tech.yandex.ru/maps/keys" target="_blank">here</a>.<br />Note, If the key parameter is not passed,
-                                                                                                                                     then the search is only available for the following countries: Russia, Ukraine, Belarus, Kazakhstan, Georgia, Abkhazia, South Ossetia, Armenia, Azerbaijan,
-                                                                                                                                     Moldova, Turkmenistan, Tajikistan, Uzbekistan, Kyrgyzstan and Turkey.');
-$config_variable[$setting]['params']['mapquest']      = array('name' => 'MapQuest', 'required' => 'geocoding|api_key', 'subtext' => '<strong>REQUIRED to use GEO API KEY</strong>', 'desc' => 'Request a KEY <a href="https://developer.mapquest.com/user/register" target="_blank">here</a>');
-$config_variable[$setting]['shortdesc']  = 'Which API to use to resolve your addresses into coordinates. If locations turn up unknown, try switching to Google.';
+$config_variable[$setting]['params']['google']        = array('name' => 'Google',   'required' => 'geo_api|google|key', 'subtext' => 'Require to use GEO API KEY', 'desc' => 'Request a KEY <a href="https://developers.google.com/maps/documentation/geocoding/get-api-key" target="_blank">here</a>');
+$config_variable[$setting]['params']['yandex']        = array('name' => 'Yandex',   'allowed'  => 'geo_api|yandex|key', 'subtext' => 'Free users have 25000 req/day limit. Allowed to use GEO API KEY', 'desc' => 'Request a KEY <a href="https://tech.yandex.ru/maps/commercial/doc/concepts/how-to-buy-docpage" target="_blank">here</a>');
+$config_variable[$setting]['params']['mapquest']      = array('name' => 'MapQuest', 'required' => 'geo_api|mapquest|key', 'subtext' => '<strong>REQUIRED to use GEO API KEY</strong>', 'desc' => 'Request a KEY <a href="https://developer.mapquest.com/user/register" target="_blank">here</a>');
+$config_variable[$setting]['shortdesc']  = 'Which API to use to resolve your addresses into coordinates. If locations turn up unknown, try switching to Other API.';
 
 $setting = 'geocoding|api_key';
 $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'GEO Coding';
-$config_variable[$setting]['name']       = 'API key for currently used GEO API';
+$config_variable[$setting]['name']       = '(DEPRECATED) API key for currently used GEO API';
 $config_variable[$setting]['type']       = 'string';
-$config_variable[$setting]['shortdesc']  = 'API keys are currently supported for Google and Yandex, and required for MapQuest.';
+$config_variable[$setting]['shortdesc']  = 'NOTE. Please use API specific KEY fields (below).';
+
+$setting = 'geo_api|geocodefarm|key';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'GEO Coding';
+$config_variable[$setting]['name']       = 'Geocode.Farm API key';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'Free users (without key) have 250 req/day and 4 req/sec limit (IP based).';
+
+$setting = 'geo_api|google|key';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'GEO Coding';
+$config_variable[$setting]['name']       = 'Google API key';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'Google API REQUIRED key!';
+
+$setting = 'geo_api|yandex|key';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'GEO Coding';
+$config_variable[$setting]['name']       = 'Yandex API key';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'Free users have 25000 req/day limit.';
+
+$setting = 'geo_api|mapquest|key';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'GEO Coding';
+$config_variable[$setting]['name']       = 'MapQuest API key';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'MapQuest API REQUIRED key!';
 
 $setting = 'geocoding|dns';
 $config_variable[$setting]['section']    = $section;
@@ -1277,6 +1319,8 @@ $config_variable[$setting]['params']['3.3'] = array('name' => '3.3+');
 $config_variable[$setting]['params']['3.4'] = array('name' => '3.4+');
 $config_variable[$setting]['params']['3.5'] = array('name' => '3.5+');
 $config_variable[$setting]['params']['3.7'] = array('name' => '3.7+');
+$config_variable[$setting]['params']['3.8'] = array('name' => '3.8+');
+$config_variable[$setting]['params']['3.9'] = array('name' => '3.9+');
 $config_variable[$setting]['shortdesc']  = 'Depending on the RANCID version, a different delimiter is used in the RANCID configuration files (: vs ;).';
 
 $setting = 'rancid_revisions';
@@ -1298,7 +1342,14 @@ $config_variable[$setting]['section']    = $section;
 $config_variable[$setting]['subsection'] = 'Smokeping';
 $config_variable[$setting]['name']       = 'Smokeping directory';
 $config_variable[$setting]['type']       = 'string';
-$config_variable[$setting]['shortdesc']  = 'Defines smokeping directory containing the RRD files. Names in Smokeping should use the split character (as defined below) instead of dots.';
+$config_variable[$setting]['shortdesc']  = 'Defines the smokeping directory containing the RRD files. Names in Smokeping should use the split character (as defined below) instead of dots.';
+
+$setting = 'smokeping|master_hostname';
+$config_variable[$setting]['section']    = $section;
+$config_variable[$setting]['subsection'] = 'Smokeping';
+$config_variable[$setting]['name']       = 'Master hostname';
+$config_variable[$setting]['type']       = 'string';
+$config_variable[$setting]['shortdesc']  = 'Defines the hostname of your Smokeping instance. Useful if you are NFS mounting the smokeping directory to Observium from another server. Defaults to the Observium server\'s hostname (own_hostname setting) if unset.';
 
 $setting = 'smokeping|split_char';
 $config_variable[$setting]['section']    = $section;

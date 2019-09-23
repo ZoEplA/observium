@@ -1,11 +1,18 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: FC PSM(Fabric Port Security Management) MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 -- V1.0 Initial version 2013-10-17
+-- V1.1 Modified by Chen Yajun 2014-06-20
+--    2014-06-20 1.All "learnt" descriptions changed into "learned".
+--               2.Added the description of the value range for
+--                 hh3cFcPsmEnableVsanIndex.
+--               3.Added the description of read value of hh3cFcPsmClearIntf.
+--               4.Changed the syntax of hh3cFcPsmLoginTime from
+--                 "TimeStamp" into "DateAndTime".
 --=================================================================
 HH3C-FC-PSM-MIB DEFINITIONS ::= BEGIN
 
@@ -13,7 +20,7 @@ IMPORTS
     Unsigned32, Counter32,
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
             FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, RowStatus, TruthValue, TimeStamp
+    TEXTUAL-CONVENTION, RowStatus, TruthValue, DateAndTime
             FROM    SNMPv2-TC
     InterfaceIndexOrZero, InterfaceIndex, ifDescr
             FROM    IF-MIB
@@ -31,9 +38,9 @@ IMPORTS
 
 hh3cFcPsm MODULE-IDENTITY
     LAST-UPDATED "201310170000Z"
-    ORGANIZATION "Hangzhou H3C Tech. Co., Ltd."
+    ORGANIZATION "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
@@ -83,7 +90,7 @@ Hh3cFcPsmClearEntryType ::= TEXTUAL-CONVENTION
         "This object when set to clearStatic, results in port bind static
          entries being cleared on this VSAN(Virtual Storage Area Networks).
          This object when set to clearAutoLearn, results in port bind
-         auto-learnt entries being cleared on this VSAN.  This object when
+         auto-learned entries being cleared on this VSAN.  This object when
          set to clearAll, results in all of the port bind entries being
          cleared on this VSAN.  No action is taken if this object is set
          to noop.
@@ -295,7 +302,7 @@ hh3cFcPsmRowStatus OBJECT-TYPE
     DESCRIPTION
         "Entry status.  When creating a new instance of this table,
          the following objects should be set simultaneously:
-         hh3cFcPsmLoginDevType, h3cFcPsmLoginDev, hh3cFcPsmLoginPoint,
+         hh3cFcPsmLoginDevType, hh3cFcPsmLoginDev, hh3cFcPsmLoginPoint,
          hh3cFcPsmRowStatus.  If hh3cFcPsmLoginDevType is set to wildCard,
          the value of the instance of hh3cFcPsmLoginDev should be
          zero-length string.  The value of hh3cFcPsmLoginDevType and
@@ -314,7 +321,7 @@ hh3cFcPsmEnfTable OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The FC port security enforced table.  It contains not only the
-         configured policies, but also the learning ones learnt by the
+         configured policies, but also the learning ones learned by the
          switch itself."
     ::= { hh3cFcPsmConfiguration 3 }
 
@@ -399,16 +406,16 @@ hh3cFcPsmEnfEntryType OBJECT-TYPE
     SYNTAX INTEGER
         {
             learning(1),
-            learnt(2),
+            learned(2),
             static(3)
         }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "When the value is learning, it represents the entry is learnt
+        "When the value is learning, it represents the entry is learned
          by the switch itself temporarily and will be deleted when the
-         device log out.  When the value is learnt, it represents the
-         entry is learnt by the switch permanently.  When the value is
+         device log out.  When the value is learned, it represents the
+         entry is learned by the switch permanently.  When the value is
          static, it represents the entry is configured."
     ::= { hh3cFcPsmEnfEntry 5 }
 
@@ -505,7 +512,7 @@ hh3cFcPsmAutoLearnEnable OBJECT-TYPE
          switch can learn the devices that have already logged in
          as learning entries on the enforced table, while the false
          can stop the learning operation with the learning entries
-         transformed to learnt ones."
+         transformed to learned ones."
     DEFVAL      { false }
     ::= { hh3cFcPsmAutoLearnEntry 1 }
 
@@ -550,7 +557,7 @@ hh3cFcPsmClearType OBJECT-TYPE
     DESCRIPTION
         "This object when set to clearStatic, results in port bind
          static entries being cleared on this VSAN.  This object when
-         set to clearAutoLearn, results in auto-learnt entries being
+         set to clearAutoLearn, results in auto-learned entries being
          cleared on this VSAN.  This object when set to clearAll,
          results in all of the port bind entries being cleared on
          this VSAN.  No action is taken if this object is set to noop.
@@ -566,7 +573,8 @@ hh3cFcPsmClearIntf OBJECT-TYPE
     DESCRIPTION
         "The object specifies the interface on which the entries will be
          cleared.  If the object is zero or not set, it means the specified
-         entries on all interfaces will be cleared."
+         entries on all interfaces will be cleared.
+         The value of this object when read is always zero."
     ::= { hh3cFcPsmClearEntry 2 }
 
 
@@ -691,7 +699,7 @@ Hh3cFcPsmViolationEntry ::=
         hh3cFcPsmLoginIntf
             InterfaceIndex,
         hh3cFcPsmLoginTime
-            TimeStamp,
+            DateAndTime,
         hh3cFcPsmLoginCount
             Counter32
              }
@@ -750,11 +758,11 @@ hh3cFcPsmLoginIntf OBJECT-TYPE
 
 
 hh3cFcPsmLoginTime OBJECT-TYPE
-    SYNTAX TimeStamp
+    SYNTAX DateAndTime
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Specifies the value of SysUpTime when the last denied login
+        "Specifies the date and time when the last denied login
          happened."
     ::= { hh3cFcPsmViolationEntry 6 }
 

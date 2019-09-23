@@ -1,9 +1,9 @@
 -- =================================================================
-    -- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
+    -- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved
     -- 
     -- Description:HUAWEI-HWTACACS-MIB
     -- Reference:
-    -- Version: V2.09
+    -- Version: V2.05
     -- History:
     --    <d30957>,<2003-03-20>,<create>
     -- =================================================================
@@ -26,7 +26,7 @@ IMPORTS
         FROM RFC1155-SMI; 
         
     hwTACACS MODULE-IDENTITY 
-            LAST-UPDATED "201611021620Z"        -- Nov  2, 2016 at 9:00 GMT
+            LAST-UPDATED "201308241100Z"        -- March 03, 2004 at 09:00 GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -36,19 +36,7 @@ IMPORTS
                      People's Republic of China
                      Website: http://www.huawei.com
                      Email: support@huawei.com
-                  " 
-            DESCRIPTION 
-                "Update descriptions of hwtacacsClientAuthenServerType, hwtacacsClientAuthorServerType, hwtacacsClientAccountServerType, hwtacacsClientCommonServerType nodes,"
-           REVISION    "201611021620Z" 
-		    DESCRIPTION 
-                "Add shared key hwGlobalTACACSServerIPAddr"
-            REVISION    "201608151620Z" 
-		    DESCRIPTION 
-                "Add shared key hwTACACSServerPriAuthenKey"	
-            REVISION    "201507291915Z" 
-            DESCRIPTION 
-                "hwTACACSServerGroupKey range is changed from 0-255 to 0-392"
-            REVISION    "201505061600Z" 
+                  "
             DESCRIPTION 
                 "Modify hwTACACSServerGroupTimer value range."
             REVISION    "201308241100Z"   
@@ -63,10 +51,9 @@ IMPORTS
            REVISION    "201402251600Z" 
            DESCRIPTION 
                 "Shared-key range is changed from 0-255 to 0-392"
-
-           REVISION    "201504011600Z" 
+            REVISION    "201504011600Z" 
            DESCRIPTION 
-                "Added common server mib table"			
+                "Added common server mib table"            
             ::= { hwDatacomm 20 }
    -- Following is for Node:hwTACACSServerConfig 
  hwTACACSServerConfig        OBJECT IDENTIFIER ::= { hwTACACS 1 }
@@ -211,16 +198,7 @@ IMPORTS
       hwTACACSSecAccClientTimeouts    Counter32,
       hwTACACSSecAccClientUnknownTypes    Counter32,
       hwTACACSSecAccClientPacketsDropped    Counter32,
-      hwTACACSServerGroupRowStatus    RowStatus,
-	  hwTACACSServerPriAuthenKey    OCTET STRING,
-	  hwTACACSServerPriAuthorKey    OCTET STRING,
-	  hwTACACSServerPriAccoutKey    OCTET STRING,
-	  hwTACACSServerSecAuthenKey    OCTET STRING,
-	  hwTACACSServerSecAuthorKey    OCTET STRING,
-	  hwTACACSServerSecAccoutKey    OCTET STRING,
-	  hwTACACSServerThiAuthenKey    OCTET STRING,
-	  hwTACACSServerThiAuthorKey    OCTET STRING,
-	  hwTACACSServerThiAccoutKey    OCTET STRING
+      hwTACACSServerGroupRowStatus    RowStatus
     }
             
   hwTACACSServerGroupIndex OBJECT-TYPE
@@ -248,7 +226,7 @@ IMPORTS
     ::={ hwTACACSServerGroupEntry 3 }
 
   hwTACACSServerGroupKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
+    SYNTAX      OCTET STRING(SIZE(0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -1218,79 +1196,7 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
     DESCRIPTION
         "RowStatus."
     ::={ hwTACACSServerGroupEntry 120 }   
-	
-   hwTACACSServerPriAuthenKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for primary authen server."
-    ::={ hwTACACSServerGroupEntry 121 } 
-	
-   hwTACACSServerPriAuthorKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for primary author server."
-    ::={ hwTACACSServerGroupEntry 122 } 
-	
-   hwTACACSServerPriAccoutKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for primary account server."
-    ::={ hwTACACSServerGroupEntry 123 }	
-	
-   hwTACACSServerSecAuthenKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for secdory authen server."
-    ::={ hwTACACSServerGroupEntry 124 } 
-	
-   hwTACACSServerSecAuthorKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for secdory author server."
-    ::={ hwTACACSServerGroupEntry 125 } 
-	
-   hwTACACSServerSecAccoutKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for secdory account server."
-    ::={ hwTACACSServerGroupEntry 126 }	
-		
-   hwTACACSServerThiAuthenKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for thrid authen server."
-    ::={ hwTACACSServerGroupEntry 127 } 
-	
-   hwTACACSServerThiAuthorKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for thrid author server."
-    ::={ hwTACACSServerGroupEntry 128 } 
-	
-   hwTACACSServerThiAccoutKey OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..392))
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION
-        "Specify group encryption shared-key for thrid account server."
-    ::={ hwTACACSServerGroupEntry 129 }	
-		
+    
     --  ============== conformance information ==============
         hwTacacsConformance OBJECT IDENTIFIER ::= { hwTACACS 2 }
         
@@ -1430,24 +1336,14 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
       hwTACACSSecAccClientTimeouts    ,
       hwTACACSSecAccClientUnknownTypes    ,
       hwTACACSSecAccClientPacketsDropped    ,
-      hwTACACSServerGroupRowStatus    ,
-	  hwTACACSServerPriAuthenKey    ,
-	  hwTACACSServerPriAuthorKey    ,
-	  hwTACACSServerPriAccoutKey    ,
-	  hwTACACSServerSecAuthenKey    ,
-	  hwTACACSServerSecAuthorKey    ,
-	  hwTACACSServerSecAccoutKey    ,
-	  hwTACACSServerThiAuthenKey    ,
-	  hwTACACSServerThiAuthorKey    ,
-	  hwTACACSServerThiAccoutKey   
-	  }
+      hwTACACSServerGroupRowStatus	  }
             STATUS current
             DESCRIPTION 
                 "The HWTACACS configuration table."
             ::= { hwTacacsObjectGroups 1 }
 
 	hwTacacsSettingGroup OBJECT-GROUP
-		OBJECTS { hwTACACSEnable, hwTACACSAcctStopResendDisable, hwTACACSAcctStopResendNumber,hwGlobalTACACSServerKey }
+		OBJECTS { hwTACACSEnable, hwTACACSAcctStopResendDisable, hwTACACSAcctStopResendNumber }
 		STATUS current
 		DESCRIPTION 
 			"The HWTACACS Setting table."
@@ -1864,9 +1760,10 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The Server Type indicates the type of server.
+                "The Server Type indicates the type of server. Default value is Primary
                 0 - Primary
                 1 - Secondary."
+		DEFVAL      { 0 }
             ::= { hwtacacsClientAuthenServerEntry 5 }
 
         
@@ -2270,9 +2167,10 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The Server Type indicates the type of server.
+                "The Server Type indicates the type of server.Default value is Primary
                 0 - Primary
                 1 - Secondary."
+            DEFVAL      { 0 }
             ::= { hwtacacsClientAuthorServerEntry 5 }
 
         
@@ -2545,9 +2443,10 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The Server Type indicates the type of server.
+                "The Server Type indicates the type of server.Default value is Primary
                 0 - Primary
                 1 - Secondary."
+            DEFVAL      { 0 }
             ::= { hwtacacsClientAccountServerEntry 5 }
 
         
@@ -2860,9 +2759,10 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"The Server Type indicates the type of server.
+				"The Server Type indicates the type of server.Default value is Primary
 				0 - Primary
 				1 - Secondary."
+			DEFVAL      { 0 }
 			::= { hwtacacsClientCommonServerEntry 5 }
 
 		hwtacacsClientCommonServerState OBJECT-TYPE
@@ -3263,23 +3163,8 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
                 STATUS current
                 DESCRIPTION
                     "The number of retransmitted accounting-stop packets."
-            ::= { hwTacacsSettingEntry 3 }
-
-        hwGlobalTACACSServerKey OBJECT-TYPE
-                SYNTAX      OCTET STRING(SIZE(0..392))
-                MAX-ACCESS  read-create
-                STATUS      current
-                DESCRIPTION
-                "Specify the global encryption shared-key ."
-                ::={ hwTacacsSettingEntry 4 }
-			
-        hwGlobalTACACSServerIPAddr OBJECT-TYPE
-                SYNTAX      IpAddress
-                MAX-ACCESS  read-create
-                STATUS      current
-                DESCRIPTION
-                "hwtacasc-server server-ip address."
-                ::={ hwTacacsSettingEntry 5 }     			
+            ::= { hwTacacsSettingEntry 3 }                        
+            			
     END
 
 --

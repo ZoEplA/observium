@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,7 +21,7 @@ if ($entPhysical['entPhysicalDescr'] && $entPhysical['entPhysicalName'] && $entP
   $serial = $entPhysical['entPhysicalSerialNum'];
   return;
 }
-
+/*
 $lines = preg_split('/\r\n|\r|\n/', $poll_device['sysDescr']);
 
 if (count($lines) == 2)
@@ -46,5 +46,5 @@ else if (count($lines) == 3)
   $version = rtrim($version, ',') . ' ' . $release;
   $hardware = $lines[1];
 }
-
+*/
 // EOF

@@ -18,14 +18,22 @@ IMPORTS
 
 
 fnFortiManagerMib MODULE-IDENTITY
-    LAST-UPDATED "201706280000Z"
+    LAST-UPDATED "201710130000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
-        "
-         Technical Support
+        "Technical Support
          email: support@fortinet.com
          http://www.fortinet.com"
+    DESCRIPTION
+         "HW sensors."
+    REVISION    "201808070000Z"
+    DESCRIPTION
+         "NPI faz800F, fmg300F."
+    REVISION    "201710130000Z"
+    DESCRIPTION
+         "NPI faz200F, faz300F, fmg200F."
+    REVISION    "201707270000Z"
     DESCRIPTION
          "Added model names faz1000E, fmg400E,
 		  faz400E, fmg300E,
@@ -198,6 +206,22 @@ fmLicDevQuotaThreshold OBJECT-TYPE
         "Licensed threshold for device quota in number of GB."
     ::= { fmTrapObject 10 }
 
+fmSensorState OBJECT-TYPE
+    SYNTAX      FmSensorEntState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Sensor status."
+    ::= { fmTrapObject 11 }
+
+fmSensorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Sensor name."
+    ::= { fmTrapObject 12 }
+
 --
 -- fortinet.fnFortiManagerMib.fmModel
 --
@@ -205,11 +229,11 @@ fmLicDevQuotaThreshold OBJECT-TYPE
 fmModel OBJECT IDENTIFIER
     ::= { fnFortiManagerMib 1 }
 
+fmgvm OBJECT IDENTIFIER
+    ::= { fmModel 64 }
+
 fmg100 OBJECT IDENTIFIER
     ::= { fmModel 1000 }
-
-fmgvm OBJECT IDENTIFIER
-    ::= { fmModel 1001 }
 
 fmg100C OBJECT IDENTIFIER
     ::= { fmModel 1003 }
@@ -220,11 +244,17 @@ fmg200D OBJECT IDENTIFIER
 fmg200E OBJECT IDENTIFIER
     ::= { fmModel 2005 }
 
+fmg200F OBJECT IDENTIFIER
+    ::= { fmModel 2006 }
+
 fmg300D OBJECT IDENTIFIER
     ::= { fmModel 3004 }
 
 fmg300E OBJECT IDENTIFIER
     ::= { fmModel 3005 }
+
+fmg300F OBJECT IDENTIFIER
+    ::= { fmModel 3006 }
 
 fmg400 OBJECT IDENTIFIER
     ::= { fmModel 4000 }
@@ -423,12 +453,47 @@ fmTrapCpuThresholdExcludeNice NOTIFICATION-TYPE
         "Indicates that the CPU usage excluding nice processes has exceeded the threshold"
     ::= { fmTrapPrefix 409 }
 
+fmTrapPowerStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the power supply, if present."
+    ::= { fmTrapPrefix 410 }
+
+fmTrapFanStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the fan, if present."
+    ::= { fmTrapPrefix 411 }
+
+fmTrapTemperatureStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the temperature sensor, if present."
+    ::= { fmTrapPrefix 412 }
+
+fmTrapVoltageStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the voltage sensor, if present."
+    ::= { fmTrapPrefix 413 }
+
 --
 -- fortinet.fnFortiManagerMib.faModel
 --
 
 faModel OBJECT IDENTIFIER
     ::= { fnFortiManagerMib 3 }
+
+fazvm OBJECT IDENTIFIER
+    ::= { faModel 64 }
 
 faz100 OBJECT IDENTIFIER
     ::= { faModel 1000 }
@@ -448,8 +513,14 @@ faz200D OBJECT IDENTIFIER
 faz200E OBJECT IDENTIFIER
     ::= {faModel 2005 }
 
+faz200F OBJECT IDENTIFIER
+    ::= {faModel 2006 }
+
 faz300D OBJECT IDENTIFIER
     ::= { faModel 3004 }
+
+faz300F OBJECT IDENTIFIER
+    ::= { faModel 3006 }
 
 faz400E OBJECT IDENTIFIER
     ::= { faModel 4005 }
@@ -471,6 +542,9 @@ faz800 OBJECT IDENTIFIER
 
 faz800B OBJECT IDENTIFIER
     ::= { faModel 8002 }
+
+faz800F OBJECT IDENTIFIER
+    ::= { faModel 8006 }
 
 faz1000B OBJECT IDENTIFIER
     ::= { faModel 10002 }
@@ -1275,60 +1349,102 @@ fmRaidDiskEntSize OBJECT-TYPE
     ::= { fmRaidDiskEntry 3 }
 
 --
--- fortinet.fnFortiManagerMib.fmPower
+-- fortinet.fnFortiManagerMib.fmSensor
 --
 
-fmPower OBJECT IDENTIFIER
+fmSensor OBJECT IDENTIFIER
     ::= { fnFortiManagerMib 8 }
 
-fmPowerTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF FmPowerEntry
+fmSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmSensorEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table of power supply status"
-    ::= { fmPower 2 }
+        "A table of sensor status"
+    ::= { fmSensor 2 }
 
-fmPowerEntry OBJECT-TYPE
-    SYNTAX      FmPowerEntry
+fmSensorEntry OBJECT-TYPE
+    SYNTAX      FmSensorEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry containing information applicable
-         to a particular power supply unit"
-    INDEX       { fmPowerEntIndex }
-    ::= { fmPowerTable 1 }
+         to a particular sensor"
+    INDEX       { fmSensorEntIndex }
+    ::= { fmSensorTable 1 }
 
-FmPowerEntry ::= SEQUENCE {
-    fmPowerEntIndex      FnIndex,
-    fmPowerEntState      FmPowerEntState
+FmSensorEntry ::= SEQUENCE {
+    fmSensorEntIndex      FnIndex,
+    fmSensorEntName       DisplayString,
+    fmSensorEntVal        DisplayString,
+    fmSensorEntType       FmSensorEntType,
+    fmSensorEntState      FmSensorEntState
 }
 
-fmPowerEntIndex OBJECT-TYPE
+fmSensorEntIndex OBJECT-TYPE
     SYNTAX      FnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An index value that uniquely identifies the entry"
-    ::= { fmPowerEntry 1 }
+    ::= { fmSensorEntry 1 }
 
-FmPowerEntState ::= TEXTUAL-CONVENTION
+FmSensorEntType ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "Power supply unit status"
+        "Sensor type"
     SYNTAX      INTEGER {
-        unknown (-1),
-        offline (0),
-        online (1)
+        power (0),
+        fan (1),
+        temperature (2),
+        voltage (3)
     }
 
-fmPowerEntState OBJECT-TYPE
-    SYNTAX      FmPowerEntState
+fmSensorEntName OBJECT-TYPE
+    SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Power supply unit status"
-    ::= { fmPowerEntry 2 }
+        "Sensor name"
+    ::= { fmSensorEntry 2 }
+
+fmSensorEntVal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor value"
+    ::= { fmSensorEntry 3 }
+
+fmSensorEntType OBJECT-TYPE
+    SYNTAX      FmSensorEntType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor status"
+    ::= { fmSensorEntry 4 }
+
+FmSensorEntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Sensor status"
+    SYNTAX      INTEGER {
+        ok (0),
+        failed (1),
+        out-of-range-not-critical (2),
+        out-of-range-critical (3),
+        out-of-range-not-recoverable (4),
+        input-lost (5),
+        not-present (6)
+    }
+
+fmSensorEntState OBJECT-TYPE
+    SYNTAX      FmSensorEntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor status"
+    ::= { fmSensorEntry 5 }
 
 --
 -- fortinet.fnFortiManagerMib.fmHa
@@ -1493,7 +1609,8 @@ fmNotificationObjComplianceGroup OBJECT-GROUP
                   fmLogRate, fmLogRateThreshold,
                   fmLogDataRate, fmLogDataRateThreshold,
                   fmLicGbDay, fmLicGbDayThreshold,
-                  fmLicDevQuota, fmLicDevQuotaThreshold }
+                  fmLicDevQuota, fmLicDevQuotaThreshold,
+                  fmSensorState, fmSensorName }
     STATUS      current
     DESCRIPTION 
         "Object identifiers used in notifications"

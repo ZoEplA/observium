@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -126,8 +126,8 @@ foreach ($rrd_list as $rrd)
     $rrd_options .= " SHIFT:inB" . $i . "X:$period";
     $rrd_options .= " SHIFT:outB" . $i . "X:$period";
 
-    $rrd_multi['in_thingX'][]  = "inB"  . $i . "X,UN,0," . "inB"  . $i . "X,IF";
-    $rrd_multi['out_thingX'][] = "outB" . $i . "X,UN,0," . "outB" . $i . "X,IF";
+    $rrd_multi['in_thingX'][]  = "inB"  . $i;
+    $rrd_multi['out_thingX'][] = "outB" . $i;
   }
 
   if (in_array("tot", $data_show))
@@ -136,8 +136,8 @@ foreach ($rrd_list as $rrd)
     $rrd_options .= " VDEF:totoutB".$i."=outB".$i.",TOTAL";
     $rrd_options .= " VDEF:tot".$i."=octets".$i.",TOTAL";
 
-    $rrd_multi['in_thing'][]  = "inB"  . $i . ",UN,0," . "inB"  . $i . ",IF";
-    $rrd_multi['out_thing'][] = "outB" . $i . ",UN,0," . "outB" . $i . ",IF";
+    $rrd_multi['in_thing'][]  = "inB"  . $i;
+    $rrd_multi['out_thing'][] = "outB" . $i;
   }
 
   if ($i) { $stack=":STACK"; }
@@ -166,11 +166,9 @@ foreach ($rrd_list as $rrd)
 
 if ($vars['previous'] == "yes")
 {
-  $in_thingX  = implode(',', $rrd_multi['in_thingX']);
-  $out_thingX = implode(',', $rrd_multi['out_thingX']);
-  $plusesX    = str_repeat(',+', count($rrd_multi['in_thingX']) - 1);
-  $rrd_options .= " CDEF:inBX=" . $in_thingX . $plusesX;
-  $rrd_options .= " CDEF:outBX=" . $out_thingX . $plusesX;
+  $rrd_options .= " CDEF:inBX=" . rrd_aggregate_dses($rrd_multi['in_thingX']);
+  $rrd_options .= " CDEF:outBX=" . rrd_aggregate_dses($rrd_multi['out_thingX']);
+
   $rrd_options .= " CDEF:octetsX=inBX,outBX,+";
   $rrd_options .= " CDEF:doutBX=outBX,-1,*";
   $rrd_options .= " CDEF:inbitsX=inBX,8,*";
@@ -189,11 +187,9 @@ if ($vars['previous'] == "yes")
 
 if (in_array("tot", $data_show))
 {
-  $in_thing  = implode(',', $rrd_multi['in_thing']);
-  $out_thing = implode(',', $rrd_multi['out_thing']);
-  $pluses    = str_repeat(',+', count($rrd_multi['in_thing']) - 1);
-  $rrd_options .= " CDEF:inB=" . $in_thing . $pluses;
-  $rrd_options .= " CDEF:outB=" . $out_thing . $pluses;
+  $rrd_options .= " CDEF:inB=" . rrd_aggregate_dses($rrd_multi['in_thing']);
+  $rrd_options .= " CDEF:outB=" . rrd_aggregate_dses($rrd_multi['out_thing']);
+
   $rrd_options .= " CDEF:octets=inB,outB,+";
   $rrd_options .= " CDEF:doutB=outB,-1,*";
   $rrd_options .= " CDEF:inbits=inB,8,*";

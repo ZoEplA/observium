@@ -170,8 +170,10 @@ IMPORTS
 	nmsipsourceBindingsrowstatus		 RowStatus,
 	nmsipsourceBindingsIpAddress       InetAddress,
 	nmsipsourceBindingsMacAddress      MacAddress, 
-    nmsipsourceBindingsInterface       InterfaceIndex
-	}
+    nmsipsourceBindingsInterface       InterfaceIndex,
+    nmsipsourceBindingsVlanID         VlanIndex
+
+	}    
 	
 	nmsipsourceBindingsrowstatus OBJECT-TYPE
 	SYNTAX	   RowStatus
@@ -211,6 +213,13 @@ IMPORTS
         host connects to."
     ::= { nmsipsourceBindingsEntry 4 }
 
-
+    nmsipsourceBindingsVlanID OBJECT-TYPE
+    SYNTAX  	VlanIndex
+    MAX-ACCESS	read-write
+    STATUS		current
+    DESCRIPTION
+    	"This objiec indicates the VLAN to which a DHCP client host
+    	belongs."                                                  
+    ::= { nmsipsourceBindingsEntry 5 }
 	
 END

@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -154,7 +154,7 @@ foreach ($cache as $index => $data)
       'entPhysicalClass' => 'port',
     );
     $value = $readings[$val_key];
-    discover_sensor($valid['sensor'], $sensor['class'], $device, $oid_num, "{$index}.{$prop}", $mib, $descr, $sensor['scale'], $value, $options);
+    discover_sensor($sensor['class'], $device, $oid_num, "{$index}.{$prop}", $mib, $descr, $sensor['scale'], $value, $options);
 
     $descr = "{$port} Transceiver";
     if ($sensor['state_descr'] != '')

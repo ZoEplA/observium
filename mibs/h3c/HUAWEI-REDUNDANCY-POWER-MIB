@@ -1,7 +1,7 @@
 -- ==================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: This file describes the huawei mib implementation of
+-- Description: This file describes the hw MIB implementation of
 --              redundancy power and fan
 -- Reference: 
 -- Version: V2.0
@@ -23,14 +23,14 @@ IMPORTS
 
     redundancyPower MODULE-IDENTITY
         LAST-UPDATED "200112200000Z"	
-        ORGANIZATION 	"Huawei Technologies Co., Ltd"
-        CONTACT-INFO 
-            "VRP Team Huawei Technologies co.,Ltd.				
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei.com
-            Zip:100085"
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION 
                 " "
         ::= { mlsr 4 }

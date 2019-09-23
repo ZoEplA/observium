@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -16,11 +16,13 @@ $table_rows = array();
 // Pre-cache all processors oid
 $query = 'SELECT `processor_oid` FROM `processors` WHERE `device_id` = ? AND `processor_oid` REGEXP ? AND `processor_type` != ?';
 // wmi excluded, select only valid numeric OIDs like .1.2.3.3 (excluded ucd-old, hr-average)
-$oid_to_cache = dbFetchColumn($query, array($device['device_id'], '^\.?[0-9]+(\.[0-9]+)+$', 'wmi'));
-usort($oid_to_cache, 'compare_numeric_oids'); // correctly sort numeric oids
-print_debug_vars($oid_to_cache);
-$oid_cache = snmp_get_multi_oid($device, $oid_to_cache, $oid_cache, NULL, NULL, OBS_SNMP_ALL_NUMERIC);
-print_debug_vars($oid_cache);
+if ($oid_to_cache = dbFetchColumn($query, array($device['device_id'], '^\.?[0-9]+(\.[0-9]+)+$', 'wmi')))
+{
+  usort($oid_to_cache, 'compare_numeric_oids'); // correctly sort numeric oids
+  print_debug_vars($oid_to_cache);
+  $oid_cache = snmp_get_multi_oid($device, $oid_to_cache, $oid_cache, NULL, NULL, OBS_SNMP_ALL_NUMERIC);
+  print_debug_vars($oid_cache);
+}
 
 $sql  = "SELECT * FROM `processors` WHERE `device_id` = ?";
 

@@ -26,8 +26,8 @@ $oid_types = array(
   'activePower'           => array('type' => 'power',       'index' => 5),
   'apparentPower'         => array('type' => 'apower',      'index' => 6),
   'powerFactor'           => array('type' => 'powerfactor', 'index' => 7),
-  //'activeEnergy'          => array('type' => 'energy',      'index' => 8), // currently not supported
-  //'apparentEnergy'        => array('type' => 'energy',      'index' => 9), // currently not supported
+  'activeEnergy'          => array('type' => 'energy',      'index' => 8),
+  'apparentEnergy'        => array('type' => 'aenergy',     'index' => 9),
   'temperature'           => array('type' => 'temperature', 'index' => 10),
   'humidity'              => array('type' => 'humidity',    'index' => 11),
   'airFlow'               => array('type' => '',            'index' => 12),
@@ -76,8 +76,8 @@ $oid_units = array(
   'amp'             => array('type' => 'current'),
   'watt'            => array('type' => 'power'),
   'voltamp'         => array('type' => 'apower'),
-  //wattHour(5),
-  //voltampHour(6),
+  'wattHour'        => array('type' => 'energy'),
+  'voltampHour'     => array('type' => 'aenergy'),
   'degreeC'         => array('type' => 'temperature', 'unit' => 'C'),
   'hertz'           => array('type' => 'frequency'),
   'percent'         => array('type' => 'humidity'),
@@ -169,7 +169,7 @@ foreach ($oids as $index => $entry)
   {
     $unit = $oid_units[$entry['inletSensorUnits']];
   }
-  else if (!empty($oid_types[$sensorType]['type']))
+  elseif (!empty($oid_types[$sensorType]['type']))
   {
     // Other sensors based on SensorTypeEnumeration
     $unit = $oid_types[$sensorType];
@@ -190,11 +190,14 @@ foreach ($oids as $index => $entry)
       $options['sensor_unit'] = $unit['unit'];
     }
 
-    // CLEANME. Compatibility, remove in r9500, but not before CE 17.8
-    rename_rrd_entity($device, 'sensor', array('descr' => $descr, 'class' => $unit['type'], 'index' => "inlet.$index_id.$sensorType", 'type' => 'raritan'), // old
-                                         array('descr' => $descr, 'class' => $unit['type'], 'index' => $index,                        'type' => $type));    // new
-
-    discover_sensor($valid['sensor'], $unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    if (isset($config['counter_types'][$unit['type']]))
+    {
+      // Counters
+      discover_counter($device, $unit['type'], $mib, $oid_name, $oid_num, $index, $descr, $scale, $value, $options);
+    } else {
+      // FIXME convert to discover_sensor_ng()
+      discover_sensor($unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    }
   }
 }
 
@@ -295,7 +298,7 @@ foreach ($oids as $index => $entry)
     rename_rrd_entity($device, 'sensor', array('descr' => $descr, 'class' => $unit['type'], 'index' => "outlet.$index_id.$sensorType", 'type' => 'raritan'), // old
                                          array('descr' => $descr, 'class' => $unit['type'], 'index' => $index,                         'type' => $type));    // new
 
-    discover_sensor($valid['sensor'], $unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor($unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
   }
 }
 
@@ -400,7 +403,7 @@ foreach ($oids as $index => $entry)
     rename_rrd_entity($device, 'sensor', array('descr' => $descr, 'class' => $unit['type'], 'index' => "tripsensorvalue.$index_id", 'type' => 'raritan'), // old
                                          array('descr' => $descr, 'class' => $unit['type'], 'index' => $index,                      'type' => $type));    // new
 
-    discover_sensor($valid['sensor'], $unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor($unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
   }
 }
 
@@ -498,7 +501,7 @@ foreach ($oids as $index => $entry)
       $options['sensor_unit'] = $unit['unit'];
     }
 
-    discover_sensor($valid['sensor'], $unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+    discover_sensor($unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
   }
 }
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -31,30 +31,32 @@ foreach ($entity_array as $index => $entry)
       $entry['hh3cEntityExtLowerTemperatureThreshold']    != 65535)
   {
 
-    $limits = array();
+    $options = array();
 
     if($entry['hh3cEntityExtLowerTemperatureThreshold']    != 65535)
     {
-      $limits['limit_low']       = $entry['hh3cEntityExtLowerTemperatureThreshold'];
+      $options['limit_low']       = $entry['hh3cEntityExtLowerTemperatureThreshold'];
     }
     if($entry['hh3cEntityExtTemperatureThreshold']         != 65535 && $entry['hh3cEntityExtTemperatureThreshold']         != 0)
     {
-      $limits['limit_high_warn'] = $entry['hh3cEntityExtTemperatureThreshold'];
+      $options['limit_high_warn'] = $entry['hh3cEntityExtTemperatureThreshold'];
     }
 
     if (($entry['hh3cEntityExtCriticalTemperatureThreshold'] != 65535 && $entry['hh3cEntityExtCriticalTemperatureThreshold'] != 0 &&
          $entry['hh3cEntityExtCriticalTemperatureThreshold'] >= $entry['hh3cEntityExtTemperatureThreshold']))
     {
-      $limits['limit_high']    = $entry['hh3cEntityExtCriticalTemperatureThreshold'];
-    } elseif(isset($limits['limit_high_warn'])) {
-      $limits['limit_high']    = $limits['limit_high_warn'] + 10;
+      $options['limit_high']    = $entry['hh3cEntityExtCriticalTemperatureThreshold'];
+    } elseif(isset($options['limit_high_warn'])) {
+      $options['limit_high']    = $options['limit_high_warn'] + 10;
     }
 
     $value = $entry['hh3cEntityExtTemperature'];
     $oid   = ".1.3.6.1.4.1.25506.2.6.1.1.1.1.12.$index";
+    $oid_name = "hh3cEntityExtTemperature";
     $descr = $entry['entPhysicalName'];
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "hh3cEntityExtTemperature.$index", 'hh3c-entity-ext-mib', $descr, 1, $value, $limits);
+    $options['rename_rrd'] = "hh3c-entity-ext-mib-hh3cEntityExtTemperature.$index";
+    discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid, $index, NULL, $descr, 1, $value, $options);
   }
 
   // HH3C-ENTITY-EXT-MIB::hh3cEntityExtVoltage.1 = INTEGER: 0
@@ -63,15 +65,17 @@ foreach ($entity_array as $index => $entry)
 
   if ($entry['hh3cEntityExtVoltage'] != 0)
   {
-    $limits['limit_low']  = $entry['hh3cEntityExtVoltageLowThreshold'];
-    $limits['limit_high'] = $entry['hh3cEntityExtVoltageHighThreshold'];
+    $options['limit_low']  = $entry['hh3cEntityExtVoltageLowThreshold'];
+    $options['limit_high'] = $entry['hh3cEntityExtVoltageHighThreshold'];
 
     $value = $entry['hh3cEntityExtVoltage'];
     $oid   = ".1.3.6.1.4.1.25506.2.6.1.1.1.1.14.$index";
+    $oid_name = "hh3cEntityExtVoltage";
     $descr = $entry['entPhysicalName'];
 
+    $options['rename_rrd'] = "hh3c-entity-ext-mib-hh3cEntityExtVoltage.$index";
+    discover_sensor_ng($device,'voltage', $mib, $oid_name, $oid, $index, NULL, $descr, 1, $value, $options);
     // FIXME scale is unknown, and not documented in the MIB; probably not 1?? My V1910 doesn't have voltage sensors.
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "hh3cEntityExtVoltage.$index", 'hh3c-entity-ext-mib', $descr, 1, $value, $limits);
   }
 
   //  [hh3cEntityExtErrorStatus] => normal

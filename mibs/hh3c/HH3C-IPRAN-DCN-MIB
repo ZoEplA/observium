@@ -1,11 +1,14 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
 -- Description: Ipran Data Communication Network(DCN) MIB.
 -- Reference:
--- Version:     V1.0
+-- Version:     V1.1
 -- V1.0  2011-09-30 The initial version, created by Longgang
 --       2014-03-10 updated by wangguanglun
 --       Changed the format
+-- V1.1  2015-01-27 updated by fengxiaodong
+--       Added hh3cIpRanDcnMAC and hh3cIpRanDcnVendor nodes to hh3cIpRanDcnInfoObject
+--       Added hh3cIpRanDcnNeInfoMAC and hh3cIpRanDcnNeInfoVendor nodes to hh3cIpRanDcnNeInfoTable
 -- ==================================================================
 HH3C-IPRAN-DCN-MIB DEFINITIONS ::= BEGIN
 
@@ -20,11 +23,11 @@ IMPORTS
         FROM SNMPv2-TC;
 
 hh3cIpRanDcn MODULE-IDENTITY
-    LAST-UPDATED "201307240000Z"
+    LAST-UPDATED "201501300000Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -32,6 +35,9 @@ hh3cIpRanDcn MODULE-IDENTITY
     DESCRIPTION
         "This MIB provides mechanisms to monitor all network elements(NE)
         in Ipran Data Communication Network."
+    REVISION "201501300000Z"
+    DESCRIPTION
+        "Add nodes to hh3cIpRanDcnInfoObject and hh3cIpRanDcnNeInfoTable."
     REVISION "201307240000Z"
     DESCRIPTION
         "The initial revision of this MIB module."
@@ -41,10 +47,10 @@ Hh3cIpRanNeId ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d.1d.1d.1d"
     STATUS current
     DESCRIPTION
-        "Uniquely identify the network entity ID.
-        The first 8 bit is 0 and the total valid length is 24 bit.
-        The high 8 bit is subnet number and the low 16 bit is base id.
-        The IpRanNeId will be showed as 0.x.x.x."
+        "Uniquely identifies the network entity ID.
+        The first 8 bits are 0 and the total number of valid bits is 24.
+        The high 8 bits represent the subnet number and the low 16 bits represent the base ID.
+        The IpRanNeId will be shown as 0.x.x.x."
     SYNTAX OCTET STRING (SIZE (4))
 
 hh3cIpRanDcnMIB OBJECT IDENTIFIER ::= { hh3cIpRanDcn 1 }
@@ -65,7 +71,7 @@ hh3cIpRanDcnNeIpType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the ip address type of the local network element."
+        "This is the IP address type of the local network element."
     ::= { hh3cIpRanDcnInfoObject 2 }
 
 hh3cIpRanDcnNeIp OBJECT-TYPE
@@ -73,7 +79,7 @@ hh3cIpRanDcnNeIp OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the ip address of the local network element."
+        "This is the IP address of the local network element."
     ::= { hh3cIpRanDcnInfoObject 3 }
 
 hh3cIpRanDcnMask OBJECT-TYPE
@@ -81,15 +87,31 @@ hh3cIpRanDcnMask OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the ip address mask of the local network element."
-    ::= { hh3cIpRanDcnInfoObject 4 }
+        "This is the IP address mask of the local network element."
+::= { hh3cIpRanDcnInfoObject 4 }
+
+hh3cIpRanDcnMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge MAC address of the network element."
+    ::= { hh3cIpRanDcnInfoObject 5 }
+
+hh3cIpRanDcnVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Company name."
+::= { hh3cIpRanDcnInfoObject 6 }
 
 hh3cIpRanDcnNeInfoTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Hh3cIpRanDcnNeInfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table provides the information of all network elements online."
+        "This table provides information about all network elements online."
     ::= { hh3cIpRanDcnObjects 2 }
 
 hh3cIpRanDcnNeInfoEntry OBJECT-TYPE
@@ -108,7 +130,9 @@ Hh3cIpRanDcnNeInfoEntry ::=
             hh3cIpRanDcnNeInfoNeIpType     InetAddressType,
             hh3cIpRanDcnNeInfoNeIp         InetAddress,
             hh3cIpRanDcnNeInfoMetric       Integer32,
-            hh3cIpRanDcnNeInfoDeviceType   DisplayString
+            hh3cIpRanDcnNeInfoDeviceType   DisplayString,
+            hh3cIpRanDcnNeInfoMAC          MacAddress,
+            hh3cIpRanDcnNeInfoVendor       DisplayString
         }
 
 hh3cIpRanDcnNeInfoNeId OBJECT-TYPE
@@ -125,7 +149,7 @@ hh3cIpRanDcnNeInfoNeIpType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the ip address type of the network element."
+        "This is the IP address type of the network element."
     ::= { hh3cIpRanDcnNeInfoEntry 2 }
 
 hh3cIpRanDcnNeInfoNeIp OBJECT-TYPE
@@ -133,7 +157,7 @@ hh3cIpRanDcnNeInfoNeIp OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the ip address of the network element."
+        "This is the IP address of the network element."
     ::= { hh3cIpRanDcnNeInfoEntry 3 }
 
 hh3cIpRanDcnNeInfoMetric OBJECT-TYPE
@@ -152,6 +176,22 @@ hh3cIpRanDcnNeInfoDeviceType OBJECT-TYPE
     DESCRIPTION
         "This is the device type of the network element."
     ::= { hh3cIpRanDcnNeInfoEntry 5 }
+
+hh3cIpRanDcnNeInfoMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge MAC address of the network element."
+    ::= { hh3cIpRanDcnNeInfoEntry 6 }
+
+hh3cIpRanDcnNeInfoVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Company name."
+    ::= { hh3cIpRanDcnNeInfoEntry 7 }
 
 hh3cIpRanDcnTrapObjects OBJECT IDENTIFIER ::= { hh3cIpRanDcnMIB 2 }
 
@@ -180,7 +220,7 @@ hh3cIpRanDcnCompanyName OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The name of company."
+        "Company name."
     ::= { hh3cIpRanDcnTrapObjects 3 }
 
 hh3cIpRanDcnDeviceType OBJECT-TYPE
@@ -188,7 +228,7 @@ hh3cIpRanDcnDeviceType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The type of device."
+        "Device type."
     ::= { hh3cIpRanDcnTrapObjects 4 }
 
 hh3cIpRanDcnDeviceMac OBJECT-TYPE

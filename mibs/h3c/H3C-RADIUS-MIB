@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:
 --
@@ -9,7 +9,7 @@
 -- traps supported to notify client the RADIUS Server's down and up state.
 --
 -- Reference: RFC2866, RADIUS-AUTH-CLIENT-MIB, RADIUS-ACC-CLIENT-MIB
--- Version: V2.1
+-- Version: V2.5
 -- History:
 --  V1.0 Initial version 2004-07-13
 --  V1.1 2004-10-12 updated by gaolong
@@ -74,43 +74,61 @@
 --       Added node of h3cRdSecAccVpnName
 --       Added node of h3cRdAccNasIpAddrType
 --       Added node of h3cRdAccNasIpAddr
---       Added node of h3cRdPrimVpnName
---       Added node of h3cRdSecVpnName
---       Added node of h3cRdAuthNasIpAddrType
---       Added node of h3cRdAuthNasIpAddr
---       Added node of h3cRdPrimAccVpnName
---       Added node of h3cRdSecAccVpnName
---       Added node of h3cRdAccNasIpAddrType
---       Added node of h3cRdAccNasIpAddr
 --       Change the length of h3cRdSecAccKey
 --       Change the length of h3cRdAccKey
 --       Change the length of h3cRdSecKey
 --       Change the length of h3cRdKey
+--  V2.2 2012-10-11, Added by liubo
+--       Added node of h3cRdAuthNasIpv6Addr
+--       Added node of h3cRdAccNasIpv6Addr
+--       Modified the length of h3cRdSecAccKey
+--       Modified the length of h3cRdAccKey
+--       Modified the length of h3cRdSecKey
+--       Modified the length of h3cRdKey
+--       Modified the length of h3cRdPrimVpnName
+--       Modified the length of h3cRdSecVpnName
+--       Modified the length of h3cRdPrimAccVpnName
+--       Modified the length of h3cRdSecAccVpnName
+--       Modified the length of h3cRdSecondaryAuthVpnName
+--       Modified the length of h3cRdSecondaryAccVpnName
+--       Modified the length of h3cRdSecondaryAuthKey
+--       Modified the length of h3cRdSecondaryAccKey
+--       Modified the default value and description of h3cRdAcctOnSendTimes
+--  V2.3 2013-03-30, Modified by luyu
+--       Modified description of h3cRdSecondaryAccUdpPort
+--       Modified the default value and description of h3cRadiusSchAccPrimUdpPort
+--       Modified the default value and description of h3cRadiusSchAccSecUdpPort
+--  V2.4 2014-06-07, Modified by liubo
+--       Modified description of h3cRdSecondaryAuthRowStatus
+--       Modified description of h3cRdSecondaryAccRowStatus
+--  V2.5 2016-11-03, Modified by yemingxia
+--       Modified the value range of h3cRdAccRealTime
+--       Added node of h3cRdAccRealTimeUnit
 -- =================================================================
 H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     IMPORTS
         h3cCommon
             FROM HUAWEI-3COM-OID-MIB
-        OBJECT-GROUP, MODULE-COMPLIANCE
-            FROM SNMPv2-CONF
         IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
         Unsigned32,Counter64, TimeTicks
             FROM SNMPv2-SMI
-        RowStatus, TruthValue
+        RowStatus, TruthValue, DisplayString
             FROM SNMPv2-TC
         InetAddressType, InetAddress
             FROM INET-ADDRESS-MIB
+        Ipv6Address
+            FROM IPV6-TC
         radiusAuthServerIndex, radiusAuthServerAddress, radiusAuthClientServerPortNumber
             FROM RADIUS-AUTH-CLIENT-MIB
         radiusAccServerIndex, radiusAccServerAddress, radiusAccClientServerPortNumber
             FROM RADIUS-ACC-CLIENT-MIB;
 
     h3cRadius MODULE-IDENTITY
-    LAST-UPDATED "201008260000Z"            -- August 26, 2010 at 00:00 GMT
+    LAST-UPDATED "201611031800Z"            -- June 7, 2014 at 18:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -119,15 +137,15 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         "The H3C-RADIUS-MIB contains objects to
         Manage configuration and Monitor running state
         for RADIUS feature."
+    REVISION "201611031800Z"        -- November 3, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified the value range of h3cRdAccRealTime.
+        Added node of h3cRdAccRealTimeUnit"
+    REVISION "201406071800Z"        -- June 7, 2014 at 18:00 GMT
+    DESCRIPTION
+        "Modified description of h3cRdSecondaryAuthRowStatus.
+        Modified description of h3cRdSecondaryAccRowStatus"
     ::= { h3cCommon 13 }
-
-
-    DisplayString ::=
-    OCTET STRING
-    -- This data type   is used to model textual information taken
-    -- from the NVT ASCII character set.  By convention, objects
-    -- with this syntax are declared as having
-    (SIZE (0..255))
 
     h3cRdObjects OBJECT IDENTIFIER ::= { h3cRadius 1 }
 
@@ -164,14 +182,15 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         h3cRdSecAuthIpAddrType  InetAddressType,
         h3cRdSecAuthIpAddr      InetAddress,
         h3cRdServerType         INTEGER,
-        h3cRdQuietTime          INTEGER,
+        h3cRdQuietTime          Integer32,
         h3cRdUserNameFormat     INTEGER,
         h3cRdRowStatus          RowStatus,
         h3cRdSecKey             DisplayString,
         h3cRdPrimVpnName        DisplayString,
         h3cRdSecVpnName         DisplayString,
         h3cRdAuthNasIpAddrType  InetAddressType,
-        h3cRdAuthNasIpAddr      InetAddress
+        h3cRdAuthNasIpAddr      IpAddress,
+        h3cRdAuthNasIpv6Addr    Ipv6Address
         }
 
     h3cRdGroupName OBJECT-TYPE
@@ -247,7 +266,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdInfoEntry 7 }
 
     h3cRdKey OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..64))
+        SYNTAX DisplayString(SIZE (0..64))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -330,12 +349,12 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdInfoEntry 15 }
 
     h3cRdQuietTime OBJECT-TYPE
-        SYNTAX INTEGER (0..255)
+        SYNTAX Integer32 (0..255)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
         "The time for server returning active.  The unit is minute.
-         When the value is 0, the server state retains active. Default value is 5."
+         When the value is 0, the server state retains active.  Default value is 5."
     ::= { h3cRdInfoEntry 16 }
 
     h3cRdUserNameFormat OBJECT-TYPE
@@ -370,7 +389,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
 
 
     h3cRdSecKey OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..64))
+        SYNTAX DisplayString(SIZE (0..64))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -381,7 +400,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdInfoEntry 19 }
 
     h3cRdPrimVpnName OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..31))
+        SYNTAX DisplayString(SIZE (0..31))
         MAX-ACCESS  read-create
         STATUS current
         DESCRIPTION
@@ -390,7 +409,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdInfoEntry 20 }
 
     h3cRdSecVpnName OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..31))
+        SYNTAX DisplayString(SIZE (0..31))
         MAX-ACCESS  read-create
         STATUS current
         DESCRIPTION
@@ -408,13 +427,22 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdInfoEntry 22 }
 
     h3cRdAuthNasIpAddr OBJECT-TYPE
-        SYNTAX InetAddress
+        SYNTAX IpAddress
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-        "The source IP address used to communicate with RADIUS authentication
+        "The source IPv4 address used to communicate with the RADIUS authentication
         server."
     ::= { h3cRdInfoEntry 23 }
+
+    h3cRdAuthNasIpv6Addr OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The source IPv6 address used to communicate with the RADIUS authentication
+        server."
+    ::= { h3cRdInfoEntry 24 }
 
 -- ***********************************************************************
 --
@@ -453,12 +481,12 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         h3cRdAccRetry               Integer32,
         h3cRdAccTimeout             Integer32,
         h3cRdAccServerType          INTEGER,
-        h3cRdAccQuietTime           INTEGER,
+        h3cRdAccQuietTime           Integer32,
         h3cRdAccFailureAction       INTEGER,
-        h3cRdAccRealTime            INTEGER,
-        h3cRdAccRealTimeRetry       INTEGER,
+        h3cRdAccRealTime            Integer32,
+        h3cRdAccRealTimeRetry       Integer32,
         h3cRdAccSaveStopPktEnable   TruthValue,
-        h3cRdAccStopRetry           INTEGER,
+        h3cRdAccStopRetry           Integer32,
         h3cRdAccDataFlowUnit        INTEGER,
         h3cRdAccPacketUnit          INTEGER,
         h3cRdAccRowStatus           RowStatus,
@@ -469,7 +497,9 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         h3cRdPrimAccVpnName         DisplayString,
         h3cRdSecAccVpnName          DisplayString,
         h3cRdAccNasIpAddrType       InetAddressType,
-        h3cRdAccNasIpAddr           InetAddress
+        h3cRdAccNasIpAddr           IpAddress,
+        h3cRdAccNasIpv6Addr         Ipv6Address,
+        h3cRdAccRealTimeUnit        INTEGER
         }
 
     h3cRdAccGroupName OBJECT-TYPE
@@ -560,7 +590,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 9 }
 
     h3cRdAccKey OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..64))
+        SYNTAX DisplayString(SIZE (0..64))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -609,12 +639,12 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 13 }
 
     h3cRdAccQuietTime OBJECT-TYPE
-        SYNTAX INTEGER (0..255)
+        SYNTAX Integer32 (0..255)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
         "The time for server returning active.  The unit is minute.
-         When the value is 0, the server state retains active. Default value is 5."
+         When the value is 0, the server state retains active.  Default value is 5."
     ::= { h3cRdAccInfoEntry 14 }
 
     h3cRdAccFailureAction OBJECT-TYPE
@@ -637,17 +667,18 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 15 }
 
     h3cRdAccRealTime OBJECT-TYPE
-        SYNTAX INTEGER (0..60)
+        SYNTAX Integer32 (0..71582)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-        "Interval of realtime-accounting packets.  The unit is minute.
-        The time must be a multiple of 3.  when the value is 0, the
-        device doesn't send realtime-accounting packet.  Default value is 12."
+        "Interval of realtime-accounting packets.
+        The unit is defined by h3cRdAccRealTimeUnit.
+        When the value is 0, the device doesn't send realtime-accounting
+        packets.  Default value is 12 minutes."
     ::= { h3cRdAccInfoEntry 16 }
 
     h3cRdAccRealTimeRetry OBJECT-TYPE
-        SYNTAX INTEGER (1..255)
+        SYNTAX Integer32 (1..255)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -669,7 +700,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 18 }
 
     h3cRdAccStopRetry OBJECT-TYPE
-        SYNTAX INTEGER (10..65535)
+        SYNTAX Integer32 (10..65535)
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -747,8 +778,8 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
         "The number of Accounting-On packets the client will send before it
-        considers the accounting server failed.  Default value is 15."
-        DEFVAL { 15 }
+        considers the accounting server failed.  Default value is 50."
+        DEFVAL { 50 }
     ::= { h3cRdAccInfoEntry 24 }
 
     h3cRdAcctOnSendInterval OBJECT-TYPE
@@ -763,7 +794,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
 
 
     h3cRdSecAccKey OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..64))
+        SYNTAX DisplayString(SIZE (0..64))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -773,7 +804,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 26 }
 
     h3cRdPrimAccVpnName OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..31))
+        SYNTAX DisplayString(SIZE (0..31))
         MAX-ACCESS  read-create
         STATUS current
         DESCRIPTION
@@ -782,7 +813,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 27 }
 
     h3cRdSecAccVpnName OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..31))
+        SYNTAX DisplayString(SIZE (0..31))
         MAX-ACCESS  read-create
         STATUS current
         DESCRIPTION
@@ -800,14 +831,37 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdAccInfoEntry 29 }
 
     h3cRdAccNasIpAddr OBJECT-TYPE
-        SYNTAX InetAddress
+        SYNTAX IpAddress
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-        "The source IP address used to communicate with RADIUS accounting
+        "The source IPv4 address used to communicate with the RADIUS accounting
         server."
     ::= { h3cRdAccInfoEntry 30 }
 
+    h3cRdAccNasIpv6Addr OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The source IPv6 address used to communicate with the RADIUS accounting
+        server."
+    ::= { h3cRdAccInfoEntry 31 }
+
+    h3cRdAccRealTimeUnit OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            minute(0),
+            second(1)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The interval unit of realtime-accounting packets.
+        0  - minute.
+        1  - second."
+        DEFVAL { minute }
+    ::= { h3cRdAccInfoEntry 32 }
 
 -- ***********************************************************************
 --
@@ -878,7 +932,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdSecondaryAuthServerEntry 2 }
 
     h3cRdSecondaryAuthVpnName OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..31))
+        SYNTAX DisplayString(SIZE (0..31))
         MAX-ACCESS  not-accessible
         STATUS current
         DESCRIPTION
@@ -910,7 +964,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdSecondaryAuthServerEntry 5 }
 
     h3cRdSecondaryAuthKey OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..64))
+        SYNTAX DisplayString(SIZE (0..64))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -927,7 +981,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         "This object is responsible for managing the creation, deletion and
         modification of rows, which support active status and CreateAndGo,
         Destroy operation.  To create a new row, h3cRdGroupName must be specified.
-        The number of rows with the same h3cRdGroupName cann't be more than 15."
+        The number of rows with the same h3cRdGroupName can't be more than 16."
     ::= { h3cRdSecondaryAuthServerEntry 7 }
 
 -- ***********************************************************************
@@ -980,7 +1034,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdSecondaryAccServerEntry 2 }
 
     h3cRdSecondaryAccVpnName OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..31))
+        SYNTAX DisplayString(SIZE (0..31))
         MAX-ACCESS  not-accessible
         STATUS current
         DESCRIPTION
@@ -994,7 +1048,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION
         "The UDP port the client is using to send requests to secondary
-        RADIUS accounting server.  Default value is 1812."
+        RADIUS accounting server.  Default value is 1813."
     ::= { h3cRdSecondaryAccServerEntry 4 }
 
     h3cRdSecondaryAccState OBJECT-TYPE
@@ -1012,7 +1066,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     ::= { h3cRdSecondaryAccServerEntry 5 }
 
     h3cRdSecondaryAccKey OBJECT-TYPE
-        SYNTAX DisplayString(SIZE (1..64))
+        SYNTAX DisplayString(SIZE (0..64))
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
@@ -1029,7 +1083,7 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         "This object is responsible for managing the creation, deletion and
         modification of rows, which support active status and CreateAndGo,
         Destroy operation.  To create a new row, h3cRdAccGroupName must be specified.
-        The number of rows with the same h3cRdAccGroupName cann't be more than 15."
+        The number of rows with the same h3cRdAccGroupName can't be more than 16."
     ::= { h3cRdSecondaryAccServerEntry 7 }
 
 
@@ -1419,8 +1473,8 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION
         "The UDP port the client is using to send requests to primary
-        RADIUS accounting server.  Default value is 1812."
-        DEFVAL { 1812 }
+        RADIUS accounting server.  Default value is 1813."
+        DEFVAL { 1813 }
     ::= { h3cRadiusSchAccEntry 3 }
 
     h3cRadiusSchAccPrimKey OBJECT-TYPE
@@ -1446,8 +1500,8 @@ H3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION
         "The UDP port the client is using to send requests to secondary
-        RADIUS accounting server.  Default value is 1812."
-        DEFVAL { 1812 }
+        RADIUS accounting server.  Default value is 1813."
+        DEFVAL { 1813 }
     ::= { h3cRadiusSchAccEntry 6 }
 
     h3cRadiusSchAccSecKey OBJECT-TYPE

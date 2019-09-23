@@ -1,7 +1,7 @@
 -- ==================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
--- 
--- Description:  HUAWEI Lan Switch mac management MIB
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
+--
+-- Description: MAC management MIB
 -- Reference:
 -- Version: V1.3
 -- History:
@@ -14,25 +14,30 @@
 
 HUAWEI-LswARP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
-   
-    MODULE-IDENTITY,OBJECT-TYPE, OBJECT-IDENTITY   
-        FROM SNMPv2-SMI   
 
-    lswCommon 
+    MODULE-IDENTITY,OBJECT-TYPE, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    lswCommon
         FROM HUAWEI-3COM-OID-MIB;
 
 
-	 hwLswArpMib MODULE-IDENTITY
-	        LAST-UPDATED "200106290000Z"
-	        ORGANIZATION ""
-	        CONTACT-INFO
-	        ""
-	        DESCRIPTION
-	        ""
-	        REVISION "200106290000Z"
-	        DESCRIPTION
-	        ""
-	        ::= { lswCommon  4 }
+     hwLswArpMib MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+                "Hangzhou H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            ""
+            REVISION "200106290000Z"
+            DESCRIPTION
+            ""
+            ::= { lswCommon  4 }
 
     hwLswProxyArpObject OBJECT-IDENTITY
             STATUS current
@@ -40,44 +45,44 @@ IMPORTS
                 "Description."
             ::= { hwLswArpMib 1 }
     hwLswProxyArpEnableTable OBJECT-TYPE
-		SYNTAX  SEQUENCE OF HwLswProxyArpEnableEntry
-		MAX-ACCESS not-accessible
-		STATUS   current
-		DESCRIPTION "Contains information that if proxy ARP enabled for every VLAN interface. "
-		::= { hwLswProxyArpObject 1 }
+        SYNTAX  SEQUENCE OF HwLswProxyArpEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "Contains information that if proxy ARP enabled for every VLAN interface. "
+        ::= { hwLswProxyArpObject 1 }
 
-	 hwLswProxyArpEnableEntry OBJECT-TYPE
-		SYNTAX  HwLswProxyArpEnableEntry
-		MAX-ACCESS not-accessible
-		STATUS current
-		DESCRIPTION 
-		  "Contains information that if proxy ARP enabled for VLAN interface."
-		INDEX   { hwLswIfIndex }
-		::= { hwLswProxyArpEnableTable 1}
+     hwLswProxyArpEnableEntry OBJECT-TYPE
+        SYNTAX  HwLswProxyArpEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+          "Contains information that if proxy ARP enabled for VLAN interface."
+        INDEX   { hwLswIfIndex }
+        ::= { hwLswProxyArpEnableTable 1 }
 
-	HwLswProxyArpEnableEntry ::=
-	SEQUENCE {	
-		hwLswIfIndex INTEGER ,
+    HwLswProxyArpEnableEntry ::=
+    SEQUENCE {
+        hwLswIfIndex INTEGER ,
         hwLswProxyArpStatus  INTEGER
-		}
-		
-	hwLswIfIndex OBJECT-TYPE
-		SYNTAX  INTEGER
-		MAX-ACCESS read-only
-		STATUS current
-		DESCRIPTION " Vlan interface index "
-		::= { hwLswProxyArpEnableEntry 1 }				
-	
-    hwLswProxyArpStatus OBJECT-TYPE 
-        SYNTAX INTEGER	
+        }
+
+    hwLswIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Vlan interface index "
+        ::= { hwLswProxyArpEnableEntry 1 }
+
+    hwLswProxyArpStatus OBJECT-TYPE
+        SYNTAX INTEGER
         {
             disabled(0),
             enabled(1)
         }
         MAX-ACCESS  read-write
-        STATUS current 
+        STATUS current
         DESCRIPTION " Proxy ARP status for this VLAN interface."
-        ::= { hwLswProxyArpEnableEntry 2 }
-        
-		
+        ::= { hwLswProxyArpEnableEntry 2    }
+
+
 END

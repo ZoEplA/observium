@@ -1,34 +1,34 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2018 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description:configuration management mib
+-- Description: Configuration management mib
 -- Reference:
--- Version: V2.4
+-- Version: V2.7
 -- History:
 --     Initial version 2002-12-20
 --     V1.1 24th Feb 2004
---     module imported from HUAWEI-3COM-OID-MIB which is the root MIB MODULE.
+--     Imported module from HUAWEI-3COM-OID-MIB,the root MIB.
 --     V1.2 14th May 2004
---     convert MIB object name from hwXXX to h3c, etc.
+--     Changed MIB object name from h3cXXX to h3c, etc.
 --     V1.3 18th Aug 2004
---     modified DESCRIPTION of 'h3cCfgLogFile' by jinyi.
+--     Modified DESCRIPTION of 'h3cCfgLogFile' by jinyi.
 --     V1.4 16th Sept 2004
---     modified DESCRIPTION of 'h3cCfgLogTerminalType' and 'h3cCfgLogTerminalNum' by wangyingxia
+--     Modified DESCRIPTION of 'h3cCfgLogTerminalType' and 'h3cCfgLogTerminalNum' by wangyingxia
 --     V1.5 9th Oct 2004
---     modified DESCRIPTION of 'h3cCfgRunModifiedLast' and 'h3cCfgManEventlog' by wangrui
+--     Modified DESCRIPTION of 'h3cCfgRunModifiedLast' and 'h3cCfgManEventlog' by wangrui
 --     V1.6 30th Nov 2004
---     modified DESCRIPTION of 'h3cCfgOperateCompletion' by wangrui
+--     Modified DESCRIPTION of 'h3cCfgOperateCompletion' by wangrui
 --     V1.7 11th Jan 2005
---     Updated by gaolong and weixinzhe for updating description
+--     Modified DESCRIPTION by gaolong and weixinzhe
 --     V1.8 26th Apr 2005
---     Updated by wangrui for added h3cCfgExecuteOperate and added ConfigOperationStateType
---     modified DESCRIPTION of 'h3cCfgLogSrcData', 'h3cCfgLogDesData' and 'h3cCfgLogTerminalType' by fuzhenyu
+--     Added h3cCfgExecuteOperate and added ConfigOperationStateType by wangrui
+--     Modified DESCRIPTION of 'h3cCfgLogSrcData', 'h3cCfgLogDesData' and 'h3cCfgLogTerminalType' by fuzhenyu
 --     V1.9 6th Jun 2005
---     Add enum value in SYNTAX of h3cCfgOperateProtocol by jinyongfeng.
+--     Added enum value in SYNTAX of h3cCfgOperateProtocol by jinyongfeng.
 --     V2.0 27th sept 2005
---     modified DESCRIPTION of 'h3cCfgLogSrcCmd', 'h3cCfgRunModifiedLast' and 'h3cCfgLogDesData' by lisongfeng and wangrui
---     V2.1 2009-05-05 Add h3cCfgOperateServerPort, h3cCfgInvalidConfigFile by jinyi
---     V2.2 2009-12-20 Add h3cCfgOperFailReason, h3cCfgReset by shuaixiaojuan
+--     Modified DESCRIPTION of 'h3cCfgLogSrcCmd', 'h3cCfgRunModifiedLast' and 'h3cCfgLogDesData' by lisongfeng and wangrui
+--     V2.1 2009-05-05 Added h3cCfgOperateServerPort, h3cCfgInvalidConfigFile by jinyi
+--     V2.2 2009-12-20 Added h3cCfgOperFailReason, h3cCfgReset by shuaixiaojuan
 --     V2.3 2010-10-30 Deprecated h3cCfgOperateServerAddress, h3cCfgLogCmdSrcAddress
 --                     and h3cCfgLogServerAddress,
 --                     added enum in ConfigOperationStateType,
@@ -36,8 +36,14 @@
 --                     h3cCfgOperateSrvVPNName, h3cCfgLogCmdSrcAddrType,
 --                     h3cCfgLogCmdSrcAddrRev, h3cCfgLogCmdSrcAddrVPNName,
 --                     h3cCfgLogServerAddrType,h3cCfgLogServerAddrRev, h3cCfgLogServerAddrVPNName by songhao.
---     V2.4 2011-11-26
---     Add h3cCfgFirstTrapTime by duyanbing 04404.
+--     V2.4 2011-11-26 Added h3cCfgFirstTrapTime by duyanbing 04404.
+--     V2.5 2013-09-13 Added h3cCfgReset2 by duyanbing 04404.
+--          2014-01-17 Modified description of h3cCfgLogCmdSrcAddress, h3cCfgLogServerAddress
+--                     and h3cCfgOperateServerAddress.
+--     V2.6 2014-08-11 Added running2File(7), file2Running(8) to ConfigOperationType,
+--                     modified description of h3cCfgOperateFileName by SongHao.
+--          2014-11-13 Modified description of ConfigOperationType for defining 'startup' by g09715.
+--     V2.7 2018-03-06 Added h3cCfgOperateFailCmd h3cCfgOperateFailCmdView h3cCfgOperateFailCmdReason by wangweihui.
 -- =================================================================
 H3C-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -50,13 +56,13 @@ IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     InetAddressType, InetAddress
-        FROM INET-ADDRESS-MIB  
+        FROM INET-ADDRESS-MIB
     DisplayString, TruthValue, RowStatus, TEXTUAL-CONVENTION
         FROM SNMPv2-TC;
 
 
 h3cConfig MODULE-IDENTITY
-    LAST-UPDATED "201111260000Z"
+    LAST-UPDATED "201803060000Z"
     ORGANIZATION
         "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -65,12 +71,80 @@ h3cConfig MODULE-IDENTITY
          http://www.h3c.com
          Zip:100085"
     DESCRIPTION
-        "This MIB contains objects to manage the system configuration. It contains the
-        model used to represent configuration data that exists elsewhere in the system and in peripheral devices.
+        "This MIB contains objects for managing the system configuration.  It contains the
+        model used to represent configuration data that exists elsewhere in the system and
+        in peripheral devices.
         There are no constraints on this MIB."
+    REVISION "201803060000Z"
+    DESCRIPTION
+        "Added h3cCfgOperateFailCmd h3cCfgOperateFailCmdView h3cCfgOperateFailCmdReason."
+    REVISION "201411140700Z"
+    DESCRIPTION
+        "Modified description of ConfigOperationType for defining 'startup'."
+    REVISION "201408110904Z"
+    DESCRIPTION
+        "Added running2File(7), file2Running(8) to ConfigOperationType,
+        modified description of h3cCfgOperateFileName."
+    REVISION "201401170000Z"
+    DESCRIPTION
+        "Modified description of h3cCfgLogCmdSrcAddress, h3cCfgLogServerAddress
+        and h3cCfgOperateServerAddress."
+    REVISION "201309130000Z"
+    DESCRIPTION
+        "Added h3cCfgReset2."
     REVISION "201111260000Z"
     DESCRIPTION
-        "The initial revision of this MIB module."
+        "Added h3cCfgFirstTrapTime."
+    REVISION "201010300000Z"
+    DESCRIPTION
+        "Deprecated h3cCfgOperateServerAddress, h3cCfgLogCmdSrcAddress
+        and h3cCfgLogServerAddress, added enum in ConfigOperationStateType,
+        added h3cCfgOperateSrvAddrType, h3cCfgOperateSrvAddrRev and
+        h3cCfgOperateSrvVPNName, h3cCfgLogCmdSrcAddrType,
+        h3cCfgLogCmdSrcAddrRev, h3cCfgLogCmdSrcAddrVPNName,
+        h3cCfgLogServerAddrType,h3cCfgLogServerAddrRev, h3cCfgLogServerAddrVPNName."
+    REVISION "200912200000Z"
+    DESCRIPTION
+        "Added h3cCfgOperFailReason, h3cCfgReset."
+    REVISION "200905050000Z"
+    DESCRIPTION
+        "Added h3cCfgOperateServerPort, h3cCfgInvalidConfigFile."
+    REVISION "200509270000Z"
+    DESCRIPTION
+        "Modified DESCRIPTION of 'h3cCfgLogSrcCmd', 'h3cCfgRunModifiedLast' and
+        'h3cCfgLogDesData'."
+    REVISION "200506060000Z"
+    DESCRIPTION
+        "Added enum value in SYNTAX of h3cCfgOperateProtocol."
+    REVISION "200504260000Z"
+    DESCRIPTION
+        "Added h3cCfgExecuteOperate and added ConfigOperationStateType.
+        Modified DESCRIPTION of 'h3cCfgLogSrcData', 'h3cCfgLogDesData' and
+        'h3cCfgLogTerminalType'."
+    REVISION "200501110000Z"
+    DESCRIPTION
+        "Modified DESCRIPTION."
+    REVISION "200411300000Z"
+    DESCRIPTION
+        "Modified DESCRIPTION of 'h3cCfgOperateCompletion'."
+    REVISION "200410090000Z"
+    DESCRIPTION
+        "Modified DESCRIPTION of 'h3cCfgRunModifiedLast' and 'h3cCfgManEventlog'."
+    REVISION "200409160000Z"
+    DESCRIPTION
+        "Modified DESCRIPTION of 'h3cCfgLogTerminalType' and 'h3cCfgLogTerminalNum'."
+    REVISION "200408180000Z"
+    DESCRIPTION
+        "Modified DESCRIPTION of 'h3cCfgLogFile'."
+    REVISION "200405140000Z"
+    DESCRIPTION
+        "Changed MIB object name from h3cXXX to h3c, etc."
+    REVISION "200402240000Z"
+    DESCRIPTION
+        "Imported module from HUAWEI-3COM-OID-MIB, the root MIB."
+    REVISION "200212200000Z"
+    DESCRIPTION
+        "Initial version. "
     ::= { h3cCommon 4 }
 
 
@@ -82,45 +156,55 @@ ConfigOperationType ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
         "Specify operation types on configuration.
-        Currently, following types of operation are provided:
+        Currently, the following types of operations are provided:
 
         running2Startup(1):
-            Update the saved configuration (startup) file used currently
-            with the current configuration running in the system. This
-            operation is equivalent to the [save] command from command line.
-            If current startup configuration file does not exist, then the default
+            Update the next-startup configuration file
+            with the current configuration running in the system.  This
+            operation is equivalent to the 'save' command from command line.
+            If  no next-startup configuration file exists, then the default
             startup configuration file is created to save the data and this
-            becomes the current startup configuration file.
+            becomes the next-startup configuration file.
 
         startup2Running(2):
             Update the current configuration running in the system
-            with the saved configuration (startup) file used currently.  The
+            with the current startup configuration file.  The
             commands in the file are executed as if they had been entered via
             the command line.  If the current startup configuration file does not
-            exist, the operation will fail with the error opFileOpenError(13).
+            exist, the operation will fail with error opFileOpenError(13).
 
         running2Net(3):
             Send the current configuration running in the system to the network
-            using the specified file transfer protocol.
+            by using the specified file transfer protocol.
 
         net2Running(4):
             Update the current configuration running in the system with a remote
-            file from the network using the specified file transfer protocol.
+            file from the network by using the specified file transfer protocol.
             The commands in the file are executed as if they had been entered via
             the command line.
 
         net2Startup(5):
-            Download a remote file to the local system using the specified file
-            transfer protocol and replace the saved configuration (startup) file
-            used currently.  If current startup configurationfile does not exist,
+            Download a remote file to the local system by using the specified file
+            transfer protocol and replace the next-startup configuration file.
+            If the next-startup configuration file does not exist,
             the default startup configuration file is created to save the data and
-            this becomes the current startup configuration file.
+            this becomes the next-startup configuration file.
 
         startup2Net(6):
-            Send the saved configuration (startup) file used currently to the network using
-            the specified file transfer protocol. If the current startup configuration
-            file does not exist, the operation will fail with the error opFileOpenError(13).
-        "
+            Send the next-startup configuration file  to the network by using
+            the specified file transfer protocol.  If the next-startup configuration
+            file does not exist, the operation will fail with error opFileOpenError(13).
+
+        running2File(7):
+            Write current configuration running in the system into a file that is
+            specified by h3cCfgOperateFileName.
+            After this operation, the next-startup configuration file will not be changed.
+
+        file2Running(8):
+            Update the current configuration running in the system with a file that is
+            specified by h3cCfgOperateFileName.
+            The commands in the file are executed as if they had been entered via
+            the command line."
     SYNTAX INTEGER
         {
             running2Startup(1),
@@ -128,7 +212,9 @@ ConfigOperationType ::= TEXTUAL-CONVENTION
             running2Net(3),
             net2Running(4),
             net2Startup(5),
-            startup2Net(6)
+            startup2Net(6),
+            running2File(7),
+            file2Running(8)
         }
 
 ConfigOperationStateType ::= TEXTUAL-CONVENTION
@@ -158,9 +244,9 @@ ConfigOperationStateType ::= TEXTUAL-CONVENTION
         opAuthFail: Invalid user name or password.
         opTimeOut : File transfer was timeout.
         opUnknownFailure : Failure unknown.
-        opInvalidConfigFile: Invalid configration file.
-        opSlaveFull : Operation is fail for the slave don't have enough space.
-        opCopyToSlaveFailure : Operation is fail when copy file to the slave.
+        opInvalidConfigFile: Invalid configuration file.
+        opSlaveFull : Operation failed for a standby MPU or subordinate device because of insufficient space.
+        opCopyToSlaveFailure : Failed to copy the file to a standby MPU or subordinate device.
         "
     SYNTAX INTEGER
         {
@@ -206,7 +292,7 @@ h3cCfgRunModifiedLast OBJECT-TYPE
         "The object records the value of sysUpTime when the current configuration
          running in the system was last modified.
 
-         The value will be changed immediately after system detects the current
+         The value will be changed immediately after the system detects that the current
          configuration has been changed."
     ::= { h3cCfgLog 1 }
 
@@ -230,8 +316,8 @@ h3cCfgStartModifiedLast OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The object records the value of sysUpTime when the saved configuration
-         used currently was last modified.  It may have been modified by a save of the
+        "The object records the value of sysUpTime when the next-startup configuration
+         used currently was last modified.  It may have been modified by a save operation of the
          current configuration running in the system or other methods such as copy."
     ::= { h3cCfgLog 3 }
 
@@ -242,7 +328,7 @@ h3cCfgLogLimitedEntries OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The object shows the maximum number of rows in
-        h3cCfgLogTable. The value supported by the system is 10.
+        h3cCfgLogTable.  The value supported by the system is 10.
         "
     ::= { h3cCfgLog 4 }
 
@@ -261,12 +347,12 @@ h3cCfgLogWantBackup OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Decide whether to backup the value of objects about h3cCfgLog."
+        "Decide whether to back up the values of objects for h3cCfgLog."
     DEFVAL { true }
     ::= { h3cCfgLog 6 }
 
 -- If the value is true, the data of configuration log on the master will send to
--- slave. Otherwise the data of log will be lost when master switches to
+-- slave.  Otherwise the data of log will be lost when master switches to
 -- slave.
 
 
@@ -275,7 +361,7 @@ h3cCfgLogTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "Table for logging configuration operation in device."
+        "Table for logging configuration operations on device ."
     ::= { h3cCfgLog 7 }
 
 h3cCfgLogEntry OBJECT-TYPE
@@ -325,7 +411,7 @@ h3cCfgLogTime OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Specify the sysUpTime when the config log was generated."
+        "Specify the sysUpTime when the configuration log was generated."
     ::= { h3cCfgLogEntry 2 }
 
 h3cCfgLogSrcCmd OBJECT-TYPE
@@ -339,9 +425,9 @@ h3cCfgLogSrcCmd OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "Specify the source command which brought the log.
-        Currently we provide the types of source:
+        Currently, we provide the following types of sources:
         1.cmdLine(1):configure log instigated by command line.
-        2.snmp(2):configure log instigated by snmp.
+        2.snmp(2):configure log instigated by SNMPS.
         3.other(3):configure log instigated by other source unknown."
     ::= { h3cCfgLogEntry 3 }
 
@@ -415,7 +501,7 @@ h3cCfgLogTerminalType OBJECT-TYPE
         unknown(2): unknown terminal type.
         console(3): console interface.
         terminal(4): generic terminal.
-        virtual(5): virtual terminal such as telnet.
+        virtual(5): virtual terminal such as Telnet.
         auxiliary(6): auxiliary interface."
     ::= { h3cCfgLogEntry 6 }
 
@@ -459,8 +545,8 @@ h3cCfgLogCmdSrcAddress OBJECT-TYPE
         is 'virtual'.
 
         Other, the value of 0.0.0.0.
-        
-        This object is replaced by for it only support IPv4."
+
+        This object is replaced by h3cCfgLogCmdSrcAddrRev for it only support IPv4."
     ::= { h3cCfgLogEntry 10 }
 
 h3cCfgLogVirHost OBJECT-TYPE
@@ -492,7 +578,7 @@ h3cCfgLogServerAddress OBJECT-TYPE
         has the value of 'netFtp'.
         Other, a value of 0.0.0.0.
 
-        This object is replaced by for it only support IPv4."
+        This object is replaced by h3cCfgLogServerAddrRev for it only support IPv4."
     ::= { h3cCfgLogEntry 13 }
 
 h3cCfgLogFile OBJECT-TYPE
@@ -501,7 +587,7 @@ h3cCfgLogFile OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The current configuration file name when h3cCfgLogSrcData has
-         the value of 'netFtp',and h3cCfgLogDesData has the value of 'startupData'.
+         the value of 'netFtp', and h3cCfgLogDesData has the value of 'startupData'.
          Other, a zero length string."
     ::= { h3cCfgLogEntry 14 }
 
@@ -533,7 +619,7 @@ h3cCfgLogCmdSrcAddrVPNName OBJECT-TYPE
     DESCRIPTION
         "The VPN instance of this operation uses."
     ::= { h3cCfgLogEntry 17 }
-    
+
 h3cCfgLogServerAddrType OBJECT-TYPE
     SYNTAX InetAddressType
     MAX-ACCESS read-only
@@ -560,6 +646,13 @@ h3cCfgLogServerAddrVPNName OBJECT-TYPE
         "The VPN instance of this operation uses."
     ::= { h3cCfgLogEntry 20 }
 
+h3cCfgFirstTrapTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Time when the first trap is sent."
+    ::= { h3cCfgLog 8 }
 
 h3cCfgOperate OBJECT IDENTIFIER ::= { h3cConfigManObjects 2 }
 
@@ -583,7 +676,7 @@ h3cCfgOperateEntryAgeOutTime OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The number of minutes an unactive h3cCfgOperateEntry SHOULD be kept in the
-        h3cCfgOperateTable before it is active. The object is a fator taken account
+        h3cCfgOperateTable before it is active.  The object is a factor taken account
         of when it needs delete some rows make room in h3cCfgOperateTable. "
     DEFVAL { 5 }
     ::= { h3cCfgOperate 2 }
@@ -684,14 +777,22 @@ h3cCfgOperateFileName OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
-        "When the object of h3cCfgOperateType has the value of net2Startup, net2running or
-        running2Net,the value must be specified. The file name may include the path if
-        applicable.
+        "When the object of h3cCfgOperateType has the value of net2Startup, net2running,
+        running2Net, running2File or file2Running, the value must be specified.
+
+        The file name may include the path if applicable.
+
         If the value of h3cCfgOperateType is net2Startup or net2running, this node specify the
-        source file name of transfers.If the value of h3cCfgOperateType is running2Net ,
+        source file name of transfers.
+
+        If the value of h3cCfgOperateType is running2Net,
         this node specify the destination file name of transfers.
-        When h3cCfgOperateType has the value of startup2net,the object may not be
-        created instead of using the file name of startup configuration file."
+
+        When h3cCfgOperateType has the value of startup2net, the object may not be
+        created instead of using the file name of startup configuration file.
+
+        If the value of h3cCfgOperateType is running2File or file2Running,
+        this node specifies the file name to be written or loaded."
     ::= { h3cCfgOperateEntry 4 }
 
 h3cCfgOperateServerAddress OBJECT-TYPE
@@ -703,8 +804,8 @@ h3cCfgOperateServerAddress OBJECT-TYPE
          or startup2net , the ip address of the ftp/tftp server from/to
         which to download/upload must be specified.
         Values of 0.0.0.0 or FF.FF.FF.FF are not permitted.
-        
-        This object is replaced by h3cFlhOperSrvAddr for it only support IPv4."
+
+        This object is replaced by h3cCfgOperateSrvAddrRev for it only support IPv4."
     ::= { h3cCfgOperateEntry 5 }
 
 h3cCfgOperateUserName OBJECT-TYPE
@@ -713,10 +814,10 @@ h3cCfgOperateUserName OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "When the operation type is running2Net,net2Running,net2Startup
-         or startup2net , the user
+         or startup2net, the user
         name for the ftp server from/to which to download/upload
-        should be specified. The object must be created if h3cCfgOperateProtocol
-        has the value of ftp. "
+        should be specified.  The object must be created if h3cCfgOperateProtocol
+        has the value of ftp."
     ::= { h3cCfgOperateEntry 6 }
 
 h3cCfgOperateUserPassword OBJECT-TYPE
@@ -725,10 +826,10 @@ h3cCfgOperateUserPassword OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "When the operation type is running2Net,net2Running,net2Startup
-         or startup2net , the user
+         or startup2net, the user
         password for the ftp server from/to which to download/upload
-        should be specified. The object must be created if h3cCfgOperateProtocol
-        has the value of ftp. "
+        should be specified.  The object must be created if h3cCfgOperateProtocol
+        has the value of ftp."
     ::= { h3cCfgOperateEntry 7 }
 
 h3cCfgOperateEndNotificationSwitch OBJECT-TYPE
@@ -749,7 +850,7 @@ h3cCfgOperateRowStatus OBJECT-TYPE
         "The status of this table entry.
         When the status is active all the
         object's value in the entry is not
-        allowed to modified."
+        allowed to be modified."
     ::= { h3cCfgOperateEntry 9 }
 
 h3cCfgOperateServerPort OBJECT-TYPE
@@ -758,7 +859,7 @@ h3cCfgOperateServerPort OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "When the operation type is running2Net, net2Running, net2Startup or startup2Net,
-         this node is used for specifying the remote port number. If the value is 0 or not
+         this node is used for specifying the remote port number.  If the value is 0 or not
          specified, the known port number will be used."
     ::= { h3cCfgOperateEntry 10 }
 
@@ -815,7 +916,10 @@ H3cCfgOperateResultEntry ::=
             h3cCfgOperateState                  ConfigOperationStateType,
             h3cCfgOperateTime                   TimeTicks,
             h3cCfgOperateEndTime                TimeTicks,
-            h3cCfgOperFailReason                DisplayString
+            h3cCfgOperFailReason                DisplayString,
+            h3cCfgOperateFailCmd                DisplayString,
+            h3cCfgOperateFailCmdView            DisplayString,
+            h3cCfgOperateFailCmdReason          DisplayString
         }
 
 h3cCfgOperateResultIndex OBJECT-TYPE
@@ -824,7 +928,7 @@ h3cCfgOperateResultIndex OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The index of Table, which is an incremental integer.
-        The maximum value of the node is 2147483647. The agent should wrap the
+        The maximum value of the node is 2147483647.  The agent should wrap the
         value to 1 and flush all the existing entries when the maximum value
         is reached."
     ::= { h3cCfgOperateResultEntry 1 }
@@ -859,7 +963,7 @@ h3cCfgOperateTime OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Record the time taken for the operation. This object will
+        "Record the time taken for the operation.  This object will
         be like a stopwatch, starting when the operation
         starts, and stopping when the operation completes."
     ::= { h3cCfgOperateResultEntry 5 }
@@ -880,6 +984,34 @@ h3cCfgOperFailReason OBJECT-TYPE
         "The failure reasons of configuration operation."
     ::= { h3cCfgOperateResultEntry 7 }
 
+h3cCfgOperateFailCmd OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..512))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The failure cmd of configuration operation."
+    ::= { h3cCfgOperateResultEntry 8 }
+
+h3cCfgOperateFailCmdView OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..264))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The failure cmd view of configuration operation."
+    ::= { h3cCfgOperateResultEntry 9 }
+
+h3cCfgOperateFailCmdReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The failure cmd reasons of configuration operation.
+        The failed reason is :
+        'Failed to execute command.'
+        'Failed to parse command.'
+        "
+    ::= { h3cCfgOperateResultEntry 10 }
+
 h3cCfgExecuteOperate OBJECT IDENTIFIER ::= { h3cCfgOperate 6 }
 
 h3cCfgExecuteOperateResultEntryLimit OBJECT-TYPE
@@ -888,7 +1020,7 @@ h3cCfgExecuteOperateResultEntryLimit OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The maximum number of ConfigOperationType entries that may be held
-        in h3cCfgExecuteResultTable. A particular setting does not guarantee
+        in h3cCfgExecuteResultTable.  A particular setting does not guarantee
         that much data can be held."
     DEFVAL { 5 }
     ::= { h3cCfgExecuteOperate 1 }
@@ -928,7 +1060,7 @@ h3cCfgExecuteResultIndex OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The index of Table, which is an incremental integer.
-        The maximum value of the node is 2147483647. The agent should wrap the
+        The maximum value of the node is 2147483647.  The agent should wrap the
         value to 1 and flush all the existing entries when the maximum value
         is reached."
     ::= { h3cCfgExecuteResultEntry 1 }
@@ -985,16 +1117,23 @@ h3cCfgReset OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Reboot device as default configuration."
+        "Reboot the device with the default configuration."
     ::= { h3cCfgOperate 7 }
 
-h3cCfgFirstTrapTime OBJECT-TYPE
-    SYNTAX      TimeTicks
-    MAX-ACCESS  accessible-for-notify
-    STATUS      current
+h3cCfgReset2 OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            normal(0),
+            reset(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
     DESCRIPTION
-        "Represents the first trap time."
-    ::= { h3cCfgLog 8 }
+        "normal:do nothing.
+        reset  :reboot the device with the default configuration.
+        'normal' will be returned when getting.
+        This node differs from h3cCfgReset in value."
+    ::= { h3cCfgOperate 8 }
 
 h3cConfigManNotifications OBJECT IDENTIFIER ::= { h3cConfig 2 }
 
@@ -1040,7 +1179,7 @@ h3cConfigManCompliance MODULE-COMPLIANCE
     STATUS current
     DESCRIPTION
         "The statement of compliance for those implementing
-        the Huawei 3Com ConfigMan MIB."
+        the configuration management MIB."
     MODULE -- this module
     MANDATORY-GROUPS { h3cCfgManLogGroup, h3cCfgOperateGroup, h3cCfgManNotificationGroup }
     OBJECT h3cCfgOperateType

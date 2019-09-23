@@ -1,10 +1,16 @@
--- ZyXEL Communications Corporation
+-- Zyxel Communications Corporation
 -- Private Enterprise MIB definition 
   
--- This file describes the ZyXEL Communications Corporation Enterprise MIB.
--- It contains ZyXEL products OIDs, and common managed objects.
+-- This file describes the Zyxel Communications Corporation Enterprise MIB.
+-- It contains Zyxel products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-PORT-MIB.mib $
+-- Revision 1.16  2016/09/09 06:33:27  Alan
+-- replace "ZyXEL" by "Zyxel"
+-- Revision 1.15  2015/04/09 02:08:49  Willson
+-- For backward compatibility, GS2210 & GS3700 can set "auto"
+-- Revision 1.14  2014/12/24 06:42:38  Bruno
+-- auto port speed
 -- Revision 1.13  2014/09/23 01:18:46  MandyLi
 -- support auto port speed
 -- Revision 1.12  2013/12/06 07:07:58  ccho
@@ -62,7 +68,7 @@ ZYXEL-PORT-MIB DEFINITIONS ::= BEGIN
 
 	zyxelPort MODULE-IDENTITY
 		LAST-UPDATED	"201207010000Z"    
-		ORGANIZATION "Enterprise Solution ZyXEL"     
+		ORGANIZATION "Enterprise Solution Zyxel"     
 		CONTACT-INFO
 			""	   
 		DESCRIPTION
@@ -116,13 +122,13 @@ ZYXEL-PORT-MIB DEFINITIONS ::= BEGIN
         	speed100Half(3),
         	speed100Full(4),
         	speed1000Full(5),
-        	speed10000Full(6),
-        	speed12000Full(7),
-        	speed40000Full(8),
-			speed1000Auto(9),
-			speedAuto1000(10),
-			speedAuto10000(11)
-			
+        	speed10GFull(6),
+        	speed12GFull(7),
+        	speed40GFull(8),
+		speedAuto1000(9),
+		speedAuto10G(10),
+		speed2500Full(11),
+		speed5GFull(12)			
         }
         MAX-ACCESS  read-write
         STATUS  current
@@ -219,7 +225,10 @@ ZYXEL-PORT-MIB DEFINITIONS ::= BEGIN
         	zyPortModuleType		INTEGER,
         	zyPortLinkUpType		INTEGER,
         	zyPortTestStatus		INTEGER,
-        	zyPortCounterReset		INTEGER
+        	zyPortCounterReset		INTEGER, 
+        	zyPortUtilizationRx		INTEGER,
+        	zyPortUtilizationTx		INTEGER
+
            }
 		   
 		zyPortModuleType  OBJECT-TYPE
@@ -269,8 +278,25 @@ ZYXEL-PORT-MIB DEFINITIONS ::= BEGIN
         STATUS  current
         DESCRIPTION
 			"Enable this entry can reset port counter record."
-        ::= { zyxelPortInfoEntry 4 } 
-
+        ::= { zyxelPortInfoEntry 4 }   
+                                                                     
+          zyPortUtilizationRx OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"This entry display the percentage of port utilization per second received on this port."
+        ::= { zyxelPortInfoEntry 5 }
+		                            
+		                            
+	    zyPortUtilizationTx OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"This entry display the percentage of port utilization per second transmitted on this port."
+        ::= { zyxelPortInfoEntry 6 }
+       
 	   zyPortAutonegotiationFailed NOTIFICATION-TYPE
        OBJECTS {
 				ifIndex

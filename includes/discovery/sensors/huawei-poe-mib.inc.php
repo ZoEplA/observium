@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -53,7 +53,7 @@ foreach ($oids as $index => $entry)
 
   $options['limit_high_warn'] = $entry['hwPoeSlotPowerUtilizationThreshold'] > 0 ? $entry['hwPoeSlotPowerUtilizationThreshold'] / 100 : 0.9;
   $options['limit_high_warn'] *= $options['limit_high'];
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 }
 
 if (OBS_DEBUG > 1 && count($oids))
@@ -140,7 +140,7 @@ foreach ($oids as $index => $entry)
     unset($options['limit_high']);
   }
 
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $descr    = $entry['ifDescr'] . ' PoE Current';
   $oid_name = 'hwPoePortCurrent';
@@ -151,7 +151,7 @@ foreach ($oids as $index => $entry)
 
   unset($options['limit_high'], $options['limit_high_warn']);
 
-  discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $descr    = $entry['ifDescr'] . ' PoE Voltage';
   $oid_name = 'hwPoePortVoltage';
@@ -162,7 +162,7 @@ foreach ($oids as $index => $entry)
 
   unset($options['limit_high'], $options['limit_high_warn']);
 
-  discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
 }
 

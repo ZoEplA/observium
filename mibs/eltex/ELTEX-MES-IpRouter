@@ -1,86 +1,97 @@
 ELTEX-MES-IpRouter DEFINITIONS ::= BEGIN
 
 -- Title:      Eltex MES IP Router Private Extension
--- Version:    1.0
--- Date:       12 Feb 2014
+-- Version:    1.1
+-- Date:       29 Mar 2018
 
 --  OSPF md5 authentication table
 
 IMPORTS
-    OBJECT-TYPE                                 FROM SNMPv2-SMI
+    OBJECT-TYPE,
+    MODULE-IDENTITY                             FROM SNMPv2-SMI
     eltMesOspf                                  FROM ELTEX-MES-IP
+    rlOspfGeneralGroupEntry                     FROM RADLAN-OSPF-MIB
     Unsigned32, IpAddress                       FROM SNMPv2-SMI
-    RowStatus                                   FROM SNMPv2-TC;
+    RowStatus                                   FROM SNMPv2-TC
+    AreaID                                      FROM OSPF-MIB;
 
-eltOspfAuthTable OBJECT-TYPE
-        SYNTAX   SEQUENCE OF EltOspfAuthEntry
-        MAX-ACCESS   not-accessible
-        STATUS   current
+--
+-- eltOspfGeneralGroupTable
+--
+
+eltOspfGeneralGroupTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EltOspfGeneralGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
         DESCRIPTION
-           "The OSPF Interface Table describes the  inter-
-           faces from the viewpoint of OSPF."
-       REFERENCE
-          "OSPF Version 2, Appendix C.3  Router  interface
-          parameters"
-      ::= { eltMesOspf 1 }
+           "This table augments existing rlOspfGeneralGroupTable."
+        ::= { eltMesOspf 4 }
 
-eltOspfAuthEntry OBJECT-TYPE
-        SYNTAX EltOspfAuthEntry
-        MAX-ACCESS   not-accessible
-        STATUS   current
+eltOspfGeneralGroupEntry OBJECT-TYPE
+        SYNTAX      EltOspfGeneralGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
         DESCRIPTION
-           "The OSPF Interface Entry describes one  inter-
-           face from the viewpoint of OSPF."
-       INDEX { eltOspfIfIpAddress, eltOspfAuthKeyId}
-       ::= { eltOspfAuthTable 1 }
+           "Information describing the configured global parame-
+           ters to the Router OSPF Process."
+        AUGMENTS { rlOspfGeneralGroupEntry }
+        ::= { eltOspfGeneralGroupTable 1 }
 
-EltOspfAuthEntry ::=
+EltOspfGeneralGroupEntry ::=
     SEQUENCE {
-        eltOspfIfIpAddress       IpAddress,
-        eltOspfAuthKeyId         Unsigned32,
-        eltOspfAuthKey           OCTET STRING,
-        eltOspfAuthStatus        RowStatus
+        eltOspfLsaMinInterval        Unsigned32,
+        eltOspfLsaHoldInterval       Unsigned32,
+        eltOspfLsaMaxInterval        Unsigned32,
+        eltOspfLsaMinArrival         Unsigned32
     }
 
-eltOspfIfIpAddress OBJECT-TYPE
-        SYNTAX   IpAddress
-        MAX-ACCESS   read-write
-        STATUS   current
+eltOspfLsaMinInterval OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..600000)
+        MAX-ACCESS  read-write
+        STATUS      current
         DESCRIPTION
-           "The IP address of this OSPF interface."
-       ::= { eltOspfAuthEntry 1 }
+           "The minimum time, in milliseconds, between distinct
+            originations of any particular LSA."
+        DEFVAL { 5000 }
+        ::= { eltOspfGeneralGroupEntry 1 }
 
-eltOspfAuthKeyId OBJECT-TYPE
-        SYNTAX   Unsigned32
-        MAX-ACCESS   read-write
-        STATUS   current
+eltOspfLsaHoldInterval OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..600000)
+        MAX-ACCESS  read-write
+        STATUS      current
         DESCRIPTION
-           "The md5 authentication key ID.  The value must be
-            (1 to 255). This field identifies the algorithm and secret
-            key used to create the message digest appended to the OSPF
-            packet.  Key Identifiers are unique per-interface
-            (or equivalently, per-subnet)."
-       ::= { eltOspfAuthEntry 2 }
+           "The time, in milliseconds, that the minimum time between
+           distinct originations of any particular LSA is increased
+           when the network is unstable.
 
-eltOspfAuthKey OBJECT-TYPE
-         SYNTAX   OCTET STRING (SIZE (0..16))
-         MAX-ACCESS   read-write
-         STATUS   current
-         DESCRIPTION
-            "The MD5 Authentication Key.  If the Area's Authorization
-            Type is md5, and the key length is shorter than 16 octets,
-            the agent will left adjust and zero fill to 16 octets.
-            When read, snOspfIfMd5AuthKey always returns an Octet String
-            of length zero."
-         ::= { eltOspfAuthEntry 3 }
+           If an event occurs within the minimum time for LSA
+           regeneration, the origination is delayed until the end of
+           the eltOspfLsaHoldInterval and the length of the interval
+           doubled.  Doubling of the hold interval contuinues until
+           the interval reaches eltOspfLsaMaxInterval."
+       DEFVAL { 0 }
+       ::= { eltOspfGeneralGroupEntry 2 }
 
-eltOspfAuthStatus OBJECT-TYPE
-        SYNTAX   RowStatus
-        MAX-ACCESS   read-create
-        STATUS   current
+eltOspfLsaMaxInterval OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..600000)
+        MAX-ACCESS  read-write
+        STATUS      current
         DESCRIPTION
-           "This variable displays the status of  the  en-
-           try."
-       ::= { eltOspfAuthEntry 4 }
+           "The maximum value, in milliseconds, that an origination of
+           any particular LSA is delayed."
+        DEFVAL { 0 }
+        ::= { eltOspfGeneralGroupEntry 3 }
+
+eltOspfLsaMinArrival OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..600000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "For any particular LSA, the minimum time in milliseconds
+           that must elapse between reception of new LSA instances
+           during flooding.  LSA instances received at higher
+           frequencies are discarded."
+        DEFVAL { 1000 }
+        ::= { eltOspfGeneralGroupEntry 4 }
 
 END

@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -38,11 +38,13 @@ foreach ($sensor_array as $index => $entry)
   {
     $ok      = TRUE;
 
+    $options = array();
     $descr   = rewrite_entity_name($entry['deviceSensorName']);
     $oid     = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.5.".$index;
     $type    = $sensor_type_map[$entry['deviceSensorUnits']];
     $scale   = si_to_scale($entry['deviceSensorScale']);
     $value   = $entry['deviceSensorValue'];
+    $oid_name = 'bluecoat-sg-proxy-mib';
 
     if ($type == 'temperature')
     {
@@ -52,11 +54,12 @@ foreach ($sensor_array as $index => $entry)
 
     if ($ok)
     {
-      discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'bluecoat-sg-proxy-mib', $descr, $scale, $value);
+      $options['rename_rrd'] = "bluecoat-sg-proxy-mib-$index";
+      discover_sensor_ng($device, $type, $mib, $oid_name, $oid, $index, NULL, $descr, $scale, $value, $options);
     }
   }
 }
 
-unset($sensor_type_map, $oids, $oids_arista, $sensor_array, $index, $scale, $type, $value, $descr, $ok);
+unset($sensor_type_map, $oids, $oids_arista, $sensor_array, $index, $scale, $type, $value, $descr, $ok, $options);
 
 // EOF

@@ -1,7 +1,7 @@
 -- =================================================================
--- Copyright (C) 2004 by  HUAWEI 3COM TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2004 by  H3C TECHNOLOGIES. All rights reserved
 -- 
--- Description: This mib file is used for inquiring for MP (Multilink PPP)
+-- Description: This MIB file is used for inquiring for MP (Multilink PPP)
 --              link status information.
 -- Reference:
 -- Version: V1.0
@@ -25,16 +25,14 @@ HUAWEI-MP-MIB DEFINITIONS ::= BEGIN
 
         hwMultilinkPPP MODULE-IDENTITY 
                 LAST-UPDATED "200405180000Z"            -- May 18, 2004 at 00:00 GMT
-                ORGANIZATION 
-                        "Huawei Technologies co.,Ltd."
-                CONTACT-INFO 
-                        " R&D BeiJing, Huawei-3Com Technologies co.,Ltd.
-                        Huawei Bld.,NO.3 Xinxi Rd., 
-                        Shang-Di Information Industry Base,
-                        Hai-Dian District Beijing P.R. China
-                        Zip:100085 
-                        Http://www.huawei-3com.com
-                        E-mail:support@huawei-3com.com "
+                ORGANIZATION
+                    "Hangzhou H3C Tech. Co., Ltd."
+                CONTACT-INFO
+                    "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                    Hai-Dian District Beijing P.R. China
+                    http://www.h3c.com
+                    Zip:100085
+                    "
                 DESCRIPTION 
                         "The HUAWEI-MP-MIB provides read access to MP(Multilink PPP) link
                         status information. The information available through this MIB includes:
@@ -282,7 +280,7 @@ HUAWEI-MP-MIB DEFINITIONS ::= BEGIN
                  STATUS current
                  DESCRIPTION 
                          "The compliance statement for entities which 
-                         implement the Huawei Multilink PPP mib."
+                         implement the Multilink PPP MIB."
                  MODULE -- this module
                          MANDATORY-GROUPS { hwMpMandatoryGroup }
                  ::= { hwMpCompliances 1 }

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -46,8 +46,10 @@ foreach ($entity_array as $index => $entry)
     $value = $entry['hpnicfEntityExtTemperature'];
     $oid   = ".1.3.6.1.4.1.11.2.14.11.15.2.6.1.1.1.1.12.$index";
     $descr = $entry['entPhysicalName'];
+    $oid_name = 'hpnicfEntityExtTemperature';
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "hpnicfEntityExtTemperature.$index", 'hh3c-entity-ext-mib', $descr, 1, $value, $options);
+    $options['rename_rrd'] = "hh3c-entity-ext-mib-hpnicfEntityExtTemperature.$index";
+    discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid, $index, NULL, $descr, 1, $value, $options);
   }
 
   // HPN-ICF-ENTITY-EXT-MIB::hpnicfEntityExtVoltage.1 = INTEGER: 0
@@ -59,12 +61,14 @@ foreach ($entity_array as $index => $entry)
     $options['limit_low']  = $entry['hpnicfEntityExtVoltageLowThreshold'];
     $options['limit_high'] = $entry['hpnicfEntityExtVoltageHighThreshold'];
 
+    $oid_name = 'hpnicfEntityExtVoltage';
     $value = $entry['hpnicfEntityExtVoltage'];
     $oid   = ".1.3.6.1.4.1.11.2.14.11.15.2.6.1.1.1.1.14.$index";
     $descr = $entry['entPhysicalName'];
 
     // FIXME scale is unknown, and not documented in the MIB; probably not 1?? My V1910 doesn't have voltage sensors.
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "hpnicfEntityExtVoltage.$index", 'hh3c-entity-ext-mib', $descr, 1, $value, $options);
+    $options['rename_rrd'] = "hh3c-entity-ext-mib-hpnicfEntityExtVoltage.$index";
+    discover_sensor_ng($device,'voltage', $mib, $oid_name, $oid, $index, NULL, $descr, 1, $value, $options);
   }
 
   //  [hpnicfEntityExtErrorStatus] => normal

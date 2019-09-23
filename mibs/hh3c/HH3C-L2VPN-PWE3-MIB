@@ -1,5 +1,5 @@
 -- ==================================================================
--- Copyright (C) 2005 by H3C TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2005 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: L2VPN PWE3(Pseudo Wire Emulation Edge-to-Edge) MIB
 -- Reference:
@@ -21,9 +21,9 @@ IMPORTS
 hh3cL2VpnPwe3 MODULE-IDENTITY
     LAST-UPDATED "200703310000Z"       -- March 31, 2007 at 00:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085

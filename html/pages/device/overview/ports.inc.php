@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -64,7 +64,7 @@ if ($ports['total'])
   /**
    * Start ports sorting based on port type, name and number
    * Full sort order:
-   *  1. Port type (phisical ports always first)
+   *  1. Port type (physical ports always first)
    *  2. Port base name (TenGig, Gigabit, etc)
    *  3. Module number
    *  4. Port number

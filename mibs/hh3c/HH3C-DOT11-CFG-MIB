@@ -1,10 +1,10 @@
 -- =============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide WLAN configuration information.
 -- Reference:
--- Version: V3.3
+-- Version: V3.5
 -- History:
 --   V1.0 2006-05-10 Initial version, created by shiyang (Richard)
 --   V1.1 2007-02-01 modified by xingjichen(Daniel)
@@ -206,6 +206,47 @@
 --        Add hh3cDot11SrvPortSecurityModeCM to hh3cDot11SrvPortSecurityTable
 --   V3.3 2014-5-14 Add by yubo
 --        Add hh3cDot11RCRssiThresholdCM to hh3cDot11RadioConfigTable
+--   V3.4 2014-9-19 Add by wanglu
+--        Add hh3cDot11SrvL2AuthenTable
+--        Add hh3cDot11AkmMode to hh3cDot11ServicePolicyExtTable
+--        Add hh3cDot11PskKey to hh3cDot11ServicePolicyExtTable
+--        Add hh3cDot11CfgSaRptDevType to hh3cDot11RadioToConfigTable
+--        Add hh3cDot11CfgSaTrapDevEnable to hh3cDot11RadioToConfigTable
+--        Add hh3cDot11CfgSaTrapDevType to hh3cDot11RadioToConfigTable
+--        Add hh3cDot11CfgSaTrapAQEnable to hh3cDot11RadioToConfigTable
+--        Add hh3cDot11CfgSaTrapAQThreshold to hh3cDot11RadioToConfigTable
+--        Add hh3cDot11CfgSaDrivenRRMEnable to hh3cDot11RadioToConfigTable
+--        Add hh3cDot11CfgSaDrivenRRMSnt to hh3cDot11RadioToConfigTable
+--   V3.5 2016-3-11 Add by wuqinggen
+--        Add hh3cDot11FwdVlanBitMapLow to hh3cDot11ServicePolicyTable
+--        Add hh3cDot11FwdVlanBitMapHigh to hh3cDot11ServicePolicyTable
+--        Add hh3cDot11ServicePolicyName to hh3cDot11ServicePolicyTable
+--        2016-3-11 add by yubo 04460
+--        Add hh3cDot11ApCoveragetype to hh3cDot11APTemplateTable
+--        Add hh3cDot11RCDynamicChlStateSelfDecisiveCM to hh3cDot11RadioConfigTable
+--        Add hh3cDot11RCDynamicPowerStateSelfDecisiveCM to hh3cDot11RadioConfigTable
+--        2016-06-15 Add by zhouwenshuai zkf6157
+--        Add hh3cDot11LocalACTemplateTable
+--        Add new node hh3cDot11ACRole to hh3cDot11GlobeConfigGroup
+--        Add new node hh3cDot11GlobalLocalACState to hh3cDot11GlobeConfigGroup
+--        Add new node hh3cDot11CentralACIPAddress to hh3cDot11GlobeConfigGroup
+--        Add new node hh3cDot11CentralACIPv6Address to hh3cDot11GlobeConfigGroup
+--        Add new node hh3cDot11APControlAddressState  to hh3cDot11APTemplateTable
+--        Add new node hh3cDot11APControlAddressIPv4 to hh3cDot11APTemplateTable
+--        Add new node hh3cDot11APControlAddressIPv6 to hh3cDot11APTemplateTable
+--        Add new node hh3cDot11APLocalACName to hh3cDot11APTemplateTable
+--        2016-12-06 Add by zhouwenshuai zkf6157
+--        Add value mode160(4) mode80and80(5) to hh3cDot11nChanelBand
+--        Add value mode160(4) mode80and80(5) to hh3cDot11nRadioCfg2ChannelBand
+--        2017-10-09 Add by lixiaoyi, jiaohaina, guozhanhua, chenxueke
+--        Add new node hh3cDot11APEchoInterval to hh3cDot11APTemplateTable
+--        Add new node hh3cDot11SIDEchoInterval to hh3cDot11APSerialIDTable
+--        Add new node hh3cDot11SecurityModeCM to hh3cDot11ServicePolicyTable
+--        Add new node hh3cDot11PreConflictTemplateSSID,hh3cDot11CurrConflictTemplateSSID
+--        to hh3cDot11SSIDWepIDConflictTrap
+--        Add new node hh3cDot11SPInCbsValue to hh3cDot11ServicePolicyTable
+--        Add new node hh3cDot11SPOutCbsValue to hh3cDot11ServicePolicyTable
+--        Add value mode80(3), mode160(4), mode80and80(5) to hh3cDot11nRadioCfg2ChannelBandCM
 -- =============================================================================
 HH3C-DOT11-CFG-MIB DEFINITIONS ::= BEGIN
 
@@ -249,11 +290,11 @@ IMPORTS
     FROM HH3C-DOT11-REF-MIB;
 
 hh3cDot11CFG MODULE-IDENTITY
-    LAST-UPDATED "201009251800Z"        -- Sep 25, 2010 at 18:00 GMT
+    LAST-UPDATED "201710091800Z"        -- Oct 09, 2017 at 18:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip: 100085"
@@ -319,6 +360,15 @@ hh3cDot11CFG MODULE-IDENTITY
         AKM
         The authentication and key management method defined by
         802.11i, and which includes 802.1x and pre-shared key."
+    REVISION "201710091800Z"        -- Oct 09, 2017 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes and new table."
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes and new table."
+    REVISION "201409191800Z"        -- Sep 19, 2014 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes and new table."
     REVISION "201009251800Z"        -- Sep 25, 2010 at 18:00 GMT
     DESCRIPTION
         "Modified to remove some issue."
@@ -377,6 +427,9 @@ hh3cDot11PolicyConfigGroup OBJECT IDENTIFIER ::= { hh3cDot11CFG 2 }
 --  hh3cDot11ServicePolicyTable          ::= { hh3cDot11PolicyConfigGroup 2 }
 --  hh3cDot11ServicePolicyExtTable       ::= { hh3cDot11PolicyConfigGroup 3 }
 --  hh3cDot11RadioPolicyExtTable         ::= { hh3cDot11PolicyConfigGroup 4 }
+--  hh3cDot11SrvPortSecurityTable        ::= { hh3cDot11PolicyConfigGroup 5 }
+--  hh3cDot11SrvPolicyExtendTable        ::= { hh3cDot11PolicyConfigGroup 6 }
+--  hh3cDot11SrvL2AuthenTable            ::= { hh3cDot11PolicyConfigGroup 7 }
 
 hh3cDot11APConfigGroup OBJECT IDENTIFIER     ::= { hh3cDot11CFG 3 }
 --  AP Configuration Group has the following children:
@@ -413,6 +466,10 @@ hh3cDot11RadioElementConfigGroup OBJECT IDENTIFIER ::= { hh3cDot11CFG 8 }
 --  hh3cDot11nRadioCfg2Table          ::= { hh3cDot11RadioElementConfigGroup 3 }
 
 hh3cDot11CfgNotifyGroup OBJECT IDENTIFIER ::= { hh3cDot11CFG 9 }
+
+hh3cDot11LocalACConfigGroup OBJECT IDENTIFIER     ::= { hh3cDot11CFG 10 }
+--  LocalAC Configuration Group has the following children:
+--  hh3cDot11LocalACTemplateTable                 ::= { hh3cDot11LocalACConfigGroup 1 }
 
 -- *****************************************************************************
 -- *  hh3cDot11GlobeConfigGroup Definition
@@ -740,6 +797,59 @@ hh3cDot11ACNasIDCM OBJECT-TYPE
         "Represents the NAS-ID of current AC."
     ::= { hh3cDot11GlobeConfigGroup 31 }
 
+hh3cDot11ACRole OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(1),
+            central(2),
+            local(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current network status of AC.
+        The following values are supported:
+        normal,     - normal ac.
+        central     - A central AC is an AC where local ACs are
+                      configured, and it establishes CAPWAP tunnels
+                      with the local ACs.
+        local       - Local ACs provide network access to APs
+                      and process client traffic. They are managed
+                      by the central AC."
+    DEFVAL      { normal }
+    ::= { hh3cDot11GlobeConfigGroup 32 }
+
+hh3cDot11GlobalLocalACState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the status of local-ac for an AC.
+        The following values are supported:
+        enable      - LocalAC state will be enabled.
+        disable     - LocalAC state will not be enabled."
+    DEFVAL      { disable }
+    ::= { hh3cDot11GlobeConfigGroup 33 }
+
+hh3cDot11CentralACIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the CentralAC IP address of LocalAC."
+    ::= { hh3cDot11GlobeConfigGroup 34 }
+
+hh3cDot11CentralACIPv6Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the CentralAC IPv6 address of LocalAC."
+    ::= { hh3cDot11GlobeConfigGroup 35 }
 -- *****************************************************************************
 -- * End of hh3cDot11GlobeConfigGroup Definition
 -- *****************************************************************************
@@ -958,7 +1068,13 @@ Hh3cDot11ServicePolicyEntry ::= SEQUENCE
         hh3cDot11SecurityCiphersCM     INTEGER,
         hh3cDot11SrvPolicyStatusCM     INTEGER,
         hh3cDot11SSIDHiddenCM          Hh3cDot11TruthValueCM,
-        hh3cDot11SPIsolateCM           Hh3cDot11TruthValueCM
+        hh3cDot11SPIsolateCM           Hh3cDot11TruthValueCM,
+        hh3cDot11FwdVlanBitMapLow      OCTET STRING,
+        hh3cDot11FwdVlanBitMapHigh     OCTET STRING,
+        hh3cDot11ServicePolicyName     OCTET STRING,
+        hh3cDot11SecurityModeCM        INTEGER,
+        hh3cDot11SPInCbsValue          Integer32,
+        hh3cDot11SPOutCbsValue         Integer32
     }
 
 hh3cDot11ServicePolicyID OBJECT-TYPE
@@ -1260,6 +1376,98 @@ hh3cDot11SPIsolateCM OBJECT-TYPE
         isolated to each other."
     DEFVAL      { dot11false }
     ::= { hh3cDot11ServicePolicyEntry 27 }
+
+hh3cDot11FwdVlanBitMapLow OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+         VLANs, with the first octet specifying VLANs 1 through 8,
+         the second octet specifying VLANs 9 through 16, etc.
+         Within each octet, the most significant bit represents
+         the highest numbered VLAN, and the least significant bit
+         represents the lowest numbered VLAN. Thus, each untagged
+         VLAN of the hybrid port is represented by a single bit
+         within the value of this object. If that bit has a value
+         of '1' then that VLAN is untagged in the set of VLANs; the
+         VLAN is not untagged if its bit has a value of '0'."
+    ::= { hh3cDot11ServicePolicyEntry 28 }
+
+hh3cDot11FwdVlanBitMapHigh OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..256))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+         VLANs, with the first octet specifying VLANs 1 through 8,
+         the second octet specifying VLANs 9 through 16, etc.
+         Within each octet, the most significant bit represents
+         the highest numbered VLAN, and the least significant bit
+         represents the lowest numbered VLAN. Thus, each untagged
+         VLAN of the hybrid port is represented by a single bit
+         within the value of this object. If that bit has a value
+         of '1' then that VLAN is untagged in the set of VLANs; the
+         VLAN is not untagged if its bit has a value of '0'."
+    ::= { hh3cDot11ServicePolicyEntry 29 }
+
+hh3cDot11ServicePolicyName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of each service policy."
+    ::= { hh3cDot11ServicePolicyEntry 30 }
+
+hh3cDot11SecurityModeCM OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            none(0),
+            psk(1),
+            radius(2),
+            wlanex(3)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines the security modes of the WLAN port.
+
+        none  - The default value. No security mode is set.
+
+        psk  - Access to the port is denied until the port client is
+        authorized (by 802.1X key negotiation).
+
+        radius  - Access to the port is denied until the port
+        client is authorized (by 802.1X).
+
+        wlanex  - Access to the port is denied until the port client is
+        authenticated by wlan cert."
+    ::= { hh3cDot11ServicePolicyEntry 31 }
+
+ hh3cDot11SPInCbsValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "byte"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the CBS of inbound direction of this service policy.
+        If the value is 0, it means that the CBS is automatically calculated
+        from the value of CIR."
+    DEFVAL      { 0 }
+    ::= { hh3cDot11ServicePolicyEntry 32 }
+
+hh3cDot11SPOutCbsValue  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "byte"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the CBS of outbound direction of this service policy.
+        If the value is 0, it means that the CBS is automatically calculated
+        from the value of CIR."
+    DEFVAL      { 0 }
+    ::= { hh3cDot11ServicePolicyEntry 33 }
+
 -- *****************************************************************************
 -- * End of hh3cDot11ServicePolicyTable Definition
 -- *****************************************************************************
@@ -1299,7 +1507,9 @@ Hh3cDot11ServicePolicyExtEntry ::= SEQUENCE
         hh3cDot11CipherKeyIndex           Integer32,
         hh3cDot11CipherKey                OCTET STRING,
         hh3cDot11SrvPolicyExtRowStatus    RowStatus,
-        hh3cDot11CipherKeyType            INTEGER
+        hh3cDot11CipherKeyType            INTEGER,
+        hh3cDot11AkmMode                  INTEGER,
+        hh3cDot11PskKey                   OCTET STRING
     }
 
 hh3cDot11ServicePolicyExtID OBJECT-TYPE
@@ -1380,6 +1590,28 @@ hh3cDot11CipherKeyType OBJECT-TYPE
         "Represents the cipher key type of hh3cDot11CipherKey."
     DEFVAL    {1}
     ::= { hh3cDot11ServicePolicyExtEntry 7 }
+
+hh3cDot11AkmMode OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        dot1x(1),
+        psk(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The authentication and key management mode."
+    DEFVAL    {dot1x}
+    ::= { hh3cDot11ServicePolicyExtEntry 8 }
+
+hh3cDot11PskKey OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the preshared key.  This configuration takes effect
+        if the hh3cDot11AkmMode value is psk."
+    ::= { hh3cDot11ServicePolicyExtEntry 9 }
 
 -- *****************************************************************************
 -- * End of hh3cDot11ServicePolicyExtTable Definition
@@ -1681,6 +1913,223 @@ hh3cDot11SrvPortSecurityModeCM OBJECT-TYPE
         authenticated by wlan cert."
     ::= { hh3cDot11SrvPortSecurityEntry 6 }
 
+hh3cDot11SrvL2AuthenTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11SrvL2AuthenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the Layer 2 authentication status of service
+         templates."
+    ::= { hh3cDot11PolicyConfigGroup 7 }
+
+hh3cDot11SrvL2AuthenEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11SrvL2AuthenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row for a service template."
+    INDEX
+        {
+            hh3cDot11SrvL2AuthenID
+        }
+    ::= { hh3cDot11SrvL2AuthenTable 1 }
+
+Hh3cDot11SrvL2AuthenEntry ::= SEQUENCE
+    {
+        hh3cDot11SrvL2AuthenID               Hh3cDot11ServicePolicyIDType,
+        hh3cDot11L2AuthenMode                INTEGER,
+        hh3cDot11L2IntrusProtectEnable       TruthValue,
+        hh3cDot11L2IntrusProtectOpt          INTEGER,
+        hh3cDot11TempServiceStopTimer        Integer32,
+        hh3cDot11TempBlockMACTimer           Integer32,
+        hh3cDot11L2IgnoreAuthorization       TruthValue,
+        hh3cDot11L2FailVLAN                  Integer32,
+        hh3cDot11L2CriticalVLAN              Integer32,
+        hh3cDot11L2AuthorFailOffline         TruthValue,
+        hh3cDot11L2AccountFailOffline        TruthValue,
+        hh3cDot11Dot1xHSEnable               TruthValue,
+        hh3cDot11Dot1xSecureHSEnable         TruthValue,
+        hh3cDot11Dot1xReauthenEnable         TruthValue,
+        hh3cDot11Dot1xMandatoryDomain        OCTET STRING,
+        hh3cDot11Dot1xMaxUserCount           Integer32,
+        hh3cDot11MACAuthenDomain             OCTET STRING,
+        hh3cDot11MACAuthenMaxUserCount       Integer32
+    }
+
+hh3cDot11SrvL2AuthenID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ServicePolicyIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the ID of a service template."
+    ::= { hh3cDot11SrvL2AuthenEntry 1 }
+
+hh3cDot11L2AuthenMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            bypass(1),
+            macAuthentication(2),
+            macThenDot1xAuthentication(3),
+            dot1xAuthentication(4),
+            dot1xThenMacAuthentication(5),
+            ouiThenDot1x(6)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication mode of the service template.
+
+        bypass  No authentication is required.
+
+        macAuthentication  MAC authentication.
+
+        macThenDot1xAuthentication  MAC authentication is executed first.
+        If MAC authentication fails, 802.1X authentication is executed.
+
+        dot1xAuthentication  Access to the port is denied until the client
+        is authorized by 802.1X.
+
+        dot1xThenMacAuthentication  802.1X authentication is executed first.
+        If 802.1X authentication fails , MAC authentication is executed.
+
+        ouiThenDot1x  OUI authentication is first executed.
+        If OUI authentication fails, 802.1X authentication is executed."
+    ::= { hh3cDot11SrvL2AuthenEntry 2 }
+
+hh3cDot11L2IntrusProtectEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables intrusion protection for the service template."
+    ::= { hh3cDot11SrvL2AuthenEntry 3 }
+
+hh3cDot11L2IntrusProtectOpt OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            blockMACTemporarily(1),
+            stopServiceTemporarily(2),
+            stopService(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Operation mode when intrusion is detected."
+    ::= { hh3cDot11SrvL2AuthenEntry 4 }
+
+hh3cDot11TempServiceStopTimer OBJECT-TYPE
+    SYNTAX      Integer32(10..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time period for temporarily stopping service."
+    ::= { hh3cDot11SrvL2AuthenEntry 5 }
+
+hh3cDot11TempBlockMACTimer OBJECT-TYPE
+    SYNTAX      Integer32(60..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time period for temporarily blocking user MACs."
+    ::= { hh3cDot11SrvL2AuthenEntry 6 }
+
+hh3cDot11L2IgnoreAuthorization OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ignores all authorization information set by the server."
+    ::= { hh3cDot11SrvL2AuthenEntry 7 }
+
+hh3cDot11L2FailVLAN OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN for authentication failure.  0 means not configured."
+    ::= { hh3cDot11SrvL2AuthenEntry 8 }
+
+hh3cDot11L2CriticalVLAN OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN for server unavailability situation.  0 means not configured."
+    ::= { hh3cDot11SrvL2AuthenEntry 9 }
+
+hh3cDot11L2AuthorFailOffline OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Users are logged off if authorization fails."
+    ::= { hh3cDot11SrvL2AuthenEntry 10 }
+
+hh3cDot11L2AccountFailOffline OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Users are logged off if accounting fails."
+    ::= { hh3cDot11SrvL2AuthenEntry 11 }
+
+hh3cDot11Dot1xHSEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables 802.1X handshake."
+    ::= { hh3cDot11SrvL2AuthenEntry 12 }
+
+hh3cDot11Dot1xSecureHSEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables secure 802.1X handshake."
+    ::= { hh3cDot11SrvL2AuthenEntry 13 }
+
+hh3cDot11Dot1xReauthenEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables 802.1X reauthentication."
+    ::= { hh3cDot11SrvL2AuthenEntry 14 }
+
+hh3cDot11Dot1xMandatoryDomain OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "802.1X authentication domain of users for the service template."
+    ::= { hh3cDot11SrvL2AuthenEntry 15 }
+
+hh3cDot11Dot1xMaxUserCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of 802.1X users supported by the BSS bound to the service
+        template."
+    ::= { hh3cDot11SrvL2AuthenEntry 16 }
+
+hh3cDot11MACAuthenDomain OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MAC authentication domain of users for the service template."
+    ::= { hh3cDot11SrvL2AuthenEntry 17 }
+
+hh3cDot11MACAuthenMaxUserCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MAC authentication users supported by the BSS bound to
+         the service template."
+    ::= { hh3cDot11SrvL2AuthenEntry 18 }
 -- *****************************************************************************
 -- *  End of hh3cDot11PortSecurityTable Definition
 -- *****************************************************************************
@@ -1780,7 +2229,13 @@ Hh3cDot11APTemplateEntry ::= SEQUENCE
         hh3cDot11ApTrapEnabled              TruthValue,
         hh3cDot11ApFmwUpdState              INTEGER,
         hh3cDot11StatisIntervModeCM         INTEGER,
-        hh3cDot11ApNasIDCM                  OCTET STRING
+        hh3cDot11ApNasIDCM                  OCTET STRING,
+        hh3cDot11ApCoveragetype             INTEGER,
+        hh3cDot11APControlAddressState      INTEGER,
+        hh3cDot11APControlAddressIPv4       IpAddress,
+        hh3cDot11APControlAddressIPv6       OCTET STRING,
+        hh3cDot11APLocalACName              OCTET STRING,
+        hh3cDot11APEchoInterval             Integer32
     }
 
 hh3cDot11APTemplateName OBJECT-TYPE
@@ -1942,7 +2397,7 @@ hh3cDot11APDevDetectEnable OBJECT-TYPE
          detection and WLAN data services.
          By default, the AP only provides WLAN data services.  When an AP works
          in monitor mode, that is, the value of object hh3cDot11APWorkMode is
-         monitor, device detection can not be enabled with object
+         monitor, device detection cannot be enabled with object
          hh3cDot11APDevDetectEnable."
     DEFVAL      { false }
     ::= { hh3cDot11APTemplateEntry 16 }
@@ -2028,6 +2483,73 @@ hh3cDot11ApNasIDCM OBJECT-TYPE
         specific radio of AP."
     ::= { hh3cDot11APTemplateEntry 22 }
 
+hh3cDot11ApCoveragetype OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        school(1),
+        traffic(2),
+        shopping(3),
+        company(4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the coverage type of AP.
+        school - the coverage type is school
+        traffic - the coverage type is traffic
+        shop - the coverage type is shop
+        company - the coverage type is company"
+    DEFVAL      { school }
+    ::= { hh3cDot11APTemplateEntry 23 }
+
+hh3cDot11APControlAddressState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the status of control address for an AP.
+        The following values are supported:
+        enable      - AC rediscovery will be enabled.
+        disable     - AC rediscovery will be disabled."
+        DEFVAL      { disable }
+    ::= { hh3cDot11APTemplateEntry 24 }
+
+hh3cDot11APControlAddressIPv4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents an AC IPv4 address for AC rediscovery."
+    ::= { hh3cDot11APTemplateEntry 25 }
+
+hh3cDot11APControlAddressIPv6 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents an AC IPv6 address for AC rediscovery."
+    ::= { hh3cDot11APTemplateEntry 26 }
+
+hh3cDot11APLocalACName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the local AC name the AP belongs to."
+    ::= { hh3cDot11APTemplateEntry 27 }
+
+hh3cDot11APEchoInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the echo-interval of the AP."
+    ::= { hh3cDot11APTemplateEntry 28 }
+
 -- *****************************************************************************
 -- *  End of  hh3cDot11APTemplateTable Definition
 -- *****************************************************************************
@@ -2079,7 +2601,14 @@ Hh3cDot11RadioToConfigEntry ::= SEQUENCE
         hh3cDot11CfgIDSEnable          TruthValue,
         hh3cDot11CfgSaEnable           TruthValue,
         hh3cDot11CfgSaCltRtFFTData     TruthValue,
-        hh3cDot11CfgSaBand             INTEGER
+        hh3cDot11CfgSaBand             INTEGER,
+        hh3cDot11CfgSaRptDevType       BITS,
+        hh3cDot11CfgSaTrapDevEnable    TruthValue,
+        hh3cDot11CfgSaTrapDevType      BITS,
+        hh3cDot11CfgSaTrapAQEnable     TruthValue,
+        hh3cDot11CfgSaTrapAQThreshold  Integer32,
+        hh3cDot11CfgSaDrivenRRMEnable  TruthValue,
+        hh3cDot11CfgSaDrivenRRMSnt     INTEGER
     }
 
 hh3cDot11APTemplateNameCfg OBJECT-TYPE
@@ -2288,6 +2817,104 @@ hh3cDot11CfgSaBand OBJECT-TYPE
          dot11aMiddle (channels 100-140)
          dot11aUpper (channels 149-165)."
     ::= { hh3cDot11RadioToConfigEntry 21 }
+
+hh3cDot11CfgSaRptDevType OBJECT-TYPE
+    SYNTAX BITS
+        {
+            microwave(0),
+            microwaveInverter(1),
+            bluetooth(2),
+            fixedFreqOthers(3),
+            fixedFreqCordlessPhone(4),
+            fixedFreqVideo(5),
+            fixedFreqAudio(6),
+            freqHopperOthers(7),
+            freqHopperCordlessBase(8),
+            freqHopperCordlessNetwork(9),
+            freqHopperXbox(10),
+            genericInterferer(11)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents which types of interference devices should be reported."
+    ::= { hh3cDot11RadioToConfigEntry 22 }
+
+hh3cDot11CfgSaTrapDevEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether trap is enabled for an interference device type."
+    ::= { hh3cDot11RadioToConfigEntry 23 }
+
+hh3cDot11CfgSaTrapDevType OBJECT-TYPE
+    SYNTAX BITS
+        {
+            microwave(0),
+            microwaveInverter(1),
+            bluetooth(2),
+            fixedFreqOthers(3),
+            fixedFreqCordlessPhone(4),
+            fixedFreqVideo(5),
+            fixedFreqAudio(6),
+            freqHopperOthers(7),
+            freqHopperCordlessBase(8),
+            freqHopperCordlessNetwork(9),
+            freqHopperXbox(10),
+            genericInterferer(11)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents for which interference device types the AP will send traps
+         when trap sending is enabled."
+    ::= { hh3cDot11RadioToConfigEntry 24 }
+
+hh3cDot11CfgSaTrapAQEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the channel quality trap is enabled."
+    ::= { hh3cDot11RadioToConfigEntry 25 }
+
+hh3cDot11CfgSaTrapAQThreshold OBJECT-TYPE
+    SYNTAX Integer32(1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the channel quality threshold.  When the channel quality
+        is below this value, the channel quality trap will be sent."
+    ::= { hh3cDot11RadioToConfigEntry 26 }
+
+hh3cDot11CfgSaDrivenRRMEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configures whether to run RRM when the AP detects
+         a certain level of interference."
+    ::= { hh3cDot11RadioToConfigEntry 27 }
+
+hh3cDot11CfgSaDrivenRRMSnt OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        low(1),
+        medium(2),
+        high(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configures the threshold for triggering RRM.  When the
+         interference level for the AP exceeds the threshold
+         , RRM initiates local dynamic frequency selection (DFS)
+         and changes the channel of the affected radio
+         to improve network performance.  Low represents a decreased
+         sensitivity to changes in the environment while high represents an
+         increased sensitivity."
+    ::= { hh3cDot11RadioToConfigEntry 28 }
 
 -- *****************************************************************************
 -- *  End of  hh3cDot11RadioToConfigTable Definition
@@ -2728,7 +3355,9 @@ Hh3cDot11RadioConfigEntry ::= SEQUENCE
         hh3cDot11RCRadioStatusCM            INTEGER,
         hh3cDot11RCRadioRateCM              OCTET STRING,
         hh3cDot11RCDynamicPowerStateCM      Hh3cDot11TruthValueCM,
-        hh3cDot11RCRssiThresholdCM          Integer32
+        hh3cDot11RCRssiThresholdCM          Integer32,
+        hh3cDot11RCDynamicChlStateSelfDecisiveCM    Hh3cDot11TruthValueCM,
+        hh3cDot11RCDynamicPowerStateSelfDecisiveCM  Hh3cDot11TruthValueCM
     }
 
 hh3cDot11RCAPSerialID OBJECT-TYPE
@@ -2925,6 +3554,23 @@ hh3cDot11RCRssiThresholdCM OBJECT-TYPE
         The clients with RSSI below this value will be refused to associate."
     DEFVAL { 1 }
     ::= { hh3cDot11RadioConfigEntry 19 }
+
+hh3cDot11RCDynamicChlStateSelfDecisiveCM OBJECT-TYPE
+    SYNTAX      Hh3cDot11TruthValueCM
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable dynamic channel selection self decisive for the band."
+    ::= { hh3cDot11RadioConfigEntry 20 }
+
+hh3cDot11RCDynamicPowerStateSelfDecisiveCM OBJECT-TYPE
+    SYNTAX      Hh3cDot11TruthValueCM
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable dynamic power selection self decisive for the band."
+    ::= { hh3cDot11RadioConfigEntry 21 }
+
 -- *****************************************************************************
 -- * End of hh3cDot11RadioConfigTable Definition
 -- *****************************************************************************
@@ -3056,7 +3702,8 @@ Hh3cDot11APSerialIDEntry ::= SEQUENCE
         hh3cDot11SIDAPElementID              Integer32,
         hh3cDot11SIDAPDevDetectEnable        TruthValue,
         hh3cDot11SIDAPStatisIntervMode       INTEGER,
-        hh3cDot11SIDAPWorkModeCM             INTEGER
+        hh3cDot11SIDAPWorkModeCM             INTEGER,
+        hh3cDot11SIDEchoInterval             Integer32
     }
 
 hh3cDot11SIDAPSerialID OBJECT-TYPE
@@ -3267,6 +3914,16 @@ hh3cDot11SIDAPWorkModeCM OBJECT-TYPE
         enabled."
     DEFVAL      { normal }
     ::= { hh3cDot11APSerialIDEntry 19 }
+
+hh3cDot11SIDEchoInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the interval for send echo requests."
+    ::= { hh3cDot11APSerialIDEntry 20 }
+
 -- *****************************************************************************
 -- *  hh3cDot11RadioIntfConfigTable Definition
 -- *****************************************************************************
@@ -4024,7 +4681,9 @@ Hh3cDot11nRadioCfgEntry ::= SEQUENCE
         hh3cDot11nClientDot11nOnly    TruthValue,
         hh3cDot11nChanelBand          INTEGER,
         hh3cDot11nShortGiEnable       TruthValue,
-        hh3cDot11nClientDot11acOnly   TruthValue
+        hh3cDot11nClientDot11acOnly   TruthValue,
+        hh3cDot11nSupportMaxMcs       Integer32,
+        hh3cDot11nMandatoryMaxMcs     Integer32
     }
 
 hh3cDot11nRadioCfgIndex OBJECT-TYPE
@@ -4068,7 +4727,9 @@ hh3cDot11nChanelBand OBJECT-TYPE
         {
         mode20(1),
         mode40(2),
-        mode80(3)
+        mode80(3),
+        mode160(4),
+        mode80and80(5)
         }
     MAX-ACCESS read-write
     STATUS current
@@ -4094,6 +4755,34 @@ hh3cDot11nClientDot11acOnly OBJECT-TYPE
         "Only permit clients of 11ac mode."
     DEFVAL { false }
     ::= { hh3cDot11nRadioCfgEntry 7 }
+
+hh3cDot11nSupportMaxMcs OBJECT-TYPE
+    SYNTAX Integer32 (0..76)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify the maximum Modulation and Coding Scheme (MCS) index for
+        802.11n supported rates.
+        The specified maximum MCS index for 802.11n supported rates must be no
+        less than the specified maximum MCS index for 802.11n mandatory rates."
+    DEFVAL { 76 }
+    ::= { hh3cDot11nRadioCfgEntry 8 }
+
+hh3cDot11nMandatoryMaxMcs OBJECT-TYPE
+    SYNTAX Integer32 (0..76 | 255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify the maximum modulation and coding scheme (MCS) index for
+        802.11n mandatory rates.
+        The value 255 indicates that no maximum MCS index
+        is specified.  No maximum MCS index is specified for 802.11n
+        mandatory rates by default.
+        Besides 255, the specified maximum MCS index for 802.11n supported
+        rates must be no less than the specified maximum MCS index for 802.11n
+        mandatory rates."
+    DEFVAL { 255 }
+    ::= { hh3cDot11nRadioCfgEntry 9 }
 
 -- *****************************************************************************
 -- *  End of hh3cDot11RadioElementConfigGroup Definition
@@ -4228,7 +4917,9 @@ Hh3cDot11nRadioCfg2Entry ::= SEQUENCE
         hh3cDot11nRadioCfg2ChannelBandCM        INTEGER,
         hh3cDot11nRadioCfg2ShortGiEnableCM      INTEGER,
         hh3cDot11nRadioCfg2ClientDot11acOnly   TruthValue,
-        hh3cDot11nRadioCfg2ClientDot11nOnlyCM   Hh3cDot11TruthValueCM
+        hh3cDot11nRadioCfg2ClientDot11nOnlyCM   Hh3cDot11TruthValueCM,
+        hh3cDot11nRadioCfg2SupportMaxMcs       Integer32,
+        hh3cDot11nRadioCfg2MandatoryMaxMcs     Integer32
     }
 
 hh3cDot11nRadioCfg2APIDIndex OBJECT-TYPE
@@ -4278,9 +4969,11 @@ hh3cDot11nRadioCfg2ClientDot11nOnly OBJECT-TYPE
 hh3cDot11nRadioCfg2ChannelBand OBJECT-TYPE
     SYNTAX INTEGER
         {
-        mode20(1),
-        mode40(2),
-        mode80(3)
+            mode20(1),
+            mode40(2),
+            mode80(3),
+            mode160(4),
+            mode80and80(5)
         }
     MAX-ACCESS read-write
     STATUS current
@@ -4314,7 +5007,10 @@ hh3cDot11nRadioCfg2ChannelBandCM OBJECT-TYPE
     SYNTAX      INTEGER
         {
             mode40(1),
-            mode20(2)
+            mode20(2),
+            mode80(3),
+            mode160(4),
+            mode80and80(5)
         }
     MAX-ACCESS read-write
     STATUS current
@@ -4353,6 +5049,35 @@ hh3cDot11nRadioCfg2ClientDot11nOnlyCM OBJECT-TYPE
         If radio type is 802.11ac, permit clients of both 11n and 11ac mode."
     DEFVAL { dot11false }
     ::= { hh3cDot11nRadioCfg2Entry 12 }
+
+hh3cDot11nRadioCfg2SupportMaxMcs OBJECT-TYPE
+    SYNTAX Integer32 (0..76)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify the maximum Modulation and Coding Scheme (MCS) index for
+        802.11n supported rates.
+        The specified maximum MCS index for 802.11n supported rates must be no
+        less than the specified maximum MCS index for 802.11n mandatory rates."
+    DEFVAL { 76 }
+    ::= { hh3cDot11nRadioCfg2Entry 13 }
+
+hh3cDot11nRadioCfg2MandatoryMaxMcs OBJECT-TYPE
+    SYNTAX Integer32 (0..76 | 255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specify the maximum modulation and coding scheme (MCS) index for
+        802.11n mandatory rates.
+        The value 255 indicates that no maximum MCS index
+        is specified.  No maximum MCS index is specified for 802.11n
+        mandatory rates by default.
+        Besides 255, the specified maximum MCS index for 802.11n supported
+        rates must be no less than the specified maximum MCS index for 802.11n
+        mandatory rates."
+    DEFVAL { 255 }
+    ::= { hh3cDot11nRadioCfg2Entry 14 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11nRadioCfg2Table Definition
 -- *****************************************************************************
@@ -4393,7 +5118,9 @@ hh3cDot11SSIDWepIDConflictTrap NOTIFICATION-TYPE
         hh3cDot11ConflictCipherIdx,
         hh3cDot11ConfigureAPID,
         hh3cDot11ConfigureRadioID,
-        hh3cDot11ConfigureAPMacAddress
+        hh3cDot11ConfigureAPMacAddress,
+        hh3cDot11PreConflictTemplateSSID,
+        hh3cDot11CurrConflictTemplateSSID
     }
     STATUS      current
     DESCRIPTION
@@ -4458,8 +5185,200 @@ hh3cDot11ConfigureAPMacAddress OBJECT-TYPE
         "Represents MAC Address of AP."
     ::= { hh3cDot11CfgTrapVarObjects 6 }
 
+hh3cDot11PreConflictTemplateSSID OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the previous SSID of the AP."
+    ::= { hh3cDot11CfgTrapVarObjects 7 }
+
+hh3cDot11CurrConflictTemplateSSID OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the current SSID of the AP."
+    ::= { hh3cDot11CfgTrapVarObjects 8 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11CfgNotifyGroup Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11LocalACTemplateTable Definition
+-- *****************************************************************************
+hh3cDot11LocalACTemplateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11LocalACTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "By local AC template CLI, administrator will configure the parameters of LocalAC
+        by convenience.
+        Before local AC boot up and connect to AC by CAPWAP tunnel, administrator
+        will create local AC template for each local AC. When local AC connect to AC,
+        AC will assign configuration to local AC by hh3cDot11LocalACSerialID
+        information in local AC template."
+    ::= { hh3cDot11LocalACConfigGroup 1 }
+
+hh3cDot11LocalACTemplateEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LocalACTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains configuration information for each LocalAC."
+    INDEX
+        {
+            hh3cDot11LocalACTemplateName
+        }
+    ::= { hh3cDot11LocalACTemplateTable 1 }
+
+Hh3cDot11LocalACTemplateEntry ::= SEQUENCE
+    {
+        hh3cDot11LocalACTemplateName             OCTET STRING,
+        hh3cDot11LocalACName                     OCTET STRING,
+        hh3cDot11LocalACSerialID                 OCTET STRING,
+        hh3cDot11TemLocalACModelAlias            OCTET STRING,
+        hh3cDot11LocalACTempRowStatus            RowStatus,
+        hh3cDot11LocalACStatus                   INTEGER,
+        hh3cDot11LocalACIPAddress                IpAddress,
+        hh3cDot11LocalACIPv6Address              OCTET STRING,
+        hh3cDot11EchoInterval                    Integer32,
+        hh3cDot11RetransInterval                 Integer32,
+        hh3cDot11RetransCount                    Integer32,
+        hh3cDot11FirmwareUpgrade                 INTEGER
+    }
+
+hh3cDot11LocalACTemplateName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of LocalAC template."
+    ::= { hh3cDot11LocalACTemplateEntry 1 }
+
+hh3cDot11LocalACName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the LocalAC name."
+    ::= { hh3cDot11LocalACTemplateEntry 2 }
+
+hh3cDot11LocalACSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents LocalAC serial id."
+    ::= { hh3cDot11LocalACTemplateEntry 3 }
+
+hh3cDot11TemLocalACModelAlias OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the alias of LocalAC model name."
+    ::= { hh3cDot11LocalACTemplateEntry 4 }
+
+hh3cDot11LocalACTempRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11LocalACTemplateEntry 5 }
+
+hh3cDot11LocalACStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            join(1),
+            joinConfirm(2),
+            download(3),
+            config(4),
+            run(5),
+            idle(6)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the capwap status of local AC.
+        The following values are supported:
+        join         - local AC is joining to cnetral AC.
+        joinConfirm  - cnetral AC confirm whether permit local AC to
+        - join.
+        download     - local AC is downloading software from cnetral
+        - AC.
+        config       - local AC and cnetral AC exchange configuration
+        - before local AC provide WLAN service.
+        run          - The local AC is run.
+        idle         - The local AC is idle."
+    ::= { hh3cDot11LocalACTemplateEntry 6 }
+
+hh3cDot11LocalACIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of an LocalAC."
+    ::= { hh3cDot11LocalACTemplateEntry 7 }
+
+hh3cDot11LocalACIPv6Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IPv6 address of LocalAC."
+    ::= { hh3cDot11LocalACTemplateEntry 8 }
+
+hh3cDot11EchoInterval OBJECT-TYPE
+    SYNTAX      Integer32(5..80)
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the interval of echo."
+    DEFVAL      { 10 }
+    ::= { hh3cDot11LocalACTemplateEntry 9 }
+
+hh3cDot11RetransInterval OBJECT-TYPE
+    SYNTAX      Integer32(3..8)
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the interval of retransmit."
+    DEFVAL      { 5 }
+    ::= { hh3cDot11LocalACTemplateEntry 10 }
+
+hh3cDot11RetransCount OBJECT-TYPE
+    SYNTAX      Integer32(2..5)
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum of retransmit."
+    DEFVAL      { 3 }
+    ::= { hh3cDot11LocalACTemplateEntry 11 }
+
+hh3cDot11FirmwareUpgrade OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the status of firmware upgrade for an local AC.
+        The following values are supported:
+        enable      - local AC firmware upgrade will be enabled.
+        disable     - local AC firmware upgrade will be disabled."
+        DEFVAL      { enable }
+    ::= { hh3cDot11LocalACTemplateEntry 12 }
+
+-- *****************************************************************************
+-- *  End of  hh3cDot11LocalACTemplateTable Definition
 -- *****************************************************************************
 
 END

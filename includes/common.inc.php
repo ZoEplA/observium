@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage common
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -56,6 +56,10 @@ function observium_autoload($class_name)
 
     case 'Defuse':
       $class_file = str_replace('Defuse/', '', $class_file);
+      break;
+
+    case 'PhpUnitsOfMeasure':
+      include_once($base_dir . 'PhpUnitsOfMeasure/UnitOfMeasureInterface.php');
       break;
 
     default:
@@ -108,7 +112,8 @@ function set_obs_attrib($attrib_type, $attrib_value)
 {
   if (isset($GLOBALS['cache']['attribs'])) { unset($GLOBALS['cache']['attribs']); } // Reset attribs cache
 
-  if (dbFetchCell("SELECT COUNT(*) FROM `observium_attribs` WHERE `attrib_type` = ?;", array($attrib_type)))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `observium_attribs` WHERE `attrib_type` = ?;", array($attrib_type)))
+  if (dbExist('observium_attribs', '`attrib_type` = ?', array($attrib_type)))
   {
     $status = dbUpdate(array('attrib_value' => $attrib_value), 'observium_attribs', "`attrib_type` = ?", array($attrib_type));
   } else {
@@ -196,6 +201,22 @@ function set_cache_clear($target = 'wui')
       // Add clear WUI cache attrib
       set_obs_attrib('cache_wui_clear', get_request_id());
   }
+}
+
+function set_status_var($var, $value)
+{
+  $GLOBALS['cache']['status_vars'][$var] = $value;
+  return TRUE;
+}
+
+function isset_status_var($var)
+{
+  return in_array($var, array_keys($GLOBALS['cache']['status_vars']));
+}
+
+function get_status_var($var)
+{
+  return $GLOBALS['cache']['status_vars'][$var];
 }
 
 /**
@@ -801,7 +822,7 @@ function print_sql($query)
 }
 
 // DOCME needs phpdoc block
-// Observium's variable debugging. Choses nice output depending upon web or cli
+// Observium's variable debugging. Chooses nice output depending upon web or cli
 // TESTME needs unit testing
 function print_vars($vars, $trace = NULL)
 {
@@ -815,9 +836,11 @@ function print_vars($vars, $trace = NULL)
       {
         if (is_null($trace))
         {
-          $trace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
+          $backtrace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
+        } else {
+          $backtrace = $trace;
         }
-        ref::config('Backtrace', $trace); // pass original backtrace
+        ref::config('Backtrace', $backtrace); // pass original backtrace
         ref::config('showStringMatches',  FALSE);
       } else {
         ref::config('showBacktrace',      FALSE);
@@ -838,9 +861,11 @@ function print_vars($vars, $trace = NULL)
       {
         if (is_null($trace))
         {
-          $trace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
+          $backtrace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace();
+        } else {
+          $backtrace = $trace;
         }
-        ref::config('Backtrace', $trace); // pass original backtrace
+        ref::config('Backtrace', $backtrace); // pass original backtrace
       } else {
         ref::config('showBacktrace',      FALSE);
         ref::config('showResourceInfo',   FALSE);
@@ -922,6 +947,14 @@ function timeticks_to_sec($timetick, $float = FALSE)
     $hours += $days  * 24;
     $mins  += $hours * 60;
     $secs  += $mins  * 60;
+
+    // Sometime used non standard years counter
+    if (count($timetick_array))
+    {
+      $years = array_pop($timetick_array);
+      $secs  += $years * 31536000; // 365 * 24 * 60 * 60;
+    }
+    //print_vars($timetick_array);
   }
   $time  = ($float ? (float)$secs + $microsecs/100 : (int)$secs);
 
@@ -1000,16 +1033,19 @@ function datetime_to_unixtime($datetime, $use_gmt = FALSE)
 # is not very accurate, but better than reporting what the
 # uptime was at some time before it went down.
 // TESTME needs unit testing
-function deviceUptime($device, $format="long")
+function deviceUptime($device, $format = "long")
 {
   if ($device['status'] == 0) {
     if ($device['last_polled'] == 0) {
       return "Never polled";
     }
     $since = time() - strtotime($device['last_polled']);
-    return "Down " . formatUptime($since, $format);
+    //$reason = isset($device['status_type']) && $format == 'long' ? '('.strtoupper($device['status_type']).') ' : '';
+    $reason = isset($device['status_type']) ? '('.strtoupper($device['status_type']).') ' : '';
+
+    return "Down $reason" . format_uptime($since, $format);
   } else {
-    return formatUptime($device['uptime'], $format);
+    return format_uptime($device['uptime'], $format);
   }
 }
 
@@ -1031,9 +1067,9 @@ function deviceUptime($device, $format="long")
  *
  * @return string
  */
-function formatUptime($uptime, $format = "long")
+function format_uptime($uptime, $format = "long")
 {
-  $uptime = (int)$uptime;
+  $uptime = intval(round($uptime, 0));
   if ($uptime <= 0) { return '0s'; }
 
   $up['y'] = floor($uptime / 31536000);
@@ -1085,7 +1121,7 @@ function formatUptime($uptime, $format = "long")
 
 /**
  * This function convert human written Uptime to seconds.
- * Opposite function for formatUptime().
+ * Opposite function for format_uptime().
  *
  * Also applicable for some uptime formats in MIB, like EigrpUpTimeString:
  *  'hh:mm:ss', reflecting hours, minutes, and seconds
@@ -1179,45 +1215,6 @@ function humanspeed($speed)
     return '-';
   } else {
     return formatRates($speed);
-  }
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/rewrites.inc.php
-function formatCiscoHardware(&$device, $short = FALSE)
-{
-  if ($device['os'] == "ios")
-  {
-    if ($device['hardware'])
-    {
-      if (preg_match("/^WS-C([A-Za-z0-9]+).*/", $device['hardware'], $matches))
-      {
-        if (!$short)
-        {
-           $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
-        }
-        else
-        {
-           $device['hardware'] = "Cisco " . $matches[1];
-        }
-      }
-      elseif (preg_match("/^CISCO([0-9]+)$/", $device['hardware'], $matches))
-      {
-        $device['hardware'] = "Cisco " . $matches[1];
-      }
-    }
-    else
-    {
-      if (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches))
-      {
-        $device['hardware'] = "Cisco " . $matches[1];
-      }
-      elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches))
-      {
-        $device['hardware'] = "Cisco " . $matches[1];
-      }
-    }
   }
 }
 
@@ -1358,12 +1355,12 @@ function external_exec($command, $timeout = NULL)
   {
     $debug_command = ($command === '' && isset($GLOBALS['snmp_command'])) ? $GLOBALS['snmp_command'] : $command;
     if (OBS_DEBUG < 2 && $GLOBALS['config']['snmp']['hide_auth'] &&
-        preg_match("/snmp(bulk)?(get|walk)(\s+-(t|r|Cr)['\d\s]+){0,3}(\s+-Cc)?\s+-v[123]c?\s+/", $debug_command))
+        preg_match("/snmp(bulk)?(get|getnext|walk)(\s+-(t|r|Cr)['\d\s]+){0,3}(\s+-Cc)?\s+-v[123]c?\s+/", $debug_command))
     {
       // Hide snmp auth params from debug cmd out,
       // for help users who want send debug output to developers
-      $pattern = "/\s+(-[cnuxXaA])\s*(?:'.+?(@\S+)?')/";
-      $debug_command = preg_replace($pattern, ' \1 ***\2', $debug_command);
+      $pattern = "/\s+(?:(-[uxXaA])\s*(?:'.*?')|(-c)\s*(?:'.*?(@\S+)?'))/"; // do not hide contexts, only community and v3 auth
+      $debug_command = preg_replace($pattern, ' \1\2 ***\3', $debug_command);
     }
     print_message(PHP_EOL . 'CMD[%y' . $debug_command . '%n]' . PHP_EOL, 'console');
   }
@@ -1387,7 +1384,7 @@ function external_exec($command, $timeout = NULL)
     if (OBS_DEBUG > 0)
     {
       print_message('CMD EXITCODE['.($exec_status['exitcode'] !== 0 ? '%r' : '%g').$exec_status['exitcode'].'%n]'.PHP_EOL.
-                    'CMD RUNTIME['.($runtime > 7 ? '%r' : '%g').round($runtime, 4).'s%n]', 'console');
+                    'CMD RUNTIME['.($exec_status['runtime'] > 7 ? '%r' : '%g').round($exec_status['runtime'], 4).'s%n]', 'console');
       print_message("STDOUT[\n\n]", 'console', FALSE);
       if ($exec_status['exitcode'] && $exec_status['stderr'])
       {
@@ -1766,14 +1763,28 @@ function is_array_assoc($array)
   return (is_array($array) && $array !== array_values($array));
 }
 
+function array_get_nested($array, $string, $delimiter = '->')
+{
+  foreach (explode($delimiter, $string) as $key)
+  {
+    if (!array_key_exists($key, $array))
+    {
+      return NULL;
+    }
+    $array = $array[$key];
+  }
+
+  return $array;
+}
+
 /**
  * Fast string compare function, checks if string contain $needle
  *
  * @param string $string              The string to search in
  * @param mixed  $needle              If needle is not a string, it is converted to an string
  * @param mixed  $encoding            For use "slow" multibyte compare, pass required encoding here (ie: UTF-8)
- * @param binary $case_insensitivity  If case_insensitivity is TRUE, comparison is case insensitive
- * @return binary                     Returns TRUE if $string starts with $needle or FALSE otherwise
+ * @param bool   $case_insensitivity  If case_insensitivity is TRUE, comparison is case insensitive
+ * @return bool                       Returns TRUE if $string starts with $needle or FALSE otherwise
  */
 function str_contains($string, $needle, $encoding = FALSE, $case_insensitivity = FALSE)
 {
@@ -2324,42 +2335,6 @@ function sgn($int)
   }
 }
 
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_sensor_rrd($device, $sensor)
-{
-  global $config;
-
-  # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
-  if ($config['os'][$device['os']]['sensor_descr'] || $sensor['poller_type'] == "ipmi")
-  {
-    $rrd_file = "sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_descr'] . ".rrd";
-  } else {
-    $rrd_file = "sensor-".$sensor['sensor_class']."-".$sensor['sensor_type']."-".$sensor['sensor_index'] . ".rrd";
-  }
-
-  return($rrd_file);
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_status_rrd($device, $status)
-{
-  global $config;
-
-  # For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
-  if ($config['os'][$device['os']]['status_descr'] || $sensor['poller_type'] == "ipmi")
-  {
-    $rrd_file = "status-".$status['status_type']."-".$status['status_descr'] . ".rrd";
-  } else {
-    $rrd_file = "status-".$status['status_type']."-".$status['status_index'] . ".rrd";
-  }
-
-  return($rrd_file);
-}
-
 // Get port array by ID (using cache)
 // DOCME needs phpdoc block
 // TESTME needs unit testing
@@ -2392,90 +2367,6 @@ function get_port_by_id($port_id)
   return FALSE;
 }
 
-// Get port array by ifIndex (using cache)
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_by_index_cache($device, $ifIndex)
-{
-  global $cache;
-
-  if (is_array($device) && isset($device['device_id']))
-  {
-    $device_id = $device['device_id'];
-  }
-  else if (is_numeric($device))
-  {
-    $device_id = $device;
-  }
-  if (!isset($device_id) || !is_numeric($ifIndex))
-  {
-    print_error("Invalid arguments passed into function get_port_by_index_cache(). Please report to developers.");
-  }
-
-  if (isset($cache['port_index'][$device_id][$ifIndex]) && is_numeric($cache['port_index'][$device_id][$ifIndex]))
-  {
-    $id = $cache['port_index'][$device_id][$ifIndex];
-  } else {
-    $id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? LIMIT 1", array($device_id, $ifIndex));
-    if (is_numeric($id)) { $cache['port_index'][$device_id][$ifIndex] = $id; }
-  }
-
-  $port = get_port_by_id_cache($id);
-  if (is_array($port)) { return $port; }
-
-  return FALSE;
-}
-
-// Get port array by ifIndex
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_by_ifIndex($device_id, $ifIndex)
-{
-  $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? LIMIT 1", array($device_id, $ifIndex));
-
-  if (is_array($port))
-  {
-    humanize_port($port);
-    return $port;
-  }
-
-  return FALSE;
-}
-
-// Get port ID by ifDescr (i.e. 'TenGigabitEthernet1/1') or ifName (i.e. 'Te1/1')
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_id_by_ifDescr($device_id, $ifDescr, $deleted = 0)
-{
-  $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND (`ifDescr` = ? OR `ifName` = ?) AND `deleted` = ? LIMIT 1", array($device_id, $ifDescr, $ifDescr, $deleted));
-
-  if (is_numeric($port_id))
-  {
-    return $port_id;
-  } else {
-    return FALSE;
-  }
-}
-
-// Get port ID by ifAlias (interface description)
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_id_by_ifAlias($device_id, $ifAlias, $deleted = 0)
-{
-  $port_id = dbFetchCell("SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifAlias` = ? AND `deleted` = ? LIMIT 1", array($device_id, $ifAlias, $deleted));
-
-  if (is_numeric($port_id))
-  {
-    return $port_id;
-  } else {
-    return FALSE;
-  }
-}
-
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 // MOVEME to includes/functions.inc.php
@@ -2490,66 +2381,6 @@ function get_bill_by_id($bill_id)
     return FALSE;
   }
 
-}
-
-// Get port ID by customer params (see http://www.observium.org/wiki/Interface_Description_Parsing)
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_id_by_customer($customer)
-{
-  $where = ' WHERE 1';
-  if (is_array($customer))
-  {
-    foreach ($customer as $var => $value)
-    {
-      if ($value != '')
-      {
-        switch ($var)
-        {
-          case 'device':
-          case 'device_id':
-            $where .= generate_query_values($value, 'device_id');
-            break;
-          case 'type':
-          case 'descr':
-          case 'circuit':
-          case 'speed':
-          case 'notes':
-            $where .= generate_query_values($value, 'port_descr_'.$var);
-            break;
-        }
-      }
-    }
-  } else {
-    return FALSE;
-  }
-
-  $query = 'SELECT `port_id` FROM `ports` ' . $where . ' ORDER BY `ifOperStatus` DESC';
-  $ids = dbFetchColumn($query);
-
-  //print_vars($ids);
-  switch (count($ids))
-  {
-    case 0:
-      return FALSE;
-    case 1:
-      return $ids[0];
-      break;
-    default:
-      foreach ($ids as $port_id)
-      {
-        $port = get_port_by_id_cache($port_id);
-        $device = device_by_id_cache($port['device_id']);
-        if ($device['disabled'] || !$device['status'])
-        {
-          continue; // switch to next ID
-        }
-        break;
-      }
-      return $port_id;
-  }
-  return FALSE;
 }
 
 // DOCME needs phpdoc block
@@ -2597,23 +2428,6 @@ function get_application_by_id($application_id)
   if (is_array($application))
   {
     return $application;
-  } else {
-    return FALSE;
-  }
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_sensor_by_id($sensor_id)
-{
-  if (is_numeric($sensor_id))
-  {
-    $sensor = dbFetchRow("SELECT * FROM `sensors` WHERE `sensor_id` = ?", array($sensor_id));
-  }
-  if (is_array($sensor))
-  {
-    return $sensor;
   } else {
     return FALSE;
   }
@@ -2761,14 +2575,6 @@ function escape_html($string, $flags = ENT_QUOTES)
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 // MOVEME to includes/functions.inc.php
-function getifhost($id)
-{
-  return dbFetchCell("SELECT `device_id` from `ports` WHERE `port_id` = ?", array($id));
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
 function get_device_by_device_id($id)
 {
   global $cache;
@@ -2825,30 +2631,6 @@ function getpeerhost($id)
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 // MOVEME to includes/functions.inc.php
-function get_ifIndex_by_port_id($id)
-{
-  return dbFetchCell("SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?", array($id));
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_by_port_id($id)
-{
-  return dbFetchRow("SELECT * FROM `ports` WHERE `port_id` = ?", array($id));
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function get_port_descr_by_port_id($id)
-{
-  return dbFetchCell("SELECT `ifDescr` FROM `ports` WHERE `port_id` = ?", array($id));
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
 function get_device_id_by_hostname($hostname)
 {
   global $cache;
@@ -2891,10 +2673,11 @@ function gethostosbyid($id)
 
 // DOCME needs phpdoc block
 // TESTME needs unit testing
-function safename($name)
+function safename($filename)
 {
-  return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+  return preg_replace('/[^a-zA-Z0-9._\-]/', '_', $filename);
 }
+
 
 // DOCME needs phpdoc block
 // TESTME needs unit testing
@@ -2947,168 +2730,6 @@ function del_dev_attrib($device, $attrib_type)
   return del_entity_attrib('device', $device, $attrib_type);
 }
 
-// DOCME needs phpdoc block
-// Return cached MIBs array available for device (from os definitions)
-// By default includes sysORID-supplied MIBs unless check_sysORID is false
-// When requesting list without sysORID, result will NOT be cached
-// MOVEME to includes/functions.inc.php
-function get_device_mibs($device, $check_sysORID = TRUE, $mibs_order = NULL)
-{
-  global $config, $cache;
-
-  if (is_numeric($device))
-  {
-    $device_id = $device;
-    $device    = device_by_id_cache($device_id);
-  } else {
-    $device_id = $device['device_id'];
-  }
-
-  // Set custom mibs order
-  $mibs_order_default = array('model', 'os', 'group', 'default');
-  if      (empty($mibs_order))
-  {
-    // Default order: per-model mibs (if model set) -> os mibs -> os group mibs -> default mibs
-    $mibs_order = $mibs_order_default;
-  }
-  else if (!is_array($mibs_order))
-  {
-    // Order can passed as string with comma: 'model,os,group,default'
-    $mibs_order = explode(',', $mibs_order);
-  }
-
-  // Check if custom order used, than set first from passed argument, second from default
-  if ($mibs_order_custom = $mibs_order !== $mibs_order_default)
-  {
-    // Set first from passed argument, second
-    $mibs_order = array_unique(array_merge($mibs_order, $mibs_order_default));
-  }
-
-  // Do not cache MIBs if custom order used, unknown $device_id or in PHPUNIT
-  $use_cache = $device_id && !$mibs_order_custom && !defined('__PHPUNIT_PHAR__');
-
-  // Cache main device MIBs list
-  if (!isset($cache['devices']['mibs'][$device_id]))
-  {
-    $mibs = array();
-    $model_array = get_model_array($device);
-    foreach ($mibs_order as $order)
-    {
-      switch ($order)
-      {
-        case 'model':
-          if (is_array($model_array) && isset($model_array['mibs']))
-          {
-            $mibs = array_merge($mibs, (array)$model_array['mibs']);
-          }
-          break;
-        case 'os':
-          $mibs = array_merge((array)$mibs, (array)$config['os'][$device['os']]['mibs']);
-          break;
-        case 'group':
-          $os_group = $config['os'][$device['os']]['group'];
-          $mibs = array_merge((array)$mibs, (array)$config['os_group'][$os_group]['mibs']);
-          break;
-        case 'default':
-          //var_dump($config['os_group']['default']['mibs']);
-          $mibs = array_merge((array)$mibs, (array)$config['os_group']['default']['mibs']);
-          break;
-      }
-    }
-    $mibs = array_unique($mibs);
-
-    //$mibs = array_unique(array_merge((array)$mibs, (array)$config['os'][$device['os']]['mibs'],
-    //                                 (array)$config['os_group'][$config['os'][$device['os']]['group']]['mibs'],
-    //                                 (array)$config['os_group']['default']['mibs']));
-
-    // Remove blacklisted MIBs from array
-    $mibs = array_diff($mibs, get_device_mibs_blacklist($device));
-
-    if ($use_cache)
-    {
-      $cache['devices']['mibs'][$device_id] = $mibs;
-    }
-  } else {
-    $mibs = $cache['devices']['mibs'][$device_id];
-  }
-  //print_error('$cache[\'devices\'][\'mibs\'][$device_id]');
-  //print_vars($cache['devices']['mibs'][$device_id]);
-  //print_vars($mibs);
-
-  // Add and cache sysORID supplied MIBs if any
-  if ($check_sysORID)
-  {
-    if (!isset($cache['devices']['mibs_sysORID'][$device_id]))
-    {
-      $sysORID = json_decode(get_entity_attrib('device', $device, 'sysORID'), TRUE);
-      if (is_array($sysORID))
-      {
-        // Leave only not exist in main MIBs and blacklist
-        $sysORID = array_diff($sysORID, get_device_mibs_blacklist($device), $mibs);
-        //print_vars($sysORID);
-      } else {
-        $sysORID = array(); // Leave empty
-      }
-      if ($use_cache)
-      {
-        $cache['devices']['mibs_sysORID'][$device_id] = $sysORID;
-      }
-    } else {
-      $sysORID = $cache['devices']['mibs_sysORID'][$device_id];
-    }
-    // Attach sysORID MIBs
-    $mibs = array_merge($mibs, (array)$sysORID);
-  }
-
-  //print_error('$mibs');
-  //print_vars($mibs);
-  return $mibs;
-}
-
-/**
- * Return array with blacklisted MIBs for current device
- *
- * @param array $device Device array
- * @return array Blacklisted MIBs
- */
-function get_device_mibs_blacklist(array $device)
-{
-  global $config;
-  $blacklist = array_unique(array_merge((array)$config['os'][$device['os']]['mib_blacklist'],
-                                        (array)$config['os_group'][$config['os'][$device['os']]['group']]['mib_blacklist']));
-  return $blacklist;
-}
-
-// Check if MIB available and permitted for device
-// if $check_permissions is TRUE, check permissions by config option $config['mibs'][$mib]
-// and from the enable/disable panel in the device configuration in the web interface
-// if $check_sysORID is TRUE, we fetch the device's supplied list as well - should only be FALSE in the sysORID code
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/functions.inc.php
-function is_device_mib($device, $mib, $check_permissions = TRUE, $check_sysORID = TRUE)
-{
-  global $config;
-
-  $mib_permitted = in_array($mib, get_device_mibs($device, $check_sysORID)); // Check if mib available for device
-
-  if ($check_permissions && $mib_permitted && (!isset($config['mibs'][$mib]['enable']) || $config['mibs'][$mib]['enable']))
-  {
-    // Check if MIB permitted by config
-    $mib_permitted = $mib_permitted && (!isset($config['mibs'][$mib]['enable']) || $config['mibs'][$mib]['enable']);
-
-    // Check if MIB disabled on device by web interface or polling process
-    $dev_attribs = get_dev_attribs($device['device_id']);
-    $mib_permitted = $mib_permitted && (!isset($dev_attribs['mib_'.$mib]) || $dev_attribs['mib_'.$mib] != 0);
-
-    // Check if MIB disabled globally by web interface
-    $obs_attribs = get_obs_attribs('mib_');
-    $mib_permitted = $mib_permitted && (!isset($obs_attribs['mib_'.$mib]) || $obs_attribs['mib_'.$mib] != 0);
-  }
-
-  return $mib_permitted;
-}
-
 /**
  * Return model array from definitions, based on device sysObjectID
  *
@@ -3130,12 +2751,12 @@ function get_model_array($device, $sysObjectID_new = NULL)
       // Use passed as param sysObjectID
       $sysObjectID = $sysObjectID_new;
     }
-    else if (isset($cache['devices']['model'][$device['device_id']]))
+    elseif (isset($cache['devices']['model'][$device['device_id']]))
     {
       // Return already cached array if no passed param sysObjectID
       return $cache['devices']['model'][$device['device_id']];
     }
-    else if (preg_match('/^\.\d[\d\.]+$/', $device['sysObjectID']))
+    elseif (preg_match('/^\.\d[\d\.]+$/', $device['sysObjectID']))
     {
       // Use sysObjectID from device array
       $sysObjectID = $device['sysObjectID'];
@@ -3274,9 +2895,15 @@ function format_value($value, $format = '', $round = 2, $sf = 3)
       $value = format_bi($value, $round, $sf);
       break;
 
-    case 'time':
-      $value = formatUptime($value);
+    case 'shorttime':
+      $value = format_uptime($value, 'short');
       break;
+
+    case 'uptime':
+    case 'time':
+      $value = format_uptime($value);
+      break;
+
     default:
       if (is_numeric($value))
       {
@@ -3483,74 +3110,6 @@ function add_service($device, $service, $descr)
   echo dbInsert($insert, 'services');
 }
 
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-// MOVEME to includes/rrdtool.inc.php
-function get_port_rrdindex($port)
-{
-  global $config;
-
-  $device = device_by_id_cache($port['device_id']);
-
-  $device_identifier = strtolower($config['os'][$device['os']]['port_rrd_identifier']);
-
-  // default to ifIndex
-  $this_port_identifier = $port['ifIndex'];
-
-  if ($device_identifier == "ifname" && $port['ifName'] != "")
-  {
-    $this_port_identifier = strtolower(str_replace("/", "-", $port['ifName']));
-  }
-
-  return $this_port_identifier;
-}
-
-// CLEANME DEPRECATED
-function get_port_rrdfilename($port, $suffix = NULL, $fullpath = FALSE)
-{
-  $this_port_identifier = get_port_rrdindex($port);
-
-  if ($suffix == "")
-  {
-    $filename = "port-" . $this_port_identifier . ".rrd";
-  } else {
-    $filename = "port-" . $this_port_identifier . "-" . $suffix . ".rrd";
-  }
-
-  if ($fullpath)
-  {
-    $device   = device_by_id_cache($port['device_id']);
-    $filename = get_rrd_path($device, $filename);
-  }
-
-  return $filename;
-}
-
-// DOCME needs phpdoc block
-// TESTME needs unit testing
-function build_request_url($url, $params = array(), $method = 'GET')
-{
-  $request = $url;
-  // Build request query
-  switch (strtolower($method))
-  {
-    case 'post':
-      break; // Just return original url
-    case 'get':
-    default:
-      $request_params = array();
-      foreach ($params as $param => $value)
-      {
-        $request_params[] = $param . '=' . $value;
-      }
-      if ($request_params)
-      {
-        $request .= '?' . implode('&', $request_params);
-      }
-  }
-  return $request;
-}
-
 /**
  * Request an http(s) url.
  * Note. If first runtime request exit with timeout,
@@ -3649,7 +3208,7 @@ function get_http_request($request, $context = array(), $rate_limit = FALSE)
   $response = '';
 
   // Add common http context
-  $opts = array('http' => set_http_context_defaults($context));
+  $opts = array('http' => generate_http_context_defaults($context));
 
   // Process http request and calculate runtime
   $start = utime();
@@ -3686,7 +3245,7 @@ function get_http_request($request, $context = array(), $rate_limit = FALSE)
   {
     $GLOBALS['request_status'] = FALSE;
   }
-  else if ($response === FALSE)
+  elseif ($response === FALSE)
   {
     // An error in get response
     $GLOBALS['response_headers'] = array('code' => 408, 'descr' => 'Request Timeout');
@@ -3743,6 +3302,78 @@ function get_http_request($request, $context = array(), $rate_limit = FALSE)
 }
 
 /**
+ * Process HTTP request by definition array and process it for valid status.
+ * Used definition params in response key.
+ *
+ * @param string $def       Definition array or alert transport key (see transports definitions)
+ * @param string $response  Response from get_http_request()
+ * @return boolean          Return TRUE if request processed with valid HTTP code (2xx, 3xx) and API response return valid param
+ */
+function test_http_request($def, $response)
+{
+  $response = trim($response);
+
+  if (is_string($def))
+  {
+    // Get transport definition for responses
+    $def = $GLOBALS['config']['transports'][$def]['notification'];
+  }
+
+  // Set status by response status
+  $success = get_http_last_status();
+
+  // If response return valid code and content, additional parse for specific defined tests
+  if ($success)
+  {
+    // Decode if request OK
+    $is_response_array = FALSE;
+    if (strtolower($def['response_format']) == 'json')
+    {
+      $response = json_decode($response, TRUE);
+      $is_response_array = TRUE;
+    }
+    // else additional formats?
+
+    // Check if call succeeded
+    if (isset($def['response_test']))
+    {
+      // Convert single test condition to multi-level condition
+      if (isset($def['response_test']['operator']))
+      {
+        $def['response_test'] = array($def['response_test']);
+      }
+
+      // Compare all definition fields with response,
+      // if response param not equals to expected, set not success
+      // multilevel keys should written with '->' separator, ie: $a[key][some][0] - key->some->0
+      foreach ($def['response_test'] as $test)
+      {
+        if ($is_response_array)
+        {
+          $field = array_get_nested($response, $test['field']);
+        } else {
+          // RAW response
+          $field = $response;
+        }
+        if (test_condition($field, $test['operator'], $test['value']) === FALSE)
+        {
+          print_debug("Response test not success: [" . $test['field'] . "] " . $test['operator'] . " [" . implode(', ', (array)$test['value']) . "]");
+
+          $success = FALSE;
+          break;
+        } else {
+          print_debug("Response test success: [" . $test['field'] . "] " . $test['operator'] . " [" . implode(', ', (array)$test['value']) . "]");
+        }
+      }
+    }
+
+    print_debug_vars($response);
+  }
+
+  return $success;
+}
+
+/**
  * Return HTTP return code for last request by get_http_request()
  *
  * @return integer HTTP code
@@ -3769,7 +3400,7 @@ function get_http_last_status()
  * @param array $context HTTP specified context, see http://php.net/manual/ru/function.stream-context-create.php
  * @return array HTTP context array
  */
-function set_http_context_defaults($context = array())
+function generate_http_context_defaults($context = array())
 {
   global $config;
 
@@ -3798,7 +3429,158 @@ function set_http_context_defaults($context = array())
     $context['header'] .= 'Proxy-Authorization: Basic ' . $auth . "\r\n";
   }
 
+  print_debug_vars($context);
+
   return $context;
+}
+
+
+/**
+ * Generate HTTP context based on passed params, tags and definition.
+ * This context will used in get_http_request_test() (or get_http_request())
+ *
+ * @global array $config
+ * @param string $def      Definition array or alert transport key (see transports definitions)
+ * @param array  $tags     (optional) Contact array and other tags
+ * @param array  $params   (optional) Array of requested params with key => value entries (used with request method POST)
+ * @return array           HTTP Context which can used in get_http_request_test() or get_http_request()
+ */
+function generate_http_context($def, $tags = array(), $params = array())
+{
+  global $config;
+
+  if (is_string($def))
+  {
+    // Get transport definition for requests
+    $def = $config['transports'][$def]['notification'];
+  }
+
+  $context = array(); // Init
+
+  // Request method POST/GET
+  if ($def['method'])
+  {
+    $context['method'] = strtoupper($def['method']);
+  }
+
+  // Content and headers
+  $header = "Connection: close\r\n";
+
+  // Add encode $params for POST request inside http headers
+  if ($context['method'] == 'POST')
+  {
+    // Generate request params
+    foreach ($def['request_params'] as $param => $entry)
+    {
+      // Try to find all keys in header like %bot_hash% matched with same key in $endpoint array
+      if (is_array($entry))
+      {
+        // ie teams and pagerduty
+        $params[$param] = array_merge((array)$params[$param], array_tag_replace($tags, $entry));
+      }
+      elseif (!isset($params[$param]) || $params[$param] === '')
+      {
+        $params[$param] = array_tag_replace($tags, $entry);
+      }
+      // Clean empty params
+      if ($params[$param] === '' || $params[$param] === []) { unset($params[$param]); }
+    }
+
+    if (strtolower($def['request_format']) == 'json')
+    {
+      // Encode params as json string
+      $data   = json_encode($params);
+      $header .= "Content-Type: application/json; charset=utf-8\r\n";
+    } else {
+      // Encode params as url encoded string
+      $data   = http_build_query($params);
+      // https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
+      //$header .= "Content-Type: multipart/form-data\r\n";
+      $header .= "Content-Type: application/x-www-form-urlencoded; charset=utf-8\r\n";
+    }
+    $header .= "Content-Length: ".strlen($data)."\r\n";
+
+    // Encoded content data
+    $context['content'] = $data;
+  }
+
+  // Additional headers with contact params
+  foreach ($def['request_header'] as $entry)
+  {
+    // Try to find all keys in header like %bot_hash% matched with same key in $endpoint array
+    $header .= array_tag_replace($tags, $entry) . "\r\n";
+  }
+
+  $context['header'] = $header;
+
+  return $context;
+}
+
+/**
+ * Generate URL based on passed params, tags and definition.
+ * This context will used in get_http_request_test() (or get_http_request())
+ *
+ * @global array $config
+ * @param string $def       Definition array or alert transport key (see transports definitions)
+ * @param array  $tags      (optional) Contact array, used only if transport required additional headers (ie hipchat)
+ * @param array  $params    (optional) Array of requested params with key => value entries (used with request method GET)
+ * @return string           URL which can used in get_http_request_test() or get_http_request()
+ */
+function generate_http_url($def, $tags = array(), $params = array())
+{
+  global $config;
+
+  if (is_string($def))
+  {
+    // Get definition for transport API
+    $def = $config['transports'][$def]['notification'];
+  }
+
+  $url = ''; // Init
+
+  // Append (if set $def['url_param']) or set hardcoded url for transport
+  if (isset($def['url']))
+  {
+    // Try to find all keys in URL like %bot_hash% matched with same key in $endpoint array
+    $url .= array_tag_replace($tags, $def['url']);
+  }
+
+  // Add GET params to url
+  if ($def['method'] == 'GET')
+  {
+    // Generate request params
+    foreach ($def['request_params'] as $param => $entry)
+    {
+      // Try to find all keys in header like %bot_hash% matched with same key in $endpoint array
+      if (is_array($entry))
+      {
+        // ie teams and pagerduty
+        $params[$param] = array_merge((array)$params[$param], array_tag_replace($tags, $entry));
+      }
+      elseif (!isset($params[$param]) || $params[$param] === '')
+      {
+        $params[$param] = array_tag_replace($tags, $entry);
+      }
+      // Clean empty params
+      if ($params[$param] === '' || $params[$param] === []) { unset($params[$param]); }
+    }
+
+    // Append params to url
+    if (count($params))
+    {
+      $data   = http_build_query($params);
+      if (str_contains($url, '?'))
+      {
+        // Append additional params to url string
+        $url .= '&' . $data;
+      } else {
+        // Add get params as first time
+        $url .= '?' . $data;
+      }
+    }
+  }
+
+  return $url;
 }
 
 /**
@@ -3830,12 +3612,12 @@ function format_timestamp($str)
 /**
  * Format unixtime.
  *
- * This function convert date/time string to format from
+ * This function convert unixtime string to format from
  * config option $config['timestamp_format'].
  * Can take an optional format parameter, which is passed to date();
  *
- * @param string $time
- * @param string $format
+ * @param string $time Unixtime in seconds since the Unix Epoch (also allowed microseconds)
+ * @param string $format Common date format
  * @return string
  */
 // TESTME needs unit testing
@@ -3843,12 +3625,65 @@ function format_unixtime($time, $format = NULL)
 {
   global $config;
 
-  if ($format != NULL)
-  {
-    return date($format, $time);
+  list($sec, $usec) = explode('.', strval($time));
+  if (strlen($usec)) {
+    $date = date_create_from_format('U.u', number_format($time, 6, '.', ''));
   } else {
-    return date($config['timestamp_format'], $time);
+    $date = date_create_from_format('U', $sec);
   }
+
+  // If something wrong with create data object, just return empty string (and yes, we never use zero unixtime)
+  if (!$date || $time == 0) { return ''; }
+
+  // Set correct timezone
+  $tz = get_timezone();
+  //r($tz);
+  $date_timezone = new DateTimeZone($tz['php']);
+  //$date_timezone = new DateTimeZone($tz['php_name']);
+  $date->setTimeZone($date_timezone);
+  //r($date);
+
+  if (strlen($format))
+  {
+    return date_format($date, $format);
+  } else {
+    //return date_format($date, $config['timestamp_format'] . ' T');
+    return date_format($date, $config['timestamp_format']);
+  }
+}
+
+/**
+ * Reformat US-based dates to display based on $config['date_format']
+ *
+ * Supported input formats:
+ *   DD/MM/YYYY
+ *   DD/MM/YY
+ *
+ * Handling of YY -> YYYY years is passed on to PHP's strtotime, which
+ * is currently cut off at 1970/2069.
+ *
+ * @param string $date Erroneous date format
+ * @return string $date
+ */
+function reformat_us_date($date)
+{
+  global $config;
+
+  $date = trim($date);
+  if (preg_match('!^\d{1,2}/\d{1,2}/(\d{2}|\d{4})$!', $date))
+  {
+    // Only date
+    $format = $config['date_format'];
+  }
+  elseif (preg_match('!^\d{1,2}/\d{1,2}/(\d{2}|\d{4})\s+\d{1,2}:\d{1,2}(:\d{1,2})?$!', $date))
+  {
+    // Date + time
+    $format = $config['timestamp_format'];
+  } else {
+    return $date;
+  }
+
+  return date($format, strtotime($date));
 }
 
 /**
@@ -4173,31 +4008,24 @@ function value_to_si($value, $unit, $type = NULL)
 {
   if (!is_numeric($value)) { return $value; } // Just return original value if not numeric
 
-  switch (strtolower($unit))
+  $unit_lower = strtolower($unit);
+  switch ($unit_lower)
   {
     case 'f':
     case 'fahrenheit':
-      $si_value = ($value - 32) * (5/9);
-
-      $type  = 'temperature';
-      $from  = $value    . ' Fahrenheit';
-      $to    = $si_value . ' Celsius';
-      break;
-
     case 'k':
     case 'kelvin':
-      $si_value = $value - 273.15;
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Temperature($value, $unit);
+      $si_value = $value_from->toUnit('C');
+      if ($si_value < -273.15)
+      {
+        // Physically incorrect value
+        $si_value = FALSE;
+      }
 
       $type  = 'temperature';
-      $from  = $value    . ' Kelvin';
-      if ($value < 0)
-      {
-        // Kelvin not possible less than 0
-        $si_value = FALSE;
-        $to    = 'FALSE';
-      } else {
-        $to    = $si_value . ' Celsius';
-      }
+      $from  = $value    . " $unit";
+      $to    = $si_value . ' Celsius';
       break;
 
     case 'c':
@@ -4215,9 +4043,10 @@ function value_to_si($value, $unit, $type = NULL)
         // https://www.everythingrf.com/rf-calculators/watt-to-dbm
         if ($value > 0)
         {
-          $si_value = 10 * log10($value) + 30;
+          $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Power($value, $unit);
+          $si_value = $value_from->toUnit('dBm');
 
-          $from  = $value    . ' W';
+          $from  = $value    . " $unit";
           $to    = $si_value . ' dBm';
         } else {
           $si_value = FALSE;
@@ -4236,11 +4065,11 @@ function value_to_si($value, $unit, $type = NULL)
         // Used when Power convert to dBm
         // https://en.wikipedia.org/wiki/DBm
         // https://www.everythingrf.com/rf-calculators/dbm-to-watts
+        $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Power($value, $unit);
+        $si_value = $value_from->toUnit('W');
 
-          $si_value = pow(10, ($value / 10)) / 1000;
-
-          $from  = $value    . ' dBm';
-          $to    = $si_value . ' W';
+        $from  = $value    . " $unit";
+        $to    = $si_value . ' W';
 
       } else {
         // not convert, just keep correct value
@@ -4249,15 +4078,78 @@ function value_to_si($value, $unit, $type = NULL)
       break;
 
     case 'psi':
+    case 'ksi':
+    case 'Mpsi':
       // https://en.wikipedia.org/wiki/Pounds_per_square_inch
-      // 1 psi ~ 6894.757 Pa
-      $si_value = $value * 6894.757;
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Pressure($value, $unit);
+      $si_value = $value_from->toUnit('Pa');
 
       $type  = 'pressure';
-      $from  = $value    . ' psi';
+      $from  = $value    . " $unit";
       $to    = $si_value . ' Pa';
       break;
 
+    case 'ft/s':
+    case 'fps':
+    case 'ft/min':
+    case 'fpm':
+    case 'lfm': // linear feet per minute
+    case 'mph': // Miles per hour
+    case 'mps': // Miles per second
+    case 'm/min': // Meter per minute
+    case 'km/h':  // Kilometer per hour
+      // Any velocity units:
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Velocity($value, $unit);
+      $si_value = $value_from->toUnit('m/s');
+
+      $type  = 'velocity';
+      $from  = $value    . " $unit";
+      $to    = $si_value . ' m/s';
+      break;
+
+    case 'ft3/s':
+    case 'cfs':
+    case 'ft3/min':
+    case 'cfm':
+    case 'gpd': // US (gallon per day)
+    case 'gpm': // US (gallon per min)
+    case 'l/min':
+    case 'lpm':
+    case 'cmh':
+    case 'm3/h':
+    case 'cmm':
+    case 'm3/min':
+      if ($type == 'waterflow')
+      {
+        // Waterflow default unit is L/s
+        $si_unit = 'L/s';
+      }
+      else if ($type == 'airflow')
+      {
+        // Use for Airflow imperial unit CFM (Cubic foot per minute) as more common industry standard
+        $si_unit = 'CFM';
+      } else {
+        // For future
+        $si_unit = 'm^3/s';
+      }
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\VolumeFlow($value, $unit);
+      $si_value = $value_from->toUnit($si_unit);
+
+      $from  = $value    . " $unit";
+      $to    = $si_value . " $si_unit";
+      break;
+
+    default:
+      // Ability to use any custom function to convert value based on unit name
+      $function_name = 'value_unit_'.$unit_lower; // ie: value_unit_ekinops_dbm1($value) or value_unit_accuenergy($value)
+      if (function_exists($function_name))
+      {
+        $si_value = call_user_func_array($function_name, array($value));
+
+        //$type  = $unit;
+        $from  = $value . " $unit";
+        $to    = $si_value;
+      }
   }
 
   if (isset($si_value))
@@ -4270,27 +4162,82 @@ function value_to_si($value, $unit, $type = NULL)
 }
 
 /**
- * Convert Fahrenheit -> Celsius
+ * Convert value of sensor from known unit to defined SI unit (used in poller/discovery)
  *
- * @param float|string $fahrenheit Temperature value in Fahrenheit unit
- * @return float|string Temperature value in Celsius unit
+ * @param float|string $value Value
+ * @param string       $unit_from Unit name/symbol for value
+ * @param string       $class Type of value
+ * @param string|array $unit_to Unit name/symbol for convert value (by default used sensor class default unit)
+ * @return array       Array with values converted to unit_from
  */
-function f2c($fahrenheit)
+function value_to_units($value, $unit_from, $class, $unit_to = [])
 {
-  return value_to_si($fahrenheit, 'F');
-}
+  global $config;
 
-/**
- * Convert Celsius -> Fahrenheit
- *
- * @param float|string $fahrenheit Temperature value in Celsius unit
- * @return float|string Temperature value in Fahrenheit unit
- */
-// TESTME needs unit testing (seems as unused function)
-function c2f($celsius)
-{
-  if (is_numeric($celsius)) { return $celsius * (9/5) + 32; }
-  else                      { return $celsius; }
+  // Convert symbols to supported by lib units
+  $unit_from = str_replace(['<sup>', '</sup>'], ['^', ''], $unit_from); // I.e. mg/m<sup>3</sup> => mg/m^3
+  $unit_from = html_entity_decode($unit_from);                          // I.e. &deg;C => °C
+
+  // Non numeric values
+  if (!is_numeric($value))
+  {
+    return [$unit_from => $value];
+  }
+
+  switch ($class)
+  {
+    case 'temperature':
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Temperature($value, $unit_from);
+      break;
+
+    case 'pressure':
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Pressure($value, $unit_from);
+      break;
+
+    case 'power':
+    case 'dbm':
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Power($value, $unit_from);
+      break;
+
+    case 'waterflow':
+    case 'airflow':
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\VolumeFlow($value, $unit_from);
+      break;
+
+    case 'velocity':
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Velocity($value, $unit_from);
+      break;
+
+    case 'lifetime':
+    case 'uptime':
+    case 'time':
+      if ($unit_from == '') { $unit_from = 's'; }
+      $value_from = new PhpUnitsOfMeasure\PhysicalQuantity\Time($value, $unit_from);
+      break;
+
+    default:
+      // Unknown, return original value
+      return [$unit_from => $value];
+  }
+
+  // Use our default unit (if not passed)
+  if (empty($unit_to) && isset($config['sensor_types'][$class]['symbol']))
+  {
+    $unit_to = $config['sensor_types'][$class]['symbol'];
+  }
+
+  // Convert to units
+  $units = [];
+  foreach ((array)$unit_to as $to)
+  {
+    // Convert symbols to supported by lib units
+    $tou = str_replace(['<sup>', '</sup>'], ['^', ''], $to); // I.e. mg/m<sup>3</sup> => mg/m^3
+    $tou = html_entity_decode($tou);                         // I.e. &deg;C => °C
+
+    $units[$to] = $value_from->toUnit($tou);
+  }
+
+  return $units;
 }
 
 /**
@@ -4339,29 +4286,6 @@ function utime()
   return microtime(TRUE);
 }
 
-/**
- * Reformat US-based dates to display based on $config['date_format']
- *
- * Supported input formats:
- *   DD/MM/YYYY
- *   DD/MM/YY
- *
- * Handling of YY -> YYYY years is passed on to PHP's strtotime, which
- * is currently cut off at 1970/2069.
- *
- * @param string $date Erroneous date format
- * @return string $date
- */
-function reformat_us_date($date)
-{
-  global $config;
-
-  list($month,$day,$year) = explode('/', $date);
-
-  if (!is_numeric($year)) { return $date; }
-
-  return date($config['date_format'], strtotime($date));
-}
 
 /**
  * Bitwise checking if flags set
@@ -4405,6 +4329,52 @@ function is_ssl()
   }
 
   return FALSE;
+}
+
+/**
+ * This function return object with recursive directory iterator.
+ *
+ * @param $dir
+ *
+ * @return RecursiveIteratorIterator
+ */
+function get_recursive_directory_iterator($dir)
+{
+  return new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($dir, FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::LEAVES_ONLY,
+    RecursiveIteratorIterator::CATCH_GET_CHILD
+  );
+}
+
+// Nice PHP (7.3) compat functions
+
+if (!function_exists('array_key_first'))
+{
+  /**
+   * Gets the first key of an array
+   *
+   * @param array $array
+   * @return mixed
+   */
+  function array_key_first($array)
+  {
+    return $array && is_array($array) ? array_keys($array)[0] : NULL;
+  }
+}
+
+if (!function_exists('array_key_last'))
+{
+  /**
+   * Gets the last key of an array
+   *
+   * @param array $array
+   * @return mixed
+   */
+  function array_key_last($array)
+  {
+    return $array && is_array($array) ? array_keys($array)[count($array) - 1] : NULL;
+  }
 }
 
 // EOF

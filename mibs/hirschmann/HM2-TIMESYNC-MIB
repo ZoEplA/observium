@@ -100,6 +100,7 @@ Hm2Ptp2LogSyncIntervalTc ::= TEXTUAL-CONVENTION
 		DESCRIPTION
 			"Logarithm to the base of 2 of the mean synchronization interval."
 		SYNTAX 		INTEGER {
+							msec-125 (-3),
 							msec-250 (-2),
 							msec-500 (-1),
 							sec-1 (0),

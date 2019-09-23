@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -22,6 +22,12 @@ if ($_SESSION['userlevel'] >= 7)
 $navbar['options']['devices']['text']        = 'Per-Device';
 $navbar['options']['modules']['text']        = 'Per-Module';
 
+//if (dbFetchCell("SELECT COUNT(*) FROM `pollers`"))
+if (dbExist('pollers'))
+{
+  $navbar['options']['pollers']['text']        = 'Pollers';
+
+}
 
 foreach ($navbar['options'] as $option => $array)
 {
@@ -152,7 +158,7 @@ else if ($vars['view'] == "wrapper" && $_SESSION['userlevel'] >= 7)
 {
 
  $rrd_file = $config['rrd_dir'].'/poller-wrapper.rrd';
- if (is_file($rrd_file))
+ if (OBS_RRD_NOLOCAL || is_file($rrd_file))
  {
   echo generate_box_open(array('header-border' => TRUE, 'title' => 'Poller Wrapper History'));
 
@@ -260,7 +266,7 @@ foreach ($poller_table as $row)
         '.$row['last_polled_timetaken'].'s
       </td>
       <td>'.format_timestamp($row['last_polled']).' </td>
-      <td>'.formatUptime($config['time']['now'] - strtotime($row['last_polled']), 'shorter').' ago</td>');
+      <td>'.format_uptime($config['time']['now'] - strtotime($row['last_polled']), 'shorter').' ago</td>');
 
   // Discovery times
   echo('
@@ -271,7 +277,7 @@ foreach ($poller_table as $row)
         '.$row['last_discovered_timetaken'].'s
       </td>
       <td>'.format_timestamp($row['last_discovered']).'</td>
-      <td>'.formatUptime($config['time']['now'] - strtotime($row['last_discovered']), 'shorter').' ago</td>
+      <td>'.format_uptime($config['time']['now'] - strtotime($row['last_discovered']), 'shorter').' ago</td>
 
     </tr>
 ');
@@ -303,6 +309,66 @@ unset($poller_table, $proc, $row);
 
 echo generate_box_close();
 
-} // End devices view
+} elseif($view = 'pollers') {
+
+  $pollers = dbFetchRows("SELECT * FROM `pollers`");
+
+  echo generate_box_open();
+
+  echo '<table class="'.OBS_CLASS_TABLE_STRIPED.'">' . PHP_EOL;
+
+  echo '<tr><td>Poller Name</td><td>Assigned Devices</td></tr>';
+
+  foreach($pollers as $poller)
+  {
+      $device_list = array();
+      echo '<tr>';
+      echo '<td class="entity-name">'.$poller['poller_name'].'</td>';
+      echo '<td>';
+
+      foreach(dbFetchRows("SELECT * FROM `devices` WHERE `poller_id` = ?", array($poller['poller_id'])) as $device)
+      {
+          $device_list[] = generate_device_link($device);
+      }
+
+      echo implode(', ', $device_list);
+
+      echo '</td>';
+      echo '</tr>';
+  }
+
+  echo '</table>';
+
+  echo generate_box_close();
+
+  foreach ($pollers as $poller)
+  {
+    echo generate_box_open(array('header-border' => TRUE, 'title' => 'Poller Wrapper ('.$poller['poller_name'].') History'));
+
+    $graph_array = array('type'   => 'poller_partitioned_wrapper_threads',
+                         //'operation' => 'poll',
+                         'id' => $poller['poller_id'],
+    //                     'width'  => 1158,
+                         'height' => 100,
+                         'from'   => $config['time']['week'],
+                         'to'     => $config['time']['now'],
+                         );
+    //echo(generate_graph_tag($graph_array));
+    print_graph_row($graph_array);
+
+    $graph_array = array('type'   => 'poller_partitioned_wrapper_times',
+                         //'operation' => 'poll',
+                         'id' => $poller['poller_id'],
+  //                       'width'  => 1158,
+                         'height' => 100,
+                         'from'   => $config['time']['week'],
+                         'to'     => $config['time']['now'],
+                         );
+    //echo(generate_graph_tag($graph_array));
+    print_graph_row($graph_array);
+
+    echo generate_box_close();
+  }
+}
 
 // EOF

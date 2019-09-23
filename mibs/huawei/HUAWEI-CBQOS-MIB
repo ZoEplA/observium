@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: This mib file is used for management of huawei Class Based
 --              QoS information.
 -- Reference:
--- Version:     V2.29
+-- Version:     V2.32
 -- History:
 --              V1.0 tianli,2004.4.10,publish
 --              V1.1 lizhiyong, 2004-9-14
@@ -48,6 +48,11 @@
 --                  modified by wangcheng 2016-11-30
 --              v2.29
 --                  modified by chenlong  2017-1-23
+--              v2.30
+--                  modified by chenlong  2017-1-23
+--              v2.32
+--                  modified by hanhongyun  2018-1-29
+
 -- ==========================================================================
 
     HUAWEI-CBQOS-MIB DEFINITIONS ::= BEGIN
@@ -70,7 +75,7 @@
     
     
         hwCBQoSMIB MODULE-IDENTITY 
-            LAST-UPDATED "201701231931Z"
+            LAST-UPDATED "201801291931Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -87,6 +92,18 @@
                 for Class Based QoS feature.                    
         
         "
+            REVISION "201801291931Z"
+               DESCRIPTION
+                  "MOD HwCBQoSMultiPolicyStatisticsEntry HwCBQoSMultiPolicyStatisticsClassifierEntry"
+
+            REVISION "201801151931Z"
+               DESCRIPTION
+                  "MOD hwCBQoSPolicyStatisticsClassifierTable"
+
+            REVISION "201701231931Z"
+               DESCRIPTION
+                  "MOD  hwCBQoSBehaviorCfgInfoTable  hwCBQoSClassifierCfgInfoTable    hwCBQoSCarCfgInfoTable  hwCBQoSCarCir  hwCBQoSCarCbs  hwCBQoSCarPir   hwCBQoSCarPbs  hwCBQoSRemarkCfgInfoTable  hwCBQoSServiceClassCfgInfoTable  hwCBQoSPolicyCfgInfoTable   hwCBQoSPolicyClassCfgInfoTable  hwCBQoSIfApplyPolicyTable  hwCBQoSIfVlanApplyPolicyTable  hwCBQoSCarStatisticsTable  hwCBQoSPolicyStatisticsTable  hwCBQoSClassifierStatisticsTable  hwCBQoSPolicyStatisticsClassifierTable  hwCBQoSGlobalCarStatisticsTable  hwCBQoSGlobalPolicyStatisticsTable  hwCBQoSGlobalClassifierStatisticsTable  OBJECT-TYPE "
+
             REVISION "201701231931Z"
                DESCRIPTION
                   "MOD HwCBQoSMultiPolicyStatisticsEntry HwCBQoSMultiPolicyStatisticsClassifierEntry"
@@ -98,6 +115,14 @@
             REVISION "201611301025Z"
                DESCRIPTION
                   "Add hwCBQoSGlobalApplyMultiPolicyTable"
+
+             REVISION "201607051025Z"
+               DESCRIPTION
+                  "MOD  hwCBQoSGlobalCarStatisticsTable INDEX"
+            
+                        REVISION "201607051025Z"
+               DESCRIPTION
+                  "MOD  hwCBQoSPolicyCfgInfoTable hwCBQoSPolicyShareFlag"
 
             REVISION "201607051025Z"
                DESCRIPTION
@@ -127,13 +152,26 @@
                DESCRIPTION
                  "hwCBQoSPolicyStatClassifierName"
 
+             REVISION "201509171808Z"
+               DESCRIPTION
+                  "MOD hwCBQoSIfApplyPolicyLinkLayer mpls-layer"
+
             REVISION "201509011737Z"
                DESCRIPTION
                  "MOD hwCBQoSClassifierCfgInfoEntry hwCBQoSBehaviorCfgInfoEntry hwCBQoSCarCfgInfoEntry NODE"
 
+            REVISION "201503281808Z"
+               DESCRIPTION
+                  "MOD HwCBQoSMatchRuleCfgInfoEntry NODE" 
+                            
             REVISION "201402191737Z"
                DESCRIPTION
                   "ADD hwCBQoSPolicyStatSubPolicyClassifierRunInfoTable "
+    
+           REVISION "201402191737Z"
+               DESCRIPTION
+                 "MOD hwCBQoSClassifierName hwCBQoSClassifierName hwCBQoSBehaviorName hwCBQoSPolicyName hwCBQoSPolicyClassClassifierName hwCBQoSPolicyClassBehaviorName hwCBQoSIfApplyPolicyName hwCBQoSAtmPvcApplyPolicyName   hwCBQoSIfVlanApplyPolicyName hwCBQoSVlanApplyPolicyName hwCBQoSTrapPolicyName hwCBQoSQueryPolicyName hwCBQoSQueryClassifierName NODE"  
+
 
             REVISION "201307201600Z"
                DESCRIPTION
@@ -143,25 +181,7 @@
                DESCRIPTION
                   "MOD hwCBQoSPolicyClassifierIndex NODE"
      
-            REVISION "201402191737Z"
-               DESCRIPTION
-                 "MOD hwCBQoSClassifierName hwCBQoSClassifierName hwCBQoSBehaviorName hwCBQoSPolicyName hwCBQoSPolicyClassClassifierName hwCBQoSPolicyClassBehaviorName hwCBQoSIfApplyPolicyName hwCBQoSAtmPvcApplyPolicyName   hwCBQoSIfVlanApplyPolicyName hwCBQoSVlanApplyPolicyName hwCBQoSTrapPolicyName hwCBQoSQueryPolicyName hwCBQoSQueryClassifierName NODE"  
-          
-            REVISION "201503281808Z"
-               DESCRIPTION
-                  "MOD HwCBQoSMatchRuleCfgInfoEntry NODE" 
-                  
-            REVISION "201509171808Z"
-               DESCRIPTION
-                  "MOD hwCBQoSIfApplyPolicyLinkLayer mpls-layer"
-		  
-            REVISION "201607051025Z"
-               DESCRIPTION
-                  "MOD  hwCBQoSGlobalCarStatisticsTable INDEX"
-            
-            REVISION "201607051025Z"
-               DESCRIPTION
-                  "MOD  hwCBQoSPolicyCfgInfoTable hwCBQoSPolicyShareFlag"	
+                                        	
     	  
                ::= { hwQoS 1 }
 --
@@ -489,7 +509,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of Traffic Classifier configuration information."
+                "This table describes the traffic classification configuration table. Classes are classified into system-defined classes and user-defined classes. System-defined classes cannot be created, modified, or deleted."
             ::= { hwCBQoSClassifierObjects 2 }
 
         
@@ -498,7 +518,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Traffic Classifier Configuration Information Entry."
+                "  hwCBQoSClassifierCfgInfoEntry ."
             INDEX { hwCBQoSClassifierIndex }
             ::= { hwCBQoSClassifierCfgInfoTable 1 }
 
@@ -524,19 +544,17 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the index of the traffic classifier.
-                 The value ranges from 0 to 65535.
-                 This object has no default value."
+                "This object indicates the traffic classification index. The value ranges from 0 to 65535. "
             ::= { hwCBQoSClassifierCfgInfoEntry 1 }
 
         
         hwCBQoSClassifierName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "This object indicates the name of the traffic classifier.
-The value of this object is a string of 1 to 64 visible ASCII characters.
+The value of this object is a string of 1 to 127 visible ASCII characters.
 This object has no default value.
 No space can exist between characters in the string. The initial space and end space are ignored."
             ::= { hwCBQoSClassifierCfgInfoEntry 2 }
@@ -592,9 +610,7 @@ The default value is OR(2)."
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the row status.
-The value of this object can be Active(1), CreateAndGo(4), or Destroy(6).
-This object has no default value."
+                "This object indicates the row status. The value can be one of the following: Active (1), CreateAndGo (4), and Destroy (6)."
             ::= { hwCBQoSClassifierCfgInfoEntry 6 }
 
         
@@ -916,7 +932,7 @@ The index used when the user creates a traffic behavior must be the same as the 
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of Traffic Behavior configuration information."
+                "This table is used to configure the traffic behavior, to be specific, specify the action for the traffic that matches a traffic classification rule."
             ::= { hwCBQoSBehaviorObjects 2 }
 
         
@@ -945,21 +961,17 @@ The index used when the user creates a traffic behavior must be the same as the 
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the index of the traffic behavior.
-The value ranges from 0 to 65535.
-This object has no default value.
+                "This object indicates the traffic behavior index. The value ranges from 0 to 65535. There is no default value.
 "
             ::= { hwCBQoSBehaviorCfgInfoEntry 1 }
 
         
         hwCBQoSBehaviorName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the name of the traffic behavior.
-The value of this object is a string of 1 to 64 visible ASCII characters, with no default value.
-Space cannot exist between the characters in the string. The initial space and end space are ignored.
+                "This object indicates the name of a traffic classifier. The value is a string of 1-127 ASCII characters that can be displayed. Default value: Note: The character string cannot contain spaces. Spaces at the beginning or end are ignored.
 "
             ::= { hwCBQoSBehaviorCfgInfoEntry 2 }
 
@@ -969,9 +981,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the row status.
-The value of this object can be Active(1), CreateAndGo(4), or Destroy(6).
-This object has no default value.
+                "This object indicates the row status of a traffic behavior. The value can be Active (1), CreateAndGo (4), or Destroy (6). There is no default value.
 "
             ::= { hwCBQoSBehaviorCfgInfoEntry 3 }
 
@@ -982,7 +992,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of CAR feature configuration information."
+                "This table is used to configure traffic policing. The traffic rate is limited according to the configuration in this table to protect different customers' rights and provide fair and reliable services."
             ::= { hwCBQoSBehaviorObjects 3 }
 
         
@@ -1031,8 +1041,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the Committed Information Rate (CIR).
-The value ranges from 100 to 1000000, in kbit/s, with no default value.
+                "This object indicates the CIR. The value is an integer ranging from 0 to 4294967295, in kbit/s. There is no default value.
 "
             ::= { hwCBQoSCarCfgInfoEntry 1 }
 
@@ -1042,10 +1051,7 @@ The value ranges from 100 to 1000000, in kbit/s, with no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the Committed Burst Size (CBS).
-The value ranges from 10000 to 33554432 bytes.
-The default value is 10000 bytes.
-"
+                "This object indicates the CBS value. The value ranges from 0 to 4294967295. There is no default value."
             ::= { hwCBQoSCarCfgInfoEntry 2 }
 
         
@@ -1068,10 +1074,7 @@ The default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the Peak Information Rate (PIR).
-The value ranges from 100 to 1000000, in kbit/s.
-This object has no default value.
-"
+                "This object indicates the PIR. The value is an integer ranging from 0 to 4294967295, in kbit/s. There is no default value."
             ::= { hwCBQoSCarCfgInfoEntry 4 }
 
         
@@ -1080,11 +1083,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the Peak Burst Size (PBS).
-The value ranges from 0 to 33554432 bytes.
-The default value is as follows:
-When hwCBQoSCarPir is not specified, the default value is 0 bytes. 
-When hwCBQoSCarPir is specified, the default value is 10000 bytes.
+                "This object indicates the PBS. The value is an integer ranging from 0 to 4294967295, in bytes. There is no default value.
 "
             ::= { hwCBQoSCarCfgInfoEntry 5 }
 
@@ -1094,15 +1093,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the action adopted when CIR is not reached.
-                 pass (1),
-                 discard (2),
-                 remark IP Precedence (3),
-                 remark DSCP(4),
-                 remark Mpls Exp(5),
-                 remark (6),
-                 remark 8021p(7)
-                 The default value is pass (1).
+                "This object indicates the action taken when the CIR is not reached. The value can be one of the following: Pass (1), discard (2), remark IP Precedence (3), remark DSCP (4), remark Mpls Exp (5), remark (6), and remark 8021p (7). The default value is pass (1).
                  "
             DEFVAL { pass }
             ::= { hwCBQoSCarCfgInfoEntry 6 }
@@ -1113,13 +1104,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value is to remark When green action is remarking.
-                the range is 11~81;   
-                the high bit represents service-class,the range is 1~8 (1:be 2:af1 3:af2 4:af3 5:af4 6:ef 7:cs6 8:cs7)
-                the low bit represents color,the range is 1~3 (1:green 2:yellow 3:red)
-                Only software QoS support this node.
-                -1 is returned only when getting value from hardware QoS or when action being pass,discard of software QoS.
-                -1 can't be set."
+                "This object indicates the re-marked internal priority of packets when the CIR is not reached. The value ranges from 0 to 83."
             ::= { hwCBQoSCarCfgInfoEntry 7 }
 
         
@@ -1128,15 +1113,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the action adopted when CIR is exceeded but PIR is not reached.
-                 pass (1),
-                 discard (2),
-                 remark IP Precedence (3),
-                 remark DSCP(4),
-                 remark Mpls Exp(5),
-                 remark (6),
-                 remark 8021p(7)
-                 The default value is pass (1).
+                "This object indicates the re-marked internal priority of packets when the CIR is not reached. The value ranges from 0 to 83.
                  "
             DEFVAL { pass }
             ::= { hwCBQoSCarCfgInfoEntry 8 }
@@ -1147,15 +1124,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value is to remark When yellow action is remarking.             
-                For remarking DSCP, the range is 11~81; 
-                the high bit represents service-class,the range is 1~8 (1:be 2:af1 3:af2 4:af3 5:af4 6:ef 7:cs6 8:cs7)
-                the low bit represents color,the range is 1~3 (1:green 2:yellow 3:red)
-
-                For remarking IP Precedence and MPLS EXP, the range is 0~7;
-                Only software QoS support this node.
-                -1 is returned only when getting value from hardware QoS or when action being pass,discard of software QoS.
-                -1 can't be set."
+                "This object indicates the re-marked internal priority of packets when the CIR is exceeded but the PIR is not exceeded. The value ranges from 0 to 83."
             ::= { hwCBQoSCarCfgInfoEntry 9 }
 
         
@@ -1164,15 +1133,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the action performed when PIR is exceeded.
-                 pass (1),
-                 discard (2),
-                 remark IP Precedence (3),
-                 remark DSCP(4),
-                 remark Mpls Exp(5),
-                 remark (6),
-                 remark 8021p(7)
-                 The default value is pass (1).
+                "This object indicates the traffic behavior when the rate exceeds the PIR.
                  "
             DEFVAL { discard }
             ::= { hwCBQoSCarCfgInfoEntry 10 }
@@ -1198,8 +1159,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "RowStatus. Three actions are used: active,
-                createAndGo, destroy"
+                "This object indicates the row status of the flow CAR. The value can be one of the following: active, createAndGo, and destroy."
             ::= { hwCBQoSCarCfgInfoEntry 12 } 
 
             
@@ -1316,7 +1276,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of Remarking feature configuration information."
+                "This table is used to configure flow-based re-marking. With traffic classification, different priorities are marked for different flows to provide differentiated services."
             ::= { hwCBQoSBehaviorObjects 5 }
 
         
@@ -1371,10 +1331,7 @@ When hwCBQoSCarPir is specified, the default value is 10000 bytes.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the re-mark value.
-When hwCBQoSRemarkType is ip-prec(1), mpls-exp(3), and vlan-8021p(4), the value ranges from 0 to 7.
-When hwCBQoSRemarkType is dscp(2) or ipv6-dscp(8), the value ranges from 0 to 63.
-This object has no default value.
+                "This object indicates the re-mark value. When hwCBQoSRemarkType is set to ip-prec (1), mpls-exp (3), or vlan-8021p (4), the value ranges from 0 to 7. When hwCBQoSRemarkType is DSCP (2) or ipv6-dscp (8), the value ranges from 0 to 63.
 "
             ::= { hwCBQoSRemarkCfgInfoEntry 2 }
 
@@ -2056,7 +2013,7 @@ This object has no default value.
              }
 
         hwCBQoSNestPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -2543,7 +2500,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of ServiceClass feature configuration information."
+                "This table is used to record service class configurations."
             ::= { hwCBQoSBehaviorObjects 22 }
 
         
@@ -2574,7 +2531,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                 "Indicates the queue ID."
+                 "This object indicates the queue ID."
             ::= { hwCBQoSServiceClassCfgInfoEntry 1 }
 
         
@@ -2588,7 +2545,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Indicates the color."
+                "This object indicates the priority color of a flow queue."
             ::= { hwCBQoSServiceClassCfgInfoEntry 2 }  
             
         hwCBQoSServiceClassRowStatus OBJECT-TYPE
@@ -2596,8 +2553,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "RowStatus. Three actions are used: active,
-                createAndGo, destroy"
+                "This object indicates the priority row status of a flow queue. You can perform one of the following actions: active, createAndGo, and destroy."
             ::= { hwCBQoSServiceClassCfgInfoEntry 3 }    
         
        	hwCBQoSServiceClassNoremarkflag OBJECT-TYPE
@@ -3397,7 +3353,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of QoS policy configuration information."
+                "This table describes the basic information about QoS policies.."
             ::= { hwCBQoSPolicyObjects 2 }
 
         
@@ -3442,12 +3398,12 @@ This object has no default value.
 
         
         hwCBQoSPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "This object indicates the policy name.
-The value of this object is a string of 1 to 64 visible ASCII characters.
+The value of this object is a string of 1 to 127 visible ASCII characters.
 This object has no default value.
 Space cannot exist between the characters in the string. The initial space and end space are ignored.
 "
@@ -3459,7 +3415,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the number of traffic classes that are associated with a policy."
+                "This object indicates the number of classes associated with the policy."
             ::= { hwCBQoSPolicyCfgInfoEntry 3 }
 
         
@@ -3473,10 +3429,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Configuration mode of Traffic Policy.
-                Only hardware QoS support this node.
-                -1 is returned only when getting value from software QoS.
-                -1 can't be set."
+                "This object indicates the configuration mode associated with the policy."
             DEFVAL { config }
             ::= { hwCBQoSPolicyCfgInfoEntry 4 }
 
@@ -3486,9 +3439,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the row status.
-The value of this object can be Active(1), CreateAndGo(4), or Destroy(6).
-This object has no default value.
+                "This object indicates the row status. The value can be one of the following: Active (1), CreateAndGo (4), and Destroy (6). 
 "
             ::= { hwCBQoSPolicyCfgInfoEntry 5 }
 
@@ -3502,11 +3453,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of the object identifies the attribute flag deciding sharing or not sharing a policy.
-The value can be either of the following:
-multiple(1): indicates that a policy is shared.
-single(2): indicates that a policy is not shared.
-The default value is multiple(1).
+                "This object indicates whether the policy is shared. The value can be one of the following: multiple (1) and shared policy single (2). The default value is multiple (1).
 "
             DEFVAL { multiple }
             ::= { hwCBQoSPolicyCfgInfoEntry 6 }
@@ -3542,7 +3489,7 @@ The default value is disabled (2).
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Traffic Policy classifier-behavior Configuration Information Entry."
+                "This table describes the association between the traffic class and traffic behavior in a QoS policy."
             INDEX { hwCBQoSPolicyIndex, hwCBQoSPolicyClassIndex }
             ::= { hwCBQoSPolicyClassCfgInfoTable 1 }
 
@@ -3570,9 +3517,7 @@ The default value is disabled (2).
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The value of the object identifies the policy class index in a QoS policy.
-The value ranges from 0 to 255.
-This object has no default value.
+                "This object indicates the classifier index. The value ranges from 0 to 255. 
 "
             ::= { hwCBQoSPolicyClassCfgInfoEntry 1 }
 
@@ -3590,12 +3535,12 @@ This object has no default value.
 
         
         hwCBQoSPolicyClassClassifierName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "This object indicates the policy class name in a QoS policy.
-The value of this object is a string of 1 to 64 visible ASCII characters.
+The value of this object is a string of 1 to 127 visible ASCII characters.
 This object has no default value.
 Space cannot exist between the characters in the string. The initial space and end space are ignored.
 "
@@ -3607,21 +3552,17 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The value of the object identifies the index of the behavior applied by a policy.
-The value ranges from 0 to 4095. 
+                "This object indicates the behavior index.
 "
             ::= { hwCBQoSPolicyClassCfgInfoEntry 4 }
 
         
         hwCBQoSPolicyClassBehaviorName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the name of the behavior applied by a policy.
-The value of this object is a string of 1 to 64 visible ASCII characters.
-This object has no default value.
-Space cannot exist between the characters in the string. The initial space and end space are ignored.
+                "This object indicates the behavior name. The value is a string of 1-127 ASCII characters that can be displayed. Default value: Note: The character string cannot contain spaces. The first and last spaces are ignored.
 "
             ::= { hwCBQoSPolicyClassCfgInfoEntry 5 }
 
@@ -3631,10 +3572,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The Precedence of the class in the policy.
-                Only hardware QoS support this node.
-                -1 is returned only when getting value from software QoS.
-                -1 can't be set."
+                "This object indicates the priority of a traffic classifier."
             ::= { hwCBQoSPolicyClassCfgInfoEntry 6 }
 
         
@@ -3643,9 +3581,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the row status.
-The value of this object can be Active(1), CreateAndGo(4), or Destroy(6).
-This object has no default value.
+                "This object indicates the row status. The value can be one of the following: Active (1), CreateAndGo (4), and Destroy (6). 
 "
             ::= { hwCBQoSPolicyClassCfgInfoEntry 7 }
 
@@ -3698,7 +3634,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of QoS policy instance."
+                "This table describes the attributes of an interface on which a QoS policy is applied."
             ::= { hwCBQoSApplyPolicyObjects 1 }
 
         
@@ -3731,8 +3667,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the index of the interface on which the policy is applied.
-This object has no value range and default value. The interface must not be an interface of the MPU or a Layer 2 interface.
+                "This object indicates the index of the interface to which the policy is applied. Value range: Default value: Note: The value cannot be the index of an interface on a main control board or a Layer 2 interface.
 "
             ::= { hwCBQoSIfApplyPolicyEntry 1 }
 
@@ -3750,12 +3685,12 @@ This object has no default value.
 
         
         hwCBQoSIfApplyPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "This object indicates the policy name.
-The value of this object is a string of 1 to 64 visible ASCII characters.
+The value of this object is a string of 1 to 127 visible ASCII characters.
 This object has no default value.
 Space cannot exist between the characters in the string. The initial space and end space are ignored.
 "
@@ -3767,9 +3702,7 @@ Space cannot exist between the characters in the string. The initial space and e
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the row status.
-The value of this object can be Active(1), CreateAndGo(4), or Destroy(6).
-This object has no default value.
+                "This object indicates the row status. The value can be one of the following: Active (1), CreateAndGo (4), and Destroy (6). 
 "
             ::= { hwCBQoSIfApplyPolicyEntry 4 }     
 -- add by l00241571 for mpls-layer            
@@ -3784,9 +3717,8 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "If it is set link-layer, it means l2 configuration is valid,
-                 or if ip-layer is set, means l3 configuration is valid, 
-                 or if mpls-layer is set, means mpls configuration is valid, or it means all "     
+                "This object indicates the forwarding layer at which the policy takes effect.
+"     
             ::= { hwCBQoSIfApplyPolicyEntry 5 }
    
 
@@ -3866,7 +3798,7 @@ This object has no default value.
 
         
         hwCBQoSAtmPvcApplyPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -3890,7 +3822,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of QoS policy instance."
+                "This table is used to display information about traffic policies applied to VLAN packets."
             ::= { hwCBQoSApplyPolicyObjects 3 }
 
         
@@ -3905,8 +3837,8 @@ This object has no default value.
 
         
         HwCBQoSIfVlanApplyPolicyEntry ::=
-            SEQUENCE { 
-                hwCBQoSIfVlanApplyPolicyIfIndex
+            SEQUENCE { hwCBQoSIfVlanApplyPolicyIfIndex
+                
                     Integer32,   
                 hwCBQoSIfVlanApplyPolicyDirection
                     DirectionType,
@@ -3929,7 +3861,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the Ethernet interface index."
+                "This object indicates the policy index of a Layer 2 interface."
             ::= { hwCBQoSIfVlanApplyPolicyEntry 1 }   
             
         hwCBQoSIfVlanApplyPolicyDirection OBJECT-TYPE
@@ -3945,7 +3877,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the VLAN that the Ethernet interface belongs to."
+                "This object indicates the start VLAN ID of a policy on a Layer 2 interface.."
             ::= { hwCBQoSIfVlanApplyPolicyEntry 3 }
 
         
@@ -3954,7 +3886,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Indicates the VLAN that the Ethernet interface belongs to."
+                "Start VLAN ID or CE VID of a traffic policy on a Layer 2 interface."
             ::= { hwCBQoSIfVlanApplyPolicyEntry 4 }
                 
         hwCBQoSIfVlanApplyPolicyCeVidEnd OBJECT-TYPE
@@ -3962,12 +3894,12 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Indicates the VLAN that the Ethernet interface belongs to."
+                "This object indicates the CE VID of a policy on a Layer 2 interface."
             ::= { hwCBQoSIfVlanApplyPolicyEntry 5 }
 
         
         hwCBQoSIfVlanApplyPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -3980,8 +3912,7 @@ This object has no default value.
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "RowStatus. Three actions are used: active,
-                createAndGo, destroy"
+                "This object indicates the status of the policy row on a Layer 2 interface. The value can be one of the following: active, createAndGo, and destroy."
             ::= { hwCBQoSIfVlanApplyPolicyEntry 7 }   
  --modify by l00241571 for mpls-layer           
         hwCBQoSIfVlanApplyPolicyLinkLayer OBJECT-TYPE
@@ -4034,7 +3965,7 @@ This object has no default value.
              }
 
         hwCBQoSFrClassApplyPolicyFrClassName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -4054,7 +3985,7 @@ This object has no default value.
 
         
         hwCBQoSFrClassApplyPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -4134,7 +4065,7 @@ This object has no default value.
 
         
         hwCBQoSFrPvcApplyPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -4206,7 +4137,7 @@ This object has no default value.
 
         
         hwCBQoSVsiApplyPolicyName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -4281,7 +4212,7 @@ This object has no default value.
 
                 
                 hwCBQoSVlanApplyPolicyName OBJECT-TYPE
-                        SYNTAX OCTET STRING (SIZE (1..64))
+                        SYNTAX OCTET STRING (SIZE (1..127))
                         MAX-ACCESS read-create
                         STATUS current
                         DESCRIPTION
@@ -7716,7 +7647,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of CAR statistics for class-based traffic classification applied in traffic monitoring."
+                "This table describes the traffic policing and statistics based on the traffic classification, including the statistics of the traffic within CIR, between CIR and PIR, and beyond PIR."
             ::= { hwCBQoSPolicyStatisticsObjects 1 }
 
         
@@ -7773,7 +7704,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of packets within the range of CIR."
+                "This object indicates the number of packets whose rate is lower than the CIR."
             ::= { hwCBQoSCarStatisticsEntry 11 }
 
         
@@ -7782,7 +7713,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes within the range of CIR."
+                "This object indicates the number of bytes whose rate is lower than the CIR."
             ::= { hwCBQoSCarStatisticsEntry 12 }
 
         
@@ -7791,7 +7722,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the packet rate within the range of CIR, in pps."
+                "This object indicates the rate of packets whose rate is lower than the CIR."
             ::= { hwCBQoSCarStatisticsEntry 13 }
 
         
@@ -7800,7 +7731,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the bytes rate within the range of CIR, in Bps."
+                "This object indicates the rate of bytes whose rate is lower than the CIR."
             ::= { hwCBQoSCarStatisticsEntry 14 }
 
         
@@ -7818,7 +7749,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes between PIR and CIR."
+                "This object indicates the number of bytes whose rate is between the PIR and CIR."
             ::= { hwCBQoSCarStatisticsEntry 16 }
 
         
@@ -7836,7 +7767,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the byte rate between PIR and CIR, in Bps."
+                "This object indicates the rate of bytes whose rate is between the PIR and the CIR."
             ::= { hwCBQoSCarStatisticsEntry 18 }
 
         
@@ -7854,7 +7785,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes when PIR is exceeded."
+                "This object indicates the number of bytes whose rate exceeds the PIR."
             ::= { hwCBQoSCarStatisticsEntry 20 }
 
         
@@ -7872,7 +7803,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the rate of bytes that exceeds the PIR, in Bps."
+                "This object indicates the rate of bytes whose rate exceeds the PIR."
             ::= { hwCBQoSCarStatisticsEntry 22 }
 
         
@@ -7890,7 +7821,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of the bytes passed after CAR is set."
+                "This object indicates the number of forwarded bytes."
             ::= { hwCBQoSCarStatisticsEntry 24 }
 
         
@@ -7908,7 +7839,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of discarded bytes after CAR is set."
+                "This object indicates the number of dropped bytes."
             ::= { hwCBQoSCarStatisticsEntry 26 }
 
         
@@ -7918,9 +7849,8 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of policy statistics applied on the interface.
-                It takes the interface as a unit to sum up all the classes
-                in the policy that are matched or are not matched."
+                "This table describes the policy-based statistics.
+"
             ::= { hwCBQoSPolicyStatisticsObjects 2 }
 
         
@@ -7973,7 +7903,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of packets matching the traffic classification policy."
+                "This object indicates the number of matching packets."
             ::= { hwCBQoSPolicyStatisticsEntry 11 }
 
         
@@ -7991,7 +7921,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of packets mismatching the traffic classification policy."
+                "This object indicates the number of unmatching packets."
             ::= { hwCBQoSPolicyStatisticsEntry 13 }
 
         
@@ -8008,7 +7938,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of packets that match the traffic classification policy and pass through"
+                "This object indicates the number of matching and forwarded packets."
             ::= { hwCBQoSPolicyStatisticsEntry 15 }
             
         hwCBQoSPolicyMatchedPassBytes OBJECT-TYPE
@@ -8024,7 +7954,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of packets that match the traffic classification policy and are discarded"
+                "This object indicates the number of matching and discarded packets."
             ::= { hwCBQoSPolicyStatisticsEntry 17 }
             
         hwCBQoSPolicyMatchedDropBytes OBJECT-TYPE
@@ -8040,7 +7970,7 @@ This object has no default value.
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Reset flag enable(1),disable(2)."
+                "This object indicates the clear flag."
             ::= { hwCBQoSPolicyStatisticsEntry 19 }
 
         hwCBQoSPolicyMatchedPacketsRate OBJECT-TYPE
@@ -8098,8 +8028,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of classifier statistics applied on the interface.
-                It takes the interface as a unit in the class that are matched or are not matched."
+                "This table is used to record class-based multi-field traffic classification statistics."
             ::= { hwCBQoSPolicyStatisticsObjects 3 }
             
         hwCBQoSClassifierStatisticsEntry OBJECT-TYPE
@@ -8143,7 +8072,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the number of packets that match the class."
+                "This object indicates the number of matching packets."
             ::= { hwCBQoSClassifierStatisticsEntry 5 }
 
         
@@ -8160,7 +8089,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the matched and passed traffic in packets."
+                "This object indicates the number of matching and forwarded packets."
             ::= { hwCBQoSClassifierStatisticsEntry 7 }
             
         hwCBQoSClassifierMatchedPassBytes OBJECT-TYPE
@@ -8176,7 +8105,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the matched and discarded traffic in packets."
+                "This object indicates the number of matching and discarded packets."
             ::= { hwCBQoSClassifierStatisticsEntry 9 }
             
         hwCBQoSClassifierMatchedDropBytes OBJECT-TYPE
@@ -8197,7 +8126,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of class based policy statistics."
+                "This table records classifier statistics."
             ::= { hwCBQoSPolicyStatisticsObjects 4 }
         
         hwCBQoSPolicyStatisticsClassifierEntry OBJECT-TYPE
@@ -8245,11 +8174,11 @@ This object has no default value.
                     }
 
         hwCBQoSPolicyStatClassifierName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..64))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Name of classifier."
+                "This object indicates the classifier name."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 1 }
         
         hwCBQoSPolicyStatClassifierMatchedPackets OBJECT-TYPE
@@ -8265,7 +8194,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of matched bytes."
+                "This object indicates the number of matching bytes."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 3 }
         
 
@@ -8292,7 +8221,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of packets that match the traffic classifier and pass through"
+                "This object indicates the number of matching and forwarded packets."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 6 }
             
 
@@ -8301,7 +8230,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of bytes that match the traffic classifier and pass through"
+                "This object indicates the number of matching and forwarded bytes."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 7 }
             
 
@@ -8310,7 +8239,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of packets that match the traffic classification policy and are discarded"
+                "This object indicates the number of matching and discarded packets."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 8 }
             
 
@@ -8319,7 +8248,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of bytes that match the traffic classification policy and are discarded"
+                "This object indicates the number of matching and discarded bytes."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 9 }
 
         hwCBQoSPolicyStatClassifierMatchedPacketsRate OBJECT-TYPE
@@ -8335,7 +8264,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Rate of matched bytes."
+                "This object indicates the average number of matching bytes."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 11 }       
 
         hwCBQoSPolicyStatClassifierMatchedPassPacketsRate OBJECT-TYPE
@@ -8352,7 +8281,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Rate of bytes that match the traffic classifier and pass through"
+                "This object indicates the average number of matching and forwarded bytes."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 13 }
             
 
@@ -8370,7 +8299,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Rate of bytes that match the traffic classification policy and are discarded"
+                "This object indicates the average number of matching and discarded bytes."
             ::= { hwCBQoSPolicyStatisticsClassifierEntry 15 }
                                 
 --    Class match statistics in policy on VLAN
@@ -9427,7 +9356,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of CAR statistics for class-based traffic classification applied in traffic monitoring."
+                "This table is applied to global ACL.This table describes CAR statistics for class-based traffic classification. ."
             ::= { hwCBQoSPolicyStatisticsObjects 10 }
 
         
@@ -9501,7 +9430,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The type of car applied in global."
+                "This object indicates the application type of traffic policing."
             ::= { hwCBQoSGlobalCarStatisticsEntry 2 }
 
 
@@ -9519,11 +9448,11 @@ This object has no default value.
 
 
         hwCBQoSGlobalCarClassifierName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The name of classifier."
+                "This object indicates the name of the classifier that matches the CAR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 4 }
 
 
@@ -9541,7 +9470,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes within the range of CIR."
+                "This object indicates the number of bytes whose rate is lower than the CIR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 6 }
 
         
@@ -9559,7 +9488,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the bytes rate within the range of CIR, in Bps."
+                "This object indicates the rate of bytes whose rate is lower than the CIR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 8 }
 
         
@@ -9577,7 +9506,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes between PIR and CIR."
+                "This object indicates the number of bytes whose rate is between the PIR and CIR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 10 }
 
         
@@ -9595,7 +9524,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the byte rate between PIR and CIR, in Bps."
+                "This object indicates the rate of bytes whose rate is between the PIR and the CIR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 12 }
 
         
@@ -9613,7 +9542,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes when PIR is exceeded."
+                "This object indicates the number of bytes whose rate exceeds the PIR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 14 }
 
         
@@ -9631,7 +9560,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the rate of bytes that exceeds the PIR, in Bps."
+                "This object indicates the rate of bytes whose rate exceeds the PIR."
             ::= { hwCBQoSGlobalCarStatisticsEntry 16 }
 
         
@@ -9648,7 +9577,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of the bytes passed after CAR is set."
+                "This object indicates the number of forwarded bytes."
             ::= { hwCBQoSGlobalCarStatisticsEntry 18 }
 
         
@@ -9675,9 +9604,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of policy statistics applied on the system.
-                It takes the slot as a unit to sum up all the classes
-                in the policy that are matched or are not matched."
+                "This table is used to collect statistics on traffic classification based on policies in global traffic policing."
             ::= { hwCBQoSPolicyStatisticsObjects 11 }
 
         
@@ -9725,7 +9652,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The ID of the slot that the interface is located."
+                "This object indicates the ID of the slot where traffic policing takes effect."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 1 }
 
 
@@ -9734,7 +9661,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The type of car."
+                "This object indicates the application type of traffic policing."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 2 }
 
 
@@ -9747,7 +9674,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the direction where the CAR statistics are queried."
+                "This object indicates the traffic direction to which traffic policing applies."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 3 }
 	    
 	    
@@ -9765,7 +9692,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes matching the traffic classification policy."
+                "This object indicates the number of matching bytes."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 5 }
 
         
@@ -9783,7 +9710,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "This object indicates the number of bytes mismatching the traffic classification policy."
+                "This object indicates the number of unmatching bytes."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 7 } 
 
         hwCBQoSGlobalPolicyMatchedPassPackets OBJECT-TYPE
@@ -9799,7 +9726,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of bytes that match the traffic classification policy and pass through"
+                "This object indicates the number of matching and forwarded bytes."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 9 }
             
         hwCBQoSGlobalPolicyMatchedDropPackets OBJECT-TYPE
@@ -9815,7 +9742,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Number of bytes that match the traffic classification policy and are discarded"
+                "This object indicates the number of matching and discarded bytes."
             ::= { hwCBQoSGlobalPolicyStatisticsEntry 11 }
             
         hwCBQoSGlobalPolicyResetFlag OBJECT-TYPE
@@ -9834,8 +9761,7 @@ This object has no default value.
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of classifier statistics applied on the interface.
-                It takes the interface as a unit in the class that are matched or are not matched."
+                " This table is used to display statistics about classifier-based user traffic classification in global traffic policing."
             ::= { hwCBQoSPolicyStatisticsObjects 12 }
             
         hwCBQoSGlobalClassifierStatisticsEntry OBJECT-TYPE
@@ -9887,7 +9813,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The type of car."
+                "This object indicates the application type of traffic policing."
             ::= { hwCBQoSGlobalClassifierStatisticsEntry 2 }
 
 
@@ -9905,7 +9831,7 @@ This object has no default value.
 
 
         hwCBQoSGlobalClassifierClassifierName OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (1..31))
+            SYNTAX OCTET STRING (SIZE (1..127))
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -9927,7 +9853,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the number of matched bytes."
+                "This object indicates the number of matching bytes."
             ::= { hwCBQoSGlobalClassifierStatisticsEntry 6 }     
         
         hwCBQoSGlobalClassifierMatchedPassPackets OBJECT-TYPE
@@ -9935,7 +9861,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the matched and passed traffic in packets."
+                "This object indicates the number of matching and forwarded packet."
             ::= { hwCBQoSGlobalClassifierStatisticsEntry 7 }
             
         hwCBQoSGlobalClassifierMatchedPassBytes OBJECT-TYPE
@@ -9943,7 +9869,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the matched and passed traffic in bytes."
+                "This object indicates the number of matching and forwarded bytes."
             ::= { hwCBQoSGlobalClassifierStatisticsEntry 8 }
             
         hwCBQoSGlobalClassifierMatchedDropPackets OBJECT-TYPE
@@ -9951,7 +9877,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the matched and discarded traffic in packets."
+                "This object indicates the number of matching and discarded packets."
             ::= { hwCBQoSGlobalClassifierStatisticsEntry 9 }
             
         hwCBQoSGlobalClassifierMatchedDropBytes OBJECT-TYPE
@@ -9959,7 +9885,7 @@ This object has no default value.
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Indicates the matched and discarded traffic in bytes."
+                "This object indicates the number of matching and discarded bytes."
             ::= { hwCBQoSGlobalClassifierStatisticsEntry 10 }            
 
 -- multi-policy applied on global statistics based on policy
@@ -10225,7 +10151,7 @@ This object has no default value.
         ::= { hwCBQoSGeneral 6 }           
         
     hwCBQoSTrapPolicyName OBJECT-TYPE   
-        SYNTAX OCTET STRING (SIZE (1..64)) 
+        SYNTAX OCTET STRING (SIZE (1..127)) 
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION

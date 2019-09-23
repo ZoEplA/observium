@@ -5,6 +5,12 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-OSPF-MIB.mib $ 
+-- Revision 1.9  2016/08/12 06:43:20  neng 
+-- change zyOspfSummaryAddressMaskBits to not-accessible 
+-- Revision 1.8  2016/03/07 02:21:58  neng 
+-- add ospf tap. 
+-- Revision 1.7  2015/07/22 02:49:48  neng 
+-- add default route metric setting. 
 -- Revision 1.6  2013/12/06 07:07:31  ccho 
 -- remove uncessary imports 
 -- Revision 1.5  2013/11/20 06:53:45  ccho 
@@ -57,6 +63,7 @@ ZYXEL-OSPF-MIB DEFINITIONS ::= BEGIN
 	
 	zyxelOspfSetup     			OBJECT IDENTIFIER ::= { zyxelOspf 1 }
 	zyxelOspfStatus				OBJECT IDENTIFIER ::= { zyxelOspf 2 }
+	zyxelOspfNotifications		OBJECT IDENTIFIER ::= { zyxelOspf 3 }
   
 -- *******************************************************************
 -- *
@@ -115,7 +122,8 @@ ZYXEL-OSPF-MIB DEFINITIONS ::= BEGIN
 
 		ZyxelOspfAreaEntry ::=
 		SEQUENCE {
-        	zyOspfAreaName	DisplayString
+        	zyOspfAreaName	DisplayString,
+			zyOspfAreaDefaultRouteMetric	INTEGER
         }          
         zyOspfAreaName OBJECT-TYPE
         SYNTAX  DisplayString
@@ -125,6 +133,15 @@ ZYXEL-OSPF-MIB DEFINITIONS ::= BEGIN
                       	"Specify a descriptive name (up to 32 printable ASCII characters) for identification purposes."
         ::= { zyxelOspfAreaEntry 1 }
 
+        zyOspfAreaDefaultRouteMetric OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"The metric value applied at the indicated Type of Service.  By default, this equals the least metric at the Type of Service among the interfaces to other areas."
+        ::= { zyxelOspfAreaEntry 2 }
+
+		
 -- zyxelOspfRedistributeRouteTable
         zyxelOspfRedistributeRouteTable	OBJECT-TYPE
         SYNTAX	SEQUENCE OF ZyxelOspfRedistributeRouteEntry
@@ -276,7 +293,7 @@ ZYXEL-OSPF-MIB DEFINITIONS ::= BEGIN
 
         zyOspfSummaryAddressMaskBits OBJECT-TYPE
         SYNTAX  INTEGER
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
                       	"Specify the subnet mask for this summary IP address which can cover multiple networks."
@@ -300,6 +317,46 @@ ZYXEL-OSPF-MIB DEFINITIONS ::= BEGIN
 			DESCRIPTION
 			   "The administrative distance of OSPF routes."		   
 		::= { zyxelOspfGeneralGroup 1 }
+
+-- zyOspfDefaultInformationOriginateState
+		zyOspfDefaultInformationOriginateState OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                    "Enable/Disable default-information originate."
+		::= { zyxelOspfSetup 8 }	
+
+-- zyOspfDefaultInformationOriginateAlways
+		zyOspfDefaultInformationOriginateAlways OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                    "Enable/Disable default-information always originate."
+		::= { zyxelOspfSetup 9 }
+
+-- zyOspfDefaultInformationOriginateMetric
+		zyOspfDefaultInformationOriginateMetric OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                    "Specify a route cost (between 0 and 16777215)."
+		::= { zyxelOspfSetup 10 }
+
+-- zyOspfDefaultInformationOriginateMetricType
+		zyOspfDefaultInformationOriginateMetricType OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                    "Select 1 for routing protocols whose external metrics are directly comparable to the internal OSPF cost. 
+					When selecting a path, the internal OSPF cost is added to the ASBR to the external metrics. 
+					(internal cost + external cost)
+					Select 2 for routing protocols whose external metrics are not comparable to the OSPF cost. In this case, 
+					the external cost of the ASBR is used in path decision to a destination.  (external cost)"
+		::= { zyxelOspfSetup 11 }
 
 -- *******************************************************************
 -- *
@@ -517,5 +574,17 @@ ZYXEL-OSPF-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
                       	"Display the mask bits of routing domain in this Link State Database."
         ::= { zyxelOspfLsdbEntry 3 }
+		
+-- *******************************************************************
+-- *
+-- * zyxelOspfNotifications
+-- *
+-- *******************************************************************
+    
+	   zyOspfExceedMaxDynamicRoutePath NOTIFICATION-TYPE
+	   STATUS  current
+       DESCRIPTION
+               "Receive LSA route path is over maximum LSA. "
+       ::= { zyxelOspfNotifications 1 }
+		
 END
-

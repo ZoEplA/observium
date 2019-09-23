@@ -404,7 +404,7 @@ rlPhdStackSofrwareVer OBJECT-TYPE
     ::= { rlPhdStackEntry 5 }
 
 rlPhdStackProductID OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (1..64))
+    SYNTAX      DisplayString (SIZE (1..128))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

@@ -8,28 +8,33 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 // lldpRemoteSystemsData: lldpRemTable + lldpRemManAddrTable + lldpRemUnknownTLVTable + lldpRemOrgDefInfoTable
 $lldpRemTable_oids = array('lldpRemChassisIdSubtype', 'lldpRemChassisId',
                            'lldpRemPortIdSubtype', 'lldpRemPortId', 'lldpRemPortDesc',
-                           'lldpRemSysName', 'lldpRemSysDesc');
-//$lldp_array = snmpwalk_cache_threepart_oid($device, "lldpRemoteSystemsData", array(), "LLDP-MIB", NULL, OBS_SNMP_ALL | OBS_SNMP_CONCAT);
+                           'lldpRemSysName');
 $lldp_array = array();
 foreach ($lldpRemTable_oids as $oid)
 {
-  $lldp_array = snmpwalk_cache_threepart_oid($device, $oid, $lldp_array, "LLDP-MIB", NULL, OBS_SNMP_ALL | OBS_SNMP_CONCAT);
+  $lldp_array = snmpwalk_cache_threepart_oid($device, $oid, $lldp_array, "LLDP-MIB");
 
   if (empty($lldp_array)) { break; } // Stop walk if no data
+}
+if ($lldp_array)
+{
+  // lldpRemSysDesc can be multilined
+  //$lldp_array = snmpwalk_cache_threepart_oid($device, 'lldpRemPortDesc', $lldp_array, "LLDP-MIB", NULL, OBS_SNMP_ALL_MULTILINE);
+  $lldp_array = snmpwalk_cache_threepart_oid($device, 'lldpRemSysDesc', $lldp_array, "LLDP-MIB", NULL, OBS_SNMP_ALL_MULTILINE);
 }
 
 print_debug_vars($lldp_array, 1);
 
 if ($lldp_array)
 {
-  $dot1d_array = snmpwalk_cache_oid($device, "dot1dBasePortIfIndex", array(), "BRIDGE-MIB");
+  $dot1d_array = snmp_cache_table($device, "dot1dBasePortIfIndex", array(), "BRIDGE-MIB");
   //$lldp_local_array = snmpwalk_cache_oid($device, "lldpLocalSystemData", array(), "LLDP-MIB");
   $lldp_local_array = snmpwalk_cache_oid($device, "lldpLocPortEntry", array(), "LLDP-MIB");
 
@@ -78,7 +83,8 @@ if ($lldp_array)
             $port = dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifPhysAddress` = ?", array($device['device_id'], $ifPhysAddress));
             break;
           case 'networkAddress':
-            $id = snmp_hexstring($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortId']);
+            $ip = snmp_hexstring($lldp_local_array[$lldpRemLocalPortNum]['lldpLocPortId']);
+            /*
             $ip_version = get_ip_version($id);
             if ($ip_version)
             {
@@ -86,6 +92,30 @@ if ($lldp_array)
               $port = dbFetchRow("SELECT * FROM `ipv".$ip_version."_addresses` LEFT JOIN `ports` USING (`port_id`) WHERE `ipv".$ip_version."_address` = ? AND `device_id` = ?", array($ip, $device['device_id']));
             }
             unset($id, $ip);
+            */
+            $peer_where = generate_query_values($device['device_id'], 'device_id'); // Additional filter for exclude self IPs
+            // Fetch all devices with peer IP and filter by UP
+            if ($ids = get_entity_ids_ip_by_network('port', $ip, $peer_where))
+            {
+              $port = get_port_by_id_cache($ids[0]);
+              /*
+              $remote_device = $ids[0];
+              if (count($ids) > 1)
+              {
+                // If multiple same IPs found, get first NOT disabled or down
+                foreach ($ids as $id)
+                {
+                  $tmp_device = device_by_id_cache($id);
+                  if (!$tmp_device['disabled'] && $tmp_device['status'])
+                  {
+                    $remote_device = $id;
+                    break;
+                  }
+                }
+              }
+              */
+            }
+
             break;
         }
       }
@@ -101,13 +131,14 @@ if ($lldp_array)
       foreach ($lldp_instance as $entry_instance => $lldp)
       {
         $remote_device_id = FALSE;
-        $remote_port_id   = 0;
+        $remote_port_id   = NULL;
 
         // Sometime lldpRemPortDesc is not set
         if (!isset($lldp['lldpRemPortDesc']))
         {
           $lldp['lldpRemPortDesc'] = '';
         }
+
         // lldpRemPortId can be hex string
         if ($lldp['lldpRemPortIdSubtype'] != 'macAddress')
         {
@@ -117,7 +148,7 @@ if ($lldp_array)
               $lldp['lldpRemPortId'] = '1:'.$lldp['lldpRemPortId'];
             }
           } else {
-            $lldp['lldpRemPortId'] = snmp_hexstring($lldp['lldpRemPortId']);
+            //$lldp['lldpRemPortId'] = snmp_hexstring($lldp['lldpRemPortId']);
           }
         }
 
@@ -250,7 +281,8 @@ if ($lldp_array)
           // FIXME. We can use lldpRemSysCapEnabled as platform, but they use BITS textual conversion:
           // LLDP-MIB::lldpRemSysCapEnabled.0.5.3 = BITS: 20 00 bridge(2)
           // LLDP-MIB::lldpRemSysCapEnabled.0.5.3 = "20 00 "
-          discover_link($valid_link, $port['port_id'], 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
+
+          discover_link($port, 'lldp', $remote_port_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
         }
       }
     }

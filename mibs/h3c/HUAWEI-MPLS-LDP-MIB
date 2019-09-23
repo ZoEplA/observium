@@ -1,8 +1,8 @@
 -- =============================================================================
--- Copyright (C) 2002-2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002-2003 by  H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description:MPLS-BGP-VPN-MIB 
--- Reference:This mib was extracted from Draft-ietf-mpls-ldp-mib-01
+-- Reference:This MIB was extracted from Draft-ietf-mpls-ldp-mib-01
 -- Version: V1.6
 -- History:
 --  VERSION    AUTHOR/          Change Description
@@ -16,15 +16,15 @@
 --                               with hwMplsLdpLsrMaxCrlspTnls
 --  1.2/1.3   19/10/99         + Added hwMplsLdpPeerType in Peer Table.
 --            04/10/99         + Added hwMplsLdpEntityIfTable.
---  1.3/1.4   23/11/99         + Added mib object for Hello Hold Time in Entity
+--  1.3/1.4   23/11/99         + Added MIB object for Hello Hold Time in Entity
 --                               Table, modified Cr-lsp Tnl index of type
 --                               read-create to not-accessible.
 --                             + Removed hwMplsLdpSessionRowStatus mib-object.
 --  
---   1.1      03/01/2k         + Huawei MPLS Release 1.0.0.0
+--   1.1      03/01/2k         + MPLS Release 1.0.0.0
 --             Naren             
 -- 
---   1.2      27/01/2k         + Modified for MPLS Implementation for Huawei
+--   1.2      27/01/2k         + Modified for MPLS Implementation
 --             Naren             Following objects are added in the Incarnation table
 --                                 hwMplsLdpLsrMaxVcmCapability                  
 --                                 hwMplsLdpLsrVcmPathVecInAllLblMapPresent      
@@ -47,7 +47,7 @@
 --        Change DEFVAL clause value of hwMplsLdpLsrHopCountLimit to 32.
 -- ====================================================================================
 --
--- Full Copyright Notice of the mib that was extracted from Draft-ietf-mpls-ldp-mib-01 as follows£º
+-- Full Copyright Notice of the MIB that was extracted from Draft-ietf-mpls-ldp-mib-01 as follows:
 --
 --Copyright (C) The Internet Society (1999). All Rights Reserved.
 --
@@ -76,11 +76,11 @@
 --   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
 --   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 --
---  HuaweiMPLS Label Distribution Protocol MIB Definitions
+--   MPLS Label Distribution Protocol MIB Definitions
 HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
      IMPORTS                  
-         huaweiMgmt,hwMpls
+         hwMpls
              FROM HUAWEI-3COM-OID-MIB
          OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
          Integer32, Counter32, Unsigned32,IpAddress
@@ -92,16 +92,17 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              
      hwMplsLdp MODULE-IDENTITY
          LAST-UPDATED "9906301200Z"     -- June 30, 1999 at 12:00 GMT
-         ORGANIZATION "HuaweiMPLS Working Group"
-         CONTACT-INFO "S. Manikantan,
-                       Huawei Software Pvt. Ltd.,
-                       481, Mount Road,
-                       Nandanam. CHENNAI-35
-                       INDIA
-                       manis@Huawei.futsoft.com"
+         ORGANIZATION
+             "Hangzhou H3C Tech. Co., Ltd."
+         CONTACT-INFO
+             "Platform Team Hangzhou H3C Tech. Co., Ltd.
+             Hai-Dian District Beijing P.R. China
+             http://www.h3c.com
+             Zip:100085
+             "
          DESCRIPTION  "All rights reserved"
          REVISION     "9611082155Z"
-         DESCRIPTION  "The MIB for HuaweiMPLS LDP module.
+         DESCRIPTION  "The MIB for MPLS LDP module.
                        This MIB has been derived from the MPLS Working 
                        group LDP MIB <drst-ietf-mpls-ldp-mib-01.txt> and
                        MPLS Working group TE MIB <draft-ietf-mpls-te-mib
@@ -263,7 +264,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  not-accessible
          STATUS      current
          DESCRIPTION
-             "HuaweiMPLS provides support for multiple incarnations of the 
+             "MPLS provides support for multiple incarnations of the 
               MPLS Stack in a target. The LSR defined in the standard <IETF
               DRAFT> MIB is treated as an incarnation in this MIB. Using a
               local policy the Network administrator must group the LDP Entities
@@ -386,7 +387,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              A value of 'false' indicates this LSR does not support loop 
              prevention.
 
-             Current release of HuaweiMPLS does not provide support to assign
+             Current release of MPLS does not provide support to assign
              this MIB object with a value 'true'."
          DEFVAL  { false }
          ::= { hwMplsLdpLsrIncarnEntry 6 }
@@ -403,7 +404,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              'enabled(1)'.  Otherwise, to turn off loop prevention, set this 
              value to 'disabled(2)'.
 
-             Current release of HuaweiMPLS does not provide support to assign
+             Current release of MPLS does not provide support to assign
              this MIB object with a value 'enabled'."
          DEFVAL  { disabled }
          ::= { hwMplsLdpLsrIncarnEntry 7 }
@@ -425,7 +426,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              this object is liberal(2) then all advertized label mappings are 
              retained whether they are from a valid next hop or not.
 
-             Current release of HuaweiMPLS does not provide support to assign
+             Current release of MPLS does not provide support to assign
              this MIB object with a value 'liberal'."
          DEFVAL  { conservative }
          ::= { hwMplsLdpLsrIncarnEntry 8 }
@@ -683,7 +684,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
              "Sets the merge capability for this LDP entity.
 
-              Current Release of HuaweiMPLS does not provide support for
+              Current Release of MPLS does not provide support for
               any kind of Merge."
          REFERENCE
              "draft-ietf-mpls-ldp-04.txt, Section 3.5.3"
@@ -755,7 +756,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              "For any given LDP session, the method of
              label distribution must be specified.
  
-             Current release of HuaweiMPLS does not provide support for
+             Current release of MPLS does not provide support for
              'downstreamUnsolicited'."
          REFERENCE
              "draft-ietf-mpls-arch-04.txt [20]."
@@ -1806,7 +1807,7 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
         ::= { hwMplsLdpNotificationPrefix 12 } 
 
      hwMplsLdpEntityUpEventFailure NOTIFICATION-TYPE
-     OBJECTS     { hwMplsLdpLsrIncarnID, hwMplsLdpEntityID }
+     OBJECTS     { hwMplsLdpLsrIncarnID, hwMplsLdpEntityID}
         STATUS      current
         DESCRIPTION
             "This notification is generated by LDP to notify 
@@ -1841,3 +1842,4 @@ HUAWEI-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
 -- End of notifications.
 END
+

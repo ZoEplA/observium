@@ -1,7 +1,7 @@
 -- ============================================================================
--- Copyright (C) 2003 by  HUAWEI 3Com TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2003 by  H3C TECHNOLOGIES. All rights reserved.
 --
--- Description: Huawei-3com Internetwork Packet Exchange MIB
+-- Description: Internetwork Packet Exchange MIB
 -- Reference:
 -- Version: V1.0
 -- History:
@@ -34,15 +34,15 @@ h3cIpx MODULE-IDENTITY
     LAST-UPDATED
         "200412241036Z"
     ORGANIZATION
-        "Huawei 3Com Technologies Co.,Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Mib Team
-        Platform Team Huawei 3Com Technologies Co.,Ltd.
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
-        http://www.huawei-3com.com
-        Zip:100085"
+        http://www.h3c.com
+        Zip:100085
+        "
     DESCRIPTION
-        "This mib defines management information used on products
+        "This MIB defines management information used on products
         which support ipx protocol. It includes 4 parts:
             1.ipx interface configuration group - This group
         contains configurable management information and statistic
@@ -736,7 +736,7 @@ h3cIpxServiceTable OBJECT-TYPE
     DESCRIPTION
         "This table inlcudes all dynamic service information.
         The dynamic service information can be read only."
-    ::= { h3cIpxSap 5}
+    ::= { h3cIpxSap 5 }
 
 h3cIpxServiceEntry OBJECT-TYPE
     SYNTAX      H3cIpxServiceEntry
@@ -1130,7 +1130,7 @@ h3cIpxStatRipReqSends OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "The total number of RIP request packets sent."
-    ::= { h3cIpxStatGlobal 20 }
+    ::= { h3cIpxStatGlobal 20}
 
 h3cIpxStatRipPeriUpdates OBJECT-TYPE
     SYNTAX      Counter32

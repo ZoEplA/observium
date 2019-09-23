@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage search
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -23,7 +23,8 @@ if (count($results))
   {
     humanize_port($result);
 
-    $name = rewrite_ifname($result['ifDescr']);
+    //$name = rewrite_ifname($result['ifDescr']); // not required, double escaping..
+    $name = $result['port_label'];
     if (strlen($name) > 35) { $name = substr($name, 0, 35) . "..."; }
     $description = $result['ifAlias'];
     if (strlen($description) > 80) { $description = substr($description, 0, 80) . "..."; }

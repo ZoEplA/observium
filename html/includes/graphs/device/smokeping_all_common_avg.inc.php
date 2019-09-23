@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2016 Observium Limited
  *
  */
 
@@ -22,9 +22,14 @@ include_once($config['html_dir']."/includes/graphs/common.inc.php");
 include("smokeping_common.inc.php");
 
 $i = 0;
-$pings = $config['smokeping']['pings'];
+$pings = 20;
+$interval = 300;
+$description = "100 Bytes";
+if (isset($config['smokeping']['pings'])) {$pings = $config['smokeping']['pings'];}                 # matt.ayre: allow user config to annotate correct
+if (isset($config['smokeping']['interval'])) {$interval = $config['smokeping']['interval'];}        # number of pings, interval duration (s) and
+if (isset($config['smokeping']['description'])) {$description = $config['smokeping']['description'];} # description (ie size and DSCP marking)
 $iter = 0;
-$colourset = "mixed-10c";
+$colourset = "mixed";
 
 if($width > "500")
 {
@@ -41,6 +46,19 @@ if($width > "500")
   $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)." RTT      Loss    SDev   RTT\:SDev\l'";
 }
 
+$p = $pings;                # matt.ayre set up new constants
+$swidth = 0.0001;
+
+$lc =  array(
+    0          => ['0',   '#26ff00'],
+    1          => ["1/$p",  '#00b8ff'],
+    2          => ["2/$p",  '#0059ff'],
+    3          => ["3/$p",  '#5e00ff'],
+    4          => ["4/$p",  '#7e00ff'],
+    intval($p/2)  => [intval($p/2)."/$p", '#dd00ff'],
+    $p-1       => [($p-1)."/$p",    '#ff0000'],
+);
+
 foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename)
 {
 
@@ -51,10 +69,10 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
   $descr = rrdtool_escape($source, $descr_len);
 
   $rrd_options .= " DEF:median$i=".$filename.":median:AVERAGE ";
-#  $rrd_options .= " CDEF:dm$i=median$i,UN,0,median$i,IF";
+  $rrd_options .= " CDEF:dm$i=median$i";                            # matt.ayre: removed trailing ",UN,0,median$i,IF" to fix red drop lines at the end of smokeping graphs
   $rrd_options .= " DEF:loss$i=".$filename.":loss:AVERAGE";
   $rrd_options .= " CDEF:ploss$i=loss$i,$pings,/,100,*";
-  $rrd_options .= " CDEF:dm$i=median$i";
+#  $rrd_options .= " CDEF:dm$i=median$i";
 #  $rrd_options .= " CDEF:dm$i=median$i,0,".$max->{$start}.",LIMIT";
 
   // start emulate Smokeping::calc_stddev
@@ -85,6 +103,34 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
   $sd_list .= ",s2d$i,+";
   $ploss_list .= ",ploss$i,+";
 
+  
+  
+  ksort($lc);                               # matt.ayre: begin section for new CDEF/AREA/STACK for line and background colour
+  $last = -1;
+  foreach ($lc as $loss => $lc_loss) {
+      $lvar = intval($loss);
+  
+      $swidth = 0.0001;
+      $bg_trans = "60";
+      if ($loss == 0) {
+          $bg_trans = "00";
+          $swidth = 0.0001;
+      }
+  
+      // line and legend (@median)
+      $rrd_options .= " CDEF:me$lvar=loss$i,$last,GT,loss$i,$loss,LE,*,1,UNKN,IF,median$i,*";
+      $rrd_options .= " CDEF:meL$lvar=me$lvar,$swidth,-";
+      $rrd_options .= " CDEF:meH$lvar=me$lvar,$i,*,$swidth,2,*,+";
+      $rrd_options_lc .= " AREA:meL$lvar";
+      $rrd_options_lc .= " STACK:meH$lvar$lc_loss[1]:$lc_loss[0]";
+  
+      // background (@lossargs)
+      $rrd_options .= " CDEF:lossbg$lvar=loss$i,$last,GT,loss$i,$loss,LE,*,INF,UNKN,IF";
+      $rrd_options_bg .= " AREA:lossbg$lvar$lc_loss[1]$bg_trans";
+  
+      $last = $loss;
+  }
+
   $i++;
 
 }
@@ -107,8 +153,19 @@ $rrd_options .= " CDEF:msr=dm_all,POP,avmed,avsd,/";
 $rrd_options .= " VDEF:avmsr=msr,AVERAGE";
 
 $rrd_options .= " GPRINT:avmed:'%5.1lf%ss'";
-$rrd_options .= " GPRINT:ploss_all:AVERAGE:'%5.1lf%%'";
+$rrd_options .= " GPRINT:ploss_all:AVERAGE:'%5.3lf%%'";
 $rrd_options .= " GPRINT:avsd:'%5.1lf%Ss'";
 $rrd_options .= " GPRINT:avmsr:'%5.1lf%s\\l'";
+
+$rrd_options .= " COMMENT:' \l'";                   # matt.ayre: legend loss thresholds
+$rrd_options .= " COMMENT:'loss color\:'";
+
+$rrd_options .= $rrd_options_lc;
+$rrd_options .= $rrd_options_bg;
+
+$rrd_options .= " COMMENT:'\l'";                    # matt.ayre: annotation showing smokeping parameters
+$rrd_options .= " COMMENT:'probes\:\t$pings ICMP Echo Pings ($description) every ${interval}s\l'";
+ 
+
 
 ?>

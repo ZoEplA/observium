@@ -1,9 +1,23 @@
+-- ***********************************************************************
+-- Module:    hpicfDhcpSnoop.mib
+--
+-- Copyright (C) 2016 Hewlett Packard Enterprise Development LP
+-- All Rights Reserved.
+--
+-- The contents of this software are proprietary and confidential to
+-- the Hewlett Packard Enterprise Development LP. No part of this
+-- program may be photocopied, reproduced, or translated into another
+-- programming language without prior written consent of the
+-- Hewlett Packard Enterprise Development LP.
+--
+-- Purpose: This file contains MIB definition of HP-ICF-DHCP-SNOOP-MIB
+-- ***********************************************************************
 HP-ICF-DHCP-SNOOP-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
         hpSwitch            
             FROM HP-ICF-OID            
-        ifIndex, InterfaceIndex            
+        ifIndex, InterfaceIndex, InterfaceIndexOrZero
             FROM IF-MIB            
         InetAddressType, InetAddress            
             FROM INET-ADDRESS-MIB            
@@ -21,7 +35,7 @@ HP-ICF-DHCP-SNOOP-MIB DEFINITIONS ::= BEGIN
 
     -- 1.3.6.1.4.1.11.2.14.11.5.1.34
     hpicfIpDhcpSnoop MODULE-IDENTITY 
-        LAST-UPDATED "201506120000Z"      -- Jun 12, 2015 at 00:00 GMT 
+        LAST-UPDATED "201901170000Z"      -- January 17, 2019 at 00:00 GMT
         ORGANIZATION "HP Networking"
         CONTACT-INFO 
             "Hewlett-Packard Company
@@ -30,7 +44,28 @@ HP-ICF-DHCP-SNOOP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "This MIB module contains HP proprietary
             objects for managing DHCP Snooping."
-
+        REVISION "201901170000Z"      -- January 17, 2019 at 00:00 GMT
+        DESCRIPTION
+            "Added object hpicfDhcpSnoopRateLimit.Added group
+             hpicfDhcpSnoopBaseGroup1 and compliance
+             hpicfDhcpSnoopCompliance11."
+        REVISION "201812070000Z"      -- December 7, 2018 at 00:00 GMT
+        DESCRIPTION
+            "Added object hpicfDhcpSnoopRateLimit.Added group
+             hpicfDhcpSnoopBaseGroup1 and compliance
+             hpicfDhcpSnoopCompliance11."
+        REVISION "201606010000Z"      -- June 1, 2016 at 00:00 GMT
+        DESCRIPTION
+            "Added objects hpicfDhcpSnoopClearBindings,
+             hpicfDhcpSnoopClearBindingsIpType, hpicfDhcpSnoopClearBindingsIpAddr,
+             hpicfDhcpSnoopClearBindingsPort, hpicfDhcpSnoopClearBindingsVlan.
+             Also added group hpicfDhcpSnoopClearBindingsOptionsGroup and
+             compliance hpicfDhcpSnoopCompliance10."
+        REVISION "201601290000Z"      -- Jan 29, 2016 at 00:00 GMT
+        DESCRIPTION
+            "Added object hpicfDhcpSnoopAllowOverwriteBinding. Added
+             group hpicfDhcpSnoopAllowOverwriteBindingGroup and
+             compliance hpicfDhcpSnoopCompliance9."
         REVISION "201506120000Z"      -- June 12, 2015 at 00:00 GMT
         DESCRIPTION 
             "Added object hpicfDhcpSnoopBindingsSecVlan."
@@ -258,16 +293,16 @@ HP-ICF-DHCP-SNOOP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "This object configures the value that will be
             used for the remote ID sub-option of the relay
-            information option that will be inserted by
-            DHCP snooping.  The possible values are:
-              mac      - switch MAC address
+            information that will be inserted by
+            DHCP snooping. The possible values are:
+              mac      - switch MAC address,
               subnetIP - switch IP address on the VLAN on
-                         which the DHCP packet was received
+                         which the DHCP packet was received,
               mgmtIP   - switch IP address on the management
-                         VLAN
+                         VLAN.
             The value of this object is ignored unless DHCP
             snooping is enabled and hpicfDhcpSnoopOpt82Insert
-            is true.  The default value is mac."
+            is true. The default value is mac."
         ::= { hpicfDhcpSnoopGlobalCfg 9 }
 
     
@@ -303,9 +338,9 @@ hpicfDhcpSnoopErrantReplyEnable OBJECT-TYPE
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "A location to store the Username of the SFTP server.
-            The default value of username is root."
-    ::= { hpicfDhcpSnoopGlobalCfg 12 }
+	  "A location to store the Username of the SFTP Server. 
+           The default value of username is root."
+        ::= { hpicfDhcpSnoopGlobalCfg 12 }
 
    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.1.1.13
    hpicfDhcpSnoopDatabaseSFTPPassword OBJECT-TYPE
@@ -313,8 +348,8 @@ hpicfDhcpSnoopErrantReplyEnable OBJECT-TYPE
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "A location to store the Password of the SFTP server."
-    ::= { hpicfDhcpSnoopGlobalCfg 13 }
+            "A location to store the Password of the SFTP Server"
+        ::= { hpicfDhcpSnoopGlobalCfg 13 }
 
    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.1.1.14
 hpicfDhcpSnoopDatabaseValidateSFTPServer OBJECT-TYPE
@@ -331,6 +366,36 @@ hpicfDhcpSnoopDatabaseValidateSFTPServer OBJECT-TYPE
          the public key of the server. When disabled, the public key 
 	 is accepted automatically."
     ::= { hpicfDhcpSnoopGlobalCfg 14 }
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.1.1.15
+    hpicfDhcpSnoopAllowOverwriteBinding OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When set to true, allows DHCP Snooping binding to be overwritten
+            for the same IP address. When a DHCP server offers a host an IP
+            address and if this address is already bound to an existing host
+            in the binding table, the existing binding is overwritten for the
+            new host if the new host is successfully able to acquire the same
+            IP address. When false, the DHCP offer packet will be dropped."
+        DEFVAL   { false }
+        ::= { hpicfDhcpSnoopGlobalCfg 15 }
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.1.1.16
+    hpicfDhcpSnoopRateLimit OBJECT-TYPE
+        SYNTAX Integer32 (100..500)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "This object sets the DHCP packet transfer rate. 
+              This rate limit is applicable only when DHCP snooping is 
+              enabled. The default rate is 100 packets per sec."
+        DEFVAL   { 100 }
+        ::= { hpicfDhcpSnoopGlobalCfg 16 }
+
 
     -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.1.2
     hpicfDhcpSnoopPortTable OBJECT-TYPE
@@ -1038,11 +1103,65 @@ hpicfDhcpSnoopErrantSrcIP OBJECT-TYPE
         DESCRIPTION
             "When the value of this object is set to TRUE,
              all the dhcp-snoop statistics will be cleared.
-             A write operation of FALSE leads to a no operation and 
-             a get request for this object always returns FALSE."
+             When the value of this object is set to FALSE,
+             the operation is ignored. A get request for this
+             object always returns FALSE."
         ::= { hpicfDhcpSnoopClearStatsOptions 1 }
 
-  
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.5
+    hpicfDhcpSnoopClearBindingsOptions OBJECT IDENTIFIER ::= {hpicfIpDhcpSnoopObjects 5}
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.5.1
+    hpicfDhcpSnoopClearBindings OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When the value of this object is set to TRUE,
+             all the dynamic DHCP Snooping binding entries will be cleared.
+             A write operation of FALSE leads to no operation and
+             a get request for this object will always return FALSE."
+        ::= { hpicfDhcpSnoopClearBindingsOptions 1 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.5.2
+    hpicfDhcpSnoopClearBindingsIpType  OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the type of the IP address of
+                     the DHCP Snooping binding entry."
+        ::= { hpicfDhcpSnoopClearBindingsOptions 2 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.5.3
+    hpicfDhcpSnoopClearBindingsIpAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Clears the dynamic DHCP Snooping binding entry
+                     that matches with the given IP address. This
+                     object will always return 0."
+        ::= { hpicfDhcpSnoopClearBindingsOptions 3 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.5.4
+    hpicfDhcpSnoopClearBindingsPort OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Clears all the dynamic DHCP Snooping binding entries
+                     that are associated with the given port. This object
+                     will always return 0."
+        ::= { hpicfDhcpSnoopClearBindingsOptions 4 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.1.5.5
+    hpicfDhcpSnoopClearBindingsVlan OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Clears all the dynamic DHCP Snooping binding entries
+                     that match with the given VLAN. This object will always
+                     return 0."
+        ::= { hpicfDhcpSnoopClearBindingsOptions 5 }
+
     -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2
     hpicfDhcpSnoopConformance OBJECT IDENTIFIER ::= { hpicfIpDhcpSnoop 2 }
 
@@ -1059,7 +1178,7 @@ hpicfDhcpSnoopErrantSrcIP OBJECT-TYPE
         hpicfDhcpSnoopCSBadReleases, hpicfDhcpSnoopCSUntrustedDestPorts, 
         hpicfDhcpSnoopSCForwards, hpicfDhcpSnoopSCUntrustedPorts
             }
-        STATUS current
+        STATUS deprecated
         DESCRIPTION 
             "A collection of objects for configuring and
             monitoring the base DHCP snooping functionality."
@@ -1095,7 +1214,7 @@ hpicfDhcpSnoopErrantSrcIP OBJECT-TYPE
     OBJECTS { hpicfDhcpSnoopDatabaseFile, hpicfDhcpSnoopDatabaseWriteDelay, 
         hpicfDhcpSnoopDatabaseWriteTimeout, hpicfDhcpSnoopDBFileWriteAttempts, 
         hpicfDhcpSnoopDBFileWriteFailures, hpicfDhcpSnoopDBFileReadStatus, 
-        hpicfDhcpSnoopDBFileWriteStatus, hpicfDhcpSnoopDBFileLastWriteTime }
+        hpicfDhcpSnoopDBFileWriteStatus, hpicfDhcpSnoopDBFileLastWriteTime}
         STATUS deprecated
         DESCRIPTION 
             "A collection of objects for configuring and
@@ -1210,6 +1329,48 @@ hpicfDhcpSnoopErrantSrcIP OBJECT-TYPE
         ::= { hpicfIpDhcpSnoopGroups 13 }
 
     
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.1.14
+    hpicfDhcpSnoopAllowOverwriteBindingGroup OBJECT-GROUP
+        OBJECTS {
+                 hpicfDhcpSnoopAllowOverwriteBinding
+                }
+        STATUS  current
+        DESCRIPTION
+                   "The MIB object represents the DHCP Snooping
+                    allow-overwrite-binding information."
+
+        ::= { hpicfIpDhcpSnoopGroups 14}
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.1.15
+    hpicfDhcpSnoopClearBindingsOptionsGroup OBJECT-GROUP
+        OBJECTS {
+                 hpicfDhcpSnoopClearBindings, hpicfDhcpSnoopClearBindingsIpType,
+                 hpicfDhcpSnoopClearBindingsIpAddr, hpicfDhcpSnoopClearBindingsPort,
+                 hpicfDhcpSnoopClearBindingsVlan
+                }
+        STATUS  current
+        DESCRIPTION "A collection of objects for clearing all the dynamic DHCP
+                     Snooping binding entries or selectively clearing entries based
+                     on the IP address, port or VLAN."
+
+        ::= { hpicfIpDhcpSnoopGroups 15}
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.1.16
+    hpicfDhcpSnoopBaseGroup1 OBJECT-GROUP
+    OBJECTS { hpicfDhcpSnoopEnable, hpicfDhcpSnoopVlanEnable,
+        hpicfDhcpSnoopVerifyMac, hpicfDhcpSnoopPortTrust,
+        hpicfDhcpSnoopCSForwards, hpicfDhcpSnoopCSMACMismatches,
+        hpicfDhcpSnoopCSBadReleases, hpicfDhcpSnoopCSUntrustedDestPorts,
+        hpicfDhcpSnoopSCForwards, hpicfDhcpSnoopSCUntrustedPorts,
+        hpicfDhcpSnoopRateLimit
+            }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects for configuring and
+            monitoring the base DHCP snooping functionality."
+        ::= { hpicfIpDhcpSnoopGroups 16 }
+
+
     -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.2
     hpicfDhcpSnoopCompliances OBJECT IDENTIFIER ::= { hpicfDhcpSnoopConformance 2 }
 
@@ -1377,12 +1538,85 @@ hpicfDhcpSnoopErrantSrcIP OBJECT-TYPE
 
      -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.2.8
     hpicfDhcpSnoopCompliance8 MODULE-COMPLIANCE
-        STATUS current
-        DESCRIPTION 
-            "The compliance statement for HP Routing switches
+        STATUS deprecated
+        DESCRIPTION
+            "The compliance statement for HP switches
             that support DHCP Snooping."
         MODULE -- this module
             MANDATORY-GROUPS { hpicfDhcpSnoopBaseGroup }
+            GROUP hpicfDhcpSnoopOpt82Group
+                DESCRIPTION 
+                    "This group is mandatory for implementations
+                    that support DHCP snooping control and
+                    processing of the DHCP relay information
+                    option."
+            GROUP hpicfDhcpSnoopServersGroup
+                DESCRIPTION 
+                    "This group is mandatory for implementations
+                    that support a DHCP trusted server list."
+            GROUP hpicfDhcpSnoopDbaseFileGroup1
+                DESCRIPTION 
+                    "This group is mandatory for implementations
+                    that support saving the DHCP lease database
+                    to a remote server."
+            GROUP hpicfDhcpSnoopBindingsGroup
+                DESCRIPTION 
+                    "This group is recommended to provide
+                    management access to the lease database.
+                    It is mandatory for implementations that
+                    support static configuration of IP source
+                    address bindings."
+            GROUP hpicfDhcpSnoopStaticBindingsGroup
+                DESCRIPTION 
+                    "This group is mandatory for implementations
+                    that support static configuration of IP
+                    source address bindings for use in IP source
+                    filtering applications."
+            GROUP hpicfDhcpSnoopMaxbindingGroup
+        	DESCRIPTION 
+		    "The compliance statement for configuring and 
+                     monitoring the dhcp-snooping max-binding implementation."
+
+          ::= { hpicfDhcpSnoopCompliances 8 }
+
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.2.9
+    hpicfDhcpSnoopCompliance9 MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for HP switches
+            that support DHCP Snooping."
+        MODULE -- this module
+            GROUP hpicfDhcpSnoopAllowOverwriteBindingGroup
+                DESCRIPTION
+           "The compliance statement for configuring and
+            monitoring the dhcp-snooping allow-overwrite-binding
+            option."
+         ::= { hpicfDhcpSnoopCompliances 9 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.2.10
+    hpicfDhcpSnoopCompliance10 MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for HP switches
+            that support DHCP Snooping."
+        MODULE -- this module
+            GROUP hpicfDhcpSnoopClearBindingsOptionsGroup
+                DESCRIPTION
+            "The compliance statement for clearing all the dynamic DHCP
+             Snooping binding entries or selectively clearing entries based
+             on the IP address, port or VLAN."
+         ::= { hpicfDhcpSnoopCompliances 10 }
+    
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.34.2.2.11
+    hpicfDhcpSnoopCompliance11 MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for HP Routing switches
+            that support DHCP Snooping."
+        MODULE -- this module
+            MANDATORY-GROUPS { hpicfDhcpSnoopBaseGroup1 }
             GROUP hpicfDhcpSnoopOpt82Group
                 DESCRIPTION
                     "This group is mandatory for implementations
@@ -1411,11 +1645,11 @@ hpicfDhcpSnoopErrantSrcIP OBJECT-TYPE
                     that support static configuration of IP
                     source address bindings for use in IP source
                     filtering applications."
-            GROUP hpicfDhcpSnoopMaxbindingGroup
+          GROUP hpicfDhcpSnoopMaxbindingGroup
                 DESCRIPTION
-            "The compliance statement for configuring and
+                    "The compliance statement for configuring and 
                      monitoring the dhcp-snooping max-binding implementation."
 
-          ::= { hpicfDhcpSnoopCompliances 8 }
+          ::= { hpicfDhcpSnoopCompliances 11 }
 
 END

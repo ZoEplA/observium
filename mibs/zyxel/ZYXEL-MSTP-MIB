@@ -413,7 +413,7 @@ ZYXEL-MSTP-MIB DEFINITIONS ::= BEGIN
             ::= { zyxelMstpInstancePortEntry 3 }
         
          	zyMstpInstancePortPathCost   OBJECT-TYPE 
-            SYNTAX      INTEGER (1..65535)
+            SYNTAX      INTEGER (1..200000000)
             MAX-ACCESS      read-write
             STATUS      current
             DESCRIPTION
@@ -699,7 +699,7 @@ ZYXEL-MSTP-MIB DEFINITIONS ::= BEGIN
             ::= { zyxelMstpInfoInstancePortEntry 1 }
         
          	zyMstpInfoInstancePortPathCost              OBJECT-TYPE 
-            SYNTAX      INTEGER (1..65535)
+            SYNTAX      INTEGER (1..200000000)
             MAX-ACCESS      read-only
             STATUS      current
             DESCRIPTION

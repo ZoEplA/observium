@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
  -- Module:   hpicfMld.mib 
  --
- -- Copyright (C) 2000-2015 Hewlett Packard Enterprise Development LP
+ -- Copyright (C) 2000-2017 Hewlett Packard Enterprise Development LP
  -- All Rights Reserved.
  -- 
  -- The contents of this software are proprietary and confidential
@@ -39,7 +39,7 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
             FROM IF-MIB;
 
     hpicfMldMIB MODULE-IDENTITY
-        LAST-UPDATED "201509110000Z"  -- Sept 11, 2015
+        LAST-UPDATED "201712150000Z"  -- Dec 15, 2017
         ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd.
@@ -47,7 +47,20 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION  "This MIB module contains HP proprietary
                      MIB definitions for managing MLD services
                      including extensions to the standard MLD MIB (RFC 3019)."
-	REVISION     "201509110000Z"  -- Sept 11, 2015
+        REVISION     "201712150000Z"  -- Dec 15, 2017
+        DESCRIPTION  "Added objects hpicfMldMcastGrpLinkLocalJoinCnt,
+                      group hpicfMldBaseGroupV4 and compliance
+                      hpicfMldMIBComplianceV5. Deprecated group
+                      hpicfMldBaseGroupV3 and compliance
+                      hpicfMldMIBComplianceV4."
+        REVISION     "201601180000Z"  -- Jan 18, 2016
+        DESCRIPTION  "Added command to determine Router Alert option layout
+                      format in MLD packet. Added object 
+                      hpicfMldSendRouterAlertOption, group hpicfMldBaseGroupV3
+                      and compliance hpicfMldMIBComplianceV4. Deprecated
+                      group hpicfMldBaseGroupV2 and compliance
+                      hpicfMldMIBComplianceV3. "
+        REVISION     "201509110000Z"  -- Sept 11, 2015
         DESCRIPTION  "Added commands to reset MLD if it is in error state."
 	REVISION     "201302100000Z"  -- Feb 10, 2013
         DESCRIPTION  "Added objects hpicfMldIfEntryStartupQueryExpiryTime,
@@ -1389,7 +1402,25 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
 			 A get on this object will always return false."
         DEFVAL          { false }
         ::= { hpicfMld 15 }
-	
+
+    hpicfMldSendRouterAlertOption OBJECT-TYPE
+        SYNTAX          INTEGER { default(1), alternativePadding(2), disabled(3)}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This enumerated value indicates whether the router alert
+                         option has to include padding after option type (1), 
+                         include padding before option type (2) or should not
+                         be sent(3)."
+        ::= { hpicfMld  16}
+
+    hpicfMldMcastGrpLinkLocalJoinCnt OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of link-local groups joined."
+        ::= { hpicfMld 17 }
+
+
 -- **********************************************************************
 -- Conformance Information
 -- **********************************************************************
@@ -1400,7 +1431,7 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
                       hpicfMldEnabledCount,
                       hpicfMldMcastGroupJoinsCount
                        }
-        STATUS      current
+        STATUS      deprecated 
         DESCRIPTION "A collection of objects to support basic MLD 
                     configuration information on HP routers."
         ::= { hpicfMldGroups 1 }
@@ -1476,7 +1507,7 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
                       hpicfMldMcastIncludeGroupJoinsCount,
                       hpicfMldMcastPortFastLearn
                        }
-        STATUS      current
+        STATUS      deprecated 
         DESCRIPTION "A collection of objects to support basic MLD 
                     configuration information on HP routers."
         ::= { hpicfMldGroups 6 }
@@ -1669,12 +1700,44 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
         ::= {hpicfMldGroups 13} 
 
 
+    hpicfMldBaseGroupV3 OBJECT-GROUP
+        OBJECTS     { hpicfMldControlUnknownMulticast,
+                      hpicfMldConfigForcedLeaveInterval,
+                      hpicfMldEnabledCount,
+                      hpicfMldMcastGroupJoinsCount,
+                      hpicfMldMcastExcludeGroupJoinsCount,
+                      hpicfMldMcastIncludeGroupJoinsCount,
+                      hpicfMldMcastPortFastLearn,
+                      hpicfMldSendRouterAlertOption
+                       }
+        STATUS      deprecated
+        DESCRIPTION "A collection of objects to support basic MLD 
+                    configuration information on HP routers."
+        ::= { hpicfMldGroups 14 }
+
+
+    hpicfMldBaseGroupV4 OBJECT-GROUP
+        OBJECTS     { hpicfMldControlUnknownMulticast,
+                      hpicfMldConfigForcedLeaveInterval,
+                      hpicfMldEnabledCount,
+                      hpicfMldMcastGroupJoinsCount,
+                      hpicfMldMcastExcludeGroupJoinsCount,
+                      hpicfMldMcastIncludeGroupJoinsCount,
+                      hpicfMldMcastPortFastLearn,
+                      hpicfMldSendRouterAlertOption,
+                      hpicfMldMcastGrpLinkLocalJoinCnt
+                       }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support basic MLD
+                    configuration information on HP routers."
+        ::= { hpicfMldGroups 15 }
+
 -- **********************************************************************
 -- Compliance statements
 -- **********************************************************************
 
     hpicfMldMIBCompliance MODULE-COMPLIANCE
-        STATUS      current
+        STATUS      deprecated 
         DESCRIPTION "The compliance statement for HP routers running
                     MLD and implementing the HP-ICF-MLD MIB."
         MODULE  -- this module
@@ -1686,7 +1749,7 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
         ::= { hpicfMldCompliances 1 }
 
     hpicfMldMIBComplianceV2 MODULE-COMPLIANCE
-        STATUS      current
+        STATUS      deprecated 
         DESCRIPTION "The compliance statement for HP routers running
                     MLD and implementing the HP-ICF-MLD MIB."
         MODULE  -- this module
@@ -1702,7 +1765,7 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
         ::= { hpicfMldCompliances 2 }
 
     hpicfMldMIBComplianceV3 MODULE-COMPLIANCE
-        STATUS      current
+        STATUS      deprecated 
         DESCRIPTION "The compliance statement for HP routers running
                     MLD and implementing the HP-ICF-MLD MIB."
         MODULE  -- this module
@@ -1718,5 +1781,38 @@ HP-ICF-MLD-MIB DEFINITIONS ::= BEGIN
                                }
         ::= { hpicfMldCompliances 3 }
 
+    hpicfMldMIBComplianceV4 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP routers running
+                    MLD and implementing the HP-ICF-MLD MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfMldIfGroupV3,
+                               hpicfMldCacheGroupV2,
+                               hpicfMldPortGroup,
+                               hpicfMldFilteredGroupPortCacheGroup,
+                               hpicfMldSrcListGroup,
+                               hpicfMldPortSrcGroup,
+                               hpicfMldGroupPortCacheGroup,
+                               hpicfMldReloadModeGroup,
+                               hpicfMldBaseGroupV3	
+                               }
+        ::= { hpicfMldCompliances 4 }
+
+    hpicfMldMIBComplianceV5 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    MLD and implementing the HP-ICF-MLD MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfMldIfGroupV3,
+                               hpicfMldCacheGroupV2,
+                               hpicfMldPortGroup,
+                               hpicfMldFilteredGroupPortCacheGroup,
+                               hpicfMldSrcListGroup,
+                               hpicfMldPortSrcGroup,
+                               hpicfMldGroupPortCacheGroup,
+                               hpicfMldReloadModeGroup,
+                               hpicfMldBaseGroupV4
+                               }
+        ::= { hpicfMldCompliances 5 }
 
 END

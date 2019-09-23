@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -66,9 +66,11 @@ function build_devices_where_array($vars)
         case 'os':
         case 'version':
         case 'hardware':
+        case 'vendor':
         case 'features':
         case 'type':
         case 'status':
+        case 'status_type':
         case 'distro':
         case 'ignore':
         case 'disabled':
@@ -101,6 +103,7 @@ function devices_with_graph($graph)
 function build_devices_sort($vars)
 {
   $order = '';
+  $desc_order = isset($vars['sort_desc']) && $vars['sort_desc'];
   switch ($vars['sort'])
   {
     case 'uptime':
@@ -111,10 +114,31 @@ function build_devices_sort($vars)
     case 'os':
     case 'device_id':
       $order = ' ORDER BY `devices`.`'.$vars['sort'].'`';
-      if(isset($vars['sort_desc']) && $vars['sort_desc']) { $order .= " DESC"; }
+      if ($desc_order)
+      {
+        $order .= " DESC";
+      }
+      break;
+    case 'domain':
+      // Special order hostnames in Domain Order
+      // SELECT `hostname`,
+      //        SUBSTRING_INDEX(SUBSTRING_INDEX(`hostname`,'.',-3),'.',1) AS `leftmost`,
+      //        SUBSTRING_INDEX(SUBSTRING_INDEX(`hostname`,'.',-2),'.',1) AS `middle`,
+      //        SUBSTRING_INDEX(`hostname`,'.',-1) AS `rightmost`
+      // FROM `devices` ORDER by `middle`, `rightmost`, `leftmost`;
+      if ($desc_order)
+      {
+        $order = ' ORDER BY `middle` DESC, `rightmost` DESC, `leftmost` DESC';
+      } else {
+        $order = ' ORDER BY `middle`, `rightmost`, `leftmost`';
+      }
       break;
     default:
       $order = ' ORDER BY `devices`.`hostname`';
+      if ($desc_order)
+      {
+        $order .= " DESC";
+      }
       break;
   }
   return $order;
@@ -231,12 +255,12 @@ function print_device_header($device, $args = array())
 
 function print_device_row($device, $vars = array('view' => 'basic'), $link_vars = array())
 {
-  global $config;
+  global $config, $cache;
 
-  if (!is_array($device)) { print_error("Invalid device passed to print_device_hostbox()!"); }
+  if (!is_array($device)) { print_error("Invalid device passed to print_device_row()!"); }
 
-  if (!is_array($vars)) { $vars = array('view' => $vars); } // For compatability
-  if ($device['os'] == "ios") { formatCiscoHardware($device, TRUE); }
+  if (!is_array($vars)) { $vars = array('view' => $vars); } // For compatibility
+  //if ($device['os'] == "ios") { formatCiscoHardware($device, TRUE); }
   humanize_device($device);
 
   $tags = array(
@@ -257,9 +281,11 @@ function print_device_row($device, $vars = array('view' => 'basic'), $link_vars 
     case 'detail':
     case 'details':
       $tags['device_image']  = get_device_icon($device);
-      $tags['ports_count']   = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `deleted` = 0;", array($device['device_id']));
-      $tags['sensors_count'] = dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ?;", array($device['device_id']));
-      $tags['sensors_count'] += dbFetchCell("SELECT COUNT(*) FROM `status` WHERE `device_id` = ?;", array($device['device_id']));
+      $tags['ports_count']   = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `deleted` = ?", array($device['device_id'], 0));
+      //$tags['sensors_count'] = dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = ?", array($device['device_id'], 0));
+      //$tags['sensors_count'] += dbFetchCell("SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_deleted` = ?", array($device['device_id'], 0));
+      $tags['sensors_count']  = $cache['sensors']['devices'][$device['device_id']]['count'];
+      $tags['sensors_count'] += $cache['statuses']['devices'][$device['device_id']]['count'];
       $hostbox = '
   <tr class="'.$tags['html_row_class'].'" onclick="openLink(\'device/device='.$tags['device_id'].'/\')" style="cursor: pointer;">
     <td class="state-marker"></td>
@@ -273,7 +299,31 @@ function print_device_row($device, $vars = array('view' => 'basic'), $link_vars 
       $hostbox .= '<br />';
       if ($tags['sensors_count'])
       {
-        $hostbox .= '<i class="'.$config['icon']['sensor'].'"></i> <span class="label">'.$tags['sensors_count'].'</span>';
+        $hostbox .= '<i class="'.$config['icon']['sensor'].'"></i> ';
+        $sensor_items = [];
+        // Ok
+        if ($event_count = $cache['sensors']['devices'][$device['device_id']]['ok'] + $cache['statuses']['devices'][$device['device_id']]['ok'])
+        {
+          $sensor_items[] = ['event' => 'success', 'text' => $event_count];
+        }
+        // Warning
+        if ($event_count = $cache['sensors']['devices'][$device['device_id']]['warning'] + $cache['statuses']['devices'][$device['device_id']]['warning'])
+        {
+          $sensor_items[] = ['event' => 'warning', 'text' => $event_count];
+        }
+        // Alert
+        if ($event_count = $cache['sensors']['devices'][$device['device_id']]['alert'] + $cache['statuses']['devices'][$device['device_id']]['alert'])
+        {
+          $sensor_items[] = ['event' => 'danger', 'text' => $event_count];
+        }
+        // Ignored
+        if ($event_count = $cache['sensors']['devices'][$device['device_id']]['ignored'] + $cache['statuses']['devices'][$device['device_id']]['ignored'])
+        {
+          $sensor_items[] = ['event' => 'default', 'text' => $event_count];
+        }
+        $hostbox .= get_label_group($sensor_items);
+
+        //'<span class="label">'.$tags['sensors_count'].'</span>';
       }
       $hostbox .= '</td>
     <td>'.$tags['os_text'].' '.$tags['version']. (!empty($tags['features']) ? ' ('.$tags['features'].')' : '').'<br />
@@ -455,13 +505,30 @@ function get_device_icon($device, $base_icon = FALSE)
       $icon  = $device['os'];
     }
   }
-  if ($icon == 'generic' && $config['os'][$device['os']]['vendor'])
+
+  // Icon by vendor name
+  if ($icon == 'generic' && ($config['os'][$device['os']]['vendor'] || $device['vendor']))
   {
-    // Icon by vendor name
-    $vendor = safename(strtolower(trim($config['os'][$device['os']]['vendor'])));
-    if (is_file($config['html_dir'] . '/images/os/' . $vendor . '.png'))
+    if ($device['vendor'])
     {
-      $icon  = $vendor;
+      $vendor = $device['vendor'];
+    } else {
+      $vendor = rewrite_vendor($config['os'][$device['os']]['vendor']); // Compatability, if device not polled for long time
+    }
+
+    $vendor_safe = safename(strtolower($vendor));
+    if (isset($config['vendors'][$vendor_safe]['icon']))
+    {
+      $icon  = $config['vendors'][$vendor_safe]['icon'];
+    }
+    else if (is_file($config['html_dir'] . '/images/os/' . $vendor_safe . '.png'))
+    {
+      $icon  = $vendor_safe;
+    }
+    else if (isset($config['os'][$device['os']]['icons']))
+    {
+      // Fallback to os alternative icon
+      $icon  = array_values($config['os'][$device['os']]['icons'])[0];
     }
   }
 
@@ -503,18 +570,15 @@ function generate_device_popup_header($device, $vars = array())
 
   humanize_device($device);
 
-  if ($device['os'] == "ios")
-  {
-    formatCiscoHardware($device, TRUE);
-  } // FIXME or generic function for more than just IOS? [and/or do this at poll time]
   $contents = generate_box_open() . '
 <table class="table table-striped table-rounded table-condensed">
   <tr class="' . $device['html_row_class'] . '" style="font-size: 10pt;">
     <td class="state-marker"></td>
     <td class="vertical-align" style="width: 64px; text-align: center;">' . get_device_icon($device) . '</td>
     <td width="200px"><a href="#" class="' . device_link_class($device) . '" style="font-size: 15px; font-weight: bold;">' . escape_html($device['hostname']) . '</a><br />' . escape_html(truncate($device['location'], 64, '')) . '</td>
-    <td>' . escape_html($device['hardware']) . ' <br /> ' . $device['os_text'] . ' ' . escape_html($device['version']) . '</td>
-    <td>' . deviceUptime($device, 'short') . '<br />' . escape_html($device['sysName']) . '
+    <td>' . $device['os_text'] . ' ' . escape_html($device['version']) . ' <br /> ' .
+          ($device['vendor'] ? escape_html($device['vendor']).' ' : '') . escape_html($device['hardware']) . '</td>
+    <td>' . deviceUptime($device, 'short') . '<br />' . escape_html($device['sysName']) . '</td>
   </tr>
 </table>
 ' . generate_box_close();
@@ -620,7 +684,17 @@ function generate_device_link($device, $text = NULL, $vars = array(), $escape = 
 {
   if (is_array($device) && !($device['hostname'] && isset($device['status'])))
   {
-    $device = device_by_id_cache($device['device_id']);
+    if (($device = device_by_id_cache($device['device_id'])) && is_null($text))
+    {
+      $text = $device['hostname'];
+    }
+  }
+  else if (is_numeric($device))
+  {
+    if (($device = device_by_id_cache($device)) && is_null($text))
+    {
+      $text = $device['hostname'];
+    }
   }
   if (!device_permitted($device['device_id']))
   {

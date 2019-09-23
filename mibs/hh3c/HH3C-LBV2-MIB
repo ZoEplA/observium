@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Private MIB File For LB
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 -- V1.0  2013-11 Initial Version created by y04448.
 -- V1.1  2014-04 updated by yuhongqiang.
@@ -17,6 +17,9 @@
 --         hh3cLBv2RSConnOverloadTrap, hh3cLBv2RSConnRecoveryTrap,
 --         hh3cLBv2RSConnsRateOverloadTrap, hh3cLBv2RSConnsRateRecoveryTrap.
 --       Change the description of hh3cLBv2VSConnsRateRecoveryTrap.
+-- V1.2  2016-11 modified description of hh3cLBv2VSActiveTrap, hh3cLBv2VSInactiveTrap,
+--         hh3cLBv2RSAvailableTrap, hh3cLBv2RSUnavailableTrap, hh3cLBv2SFActiveTrap,
+--         hh3cLBv2SFInactiveTrap, hh3cLBv2ActionInUseSFChangeTrap, hh3cLBv2VSInUseSFChangeTrap  by l08992.
 -- =================================================================
 HH3C-LBV2-MIB DEFINITIONS ::= BEGIN
 
@@ -31,9 +34,9 @@ IMPORTS
 hh3cLBv2 MODULE-IDENTITY
     LAST-UPDATED "201311010000Z"
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -879,7 +882,7 @@ hh3cLBv2VSActiveTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2VSStatusTrap notification is sent when virtual
+        "A hh3cLBv2VSActiveTrap notification is sent when virtual
          server status changes to active."
     ::= { hh3cLBv2TrapPrefix 5 }
 
@@ -893,7 +896,7 @@ hh3cLBv2VSInactiveTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2VSStatusTrap notification is sent when virtual
+        "A hh3cLBv2VSInactiveTrap notification is sent when virtual
          server status changes to inactive."
     ::= { hh3cLBv2TrapPrefix 6 }
 
@@ -907,7 +910,7 @@ hh3cLBv2RSAvailableTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2RSStatusTrap notification is sent when the status of
+        "A hh3cLBv2RSAvailableTrap notification is sent when the status of
          the real server changes to available."
     ::= { hh3cLBv2TrapPrefix 7 }
 
@@ -921,7 +924,7 @@ hh3cLBv2RSUnavailableTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2RSStatusTrap notification is sent when the status of
+        "A hh3cLBv2RSUnavailableTrap notification is sent when the status of
          the real server changes to unavailable."
     ::= { hh3cLBv2TrapPrefix 8 }
 
@@ -935,7 +938,7 @@ hh3cLBv2SFActiveTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2SFStatusTrap notification is sent when the status of
+        "A hh3cLBv2SFActiveTrap notification is sent when the status of
          the server farm changes to active."
     ::= { hh3cLBv2TrapPrefix 9 }
 
@@ -949,7 +952,7 @@ hh3cLBv2SFInactiveTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2SFStatusTrap notification is sent when the status of
+        "A hh3cLBv2SFInactiveTrap notification is sent when the status of
          the server farm changes to inactive."
     ::= { hh3cLBv2TrapPrefix 10 }
 
@@ -966,7 +969,7 @@ hh3cLBv2ActionInUseSFChangeTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-         "A hh3cLBv2VSInUseSFChangeTrap notification is sent when the
+         "A hh3cLBv2ActionInUseSFChangeTrap notification is sent when the
          server farm which is in use quoted by action changes."
     ::= { hh3cLBv2TrapPrefix 11 }
 
@@ -983,7 +986,7 @@ hh3cLBv2VSInUseSFChangeTrap NOTIFICATION-TYPE
         }
     STATUS      current
     DESCRIPTION
-        "A hh3cLBv2ActionInUseSFChangeTrap notification is sent when
+        "A hh3cLBv2VSInUseSFChangeTrap notification is sent when
          the server farm which is in use quoted by virtual server
          changes."
     ::= { hh3cLBv2TrapPrefix 12 }

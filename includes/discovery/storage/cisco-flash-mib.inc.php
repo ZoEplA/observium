@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -46,7 +46,7 @@ if ((int)$ciscoFlashDevicesSupported > 0)
     //    $has_hc = $GLOBALS['snmp_status'];
     //  }
     //}
-    if (OBS_DEBUG > 1 && count($ciscoFlashDeviceTable)) { print_vars($ciscoFlashDeviceTable); }
+    print_debug_vars($ciscoFlashDeviceTable);
 
     sleep(5); // Yes, really.. sleep here, because cisco freeze
 
@@ -65,7 +65,7 @@ if ((int)$ciscoFlashDevicesSupported > 0)
       $ciscoFlashPartitionTable = snmpwalk_cache_twopart_oid($device_tmp, $oid, $ciscoFlashPartitionTable, 'CISCO-FLASH-MIB');
     }
     */
-    if (OBS_DEBUG > 1 && count($ciscoFlashPartitionTable)) { print_vars($ciscoFlashPartitionTable); }
+    print_debug_vars($ciscoFlashPartitionTable);
 
     /* Now this module run as last, sleep and disable mib not required
     if ($GLOBALS['snmp_error_code'] == 1002)
@@ -73,7 +73,7 @@ if ((int)$ciscoFlashDevicesSupported > 0)
       // We get timeout error here, f* cisco with your shit ;)
       // Additional sleep here and completely disable this mib now, for do not use it next time...
       sleep(5);
-      set_entity_attrib('device', $device, 'mib_' . 'CISCO-FLASH-MIB', "0"); /// FIXME. Note for myself, replace later with set_device_mibs_disabled(), not released yet
+      set_entity_attrib('device', $device, 'mib_' . 'CISCO-FLASH-MIB', "0"); /// FIXME. Note for myself, replace later with set_device_mib_disable(), not released yet
       log_event('Note, polling/discovery by MIB "' . 'CISCO-FLASH-MIB' . '" disabled, due to produced many Timeout errors. You can enable it again in device "Properties -> MIBs" page.', $device, 'device', $device['device_id'], 'warning');
     }
     sleep(5); // Yes, really.. sleep here, because cisco freeze and next discovery module return empty

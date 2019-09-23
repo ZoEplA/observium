@@ -7,13 +7,15 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$vars['data'] = json_decode($vars['data'], TRUE);
+//$vars['data'] = json_decode($vars['data'], TRUE);
 
 $multiplier = 8;
+
+//r($vars['data']);
 
 foreach($vars['data'] as $entry)
 {

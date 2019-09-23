@@ -86,6 +86,12 @@ eltMesLinkAgg   OBJECT IDENTIFIER ::= { eltMes 9  }
 eltMesQosTailDropMib   OBJECT IDENTIFIER ::= { eltMes 12  }
 -- see eltQosTailDropMib.mib
 
+--eltMesL2TunnelConfig ::= { eltMes 13 }
+-- see ELTEX-L2-TUNNEL-CONFIG-MIB.mib
+
+eltMesHardwareMib   OBJECT IDENTIFIER ::= { eltMes 14  }
+-- see eltHardware.mib
+
 eltMesTuning   OBJECT IDENTIFIER ::= { eltMes 29  }
 -- see eltTuning.mib
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -17,8 +17,8 @@ $mib = 'PowerNet-MIB';
 
 $scale     = 0.1;  // Default scale
 $scale_min = 1/60; // Scale for minutes
-$inputs    = snmp_get($device, 'upsPhaseNumInputs.0', '-Ovq', 'PowerNet-MIB');
-$outputs   = snmp_get($device, 'upsPhaseNumOutputs.0', '-Ovq', 'PowerNet-MIB');
+$inputs    = snmp_get_oid($device, 'upsPhaseNumInputs.0', 'PowerNet-MIB');
+$outputs   = snmp_get_oid($device, 'upsPhaseNumOutputs.0', 'PowerNet-MIB');
 
 echo('Caching OIDs: ');
 $cache['apc'] = array();
@@ -51,7 +51,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid, "upsPhaseInputCurrent.$tindex.1.$p", 'apc', $descr, $scale, $value);
+        discover_sensor('current', $device, $oid, "upsPhaseInputCurrent.$tindex.1.$p", 'apc', $descr, $scale, $value);
       }
 
       $oid      = ".1.3.6.1.4.1.318.1.1.1.9.2.3.1.3.$tindex.1.$p";
@@ -59,7 +59,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsPhaseInputVoltage.$tindex.1.$p", 'apc', $descr, 1, $value);
+        discover_sensor('voltage', $device, $oid, "upsPhaseInputVoltage.$tindex.1.$p", 'apc', $descr, 1, $value);
       }
     }
 
@@ -71,7 +71,7 @@ if ($inputs || $outputs)
 
     if ($value != '' && $value != -1)
     {
-      discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, 'apc', $descr, $scale, $value);
+      discover_sensor('frequency', $device, $oid, $index, 'apc', $descr, $scale, $value);
     }
   }
 
@@ -91,7 +91,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid, "upsPhaseOutputCurrent.$tindex.1.$p", 'apc', $descr, $scale, $value);
+        discover_sensor('current', $device, $oid, "upsPhaseOutputCurrent.$tindex.1.$p", 'apc', $descr, $scale, $value);
       }
 
       $oid      = ".1.3.6.1.4.1.318.1.1.1.9.3.3.1.3.$tindex.1.$p";
@@ -99,7 +99,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsPhaseOutputVoltage.$tindex.1.$p", 'apc', $descr, 1, $value);
+        discover_sensor('voltage', $device, $oid, "upsPhaseOutputVoltage.$tindex.1.$p", 'apc', $descr, 1, $value);
       }
 
       $oid_name = 'upsPhaseOutputPercentPower';
@@ -113,7 +113,7 @@ if ($inputs || $outputs)
       {
         rename_rrd_entity($device, 'sensor', array('descr' => "$descr Load", 'class' => 'capacity', 'index' => "upsPhaseOutputPercentPower.$tindex.1.$p", 'type' => 'apc'),  // old
                                              array('descr' => "$descr Load", 'class' => 'load',     'index' => "$tindex.1.$p",                            'type' => $type)); // new
-        discover_sensor($valid['sensor'], 'load', $device, $oid_num, "$tindex.1.$p", $type, "$descr Load", 1, $value);
+        discover_sensor('load', $device, $oid_num, "$tindex.1.$p", $type, "$descr Load", 1, $value);
       }
 
       $oid_name = 'upsPhaseOutputLoad';
@@ -123,7 +123,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'apower', $device, $oid_num, "$tindex.1.$p", $type, "$descr Power", 1, $value);
+        discover_sensor('apower', $device, $oid_num, "$tindex.1.$p", $type, "$descr Power", 1, $value);
       }
 
       /*
@@ -134,7 +134,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'load', $device, $oid_num, "$tindex.1.$p", $type, "$descr Load", 1, $value);
+        discover_sensor('load', $device, $oid_num, "$tindex.1.$p", $type, "$descr Load", 1, $value);
       }
       */
     }
@@ -146,7 +146,7 @@ if ($inputs || $outputs)
 
     if ($value != '' && $value != -1)
     {
-      discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsPhaseOutputFrequency.$tindex", 'apc', $descr, $scale, $value);
+      discover_sensor('frequency', $device, $oid, "upsPhaseOutputFrequency.$tindex", 'apc', $descr, $scale, $value);
     }
   }
 } else {
@@ -167,7 +167,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsHighPrecInputLineVoltage.$index", 'apc', $descr, $scale, $value);
+        discover_sensor('voltage', $device, $oid, "upsHighPrecInputLineVoltage.$index", 'apc', $descr, $scale, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.3.3.4.$index";
@@ -176,7 +176,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsHighPrecInputFrequency.$index", 'apc', $descr, $scale, $value);
+        discover_sensor('frequency', $device, $oid, "upsHighPrecInputFrequency.$index", 'apc', $descr, $scale, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.3.1.$index";
@@ -185,7 +185,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsHighPrecOutputVoltage.$index", 'apc', $descr, $scale, $value);
+        discover_sensor('voltage', $device, $oid, "upsHighPrecOutputVoltage.$index", 'apc', $descr, $scale, $value);
       }
 
       $oid = ".1.3.6.1.4.1.318.1.1.1.4.3.4.$index";
@@ -194,7 +194,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid, "upsHighPrecOutputCurrent.$index", 'apc', $descr, $scale, $value);
+        discover_sensor('current', $device, $oid, "upsHighPrecOutputCurrent.$index", 'apc', $descr, $scale, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.3.2.$index";
@@ -203,7 +203,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsHighPrecOutputFrequency.$index", 'apc', $descr, $scale, $value);
+        discover_sensor('frequency', $device, $oid, "upsHighPrecOutputFrequency.$index", 'apc', $descr, $scale, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.3.3.$index";
@@ -213,7 +213,16 @@ if ($inputs || $outputs)
       if ($value != '' && $value != -1)
       {
         $limits = array('limit_high' => 85, 'limit_high_warn' => 70);
-        discover_sensor($valid['sensor'], 'capacity', $device, $oid, "upsHighPrecOutputLoad.$index", 'apc', $descr, $scale, $value, $limits);
+        discover_sensor('capacity', $device, $oid, "upsHighPrecOutputLoad.$index", 'apc', $descr, $scale, $value, $limits);
+      }
+
+      $oid   = ".1.3.6.1.4.1.318.1.1.1.4.3.6.$index";
+      $descr = "Output Energy";
+      $value = $entry['upsHighPrecOutputEnergyUsage'];
+
+      if ($value != '' && $value != -1)
+      {
+        discover_counter($device, 'energy', $mib, 'upsHighPrecOutputEnergyUsage', $oid, $index, $descr, 10, $value);
       }
     }
     elseif (isset($entry['upsAdvInputLineVoltage']))
@@ -225,7 +234,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsAdvInputLineVoltage.$index", 'apc', $descr, 1, $value);
+        discover_sensor('voltage', $device, $oid, "upsAdvInputLineVoltage.$index", 'apc', $descr, 1, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.3.2.4.$index";
@@ -234,7 +243,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsAdvInputFrequency.$index", 'apc', $descr, 1, $value);
+        discover_sensor('frequency', $device, $oid, "upsAdvInputFrequency.$index", 'apc', $descr, 1, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.2.1.$index";
@@ -243,7 +252,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsAdvOutputVoltage.$index", 'apc', $descr, 1, $value);
+        discover_sensor('voltage', $device, $oid, "upsAdvOutputVoltage.$index", 'apc', $descr, 1, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.2.4.$index";
@@ -252,7 +261,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid, "upsAdvOutputCurrent.$index", 'apc', $descr, 1, $value);
+        discover_sensor('current', $device, $oid, "upsAdvOutputCurrent.$index", 'apc', $descr, 1, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.2.2.$index";
@@ -261,7 +270,7 @@ if ($inputs || $outputs)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'frequency', $device, $oid, "upsAdvOutputFrequency.$index", 'apc', $descr, 1, $value);
+        discover_sensor('frequency', $device, $oid, "upsAdvOutputFrequency.$index", 'apc', $descr, 1, $value);
       }
 
       $oid   = ".1.3.6.1.4.1.318.1.1.1.4.2.3.$index";
@@ -271,7 +280,16 @@ if ($inputs || $outputs)
       if ($value != '' && $value != -1)
       {
         $limits = array('limit_high' => 85, 'limit_high_warn' => 70);
-        discover_sensor($valid['sensor'], 'capacity', $device, $oid, "upsAdvOutputLoad.$index", 'apc', $descr, 1, $value, $limits);
+        discover_sensor('capacity', $device, $oid, "upsAdvOutputLoad.$index", 'apc', $descr, 1, $value, $limits);
+      }
+
+      $oid   = ".1.3.6.1.4.1.318.1.1.1.4.2.12.$index";
+      $descr = "Output Energy";
+      $value = $entry['upsAdvOutputEnergyUsage'];
+
+      if ($value != '' && $value != -1)
+      {
+        discover_counter($device, 'energy', $mib, 'upsHighPrecOutputEnergyUsage', $oid, $index, $descr, 1000, $value);
       }
     }
 
@@ -279,8 +297,8 @@ if ($inputs || $outputs)
     {
       $descr = "Last InputLine Fail Cause";
       $oid   = ".1.3.6.1.4.1.318.1.1.1.3.2.5.$index";
-
-      discover_status($device, $oid, "upsAdvInputLineFailCause.$index", 'powernet-upsadvinputfail-state', $descr, $entry['upsAdvInputLineFailCause'], array('entPhysicalClass' => 'other'));
+      // This does not reset after the failure is over, so we won't collect it for the time being.
+      //discover_status($device, $oid, "upsAdvInputLineFailCause.$index", 'powernet-upsadvinputfail-state', $descr, $entry['upsAdvInputLineFailCause'], array('entPhysicalClass' => 'other'));
     }
   }
 }
@@ -304,13 +322,13 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.3.2.$index";
     $value = $entry['upsHighPrecBatteryTemperature'];
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "upsHighPrecBatteryTemperature.$index", 'apc', $descr, $scale, $value);
+    discover_sensor('temperature', $device, $oid, "upsHighPrecBatteryTemperature.$index", 'apc', $descr, $scale, $value);
   } elseif ($entry['upsAdvBatteryTemperature'] && $entry['upsAdvBatteryTemperature'] != -1)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.2.2.$index";
     $value = $entry['upsAdvBatteryTemperature'];
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "upsAdvBatteryTemperature.$index", 'apc', $descr, 1, $value);
+    discover_sensor('temperature', $device, $oid, "upsAdvBatteryTemperature.$index", 'apc', $descr, 1, $value);
   }
 
   $descr = "Battery Nominal Voltage";
@@ -319,12 +337,12 @@ foreach ($cache['apc'] as $index => $entry)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.3.3.$index";
     $value = $entry['upsHighPrecBatteryNominalVoltage'];
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsHighPrecBatteryNominalVoltage.$index", 'apc', $descr, $scale, $value);
+    discover_sensor('voltage', $device, $oid, "upsHighPrecBatteryNominalVoltage.$index", 'apc', $descr, $scale, $value);
   } elseif ($entry['upsAdvBatteryNominalVoltage'] && $entry['upsAdvBatteryNominalVoltage'] != -1)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.2.7.$index";
     $value = $entry['upsAdvBatteryNominalVoltage'];
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsAdvBatteryNominalVoltage.$index", 'apc', $descr, 1, $value);
+    discover_sensor('voltage', $device, $oid, "upsAdvBatteryNominalVoltage.$index", 'apc', $descr, 1, $value);
   }
 
   $descr = "Battery Actual Voltage";
@@ -333,12 +351,12 @@ foreach ($cache['apc'] as $index => $entry)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.3.4.$index";
     $value = $entry['upsHighPrecBatteryActualVoltage'];
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsHighPrecBatteryActualVoltage.$index", 'apc', $descr, $scale, $value);
+    discover_sensor('voltage', $device, $oid, "upsHighPrecBatteryActualVoltage.$index", 'apc', $descr, $scale, $value);
   } elseif ($entry['upsAdvBatteryActualVoltage'] && $entry['upsAdvBatteryActualVoltage'] != -1)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.2.8.$index";
     $value = $entry['upsAdvBatteryActualVoltage'];
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "upsAdvBatteryActualVoltage.$index", 'apc', $descr, 1, $value);
+    discover_sensor('voltage', $device, $oid, "upsAdvBatteryActualVoltage.$index", 'apc', $descr, 1, $value);
   }
 
   $descr = "Battery";
@@ -348,13 +366,13 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.3.5.$index";
     $value = $entry['upsHighPrecBatteryCurrent'];
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "upsHighPrecBatteryCurrent.$index", 'apc', $descr, $scale, $value);
+    discover_sensor('current', $device, $oid, "upsHighPrecBatteryCurrent.$index", 'apc', $descr, $scale, $value);
   } elseif ($entry['upsAdvBatteryCurrent'] && $entry['upsAdvBatteryCurrent'] != -1)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.2.9.$index";
     $value = $entry['upsAdvBatteryCurrent'];
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "upsAdvBatteryCurrent.$index", 'apc', $descr, 1, $value);
+    discover_sensor('current', $device, $oid, "upsAdvBatteryCurrent.$index", 'apc', $descr, 1, $value);
   }
 
   $descr = "Total DC";
@@ -364,13 +382,13 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.3.6.$index";
     $value = $entry['upsHighPrecTotalDCCurrent'];
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "upsHighPrecTotalDCCurrent.$index", 'apc', $descr, $scale, $value);
+    discover_sensor('current', $device, $oid, "upsHighPrecTotalDCCurrent.$index", 'apc', $descr, $scale, $value);
   } elseif ($entry['upsAdvTotalDCCurrent'] && $entry['upsAdvTotalDCCurrent'] != -1)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.2.10.$index";
     $value = $entry['upsAdvTotalDCCurrent'];
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "upsAdvTotalDCCurrent.$index", 'apc', $descr, 1, $value);
+    discover_sensor('current', $device, $oid, "upsAdvTotalDCCurrent.$index", 'apc', $descr, 1, $value);
   }
 
   $descr = "Battery Capacity";
@@ -380,28 +398,28 @@ foreach ($cache['apc'] as $index => $entry)
     $oid    = ".1.3.6.1.4.1.318.1.1.1.2.3.1.$index";
     $value  = $entry['upsHighPrecBatteryCapacity'];
     $limits = array('limit_low' => 15, 'limit_low_warn' => 30);
-    discover_sensor($valid['sensor'], 'capacity', $device, $oid, "upsHighPrecBatteryCapacity.$index", 'apc', $descr, $scale, $value, $limits);
+    discover_sensor('capacity', $device, $oid, "upsHighPrecBatteryCapacity.$index", 'apc', $descr, $scale, $value, $limits);
   }
   elseif ($entry['upsAdvBatteryCapacity'] && $entry['upsAdvBatteryCapacity'] != -1)
   {
     $oid   = ".1.3.6.1.4.1.318.1.1.1.2.2.1.$index";
     $value = $entry['upsAdvBatteryCapacity'];
     $limits = array('limit_low' => 15, 'limit_low_warn' => 30);
-    discover_sensor($valid['sensor'], 'capacity', $device, $oid, "upsAdvBatteryCapacity.$index", 'apc', $descr, 1, $value, $limits);
+    discover_sensor('capacity', $device, $oid, "upsAdvBatteryCapacity.$index", 'apc', $descr, 1, $value, $limits);
   }
 
   $descr = "Battery Runtime Remaining";
 
   if ($entry['upsAdvBatteryRunTimeRemaining'])
   {
-    // Runtime stores data in minuntes
+    // Runtime stores data in minutes
     $oid       = ".1.3.6.1.4.1.318.1.1.1.2.2.3.$index";
     $value     = timeticks_to_sec($entry['upsAdvBatteryRunTimeRemaining']);
-    $limit_low = snmp_get($device, "upsAdvConfigLowBatteryRunTime.$index", "-Ovq", "PowerNet-MIB");
+    $limit_low = snmp_get_oid($device, "upsAdvConfigLowBatteryRunTime.$index", "PowerNet-MIB");
     $limit_low = timeticks_to_sec($limit_low);
     $limits    = array('limit_low' => (is_numeric($limit_low) ? $limit_low * $scale_min : 2));
 
-    discover_sensor($valid['sensor'], 'runtime', $device, $oid, "upsAdvBatteryRunTimeRemaining.$index", 'apc', $descr, $scale_min, $value, $limits);
+    discover_sensor('runtime', $device, $oid, "upsAdvBatteryRunTimeRemaining.$index", 'apc', $descr, $scale_min, $value, $limits);
   }
 
   $descr = "Battery Replace";
@@ -447,7 +465,7 @@ if ($value !== '')
   $oid = ".1.3.6.1.4.1.318.1.1.1.4.1.1.0";
   $descr = "Output Status";
 
-  discover_sensor($valid['sensor'], 'state', $device, $oid, "upsBasicOutputStatus.0", 'powernet-upsbasicoutput-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+  discover_status($device, $oid, "upsBasicOutputStatus.0", 'powernet-upsbasicoutput-state', $descr, $value, array('entPhysicalClass' => 'power'));
 }
 
 #### ATS #############################################################################################
@@ -502,7 +520,7 @@ if ($inputs || $outputs)
 
       if ($value != -1)
       {
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
+        discover_sensor('voltage', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
       }
 
       // Input Current
@@ -512,7 +530,7 @@ if ($inputs || $outputs)
 
       if ($value != -1)
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
+        discover_sensor('current', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
       }
 
       // Input Power
@@ -526,7 +544,7 @@ if ($inputs || $outputs)
                         'limit_low'       => snmp_get_oid($device, "atsConfigPhaseLowLoadThreshold.$phase",      "PowerNet-MIB"),
                         'limit_high_warn' => snmp_get_oid($device, "atsConfigPhaseNearOverLoadThreshold.$phase", "PowerNet-MIB"));
 
-        discover_sensor($valid['sensor'], 'power', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
+        discover_sensor('power', $device, $oid_num, $oid_name.$dot_index, 'apc', $descr, 1, $value);
       }
     }
 
@@ -536,7 +554,7 @@ if ($inputs || $outputs)
 
     if ($value != '' && $value != -1)
     {
-      discover_sensor($valid['sensor'], 'frequency', $device, $oid, "atsInputFrequency.$index", 'apc', $descr, 1, $value);
+      discover_sensor('frequency', $device, $oid, "atsInputFrequency.$index", 'apc', $descr, 1, $value);
     }
 
     $descr = "Output"; // No check for multiple output feeds, currently - I don't think this exists.
@@ -549,7 +567,7 @@ if ($inputs || $outputs)
 
     if ($value != -1)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "atsOutputVoltage.$index.1.1", 'apc', $descr, 1, $value);
+      discover_sensor('voltage', $device, $oid, "atsOutputVoltage.$index.1.1", 'apc', $descr, 1, $value);
     }
 
     $oid   = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.13'.$dot_index;
@@ -557,7 +575,7 @@ if ($inputs || $outputs)
 
     if ($value != -1)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "atsOutputPower.$index.1.1", 'apc', $descr, 1, $value);
+      discover_sensor('power', $device, $oid, "atsOutputPower.$index.1.1", 'apc', $descr, 1, $value);
     }
 
     $oid   = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.4'.$dot_index;
@@ -569,7 +587,7 @@ if ($inputs || $outputs)
                       'limit_low'       => snmp_get_oid($device, "atsConfigPhaseLowLoadThreshold.1",      "PowerNet-MIB"),
                       'limit_high_warn' => snmp_get_oid($device, "atsConfigPhaseNearOverLoadThreshold.1", "PowerNet-MIB"));
 
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "atsOutputCurrent.$index.1.1", 'apc', $descr, $scale, $value, $limits);
+      discover_sensor('current', $device, $oid, "atsOutputCurrent.$index.1.1", 'apc', $descr, $scale, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.4.2.1.4.$index";
@@ -577,7 +595,7 @@ if ($inputs || $outputs)
 
     if ($value != -1)
     {
-      discover_sensor($valid['sensor'], 'frequency', $device, $oid, "atsOutputFrequency.$index", 'apc', $descr, 1, $value);
+      discover_sensor('frequency', $device, $oid, "atsOutputFrequency.$index", 'apc', $descr, 1, $value);
     }
   }
 
@@ -596,27 +614,27 @@ if ($inputs || $outputs)
     $descr = "Switch Status";
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.1.10.$index";
     $value = $entry['atsStatusSwitchStatus'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "atsStatusSwitchStatus.$index", 'powernet-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+    discover_status($device, $oid, "atsStatusSwitchStatus.$index", 'powernet-status-state', $descr, $value, array('entPhysicalClass' => 'other'));
 
     $descr = "Source A";
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.1.12.$index";
     $value = $entry['atsStatusSourceAStatus'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "atsStatusSourceAStatus.$index", 'powernet-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+    discover_status($device, $oid, "atsStatusSourceAStatus.$index", 'powernet-status-state', $descr, $value, array('entPhysicalClass' => 'power'));
 
     $descr = "Source B";
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.1.13.$index";
     $value = $entry['atsStatusSourceBStatus'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "atsStatusSourceBStatus.$index", 'powernet-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+    discover_status($device, $oid, "atsStatusSourceBStatus.$index", 'powernet-status-state', $descr, $value, array('entPhysicalClass' => 'power'));
 
     $descr = "Phase Sync";
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.1.14.$index";
     $value = $entry['atsStatusPhaseSyncStatus'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "atsStatusPhaseSyncStatus.$index", 'powernet-sync-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+    discover_status($device, $oid, "atsStatusPhaseSyncStatus.$index", 'powernet-sync-state', $descr, $value, array('entPhysicalClass' => 'power'));
 
     $descr = "Hardware";
     $oid   = ".1.3.6.1.4.1.318.1.1.8.5.1.16.$index";
     $value = $entry['atsStatusHardwareStatus'];
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "atsStatusHardwareStatus.$index", 'powernet-status-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+    discover_status($device, $oid, "atsStatusHardwareStatus.$index", 'powernet-status-state', $descr, $value, array('entPhysicalClass' => 'other'));
   }
 
 /*
@@ -696,7 +714,7 @@ if ($outlets)
       if ($value != 0 && $value != -1 && $loadDev[0]['rPDULoadDevNumPhases'] > 1)
       {
         // Device Output if more than 1 Phase
-        discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDU2DeviceStatusPower.$index", 'apc', $descr, 10, $value, array('entPhysicalClass' => 'power'));
+        discover_sensor('power', $device, $oid, "rPDU2DeviceStatusPower.$index", 'apc', $descr, 10, $value, array('entPhysicalClass' => 'power'));
       }
 
       // PowerNet-MIB::rPDU2DeviceStatusApparentPower.1 = INTEGER: 198
@@ -706,12 +724,27 @@ if ($outlets)
 
       if ($value != 0 && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'apower', $device, $oid, "rPDU2DeviceStatusApparentPower.$index", 'apc', $descr, 10, $value, array('entPhysicalClass' => 'power'));
+        discover_sensor('apower', $device, $oid, "rPDU2DeviceStatusApparentPower.$index", 'apc', $descr, 10, $value, array('entPhysicalClass' => 'power'));
       }
 
-      // rPDU2DeviceStatusPowerFactor.1 = INTEGER: 93 -- Not used right now.
-      // rPDU2DeviceStatusEnergy.1 = INTEGER: 170982 -- kWh counter, not supported right now
+      // rPDU2DeviceStatusPowerFactor.1 = INTEGER: 93
+      $descr     = $unit . "Power Factor";
+      $oid       = ".1.3.6.1.4.1.318.1.1.26.4.3.1.17.$index";
+      $value     = $entry['rPDU2DeviceStatusPowerFactor'];
+      if ($value != 0 && $value != -1)
+      {
+        discover_sensor_ng($device, 'powerfactor', $mib, 'rPDU2DeviceStatusPowerFactor', $oid, $index, NULL, $descr, 0.01, $value);
+      }
+
+      // rPDU2DeviceStatusEnergy.1 = INTEGER: 170982
       // rPDU2DeviceStatusEnergyStartTime.1 = "05/30/2011 00:12:17"
+      $descr     = $unit . "Energy (since " . reformat_us_date($entry['rPDU2DeviceStatusEnergyStartTime']) . ")";
+      $oid       = ".1.3.6.1.4.1.318.1.1.26.4.3.1.9.$index";
+      $value     = $entry['rPDU2DeviceStatusEnergy'];
+      if ($value != 0 && $value != -1)
+      {
+        discover_counter($device, 'energy', $mib, 'rPDU2DeviceStatusEnergy', $oid, $index, $descr, 100, $value);
+      }
 
       // rPDU2PhaseConfigIndex.1 = INTEGER: 1
       // rPDU2PhaseConfigModule.1 = INTEGER: 1
@@ -773,7 +806,7 @@ if ($outlets)
 
           if ($value != '' && $value != -1)
           {
-            discover_sensor($valid['sensor'], 'current', $device, $oid, "rPDU2PhaseStatusCurrent.$index", 'apc', $descr, $scale, $value, $limits);
+            discover_sensor('current', $device, $oid, "rPDU2PhaseStatusCurrent.$index", 'apc', $descr, $scale, $value, $limits);
           }
 
           $oid       = ".1.3.6.1.4.1.318.1.1.26.6.3.1.6.$index";
@@ -781,7 +814,7 @@ if ($outlets)
 
           if ($value != '' && $value != -1)
           {
-            discover_sensor($valid['sensor'], 'voltage', $device, $oid, "rPDU2PhaseStatusVoltage.$index", 'apc', $descr, 1, $value);
+            discover_sensor('voltage', $device, $oid, "rPDU2PhaseStatusVoltage.$index", 'apc', $descr, 1, $value);
           }
 
           $oid       = ".1.3.6.1.4.1.318.1.1.26.6.3.1.7.$index";
@@ -789,15 +822,15 @@ if ($outlets)
 
           if ($value != '' && $value != -1)
           {
-            discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDU2PhaseStatusPower.$index", 'apc', $descr, 10, $value);
+            discover_sensor('power', $device, $oid, "rPDU2PhaseStatusPower.$index", 'apc', $descr, 10, $value);
           }
 
-          $oid       = ".1.3.6.1.4.1.318.1.1.26.4.3.1.17.$index";
-          $value     = $entry['rPDU2DeviceStatusPowerFactor'];
+          $oid       = ".1.3.6.1.4.1.318.1.1.26.6.3.1.9.$index";
+          $value     = $entry['rPDU2PhaseStatusPowerFactor'];
 
           if ($value != -1)
           {
-            discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, "rPDU2DeviceStatusPowerFactor.$index", 'apc', $descr, 1, $value);
+            discover_sensor_ng($device, 'powerfactor', $mib, 'rPDU2PhaseStatusPowerFactor', $oid, $index, NULL, $descr, 0.01, $value);
           }
 
           // rPDU2PhaseStatusLoadState.1 = INTEGER: normal(2)
@@ -840,7 +873,7 @@ if ($outlets)
           {
             $options = array('limit_high'      => $entry['rPDU2BankConfigOverloadCurrentThreshold'],
                              'limit_high_warn' => $entry['rPDU2BankConfigNearOverloadCurrentThreshold']);
-            discover_sensor($valid['sensor'], 'current', $device, $oid, "rPDU2BankStatusCurrent.$index", 'apc', $descr, $scale, $value, $options);
+            discover_sensor('current', $device, $oid, "rPDU2BankStatusCurrent.$index", 'apc', $descr, $scale, $value, $options);
           }
 
           $oid      = ".1.3.6.1.4.1.318.1.1.26.8.3.1.4.$index";
@@ -870,7 +903,7 @@ if ($outlets)
         $descr = 'Power Supply '.$unit;
         $oid   = ".1.3.6.1.4.1.318.1.1.12.4.1.$unit.$index";
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, "$key.$index", $type, $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+        discover_status($device, $oid, "$key.$index", $type, $descr, $value, array('entPhysicalClass' => 'power'));
       }
     }
 
@@ -921,7 +954,7 @@ if ($outlets)
 
       if ($value != '' && $value != -1)
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid, "rPDULoadStatusLoad.$index", 'apc', $descr, $scale, $value, $limits);
+        discover_sensor('current', $device, $oid, "rPDULoadStatusLoad.$index", 'apc', $descr, $scale, $value, $limits);
       }
 
       // [rPDUStatusPhaseState] => phaseLoadNormal
@@ -978,7 +1011,7 @@ if ($outlets)
 
     if ($value != -1)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "rPDUIdentDeviceLinetoLineVoltage.$index", 'apc', 'Line-to-Line', 1, $value);
+      discover_sensor('voltage', $device, $oid, "rPDUIdentDeviceLinetoLineVoltage.$index", 'apc', 'Line-to-Line', 1, $value);
     }
 
     $oid   = ".1.3.6.1.4.1.318.1.1.12.1.16.$index";
@@ -986,7 +1019,7 @@ if ($outlets)
 
     if ($value != -1 && !isset($valid['sensor']['power']['apc']['rPDU2PhaseStatusPower.1']))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDUIdentDevicePowerWatts.$index", 'apc', $descr, 1, $value);
+      discover_sensor('power', $device, $oid, "rPDUIdentDevicePowerWatts.$index", 'apc', $descr, 1, $value);
     }
 
     $oid   = ".1.3.6.1.4.1.318.1.1.12.1.17.$index";
@@ -994,7 +1027,7 @@ if ($outlets)
 
     if ($value != -1)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, "rPDUIdentDevicePowerFactor.$index", 'apc', $descr, 0.001, $value);
+      discover_sensor('powerfactor', $device, $oid, "rPDUIdentDevicePowerFactor.$index", 'apc', $descr, 0.001, $value);
     }
 
     $oid   = ".1.3.6.1.4.1.318.1.1.12.1.18.$index";
@@ -1002,7 +1035,7 @@ if ($outlets)
 
     if ($value != -1)
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, "rPDUIdentDevicePowerVA.$index", 'apc', $descr, 1, $value);
+      discover_sensor('apower', $device, $oid, "rPDUIdentDevicePowerVA.$index", 'apc', $descr, 1, $value);
     }
   }
 
@@ -1027,7 +1060,7 @@ if ($outlets)
 
     if ($value != '' && $value != -1)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "rPDU2OutletMeteredStatusCurrent.$index", 'apc', $descr, $scale, $value, $limits);
+      discover_sensor('current', $device, $oid, "rPDU2OutletMeteredStatusCurrent.$index", 'apc', $descr, $scale, $value, $limits);
     }
 
     $oid       = ".1.3.6.1.4.1.318.1.1.26.9.4.3.1.7.$index";
@@ -1035,7 +1068,7 @@ if ($outlets)
 
     if ($value != '' && $value != -1)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "rPDU2OutletMeteredStatusPower.$index", 'apc', $descr, 1, $value);
+      discover_sensor('power', $device, $oid, "rPDU2OutletMeteredStatusPower.$index", 'apc', $descr, 1, $value);
     }
 
     // Not currently supported: kWh reading: rPDU2OutletMeteredStatusEnergy - "A user resettable energy meter measuring Rack PDU load energy consumption in tenths of kilowatt-hours"
@@ -1060,7 +1093,7 @@ if ($oids)
     $index = "LtoN:".$phase;
     $descr = "Phase $phase Line to Neutral";
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'apc', $descr, $scale, $value);
+    discover_sensor('voltage', $device, $oid, $index, 'apc', $descr, $scale, $value);
   }
 }
 
@@ -1079,7 +1112,7 @@ if ($oids)
       $breaker = $split_oid[count($split_oid)-2];
       $index = str_pad($breaker, 2, "0", STR_PAD_LEFT) . "-" . $phase;
       $descr = "Breaker $breaker Phase $phase";
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'apc', $descr, $scale, $value);
+      discover_sensor('current', $device, $oid, $index, 'apc', $descr, $scale, $value);
     }
   }
 
@@ -1094,7 +1127,7 @@ if ($oids)
       $phase = $split_oid[count($split_oid)-1];
       $index = ".$phase";
       $descr = "Phase $phase overall";
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'apc', $descr, $scale, $value);
+      discover_sensor('current', $device, $oid, $index, 'apc', $descr, $scale, $value);
     }
   }
 }
@@ -1129,7 +1162,7 @@ foreach ($cache['apc'] as $index => $entry)
 
   if ($value != '' && $value > 0) // Humidity = 0 or -1 -> Sensor not available
   {
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "emsProbeStatusProbeHumidity.$index", 'apc', $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "emsProbeStatusProbeHumidity.$index", 'apc', $descr, 1, $value, $limits);
   }
 
   // Temperature
@@ -1150,7 +1183,7 @@ foreach ($cache['apc'] as $index => $entry)
       $options['sensor_unit'] = 'C';
     }
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "emsProbeStatusProbeTemperature.$index", 'apc', $descr, $scale_temp, $value, $options);
+    discover_sensor('temperature', $device, $oid, "emsProbeStatusProbeTemperature.$index", 'apc', $descr, $scale_temp, $value, $options);
   }
 }
 
@@ -1181,7 +1214,7 @@ foreach ($cache['apc'] as $index => $entry)
 
   if ($value != '' && $value > 0) // Humidity = 0 or -1 -> Sensor not available
   {
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "iemStatusProbeCurrentHumid.$index", 'apc', $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "iemStatusProbeCurrentHumid.$index", 'apc', $descr, 1, $value, $limits);
     $iem_sensors['humidity'][] = $descr; // Store for later use in uio code below
   }
 
@@ -1193,7 +1226,7 @@ foreach ($cache['apc'] as $index => $entry)
                            'limit_high_warn' => $entry['iemConfigProbeHighTempThreshold'],
                            'limit_low_warn'  => $entry['iemConfigProbeLowTempThreshold']);
 
-  if ($value != '' && $value != -1) // Temperature = -1 -> Sensor not available
+  if ($value != '' && $value > 0) // Temperature = -1 -> Sensor not available
   {
     $scale_temp = 1;
     if ($temp_units == 'fahrenheit')
@@ -1203,7 +1236,7 @@ foreach ($cache['apc'] as $index => $entry)
       $options['sensor_unit'] = 'C';
     }
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "iemStatusProbeCurrentTemp.$index", 'apc', $descr, $scale_temp, $value, $options);
+    discover_sensor('temperature', $device, $oid, "iemStatusProbeCurrentTemp.$index", 'apc', $descr, $scale_temp, $value, $options);
     $iem_sensors['temperature'][] = $descr; // Store for later use in uio code below
   }
 }
@@ -1261,7 +1294,7 @@ foreach ($cache['apc'] as $index => $entry)
     // Skip if already discovered through iem
     if (!in_array($descr, $iem_sensors['humidity']))
     {
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, "uioSensorStatusHumidity.$index", 'apc', $descr, 1, $value);
+      discover_sensor('humidity', $device, $oid, "uioSensorStatusHumidity.$index", 'apc', $descr, 1, $value);
     } else {
       print_debug("Sensor was already found through iem table, skipping uio");
     }
@@ -1277,7 +1310,7 @@ foreach ($cache['apc'] as $index => $entry)
     // Skip if already discovered through iem
     if (!in_array($descr, $iem_sensors['temperature']))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "uioSensorStatusTemperatureDegC.$index", 'apc', $descr, 1, $value);
+      discover_sensor('temperature', $device, $oid, "uioSensorStatusTemperatureDegC.$index", 'apc', $descr, 1, $value);
     } else {
       print_debug("Sensor was already found through iem table, skipping uio");
     }
@@ -1304,7 +1337,7 @@ foreach ($cache['apc'] as $index => $entry)
 
   if ($value != '' && $value != -1 && $entry['rPDU2SensorTempHumidityStatusHumidityStatus'] != 'notPresent')
   {
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "rPDU2SensorTempHumidityStatusRelativeHumidity.$index", 'apc', $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "rPDU2SensorTempHumidityStatusRelativeHumidity.$index", 'apc', $descr, 1, $value, $limits);
   }
 
   // Temperature
@@ -1315,7 +1348,7 @@ foreach ($cache['apc'] as $index => $entry)
 
   if ($value != '' && $value != -1)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "rPDU2SensorTempHumidityStatusTempC.$index", 'apc', $descr, $scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid, "rPDU2SensorTempHumidityStatusTempC.$index", 'apc', $descr, $scale, $value, $limits);
   }
 }
 
@@ -1357,7 +1390,7 @@ foreach ($cache['apc'] as $index => $entry)
       $options['sensor_unit'] = 'C';
     }
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "memSensorsTemperature.$index", 'apc', $descr, $scale_temp, $value, $options);
+    discover_sensor('temperature', $device, $oid, "memSensorsTemperature.$index", 'apc', $descr, $scale_temp, $value, $options);
   }
 
   $oid   = ".1.3.6.1.4.1.318.1.1.10.4.2.3.1.6.$index";
@@ -1366,7 +1399,7 @@ foreach ($cache['apc'] as $index => $entry)
   // Exclude already added sensor from emsProbeStatusTable
   if ($value != '' && $value > 0 && !isset($valid['sensor']['humidity']['apc']["emsProbeStatusProbeHumidity.$ems_index"]))
   {
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "memSensorsHumidity.$index", 'apc', $descr, 1, $value);
+    discover_sensor('humidity', $device, $oid, "memSensorsHumidity.$index", 'apc', $descr, 1, $value);
   }
 }
 
@@ -1437,7 +1470,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
+      discover_sensor('power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
     }
 
     // airIRxxGroupStatusCoolDemand.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.2.x]
@@ -1448,7 +1481,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
+      discover_sensor('power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
     }
 
     // airIRxxGroupStatusAirFlowUS.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.3.x]
@@ -1459,7 +1492,9 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'airflow', $device, $oid, "$name.$index", 'apc', $descr, 1, $value);
+      //$options = ['sensor_unit' => 'CFM']; // cubic feet per minute
+
+      discover_sensor('airflow', $device, $oid, "$name.$index", 'apc', $descr, 1, $value, $options);
     }
 
     // airIRxxGroupStatusMaxRackInletTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.6.x]
@@ -1470,7 +1505,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
 
     // airIRxxGroupStatusMinRackInletTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.8.x]
@@ -1481,7 +1516,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
 
     // airIRxxGroupStatusMaxReturnAirTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.10.x]
@@ -1492,7 +1527,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
 
     // airIRxxGroupStatusMinReturnAirTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.12.x]
@@ -1503,7 +1538,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
 
     // airIRxxGroupSetpointsCoolMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.x.2.x]
@@ -1514,7 +1549,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
 
     // airIRxxGroupSetpointsSupplyAirMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.x.4.x]
@@ -1525,7 +1560,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
   }
 
@@ -1550,7 +1585,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
+      discover_sensor('power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
     }
 
     // airIRxxUnitStatusCoolDemand.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.3.x]
@@ -1561,7 +1596,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
+      discover_sensor('power', $device, $oid, "$name.$index", 'apc', $descr, 100, $value);
     }
 
     // airIRxxUnitStatusAirFlowUS.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.4.x]
@@ -1572,7 +1607,9 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'airflow', $device, $oid, "$name.$index", 'apc', $descr, 1, $value);
+      //$options = ['sensor_unit' => 'CFM']; // cubic feet per minute
+
+      discover_sensor('airflow', $device, $oid, "$name.$index", 'apc', $descr, 1, $value, $options);
     }
 
     // airIRxxUnitStatusRackInletTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.7.x]
@@ -1584,7 +1621,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
     }
 
     // airIRxxUnitStatusSupplyAirTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.9.x]
@@ -1596,7 +1633,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
     }
 
     // airIRxxUnitStatusReturnAirTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.11.x]
@@ -1608,7 +1645,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
     }
 
     // airIRxxUnitStatusSuctionTempMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.13.x]
@@ -1619,7 +1656,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
 
     // airIRxxUnitStatusFilterDPMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.13.x]
@@ -1630,7 +1667,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'pressure', $device, $oid, "$name.$index", 'apc', $descr, 1, $value);
+      discover_sensor('pressure', $device, $oid, "$name.$index", 'apc', $descr, 1, $value);
     }
 
     // airIRxxUnitStatusContainmtDPMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.15.x]
@@ -1641,7 +1678,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'pressure', $device, $oid, "$name.$index", 'apc', $descr, 1, $value);
+      discover_sensor('pressure', $device, $oid, "$name.$index", 'apc', $descr, 1, $value);
     }
 
     // airIRxxUnitStatusEnteringFluidTemperatureMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.24.x]
@@ -1653,7 +1690,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value, $limit);
     }
 
     // airIRxxUnitStatusLeavingFluidTemperatureMetric.x [.1.3.6.1.4.1.318.1.1.13.x.x.x.26.x]
@@ -1664,7 +1701,7 @@ if (array_key_exists($type, $inrow)) // Check if the device is a supported APC I
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
+      discover_sensor('temperature', $device, $oid, "$name.$index", 'apc', $descr, 0.1, $value);
     }
   }
 }
@@ -1685,7 +1722,7 @@ $apc_unit_map = array(
   'C' => 'temperature',
   'F' => '', // Ignored, we use C instead
   'CFM' => 'airflow',
-  'GPM' => '', // Gallons per minute, no sensor type for water flow right now
+  'GPM' => 'waterflow', // Gallons per minute
   'kW' => 'power',
   'W' => 'power',
   '%' => 'capacity',
@@ -1716,14 +1753,20 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.27.1.4.1.2.1.3.$index";
     $scale = 1 / $entry['coolingUnitStatusAnalogScale'];
     $value = $entry['coolingUnitStatusAnalogValue'];
+    $options = [];
 
     // Workaround for kW vs W
     if ($entry['coolingUnitStatusAnalogUnits'] == 'kW')
     {
       $scale = 1000 / $entry['coolingUnitStatusAnalogScale']; // 1kW = 1000W
     }
+    // Append unit conversion for airflow and waterflow
+    if (in_array($entry['coolingUnitStatusAnalogUnits'], ['GPM']))
+    {
+      $options['sensor_unit'] = $entry['coolingUnitStatusAnalogUnits'];
+    }
 
-    discover_sensor($valid['sensor'], $apc_unit_map[$entry['coolingUnitStatusAnalogUnits']], $device, $oid, "coolingUnitStatusAnalogValue.$index", 'apc', $descr, $scale, $value);
+    discover_sensor($apc_unit_map[$entry['coolingUnitStatusAnalogUnits']], $device, $oid, "coolingUnitStatusAnalogValue.$index", 'apc', $descr, $scale, $value, $options);
   }
 }
 
@@ -1757,7 +1800,7 @@ foreach ($cache['apc'] as $index => $entry)
       $scale = 1000 / $entry['coolingUnitStatusAnalogScale']; // 1kW = 1000W
     }
 
-    discover_sensor($valid['sensor'], $apc_unit_map[$entry['coolingUnitExtendedAnalogUnits']], $device, $oid, "coolingUnitExtendedAnalogValue.$index", 'apc', $descr, $scale, $value);
+    discover_sensor($apc_unit_map[$entry['coolingUnitExtendedAnalogUnits']], $device, $oid, "coolingUnitExtendedAnalogValue.$index", 'apc', $descr, $scale, $value);
   }
 }
 
@@ -1859,7 +1902,7 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.2.1.1.$index";
     $value = $entry['mUpsEnvironAmbientTemperature'];
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "mUpsEnvironAmbientTemperature.$index", 'apc', $descr, 1, $value);
+    discover_sensor('temperature', $device, $oid, "mUpsEnvironAmbientTemperature.$index", 'apc', $descr, 1, $value);
   }
 
   if (is_numeric($entry['mUpsEnvironRelativeHumidity']) &&
@@ -1869,7 +1912,7 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.2.1.2.$index";
     $value = $entry['mUpsEnvironRelativeHumidity'];
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "mUpsEnvironRelativeHumidity.$index", 'apc', $descr, 1, $value);
+    discover_sensor('humidity', $device, $oid, "mUpsEnvironRelativeHumidity.$index", 'apc', $descr, 1, $value);
   }
 
   if ($entry['mUpsEnvironAmbientTemperature2'] != 0 && $entry['mUpsEnvironRelativeHumidity2'] != 255)
@@ -1881,7 +1924,7 @@ foreach ($cache['apc'] as $index => $entry)
       $oid   = ".1.3.6.1.4.1.318.1.1.2.1.3.$index";
       $value = $entry['mUpsEnvironAmbientTemperature2'];
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "mUpsEnvironAmbientTemperature2.$index", 'apc', $descr, 1, $value);
+      discover_sensor('temperature', $device, $oid, "mUpsEnvironAmbientTemperature2.$index", 'apc', $descr, 1, $value);
     }
 
     if (is_numeric($entry['mUpsEnvironRelativeHumidity2']) &&
@@ -1891,7 +1934,7 @@ foreach ($cache['apc'] as $index => $entry)
       $oid   = ".1.3.6.1.4.1.318.1.1.2.1.4.$index";
       $value = $entry['mUpsEnvironRelativeHumidity2'];
 
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, "mUpsEnvironRelativeHumidity2.$index", 'apc', $descr, 1, $value);
+      discover_sensor('humidity', $device, $oid, "mUpsEnvironRelativeHumidity2.$index", 'apc', $descr, 1, $value);
     }
   }
 }
@@ -1912,7 +1955,7 @@ foreach ($cache['apc'] as $index => $entry)
     $oid   = ".1.3.6.1.4.1.318.1.1.2.2.2.1.5.$index";
     $value = $entry['currentStatus'];
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "currentStatus.$index", 'powernet-mupscontact-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+    discover_status($device, $oid, "currentStatus.$index", 'powernet-mupscontact-state', $descr, $value, array('entPhysicalClass' => 'other'));
   }
 }
 

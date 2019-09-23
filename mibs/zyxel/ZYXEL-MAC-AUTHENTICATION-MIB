@@ -5,6 +5,8 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-MAC-AUTHENTICATION-MIB.mib $ 
+-- Revision 1.5  2015/02/05 07:25:28  Alan 
+-- Add new feature Per VLAN MAC-Authentication 
 -- Revision 1.4  2013/12/06 07:06:41  ccho 
 -- remove uncessary imports 
 -- Revision 1.3  2012/09/19 07:40:35  Kevin 
@@ -82,7 +84,7 @@ ZYXEL-MAC-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
 			"Specify the amount of time before the switch allows a client MAC address that fails authentication 
 			 to try and authenticate again. Maximum time is 3000 seconds."
         ::= { zyxelMacAuthenticationSetup 4 }
-                                               
+		
 --		zyxelMacAuthenticationPortTable
  
 		zyxelMacAuthenticationPortTable OBJECT-TYPE
@@ -104,7 +106,11 @@ ZYXEL-MAC-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
  
 		ZyxelMacAuthenticationPortEntry ::=
 		SEQUENCE {
-			zyMacAuthenticationPortState EnabledStatus
+			zyMacAuthenticationPortState EnabledStatus,
+			zyMacAuthenticationPortTrustedVlan1k	OCTET STRING,
+			zyMacAuthenticationPortTrustedVlan2k	OCTET STRING,
+			zyMacAuthenticationPortTrustedVlan3k	OCTET STRING,
+			zyMacAuthenticationPortTrustedVlan4k	OCTET STRING
 		}
  
         zyMacAuthenticationPortState OBJECT-TYPE
@@ -114,5 +120,116 @@ ZYXEL-MAC-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
 			"Enable/disable MAC authentication on the port."
         ::= { zyxelMacAuthenticationPortEntry 1 }
+		
+		zyMacAuthenticationPortTrustedVlan1k OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE (0..128))
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+           "A string of octets containing one bit per VLAN. The
+            first octet corresponds to VLANs with VlanIndex values
+            1 through 8; the second octet to VLANs 9 through
+            16 etc.  The most significant bit of each octet
+            corresponds to the lowest VlanIndex value in that octet.
 
+            For each VLAN that is associated to this primary VLAN,
+            the bit corresponding to that VLAN is set to '1'.
+            Empty (zero) most significant octes are not mandatory."
+    	::= { zyxelMacAuthenticationPortEntry 2 }
+		
+        zyMacAuthenticationPortTrustedVlan2k      OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE (0..128))
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "A string of octets containing one bit per VLAN for
+             VLANS with VlanIndex values 1024 through 2047. The
+             first octet corresponds to VLANs with VlanIndex values
+             1024 through 1031; the second octet to VLANs 1032
+             through 1039 etc.  The most significant bit of each
+             octet corresponds to the lowest VlanIndex value in that
+             octet.
+             
+             For each VLAN that is associated to this primary VLAN,
+             the bit corresponding to that VLAN is set to '1'.
+
+             Empty (zero) most significant octes are not mandatory."
+         ::= { zyxelMacAuthenticationPortEntry 3 }
+        
+        zyMacAuthenticationPortTrustedVlan3k      OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE (0..128))
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+            "A string of octets containing one bit per VLAN for
+             VLANS with VlanIndex values 2048 through 3071. The
+             first octet corresponds to VLANs with VlanIndex values
+             of 2048 through 2055; the second octet to VLANs 2056
+             through 2063 etc.  The most significant bit of each
+             octet corresponds to the lowest VlanIndex value in that
+             octet.
+
+             For each VLAN that is associated to this primary VLAN,
+             the bit corresponding to that VLAN is set to '1'.
+
+             Empty (zero) most significant octes are not mandatory."
+         ::= { zyxelMacAuthenticationPortEntry 4 }
+        
+        zyMacAuthenticationPortTrustedVlan4k      OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE (0..128))
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+            "A string of octets containing one bit per VLAN for
+             VLANS with VlanIndex values 3072 through 4095. The
+             first octet corresponds to VLANs with VlanIndex values
+             3072 through 3079; the second octet to VLANs 3080
+             through 3087 etc.  The most significant bit of each
+             octet corresponds to the lowest VlanIndex value in that
+             octet.
+        
+             For each VLAN that is associated to this primary VLAN,
+             the bit corresponding to that VLAN is set to '1'.
+           
+             Empty (zero) most significant octes are not mandatory."
+         ::= { zyxelMacAuthenticationPortEntry 5 }
+
+		 
+        zyMacAuthenticationDelimiter OBJECT-TYPE
+        SYNTAX  INTEGER {
+			dash(1),
+			colon(2),
+			none(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"Delimiter used in the MAC string:
+				dash specifies the format xx-xx-xx-xx-xx-xx
+				colon specifies the format xx:xx:xx:xx:xx:xx
+				none specifies the format xxxxxxxxxxxx"
+        ::= { zyxelMacAuthenticationSetup 6 }	
+
+        zyMacAuthenticationCase OBJECT-TYPE
+        SYNTAX  INTEGER {
+			upper(1),
+			lower(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"This option specifies the case (upper or lower) used in the MAC string."
+        ::= { zyxelMacAuthenticationSetup 7 }
+
+        zyMacAuthenticationPasswordType OBJECT-TYPE
+        SYNTAX  INTEGER {
+			static(1),
+			mac-address(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"Password type specifies the use of static password or User-Name(MAC address string) as the password."
+        ::= { zyxelMacAuthenticationSetup 8 }
+		 
 END

@@ -174,7 +174,7 @@ NMS-HAL-IF-MIB  DEFINITIONS ::= BEGIN
               STATUS  mandatory
 
               DESCRIPTION
-                      "Port initial type. 1-copper£¬2-fiber, 3-combo, 4-other."
+                      "Port initial type. 1-copper, 2-fiber, 3-combo, 4-other."
               ::= { physicalIfConfigEntry 9 }
 
 

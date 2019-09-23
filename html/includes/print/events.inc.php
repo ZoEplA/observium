@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -92,7 +92,7 @@ function print_events($vars)
       {
         $string .= '    <td class="syslog" style="white-space: nowrap">';
         $timediff = $GLOBALS['config']['time']['now'] - strtotime($entry['timestamp']);
-        $string .= generate_tooltip_link('', formatUptime($timediff, "short-3"), format_timestamp($entry['timestamp']), NULL) . '</td>' . PHP_EOL;
+        $string .= generate_tooltip_link('', format_uptime($timediff, "short-3"), format_timestamp($entry['timestamp']), NULL) . '</td>' . PHP_EOL;
       } else {
         $string .= '    <td style="width: 160px">';
         $string .= format_timestamp($entry['timestamp']) . '</td>' . PHP_EOL;

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -179,7 +179,7 @@ function discover_wifi_wlan($device_id, $wlan)
     foreach ($params as $param)
     {
       $insert[$param] = $wlan[$param];
-      if ($wlan[$param] == NULL) { $insert[$param] = array('NULL'); }
+      if (is_null($wlan[$param])) { $insert[$param] = array('NULL'); }
     }
     $wlan_id = dbInsert($insert, 'wifi_wlans');
     echo("+");

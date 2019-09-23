@@ -93,6 +93,12 @@ nmsEPONGroup OBJECT-IDENTITY
 		"nmsEPONGroup is the main subtree for new epon mib ."
 	::= { nms 101 }   
 	
+  nmsPTNGroup OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"PTN ."
+	::= { nms 102 }   
+	
 
 
 

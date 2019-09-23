@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -29,12 +29,16 @@ if ($_SESSION['userlevel'] < 10)
                                       'type'        => 'hidden',
                                       'value'       => $device['device_id']);
       $form['row'][4]['deleterrd'] = array(
-                                      'type'        => 'checkbox',
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'red',
                                       'name'        => 'Delete RRDs',
                                       'onchange'    => "javascript: showDiv(this.checked);",
                                       'value'       => 'confirm');
       $form['row'][5]['confirm'] = array(
-                                      'type'        => 'checkbox',
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
+                                      'palette'     => 'red',
                                       'name'        => 'Confirm Deletion',
                                       'onchange'    => "javascript: toggleAttrib('disabled', 'delete');",
                                       'value'       => 'confirm');

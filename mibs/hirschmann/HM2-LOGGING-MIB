@@ -379,7 +379,7 @@ hm2LogPersistAdminStatus	OBJECT-TYPE
 
 
 hm2LogPersistMaxFileSize	OBJECT-TYPE
-			SYNTAX			Integer32
+			SYNTAX			Integer32 (0..4096)
 			MAX-ACCESS		read-write
 			STATUS 		current
 			DESCRIPTION
@@ -390,7 +390,7 @@ hm2LogPersistMaxFileSize	OBJECT-TYPE
 
 
 hm2LogPersistFilesMax	OBJECT-TYPE
-			SYNTAX			Integer32
+			SYNTAX			Integer32 (0..25)
 			MAX-ACCESS		read-write
 			STATUS 		current
 			DESCRIPTION

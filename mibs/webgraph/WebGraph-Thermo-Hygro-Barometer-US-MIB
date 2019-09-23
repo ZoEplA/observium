@@ -1,5 +1,15 @@
 WebGraph-Thermo-Hygro-Barometer-US-MIB DEFINITIONS ::= BEGIN
 ----------------------------------------------------------------
+-- Revison: 1.36
+----------------------------------------------------------------
+-- 09.03.2017 	New: wtWebGraphThermoBaroAlarmSensorLostSelection
+--		     		 wtWebGraphThermoBaroAlarmLimitWindow
+----------------------------------------------------------------
+-- Revison: 1.35
+----------------------------------------------------------------
+-- 09.11.2016 	New: wtWebGraphThermoBaroMQTT group
+--		HTTP Request & MQTT Alarm
+----------------------------------------------------------------
 -- Revison: 1.34
 ----------------------------------------------------------------
 -- 14.07.2015 	New: wtWebioAn1GraphAlarmName,
@@ -244,54 +254,57 @@ WebGraph-Thermo-Hygro-Barometer-US-MIB DEFINITIONS ::= BEGIN
 
 
 --  Wiesemann & Theis Com-Server MIB
-
-    wut                				OBJECT IDENTIFIER ::= { enterprises 5040 }
-    wtComServer        				OBJECT IDENTIFIER ::= { wut 1 }
-    wtWebio            				OBJECT IDENTIFIER ::= { wtComServer 2 }
+	
+    wut	                					OBJECT IDENTIFIER ::= { enterprises 5040 }
+    wtComServer 	       					OBJECT IDENTIFIER ::= { wut 1 }
+    wtWebio            						OBJECT IDENTIFIER ::= { wtComServer 2 }
 
 --  wtWebGraph Tree
 
-    wtWebGraphThermoBaro  			OBJECT IDENTIFIER ::= { wtWebio 37 }
+    wtWebGraphThermoBaro  					OBJECT IDENTIFIER ::= { wtWebio 37 }
     
 --  wtWebGraphThermoBaro Tree
 
-    wtWebGraphThermoBaroTemp      		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 1 }
-    wtWebGraphThermoBaroSessCntrl 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 2 }
-    wtWebGraphThermoBaroConfig    		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 3 }
-    wtWebGraphThermoBaroDiag    		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 4 }    
+    wtWebGraphThermoBaroTemp      			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 1 }
+    wtWebGraphThermoBaroSessCntrl 			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 2 }
+    wtWebGraphThermoBaroConfig    			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 3 }
+    wtWebGraphThermoBaroDiag    			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 4 }    
     
 --  wtWebGraphThermoBaroConfig Tree
 
-    wtWebGraphThermoBaroDevice    		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 1 }
-    wtWebGraphThermoBaroPorts     		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 2 }	
-    wtWebGraphThermoBaroManufact  		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 3 }	
+    wtWebGraphThermoBaroDevice    			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 1 }
+    wtWebGraphThermoBaroPorts     			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 2 }	
+    wtWebGraphThermoBaroManufact  			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 3 }	
 
 --  wtWebGraphThermoBaroDevice Tree
 
-    wtWebGraphThermoBaroText			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 1 }	
-    wtWebGraphThermoBaroTimeDate 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 2 }
-    wtWebGraphThermoBaroBasic			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 3 }	
-    wtWebGraphThermoBaroDatalogger		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 4 }	
-    wtWebGraphThermoBaroAlarm			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 5 }
-    wtWebGraphThermoBaroGraphics 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 6 }
+    wtWebGraphThermoBaroText				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 1 }	
+    wtWebGraphThermoBaroTimeDate 			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 2 }
+    wtWebGraphThermoBaroBasic				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 3 }	
+    wtWebGraphThermoBaroDatalogger			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 4 }	
+    wtWebGraphThermoBaroAlarm				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 5 }
+    wtWebGraphThermoBaroGraphics 			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 6 }
     
 --  wtWebGraphThermoBaroTimeDate Tree
 
-    wtWebGraphThermoBaroTimeZone		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 1 }
-    wtWebGraphThermoBaroTimeServer		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 2 }	
-    wtWebGraphThermoBaroDeviceClock		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 3 }
+    wtWebGraphThermoBaroTimeZone			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 1 }
+    wtWebGraphThermoBaroTimeServer			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 2 }	
+    wtWebGraphThermoBaroDeviceClock			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 3 }
 
 --  wtWebGraphThermoBaroBasic Tree
     
-    wtWebGraphThermoBaroNetwork			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 1 }
-    wtWebGraphThermoBaroHTTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 2 }
-    wtWebGraphThermoBaroMail			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 3 }	
-    wtWebGraphThermoBaroSNMP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 4 }
-    wtWebGraphThermoBaroUDP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 5 }
-    wtWebGraphThermoBaroSyslog			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 6 }    
-    wtWebGraphThermoBaroFTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 7 }
-    wtWebGraphThermoBaroRSS			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 8 }
-    wtWebGraphThermoBaroLanguage		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 9 }
+    wtWebGraphThermoBaroNetwork				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 1 }
+    wtWebGraphThermoBaroHTTP				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 2 }
+    wtWebGraphThermoBaroMail				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 3 }	
+    wtWebGraphThermoBaroSNMP				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 4 }
+    wtWebGraphThermoBaroUDP					OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 5 }
+    wtWebGraphThermoBaroSyslog				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 6 }    
+    wtWebGraphThermoBaroFTP					OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 7 }
+    wtWebGraphThermoBaroRSS					OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 8 }
+    wtWebGraphThermoBaroLanguage			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 9 }
+	wtWebGraphThermoBaroMQTT				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 12 }
+	wtWebGraphThermoBaroREST				OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 13 }
+
 
     
 --  wtWebGraphThermoBaroGraphics Tree
@@ -1251,7 +1264,103 @@ wtWebGraphThermoBaroLanguageSelect OBJECT-TYPE
         	Bit 1  : englisch
                 Bit 0  : german"
     ::= { wtWebGraphThermoBaroLanguage 1 }   
+	
+--  wtWebGraphThermoBaroMQTT Group
+--------------------------------
+
+wtWebGraphThermoBaroMQTTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 7 schaltet MQTT frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0-6: ungenutzt
+                Bit 7  : MQTT enable"
+    ::= { wtWebGraphThermoBaroMQTT 1 }  
+
+wtWebGraphThermoBaroMQTTBrockerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP-address of the MQTT-Server."
+    ::= { wtWebGraphThermoBaroMQTT 2 }
+
+wtWebGraphThermoBaroMQTTUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login  user name."
+    ::= { wtWebGraphThermoBaroMQTT 3 }
+
+wtWebGraphThermoBaroMQTTPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login password."
+    ::= { wtWebGraphThermoBaroMQTT 4 }
+
+wtWebGraphThermoBaroMQTTLocalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Local port number."
+    ::= { wtWebGraphThermoBaroMQTT 5 }
     
+wtWebGraphThermoBaroMQTTBrokerServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Server port number."
+    ::= { wtWebGraphThermoBaroMQTT 6 }
+    
+wtWebGraphThermoBaroMQTTInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Ping intervall, if no data has to be send: time in seconds."
+    ::= { wtWebGraphThermoBaroMQTT 7 }
+    	
+--  wtWebGraphThermoBaroREST Group
+--------------------------------
+
+wtWebGraphThermoBaroRESTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates REST :
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : REST enable"
+    ::= { wtWebGraphThermoBaroREST 1 }  
+
+wtWebGraphThermoBaroRESTDigestAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates Digest-Authentification:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : Digest Auth enable"
+    ::= { wtWebGraphThermoBaroREST 2 }  	
+        
 -- wtWebGraphThermoBaroDatalogger Group
 --------------------------------
 
@@ -1428,44 +1537,55 @@ wtWebGraphThermoBaroAlarmEntry OBJECT-TYPE
     ::= { wtWebGraphThermoBaroAlarmTable 1 }
 
 WtWebGraphThermoBaroAlarmEntry ::= SEQUENCE {
-    wtWebGraphThermoBaroAlarmTrigger		OCTET STRING,
-    wtWebGraphThermoBaroAlarmMin		OCTET STRING,
-    wtWebGraphThermoBaroAlarmMax		OCTET STRING,
-    wtWebGraphThermoBaroAlarmHysteresis		OCTET STRING,
-    wtWebGraphThermoBaroAlarmDelay		OCTET STRING,
-    wtWebGraphThermoBaroAlarmInterval		OCTET STRING,
-    wtWebGraphThermoBaroAlarmEnable		OCTET STRING,
-    wtWebGraphThermoBaroAlarmEMailAddr		OCTET STRING,
-    wtWebGraphThermoBaroAlarmMailSubject	OCTET STRING,
-    wtWebGraphThermoBaroAlarmMailText		OCTET STRING,
-    wtWebGraphThermoBaroAlarmManagerIP		OCTET STRING,
-    wtWebGraphThermoBaroAlarmTrapText		OCTET STRING,
-    wtWebGraphThermoBaroAlarmMailOptions	OCTET STRING,
-    wtWebGraphThermoBaroAlarmTcpIpAddr		OCTET STRING,
-    wtWebGraphThermoBaroAlarmTcpPort		INTEGER,
-    wtWebGraphThermoBaroAlarmTcpText		OCTET STRING,
-    wtWebGraphThermoBaroAlarmClearMailSubject	OCTET STRING,
-    wtWebGraphThermoBaroAlarmClearMailText	OCTET STRING,
-    wtWebGraphThermoBaroAlarmClearTrapText	OCTET STRING,
-    wtWebGraphThermoBaroAlarmClearTcpText	OCTET STRING,
-    wtWebGraphThermoBaroAlarmDeltaTemp		OCTET STRING,
-    wtWebGraphThermoBaroAlarmRHMin		OCTET STRING,
-    wtWebGraphThermoBaroAlarmRHMax		OCTET STRING,
-    wtWebGraphThermoBaroAlarmRHHysteresis	OCTET STRING,
-    wtWebGraphThermoBaroAlarmAHMin		OCTET STRING,
-    wtWebGraphThermoBaroAlarmAHMax		OCTET STRING,    
-    wtWebGraphThermoBaroAlarmSyslogIpAddr	OCTET STRING,
-    wtWebGraphThermoBaroAlarmSyslogPort		INTEGER,
-    wtWebGraphThermoBaroAlarmSyslogText		OCTET STRING,
-    wtWebGraphThermoBaroAlarmSyslogClearText	OCTET STRING,
-    wtWebGraphThermoBaroAlarmFtpDataPort	OCTET STRING,
-    wtWebGraphThermoBaroAlarmFtpFileName	OCTET STRING,
-    wtWebGraphThermoBaroAlarmFtpText		OCTET STRING,
-    wtWebGraphThermoBaroAlarmFtpClearText	OCTET STRING,
-    wtWebGraphThermoBaroAlarmFtpOption		OCTET STRING,
-    wtWebGraphThermoBaroAlarmTimerCron		OCTET STRING,
-	wtWebGraphThermoBaroAlarmName 			OCTET STRING,
-	wtWebGraphThermoBaroAlarmActive 		OCTET STRING
+	wtWebGraphThermoBaroAlarmTrigger				OCTET STRING,
+	wtWebGraphThermoBaroAlarmMin					OCTET STRING,
+	wtWebGraphThermoBaroAlarmMax					OCTET STRING,
+	wtWebGraphThermoBaroAlarmHysteresis				OCTET STRING,
+	wtWebGraphThermoBaroAlarmDelay					OCTET STRING,
+	wtWebGraphThermoBaroAlarmInterval				OCTET STRING,
+	wtWebGraphThermoBaroAlarmEnable					OCTET STRING,
+	wtWebGraphThermoBaroAlarmEMailAddr				OCTET STRING,
+	wtWebGraphThermoBaroAlarmMailSubject			OCTET STRING,
+	wtWebGraphThermoBaroAlarmMailText				OCTET STRING,
+	wtWebGraphThermoBaroAlarmManagerIP				OCTET STRING,
+	wtWebGraphThermoBaroAlarmTrapText				OCTET STRING,
+	wtWebGraphThermoBaroAlarmMailOptions			OCTET STRING,
+	wtWebGraphThermoBaroAlarmTcpIpAddr				OCTET STRING,
+	wtWebGraphThermoBaroAlarmTcpPort				INTEGER,
+	wtWebGraphThermoBaroAlarmTcpText				OCTET STRING,
+	wtWebGraphThermoBaroAlarmClearMailSubject		OCTET STRING,
+	wtWebGraphThermoBaroAlarmClearMailText			OCTET STRING,
+	wtWebGraphThermoBaroAlarmClearTrapText			OCTET STRING,
+	wtWebGraphThermoBaroAlarmClearTcpText			OCTET STRING,
+	wtWebGraphThermoBaroAlarmDeltaTemp				OCTET STRING,
+	wtWebGraphThermoBaroAlarmRHMin					OCTET STRING,
+	wtWebGraphThermoBaroAlarmRHMax					OCTET STRING,
+	wtWebGraphThermoBaroAlarmRHHysteresis			OCTET STRING,
+	wtWebGraphThermoBaroAlarmAHMin					OCTET STRING,
+	wtWebGraphThermoBaroAlarmAHMax					OCTET STRING,    
+	wtWebGraphThermoBaroAlarmSyslogIpAddr			OCTET STRING,
+	wtWebGraphThermoBaroAlarmSyslogPort				INTEGER,
+	wtWebGraphThermoBaroAlarmSyslogText				OCTET STRING,
+	wtWebGraphThermoBaroAlarmSyslogClearText		OCTET STRING,
+	wtWebGraphThermoBaroAlarmFtpDataPort			OCTET STRING,
+	wtWebGraphThermoBaroAlarmFtpFileName			OCTET STRING,
+	wtWebGraphThermoBaroAlarmFtpText				OCTET STRING,
+	wtWebGraphThermoBaroAlarmFtpClearText			OCTET STRING,
+	wtWebGraphThermoBaroAlarmFtpOption				OCTET STRING,
+	wtWebGraphThermoBaroAlarmTimerCron				OCTET STRING,
+	wtWebGraphThermoBaroAlarmName 					OCTET STRING,
+	wtWebGraphThermoBaroAlarmActive 				OCTET STRING,
+	wtWebGraphThermoBaroAlarmHttpReqAuthEnable		OCTET STRING,
+	wtWebGraphThermoBaroAlarmHttpReqAuthUser		OCTET STRING,
+	wtWebGraphThermoBaroAlarmHttpReqAuthPassword	OCTET STRING,
+	wtWebGraphThermoBaroAlarmHttpReqSetUrl			OCTET STRING,
+	wtWebGraphThermoBaroAlarmHttpReqClearUrl		OCTET STRING,
+	wtWebGraphThermoBaroAlarmHttpReqServerPort		OCTET STRING,
+	wtWebGraphThermoBaroAlarmMqttTopicPath			OCTET STRING,
+	wtWebGraphThermoBaroAlarmMqttTopicSetTopic		OCTET STRING,
+	wtWebGraphThermoBaroAlarmMqttTopicClear			OCTET STRING,
+	wtWebGraphThermoBaroAlarmSensorLostSelection	OCTET STRING,
+	wtWebGraphThermoBaroAlarmLimitWindow			OCTET STRING
 }
 
 wtWebGraphThermoBaroAlarmTrigger OBJECT-TYPE
@@ -1540,11 +1660,13 @@ wtWebGraphThermoBaroAlarmEnable OBJECT-TYPE
         Octet 2: unused
         Octet 3: unused
         Octet 4:
-		Bit 0:	Mail Enable
+			Bit 0:	Mail Enable
         	Bit 1:	SNMP Trap enable
         	Bit 2:  TCP Client enable
 			Bit 3:  Syslog enable
-			Bit 4:  FTP enable"
+			Bit 4:  FTP enable
+			Bit 5:	HTTP Request enable
+			Bit 6:	MQTT Publish enable"
     ::= { wtWebGraphThermoBaroAlarmEntry 7 }
 
 wtWebGraphThermoBaroAlarmEMailAddr OBJECT-TYPE
@@ -1833,6 +1955,116 @@ wtWebGraphThermoBaroAlarmActive OBJECT-TYPE
 			1 = ON
 			0 = OFF"
     ::= { wtWebGraphThermoBaroAlarmEntry 40 } 	
+
+wtWebGraphThermoBaroAlarmHttpReqAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 1-7: unused
+        Bit 0  : HHTP Request Authentication enable"
+    ::= { wtWebGraphThermoBaroAlarmEntry 61 }
+
+wtWebGraphThermoBaroAlarmHttpReqAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: User"
+    ::= { wtWebGraphThermoBaroAlarmEntry 62 }
+
+wtWebGraphThermoBaroAlarmHttpReqAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Password"
+    ::= { wtWebGraphThermoBaroAlarmEntry 63 }
+
+wtWebGraphThermoBaroAlarmHttpReqSetUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Set URL"
+    ::= { wtWebGraphThermoBaroAlarmEntry 64 }
+
+wtWebGraphThermoBaroAlarmHttpReqClearUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Clear URL"
+    ::= { wtWebGraphThermoBaroAlarmEntry 65 }
+
+wtWebGraphThermoBaroAlarmHttpReqServerPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Server Port"
+    ::= { wtWebGraphThermoBaroAlarmEntry 66 }
+
+wtWebGraphThermoBaroAlarmMqttTopicPath OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic path"
+    ::= { wtWebGraphThermoBaroAlarmEntry 67 }
+
+wtWebGraphThermoBaroAlarmMqttTopicSetTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic SET message"
+    ::= { wtWebGraphThermoBaroAlarmEntry 68 }
+
+wtWebGraphThermoBaroAlarmMqttTopicClear OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic CLEAR message"
+    ::= { wtWebGraphThermoBaroAlarmEntry 69 }
+	
+wtWebGraphThermoBaroAlarmSensorLostSelection OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 3-7: unused
+		Bit 2  : Sensor 2
+		Bit 1  : Sensor 1
+        Bit 0  : Sensor 0"
+    ::= { wtWebGraphThermoBaroAlarmEntry 70 }
+	
+wtWebGraphThermoBaroAlarmLimitWindow OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If window type is INSIDE the alarm is genereted when the temperature
+        is greater minumum value and lower than maximum value. If window type is OUTSIDE
+        the alarm is generated when the measured value is lower than the minimum value
+        or greater than the maximum value.
+		Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : inside window
+        Bit 0  : outside window"
+    ::= { wtWebGraphThermoBaroAlarmEntry 71 }	
     
 -- wtWebGraphThermoBaroGraphicsBase Group
 ----------------------------

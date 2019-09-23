@@ -5,6 +5,8 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-RIP-MIB.mib $ 
+-- Revision 1.6  2016/03/03 00:50:03  Bruno 
+-- Add rip log/trap 
 -- Revision 1.5  2013/12/06 07:08:37  ccho 
 -- remove uncessary imports 
 -- Revision 1.4  2012/09/19 07:46:09  Kevin 
@@ -45,6 +47,7 @@ ZYXEL-RIP-MIB DEFINITIONS ::= BEGIN
 		::= { esMgmt 74 }
 		
 	zyxelRipSetup     		OBJECT IDENTIFIER ::= { zyxelRip 1 }
+	zyxelRipNotifications   OBJECT IDENTIFIER ::= { zyxelRip 2 }
 
 
   
@@ -122,4 +125,15 @@ ZYXEL-RIP-MIB DEFINITIONS ::= BEGIN
 			"RIP version which controls the format and the broadcasting method of the RIP packets that the switch sends."
         ::= { zyxelRipRouteDomainEntry 2 }
 
+-- *******************************************************************
+-- *
+-- * zyxelRipNotifications
+-- *
+-- *******************************************************************	
+       zyRipExceedMaxDynamicRoute NOTIFICATION-TYPE
+	   STATUS  current
+       DESCRIPTION
+       "Received dynamic route is over the max route"
+       ::= { zyxelRipNotifications 1 }
+	
 END   

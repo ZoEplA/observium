@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -82,7 +82,6 @@ foreach ($oids as $index => $entry)
       $descr    = $entry['ifDescr'] . ":{$i} DOM";
       $oid_name = 'jnxDomCurrentLaneLaserTemperature';
       $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.2.1.1.9.{$lane_index}";
-      $type     = 'juniper-dom'; // $mib . '-' . $oid_name;
       $scale    = 1;
       $value    = $lane_oids[$lane_index][$oid_name];
 
@@ -93,14 +92,14 @@ foreach ($oids as $index => $entry)
 
       if ($value != 0)
       {
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $lane_index, $type, $descr, $scale, $value, array_merge($options, $limits));
+        $limits['rename_rrd'] = "juniper-dom-$lane_index";
+        discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid_num, $lane_index, NULL, $descr, $scale, $value, array_merge($options, $limits));
       }
 
       // jnxDomCurrentTxLaserBiasCurrent
       $descr    = $entry['ifDescr'] . " {$i} TX Bias";
       $oid_name = 'jnxDomCurrentLaneTxLaserBiasCurrent';
       $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.2.1.1.7.{$lane_index}";
-      $type     = 'juniper-dom'; // $mib . '-' . $oid_name;
       $scale    = si_to_scale('micro'); // Yah, I forgot number :)
       $value    = $lane_oids[$lane_index][$oid_name];
 
@@ -109,15 +108,13 @@ foreach ($oids as $index => $entry)
                         'limit_high_warn'  => $entry['jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold'] * $scale,
                         'limit_low_warn'   => $entry['jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold']  * $scale);
 
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $lane_index, $type, $descr, $scale, $value, array_merge($options, $limits));
-
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+      $limits['rename_rrd'] = "juniper-dom-$lane_index";
+      discover_sensor_ng($device,'current', $mib, $oid_name, $oid_num, $lane_index, NULL, $descr, $scale, $value, array_merge($options, $limits));
 
       # jnxDomCurrentRxLaserPower[508] -507 0.01 dbm
       $descr    = $entry['ifDescr'] . " {$i} RX Power";
       $oid_name = 'jnxDomCurrentLaneRxLaserPower';
       $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.2.1.1.6.{$lane_index}";
-      $type     = 'juniper-dom-rx'; // $mib . '-' . $oid_name;
       $scale    = 0.01;
       $value    = $lane_oids[$lane_index][$oid_name];
 
@@ -126,13 +123,13 @@ foreach ($oids as $index => $entry)
                         'limit_high_warn'  => $entry['jnxDomCurrentRxLaserPowerHighWarningThreshold'] * $scale,
                         'limit_low_warn'   => $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold']  * $scale);
 
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $lane_index, $type, $descr, $scale, $value, array_merge($options, $limits));
+      $limits['rename_rrd'] = "juniper-dom-rx-$lane_index";
+      discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $lane_index, NULL, $descr, $scale, $value, array_merge($options, $limits));
 
       # jnxDomCurrentTxLaserOutputPower[508] -507 0.01 dbm
       $descr    = $entry['ifDescr'] . " {$i} TX Power";
       $oid_name = 'jnxDomCurrentLaneTxLaserOutputPower';
       $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.2.1.1.8.{$lane_index}";
-      $type     = 'juniper-dom-tx'; // $mib . '-' . $oid_name;
       $scale    = 0.01;
       $value    = $lane_oids[$lane_index][$oid_name];
 
@@ -141,7 +138,8 @@ foreach ($oids as $index => $entry)
                         'limit_high_warn'  => $entry['jnxDomCurrentTxLaserOutputPowerHighWarningThreshold'] * $scale,
                         'limit_low_warn'   => $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']  * $scale);
 
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $lane_index, $type, $descr, $scale, $value, array_merge($options, $limits));
+      $limits['rename_rrd'] = "juniper-dom-tx-$lane_index";
+      discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $lane_index, NULL, $descr, $scale, $value, array_merge($options, $limits));
     }
   } else {
 
@@ -153,7 +151,6 @@ foreach ($oids as $index => $entry)
     $descr    = $entry['ifDescr'] . ' DOM';
     $oid_name = 'jnxDomCurrentModuleTemperature';
     $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.1.1.1.8.{$index}";
-    $type     = 'juniper-dom'; // $mib . '-' . $oid_name;
     $scale    = 1;
     $value    = $entry[$oid_name];
 
@@ -164,7 +161,8 @@ foreach ($oids as $index => $entry)
 
     if ($value != 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+      $limits['rename_rrd'] = "juniper-dom-$index";
+      discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, array_merge($options, $limits));
     }
 
     if ($entry['jnxDomCurrentTxLaserBiasCurrent'] == 0 &&
@@ -178,7 +176,6 @@ foreach ($oids as $index => $entry)
     $descr    = $entry['ifDescr'] . " TX Bias";
     $oid_name = 'jnxDomCurrentTxLaserBiasCurrent';
     $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.1.1.1.6.{$index}";
-    $type     = 'juniper-dom'; // $mib . '-' . $oid_name;
     $scale    = si_to_scale('micro'); // Yah, I forgot number :)
     $value    = $entry[$oid_name];
 
@@ -187,13 +184,13 @@ foreach ($oids as $index => $entry)
                       'limit_high_warn'  => $entry['jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold'] * $scale,
                       'limit_low_warn'   => $entry['jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold']  * $scale);
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+    $limits['rename_rrd'] = "juniper-dom-$index";
+    discover_sensor_ng($device,'current', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, array_merge($options, $limits));
 
     # jnxDomCurrentRxLaserPower[508] -507 0.01 dbm
     $descr    = $entry['ifDescr'] . " RX Power";
     $oid_name = 'jnxDomCurrentRxLaserPower';
     $oid_num  = ".1.3.6.1.4.1.2636.3.60.1.1.1.1.5.{$index}";
-    $type     = 'juniper-dom-rx'; // $mib . '-' . $oid_name;
     $scale    = 0.01;
     $value    = $entry[$oid_name];
 
@@ -202,7 +199,8 @@ foreach ($oids as $index => $entry)
                       'limit_high_warn'  => $entry['jnxDomCurrentRxLaserPowerHighWarningThreshold'] * $scale,
                       'limit_low_warn'   => $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold']  * $scale);
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+    $limits['rename_rrd'] = "juniper-dom-rx-$index";
+    discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, array_merge($options, $limits));
 
     # jnxDomCurrentTxLaserOutputPower[508] -507 0.01 dbm
     $descr    = $entry['ifDescr'] . " TX Power";
@@ -217,7 +215,8 @@ foreach ($oids as $index => $entry)
                       'limit_high_warn'  => $entry['jnxDomCurrentTxLaserOutputPowerHighWarningThreshold'] * $scale,
                       'limit_low_warn'   => $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']  * $scale);
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $index, $type, $descr, $scale, $value, array_merge($options, $limits));
+    $limits['rename_rrd'] = "juniper-dom-tx-$index";
+    discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, array_merge($options, $limits));
 
   }
 

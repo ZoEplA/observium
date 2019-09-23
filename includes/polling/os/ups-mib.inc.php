@@ -7,24 +7,29 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$manufacturer = snmp_get_oid($device, 'upsIdentManufacturer.0', 'UPS-MIB');
+// Keep this for some OSes, who not include UPS-MIB by default
 
-if (snmp_status())
+// Better to use vendor from OS definition
+//if (empty($vendor))
+//{
+//  $vendor = snmp_get_oid($device, 'upsIdentManufacturer.0', 'UPS-MIB');
+//}
+
+if (empty($hardware))
 {
-  $model    = snmp_get_oid($device, 'upsIdentModel.0', 'UPS-MIB');
-  $hardware = $manufacturer . ' ' . $model;
-
-  // Clean up
-  //$hardware = str_replace('Liebert Corporation Liebert', 'Liebert', $hardware);
-  $hardware_replace = array(
-    'Liebert Corporation Liebert' => 'Liebert',
-    'CPS '                        => 'PowerWalker ',
-  );
-  $hardware = array_str_replace($hardware_replace, $hardware, TRUE);
+  $hardware = snmp_get_oid($device, 'upsIdentModel.0', 'UPS-MIB');
+}
+if (empty($version))
+{
+  $version = snmp_get_oid($device, 'upsIdentUPSSoftwareVersion.0', 'UPS-MIB');
+  if (empty($version))
+  {
+    $version = snmp_get_oid($device, 'upsIdentAgentSoftwareVersion.0', 'UPS-MIB');
+  }
 }
 
 // EOF

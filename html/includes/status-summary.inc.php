@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,7 +18,7 @@ if ($cache['ports']['stat']['down']) { $ports_class = "error"; } else { $ports_c
 
 ?>
 
-<div class="<?php echo($div_class); ?>">
+<div class="<?php echo($div_class); ?>" style="margin-bottom: 10px;">
   <div class="box box-solid">
 <table class="table table-condensed-more table-striped">
   <thead>
@@ -27,7 +27,7 @@ if ($cache['ports']['stat']['down']) { $ports_class = "error"; } else { $ports_c
       <th></th>
       <th style="width: 10%">Total</th>
       <th style="width: 14%">Up</th>
-      <th style="width: 14%">Down</th>
+      <th style="width: 14%">Alert</th>
       <th style="width: 20%">Ignored (Dev)</th>
       <th style="width: 20%">Disabled / Shut</th>
     </tr>
@@ -52,16 +52,33 @@ if ($cache['ports']['stat']['down']) { $ports_class = "error"; } else { $ports_c
       <td><a class="grey"  href="<?php echo(generate_url(array('page' => 'ports', 'state' => 'admindown', 'ignore' => '0')));             ?>"><?php echo($cache['ports']['stat']['shutdown'])   ?> shutdown</a></td>
     </tr>
 <?php
+  // Sensors
   if ($cache['sensors']['stat']['count'])
   {
-    if ($cache['sensors']['stat']['alert']) { $cache['sensors']['stat']['class'] = "error"; } elseif ($cache['sensors']['stat']['warning']) { $cache['sensors']['stat']['class'] = "warning"; } else { $cache['sensors']['stat']['class'] = ""; }
+    if ($cache['sensors']['stat']['alert'])
+    {
+      $cache['sensors']['stat']['class'] = "error";
+      $alert_msg = $cache['sensors']['stat']['alert'] . ' alerts';
+      if ($cache['sensors']['stat']['warning'])
+      {
+        $alert_msg .= ', ' . $cache['sensors']['stat']['warning'] . ' warnings';
+      }
+    }
+    elseif ($cache['sensors']['stat']['warning'])
+    {
+      $cache['sensors']['stat']['class'] = "warning";
+      $alert_msg = $cache['sensors']['stat']['warning'] . ' warnings';
+    } else {
+      $cache['sensors']['stat']['class'] = "";
+      $alert_msg = '0 alerts';
+    }
 ?>
     <tr class="<?php echo($cache['sensors']['stat']['class']) ?>">
       <td class="state-marker"></td>
-      <td><strong><a       href="<?php echo(generate_url(array('page' => 'health'))); ?>">Sensors</a></strong></td>
+      <td><strong><a       href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors'))); ?>">Sensors</a></strong></td>
       <td><a               href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors')));                             ?>"><?php echo($cache['sensors']['stat']['count'])    ?></a></td>
       <td><a class="green" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors', 'event' => 'ok')));            ?>"><?php echo($cache['sensors']['stat']['ok'])       ?> ok</a></td>
-      <td><a class="red"   href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors', 'event' => 'alert,warning'))); ?>"><?php echo($cache['sensors']['stat']['alert'] + $cache['sensors']['stat']['warning']) ?> down</span> </a></td>
+      <td><a class="red"   href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors', 'event' => 'alert,warning'))); ?>"><?php echo($alert_msg)                            ?></a></td>
       <td><a class="black" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors', 'event' => 'ignore')));        ?>"><?php echo($cache['sensors']['stat']['ignored'])  ?> ignored</a></td>
       <td><a class="grey"  href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'sensors')));                             ?>"><?php echo($cache['sensors']['stat']['disabled']) ?> disabled</a></td>
     </tr>
@@ -69,19 +86,70 @@ if ($cache['ports']['stat']['down']) { $ports_class = "error"; } else { $ports_c
   } # end if sensors
   if ($cache['statuses']['stat']['count'])
   {
-    if ($cache['statuses']['stat']['alert']) { $cache['statuses']['stat']['class'] = "error"; } else { $cache['statuses']['stat']['class'] = ""; }
+    //if ($cache['statuses']['stat']['alert']) { $cache['statuses']['stat']['class'] = "error"; } else { $cache['statuses']['stat']['class'] = ""; }
+    if ($cache['statuses']['stat']['alert'])
+    {
+      $cache['statuses']['stat']['class'] = "error";
+      $alert_msg = $cache['statuses']['stat']['alert'] . ' alerts';
+      if ($cache['statuses']['stat']['warning'])
+      {
+        $alert_msg .= ', ' . $cache['statuses']['stat']['warning'] . ' warnings';
+      }
+    }
+    elseif ($cache['statuses']['stat']['warning'])
+    {
+      $cache['statuses']['stat']['class'] = "warning";
+      $alert_msg = $cache['statuses']['stat']['warning'] . ' warnings';
+    } else {
+      $cache['statuses']['stat']['class'] = "";
+      $alert_msg = '0 alerts';
+    }
 ?>
     <tr class="<?php echo($cache['statuses']['stat']['class']) ?>">
       <td class="state-marker"></td>
       <td><strong><a       href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status'))); ?>">Statuses</a></strong></td>
       <td><a               href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status')));                              ?>"><?php echo($cache['statuses']['stat']['count'])   ?></a></td>
-      <td><a class="green" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status', 'event' => 'ok,warning')));     ?>"><?php echo($cache['statuses']['stat']['ok'])      ?> ok</a></td>
-      <td><a class="red"   href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status', 'event' => 'alert,')));         ?>"><?php echo($cache['statuses']['stat']['alert'])   ?> alert</a></td>
+      <td><a class="green" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status', 'event' => 'ok')));             ?>"><?php echo($cache['statuses']['stat']['ok'])      ?> ok</a></td>
+      <td><a class="red"   href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status', 'event' => 'alert,warning')));  ?>"><?php echo($alert_msg)                            ?></a></td>
       <td><a class="black" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status', 'event' => 'ignore')));         ?>"><?php echo($cache['statuses']['stat']['ignored']) ?> ignored</a></td>
       <td><a class="grey"  href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'status')));                              ?>"><?php echo($cache['statuses']['stat']['disabled'])?> disabled</a></td>
     </tr>
 <?php
   } # end if statuses
+
+  if ($cache['counters']['stat']['count'])
+  {
+    //if ($cache['counters']['stat']['alert']) { $cache['counters']['stat']['class'] = "error"; } elseif ($cache['counters']['stat']['warning']) { $cache['counters']['stat']['class'] = "warning"; } else { $cache['counters']['stat']['class'] = ""; }
+    if ($cache['counters']['stat']['alert'])
+    {
+      $cache['counters']['stat']['class'] = "error";
+      $alert_msg = $cache['counters']['stat']['alert'] . ' alerts';
+      if ($cache['counters']['stat']['warning'])
+      {
+        $alert_msg .= ', ' . $cache['counters']['stat']['warning'] . ' warnings';
+      }
+    }
+    elseif ($cache['counters']['stat']['warning'])
+    {
+      $cache['counters']['stat']['class'] = "warning";
+      $alert_msg = $cache['counters']['stat']['warning'] . ' warnings';
+    } else {
+      $cache['counters']['stat']['class'] = "";
+      $alert_msg = '0 alerts';
+    }
+?>
+    <tr class="<?php echo($cache['counters']['stat']['class']) ?>">
+        <td class="state-marker"></td>
+        <td><strong><a       href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'counter'))); ?>">Counters</a></strong></td>
+        <td><a               href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'counter')));                             ?>"><?php echo($cache['counters']['stat']['count'])    ?></a></td>
+        <td><a class="green" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'counter', 'event' => 'ok')));            ?>"><?php echo($cache['counters']['stat']['ok'])       ?> ok</a></td>
+        <td><a class="red"   href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'counter', 'event' => 'alert,warning'))); ?>"><?php echo($alert_msg)                             ?></a></td>
+        <td><a class="black" href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'counter', 'event' => 'ignore')));        ?>"><?php echo($cache['counters']['stat']['ignored'])  ?> ignored</a></td>
+        <td><a class="grey"  href="<?php echo(generate_url(array('page' => 'health', 'metric' => 'counter')));                             ?>"><?php echo($cache['counters']['stat']['disabled']) ?> disabled</a></td>
+    </tr>
+    <?php
+    } # end if counters
+
 ?>
     </tbody>
   </table>
@@ -149,7 +217,7 @@ if ($cache['ports']['stat']['down']) { $ports_class = "error"; } else { $ports_c
 <?php
 
 
-if($_SESSION['userlevel'] >= 5)
+if($_SESSION['userlevel'] >= 5 && !isset($hide_group_bar))
 {
 
    $navbar              = array();

@@ -5,6 +5,12 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-ACCESS-CONTROL-MIB.mib $ 
+-- Revision 1.8  2015/07/28 08:57:46  Willson 
+-- clean warning 
+-- Revision 1.7  2015/07/21 02:24:56  Julian 
+-- add login inforation https trap 
+-- Revision 1.6  2015/05/27 07:07:18  Shinge 
+-- add login information trap 
 -- Revision 1.5  2013/12/06 07:01:49  ccho 
 -- remove uncessary imports 
 -- Revision 1.4  2012/09/19 07:27:54  Kevin 
@@ -45,7 +51,8 @@ ZYXEL-ACCESS-CONTROL-MIB DEFINITIONS ::= BEGIN
 		::= { esMgmt 9 }
 	
 	zyxelAccessControlSetup     OBJECT IDENTIFIER ::= { zyxelAccessControl 1 }	
-
+	zyxelAccessControlTrapInfoObject OBJECT IDENTIFIER ::= { zyxelAccessControl 3 }
+	zyxelAccessControlNotifications 	OBJECT IDENTIFIER ::= { zyxelAccessControl 4 }
 --  1.zyxelAccessControlSetup
 	                                                      
 -- 		zyxelAccessControlTable
@@ -190,6 +197,76 @@ ZYXEL-ACCESS-CONTROL-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
         "Select services that may be used for managing the switch from the specified trusted computers."
         ::= { zyxelSecuredClientEntry 5 }
+		
+			   -- *******************************************************************
+-- *
+-- * zyxelAccessControlTrapInfoObject
+-- *
+-- *******************************************************************		
+		zyAccessControlLoginService OBJECT-TYPE
+        SYNTAX  INTEGER {
+        	console(0),
+			telnet(1),
+        	ssh(2),
+        	ftp(3),
+        	http(4),
+			https(5)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"Services user use to access the switch."  
+        ::= { zyxelAccessControlTrapInfoObject 1 } 
+		
+		
+		zyAccessControlLoginUsername OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"Username of login the switch"  
+        ::= { zyxelAccessControlTrapInfoObject 2 } 
+		
+		zyAccessControlLoginIpAddress OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"IP address of loging this switch"  
+        ::= { zyxelAccessControlTrapInfoObject 3 } 
+		
+	   zyAccessControlLoginRecord NOTIFICATION-TYPE
+       OBJECTS {
+				zyAccessControlLoginService,
+				zyAccessControlLoginUsername,
+				zyAccessControlLoginIpAddress
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Record login information."
+       ::= { zyxelAccessControlNotifications 1 }
+	   
+	   zyAccessControlLogoutRecord NOTIFICATION-TYPE
+       OBJECTS {
+				zyAccessControlLoginService,
+				zyAccessControlLoginUsername,
+				zyAccessControlLoginIpAddress
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Record login information."
+       ::= { zyxelAccessControlNotifications 2 }
+	   
+	   zyAccessControlLoginFail NOTIFICATION-TYPE
+       OBJECTS {
+				zyAccessControlLoginService,
+				zyAccessControlLoginUsername,
+				zyAccessControlLoginIpAddress
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Record login information."
+       ::= { zyxelAccessControlNotifications 3 }
 
 END
 

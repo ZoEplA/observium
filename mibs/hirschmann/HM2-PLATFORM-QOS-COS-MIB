@@ -379,8 +379,9 @@ hm2AgentCosQueueCfgGroup   OBJECT IDENTIFIER ::= { hm2PlatformQosCos 2 }
                     
          ::= { hm2AgentCosQueueControlEntry 1 }
 
+--#ifdef HM_MODIFIED     /* More details : https://haczilla.belden.eu.com/show_bug.cgi?id=30813 */
     hm2AgentCosQueueIntfShapingRate OBJECT-TYPE
-         SYNTAX      Unsigned32 (0..4294967295)
+         SYNTAX      Unsigned32
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -34,8 +34,8 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
   {
     if (empty($entry['ifIndex']))
     {
-      // Compatability
-      $ifIndex = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?', array($entry['port_id']));
+      // Compatibility
+      $ifIndex = dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `port_id` = ? AND `deleted` = ?', array($entry['port_id'], 0));
     } else {
       $ifIndex = $entry['ifIndex'];
     }
@@ -55,10 +55,13 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
     {
       $port_id = $port['port_id'];
     } else {
-      // Allow to store IP addresses without associted port, but ifIndex avialable
+      // Allow to store IP addresses without associated port, but ifIndex available
       // ie, Nortel/Avaya devices have hidden vlan ifIndexes
       $port_id = '0';
     }
+
+    print_debug_vars($port);
+    print_debug_vars($addresses);
 
     foreach ($addresses as $ip_address => $entry)
     {
@@ -246,8 +249,9 @@ foreach (array('ipv4', 'ipv6') as $ip_version)
   // Clean networks
   foreach ($check_networks[$ip_version] as $ip_network_id => $n)
   {
-    $count = dbFetchCell('SELECT COUNT(*) FROM `'.$ip_version.'_addresses` WHERE `'.$ip_version.'_network_id` = ?', array($ip_network_id));
-    if (empty($count))
+    //$count = dbFetchCell('SELECT COUNT(*) FROM `'.$ip_version.'_addresses` WHERE `'.$ip_version.'_network_id` = ?', array($ip_network_id));
+    //if (empty($count))
+    if (!dbExist($ip_version.'_addresses', '`'.$ip_version.'_network_id` = ?', array($ip_network_id)))
     {
       dbDelete($ip_version.'_networks', '`'.$ip_version.'_network_id` = ?', array($ip_network_id));
       //echo('n');

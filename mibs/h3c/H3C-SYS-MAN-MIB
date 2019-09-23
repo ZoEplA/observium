@@ -1,14 +1,14 @@
 -- ===========================================================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2018 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: System Management MIB
 -- Reference:
--- Version: V2.4
+-- Version: V2.7
 -- History:
 --  revision 1.0 2002-12-20 created by xuqingwei
 --  revision 1.1 2004-4-16  added the support for XRN  by xuqingwei
 --  revision 1.2 2004-4-16  added 'h3cSysImageType' in h3cSysImageTable for dual image  by changxiangqing
---  revision 1.3 2004-5-14  convert MIB object name from hwXXX to h3c, etc.
+--  revision 1.3 2004-5-14  convert MIB object name from h3cXXX to h3c, etc.
 --  revision 1.31 2004-7-16 1. modified 'h3cSysImageSize' in h3cSysImageTable by zhaolina
 --                      2.modified SYNTAX of 'h3cSysReloadImage','h3cSysImageIndex','h3cSysCFGFileIndex'
 --                           from (1..2147483647) to (0..2147483647) by zhaolina
@@ -34,6 +34,12 @@
 --  revision 2.2 2009-06-07 Change the MAX-ACCESS of h3cSysLocalClock.
 --          V2.3 2010-03-17 add h3cSysLocalClockString by jinyi
 --  revision V2.4 2011-08-30 add  h3cSysPackage, h3cSysIpePackage by z02031
+--  revision V2.5 2013-10-18 add h3cSysPackageLoadAttribute, h3cSysPackageModel, h3cSysIpeFileModel,
+--                h3cSysIpePackageModel and h3cSysSetBootImage by z03030 and z08715
+--  revision V2.6 2015-07-07 add h3cSysClockProtocolGroup, h3cSysClockProtocol, h3cSysClockProtocolSrcMdc
+--                and h3cSysClockProtocolSrcContext by l09650
+--  revision V2.7 2017-05-27 add h3cSysLocalClockString2 by h12133
+--                2018-01-10 added 'interface' attribute for h3cSysClockProtocol in h3cSysClockProtocolGroup by t16382
 -- ============================================================================================================
 H3C-SYS-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -42,7 +48,7 @@ IMPORTS
         FROM SNMPv2-CONF
     Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, TimeTicks, Unsigned32
         FROM SNMPv2-SMI
-    DateAndTime, DisplayString, RowStatus
+    DateAndTime, DisplayString, RowStatus, TruthValue
         FROM SNMPv2-TC
     SnmpTagList, SnmpTagValue
         FROM SNMP-TARGET-MIB
@@ -51,7 +57,7 @@ IMPORTS
 
 
 h3cSystemMan MODULE-IDENTITY
-    LAST-UPDATED "200906070000Z"
+    LAST-UPDATED "201801100000Z"
     ORGANIZATION
         "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -63,8 +69,14 @@ h3cSystemMan MODULE-IDENTITY
         "This MIB contains objects to manage the system.
          It focuses on the display of current configure file and image
          file,and the definition of reloading image.
-         Add the support for XRN.
-        "
+         Add the support for XRN."
+    REVISION     "201801100000Z"
+    DESCRIPTION  "added 'interface' attribute for h3cSysClockProtocol in h3cSysClockProtocolGroup."
+    REVISION     "201706120000Z"
+    DESCRIPTION  "Add h3cSysLocalClockString2."
+    REVISION     "201507270000Z"
+    DESCRIPTION  "Add h3cSysClockProtocolGroup, h3cSysClockProtocol, h3cSysClockProtocolSrcMdc
+--                and h3cSysClockProtocolSrcContext."
     REVISION "200404081345Z"        -- April 08, 2004 at 13:45 GMT
     DESCRIPTION
         " "
@@ -119,7 +131,7 @@ h3cSysSummerTimeEnable OBJECT-TYPE
     ::= { h3cSysSummerTime 1 }
 
 h3cSysSummerTimeZone OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -192,6 +204,96 @@ h3cSysLocalClockString OBJECT-TYPE
         For example, Tuesday May 26, 2002 at 1:30:15 would be
         displayed as: 2002-5-26T13:30:15.0Z"
     ::= { h3cSysClock 3 }
+
+h3cSysClockProtocolGroup OBJECT IDENTIFIER ::= { h3cSysClock 4 }
+
+h3cSysLocalClockString2 OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (14..19))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This node gives the current local time of the system.
+        For example, 1:30:15 on Tuesday, May 26th, 2002 will be
+        displayed as: 2002/05/26/01/30/15.
+        2002/5/26/1/30/15 or 2002/05/26/01/30/15 will be applied in a write operation."
+    ::= { h3cSysClock 5 }
+
+h3cSysClockProtocol OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        ntp(2),
+        ptp(3),
+        interface(4)
+         }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Writing none(1) to this object indicates to use the local system time.
+        When the value is set to none(1), h3cSysClockProtocolSrcMdc and
+        h3cSysClockProtocolSrcContext cannot be written and the value will be
+        set to invalid.  Change system time will be performed through the node
+        of h3cSysLocalClock and h3cSysSummerTime.
+        Writing ntp(2) to this object indicates to use NTP time source.
+        NTP means Network Time Protocol.  To get the system time through NTP,
+        NTP must be configured successfully.  NTP time source can be obtained
+        from non-default MDC and non-default context.
+        When ntp(2) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing ptp(3) to this object indicates to use PTP time source.
+        PTP means Precision Time Protocol.  To get clock time through PTP, PTP
+        must be configured successfully.  PTP time source can be obtained from
+        non-default MDC but cannot be obtained from non-default context.
+        When ptp(3) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        Writing interface(4) to this object indicates to get time source from interface.
+        To get clock time through interface, interface must be configured successfully.
+        When interface(4) is set, the system time can't be changed manually.
+        Support for this keyword depends on the device model.
+
+        All MDCs on the device share the same time source and use the same system time.
+        The shared time source can be one of the following items:
+        Local system time - the time signal that is generated by the local
+        crystal oscillator
+        Remote time source - the time signal that is obtained by the specified MDC
+        from another device on the network."
+    ::= { h3cSysClockProtocolGroup 1 }
+
+h3cSysClockProtocolSrcMdc OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The MDC ID that is used for the system time source.
+        This node is valid when the clock protocol is NTP or PTP.
+        If MDC is not supported on this system, this node is invalid.
+        If the device supports MDC, the system time will be obtained
+        from NTP or PTP on the specified MDC.
+        If the device supports context and MDC, the most recent configuration of
+        h3cSysClockProtocolSrcContext and h3cSysClockProtocolSrcMdc takes
+        effect if set multiple times, and another one will be set to zero as an
+        invalid value."
+     DEFVAL { 1 }
+    ::= { h3cSysClockProtocolGroup 2 }
+
+h3cSysClockProtocolSrcContext OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The context ID that is used for the system time source.
+        This node is valid when the clock protocol is NTP or PTP.
+        If context is not supported on this system, this node is invalid.
+        If the system supports context, the system time will be obtained from
+        NTP or PTP on the specified context.
+        If the device supports context and MDC, the most recent configuration of
+        h3cSysClockProtocolSrcContext and h3cSysClockProtocolSrcMdc takes
+        effect if set multiple times, and another one will be set to zero as an
+        invalid value."
+    DEFVAL { 1 }
+    ::= { h3cSysClockProtocolGroup 3 }
 
 h3cSysCurrent OBJECT IDENTIFIER ::= { h3cSystemManMIBObjects 2 }
 
@@ -646,7 +748,7 @@ h3cSysImageIndex OBJECT-TYPE
     ::= { h3cSysImageEntry 1 }
 
 h3cSysImageName OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -664,7 +766,7 @@ h3cSysImageSize OBJECT-TYPE
     ::= { h3cSysImageEntry 3 }
 
 h3cSysImageLocation OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -852,7 +954,7 @@ h3cSysCFGFileIndex OBJECT-TYPE
     ::= { h3cSysCFGFileEntry 1 }
 
 h3cSysCFGFileName OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -877,7 +979,7 @@ h3cSysCFGFileSize OBJECT-TYPE
     ::= { h3cSysCFGFileEntry 3 }
 
 h3cSysCFGFileLocation OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1124,7 +1226,9 @@ H3cSysPackageEntry ::=
         h3cSysPackageStatus           INTEGER,
         h3cSysPackageDescription      DisplayString,
         h3cSysPackageFeature          DisplayString,
-        h3cSysPackageVersion          DisplayString
+        h3cSysPackageVersion          DisplayString,
+        h3cSysPackageLoadAttribute    INTEGER,
+        h3cSysPackageModel            DisplayString
     }
 
 h3cSysPackageIndex OBJECT-TYPE
@@ -1160,7 +1264,7 @@ h3cSysPackageIndex OBJECT-TYPE
     ::= { h3cSysPackageEntry 1 }
 
 h3cSysPackageName OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1181,7 +1285,7 @@ h3cSysPackageSize OBJECT-TYPE
     ::= { h3cSysPackageEntry 3 }
 
 h3cSysPackageLocation OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1253,7 +1357,7 @@ h3cSysPackageStatus OBJECT-TYPE
     ::= { h3cSysPackageEntry 7 }
 
 h3cSysPackageDescription OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1263,7 +1367,7 @@ h3cSysPackageDescription OBJECT-TYPE
     ::= { h3cSysPackageEntry 8 }
 
 h3cSysPackageFeature OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1274,7 +1378,7 @@ h3cSysPackageFeature OBJECT-TYPE
     ::= { h3cSysPackageEntry 9 }
 
 h3cSysPackageVersion OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1282,6 +1386,32 @@ h3cSysPackageVersion OBJECT-TYPE
     Indicate the version of the package.
     "
     ::= { h3cSysPackageEntry 10 }
+
+h3cSysPackageLoadAttribute OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        none(1),
+        primary(2),
+        secondary(3),
+        primarySecondary(4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "File attribute of the startup image for an extended device to load from
+    the parent device.  Examples of extended devices include PEXs and firewall
+    modules.  The none attribute is returned if the image is not for extended
+    devices, or if the load attribute is not specified."
+    ::= { h3cSysPackageEntry 11 }
+
+h3cSysPackageModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates whether the image file is for an extended device or the parent
+    device.  Examples of extended devices include PEXs and firewall modules."
+    ::= { h3cSysPackageEntry 12 }
 
 -- begin package operate table
 h3cSysPackageOperateEntryLimit OBJECT-TYPE
@@ -1428,7 +1558,8 @@ H3cSysIpeFileEntry ::=
         h3cSysIpeFileIndex            Integer32,
         h3cSysIpeFileName             DisplayString,
         h3cSysIpeFileSize             Unsigned32,
-        h3cSysIpeFileLocation         DisplayString
+        h3cSysIpeFileLocation         DisplayString,
+        h3cSysIpeFileModel            SnmpTagList
      }
 
 h3cSysIpeFileIndex OBJECT-TYPE
@@ -1464,7 +1595,7 @@ h3cSysIpeFileIndex OBJECT-TYPE
     ::= { h3cSysIpeFileEntry 1 }
 
 h3cSysIpeFileName OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1485,7 +1616,7 @@ h3cSysIpeFileSize OBJECT-TYPE
     ::= { h3cSysIpeFileEntry 3 }
 
 h3cSysIpeFileLocation OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1497,6 +1628,17 @@ h3cSysIpeFileLocation OBJECT-TYPE
         For slave mainboard and subboards: slotN#flash:/
         "
     ::= { h3cSysIpeFileEntry 4 }
+
+h3cSysIpeFileModel OBJECT-TYPE
+    SYNTAX SnmpTagList
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device models for which the IPE file contains software images.  For
+        the ease of software upgrade, an IPE file might contain software images
+        for a parent device and extended devices.  Examples of extended devices
+        include PEXs and firewall modules."
+    ::= { h3cSysIpeFileEntry 5 }
 
 -- Begin define Ipe-package
 h3cSysIpePackageTable OBJECT-TYPE
@@ -1530,7 +1672,8 @@ H3cSysIpePackageEntry ::=
         h3cSysIpePackageType             INTEGER,
         h3cSysIpePackageDescription      DisplayString,
         h3cSysIpePackageFeature          DisplayString,
-        h3cSysIpePackageVersion          DisplayString
+        h3cSysIpePackageVersion          DisplayString,
+        h3cSysIpePackageModel            DisplayString
      }
 
 h3cSysIpePackageIndex OBJECT-TYPE
@@ -1550,11 +1693,11 @@ h3cSysIpePackageIndex OBJECT-TYPE
     ::= { h3cSysIpePackageEntry 1 }
 
 h3cSysIpePackageName OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The file name of the package file. "
+        "The file name of the package file."
     ::= { h3cSysIpePackageEntry 2 }
 
 h3cSysIpePackageSize OBJECT-TYPE
@@ -1590,7 +1733,7 @@ h3cSysIpePackageType OBJECT-TYPE
     ::= { h3cSysIpePackageEntry 4 }
 
 h3cSysIpePackageDescription OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1600,7 +1743,7 @@ h3cSysIpePackageDescription OBJECT-TYPE
     ::= { h3cSysIpePackageEntry 5 }
 
 h3cSysIpePackageFeature OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1610,7 +1753,7 @@ h3cSysIpePackageFeature OBJECT-TYPE
     ::= { h3cSysIpePackageEntry 6 }
 
 h3cSysIpePackageVersion OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1618,6 +1761,16 @@ h3cSysIpePackageVersion OBJECT-TYPE
     The version of the package.
     "
     ::= { h3cSysIpePackageEntry 7 }
+
+h3cSysIpePackageModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Indicates whether the image package file is for an extended device, the
+    parent device, or both.  Examples of extended devices include PEXs and
+    firewall modules."
+    ::= { h3cSysIpePackageEntry 8 }
 -- End define Ipe-package
 
 -- Begin define Ipe File operate table
@@ -1722,8 +1875,276 @@ h3cSysIpeFileOperateResult OBJECT-TYPE
         the result of the operation.
         "
     ::= { h3cSysIpeFileOperateEntry 5 }
-
 -- End define IpePackage operate table
+
+h3cSysSetBootImage OBJECT IDENTIFIER ::= { h3cSystemManMIBObjects 9 }
+
+h3cSysSetBootImageOp OBJECT IDENTIFIER ::= { h3cSysSetBootImage 1 }
+
+h3cSysSetBootImageAction OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        done(2),
+        bootLoadPrimary(3),
+        bootLoadSecondary(4),
+        bootLoadPrimarySecondary(5),
+        bootPrimary(6),
+        bootSecondary(7),
+        bootPrimarySecondary(8),
+        loadPrimary(9),
+        loadSecondary(10),
+        loadPrimarySecondary(11)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sets images as primary startup images, secondary startup images, or
+        both.  Primary startup images are also called 'main' startup images.
+        For extended devices, startup images saved on their local media are
+        called 'local startup images,' and images saved on the parent device
+        are called 'remote startup images.'
+        none: Returns a success without setting image attributes.
+        done: Clears data for the previous startup image operation.  This
+        object must be set 'done' before each startup image operation.
+
+        -------------------------+-----------------------+---------------------------------------------------
+            Action               |   Parent devices      |                  Extended devices
+        -------------------------+-----------------------+---------------------------------------------------
+        bootLoadPrimary          | Sets images as the    | Sets images as the primary startup images
+                                 | primary startup       |
+                                 | images                | With storage medium: Sets both local and
+                                 |                       |                      remote startup images
+                                 |                       | Without storage medium: Sets remote startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        bootLoadSecondary        | Sets images as the    | Sets images as the backup startup images
+                                 | backup startup images |
+                                 |                       | With storage medium: Sets both local and
+                                 |                       |                      remote startup images
+                                 |                       | Without storage medium: Sets remote startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        bootLoadPrimarySecondary | Sets images as both   | Sets images as both the primary and backup startup
+                                 | the primary and       | images
+                                 | backup startup images | With storage medium: Sets both local and
+                                 |                       |                      remote startup images
+                                 |                       | Without storage medium: Sets remote startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        bootPrimary              | Sets images as the    | Sets images as the primary startup images
+                                 | primary startup       |
+                                 | images                | With storage medium: Sets local startup images
+                                 |                       | Without storage medium: N/A
+        -------------------------+-----------------------+---------------------------------------------------
+        bootSecondary            | Sets images as the    | Sets images as the backup startup images
+                                 | backup startup images |
+                                 |                       | With storage medium: Sets local startup images
+                                 |                       | Without storage medium: N/A
+        -------------------------+-----------------------+---------------------------------------------------
+        bootPrimarySecondary     | Sets images as both   | Sets images as both the primary and backup startup
+                                 | the primary and       | images
+                                 | backup startup images | With storage medium: Sets local startup images
+                                 |                       | Without storage medium: N/A
+        -------------------------+-----------------------+---------------------------------------------------
+        loadPrimary              | N/A                   | Sets images as the remote primary startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        loadSecondary            | N/A                   | Sets images as the remote backup startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        loadPrimarySecondary     | N/A                   | Sets images as both the remote primary and
+                                 |                       | backup startup images
+        -------------------------+-----------------------+---------------------------------------------------
+        "
+    ::= { h3cSysSetBootImageOp 1 }
+
+h3cSysSetBootImageFileOverWrite OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines whether to overwrite the existing image file with the same
+        name as the downloaded image file. "
+    DEFVAL { false }
+    ::= { h3cSysSetBootImageOp 2 }
+
+h3cSysSetBootImageRemoveIpeFile OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Determines whether the IPE file will be removed when the startup
+        images are set successfully.  If this object is set to TRUE,
+        the IPE file will be removed."
+    DEFVAL { false }
+    ::= { h3cSysSetBootImageOp 3 }
+
+h3cSysSetBootImageStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        doing(2),
+        success(3),
+        failed(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of the startup image set operation."
+    ::= { h3cSysSetBootImageOp 4 }
+
+h3cSysSetBootImageFailedReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Startup image operation failure reason.  The field is empty if the
+        operation was successful."
+    ::= { h3cSysSetBootImageOp 5 }
+
+h3cSysBootPackageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cSysBootPackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of images to be set as startup images.  It should be used when
+         h3cSysBootIpeTable is empty."
+    ::= { h3cSysSetBootImage 2 }
+
+h3cSysBootPackageEntry OBJECT-TYPE
+    SYNTAX H3cSysBootPackageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of the image table."
+    INDEX { h3cSysBootPackageIndex }
+    ::= { h3cSysBootPackageTable 1 }
+
+H3cSysBootPackageEntry ::=
+    SEQUENCE {
+        h3cSysBootPackageIndex
+            Integer32,
+        h3cSysBootPackageRowStatus
+            RowStatus
+     }
+
+h3cSysBootPackageIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the software images.  The index must be included
+        in h3cSysPackageTable."
+    ::= { h3cSysBootPackageEntry 1 }
+
+h3cSysBootPackageRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status of the image entry."
+    ::= { h3cSysBootPackageEntry 2 }
+
+h3cSysBootIpeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cSysBootIpeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of the IPE files to be set for startup.  It should be used when
+        h3cSysBootPackageTable is empty."
+    ::= { h3cSysSetBootImage 3 }
+
+h3cSysBootIpeEntry OBJECT-TYPE
+    SYNTAX H3cSysBootIpeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry in the IPE file table."
+    INDEX { h3cSysBootIpeIndex }
+    ::= { h3cSysBootIpeTable 1 }
+
+H3cSysBootIpeEntry ::=
+    SEQUENCE
+        {
+        h3cSysBootIpeIndex
+            Integer32,
+        h3cSysBootIpeRowStatus
+            RowStatus
+        }
+
+h3cSysBootIpeIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPE file index.  The index must be included in h3cSysIpeFileTable."
+    ::= { h3cSysBootIpeEntry 1 }
+
+h3cSysBootIpeRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status of the IPE file table entry."
+    ::= { h3cSysBootIpeEntry 2 }
+
+h3cSysSetBootImageResultTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF H3cSysSetBootImageResultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of startup image operation results.  This table shows the
+        result for each card."
+    ::= { h3cSysSetBootImage 4 }
+
+h3cSysSetBootImageResultEntry OBJECT-TYPE
+    SYNTAX H3cSysSetBootImageResultEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry in the startup image operation result table."
+    INDEX { h3cSysSetBootImageResultIndex }
+    ::= { h3cSysSetBootImageResultTable 1 }
+
+H3cSysSetBootImageResultEntry ::=
+    SEQUENCE {
+        h3cSysSetBootImageResultIndex
+            Integer32,
+        h3cSysSetBootImageResultStatusOfEachCard
+            INTEGER,
+        h3cSysSetBootImageFailedReasonOfEachCard
+            DisplayString
+     }
+
+h3cSysSetBootImageResultIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of a startup image operation result.  It is identical to the
+        entity index of each card."
+    ::= { h3cSysSetBootImageResultEntry 1 }
+
+h3cSysSetBootImageResultStatusOfEachCard OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        doing(2),
+        success(3),
+        failed(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of the startup image set operation."
+    ::= { h3cSysSetBootImageResultEntry 2 }
+
+h3cSysSetBootImageFailedReasonOfEachCard OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reason of the startup image set failure for a card.  It is empty if
+        the operation was successful."
+    ::= { h3cSysSetBootImageResultEntry 3 }
+-- End define Boot/Load image table
+
 h3cSystemManMIBNotifications OBJECT IDENTIFIER ::= { h3cSystemMan 2 }
 
 

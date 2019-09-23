@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $table_rows = array();
 
-// Build ifIndex > port and port-id > port cache table
+// Build ifIndex > port and port_id > port cache table
 $port_ifIndex_table = array();
 $port_table = array();
 foreach (dbFetchRows('SELECT `ifIndex`,`port_id`,`ifDescr`,`port_label_short` FROM `ports` WHERE `device_id` = ?', array($device['device_id'])) as $cache_port)
@@ -33,7 +33,6 @@ foreach ($fdbs_q as $fdb_db)
   $fdbs_db[$fdb_db['vlan_id']][$fdb_db['mac_address']] = $fdb_db;
 }
 
-
 $include_dir = "includes/polling/fdb/";
 include("includes/include-dir-mib.inc.php");
 
@@ -45,20 +44,36 @@ include("includes/include-dir-mib.inc.php");
  * Cisco Q-BRIDGE-MIB *
  **********************/
 
-if (!count($fdbs) && $device['os_group'] == 'cisco' && is_device_mib($device, 'Q-BRIDGE-MIB')) // Can block by mib permissions!
+if (!count($fdbs) && $device['os_group'] == 'cisco' && empty($device['snmp_context']) &&
+    is_device_mib($device, 'Q-BRIDGE-MIB')) // Can block by mib permissions!
 {
 
-  // I think this is global, not per-VLAN.
-  //dot1dBasePortIfIndex.28 = 10128
-  $dot1dBasePortIfIndex = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
-  foreach ($dot1dBasePortIfIndex as $base_port => $data)
+  // I think this is global, not per-VLAN. (in normal world..)
+  // But NOPE, this is Cisco way (probably for pvst) @mike
+  // See: https://jira.observium.org/browse/OBS-2813
+  //
+  // From same device example default and vlan 103:
+  // snmpbulkwalk -v2c community -m BRIDGE-MIB -M /srv/observium/mibs/rfc:/srv/observium/mibs/net-snmp sw-1917 dot1dBasePortIfIndex
+  //BRIDGE-MIB::dot1dBasePortIfIndex.49 = INTEGER: 10101
+  //BRIDGE-MIB::dot1dBasePortIfIndex.50 = INTEGER: 10102
+  // snmpbulkwalk -v2c community@103 -m BRIDGE-MIB -M /srv/observium/mibs/rfc:/srv/observium/mibs/net-snmp sw-1917 dot1dBasePortIfIndex
+  //BRIDGE-MIB::dot1dBasePortIfIndex.1 = INTEGER: 10001
+  //BRIDGE-MIB::dot1dBasePortIfIndex.3 = INTEGER: 10003
+  //BRIDGE-MIB::dot1dBasePortIfIndex.4 = INTEGER: 10004
+  //...
+  // But I will try to pre-cache, this fetch port association for default (1) vlan only!
+  $dot1dBasePortIfIndex[1] = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
+  foreach ($dot1dBasePortIfIndex[1] as $base_port => $data)
   {
     $dot1dBasePort_table[$base_port] = $port_ifIndex_table[$data['dot1dBasePortIfIndex']];
   }
 
-  // Fetch list of active VLANs
-  foreach (dbFetchRows('SELECT `vlan_vlan` FROM `vlans` WHERE (`vlan_status` = ? OR `vlan_status` = ?) AND `device_id` = ?', array('active', 'operational', $device['device_id'])) as $cisco_vlan)
+  // Fetch list of active VLANs (with vlan context exist)
+  foreach (dbFetchRows('SELECT DISTINCT `vlan_vlan` FROM `vlans` WHERE `device_id` = ? AND `vlan_context` = ? AND (`vlan_status` = ? OR `vlan_status` = ?)', array($device['device_id'], 1, 'active', 'operational')) as $cisco_vlan)
   {
+    $vlan = $cisco_vlan['vlan_vlan'];
+
+    /* Not actual, since we check if context exist in vlans discovery
     list($ios_version) = explode('(', $device['version']);
     // vlan context not worked on Cisco IOS <= 12.1 (SNMPv3)
     if ($device['snmp_version'] == 'v3' && $device['os'] == 'ios' && ($ios_version * 10) <= 121)
@@ -67,10 +82,9 @@ if (!count($fdbs) && $device['os_group'] == 'cisco' && is_device_mib($device, 'Q
       break;
     }
 
-    $vlan = $cisco_vlan['vlan_vlan'];
-
     // Skip hardcoded VLANs used for non-Ethernet purposes.
     if (!is_numeric($vlan) || ($vlan >= 1002 && $vlan <= 1005)) { continue; }
+    */
 
     // Set per-VLAN context
     $device_context = $device;
@@ -81,7 +95,7 @@ if (!count($fdbs) && $device['os_group'] == 'cisco' && is_device_mib($device, 'Q
     } else {
       $device_context['snmp_context'] = $vlan;
     }
-    $device_context['snmp_retries'] = 1;         // Set retries to 0 for speedup walking
+    //$device_context['snmp_retries'] = 1;         // Set retries to 0 for speedup walking
 
     //dot1dTpFdbAddress[0:7:e:6d:55:41] 0:7:e:6d:55:41
     //dot1dTpFdbPort[0:7:e:6d:55:41] 28
@@ -112,6 +126,24 @@ if (!count($fdbs) && $device['os_group'] == 'cisco' && is_device_mib($device, 'Q
       $mac      = mac_zeropad($mac);
       $fdb_port = $entry['dot1dTpFdbPort'];
 
+      // If not exist ifIndex associations from previous walks, fetch association for current vlan context
+      // This is derp, but I not know better speedup this walks
+      if (!isset($dot1dBasePort_table[$fdb_port]) && !isset($dot1dBasePortIfIndex[$vlan]))
+      {
+        print_debug("Cache dot1dBasePort -> IfIndex association table by vlan $vlan");
+        // Need to walk port association for this vlan context
+        $dot1dBasePortIfIndex[$vlan] = snmpwalk_cache_oid($device_context, 'dot1dBasePortIfIndex', array(), 'BRIDGE-MIB');
+        foreach ($dot1dBasePortIfIndex[$vlan] as $base_port => $data)
+        {
+          $dot1dBasePort_table[$base_port] = $port_ifIndex_table[$data['dot1dBasePortIfIndex']];
+        }
+        // Prevent rewalk in cycle if empty output
+        if (is_null($dot1dBasePortIfIndex[$vlan]))
+        {
+          $dot1dBasePortIfIndex[$vlan] = FALSE;
+        }
+      }
+
       $data = array();
 
       $data['port_id']    = $dot1dBasePort_table[$fdb_port]['port_id'];
@@ -122,6 +154,7 @@ if (!count($fdbs) && $device['os_group'] == 'cisco' && is_device_mib($device, 'Q
     }
   }
 }
+unset($dot1dBasePortIfIndex, $dot1dTpFdbEntry_table);
 
 /**************************
  * non-Cisco Q-BRIDGE-MIB *
@@ -344,14 +377,15 @@ foreach ($fdbs_db as $vlan => $fdb_macs)
     }
   }
 }
+
+// MultiDelete old entries
 if (count($fdb_delete))
 {
-  // Multi delete
   print_debug_vars($fdb_delete);
   dbDelete('vlans_fdb', generate_query_values($fdb_delete, 'fdb_id', NULL, FALSE));
 }
 
-// Insert new fdb entries
+// MultiInsert new fdb entries
 if (count($fdb_insert))
 {
   print_debug_vars($fdb_insert);
@@ -367,6 +401,7 @@ if (!$fdb_count['total'] && is_device_mib($device, 'STATISTICS-MIB'))
 if (is_numeric($fdb_count['total']) && $fdb_count['total'] > 0)
 {
   rrdtool_update_ng($device, 'fdb_count', array('value' => $fdb_count['total']));
+  $graphs['fdb_count'] = TRUE;
 }
 
 $alert_metrics['fdb_count'] = $fdb_count['total']; // Append fdb count to device metrics
@@ -396,7 +431,5 @@ print_cli_table($table_rows, array('%WVLAN%n', '%WMAC Address%n', '%WPort Name%n
 // Clean
 unset($fdbs_db, $fdb, $fdb_count, $fdb_insert, $fdb_update, $fdb_delete,
       $table_rows, $port_ifIndex_table, $port_table);
-
-echo(PHP_EOL);
 
 // EOF

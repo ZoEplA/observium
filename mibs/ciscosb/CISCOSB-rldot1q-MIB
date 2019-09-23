@@ -173,7 +173,10 @@ rldot1qTpFdbCountType OBJECT-TYPE
                     invalid(2),
                     learned(3),  --dynamic
                     self(4), --self
-                    mgmt(5) --static
+                    mgmt(5), --static
+					multicast(6),
+					ipv4Host(7),
+					ipv6Host(8)
                 }
     MAX-ACCESS  read-only
     STATUS      current

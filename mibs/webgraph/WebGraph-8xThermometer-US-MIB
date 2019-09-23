@@ -1,5 +1,24 @@
 WebGraph-8xThermometer-US-MIB DEFINITIONS ::= BEGIN
 ----------------------------------------------------------------
+-- Revison: 1.34
+----------------------------------------------------------------
+-- 09.03.2017 	New: wtWebioAn8GraphAlarmSensorLostSelection
+--		     		 wtWebioAn8GraphAlarmLimitWindow
+----------------------------------------------------------------
+-- Revison: 1.33
+----------------------------------------------------------------
+-- xx.xx.20xx 	skipped
+--		     
+----------------------------------------------------------------
+-- Revison: 1.32
+----------------------------------------------------------------
+-- 09.11.2016 	New: wtWebioAn8GraphMQTT group
+--		     HTTP Request, MQTT Alarm, REST
+----------------------------------------------------------------
+-- Revison: 1.31
+----------------------------------------------------------------
+-- 15.07.2015 	Changes for new Navigation (__JB__)
+----------------------------------------------------------------
 -- Revison: 1.30
 ----------------------------------------------------------------
 -- 22.06.2010 	Output with decimal point
@@ -70,7 +89,7 @@ WebGraph-8xThermometer-US-MIB DEFINITIONS ::= BEGIN
 
 --  wtWebio Tree
 
-    wtWebioAn8Graph    			OBJECT IDENTIFIER ::= { wtWebio 6 }
+    wtWebioAn8Graph    			OBJECT IDENTIFIER ::= { wtWebio 44 }
     	
 --  wtWebioAn8Graph Tree
 
@@ -109,6 +128,10 @@ WebGraph-8xThermometer-US-MIB DEFINITIONS ::= BEGIN
     wtWebioAn8GraphUDP			OBJECT IDENTIFIER ::= { wtWebioAn8GraphBasic 5 }
     wtWebioAn8GraphSyslog		OBJECT IDENTIFIER ::= { wtWebioAn8GraphBasic 6 }    
     wtWebioAn8GraphFTP			OBJECT IDENTIFIER ::= { wtWebioAn8GraphBasic 7 }
+    wtWebioAn8GraphLanguage		OBJECT IDENTIFIER ::= { wtWebioAn8GraphBasic 9 }
+    wtWebioAn8GraphMQTT		OBJECT IDENTIFIER ::= { wtWebioAn8GraphBasic 12 }
+    wtWebioAn8GraphREST		OBJECT IDENTIFIER ::= { wtWebioAn8GraphBasic 13 }
+    
     
 --  wtWebioAn8GraphGraphics Tree
            
@@ -1051,7 +1074,121 @@ wtWebioAn8GraphFTPEnable OBJECT-TYPE
         	Bit 1-7: unused
                 Bit 0  : FTP enable"
     ::= { wtWebioAn8GraphFTP 7 }
+	
+--  wtWebioAn8GraphLanguage Group
+--------------------------------
+
+wtWebioAn8GraphLanguageSelect OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Language selection:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 2-7: unused
+        	Bit 1  : English
+                Bit 0  : German"
+    ::= { wtWebioAn8GraphLanguage 1 }  	
+
+--  wtWebioAn8GraphMQTT Group
+--------------------------------
+
+wtWebioAn8GraphMQTTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 7 schaltet MQTT frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0-6: ungenutzt
+                Bit 7  : MQTT enable"
+    ::= { wtWebioAn8GraphMQTT 1 }  
+
+wtWebioAn8GraphMQTTBrockerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP-address of the MQTT-Server."
+    ::= { wtWebioAn8GraphMQTT 2 }
+
+wtWebioAn8GraphMQTTUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login  user name."
+    ::= { wtWebioAn8GraphMQTT 3 }
+
+wtWebioAn8GraphMQTTPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login password."
+    ::= { wtWebioAn8GraphMQTT 4 }
+
+wtWebioAn8GraphMQTTLocalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Local port number."
+    ::= { wtWebioAn8GraphMQTT 5 }
     
+wtWebioAn8GraphMQTTBrokerServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Server port number."
+    ::= { wtWebioAn8GraphMQTT 6 }
+    
+wtWebioAn8GraphMQTTInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Ping intervall, if no data has to be send: time in seconds."
+    ::= { wtWebioAn8GraphMQTT 7 }
+    	
+--  wtWebioAn8GraphREST Group
+--------------------------------
+
+wtWebioAn8GraphRESTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates REST :
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : REST enable"
+    ::= { wtWebioAn8GraphREST 1 }  
+
+wtWebioAn8GraphRESTDigestAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates Digest-Authentification:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : Digest Auth enable"
+    ::= { wtWebioAn8GraphREST 2 }  	
+
 -- wtWebioAn8GraphDatalogger Group
 --------------------------------
 
@@ -1251,36 +1388,48 @@ wtWebioAn8GraphAlarmEntry OBJECT-TYPE
     ::= { wtWebioAn8GraphAlarmTable 1 }
 
 WtWebioAn8GraphAlarmEntry ::= SEQUENCE {
-    wtWebioAn8GraphAlarmTrigger			OCTET STRING,
-    wtWebioAn8GraphAlarmMin			OCTET STRING,
-    wtWebioAn8GraphAlarmMax			OCTET STRING,
-    wtWebioAn8GraphAlarmHysteresis		OCTET STRING,
-    wtWebioAn8GraphAlarmDelay			OCTET STRING,
-    wtWebioAn8GraphAlarmInterval		OCTET STRING,
-    wtWebioAn8GraphAlarmEnable			OCTET STRING,
-    wtWebioAn8GraphAlarmEMailAddr		OCTET STRING,
-    wtWebioAn8GraphAlarmMailSubject		OCTET STRING,
-    wtWebioAn8GraphAlarmMailText		OCTET STRING,
-    wtWebioAn8GraphAlarmManagerIP		OCTET STRING,
-    wtWebioAn8GraphAlarmTrapText		OCTET STRING,
-    wtWebioAn8GraphAlarmMailOptions		OCTET STRING,
-    wtWebioAn8GraphAlarmTcpIpAddr		OCTET STRING,
-    wtWebioAn8GraphAlarmTcpPort			INTEGER,
-    wtWebioAn8GraphAlarmTcpText			OCTET STRING,
-    wtWebioAn8GraphAlarmClearMailSubject	OCTET STRING,
-    wtWebioAn8GraphAlarmClearMailText		OCTET STRING,
-    wtWebioAn8GraphAlarmClearTrapText		OCTET STRING,
-    wtWebioAn8GraphAlarmClearTcpText		OCTET STRING,    
-    wtWebioAn8GraphAlarmSyslogIpAddr		OCTET STRING,
-    wtWebioAn8GraphAlarmSyslogPort		INTEGER,
-    wtWebioAn8GraphAlarmSyslogText		OCTET STRING,
-    wtWebioAn8GraphAlarmFtpDataPort		OCTET STRING,
-    wtWebioAn8GraphAlarmFtpFileName		OCTET STRING,
-    wtWebioAn8GraphAlarmFtpText			OCTET STRING,
-    wtWebioAn8GraphAlarmFtpClearText		OCTET STRING,
-    wtWebioAn8GraphAlarmFtpOption		OCTET STRING,
-    wtWebioAn8GraphAlarmTimerCron		OCTET STRING
-    
+    wtWebioAn8GraphAlarmTrigger				OCTET STRING,
+    wtWebioAn8GraphAlarmMin				OCTET STRING,
+    wtWebioAn8GraphAlarmMax				OCTET STRING,
+    wtWebioAn8GraphAlarmHysteresis			OCTET STRING,
+    wtWebioAn8GraphAlarmDelay				OCTET STRING,
+    wtWebioAn8GraphAlarmInterval			OCTET STRING,
+    wtWebioAn8GraphAlarmEnable				OCTET STRING,
+    wtWebioAn8GraphAlarmEMailAddr			OCTET STRING,
+    wtWebioAn8GraphAlarmMailSubject			OCTET STRING,
+    wtWebioAn8GraphAlarmMailText			OCTET STRING,
+    wtWebioAn8GraphAlarmManagerIP			OCTET STRING,
+    wtWebioAn8GraphAlarmTrapText			OCTET STRING,
+    wtWebioAn8GraphAlarmMailOptions			OCTET STRING,
+    wtWebioAn8GraphAlarmTcpIpAddr			OCTET STRING,
+    wtWebioAn8GraphAlarmTcpPort				INTEGER,
+    wtWebioAn8GraphAlarmTcpText				OCTET STRING,
+    wtWebioAn8GraphAlarmClearMailSubject		OCTET STRING,
+    wtWebioAn8GraphAlarmClearMailText			OCTET STRING,
+    wtWebioAn8GraphAlarmClearTrapText			OCTET STRING,
+    wtWebioAn8GraphAlarmClearTcpText			OCTET STRING,    
+    wtWebioAn8GraphAlarmSyslogIpAddr			OCTET STRING,
+    wtWebioAn8GraphAlarmSyslogPort			INTEGER,
+    wtWebioAn8GraphAlarmSyslogText			OCTET STRING,
+    wtWebioAn8GraphAlarmFtpDataPort			OCTET STRING,
+    wtWebioAn8GraphAlarmFtpFileName			OCTET STRING,
+    wtWebioAn8GraphAlarmFtpText				OCTET STRING,
+    wtWebioAn8GraphAlarmFtpClearText			OCTET STRING,
+    wtWebioAn8GraphAlarmFtpOption			OCTET STRING,
+    wtWebioAn8GraphAlarmTimerCron			OCTET STRING,
+    wtWebioAn8GraphAlarmName 				OCTET STRING,
+    wtWebioAn8GraphAlarmActive 				OCTET STRING,
+    wtWebioAn8GraphAlarmHttpReqAuthEnable		OCTET STRING,
+    wtWebioAn8GraphAlarmHttpReqAuthUser			OCTET STRING,
+    wtWebioAn8GraphAlarmHttpReqAuthPassword		OCTET STRING,
+    wtWebioAn8GraphAlarmHttpReqSetUrl			OCTET STRING,
+    wtWebioAn8GraphAlarmHttpReqClearUrl			OCTET STRING,
+    wtWebioAn8GraphAlarmHttpReqServerPort		OCTET STRING,
+    wtWebioAn8GraphAlarmMqttTopicPath			OCTET STRING,
+    wtWebioAn8GraphAlarmMqttTopicSetTopic		OCTET STRING,
+    wtWebioAn8GraphAlarmMqttTopicClear			OCTET STRING,
+   	wtWebioAn8GraphAlarmSensorLostSelection	OCTET STRING,
+    wtWebioAn8GraphAlarmLimitWindow			OCTET STRING
 }
 
 wtWebioAn8GraphAlarmTrigger OBJECT-TYPE
@@ -1544,7 +1693,7 @@ wtWebioAn8GraphAlarmFtpClearText OBJECT-TYPE
         "Alarm clear message to store on the FTP server."
     ::= { wtWebioAn8GraphAlarmEntry 28 }
     
-wtWebioAn8GraphAlarmFtpOptions OBJECT-TYPE
+wtWebioAn8GraphAlarmFtpOption OBJECT-TYPE
     SYNTAX OCTET STRING (SIZE(4))
     ACCESS read-write
     STATUS mandatory
@@ -1583,6 +1732,141 @@ wtWebioAn8GraphAlarmTimerCron OBJECT-TYPE
          - step size within an partition of the allowed range (0-59/2: every second minute)."
     ::= { wtWebioAn8GraphAlarmEntry 30 }  
 
+-- __JB__
+wtWebioAn8GraphAlarmName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alert name"
+    ::= { wtWebioAn8GraphAlarmEntry 39 } 
+	
+-- __JB__
+wtWebioAn8GraphAlarmActive OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alert active
+			1 = ON
+			0 = OFF"
+    ::= { wtWebioAn8GraphAlarmEntry 40 }
+    
+wtWebioAn8GraphAlarmHttpReqAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 1-7: unused
+        Bit 0  : HHTP Request Authentication enable"
+    ::= { wtWebioAn8GraphAlarmEntry 61 }
+
+wtWebioAn8GraphAlarmHttpReqAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: User"
+    ::= { wtWebioAn8GraphAlarmEntry 62 }
+
+wtWebioAn8GraphAlarmHttpReqAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Password"
+    ::= { wtWebioAn8GraphAlarmEntry 63 }
+
+wtWebioAn8GraphAlarmHttpReqSetUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Set URL"
+    ::= { wtWebioAn8GraphAlarmEntry 64 }
+
+wtWebioAn8GraphAlarmHttpReqClearUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Clear URL"
+    ::= { wtWebioAn8GraphAlarmEntry 65 }
+
+wtWebioAn8GraphAlarmHttpReqServerPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Server Port"
+    ::= { wtWebioAn8GraphAlarmEntry 66 }
+
+wtWebioAn8GraphAlarmMqttTopicPath OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic path"
+    ::= { wtWebioAn8GraphAlarmEntry 67 }
+
+wtWebioAn8GraphAlarmMqttTopicSetTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic SET message"
+    ::= { wtWebioAn8GraphAlarmEntry 68 }
+
+wtWebioAn8GraphAlarmMqttTopicClear OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic CLEAR message"
+    ::= { wtWebioAn8GraphAlarmEntry 69 }    
+
+wtWebioAn8GraphAlarmSensorLostSelection OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4: 
+		Bit 7  : Sensor 7
+		Bit 6  : Sensor 6
+		Bit 5  : Sensor 5
+		Bit 4  : Sensor 4
+		Bit 3  : Sensor 3
+		Bit 2  : Sensor 2
+		Bit 1  : Sensor 1
+        Bit 0  : Sensor 0 "
+    ::= { wtWebioAn8GraphAlarmEntry 70 }
+	
+wtWebioAn8GraphAlarmLimitWindow OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If window type is INSIDE the alarm is genereted when the temperature
+        is greater minumum value and lower than maximum value. If window type is OUTSIDE
+        the alarm is generated when the measured value is lower than the minimum value
+        or greater than the maximum value.
+		Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : inside window
+        Bit 0  : outside window"
+    ::= { wtWebioAn8GraphAlarmEntry 71 }
+	
 -- wtWebioAn8GraphGraphicsBase Group
 ----------------------------
 

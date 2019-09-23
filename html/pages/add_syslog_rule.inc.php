@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -57,7 +57,7 @@ include($config['html_dir']."/includes/alerting-navbar.inc.php");
         print_error('Failed to create new rule.');
       }
     } else {
-      print_error('Failed to create new rule. Incorrect rule passed.');
+      print_error('<b>Failed to create new rule</b>: Rule name, message and valid regular expression are mandatory.');
     }
   }
 

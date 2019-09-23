@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -46,7 +46,7 @@ foreach (dbFetchRows("SELECT * FROM `eigrp_peers` WHERE `device_id` = ? AND `eig
           <td>'.$peer['peer_addr'].'<br /><span class="entity-title">'.(is_array($peer['device']) ? generate_device_link($peer['device']) : '').'</span></td>
           <td><span class="entity-title">'.(is_array($peer['port']) ? generate_port_link($peer['port']) : '').'</span><br />
                                  '.$peer['port']['ifAlias'].'</td>
-          <td>'.formatUptime($peer['peer_uptime']).'</td>
+          <td>'.format_uptime($peer['peer_uptime']).'</td>
           <td>'.$peer['peer_srtt'].'ms</td>
           <td>'.$peer['peer_rto'].'ms</td>
           <td>'.$peer['peer_version'].'</td>

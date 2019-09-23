@@ -1,31 +1,59 @@
---**************************************************************************
---                                                                          
---    Copyright 2002 Broadcom Corporation                                   
---    All Rights Reserved                                                   
---    No portions of this material may be reproduced in any form without the
---    written permission of:                                                
---             Broadcom Corporation                                         
---             16251 Laguna Canyon Road                                     
---             Irvine, California  92618                                    
---    All information contained in this document is Broadcom Corporation    
---    company private, proprietary, and trade secret.                       
---                                                                          
---                                                                          
---                                                                          
---**************************************************************************
+--****************************************************************************
+--
+-- Copyright (c) 2002-2011 Broadcom Corporation
+--
+-- This program is the proprietary software of Broadcom Corporation and/or
+-- its licensors, and may only be used, duplicated, modified or distributed
+-- pursuant to the terms and conditions of a separate, written license
+-- agreement executed between you and Broadcom (an "Authorized License").
+-- Except as set forth in an Authorized License, Broadcom grants no license
+-- (express or implied), right to use, or waiver of any kind with respect to
+-- the Software, and Broadcom expressly reserves all rights in and to the
+-- Software and all intellectual property rights therein.  IF YOU HAVE NO
+-- AUTHORIZED LICENSE, THEN YOU HAVE NO RIGHT TO USE THIS SOFTWARE IN ANY WAY,
+-- AND SHOULD IMMEDIATELY NOTIFY BROADCOM AND DISCONTINUE ALL USE OF THE
+-- SOFTWARE.  
+--
+-- Except as expressly set forth in the Authorized License,
+--
+-- 1.     This program, including its structure, sequence and organization,
+-- constitutes the valuable trade secrets of Broadcom, and you shall use all
+-- reasonable efforts to protect the confidentiality thereof, and to use this
+-- information only in connection with your use of Broadcom integrated circuit
+-- products.
+--
+-- 2.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED
+-- "AS IS" AND WITH ALL FAULTS AND BROADCOM MAKES NO PROMISES, REPRESENTATIONS
+-- OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+-- RESPECT TO THE SOFTWARE.  BROADCOM SPECIFICALLY DISCLAIMS ANY AND ALL
+-- IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR
+-- A PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+-- ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. YOU ASSUME
+-- THE ENTIRE RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE.
+--
+-- 3.     TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL BROADCOM
+-- OR ITS LICENSORS BE LIABLE FOR (i) CONSEQUENTIAL, INCIDENTAL, SPECIAL,
+-- INDIRECT, OR EXEMPLARY DAMAGES WHATSOEVER ARISING OUT OF OR IN ANY WAY
+-- RELATING TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE EVEN IF BROADCOM
+-- HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES; OR (ii) ANY AMOUNT IN
+-- EXCESS OF THE AMOUNT ACTUALLY PAID FOR THE SOFTWARE ITSELF OR U.S. $1,
+-- WHICHEVER IS GREATER. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING ANY
+-- FAILURE OF ESSENTIAL PURPOSE OF ANY LIMITED REMEDY.
+--
+--****************************************************************************
 --    Filename: brcm-cm-factory.mib
 --    Author:   Kevin O'Neal
 --    Creation Date: 19-june-2002
 --
---**************************************************************************
+--****************************************************************************
 --    Description:
 --
 --		private MIB for cablemodem factory
 --		
---**************************************************************************
+--****************************************************************************
 --    Revision History:
 --
---**************************************************************************
+--****************************************************************************
 
 BRCM-CM-FACTORY-MIB DEFINITIONS ::= BEGIN
 
@@ -42,7 +70,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-FACTORY-MIB;
                 
 cablemodemFactory MODULE-IDENTITY
-    LAST-UPDATED "0702020000Z"
+    LAST-UPDATED "201104200000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -58,50 +86,82 @@ cablemodemFactory MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata private MIB"
-    REVISION     "0206040000Z"
+        "Broadcom proprietary MIB for management and configuration
+         of cablemodem objects used in manufacturing."
+    REVISION     "201104200000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
-    REVISION     "0211120000Z"
+            "Added cmFactExtendedUsTxPowerCapability object."
+    REVISION     "201101170000Z"
     DESCRIPTION
-            "Added objects for Broadcom internal software description."
-    REVISION     "0212120000Z"
+            "Added cmFactoryFpm group."
+    REVISION     "201012100000Z"
+    DESCRIPTION
+            "Added cmFactAnnex object."
+    REVISION     "201008180000Z"
+    DESCRIPTION
+            "Added cmFactoryOtp group."
+    REVISION     "200910070000Z"
+    DESCRIPTION
+            "Added cmFactEnabledTuners object."
+    REVISION     "200808260000Z"
+    DESCRIPTION
+            "Added cmUsCalChannelNumber object."
+    REVISION      "200702050000Z"
+    DESCRIPTION
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected.
+         - Revision dates were updated to post-Y2K format.
+         - Access of cmUsCalChannelWidth was changed from read-create to 
+           read-write.
+         - Range restriction was added to objects cmDsCalOffsetIndex and 
+           cmUsCalOffsetIndex."
+    REVISION     "200702020000Z"
+    DESCRIPTION
+            "Added 'cw' to enumerated values for  cmUsCalModulation."
+    REVISION     "200601270000Z"
+    DESCRIPTION
+            "Added cmDsCalChannelNumber object."
+    REVISION     "200511140000Z"
+    DESCRIPTION
+            "Added cmFactChannelBondingEnable object."
+    REVISION     "200505100000Z"
+    DESCRIPTION
+            "Added object cmFactHighOutputPAEnable."    
+    REVISION     "200412300000Z"
+    DESCRIPTION
+            "Added object cmFact3420OptimizedFreqMapEnable."
+    REVISION     "200412140000Z"
+    DESCRIPTION
+            "Added object cmFactPowerSaveModeEnable."
+    REVISION     "200406010000Z"
+    DESCRIPTION
+            "Added object cmHwAdvanceMapRunAheadEnable."
+    REVISION     "200403240000Z"
+    DESCRIPTION
+            "Changed behavior of cmBpiPrivateKey to return a CRC32 of the
+             key when read rather than the key itself for security reasons."
+    REVISION     "200308130000Z"
+    DESCRIPTION
+            "Added cmFactNonstdUpstreamEnable object."
+    REVISION     "200305210000Z"
+    DESCRIPTION
+            "Added cmFactAckCelEnable object."
+    REVISION     "200212230000Z"
+    DESCRIPTION
+            "Added AGC control objects.  Ho, Ho, Ho."
+    REVISION     "200212120000Z"
     DESCRIPTION
             "Removed write access from cmUsCalOffsetFrequency and 
              cmUsCalNumOffsets.  These can't be written because of the way data 
              is stored in non-vol.  You must change the start, end, or interval 
              to do this (see BRCM-CM-ENGINEERING-MIB)."
-    REVISION     "0212230000Z"
+    REVISION     "200211120000Z"
     DESCRIPTION
-            "Added AGC control objects.  Ho, Ho, Ho."
-    REVISION     "0305210000Z"
+            "Added objects for Broadcom internal software description."    
+    REVISION     "200206040000Z"
     DESCRIPTION
-            "Added cmFactAckCelEnable object."
-    REVISION     "0308130000Z"
-    DESCRIPTION
-            "Added cmFactNonstdUpstreamEnable object."
-    REVISION     "0403240000Z"
-    DESCRIPTION
-            "Changed behavior of cmBpiPrivateKey to return a CRC32 of the
-             key when read rather than the key itself for security reasons."
-    REVISION     "0406010000Z"
-    DESCRIPTION
-            "Added object cmHwAdvanceMapRunAheadEnable."
-    REVISION     "0412140000Z"
-    DESCRIPTION
-            "Added object cmFactPowerSaveModeEnable."
-    REVISION     "0412300000Z"
-    DESCRIPTION
-            "Added object cmFact3420OptimizedFreqMapEnable."
-    REVISION     "0505100000Z"
-    DESCRIPTION
-            "Added object cmFactHighOutputPAEnable."
-    REVISION     "0511140000Z"
-    DESCRIPTION
-            "Added cmFactChannelBondingEnable object."
-    REVISION     "0702020000Z"
-    DESCRIPTION
-            "Added 'cw' to enumerated values for  cmUsCalModulation."
+            "Initial version of this MIB module."
     ::= { cableDataFactory 2 }
 
 -- cmFactoryBase: miscellaneous control/state objects for factory mode    
@@ -222,6 +282,77 @@ cmFactChannelBondingEnable  OBJECT-TYPE
          setting will only have any effect if the hardware and firmware
          support channel bonding."
     ::= { cmFactoryBase 11 }
+    
+cmFactEnabledTuners  OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of tuners which will be advertised to the CMTS
+         in the CM's modem capabilities message.  By advertising fewer tuners
+         than the design actually supports, power consumption may be reduced,
+         at the expense of reduced channel bonding capacity.  
+
+         Note that setting the value of this object to fewer tuners than are 
+         physically present does not cause the additional tuners to be disabled;
+         only the modem capabilities message is affected.
+
+         The value of this object may not be set to fewer than one tuner, or to 
+         more than the number of tuners physically present on the board."
+    ::= { cmFactoryBase 12 }
+
+cmFactAnnex  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                annexB(0), -- North America
+                annexA(1), -- Europe
+                annexJ(2), -- Japan 2.0+
+                annexOther(3),
+                annexC(4)  -- Japan 1.x
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the annex mode which will be used.  This setting affects
+         downstream tuning parameters including frequency list and phy level
+         operation."
+    ::= { cmFactoryBase 13 }
+
+cmFactExtendedUsTxPowerCapability  OBJECT-TYPE
+    SYNTAX      Integer32 (0|205..244)
+    UNITS       "quarter dBmV" 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Specifies the maximum extended upstream transmit power of which this 
+          device is capable.  A value of zero indicates that the device has no 
+          extended upstream power capability.  The value specified in this 
+          object will be advertised in TLV 5.40 of the CM's modem capability
+          message.
+
+          This object differs from cmExtendedUsTxPowerCapability from the
+          BRCM-CM-MGMT-MIB in that the value set to this object will be stored
+          in both permanent and dynamic nonvol.  The permanent setting will
+          become the new default; if dynamic nonvol is defaulted then it will
+          adopt the value stored in permanent nonvol.
+
+          Note There will be limitations on performance in extended power mode:
+
+          1. The same modulation format must be used for all 4 upstream channels.
+
+          2. Distortion will increased. It will comply with DOCSIS requirements, 
+             but will no longer comply with the extended Comcast specifications 
+             for downstream spurious signals from 54 to 88 MHz.
+
+          3. Extended power will be increased for 64-QAM and 16-QAM formats 
+             ONLY.  
+
+          4. Power enhancement will only be achievable on North American 
+             low-split systems (42 MHz upper limit)."
+    REFERENCE 
+         "Data-Over-Cable Service Interface Specifications DOCSIS 3.0 MAC and 
+          Upper Layer Protocols Interface Specification 
+          CM-SP-MULPIv3.0-I15-110210 section 6.4.28.1.15" 
+    ::= { cmFactoryBase 14 }
 
 -- cmFactoryBaselinePrivacy: BPI-related factory objects
 cmFactoryBaselinePrivacy OBJECT IDENTIFIER ::= { cablemodemFactory 2 }
@@ -402,7 +533,7 @@ CmDsCalOffsetEntry ::=
     }
     
 cmDsCalOffsetIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (0..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -439,6 +570,17 @@ cmDsCalOffsetPower OBJECT-TYPE
          "docsIfDownChannelPower from DOCS-IF-MIB" 
     ::= { cmDsCalOffsetEntry 3 }
     
+cmDsCalChannelNumber  OBJECT-TYPE 
+     SYNTAX      Integer32 (0..15)
+     MAX-ACCESS  read-write 
+     STATUS      current 
+     DESCRIPTION 
+        "For bonded downstream systems, this object identifies which downstream
+         channel is to be calibrated.  When the value of this object is changed,
+         the cmDsCalOffsetTable will be rebuilt to reflect the settings for
+         the specified channel." 
+     ::= { cmFactoryDownstreamCalibration 9 } 
+    
 cmFactoryUpstreamCalibration OBJECT IDENTIFIER ::= { cablemodemFactory 4 }
 
 cmUsCalFrequency  OBJECT-TYPE 
@@ -459,7 +601,7 @@ cmUsCalFrequency  OBJECT-TYPE
 cmUsCalChannelWidth OBJECT-TYPE 
     SYNTAX      Integer32 (0..64000000) 
     UNITS       "hertz" 
-    MAX-ACCESS  read-create 
+    MAX-ACCESS  read-write 
     STATUS      current 
     DESCRIPTION 
        "The bandwidth of the upstream transmission which will be intiated
@@ -559,7 +701,7 @@ CmUsCalOffsetEntry ::=
     }
     
 cmUsCalOffsetIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -628,6 +770,17 @@ cmHwAdvanceMapRunAheadEnable OBJECT-TYPE
          and therefore enables more efficient use of concatenation."
     ::= { cmFactoryHardware 4 }
     
+cmUsCalChannelNumber  OBJECT-TYPE 
+     SYNTAX      Integer32 (0..15) 
+     MAX-ACCESS  read-write 
+     STATUS      current 
+     DESCRIPTION 
+        "For bonded upstream systems, this object identifies which upstream
+         channel is to be calibrated.  When the value of this object is changed,
+         the cmUsCalOffsetTable will be rebuilt to reflect the settings for
+         the specified channel." 
+     ::= { cmFactoryUpstreamCalibration 8 } 
+
 --
 -- cmFactoryOtp: This group is used to read and write (once only, obviously)    
 -- the one time programable bits which are available in certain platforms.
@@ -643,170 +796,252 @@ cmHwAdvanceMapRunAheadEnable OBJECT-TYPE
 cmFactoryOtp OBJECT IDENTIFIER ::= { cablemodemFactory 6 }
 
 cmOtpIsProgrammed OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Indicates if the OTP section of this chip has been programmed.  Note
-         that if this object returns true(1), all objects in this group will
-         be read-only and any attempt to write them will return a notWritable
-         error."
-    ::= { cmFactoryOtp 1 }
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Indicates if the OTP section of this chip has been programmed.  Note
+          that if this object returns true(1), all objects in this group will
+          be read-only and any attempt to write them will return a notWritable
+          error."
+     ::= { cmFactoryOtp 1 }
     
 cmOtpProgramNow OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "If set to true(1), initiates programming of the OTP.  Setting to 
-         false(2) has no effect.  Always returns false(2) when read.
-         
-         Note that setting this object to true(1) will result in permanent and
-         irreversable storage of the settings in this group to hardware.  After
-         the part has been programmed, it may never be programmed again.
-         
-         Setting this object to true(1) may fail for a number of reasons, 
-         indicated by the error code returned to the SNMP-SET, as follows:
-         
-         noError: programming was successful.
-         resourceUnavailable: the part has already been programmed.
-         inconsistentValue: OTP programming is not supported on this platform.
-         commitFailed: internal h/w failure.  In this case, the chip should be
-                       discarded, since some of the bits may have been 
-                       programmed and others might have failed."
-    ::= { cmFactoryOtp 2 }
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to true(1), initiates programming of the OTP.  Setting to 
+          false(2) has no effect.  Always returns false(2) when read.
+          
+          Note that setting this object to true(1) will result in permanent and
+          irreversable storage of the settings in this group to hardware.  After
+          the part has been programmed, it may never be programmed again.
+          
+          Setting this object to true(1) may fail for a number of reasons, 
+          indicated by the error code returned to the SNMP-SET, as follows:
+          
+          noError: programming was successful.
+          resourceUnavailable: the part has already been programmed.
+          inconsistentValue: OTP programming is not supported on this platform.
+          commitFailed: internal h/w failure.  In this case, the chip should be
+                        discarded, since some of the bits may have been 
+                        programmed and others might have failed."
+     ::= { cmFactoryOtp 2 }
     
 cmOtpProgramResult OBJECT-TYPE
-    SYNTAX      INTEGER {
-                notAttempted(-1),
-                success(0),
-                failedAlreadyProgrammed(1),
-                failedProgrammingNotSupported(2),
-                failedHardwareFailure(3)
-    }
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Indicates the result of an attempt to program the OTP.  Note that this
-         value does not persist across a reboot, but it will provide the result
-         of an attempt to program the OTP until the device is rebooted.
-         
-         notAttempted(-1): no attempt has been made to program the OTP since the
-         last reboot.
-         
-         success(0): programming was successful.
-         
-         failedAlreadyProgrammed(1): the part has already been programmed.
-         
-         failedProgrammingNotSupported(2): OTP programming is not supported on 
-         this platform.
-                                           
-         failedHardwareFailure(3): internal h/w failure.  In this case, the 
-         chip should be discarded, since some of the bits may have been 
-         programmed and others might have failed."
-    ::= { cmFactoryOtp 3 }
+     SYNTAX      INTEGER {
+                 notAttempted(-1),
+                 success(0),
+                 failedAlreadyProgrammed(1),
+                 failedProgrammingNotSupported(2),
+                 failedHardwareFailure(3)
+     }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Indicates the result of an attempt to program the OTP.  Note that this
+          value does not persist across a reboot, but it will provide the result
+          of an attempt to program the OTP until the device is rebooted.
+          
+          notAttempted(-1): no attempt has been made to program the OTP since the
+          last reboot.
+          
+          success(0): programming was successful.
+          
+          failedAlreadyProgrammed(1): the part has already been programmed.
+          
+          failedProgrammingNotSupported(2): OTP programming is not supported on 
+          this platform.
+                                            
+          failedHardwareFailure(3): internal h/w failure.  In this case, the 
+          chip should be discarded, since some of the bits may have been 
+          programmed and others might have failed."
+     ::= { cmFactoryOtp 3 }
     
 cmOtpRawBitsSize OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..32)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Indicates the size of the OTP region in bits."
-    ::= { cmFactoryOtp 4 }
+     SYNTAX      Unsigned32 (0..32)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Indicates the size of the OTP region in bits."
+     ::= { cmFactoryOtp 4 }
     
 cmOtpRawBits OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Allows reading or writing the OTP region as a raw hex value.  
-        
-         When reading, note that only the right-most bits are valid.  The 
-         number of valid bits is returned by otpRawBitsSize.
-        
-         When writing, note that the value must be formatted properly for the 
-         h/w, and must be padded on the left with 0's so that the otpRawBitsSize 
-         is not exceeded."
-    ::= { cmFactoryOtp 5 }
-    
-cmOtpJtagDisabled OBJECT-TYPE    
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "If set to true(1), disables JTAG in hardware.  If set to false(2), 
-         JTAG will remain enabled."
-    ::= { cmFactoryOtp 6 }
-    
-cmOtpConsoleDisabled OBJECT-TYPE    
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "If set to true(1), disables the serial console port in hardware.  If 
-         set to false(2), serial console will remain enabled."
-    ::= { cmFactoryOtp 7 }
-    
-cmOtpSpiSlaveDisabled OBJECT-TYPE    
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "If set to true(1), disables the SPI slave in hardware.  If 
-         set to false(2), the SPI slave will remain enabled."
-    ::= { cmFactoryOtp 8 }
-    
-cmOtpMpiAccessControl OBJECT-TYPE    
-    SYNTAX      INTEGER {
-                mpiFullAccess(0),
-                mpiRestrictedAccess(1),
-                mpiNoAccess(3)
-    }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Indicates the value of the MPI access control setting."
-    ::= { cmFactoryOtp 9 }
-    
-cmOtpBootRomEnabled OBJECT-TYPE    
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "If set to true(1), the part will boot only from ROM.  If 
-         set to false(2), the part will boot from a bootloader in flash."
-    ::= { cmFactoryOtp 10 }
-    
-cmOtpRamScramblerEnabled OBJECT-TYPE    
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Enables or disables the RAM scrambler."
-    ::= { cmFactoryOtp 11 }
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Allows reading or writing the OTP region as a raw hex value.  
+         
+          When reading, note that only the right-most bits are valid.  The 
+          number of valid bits is returned by otpRawBitsSize.
+         
+          When writing, note that the value must be formatted properly for the 
+          h/w, and must be padded on the left with 0's so that the otpRawBitsSize 
+          is not exceeded."
+     ::= { cmFactoryOtp 5 }
     
 cmOtpCustomerDefinedBitsSize OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..32)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Indicates the size of the customer defined region in bits."
-    ::= { cmFactoryOtp 12 }
+     SYNTAX      Unsigned32 (0..32)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Indicates the size of the customer defined region in bits."
+     ::= { cmFactoryOtp 6 }
     
 cmOtpCustomerDefinedBits OBJECT-TYPE
-    SYNTAX      Unsigned32
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Allows reading or writing the customer defined region as a raw hex 
+          value.  
+         
+          When reading, note that only the right-most bits are valid.  The 
+          number of valid bits is returned by cmOtpCustomerDefinedBitsSize.
+         
+          When writing, note that the value must be formatted properly for the 
+          h/w, and must be padded on the left with 0's so that the 
+          cmOtpCustomerDefinedBitsSize is not exceeded."
+     ::= { cmFactoryOtp 7 }
+
+cmOtpSecurityLevel OBJECT-TYPE    
+     SYNTAX      INTEGER {
+                 noSecurity(0),
+                 partialSecurity(1),
+                 fullSecurity(2)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Reports and controls the current security level for the cumulative
+          set of supported OTP features for this device.  This provides a 
+          platform-independent mechanism to set all supported security features
+          at once without requiring each feature to be configured individually.
+
+          When read, a value of noSecurity(0) indicates that all supported 
+          features are currently set to the least secure value.  If set to 
+          noSecurity(0), all supported OTP features will be set to the least 
+          secure value.  
+
+          When read, a value of partialSecurity(1) indicates that the supported
+          OTP features currently have a mixture of secure and non-secure 
+          settings.  An attempt to set this object to a value of 
+          partialSecurity(1) will fail with an error of INCONSISTENT_VALUE 
+          unless the current value of this object is partialSecurity(1).  In
+          order to create a partially secure configuration, each OTP feature
+          must be set individually.
+
+          When read, a value of fullSecurity(2) indicates that all supported 
+          features are currently set to the most secure value.  If set to 
+          fullSecurity(2), all supported OTP features will be set to the most 
+          secure value."
+     ::= { cmFactoryOtp 8 }
+
+cmOtpJtagDisabled OBJECT-TYPE    
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to true(1), disables JTAG in hardware.  If set to false(2), 
+          JTAG will remain enabled.  
+
+          Setting cmOtpSecurityLevel to fullSecurity(2) will cause the value of 
+          this object to be set to true(1).  Setting cmOtpSecurityLevel to 
+          noSecurity(0) will cause the value of this object to be set to
+          false(2)."
+     ::= { cmFactoryOtp 9 }
+    
+cmOtpConsoleDisabled OBJECT-TYPE    
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to true(1), disables the serial console port in hardware.  If 
+          set to false(2), serial console will remain enabled.
+
+          Setting cmOtpSecurityLevel to fullSecurity(2) will cause the value of 
+          this object to be set to true(1).  Setting cmOtpSecurityLevel to 
+          noSecurity(0) will cause the value of this object to be set to
+          false(2)."
+     ::= { cmFactoryOtp 10 }
+    
+cmOtpSpiSlaveDisabled OBJECT-TYPE    
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to true(1), disables the SPI slave in hardware.  If 
+          set to false(2), the SPI slave will remain enabled.
+
+          Setting cmOtpSecurityLevel to fullSecurity(2) will cause the value of 
+          this object to be set to true(1).  Setting cmOtpSecurityLevel to 
+          noSecurity(0) will cause the value of this object to be set to
+          false(2)."
+     ::= { cmFactoryOtp 11 }
+    
+cmOtpMpiAccessControl OBJECT-TYPE    
+     SYNTAX      INTEGER {
+                 mpiFullAccess(0),
+                 mpiRestrictedAccess(1),
+              -- value (2) is reserved
+                 mpiNoAccess(3)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Indicates the value of the MPI access control setting.
+
+          The effect of setting cmOtpSecurityLevel on the value of this object 
+          is platform-dependant."
+     ::= { cmFactoryOtp 12 }
+    
+cmOtpBootRomEnabled OBJECT-TYPE    
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to true(1), the part will boot only from ROM.  If 
+          set to false(2), the part will boot from a bootloader in flash.
+
+          Setting cmOtpSecurityLevel to fullSecurity(2) will cause the value of 
+          this object to be set to true(1).  Setting cmOtpSecurityLevel to 
+          noSecurity(0) will cause the value of this object to be set to
+          false(2)."
+     ::= { cmFactoryOtp 13 }
+    
+cmOtpRamScramblerEnabled OBJECT-TYPE    
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Enables or disables the RAM scrambler.
+
+          Setting cmOtpSecurityLevel to fullSecurity(2) will cause the value of 
+          this object to be set to true(1).  Setting cmOtpSecurityLevel to 
+          noSecurity(0) will cause the value of this object to be set to
+          false(2)."
+     ::= { cmFactoryOtp 14 }
+
+--
+-- cmFactoryFpm: This group is used to control various features associated with
+-- the Free Pool Manager.  Note that this group may not be supported on 
+-- platforms which have no FPM support, or on products which have FPM excluded
+-- at build time.
+--
+
+cmFactoryFpm OBJECT IDENTIFIER ::= { cablemodemFactory 7 }
+
+cmFpmTokenDepletionWatchdogEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Allows reading or writing the customer defined region as a raw hex 
-         value.  
-        
-         When reading, note that only the right-most bits are valid.  The 
-         number of valid bits is returned by cmOtpCustomerDefinedBitsSize.
-        
-         When writing, note that the value must be formatted properly for the 
-         h/w, and must be padded on the left with 0's so that the 
-         cmOtpCustomerDefinedBitsSize is not exceeded."
-    ::= { cmFactoryOtp 13 }
+        "Enables or disables the free pool manager token watchdog feature.  If 
+         enabled, this feature causes the CM to reboot if the FPM becomes 
+         depleted of tokens."
+    ::= { cmFactoryFpm 1 }
+
 
 END

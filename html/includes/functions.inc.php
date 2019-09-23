@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -55,6 +55,7 @@ function html_callback($buffer)
   // Install registered CSS/JS links
   $types = array(
     'css'    => '  <link href="%%STRING%%?v=' . OBSERVIUM_VERSION . '" rel="stylesheet" type="text/css" />' . PHP_EOL,
+    'style'  => '  <style type="text/css">' . PHP_EOL . '%%STRING%%' . PHP_EOL . '  </style>' . PHP_EOL,
     'js'     => '  <script type="text/javascript" src="%%STRING%%?v=' . OBSERVIUM_VERSION . '"></script>' . PHP_EOL,
     'script' => '  <script type="text/javascript">' . PHP_EOL .
                 '  <!-- Begin' . PHP_EOL . '%%STRING%%' . PHP_EOL .
@@ -144,7 +145,9 @@ function get_vars($vars_order = array(), $auth = FALSE)
   }
 
   // XSS script regex
-  $prevent_xss = '!<\s*/?\s*s\s*c\s*r\s*i\s*p\s*t\s*>!i'; // <sCrIpT> < / s c r i p t >
+  // <sCrIpT> < / s c r i p t >
+  // javascript:alert("Hello world");/
+  $prevent_xss = '!(^\s*(J\s*A\s*V\s*A\s*)?S\s*C\s*R\s*I\s*P\s*T\s*:|<\s*/?\s*S\s*C\s*R\s*I\s*P\s*T\s*>)!i';
 
   // Allow to use var_decode(), this prevent to use potentially unsafe serialize functions
   $auth = $auth || $_SESSION['authenticated'];
@@ -179,8 +182,12 @@ function get_vars($vars_order = array(), $auth = FALSE)
           //$segment = urldecode($segment);
           if ($pos == "0" && !str_contains($segment, '='))
           {
-            $segment      = urldecode($segment);
-            $vars['page'] = $segment;
+            if (!preg_match($prevent_xss, $segment))
+            {
+              // Prevent any <script> html tag inside vars, exclude any possible XSS with scripts
+              $segment = urldecode($segment);
+              $vars['page'] = $segment;
+            }
           } else {
             list($name, $value) = explode('=', $segment, 2);
             if (!isset($vars[$name]))
@@ -262,7 +269,7 @@ function get_vars($vars_order = array(), $auth = FALSE)
     }
     else if (is_array($vars['location']))
     {
-      // Additionaly decode locations if array entries encoded
+      // Additionally decode locations if array entries encoded
       foreach ($vars['location'] as $k => $location)
       {
         $vars['location'][$k] = $auth ? var_decode($location) : $location;
@@ -1011,6 +1018,7 @@ function generate_popup_link($type, $text = NULL, $vars = array(), $class = NULL
  * @param string $contents Text content displayed in mouseover tooltip (only for non-mobile devices)
  * @param string $class Css class name used for link
  * @param boolean $escape Escape or not link text
+ * @return string
  */
 // TESTME needs unit testing
 function generate_tooltip_link($url, $text, $contents = '', $class = NULL, $escape = FALSE)
@@ -1121,9 +1129,10 @@ function generate_menu_link_new($array)
   $array = array_merge(array(
                            'count' => NULL,
                            'escape' => FALSE,
-                            'class' => 'label'
+                           'class' => 'label'
                          ), $array);
 
+  $link_opts = '';
   if (isset($array['link_opts'])) { $link_opts .= ' ' . $array['link_opts']; }
   if (isset($array['alt']))       { $link_opts .= ' data-rel="tooltip" data-tooltip="'.$array['alt'].'"'; }
   if (isset($array['id']))        { $link_opts .= ' id="'.$array['id'].'"'; }
@@ -1132,7 +1141,7 @@ function generate_menu_link_new($array)
 
   if ($array['escape']) { $array['text'] = escape_html($array['text']); }
 
-  $output .= '<a role="menuitem" href="'.$array['url'].'" '.$link_opts.'>';
+  $output  = '<a role="menuitem" href="'.$array['url'].'" '.$link_opts.'>';
 
   $output .= '<span>';
   if (isset($array['icon']))
@@ -1141,15 +1150,42 @@ function generate_menu_link_new($array)
   }
   $output .= $array['text'] . '</span>';
 
-  if (is_numeric($array['alert_count']))
-  {
-    $output .= ' <span class="label label-danger">' . $array['alert_count'] . '</span> ';
+  // Counter label(s) in navbar menu
+  if (isset($array['count_array']) && count($array['count_array'])) {
+    // Multiple counts as group
+    $count_items = [];
+    // Ok/Up
+    if      ($array['count_array']['ok'])       { $count_items[] = ['event' => 'success', 'text' => $array['count_array']['ok']]; }
+    else if ($array['count_array']['up'])       { $count_items[] = ['event' => 'success', 'text' => $array['count_array']['up']]; }
+    // Warning
+    if      ($array['count_array']['warning'])  { $count_items[] = ['event' => 'warning', 'text' => $array['count_array']['warning']]; }
+    // Alert/Down
+    if      ($array['count_array']['alert'])    { $count_items[] = ['event' => 'danger',  'text' => $array['count_array']['alert']]; }
+    else if ($array['count_array']['down'])     { $count_items[] = ['event' => 'danger',  'text' => $array['count_array']['down']]; }
+    // Ignored
+    if      ($array['count_array']['ignored'])  { $count_items[] = ['event' => 'default', 'text' => $array['count_array']['ignored']]; }
+    // Disabled
+    if      ($array['count_array']['disabled']) { $count_items[] = ['event' => 'inverse', 'text' => $array['count_array']['disabled']]; }
+    // Fallback to just count
+    if (!count($count_items) && strlen($array['count_array']['count'])) {
+      $count_items[] = ['event' => 'default', 'text' => $array['count_array']['count']];
+    }
+
+    //r(get_label_group($count_items));
+    $output .= get_label_group($count_items);
+  } else {
+    // single counts
+    if (is_numeric($array['alert_count']))
+    {
+      $output .= ' <span class="label label-danger">' . $array['alert_count'] . '</span> ';
+    }
+
+    if (is_numeric($array['count']))
+    {
+      $output .= ' <span class="' . $array['class'] . '">' . $array['count'] . '</span>';
+    }
   }
 
-  if (is_numeric($array['count']))
-  {
-    $output .= ' <span class="' . $array['class'] . '">' . $array['count'] . '</span>';
-  }
   $output .= '</a>';
 
   return $output;
@@ -1233,30 +1269,6 @@ function permissions_cache($user_id)
         break;
     }
   }
-
-/**
-
-  // Please don't do this, it's INCREDIBLY SLOW.
-
-  // For limited users expand device permission into entity permission
-  if ((!isset($_SESSION['user_limited']) || $_SESSION['user_limited']) && count($permissions['device']))
-  {
-    foreach ($GLOBALS['config']['entities'] as $entity_type => $entity_def)
-    {
-      if ($entity_type == 'device' || $entity_def['hide'] || empty($entity_def['table_fields']['device_id']))
-      {
-        continue;
-      }
-      $devices = array_keys($permissions['device']);
-      $query   = 'SELECT `'.$entity_def['table_fields']['id'].'` FROM `'.$entity_def['table'] . '`';
-      $query  .= ' WHERE 1 ' . generate_query_values($devices, $entity_def['table_fields']['device_id']);
-      foreach (dbFetchColumn($query) as $entity_id)
-      {
-        $permissions[$entity_type][$entity_id] = TRUE;
-      }
-    }
-  }
-**/
 
   // Alerts
   $alert = array();
@@ -1520,6 +1532,7 @@ function print_graph_tag($args)
 // DOCME needs phpdoc block
 function generate_graph_tag($args, $return_array = FALSE)
 {
+
   if (empty($args)) { return ''; } // Quick return if passed empty array
 
   $style = 'max-width: 100%; width: auto; vertical-align: top;';
@@ -1551,15 +1564,19 @@ function generate_graph_tag($args, $return_array = FALSE)
     $args_x = $args;
     $args_x['zoom'] = $zoom;
     $srcset = ' srcset="'.generate_graph_url($args_x).' '.$args_x['zoom'].'x"';
-    $i['srcset'] = $srcset;
+    $i['srcset'] = $attribs;
   } else{
     $srcset = '';
   }
 
+  if(isset($args['class']))
+  { $attribs .= ' class="'.$args['class'].'"'; unset($args['class']); }
+
+
   $img_url = generate_graph_url($args);
 
   $i['img_url'] = $img_url;
-  $i['img_tag'] = '<img id="' . $i['img_id'] . '" src="' . $img_url . '"' . $srcset . ' style="' . $style . '" alt="" />';
+  $i['img_tag'] = '<img id="' . $i['img_id'] . '" src="' . $img_url . '"' . $srcset . $attribs.' style="' . $style . '" alt="" />';
 
 
   if($return_array === TRUE)
@@ -1873,12 +1890,18 @@ function get_nfsen_filename($hostname)
   {
     if ($nfsen_rrd[strlen($nfsen_rrd)-1] != '/') { $nfsen_rrd .= '/'; }
     $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $hostname);
-    if ($config['nfsen_suffix'])
+
+    // Remove suffix and prefix from basename
+    $nfsen_filename = $basefilename_underscored;
+    if (isset($config['nfsen_suffix']) && strlen($config['nfsen_suffix']))
     {
-      $nfsen_filename = (strstr($basefilename_underscored, $config['nfsen_suffix'], TRUE));
-    } else {
-      $nfsen_filename = $basefilename_underscored;
+      $nfsen_filename = (strstr($nfsen_filename, $config['nfsen_suffix'], TRUE));
     }
+    if (isset($config['nfsen_prefix']) && strlen($config['nfsen_prefix']))
+    {
+      $nfsen_filename = (strstr($nfsen_filename, $config['nfsen_prefix']));
+    }
+
     $nfsen_rrd_file = $nfsen_rrd . $nfsen_filename . '.rrd';
     if (is_file($nfsen_rrd_file))
     {
@@ -2253,12 +2276,11 @@ function get_user_pref($user_id, $pref)
 // DOCME needs phpdoc block
 function set_user_pref($user_id, $pref, $value)
 {
-  if (dbFetchCell("SELECT COUNT(*) FROM `users_prefs` WHERE `user_id` = ? AND `pref` = ?", array($user_id, $pref)))
+  //if (dbFetchCell("SELECT COUNT(*) FROM `users_prefs` WHERE `user_id` = ? AND `pref` = ?", array($user_id, $pref)))
+  if (dbExist('users_prefs', '`user_id` = ? AND `pref` = ?', array($user_id, $pref)))
   {
     $id = dbUpdate(array('value' => $value), 'users_prefs', '`user_id` = ? AND `pref` = ?', array($user_id, $pref));
-  }
-  else
-  {
+  } else {
     $id = dbInsert(array('user_id' => $user_id, 'pref' => $pref, 'value' => $value), 'users_prefs');
   }
   return $id;
@@ -2280,6 +2302,13 @@ function get_smokeping_files($rdebug = 0)
   $smokeping_files = array();
 
   if ($rdebug) { echo('- Recursing through ' . $config['smokeping']['dir'] . '<br />'); }
+
+  if (isset($config['smokeping']['master_hostname']))
+  {
+    $master_hostname = $config['smokeping']['master_hostname'];
+  } else {
+    $master_hostname = $config['own_hostname'];
+  }
 
   if (is_dir($config['smokeping']['dir']))
   {
@@ -2303,8 +2332,8 @@ function get_smokeping_files($rdebug = 0)
           $target = str_replace($config['smokeping']['split_char'], ".", $target);
           if ($rdebug) { echo('- After replacing configured split_char ' . $config['smokeping']['split_char'] . ' by . target is <b>' . $target . '</b><br />'); }
           if ($config['smokeping']['suffix']) { $target = $target.$config['smokeping']['suffix']; if ($rdebug) { echo('- Suffix is configured, target is now <b>' . $target . '</b><br />'); } }
-          $smokeping_files['incoming'][$target][$config['own_hostname']] = $file;
-          $smokeping_files['outgoing'][$config['own_hostname']][$target] = $file;
+          $smokeping_files['incoming'][$target][$master_hostname] = $file;
+          $smokeping_files['outgoing'][$master_hostname][$target] = $file;
         }
       }
     }
@@ -2537,6 +2566,32 @@ function register_html_title($title)
 function register_html_panel($html = '')
 {
   $GLOBALS['cache_html']['page_panel'] = $html;
+}
+
+/**
+ * Redirect to specified URL
+ *
+ * @param string $url Redirecting URL
+ */
+function redirect_to_url($url)
+{
+  if (!strlen($url) || $url == '#') { return; } // Empty url, do not redirect
+
+  $parse = parse_url($url);
+  if (!isset($parse['scheme']) && !str_starts($url, '/'))
+  {
+    // When this is not full url or not started with /
+    $url = '/' . $url;
+  }
+
+  if (headers_sent())
+  {
+    // HTML headers already sent, use JS than
+    register_html_resource('script', "location.href='$url'");
+  } else {
+    // Just use headers
+    header('Location: '.$url);
+  }
 }
 
 function generate_colour_gradient($start_colour, $end_colour, $steps) {

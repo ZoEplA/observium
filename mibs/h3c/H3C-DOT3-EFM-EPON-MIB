@@ -1,6 +1,6 @@
 --===========================================================
--- Copyright (C) 2003 by  HUAWEI 3Com TECHNOLOGIES. All rights reserved.  
--- Description: This mib is excerpted from the draft-ietf-hubmib-efm-epon-mib-02 directly
+-- Copyright (C) 2003 by  H3C TECHNOLOGIES. All rights reserved.  
+-- Description: This MIB is excerpted from the draft-ietf-hubmib-efm-epon-mib-02 directly
 ---             only changed the object name,added the h3c as prefix.
 -- Reference:  
 -- Version: V1.0
@@ -25,32 +25,14 @@ H3C-DOT3-EFM-EPON-MIB DEFINITIONS ::= BEGIN
 
    h3cDot3EfmeponMIB MODULE-IDENTITY
        LAST-UPDATED "200409210000Z"  -- September 21, 2004
-       ORGANIZATION "IETF Ethernet Interfaces and Hub MIB Working
-                    Group"
+       ORGANIZATION
+           "Hangzhou H3C Tech. Co., Ltd."
        CONTACT-INFO
-                    "WG charter:
-                 http://www.ietf.org/html.charters/hubmib-charter.html
-                     Mailing Lists:
-                       General Discussion: hubmib@ietf.org
-                       To Subscribe: hubmib-request@ietf.org
-                       In Body: subscribe your_email_address
-                       Chair: Dan Romascanu
-                       Postal: Avaya Inc.
-                               Atidim Technology Park, Bldg. 3
-                               Tel Aviv 61131
-                               Israel
-                        Tel: +972-3-645-8414
-                        E-mail: dromasca@avaya.com
-
-                     Editor: Lior Khermosh
-                        Postal: Passave Technologies Inc.
-                               Ackerstein Towers, Tower A, 6th floor,
-                               9 Hamenofim St.
-                               Hertzliya Pituach 46725,
-                               ISRAEL
-                        P.O.Box 2089 Hertzliya Pituach 46120 Israel
-                        Tel:    +972-9-9717600 Ext: 7181
-                        E-mail: lior.khermosh@passave.com"
+           "Platform Team Hangzhou H3C Tech. Co., Ltd.
+           Hai-Dian District Beijing P.R. China
+           http://www.h3c.com
+           Zip:100085
+           "
        DESCRIPTION
                "The objects in this MIB module are used to manage the
                 Ethernet in the First Mile (EFM) Multi Point Control
@@ -764,7 +746,7 @@ H3C-DOT3-EFM-EPON-MIB DEFINITIONS ::= BEGIN
                 subordinate managed objects of the containing object.
                 The value is mandated for an ONU."
        REFERENCE   "[802.3ah], 30.3.7.1.1."
-       ::= { h3cDot3OmpEmulationEntry 1}
+       ::= { h3cDot3OmpEmulationEntry 1 }
 
    h3cDot3OmpEmulationType OBJECT-TYPE
        SYNTAX  INTEGER {

@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:	The MIB module defines MIB objects which provide device
 --              management NMS interfaces.
 -- Reference:   
--- Version:     V4.64
+-- Version:     V4.80
 -- ============================================================================
 	HUAWEI-DEVICE-MIB DEFINITIONS ::= BEGIN 
 	
@@ -27,7 +27,7 @@
                     FROM INET-ADDRESS-MIB;
 
     hwDev MODULE-IDENTITY
-        LAST-UPDATED "201702090000Z"
+        LAST-UPDATED "201801150000Z"
             ORGANIZATION
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -44,6 +44,112 @@
                     management NMS interfaces.
                     "
 --  Revision history
+                REVISION "201801150000Z"
+                DESCRIPTION "V4.80, Modify the description "
+
+                REVISION "201712150000Z"
+                DESCRIPTION "V4.79, 
+                             1.Add hwSysDeviceNameMode in hwSystemPara table.
+							 2.Added the following nodes:
+                             hwDevSystemDeviceNameChangeTrap
+                             "
+							 
+                REVISION "201712060000Z"
+                DESCRIPTION "V4.78, 
+                             Delete the description of hwFrameTable.
+                             Delete the description of hwFrameIndex.
+                             Delete the description of hwSlotIndex.
+                             "
+
+                REVISION "201711140000Z"
+                DESCRIPTION "V4.77, 
+                             Add hwDeviceCountryCode in hwSystemPara table.
+                             "
+
+                REVISION    "201710190000Z"
+                DESCRIPTION "V4.76, Added alarm parameters to node hwDevBoardInputFaultTrap,hwDevBoardInputRecoverTrap,hwDevPowerLackVoltageFaultTrap and hwDevPowerLackVolitageRecoverTrap.
+                             Added enumerated value channelvoltage(6) to hwSlotInputType's value list."
+						
+                REVISION "201709270000Z"
+                DESCRIPTION "V4.75, Added the following node: 
+                             hwSlotPortNumWorkMode
+                             "
+                             
+                REVISION "201709230000Z"
+                DESCRIPTION "V4.74,
+                             Modify the string length of hwOntRemoteHttpChnlPassword.
+                             "
+
+                REVISION "201708220000Z"
+                DESCRIPTION "V4.73, Changed node's DESCRIPTION: 
+                             hwOntRemoteHttpChnlVlan
+                             hwOntRemoteHttpChnlHttpPort 
+                             hwOntRemoteHttpChnlUserName
+                             hwOntRemoteHttpChnlPassword
+                             hwOntRemoteHttpProxyPort
+                             hwOntRemoteHttpChnlDuration
+                            "
+                REVISION "201708170000Z"
+                DESCRIPTION "V4.72, Changed node's DESCRIPTION: 
+                             hwCpuDevIndex
+                             hwCpuDevDuty 
+                             hwAvgDuty1min
+                             hwAvgDuty5min
+                            "
+                REVISION "201707170000Z"
+                DESCRIPTION "V4.71, Added the following node: 
+                             hwDevSubBoardTemperatureTooHighTrap
+                             hwDevSubBoardTemperatureTooHighRecoverTrap 
+                             hwDevSubBoardFaultTrap
+                             hwDevSubBoardFaultRecoverTrap
+                             "
+                REVISION "201706290000Z"
+                DESCRIPTION "V4.70, 
+                            Added hwDevSnmpProbeMonitorActiveThreshold.
+                            "
+                            
+                REVISION "201706140000Z"
+                DESCRIPTION "V4.69, 
+                            Modify the string length of hwPortDesc from 64 to 80.
+                            "
+
+                REVISION "201706080000Z"
+                DESCRIPTION "V4.68, 
+                            1.Added hwOntRemoteHttpChnlCfgTable.
+                            2.Added hwOntRemoteHttpChnlCfgEntry.
+                            3.Added the following nodes:
+                            hwOntRemoteHttpChnlVlan
+                            hwOntRemoteHttpChnlIpAddress
+                            hwOntRemoteHttpChnlHttpPort
+                            hwOntRemoteHttpChnlProtocol
+                            hwOntRemoteHttpChnlUserName
+                            hwOntRemoteHttpChnlPassword 
+                            hwOntRemoteHttpChnlDuration
+                            hwOntRemoteHttpProxyPort
+                            hwOntRemoteHttpProxyStatus
+                            hwOntRemoteHttpChnlRowStatus.
+                            "
+
+                REVISION "201705030000Z"
+                DESCRIPTION "V4.67, Add hwSysMarketScene to hwSystemPara for indicating the device market scene."
+
+                REVISION "201704120000Z"
+                DESCRIPTION "V4.66, 
+                            1.Added hwDevSnmpProbeMonitor.
+                            2.Added the following nodes:
+                            hwDevSnmpHostIpAddress
+                            hwDevSnmpLastReceivedTime
+                            hwDevSnmpAverageInterval
+                            hwDevSnmpMinimumInterval
+                            hwDevSnmpMaxmumInterval
+                            hwDevSnmpReceivedCount 
+                            hwDevSnmpProbeRecordTrap.
+                            "
+
+                REVISION "201703030000Z"
+                DESCRIPTION "V4.65, Added the following node: 
+                             hwSysFtpMode
+                             "
                 REVISION "201702090000Z"  
                 DESCRIPTION "V4.64, 
                              1. Modify the following nodes:
@@ -1445,7 +1551,78 @@
                 2. disable(2)    -The secure software downloading is disable
                 "
             ::= { hwSystemPara 41 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.1.42
+        hwSysFtpMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                port(1),
+                passive(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                FTP connection mode.
+                Options:
+                1. port(1)       -Set the FTP connection mode to port.
+                2. passive(2)    -Set the FTP connection mode to passive.
+                Default: port(1)
+                "
+            ::= { hwSystemPara 42 }
 
+        -- 1.3.6.1.4.1.2011.6.3.1.43
+        hwSysMarketScene OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                carrier(1),
+                enterprise(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The device options:
+				1. carrier(1) -Device work in carrier scene.
+				2. enterprise(2) -Device work in enterprise scene.
+				Default: carrier(1)
+                "
+            ::= { hwSystemPara 43 }
+            			
+        -- 1.3.6.1.4.1.2011.6.3.1.44
+        hwDeviceCountryCode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                china(1),
+                oversea(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                1. china(1) -Device of china.
+                2. oversea(2) -Device of oversea.
+                Default: oversea(2)
+                "
+            ::= { hwSystemPara 44 }
+			
+	-- 1.3.6.1.4.1.2011.6.3.1.45
+        hwSysDeviceNameMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                simple(1),
+                detail(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                1. simple(1) -Simplified device name.
+                2. detail(2) -Detailed device name.
+                Default: simple(1)
+                "
+            ::= { hwSystemPara 45 }	
+	
         -- 1.3.6.1.4.1.2011.6.3.1.999
         hwSysVersionVrcb OBJECT-TYPE
             SYNTAX DisplayString
@@ -1689,10 +1866,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The index of this table is hwFrameTable.
-                Shelf description table that describes basic information of a shelf.
-                You can obtain the shelf information, including the shelf type,
-                number of slots, and the shelf running status, and the shelf management status.
+                This table describes basic chassis information.
                 "
             ::= { hwSlotConf 1 }
 
@@ -2081,12 +2255,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The board description table, used to manage the running status of
-                boards and board information, such as description of boards,
-                daughter board quantity and board type.
-                The indexes of this table are hwFrameIndex and hwSlotIndex.
-                For the hwFrameIndex object, refer to hwFrameTable.
-                For example, 0.2 indicates that the board is in slot 2, shelf 0.
+                This table describes board information.
                 "
             ::= { hwSlotConf 2 }
 
@@ -2158,7 +2327,9 @@
                 hwSlotSecondaryStatus
                     BITS,
                 hwSlotCreateTime
-                    DateAndTime
+                    DateAndTime,
+                hwSlotPortNumWorkMode
+                    INTEGER
              }
 
         -- 1.3.6.1.4.1.2011.6.3.3.2.1.1
@@ -2710,7 +2881,37 @@
                 "
                 This object is used for getting the time of adding or creating a board.
                 "
-            ::= { hwSlotEntry 24 }
+            ::= { hwSlotEntry 24 }            
+        
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.2.1.25
+        hwSlotPortNumWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                portnumworkmode8(1),
+                portnumworkmode16(2),
+                portnumworkmode24(3),
+                portnumworkmode32(4),
+                portnumworkmode48(5),
+                other(255)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the port number working mode of a board.
+                The default value is portnumworkmode48(5).  
+                Options:
+                1. portnumworkmode8(1)             - Indicates that the board is in 8-channel port number working mode.  
+                2. portnumworkmode16(2)            - Indicates that the board is in 16-channel port number working mode.
+                3. portnumworkmode24(3)            - Indicates that the board is in 24-channel port number working mode.
+                4. portnumworkmode32(4)            - Indicates that the board is in 32-channel port number working mode.
+                5. portnumworkmode48(5)            - Indicates that the board is in 48-channel port number working mode.
+                6. other(255)                      - Indicates that the board is in invalid port working mode.            
+                Setting port working mode of a board triggers system restarts. 
+                Therefore, this node cannot be set concurrently with hwSlotAdminStatus, hwSlotRowStatus, and hwSlotWorkMode nodes.
+                "
+            ::= { hwSlotEntry 25 }
 
 
         -- 1.3.6.1.4.1.2011.6.3.3.3
@@ -3199,7 +3400,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.3.4.1.3
         hwPortDesc OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..64))
+            SYNTAX OCTET STRING (SIZE (0..80))
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -3995,8 +4196,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The indexes of this table are hwFrameIndex, hwSlotIndex and hwCpuDevIndex.
-                A table of CPU statistics.
+                This table describes the CPU usage, including the average CPU usage and periodic CPU usage.
                 "
             ::= { hwDev 4 }
 
@@ -4044,7 +4244,8 @@
             STATUS current
             DESCRIPTION
                 "
-                Index of hwCpuDevTable.
+                CPU index, hwFrameIndex, and hwSlotIndex constitute the HUAWEI-CPU-MIB index. 
+                For a single-CPU device, the value of this object is 0.
                 "
             ::= { hwCpuDevEntry 1 }
 
@@ -4056,7 +4257,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The overall CPU duty percentage in the last 5-second period.
+                The value of this object identifies the average CPU usage of a board or an entity.
                 "
             ::= { hwCpuDevEntry 2 }
 
@@ -4068,7 +4269,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The overall CPU duty percentage in the last 1 minute period.
+                The value of this object identifies the average CPU usage of a board or entity 1 minute before the data is read.
                 "
             ::= { hwCpuDevEntry 3 }
 
@@ -4080,7 +4281,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The overall CPU duty percentage in the last 5-minute period.
+                The value of this object identifies the average CPU usage of a board or entity 5 minutes before the data is read.
                 "
             ::= { hwCpuDevEntry 4 }
 
@@ -4154,8 +4355,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The index of this table is hwFrameIndex, hwSlotIndex or hwMemoryDevModuleIndex.
-                This table contains memory information.
+                This table describes memory usage statistics, including the total memory, idle memory, and occupied memory.
                 "
             ::= { hwMemoryDev 1 }
 
@@ -4203,7 +4403,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Index of hwMemoryDevTable.
+                This object is only used for extension. For a single-CPU device, the value of this object is 0.
                 "
             ::= { hwMemoryDevEntry 1 }
 
@@ -4215,8 +4415,8 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the total size of the memory module
-                which is on the managed object. Its unit is byte.
+                This object indicates the total memory size of a managed object, in bytes. It includes the free memory size and occupied memory size, that is, the sum of hwMemoryDevFree and hwMemoryDevRawSliceUsed. 
+                Each board has a memory. The memory size varies with products.
                 "
             ::= { hwMemoryDevEntry 2 }
 
@@ -4228,7 +4428,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the free size of the memory, in the unit of byte.
+                This object indicates the idle memory size of the main control board, in bytes. The value of this object is always less than hwMemoryDevSize.
                 "
             ::= { hwMemoryDevEntry 3 }
 
@@ -4240,7 +4440,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the used size of the raw slice memory, in the unit of byte.
+                This object indicates the total size of occupied raw slice memory, in bytes. The value of this object is always less than hwMemoryDevSize.
                 "
             ::= { hwMemoryDevEntry 4 }
 
@@ -4252,7 +4452,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The maximum size of the memory that can be currently used, in the unit of byte.
+                This object indicates the maximum number of consecutive bytes that are not occupied on a managed object. It is the maximum memory size that can be allocated by the system. The value of this object is always less than hwMemoryDevSize.
                 "
             ::= { hwMemoryDevEntry 5 }
 
@@ -4264,7 +4464,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Count of memory allocation failures.
+                This object indicates the number of memory allocation failures. The default value is 0.
                 "
             ::= { hwMemoryDevEntry 6 }
 
@@ -4276,7 +4476,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Count of the memory allocation
+                This object indicates the number of memory allocation failures due to the lack of idle memory. The default value is 0.
                 "
             ::= { hwMemoryDevEntry 7 }
 
@@ -4289,8 +4489,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the total size of the memory module incase of excessing 4G
-                which is on the managed object.Its unit is byte.
+                This object indicates the total size of memory modules on the managed object that exceeds 4 GB, in bytes.
                 "
             ::= { hwMemoryDevEntry 8 }
 
@@ -4303,7 +4502,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the free size of the memory incase of excessing 4G, in the unit of byte.
+                This object indicates the idle memory size when the total size of memory modules on the managed object exceeds 4 GB, in bytes.
                 "
             ::= { hwMemoryDevEntry 9 }
 
@@ -5129,7 +5328,8 @@
                 localdc(2),
                 remoteac(3),
                 remotedc(4),
-                pd(5)
+                pd(5),
+                channelvoltage(6)
                 }
             MAX-ACCESS accessible-for-notify
             STATUS current
@@ -5142,6 +5342,7 @@
                 3. remoteac(3)  -remote ac type.
                 4. remotedc(4)  -remote dc type.
                 5. pd(5)        -pd type.
+                6. channelvoltage(6) - channel voltage type.
                 "
             ::= { hwDevTrapVbOids 30 }
 
@@ -5276,7 +5477,106 @@
             	The current temperature of the device.
             	"
             ::= { hwDevTrapVbOids 41 }                                
-                                        
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.42       
+        hwDevSnmpHostIpAddress OBJECT-TYPE           
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The IP address of SNMP probe abnormal record.
+                "
+            ::= { hwDevTrapVbOids 42 } 
+                                           
+        -- 1.3.6.1.4.1.2011.6.3.8.1.43        
+        hwDevSnmpLastReceivedTime OBJECT-TYPE           
+            SYNTAX DateAndTime
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The last probe time of SNMP probe abnormal record.
+                "
+            ::= { hwDevTrapVbOids 43 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.8.1.44       
+        hwDevSnmpAverageInterval OBJECT-TYPE           
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The average interval of SNMP probe abnormal record.
+                "
+            ::= { hwDevTrapVbOids 44 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.45       
+        hwDevSnmpMinimumInterval OBJECT-TYPE           
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The minimum interval of SNMP probe abnormal record.
+                "
+            ::= { hwDevTrapVbOids 45 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.8.1.46       
+        hwDevSnmpMaxmumInterval OBJECT-TYPE           
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The maxmum interval of SNMP probe abnormal record.
+                "
+            ::= { hwDevTrapVbOids 46 }
+                                          
+        -- 1.3.6.1.4.1.2011.6.3.8.1.47      
+        hwDevSnmpReceivedCount OBJECT-TYPE           
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The connection count of SNMP probe abnormal record.
+                "
+            ::= { hwDevTrapVbOids 47 }
+                                                    
+        -- 1.3.6.1.4.1.2011.6.3.8.1.48      
+        hwSubboardID OBJECT-TYPE           
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The index ID of sub board.
+                "
+            ::= { hwDevTrapVbOids 48 }
+                                    
+        -- 1.3.6.1.4.1.2011.6.3.8.1.49
+        hwPowerSupplyChannelVoltage OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The value of power supply channel voltage.
+            	"
+            ::= { hwDevTrapVbOids 49 }
+                                    
+        -- 1.3.6.1.4.1.2011.6.3.8.1.50
+        hwPowerSupplyDescription OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The description of power supply.
+            	"
+            ::= { hwDevTrapVbOids 50 }
+	
         -- 1.3.6.1.4.1.2011.6.3.8.2
         hwDevCommonTraps OBJECT IDENTIFIER ::= { hwDevTraps 2 }
 
@@ -5412,6 +5712,16 @@
                 This trap message is reported when a extended frame's uplink port changes.
                 "
             ::= { hwDevCommonTrapsPrefix 11 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.8.2.0.12        
+        hwDevSnmpProbeRecordTrap NOTIFICATION-TYPE           
+            OBJECTS { hwDevSnmpHostIpAddress, hwDevSnmpLastReceivedTime, hwDevSnmpAverageInterval, hwDevSnmpMinimumInterval, hwDevSnmpMaxmumInterval, hwDevSnmpReceivedCount }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the abnormal record of SNMP probe monitor occurs.
+                "
+            ::= { hwDevCommonTrapsPrefix 12 }
 
 
 -- 1.3.6.1.4.1.2011.6.3.8.3
@@ -5500,6 +5810,15 @@
                 This trap message is reported when the auto-deployment fails.
                 "
             ::= { hwDevSystemTrapsPrefix 8 }
+			
+		-- 1.3.6.1.4.1.2011.6.3.8.3.1.0.9
+        hwDevSystemDeviceNameChangeTrap NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the device name is changed.
+                "
+            ::= { hwDevSystemTrapsPrefix 9 }
 
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.2
@@ -5626,7 +5945,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data link changes to down.
+		This object indicates that when the data link goes Down, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 10 }
 
@@ -5637,7 +5956,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data link changes to up.
+		This object indicates that when the data link goes Up, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 11 }
 
@@ -5648,7 +5967,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data channel changes to down.
+		This object indicates that when the data channel is down, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 12 }
 
@@ -5659,7 +5978,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data channel changes to up.
+		This object indicates that when the data channel goes Up, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 13 }
 
@@ -5953,7 +6272,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.26
         hwDevBoardInputFaultTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -5963,7 +6282,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.27
         hwDevBoardInputRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -5973,7 +6292,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.28
         hwDevPowerLackVoltageFaultTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex }
+            OBJECTS { hwFrameIndex, hwSlotInputIdIndex, hwPowerSupplyChannelVoltage, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -5984,7 +6303,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.29
         hwDevPowerLackVolitageRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex }
+            OBJECTS { hwFrameIndex, hwSlotInputIdIndex, hwPowerSupplyChannelVoltage, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -6065,7 +6384,49 @@
                 "
             ::= { hwDevSubBoardTrapsPrefix 3 }
 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.4
+        hwDevSubBoardTemperatureTooHighTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID, hwSlotTemprature }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the current temperature of service sub board
+                exceed the high temperature threshold.
+                "
+            ::= { hwDevSubBoardTrapsPrefix 4 }
 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.5
+        hwDevSubBoardTemperatureTooHighRecoverTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID, hwSlotTemprature }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the current temperature of service sub board
+                recovers to the normal range from high temperature.
+                "
+            ::= { hwDevSubBoardTrapsPrefix 5 }	
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.6
+        hwDevSubBoardFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the communication of the board interrupted.
+                "
+            ::= { hwDevSubBoardTrapsPrefix 6 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.7
+        hwDevSubBoardFaultRecoverTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the communication of the board restored.
+                "
+            ::= { hwDevSubBoardTrapsPrefix 7 }	
+			
+			
         -- 1.3.6.1.4.1.2011.6.3.8.3.5
         hwDevDiagTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 5 }
 
@@ -6538,7 +6899,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The compatible SYSOID of new network element.
+                This object indicates the compatible SYSOID of the new NE.
                 "
             ::= { hwDevCompatibleTable 1 }
 
@@ -6550,7 +6911,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The compatible version of new network element.
+                This object indicates the compatible version of the new NE.
                 "
             ::= { hwDevCompatibleTable 2 }
 
@@ -6574,7 +6935,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The compatible product name of new network element.
+                This object indicates the name of the compatible product of the new NE.
                 "
             ::= { hwDevCompatibleTable 4 }
 
@@ -8221,5 +8582,506 @@
                 6.bandwidth200G(6)  - 200G
                 "
             ::= { hwBandwidth 1 }
+            
+            
+        -- 1.3.6.1.4.1.2011.6.3.103
+        hwDevSnmpProbeMonitor  OBJECT IDENTIFIER ::= { hwDev 103 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.1
+        hwDevSnmpProbeMonitorPara OBJECT IDENTIFIER ::= { hwDevSnmpProbeMonitor 1 }  
+        
+        -- 1.3.6.1.4.1.2011.6.3.103.1.1
+        hwDevSnmpProbeMonitorSwitch OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                 enable(1),
+                 disable(2)
+                 }                    
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " 
+                The object specifies the switch state of SNMP probe monitor. 
+                Options:
+                enable(1)  -indicates the SNMP probe monitor switch is on.
+                disable(2) -indicates the SNMP probe monitor switch is off.
+                Default: enable(1).  
+                "
+            ::= { hwDevSnmpProbeMonitorPara 1 }  
+            
+        -- 1.3.6.1.4.1.2011.6.3.103.1.2
+        hwDevSnmpProbeMonitorActiveThreshold OBJECT-TYPE
+            SYNTAX Integer32 (3..60)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the active-threshold of SNMP probe monitor.
+                From 3 minutes to 60 minutes.
+                Default: 15 minutes.
+                "
+            ::= { hwDevSnmpProbeMonitorPara 2 }
+            
+       -- 1.3.6.1.4.1.2011.6.3.103.2
+        hwDevSnmpProbeHostTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDevSnmpProbeHostEntry
+            MAX-ACCESS not-accessible 
+            STATUS current
+         DESCRIPTION
+                "
+                The SNMP probe monitor table, which supports the functions of querying the information 
+                of SNMP probe monitor. The index of this table is hwDevSnmpProbeHostIndex.
+                "
+            ::= { hwDevSnmpProbeMonitor 2 } 
+  
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1           
+        hwDevSnmpProbeHostEntry OBJECT-TYPE
+            SYNTAX HwDevSnmpProbeHostEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The SNMP probe monitor table, which supports the functions of querying the information 
+                of SNMP probe monitor. The index of this table is hwDevSnmpProbeHostIndex.
+                "
+            INDEX { hwDevSnmpProbeHostIndex }
+            ::= { hwDevSnmpProbeHostTable 1 } 
+            
+        HwDevSnmpProbeHostEntry ::=
+            SEQUENCE {
+                hwDevSnmpProbeHostIndex
+                    Integer32,
+                hwDevSnmpProbeHostIpAddressType
+                    InetAddressType,
+                hwDevSnmpProbeHostIpAddress
+                    InetAddress,
+                hwDevSnmpProbeReceivedCount
+                    Integer32,
+                hwDevSnmpProbeInitiallyReceivedTime
+                    DateAndTime,
+                hwDevSnmpProbeRecentlyReceivedTime
+                    DateAndTime,
+                hwDevSnmpProbeMinimumInterval
+                    Integer32,
+		        hwDevSnmpProbeMaxmumInterval
+                    Integer32,
+                hwDevSnmpProbeAverageInterval
+                    Integer32
+             }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.1              
+        hwDevSnmpProbeHostIndex OBJECT-TYPE
+            SYNTAX Integer32(0..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of SNMP probe monitor.
+                "
+            ::= { hwDevSnmpProbeHostEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.2            
+        hwDevSnmpProbeHostIpAddressType OBJECT-TYPE
+            SYNTAX InetAddressType                   
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION                
+                "
+                The object specifies the IP address type of SNMP probe monitor:
+                Options:
+                ipv4(1)  -indicates an IPv4 address
+                ipv6(2)  -indicates an IPv6 address
+                "
+            ::= { hwDevSnmpProbeHostEntry 2 } 
+        
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.3
+        hwDevSnmpProbeHostIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the IP address of SNMP probe monitor.
+                "
+            ::= { hwDevSnmpProbeHostEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.4
+        hwDevSnmpProbeReceivedCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the total probe count of SNMP probe monitor.
+                "
+            ::= { hwDevSnmpProbeHostEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.5
+        hwDevSnmpProbeInitiallyReceivedTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the initial probe time of SNMP probe monitor.
+                "
+            ::= { hwDevSnmpProbeHostEntry 5 }              
+
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.6
+        hwDevSnmpProbeRecentlyReceivedTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the recent probe time of SNMP probe monitor.
+                "
+            ::= { hwDevSnmpProbeHostEntry 6 }                       
+             
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.7
+        hwDevSnmpProbeMinimumInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the minimum interval of SNMP probe monitor, unit second.
+                "
+            ::= { hwDevSnmpProbeHostEntry 7 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.2.1.8
+        hwDevSnmpProbeMaxmumInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the maxmum interval of SNMP probe monitor, unit second.
+                "
+            ::= { hwDevSnmpProbeHostEntry 8 } 
+            
+         -- 1.3.6.1.4.1.2011.6.3.103.2.1.9
+        hwDevSnmpProbeAverageInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the average interval of SNMP probe monitor, unit second.
+                "
+            ::= { hwDevSnmpProbeHostEntry 9 }         
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3
+        hwDevSnmpProbeRecordTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDevSnmpProbeRecordEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The abnormal record table of SNMP probe monitor, which supports the functions of querying 
+                the abnormal record of SNMP probe monitor. The index of this table is hwDevSnmpProbeRecordIndex.
+                "
+            ::= { hwDevSnmpProbeMonitor 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1           
+        hwDevSnmpProbeRecordEntry OBJECT-TYPE
+            SYNTAX HwDevSnmpProbeRecordEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The abnormal record table of SNMP probe monitor, which supports the functions of querying 
+                the abnormal record of SNMP probe monitor. The index of this table is hwDevSnmpProbeRecordIndex.
+                "
+            INDEX { hwDevSnmpProbeRecordIndex }
+            ::= { hwDevSnmpProbeRecordTable 1 } 
+            
+        HwDevSnmpProbeRecordEntry ::=
+            SEQUENCE {
+                hwDevSnmpProbeRecordIndex
+                    Integer32,
+                hwDevSnmpProbeRecordHostIpAddressType
+                    InetAddressType,
+                hwDevSnmpProbeRecordHostIpAddress
+                    InetAddress,
+                hwDevSnmpProbeRecordLastReceivedTime
+                    DateAndTime,
+                hwDevSnmpProbeRecordReceivedCount
+                    Integer32,
+		        hwDevSnmpProbeRecordMinimumInterval
+                    Integer32,
+                hwDevSnmpProbeRecordMaxmumInterval
+                    Integer32,
+                hwDevSnmpProbeRecordAverageInterval
+                    Integer32  
+             }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.1              
+        hwDevSnmpProbeRecordIndex OBJECT-TYPE
+            SYNTAX Integer32(0..49)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of abnormal record.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.2            
+        hwDevSnmpProbeRecordHostIpAddressType OBJECT-TYPE
+            SYNTAX InetAddressType                 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION                
+                "
+                The object specifies the IP address type of abnormal record:
+                Options:
+                ipv4(1)  -indicates an IPv4 address 
+                ipv6(2)  -indicates an IPv6 address
+                "
+            ::= { hwDevSnmpProbeRecordEntry 2 }  
+        
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.3
+        hwDevSnmpProbeRecordHostIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the IP address of abnormal record.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.4
+        hwDevSnmpProbeRecordLastReceivedTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the last probe time of abnormal record.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.5
+        hwDevSnmpProbeRecordReceivedCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the total probe count of abnormal record.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 5 }              
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.6
+        hwDevSnmpProbeRecordMinimumInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the minimum interval of abnormal record, unit second.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 6 }                       
+             
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.7
+        hwDevSnmpProbeRecordMaxmumInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the maxmum interval of abnormal record, unit second.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 7 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.3.1.8
+        hwDevSnmpProbeRecordAverageInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the average interval of the abnormal record, unit second.
+                "
+            ::= { hwDevSnmpProbeRecordEntry 8 }
+
+
+        -- 1.3.6.1.4.1.2011.6.3.34
+        hwOntRemoteHttpChnlCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOntRemoteHttpChnlCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                This table describes parameters that need to be delivered to the OLT and ONT during remote access to the ONT through the web page.
+                "
+            ::= { hwDev 34 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1
+        hwOntRemoteHttpChnlCfgEntry OBJECT-TYPE
+            SYNTAX HwOntRemoteHttpChnlCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The index of this entry is hwFrameIndex,hwSlotIndex,hwPortIndex,hwOntIndex.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex, hwPortIndex, hwOntIndex }
+            ::= { hwOntRemoteHttpChnlCfgTable 1 }
+
+            HwOntRemoteHttpChnlCfgEntry ::=
+            SEQUENCE {
+                hwOntRemoteHttpChnlVlan
+                    Integer32,
+                hwOntRemoteHttpChnlIpAddress
+                    IpAddress,
+                hwOntRemoteHttpChnlHttpPort
+                    Integer32,
+                hwOntRemoteHttpChnlProtocol
+                    INTEGER,
+                hwOntRemoteHttpChnlUserName
+                    OCTET STRING,
+                hwOntRemoteHttpChnlPassword
+                    OCTET STRING,
+                hwOntRemoteHttpChnlDuration
+                    Integer32,
+                hwOntRemoteHttpProxyPort
+                    Integer32,
+                hwOntRemoteHttpProxyStatus
+                    INTEGER,
+                hwOntRemoteHttpChnlRowStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.1
+        hwOntRemoteHttpChnlVlan OBJECT-TYPE
+            SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the VLAN ID of the ONT. If this parameter is not specified, 
+                the system automatically obtains an unoccupied VLAN ID and uses it as the default VLAN ID.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.2
+        hwOntRemoteHttpChnlIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the IP address of the ONT. 
+                If this parameter is not specified, the system selects an unoccupied IP address and uses it as the default IP address.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.3
+        hwOntRemoteHttpChnlHttpPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65528)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the web server port of the ONT. If this parameter is not specified, port 7017 is used by default.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.4
+        hwOntRemoteHttpChnlProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+                 {
+                   http(1),
+                   https(2)
+                 }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the protocol type of the web server of the ONT. If this parameter is not specified, HTTPS protocol is used by default.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.5
+        hwOntRemoteHttpChnlUserName OBJECT-TYPE
+            SYNTAX OCTET STRING  (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the user name used for a temporary user to log in to the web server of the ONT. 
+                 If this parameter is not specified, the existing user name and password are used for login.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 5 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.6
+        hwOntRemoteHttpChnlPassword OBJECT-TYPE
+            SYNTAX OCTET STRING  (SIZE (6..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the password used for a temporary user to log in to the web server of the ONT, 
+                 which can consist of numbers, uppercase letters, lowercase letters, and special characters.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 6 } 
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.7
+        hwOntRemoteHttpProxyPort OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the port ID of the TCP proxy during remote access to the ONT from the OLT through the web page, which is port 8024 fixedly.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 7 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.8
+        hwOntRemoteHttpChnlDuration OBJECT-TYPE
+            SYNTAX Integer32 (1..120)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the ONT login duration of a temporary user (unit: minute). 
+                 If this parameter is not specified, the login duration is 30 minutes by default. 
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 8 }
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.9
+        hwOntRemoteHttpProxyStatus OBJECT-TYPE
+            SYNTAX INTEGER 
+                 {
+                   enable(1),
+                   disable(2)
+                 }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 Indicates the enabling status of the TCP proxy. The initial state is disable.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 9 } 
+
+        -- 1.3.6.1.4.1.2011.6.3.34.1.10
+        hwOntRemoteHttpChnlRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the row status, used for creating or deleting
+                a service configuration object. createAndGo(4) and destroy(6)
+                are supported. During the query operation, active(1) is
+                always returned for this leaf.
+                Options:
+                2. createAndGo(4) -create a new instance of a conceptual row.
+                3. destroy(6)     -delete the instances associated with an existing conceptual row.
+                "
+            ::= { hwOntRemoteHttpChnlCfgEntry 10 }
 
     END

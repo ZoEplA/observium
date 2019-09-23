@@ -1,14 +1,14 @@
 -- ==================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
--- 
--- Description: This file describes the huawei mib implementation of perormance
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
+--
+-- Description: This file describes the hw MIB implementation of perormance
 -- Reference:   the content of this file include part description from RFC1757
 -- Version: V2.0
 -- History:
 --  v1.0 Created by Qizhenglin, 2002.8.15
---  v1.1 2004-7-6 xiejianping 
---	merge huawei-rmon-ext.mib to huawei-splat-performance.mib and change
---	module name from HUWAEI-LswPERFORMANCE-MIB to HUAWEI-RMON-EXT-MIB
+--  v1.1 2004-7-6 xiejianping
+--    merge HUAWEI-RMON-EXT-MIB to HUAWEI-LswPERFORMANCE-MIB and change
+--    module name from HUAWEI-LswPERFORMANCE-MIB to HUAWEI-RMON-EXT-MIB
 -- V2.0 2004-10-12 updated by gaolong
 --      Import from SNMPv2-SMI instead from RFC-1212
 --      Import hwInternetProtocol, rmonExtend instead define them in the MIB.
@@ -19,7 +19,7 @@
 -- ==================================================================
 
 -- ==================================================================
--- 
+--
 -- Varibles and types be imported
 --
 -- ==================================================================
@@ -46,24 +46,22 @@ IMPORTS
 --
 -- ==================================================================
 
-	performance MODULE-IDENTITY
-		LAST-UPDATED "200303150000Z"		-- March 19, 2003 at 16:05 GMT
-		ORGANIZATION 
-				"Huawei Technologies co.,Ltd."
-		CONTACT-INFO 
-			" R&D BeiJing, Huawei Technologies co.,Ltd.
-			Huawei Bld.,NO.3 Xinxi Rd., 
-			Shang-Di Information Industry Base,
-			Hai-Dian District Beijing P.R. China
-			Zip:100085 
-			Http://www.huawei.com                                       
-			E-mail:support@huawei.com "
-		DESCRIPTION
-			" "
-		REVISION "200303150000Z"		-- March 19, 2003 at 16:06 GMT
-		DESCRIPTION 
-			"The initial revision of this MIB module."
-		::= { rmonExtend 4 }
+    performance MODULE-IDENTITY
+        LAST-UPDATED "200303150000Z"        -- March 19, 2003 at 16:05 GMT
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            " "
+        REVISION "200303150000Z"        -- March 19, 2003 at 16:06 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { rmonExtend 4 }
 
         prialarmTable OBJECT-TYPE
                 SYNTAX SEQUENCE OF PriAlarmEntry
@@ -72,7 +70,7 @@ IMPORTS
                 DESCRIPTION
                   "A list of alarm entries."
                 ::= { performance 1 }
-        
+
         prialarmEntry OBJECT-TYPE
                 SYNTAX PriAlarmEntry
                 MAX-ACCESS not-accessible
@@ -83,7 +81,7 @@ IMPORTS
                   alarmValue object might be named alarmValue.8"
                 INDEX { prialarmIndex }
                 ::= { prialarmTable 1 }
-        
+
         PriAlarmEntry ::= SEQUENCE {
                 prialarmIndex                    INTEGER,
                 prialarmInterval                 INTEGER,
@@ -101,7 +99,7 @@ IMPORTS
                 prialarmOwner                    OwnerString,
                 prialarmStatus                   EntryStatus
         }
-        
+
         prialarmIndex OBJECT-TYPE
                 SYNTAX INTEGER (1..65535)
                 MAX-ACCESS read-only
@@ -112,7 +110,7 @@ IMPORTS
                   diagnostic sample at a particular interval
                   for an object on the device."
                 ::= { prialarmEntry 1 }
-        
+
         prialarmInterval OBJECT-TYPE
                 SYNTAX INTEGER
                 MAX-ACCESS read-write
@@ -126,11 +124,11 @@ IMPORTS
                   that the sampled variable is very unlikely to
                   increase or decrease by more than 2^31 - 1 during
                   a single sampling interval.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 2 }
-        
+
         prialarmVariable OBJECT-TYPE
                 SYNTAX DisplayString
                 MAX-ACCESS read-write
@@ -140,7 +138,7 @@ IMPORTS
                   sampled.  Only variables that resolve to an ASN.1 primitive
                   type of INTEGER (INTEGER, Integer32, Counter32, Counter64,
                   Gauge, or TimeTicks) may be sampled.
-                
+
                   Because SNMP access control is articulated entirely
                   in terms of the contents of MIB views, no access
                   control mechanism exists that can restrict the value of
@@ -151,26 +149,26 @@ IMPORTS
                   probe must only grant write access to this object in
                   those views that have read access to all objects on
                   the probe.
-                
+
                   During a set operation, if the supplied variable name is
                   not available in the selected MIB view, a badValue error
                   must be returned.  If at any time the variable name of
                   an established alarmEntry is no longer available in the
                   selected MIB view, the probe must change the status of
                   this alarmEntry to invalid(4).
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 3 }
-        
+
         prialarmSympol OBJECT-TYPE
                 SYNTAX  DisplayString
                 MAX-ACCESS read-write
                 STATUS current
                 DESCRIPTION
                   ""
-                ::= {prialarmEntry 4 }
-        
+                ::= { prialarmEntry 4 }
+
         prialarmSampleType OBJECT-TYPE
                 SYNTAX INTEGER {
                   absoluteValue(1),
@@ -190,11 +188,11 @@ IMPORTS
                   variable at the last sample will be subtracted from
                   the current value, and the difference compared with
                   the thresholds.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 5 }
-                
+
         prialarmValue OBJECT-TYPE
                 SYNTAX INTEGER
                 MAX-ACCESS read-only
@@ -208,12 +206,12 @@ IMPORTS
                   value at the end of the period.
                   This is the value that is compared with the rising and
                   falling thresholds.
-                
+
                   The value during the current sampling period is not
                   made available until the period is completed and will
                   remain available until the next period completes."
                 ::= { prialarmEntry 6 }
-        
+
         prialarmStartupAlarm OBJECT-TYPE
                 SYNTAX INTEGER {
                   risingAlarm(1),
@@ -233,11 +231,11 @@ IMPORTS
                   to the fallingThreshold and alarmStartupAlarm is equal
                   to fallingAlarm(2) or risingOrFallingAlarm(3), then a
                   single falling alarm will be generated.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 7 }
-        
+
         prialarmRisingThreshold OBJECT-TYPE
                 SYNTAX INTEGER
                 MAX-ACCESS read-write
@@ -252,16 +250,16 @@ IMPORTS
                   equal to this threshold and the associated
                   alarmStartupAlarm is equal to risingAlarm(1) or
                   risingOrFallingAlarm(3).
-                
+
                   After a rising event is generated, another such event
                   will not be generated until the sampled value
                   falls below this threshold and reaches the
                   alarmFallingThreshold.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 8 }
-        
+
         prialarmFallingThreshold OBJECT-TYPE
                 SYNTAX INTEGER
                 MAX-ACCESS read-write
@@ -276,16 +274,16 @@ IMPORTS
                   equal to this threshold and the associated
                   alarmStartupAlarm is equal to fallingAlarm(2) or
                   risingOrFallingAlarm(3).
-                
+
                   After a falling event is generated, another such event
                   will not be generated until the sampled value
                   rises above this threshold and reaches the
                   alarmRisingThreshold.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 9 }
-        
+
         prialarmRisingEventIndex OBJECT-TYPE
                 SYNTAX INTEGER (0..65535)
                 MAX-ACCESS read-write
@@ -300,11 +298,11 @@ IMPORTS
                   no association exists.  In particular, if this value
                   is zero, no associated event will be generated, as
                   zero is not a valid event index.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 10 }
-        
+
         prialarmFallingEventIndex OBJECT-TYPE
                 SYNTAX INTEGER (0..65535)
                 MAX-ACCESS read-write
@@ -319,11 +317,11 @@ IMPORTS
                   no association exists.  In particular, if this value
                   is zero, no associated event will be generated, as
                   zero is not a valid event index.
-                
+
                   This object may not be modified if the associated
                   alarmStatus object is equal to valid(1)."
                 ::= { prialarmEntry 11 }
-        
+
         prialarmStatCycle             OBJECT-TYPE
                 SYNTAX INTEGER
                 MAX-ACCESS read-write
@@ -331,8 +329,8 @@ IMPORTS
                 DESCRIPTION
                   ""
                 ::= { prialarmEntry 12 }
-        
-        
+
+
         prialarmStatType              OBJECT-TYPE
                 SYNTAX INTEGER{
                   forever(1),
@@ -343,7 +341,7 @@ IMPORTS
                 DESCRIPTION
                   ""
                 ::= { prialarmEntry 13 }
-        
+
         prialarmOwner OBJECT-TYPE
                 SYNTAX OwnerString
                 MAX-ACCESS read-write
@@ -352,7 +350,7 @@ IMPORTS
                   "The entity that configured this entry and is therefore
                   using the resources assigned to it."
                 ::= { prialarmEntry 14 }
-        
+
         prialarmStatus OBJECT-TYPE
                 SYNTAX EntryStatus
                 MAX-ACCESS read-write
@@ -360,7 +358,7 @@ IMPORTS
                 DESCRIPTION
                   "The status of this alarm entry."
                 ::= { prialarmEntry 15 }
-        
+
         hwrmonEnableTable  OBJECT-TYPE
                 SYNTAX SEQUENCE OF HwrmonEnableTableEntry
                 MAX-ACCESS not-accessible
@@ -368,7 +366,7 @@ IMPORTS
                 DESCRIPTION
                   "A list of enable rmon entries."
                 ::= { rmonExtend 5 }
-        
+
         hwrmonEnableTableEntry OBJECT-TYPE
                 SYNTAX HwrmonEnableTableEntry
                 MAX-ACCESS not-accessible
@@ -377,12 +375,12 @@ IMPORTS
                   "A list of parameters that set up a hwrmonEnableTable"
                 INDEX { hwrmonEnableIfIndex }
                 ::= { hwrmonEnableTable 1 }
-        
+
         HwrmonEnableTableEntry ::= SEQUENCE {
                 hwrmonEnableIfIndex             INTEGER,
                 hwrmonEnableStatus              INTEGER
         }
-                  
+
         hwrmonEnableIfIndex OBJECT-TYPE
                 SYNTAX INTEGER (0..65535)
                 MAX-ACCESS read-only
@@ -390,7 +388,7 @@ IMPORTS
                 DESCRIPTION
                   "Specify an interface to enable rmon."
                 ::= { hwrmonEnableTableEntry 1 }
-        
+
         hwrmonEnableStatus OBJECT-TYPE
                 SYNTAX INTEGER {
                              enable(1),
@@ -399,9 +397,9 @@ IMPORTS
                 MAX-ACCESS read-write
                 STATUS current
                 DESCRIPTION
-                  "Specify an interface to enable rmon."              
+                  "Specify an interface to enable rmon."
                 ::= { hwrmonEnableTableEntry 2 }
-                  
+
         hwTrapDestTable OBJECT-TYPE
                 SYNTAX      SEQUENCE OF HWTrapDestEntry
                 MAX-ACCESS  not-accessible
@@ -410,7 +408,7 @@ IMPORTS
                  "Defines the trap destination Extend Table for providing, via SNMP,
                  the capability of configure a trap dest."
                 ::= { rmonExtend 6 }
-        	
+
         hwTrapDestEntry OBJECT-TYPE
                 SYNTAX      HWTrapDestEntry
                 MAX-ACCESS  not-accessible
@@ -418,13 +416,13 @@ IMPORTS
                 DESCRIPTION
                  "Defines an entry in the hwTrapDestTable."
                 AUGMENTS    { trapDestEntry }
-                ::= { hwTrapDestTable 1 }    
-        	    
+                ::= { hwTrapDestTable 1 }
+
         HWTrapDestEntry ::=
                 SEQUENCE {
                 hwTrapDestVersion     INTEGER
                 }
-        	        
+
         hwTrapDestVersion          OBJECT-TYPE
                 SYNTAX      INTEGER {
                               snmpv1(1),
@@ -440,18 +438,18 @@ IMPORTS
                  This object may not be modified if the associated
                  trapDestStatus object is equal to active(1)."
                  DEFVAL      { snmpv1 }
-                ::= { hwTrapDestEntry 1 }  
-        
+                ::= { hwTrapDestEntry 1 }
+
         --  extend from Remote Network Monitoring Traps
-        	  
+
         rmonExtendEventsV2 OBJECT-IDENTITY
                 STATUS      current
                 DESCRIPTION "Definition point for pri RMON notifications."
                 ::= { rmonExtend 0 }
-        
+
         pririsingAlarm NOTIFICATION-TYPE
                 OBJECTS  { prialarmIndex, prialarmSympol, prialarmSampleType,
-                	prialarmValue, prialarmRisingThreshold }
+                    prialarmValue, prialarmRisingThreshold }
                 STATUS   current
                 DESCRIPTION
                  "The SNMP trap that is generated when an alarm
@@ -459,7 +457,7 @@ IMPORTS
                   an event that is configured for sending SNMP
                   traps."
                 ::= { rmonExtendEventsV2 1 }
-        
+
         prifallingAlarm NOTIFICATION-TYPE
                 OBJECTS { prialarmIndex, prialarmSympol, prialarmSampleType,
                   prialarmValue, prialarmFallingThreshold }

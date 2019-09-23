@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 EXTREME-CFGMGMT-MIB DEFINITIONS ::= BEGIN
@@ -23,10 +17,19 @@ EXTREME-CFGMGMT-MIB DEFINITIONS ::= BEGIN
 
 
     extremeCfgMgmt MODULE-IDENTITY
-        LAST-UPDATED "201201280000Z"
+        LAST-UPDATED "201709120000Z"
         ORGANIZATION "Extreme Networks, Inc."
-        CONTACT-INFO "www.extremenetworks.com"
+        CONTACT-INFO
+           "Postal:  Extreme Networks, Inc.
+                     6480 Via Del Oro
+                     San Jose, CA 95119 USA
+            Phone:   +1 408 579-2800
+            E-mail:  support@extremenetworks.com
+            WWW:     http://www.extremenetworks.com"
         DESCRIPTION "Extreme Configuration Management objects: objects common to all platforms"
+        REVISION    "201709120000Z"
+        DESCRIPTION
+             "Updated the descriptions of extremeLastChangeCfgTable and possible values for extremeLastSaveConfigSource, extremeLastChangeConfigSource"
     ::= { extremeAgent 42 }
 
     extremeCfgMgmtCommon OBJECT IDENTIFIER
@@ -103,7 +106,8 @@ ExtremeLastSavedEntry ::=
     extremeLastSaveConfigSource OBJECT-TYPE
         SYNTAX INTEGER {
             snmp(1),
-            remoteDevice(2)
+            remoteDevice(2),
+            none(3)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -164,9 +168,7 @@ ExtremeLastChangeCfgEntry ::=
         STATUS current
         DESCRIPTION
             "This object will return the date and time of the last 
-            configuration change operation.  This data will reflect 
-            the last cli or the last setting of the extremeSaveConfiguration 
-            object."
+            configuration change operation."
     ::= { extremeLastChangeCfgEntry 2 }
 
     extremeLastChangeConfigFileName  OBJECT-TYPE
@@ -174,26 +176,27 @@ ExtremeLastChangeCfgEntry ::=
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
-            "This object will return the configuration file name of the last change operation."
+            "This object will return the name of the file containing the configuration
+             on which the last configuration change operation occurred."
     ::= { extremeLastChangeCfgEntry 3 }
 
     extremeLastChangeConfigSource OBJECT-TYPE
         SYNTAX INTEGER {
             snmp(1),
-            remoteDevice(2)
+            remoteDevice(2),
+            none(3)
         }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "This object indicates the source of the last configuration change operation 
-             for extremeLastChangeConfigFileName ."
+            "This object indicates the source of the last configuration change operation."
     ::= { extremeLastChangeCfgEntry 4 }
 
 
 --
 --  Configuration save objects.  These objects are used by the network
 --  management application to save configuration changes into the
---  persistant store.  There are 2 stores on the device; a primary and
+--  persistent store.  There are 2 stores on the device; a primary and
 --  a secondary.
 
 --

@@ -25,7 +25,7 @@ firebrick MODULE-IDENTITY
                 "Unofficial Firebrick MIB. For Observium use only."
         ::= { enterprises 24693 }
 
-fbSensorObjects       	OBJECT IDENTIFIER ::= { firebrick 1 }
+fbSensorObjects         OBJECT IDENTIFIER ::= { firebrick 1 }
 fbL2tpObjects           OBJECT IDENTIFIER ::= { firebrick 1701 }
 fbBgpObjects            OBJECT IDENTIFIER ::= { firebrick 179 }
 
@@ -56,7 +56,7 @@ fbSensorFanspeed OBJECT-TYPE
 fbL2tpTunnelStats           OBJECT IDENTIFIER ::= { fbL2tpObjects 1 }
 fbL2tpSessionStats          OBJECT IDENTIFIER ::= { fbL2tpObjects 2 }
 
-fbL2tpTunnelsFree 	OBJECT-TYPE
+fbL2tpTunnelsFree           OBJECT-TYPE
     SYNTAX      INTEGER
     MAX-ACCESS  read-only
     STATUS      current
@@ -186,4 +186,3 @@ fbL2tpSessionsClosed      OBJECT-TYPE
 
 
 END
-

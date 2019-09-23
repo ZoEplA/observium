@@ -1,9 +1,9 @@
 -- ===========================================================
--- Copyright (C) 2003 by HUAWEI-3Com TECHNOLOGIES.  All rights reserved.
+-- Copyright (c) 2004-2018 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
--- Description:  HUAWEI LAN Switch huawei-3com epon MIB
+-- Description: Epon MIB
 -- Reference:  IF-MIB
--- Version:  V1.7
+-- Version:  V1.9
 -- History:
 -- V1.0 created by liuhongxu.
 --   Initial version 2006-01-10
@@ -34,7 +34,7 @@
 --   Modify h3cEponUniInterfaceType
 -- V1.5 Updated by maguoqiang,wangke,zhaodan 2008-1-14
 -- Deleted default values of these leaves:
---      h3cEponUniMdi,h3cEponUniPriority, h3cEponUniVlanType, h3cEponUniFlowControl,
+--      h3cEponUniMdi, h3cEponUniPriority, h3cEponUniVlanType, h3cEponUniFlowControl,
 --      h3cEponUniDuplex, h3cEponUniVlanVPNStatus, h3cEponUniPortIsolate,
 --      h3cEponUniAutoNegotiation, h3cEponUniVitualCableTest
 --   Add h3cEponUniMulticastSourceIpList to h3cEponUniMulticastControlTable
@@ -50,10 +50,18 @@
 --          h3cEponUniVCTNearendCrosstalk to h3cEponUniSysManTable
 -- V1.6 Updated by zoudian 2008-3-17
 --   Add    h3cEponUniPortPolicyOutboundPir to h3cEponUniPortPolicyTable
---   Mofify h3cEponUniPortPolicyOutboundCir
+--   Modify h3cEponUniPortPolicyOutboundCir
 -- V1.7 Updated by zhaodan 2008-06-04
 --   Add h3cEponUniLinkUpTrap and h3cEponUniLinkDownTrap.
 --   Modify the MAX-ACCESS of h3cEponUniIndex to accessible-for-notify.
+-- V1.8 Updated by chenchao 2012-11-16
+--   Add h3cEponUniLoopBackDetectedTrap and h3cEponUniLoopBackRecoveredTrap.
+-- V1.9 Updated by zhuhaifeng 2018-02-02.
+--   Add h3cEponCTCAlarmTable and h3cEponUniErrorInfo.
+--   Add h3cEponCTCAlarmTrap and h3cEponCTCAlarmRecoverTrap.
+--   Add h3cUniStatisticsTable.
+--   Add h3cEponUniMacMax to h3cEponUniSysManTable
+--   Modify h3cEponUniVlanType and h3cEponUniVlanConfiguration to h3cEponUniSysManTable
 -- =================================================================
 H3C-EPON-UNI-MIB DEFINITIONS ::= BEGIN
 
@@ -69,7 +77,7 @@ IMPORTS
     FROM SNMPv2-TC;
 
 h3cEponUni MODULE-IDENTITY
-    LAST-UPDATED "200807281743Z"
+    LAST-UPDATED "201706061145Z"  -- June 06, 2017
     ORGANIZATION
         "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -81,6 +89,11 @@ h3cEponUni MODULE-IDENTITY
         "The objects in this MIB module are used to manage and
         display current configuration of UNI (user network interface)
         which is based on the ONU(Optical Network Unit)."
+    REVISION    "201706061145Z"  -- June 06, 2017
+    DESCRIPTION "Add h3cEponUniMacMax to h3cEponUniSysManTable."
+    REVISION    "201703061145Z"  -- March 06, 2017
+    DESCRIPTION "Add the objects of h3cEponCTCAlarmTable, h3cEponUniErrorInfo,
+                 h3cEponCTCAlarmTrap, h3cEponCTCAlarmRecoverTrap, and h3cUniStatisticsTable."
     ::= { h3cEpon 5 }
 
 h3cEponUniSysMan OBJECT IDENTIFIER ::= { h3cEponUni 1 }
@@ -141,7 +154,9 @@ H3cEponUniSysManEntry ::= SEQUENCE
         h3cEponUniVCTPolaritySwap           INTEGER,
         h3cEponUniVCTInsertionLoss          Integer32,
         h3cEponUniVCTReturnLoss             Integer32,
-        h3cEponUniVCTNearendCrosstalk       Integer32
+        h3cEponUniVCTNearendCrosstalk       Integer32,
+        h3cEponUniVlan                      Integer32,
+        h3cEponUniMacMax                    Integer32
     }
 
 h3cEponUniIndex OBJECT-TYPE
@@ -217,7 +232,8 @@ h3cEponUniVlanType OBJECT-TYPE
             transparent(5),
             doubletagged(6),
             tag(7),
-            translation(8)
+            translation(8),
+            aggregation(9)
         }
     MAX-ACCESS  read-write
     STATUS      current
@@ -248,14 +264,14 @@ h3cEponUniVLANTrunkAllowListLow OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Each octet within this value specifies a set of eight vlans,
-        with the first octet specifying vlans 1 through 8, the second
-        octet specifying vlans 9 through 16, etc.  Within each octet,
+        "Each octet within this value specifies a set of eight VLANs,
+        with the first octet specifying VLANs 1 through 8, the second
+        octet specifying VLANs 9 through 16, etc.  Within each octet,
         the most significant bit represents the highest numbered VLAN,
         and the least significant bit represents the lowest numbered VLAN.
         Thus, each allowed vlan of the trunk port is represented by a
         single bit within the value of this object.  If that bit has a value
-        of '1' then that vlan is allowed in the set of vlans.  the vlan
+        of '1' then that vlan is allowed in the set of VLANs.  The vlan
         is not allowed if its bit has a value of '0'."
     ::= { h3cEponUniSysManEntry 9 }
 
@@ -264,15 +280,15 @@ h3cEponUniVLANTrunkAllowListHigh OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Each octet within this value specifies a set of eight vlans,
-        with the first octet specifying vlans 2049 through 2056, the
-        second octet specifying vlans 2057 through 2064, etc. Within
+        "Each octet within this value specifies a set of eight VLANs,
+        with the first octet specifying VLANs 2049 through 2056, the
+        second octet specifying VLANs 2057 through 2064, etc. Within
         each octet, the most significant bit represents the highest
         numbered vlan, and the least significant bit represents the
         lowest numbered vlan. Thus, each allowed vlan of the trunk port
         is represented by a single bit within the value of this object.
         If that bit has a value of '1' then that vlan is allowed in the
-        set of vlans; the vlan is not allowed if its bit has a value of '0'.
+        set of VLANs. The vlan is not allowed if its bit has a value of '0'.
         "
     ::= { h3cEponUniSysManEntry 10 }
 
@@ -389,11 +405,27 @@ h3cEponUniVlanConfiguration OBJECT-TYPE
         zero length string.
         Tag vlan mode: the first four octets were the tag
         assigned to untagged frames received on UNI, including TPID,
-        VID,CFI and priority.
+        VID, CFI and priority.
         Translation vlan mode: the first four octets were the old tag
         (including TPID, VID, CFI and priority), which is replaced
         by the new tag(including TPID, VID, CFI and priority),
         the second four octets.
+        Doubletagged vlan mode: the first four octets were the tag
+        assigned to untagged or tagged frames received on UNI, including TPID,
+        VID, CFI and priority.
+        Vlantrunk vlan mode: the first four octets were the old tag
+        (including TPID, VID, CFI and priority), which is replaced
+        by the new tag(including TPID, VID, CFI and priority) of
+        the second four octets, the frames which assigned tag ranges from
+        the third four octets to fourth four octets were transmited freely
+        and so on for following octets.
+        Aggregation vlan mode: the first four octets were the old tag
+        (including TPID, VID, CFI and priority), which is replaced
+        by the new tag(including TPID, VID, CFI and priority) of
+        the second four octets, the frames which assigned tag ranges from
+        the third four octets to fourth four octets(using low two octets as vlan tag)
+        were replaced by the new tag(using high two octets as target vlan tag)
+        and so on for following octets.
         "
     ::= { h3cEponUniSysManEntry 23 }
 
@@ -500,7 +532,7 @@ h3cEponUniVCTCableLength OBJECT-TYPE
         When h3cEponUniVCTCableStatus is normal,
         the node stands for the length from the UNI port to the port opposite.
         When h3cEponUniVCTCableStatus is abnormal,
-        it stands for the lengh from the UNI port to the failure place.
+        it stands for the length from the UNI port to the failure place.
         Unit:meter(m).
         "
     ::= { h3cEponUniSysManEntry 33 }
@@ -527,7 +559,7 @@ h3cEponUniVCTPairSkew OBJECT-TYPE
     DESCRIPTION
         "
         Get the symmetry of cable.
-        If the function is not supported ,
+        If the function is not supported,
         the default value 0 will be returned.
         Unit:nanosecond(ns).
         "
@@ -567,7 +599,7 @@ h3cEponUniVCTInsertionLoss OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        If the function is not supported ,
+        If the function is not supported,
         the default value 0 will be returned.
         Unit:decibel(db).
         "
@@ -579,7 +611,7 @@ h3cEponUniVCTReturnLoss OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        If the function is not supported ,
+        If the function is not supported,
         the default value 0 will be returned.
         Unit:decibel(db).
         "
@@ -591,12 +623,34 @@ h3cEponUniVCTNearendCrosstalk OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        If the function is not supported ,
+        If the function is not supported,
         the default value 0 will be returned.
         Unit:decibel(db).
         "
     ::= { h3cEponUniSysManEntry 40 }
-
+h3cEponUniVlan   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "
+        If the function is not supported,
+        the default value 0 will be returned.
+        Unit:decibel(db).
+        "
+    ::= { h3cEponUniSysManEntry 41 }
+h3cEponUniMacMax   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        The maximum number of MAC addresses that the UNI port can learn.
+        no-limit(65535)
+        others(0~65534)
+        "
+    DEFVAL { 65535 }
+    ::= { h3cEponUniSysManEntry 42 }
 -- END for UNI VCT
 
 h3cEponUniCountTable OBJECT-TYPE
@@ -1793,7 +1847,7 @@ h3cEponUniMirrorOutboundPortList OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        UNI outnbound port list, more infomation reference h3cEponUniMirrorInboundPortList
+        UNI outbound port list. For more information, see h3cEponUniMirrorInboundPortList.
         "
     ::= { h3cEponUniMirrorGroupEntry 3 }
 
@@ -2006,6 +2060,291 @@ h3cEponUniMulticastConfIndexNext OBJECT-TYPE
     ::= { h3cEponUniMulticastIndexNextEntry 1 }
 
 --
+-- h3cEponCTCAlarmTable
+--
+
+h3cEponCTCAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cEponCTCAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        This table is used for setting CTC alarm of an ONU.
+        "
+    ::= { h3cEponUniSysMan 17 }
+
+h3cEponCTCAlarmEntry OBJECT-TYPE
+    SYNTAX      H3cEponCTCAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The entry of the h3cEponCTCAlarmTable.
+        "
+    INDEX
+        {
+            ifIndex,
+            h3cEponCTCAlarmID
+        }
+    ::= { h3cEponCTCAlarmTable 1 }
+
+H3cEponCTCAlarmEntry ::= SEQUENCE
+    {
+        h3cEponCTCAlarmID              INTEGER,
+        h3cEponCTCAlarmProtocol        INTEGER,
+        h3cEponCTCAlarmEnable          TruthValue,
+        h3cEponCTCAlarmTriggerThresVal OCTET STRING,
+        h3cEponCTCAlarmClearThresVal   OCTET STRING
+    }
+
+h3cEponCTCAlarmID OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+-- ONU alarm ID
+            onuEquipmentAlarm(1),
+            onuPowerAlarm(2),
+            onuBatteryMissing(3),
+            onuBatteryFailure(4),
+            onuBatteryVoltLow(5),
+            onuPhysicalIntrusionAlarm(6),
+            onuONUSelfTestFailure(7),
+            onuONUTempHighAlarm(9),
+            onuONUTempLowAlarm(10),
+            onuIADConnectionFailure(11),
+            onuPonIFSwitch(12),
+            onuSleepStatusUpdate(13),
+-- PON alarm ID
+            ponRXPowerHighAlarm(257),
+            ponRXPowerLowAlarm(258),
+            ponTXPowerHighAlarm(259),
+            ponTXPowerLowAlarm(260),
+            ponTXBiasHighAlarm(261),
+            ponTXBiasLowAlarm(262),
+            ponVccHighAlarm(263),
+            ponVccLowAlarm(264),
+            ponTempHighAlarm(265),
+            ponTempLowAlarm(266),
+            ponRXPowerHighWarning(267),
+            ponRXPowerLowWarning(268),
+            ponTXPowerHighWarning(269),
+            ponTXPowerLowWarning(270),
+            ponTXBiasHighWarning(271),
+            ponTXBiasLowWarning(272),
+            ponVccHighWarning(273),
+            ponVccLowWarning(274),
+            ponTempHighWarning(275),
+            ponTempLowWarning(276),
+            ponDownstreamDropEventsAlarm(277),
+            ponUpstreamDropEventsAlarm(278),
+            ponDownstreamCRCErrorFramesAlarm(279),
+            ponUpstreamCRCErrorFramesAlarm(280),
+            ponDownstreamUndersizeFramesAlarm(281),
+            ponUpstreamUndersizeFramesAlarm(282),
+            ponDownstreamOversizeFramesAlarm(283),
+            ponUpstreamOversizeFramesAlarm(284),
+            ponDownstreamFragmentsAlarm(285),
+            ponUpstreamFragmentsAlarm(286),
+            ponDownstreamJabbersAlarm(287),
+            ponUpstreamJabbersAlarm(288),
+            ponDownstreamDiscardsAlarm(289),
+            ponUpstreamDiscardsAlarm(290),
+            ponDownstreamErrorsAlarm(291),
+            ponUpstreamErrorsAlarm(292),
+            ponDownstreamDropEventsWarning(293),
+            ponUpstreamDropEventsWarning(294),
+            ponDownstreamCRCErrorFramesWarning(295),
+            ponUpstreamCRCErrorFramesWarning(296),
+            ponDownstreamUndersizeFramesWarning(297),
+            ponUpstreamUndersizeFramesWarning(298),
+            ponDownstreamOversizeFramesWarning(299),
+            ponUpstreamOversizeFramesWarning(300),
+            ponDownstreamFragmentsWarning(301),
+            ponUpstreamFragmentsWarning(302),
+            ponDownstreamJabbersWarning(303),
+            ponUpstreamJabbersWarning(304),
+            ponDownstreamDiscardsWarning(305),
+            ponUpstreamDiscardsWarning(306),
+            ponDownstreamErrorsWarning(307),
+            ponUpstreamErrorsWarning(308),
+-- UNI alarm ID
+            uniEthPortAutoNegFailure(769),
+            uniEthPortLOS(770),
+            uniEthPortFailure(771),
+            uniEthPortLoopback(772),
+            uniEthPortCongestion(773),
+            uniDownstreamDropEventsAlarm(774),
+            uniUpstreamDropEventsAlarm(775),
+            uniDownstreamCRCErrorFramesAlarm(776),
+            uniUpstreamCRCErrorFramesAlarm(777),
+            uniDownstreamUndersizeFramesAlarm(778),
+            uniUpstreamUndersizeFramesAlarm(779),
+            uniDownstreamOversizeFramesAlarm(780),
+            uniUpstreamOversizeFramesAlarm(781),
+            uniDownstreamFragmentsAlarm(782),
+            uniUpstreamFragmentsAlarm(783),
+            uniDownstreamJabbersAlarm(784),
+            uniUpstreamJabbersAlarm(785),
+            uniDownstreamDiscardsAlarm(786),
+            uniUpstreamDiscardsAlarm(787),
+            uniDownstreamErrorsAlarm(788),
+            uniUpstreamErrorsAlarm(789),
+            uniStatusChangeTimesAlarm(790),
+            uniDownstreamDropEventsWarning(791),
+            uniUpstreamDropEventsWarning(792),
+            uniDownstreamCRCErrorFramesWarning(793),
+            uniUpstreamCRCErrorFramesWarning(794),
+            uniDownstreamUndersizeFramesWarning(795),
+            uniUpstreamUndersizeFramesWarning(796),
+            uniDownstreamOversizeFramesWarning(797),
+            uniUpstreamOversizeFramesWarning(798),
+            uniDownstreamFragmentsWarning(799),
+            uniUpstreamFragmentsWarning(800),
+            uniDownstreamJabbersWarning(801),
+            uniUpstreamJabbersWarning(802),
+            uniDownstreamDiscardsWarning(803),
+            uniUpstreamDiscardsWarning(804),
+            uniDownstreamErrorsWarning(805),
+            uniUpstreamErrorsWarning(806),
+            uniStatusChangeTimesWarning(807),
+            uniPOTSPortFailure(1025),
+            uniE1PortFailure(1281),
+            uniE1TimingUnlock(1282),
+            uniE1LOS(1283)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "
+        The CTC alarm ID. There are 3 types of CTC alarms.
+        ONU alarm:   0x0001~0x00ff
+        PON alarm:   0x0101~0x01ff
+        UNI alarm:   0x0301~0x05ff
+        "
+    ::= { h3cEponCTCAlarmEntry 1 }
+
+h3cEponCTCAlarmProtocol OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            auto(0),
+            ctc21(33),
+            ctc30(48)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Choose a CTC protocol to set CTC alarm of an ONU.
+        auto(0)  - Automatically select a CTC protocol.
+        ctc21(33) - Use CTC2.1 protocol.
+        ctc30(48) - Use CTC3.0 or later protocols.
+        "
+    DEFVAL { auto }
+    ::= { h3cEponCTCAlarmEntry 2 }
+
+h3cEponCTCAlarmEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Enable or disable a CTC alarm of an ONU.
+        true(1)  - alarm enable.
+        false(2) - alarm disable.
+        "
+    ::= { h3cEponCTCAlarmEntry 3 }
+
+h3cEponCTCAlarmTriggerThresVal OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Trigger threshold value of a CTC alarm on an ONU.
+        For different CTC alarms, there are different units(dBm, mA, V, C).
+        "
+    ::= { h3cEponCTCAlarmEntry 4 }
+
+h3cEponCTCAlarmClearThresVal OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Clear threshold value of a CTC alarm on an ONU.
+        For different CTC alarms, there are different units(dBm, mA, V, C).
+        "
+    ::= { h3cEponCTCAlarmEntry 5 }
+
+h3cEponUniErrorInfo OBJECT IDENTIFIER ::= { h3cEponUniSysMan 18 }
+
+h3cEponCTCAlarmInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "
+        The information of an ONU CTC alarm.
+        "
+    ::= { h3cEponUniErrorInfo 1 }
+
+--
+-- h3cUniStatisticsTable
+--
+
+h3cUniStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cUniStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        This table is used for enabling or disabling statistics and setting period of a UNI.
+        "
+    ::= { h3cEponUniSysMan 19 }
+
+h3cUniStatisticsEntry OBJECT-TYPE
+    SYNTAX      H3cUniStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The entry of the h3cUniStatisticsTable.
+        "
+    INDEX
+        {
+            ifIndex,
+            h3cEponUniIndex
+        }
+    ::= { h3cUniStatisticsTable 1 }
+
+H3cUniStatisticsEntry ::= SEQUENCE
+    {
+        h3cUniStatisticsPeriodVal  Unsigned32,
+        h3cUniStatisticsEnable     TruthValue
+    }
+
+h3cUniStatisticsPeriodVal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        UNI statistics period value.
+        "
+    ::= { h3cUniStatisticsEntry 1 }
+
+h3cUniStatisticsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Enable or disable statistics of an UNI.
+        true(1)  - statistics enable.
+        false(2) - statistics disable.
+        "
+    ::= { h3cUniStatisticsEntry 2 }
+
+--
 -- h3cEponUni NOTIFICATION
 --
 
@@ -2048,5 +2387,74 @@ h3cEponUniLinkDownTrap NOTIFICATION-TYPE
         and the transmitting switch is turned on.
         "
     ::= { h3cEponUniTrapPrefix 2 }
+
+h3cEponUniLoopBackDetectedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            h3cEponUniIndex,
+            h3cEponUniDescr,
+            h3cEponUniVlan
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        A h3cEponUniLoopBackDetectedTrap notification is sent
+        when the UNI loopback event is detected.
+        "
+    ::= { h3cEponUniTrapPrefix 3 }
+h3cEponUniLoopBackRecoveredTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            h3cEponUniIndex,
+            h3cEponUniDescr,
+            h3cEponUniVlan
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        A h3cEponUniLoopBackRecoveredTrap notification is sent
+        when the UNI loopback is recovered.
+        "
+    ::= { h3cEponUniTrapPrefix 4 }
+
+h3cEponCTCAlarmTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            h3cEponCTCAlarmID,
+            h3cEponUniIndex,
+            h3cEponUniDescr,
+            h3cEponCTCAlarmInfo
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        A h3cEponCTCAlarmTrap notification is sent
+        when an ONU CTC alarm is detected.
+        "
+    ::= { h3cEponUniTrapPrefix 5 }
+
+h3cEponCTCAlarmRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            h3cEponCTCAlarmID,
+            h3cEponUniIndex,
+            h3cEponUniDescr,
+            h3cEponCTCAlarmInfo
+        }
+    STATUS      current
+    DESCRIPTION
+        "
+        A h3cEponCTCAlarmRecoverTrap notification is sent
+        when an ONU CTC alarm is cleared.
+        "
+    ::= { h3cEponUniTrapPrefix 6 }
 
 END

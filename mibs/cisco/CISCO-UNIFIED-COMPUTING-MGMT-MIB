@@ -4,9 +4,9 @@
 -- MIB representation of the Cisco Unified Computing System
 -- MGMT management information model package
 -- 
--- Created January 2016 by Charles Bullis
+-- Created July 2018 by Charles Bullis
 -- 
--- Copyright (c) 2005-2016 Cisco Systems, Inc. All rights reserved.
+-- Copyright (c) 2005-2018 Cisco Systems, Inc. All rights reserved.
 -- 
 -- *********************************************************************
 
@@ -55,6 +55,7 @@ IMPORTS
     CucsFsmFlags,
     CucsFsmFsmStageStatus,
     CucsIpProtocol,
+    CucsMgmtASecureBootAdminState,
     CucsMgmtAccess,
     CucsMgmtAdminState,
     CucsMgmtBackupFsmCurrentFsm,
@@ -72,19 +73,21 @@ IMPORTS
     CucsMgmtCapability,
     CucsMgmtCfgExportPolicyFsmCurrentFsm,
     CucsMgmtCfgExportPolicyFsmStageName,
-    CucsMgmtCimcSecureBootAdminState,
     CucsMgmtConfigState,
     CucsMgmtConnectionState,
     CucsMgmtControllerFsmCurrentFsm,
     CucsMgmtControllerFsmStageName,
     CucsMgmtControllerFsmTaskFlags,
     CucsMgmtControllerFsmTaskItem,
+    CucsMgmtControllerHostagCommMethod,
     CucsMgmtDimmBlacklistingOperState,
+    CucsMgmtDiskZoningState,
     CucsMgmtEntityChassisDeviceIoState1,
     CucsMgmtEntityChassisDeviceIoState2,
     CucsMgmtEntityChassisDeviceIoState3,
     CucsMgmtEntityHaFailureReason,
     CucsMgmtEntityHaReadiness,
+    CucsMgmtEntityLeadIdForAutoInstall,
     CucsMgmtEntityLeadership,
     CucsMgmtEntityMgmtServicesState,
     CucsMgmtEntityProblems,
@@ -124,6 +127,7 @@ IMPORTS
     CucsNetworkPortRole,
     CucsNetworkSwitchId,
     CucsNetworkTransport,
+    CucsPkiCertStatus,
     CucsPolicyPolicyOwner,
     CucsTrigAdminState,
     CucsTrigTrigOperState,
@@ -131,7 +135,7 @@ IMPORTS
         FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
 
 cucsMgmtObjects MODULE-IDENTITY
-    LAST-UPDATED    "201601180000Z"
+    LAST-UPDATED    "201807260000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
         "Cisco Systems
@@ -411,9 +415,9 @@ CucsMgmtBackupEntry ::= SEQUENCE {
     cucsMgmtBackupIntId                                              SnmpAdminString,
     cucsMgmtBackupJob                                                CucsMgmtBackupJob,
     cucsMgmtBackupName                                               SnmpAdminString,
-    cucsMgmtBackupPostAction                                         CucsMgmtBackupPostAction,
+    cucsMgmtBackupPostAction                                         CucsMgmtAbsBackupPostAction,
     cucsMgmtBackupPreservePooledValues                               TruthValue,
-    cucsMgmtBackupProto                                              CucsMgmtBackupProto,
+    cucsMgmtBackupProto                                              CucsMgmtAbsBackupProto,
     cucsMgmtBackupPwd                                                SnmpAdminString,
     cucsMgmtBackupRemoteFile                                         SnmpAdminString,
     cucsMgmtBackupType                                               CucsMgmtBackupType,
@@ -578,7 +582,7 @@ cucsMgmtBackupName OBJECT-TYPE
     ::= { cucsMgmtBackupEntry 19 }
 
 cucsMgmtBackupPostAction OBJECT-TYPE
-    SYNTAX       CucsMgmtBackupPostAction
+    SYNTAX       CucsMgmtAbsBackupPostAction
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -595,7 +599,7 @@ cucsMgmtBackupPreservePooledValues OBJECT-TYPE
     ::= { cucsMgmtBackupEntry 21 }
 
 cucsMgmtBackupProto OBJECT-TYPE
-    SYNTAX       CucsMgmtBackupProto
+    SYNTAX       CucsMgmtAbsBackupProto
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2294,7 +2298,7 @@ CucsMgmtCimcSecureBootEntry ::= SEQUENCE {
     cucsMgmtCimcSecureBootInstanceId                                 CucsManagedObjectId,
     cucsMgmtCimcSecureBootDn                                         CucsManagedObjectDn,
     cucsMgmtCimcSecureBootRn                                         SnmpAdminString,
-    cucsMgmtCimcSecureBootAdminState                                 CucsMgmtCimcSecureBootAdminState,
+    cucsMgmtCimcSecureBootAdminState                                 CucsMgmtASecureBootAdminState,
     cucsMgmtCimcSecureBootOperState                                  CucsMgmtSecureBootOperState
 }
 
@@ -2323,7 +2327,7 @@ cucsMgmtCimcSecureBootRn OBJECT-TYPE
     ::= { cucsMgmtCimcSecureBootEntry 3 }
 
 cucsMgmtCimcSecureBootAdminState OBJECT-TYPE
-    SYNTAX       CucsMgmtCimcSecureBootAdminState
+    SYNTAX       CucsMgmtASecureBootAdminState
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2337,6 +2341,71 @@ cucsMgmtCimcSecureBootOperState OBJECT-TYPE
     DESCRIPTION
         "Cisco UCS mgmt:CimcSecureBoot:operState managed object property"
     ::= { cucsMgmtCimcSecureBootEntry 5 }
+
+cucsMgmtCmcSecureBootTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMgmtCmcSecureBootEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS mgmt:CmcSecureBoot managed object table"
+    ::= { cucsMgmtObjects 69 }
+
+cucsMgmtCmcSecureBootEntry OBJECT-TYPE
+    SYNTAX           CucsMgmtCmcSecureBootEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMgmtCmcSecureBootTable table."
+    INDEX { cucsMgmtCmcSecureBootInstanceId }
+    ::= { cucsMgmtCmcSecureBootTable 1 }
+
+CucsMgmtCmcSecureBootEntry ::= SEQUENCE {
+    cucsMgmtCmcSecureBootInstanceId                                  CucsManagedObjectId,
+    cucsMgmtCmcSecureBootDn                                          CucsManagedObjectDn,
+    cucsMgmtCmcSecureBootRn                                          SnmpAdminString,
+    cucsMgmtCmcSecureBootAdminState                                  CucsMgmtASecureBootAdminState,
+    cucsMgmtCmcSecureBootOperState                                   CucsMgmtSecureBootOperState
+}
+
+cucsMgmtCmcSecureBootInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMgmtCmcSecureBootEntry 1 }
+
+cucsMgmtCmcSecureBootDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:CmcSecureBoot:dn managed object property"
+    ::= { cucsMgmtCmcSecureBootEntry 2 }
+
+cucsMgmtCmcSecureBootRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:CmcSecureBoot:rn managed object property"
+    ::= { cucsMgmtCmcSecureBootEntry 3 }
+
+cucsMgmtCmcSecureBootAdminState OBJECT-TYPE
+    SYNTAX       CucsMgmtASecureBootAdminState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:CmcSecureBoot:adminState managed object property"
+    ::= { cucsMgmtCmcSecureBootEntry 4 }
+
+cucsMgmtCmcSecureBootOperState OBJECT-TYPE
+    SYNTAX       CucsMgmtSecureBootOperState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:CmcSecureBoot:operState managed object property"
+    ::= { cucsMgmtCmcSecureBootEntry 5 }
 
 cucsMgmtConnectionTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtConnectionEntry
@@ -2459,7 +2528,10 @@ CucsMgmtControllerEntry ::= SEQUENCE {
     cucsMgmtControllerDesiredMaintenanceMode                         CucsMgmtMaintMode,
     cucsMgmtControllerLastRebootReason                               SnmpAdminString,
     cucsMgmtControllerPowerFanSpeedPolicySupported                   TruthValue,
-    cucsMgmtControllerSupportedCapability                            CucsMgmtCapability
+    cucsMgmtControllerSupportedCapability                            CucsMgmtCapability,
+    cucsMgmtControllerDiskZoningState                                CucsMgmtDiskZoningState,
+    cucsMgmtControllerHostagCommMethod                               CucsMgmtControllerHostagCommMethod,
+    cucsMgmtControllerWebUIKvmConsoleSupported                       TruthValue
 }
 
 cucsMgmtControllerInstanceId OBJECT-TYPE
@@ -2711,6 +2783,33 @@ cucsMgmtControllerSupportedCapability OBJECT-TYPE
         "Cisco UCS mgmt:Controller:supportedCapability
         managed object property"
     ::= { cucsMgmtControllerEntry 30 }
+
+cucsMgmtControllerDiskZoningState OBJECT-TYPE
+    SYNTAX       CucsMgmtDiskZoningState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Controller:diskZoningState managed
+        object property"
+    ::= { cucsMgmtControllerEntry 31 }
+
+cucsMgmtControllerHostagCommMethod OBJECT-TYPE
+    SYNTAX       CucsMgmtControllerHostagCommMethod
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Controller:hostagCommMethod managed
+        object property"
+    ::= { cucsMgmtControllerEntry 32 }
+
+cucsMgmtControllerWebUIKvmConsoleSupported OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Controller:webUIKvmConsoleSupported
+        managed object property"
+    ::= { cucsMgmtControllerEntry 33 }
 
 cucsMgmtControllerFsmTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtControllerFsmEntry
@@ -3019,6 +3118,72 @@ cucsMgmtControllerFsmTaskSeqId OBJECT-TYPE
         "Cisco UCS mgmt:ControllerFsmTask:seqId managed object property"
     ::= { cucsMgmtControllerFsmTaskEntry 7 }
 
+cucsMgmtDbStateTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMgmtDbStateEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS mgmt:DbState managed object table"
+    ::= { cucsMgmtObjects 71 }
+
+cucsMgmtDbStateEntry OBJECT-TYPE
+    SYNTAX           CucsMgmtDbStateEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMgmtDbStateTable table."
+    INDEX { cucsMgmtDbStateInstanceId }
+    ::= { cucsMgmtDbStateTable 1 }
+
+CucsMgmtDbStateEntry ::= SEQUENCE {
+    cucsMgmtDbStateInstanceId                                        CucsManagedObjectId,
+    cucsMgmtDbStateDn                                                CucsManagedObjectDn,
+    cucsMgmtDbStateRn                                                SnmpAdminString,
+    cucsMgmtDbStateCorruptedCount                                    Unsigned64,
+    cucsMgmtDbStateLastOccurrenceTime                                DateAndTime
+}
+
+cucsMgmtDbStateInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMgmtDbStateEntry 1 }
+
+cucsMgmtDbStateDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:DbState:dn managed object property"
+    ::= { cucsMgmtDbStateEntry 2 }
+
+cucsMgmtDbStateRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:DbState:rn managed object property"
+    ::= { cucsMgmtDbStateEntry 3 }
+
+cucsMgmtDbStateCorruptedCount OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:DbState:corruptedCount managed object property"
+    ::= { cucsMgmtDbStateEntry 4 }
+
+cucsMgmtDbStateLastOccurrenceTime OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:DbState:lastOccurrenceTime managed
+        object property"
+    ::= { cucsMgmtDbStateEntry 5 }
+
 cucsMgmtEntityTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtEntityEntry
     MAX-ACCESS       not-accessible
@@ -3060,7 +3225,8 @@ CucsMgmtEntityEntry ::= SEQUENCE {
     cucsMgmtEntitySshAuthKeysSize                                    Unsigned64,
     cucsMgmtEntitySshKeyStatus                                       Unsigned64,
     cucsMgmtEntitySshRootPubKeyCsum                                  SnmpAdminString,
-    cucsMgmtEntitySshRootPubKeySize                                  Unsigned64
+    cucsMgmtEntitySshRootPubKeySize                                  Unsigned64,
+    cucsMgmtEntityLeadIdForAutoInstall                               CucsMgmtEntityLeadIdForAutoInstall
 }
 
 cucsMgmtEntityInstanceId OBJECT-TYPE
@@ -3257,6 +3423,15 @@ cucsMgmtEntitySshRootPubKeySize OBJECT-TYPE
     DESCRIPTION
         "Cisco UCS mgmt:Entity:sshRootPubKeySize managed object property"
     ::= { cucsMgmtEntityEntry 24 }
+
+cucsMgmtEntityLeadIdForAutoInstall OBJECT-TYPE
+    SYNTAX       CucsMgmtEntityLeadIdForAutoInstall
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Entity:leadIdForAutoInstall managed
+        object property"
+    ::= { cucsMgmtEntityEntry 25 }
 
 cucsMgmtExportPolicyFsmTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtExportPolicyFsmEntry
@@ -4263,7 +4438,7 @@ CucsMgmtIfEntry ::= SEQUENCE {
     cucsMgmtIfDn                                                     CucsManagedObjectDn,
     cucsMgmtIfRn                                                     SnmpAdminString,
     cucsMgmtIfAccess                                                 CucsMgmtAccess,
-    cucsMgmtIfAdminState                                             CucsMgmtAdminState,
+    cucsMgmtIfAdminState                                             CucsMgmtMgmtAdminState,
     cucsMgmtIfChassisId                                              Gauge32,
     cucsMgmtIfDiscovery                                              CucsEtherSatelliteConnectionDisc,
     cucsMgmtIfEpDn                                                   SnmpAdminString,
@@ -4338,7 +4513,7 @@ cucsMgmtIfAccess OBJECT-TYPE
     ::= { cucsMgmtIfEntry 4 }
 
 cucsMgmtIfAdminState OBJECT-TYPE
-    SYNTAX       CucsMgmtAdminState
+    SYNTAX       CucsMgmtMgmtAdminState
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -4997,8 +5172,8 @@ CucsMgmtImporterEntry ::= SEQUENCE {
     cucsMgmtImporterHostname                                         SnmpAdminString,
     cucsMgmtImporterIntId                                            SnmpAdminString,
     cucsMgmtImporterName                                             SnmpAdminString,
-    cucsMgmtImporterPostAction                                       CucsMgmtImporterPostAction,
-    cucsMgmtImporterProto                                            CucsMgmtImporterProto,
+    cucsMgmtImporterPostAction                                       CucsMgmtAbsImporterPostAction,
+    cucsMgmtImporterProto                                            CucsMgmtAbsImporterProto,
     cucsMgmtImporterPwd                                              SnmpAdminString,
     cucsMgmtImporterRemoteFile                                       SnmpAdminString,
     cucsMgmtImporterUser                                             SnmpAdminString,
@@ -5161,7 +5336,7 @@ cucsMgmtImporterName OBJECT-TYPE
     ::= { cucsMgmtImporterEntry 19 }
 
 cucsMgmtImporterPostAction OBJECT-TYPE
-    SYNTAX       CucsMgmtImporterPostAction
+    SYNTAX       CucsMgmtAbsImporterPostAction
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -5169,7 +5344,7 @@ cucsMgmtImporterPostAction OBJECT-TYPE
     ::= { cucsMgmtImporterEntry 20 }
 
 cucsMgmtImporterProto OBJECT-TYPE
-    SYNTAX       CucsMgmtImporterProto
+    SYNTAX       CucsMgmtAbsImporterProto
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -5554,7 +5729,9 @@ CucsMgmtInbandProfileEntry ::= SEQUENCE {
     cucsMgmtInbandProfileRn                                          SnmpAdminString,
     cucsMgmtInbandProfileDefaultVlanName                             SnmpAdminString,
     cucsMgmtInbandProfileName                                        SnmpAdminString,
-    cucsMgmtInbandProfilePoolName                                    SnmpAdminString
+    cucsMgmtInbandProfilePoolName                                    SnmpAdminString,
+    cucsMgmtInbandProfileMonitorInterval                             Gauge32,
+    cucsMgmtInbandProfilePolicyOwner                                 CucsPolicyPolicyOwner
 }
 
 cucsMgmtInbandProfileInstanceId OBJECT-TYPE
@@ -5605,6 +5782,23 @@ cucsMgmtInbandProfilePoolName OBJECT-TYPE
     DESCRIPTION
         "Cisco UCS mgmt:InbandProfile:poolName managed object property"
     ::= { cucsMgmtInbandProfileEntry 6 }
+
+cucsMgmtInbandProfileMonitorInterval OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:InbandProfile:monitorInterval managed
+        object property"
+    ::= { cucsMgmtInbandProfileEntry 7 }
+
+cucsMgmtInbandProfilePolicyOwner OBJECT-TYPE
+    SYNTAX       CucsPolicyPolicyOwner
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:InbandProfile:policyOwner managed object property"
+    ::= { cucsMgmtInbandProfileEntry 8 }
 
 cucsMgmtIntAuthPolicyTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtIntAuthPolicyEntry
@@ -5707,7 +5901,8 @@ CucsMgmtInterfaceEntry ::= SEQUENCE {
     cucsMgmtInterfaceIpV6State                                       CucsVnicExternalMgmtIPMode,
     cucsMgmtInterfaceMode                                            CucsMgmtMode,
     cucsMgmtInterfaceOperState                                       CucsMgmtOperState,
-    cucsMgmtInterfaceIsDefaultDerived                                TruthValue
+    cucsMgmtInterfaceIsDefaultDerived                                TruthValue,
+    cucsMgmtInterfaceMonitorInterval                                 Gauge32
 }
 
 cucsMgmtInterfaceInstanceId OBJECT-TYPE
@@ -5790,6 +5985,274 @@ cucsMgmtInterfaceIsDefaultDerived OBJECT-TYPE
         "Cisco UCS mgmt:Interface:isDefaultDerived managed
         object property"
     ::= { cucsMgmtInterfaceEntry 10 }
+
+cucsMgmtInterfaceMonitorInterval OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Interface:monitorInterval managed object property"
+    ::= { cucsMgmtInterfaceEntry 11 }
+
+cucsMgmtKmipTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMgmtKmipEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip managed object table"
+    ::= { cucsMgmtObjects 72 }
+
+cucsMgmtKmipEntry OBJECT-TYPE
+    SYNTAX           CucsMgmtKmipEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMgmtKmipTable table."
+    INDEX { cucsMgmtKmipInstanceId }
+    ::= { cucsMgmtKmipTable 1 }
+
+CucsMgmtKmipEntry ::= SEQUENCE {
+    cucsMgmtKmipInstanceId                                           CucsManagedObjectId,
+    cucsMgmtKmipDn                                                   CucsManagedObjectDn,
+    cucsMgmtKmipRn                                                   SnmpAdminString,
+    cucsMgmtKmipCaCertificate                                        SnmpAdminString,
+    cucsMgmtKmipCertSignRequest                                      SnmpAdminString,
+    cucsMgmtKmipCertStatus                                           CucsPkiCertStatus,
+    cucsMgmtKmipCertificate                                          SnmpAdminString,
+    cucsMgmtKmipPriConnStatus                                        SnmpAdminString,
+    cucsMgmtKmipSecConnStatus                                        SnmpAdminString
+}
+
+cucsMgmtKmipInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMgmtKmipEntry 1 }
+
+cucsMgmtKmipDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:dn managed object property"
+    ::= { cucsMgmtKmipEntry 2 }
+
+cucsMgmtKmipRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:rn managed object property"
+    ::= { cucsMgmtKmipEntry 3 }
+
+cucsMgmtKmipCaCertificate OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:caCertificate managed object property"
+    ::= { cucsMgmtKmipEntry 4 }
+
+cucsMgmtKmipCertSignRequest OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:certSignRequest managed object property"
+    ::= { cucsMgmtKmipEntry 5 }
+
+cucsMgmtKmipCertStatus OBJECT-TYPE
+    SYNTAX       CucsPkiCertStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:certStatus managed object property"
+    ::= { cucsMgmtKmipEntry 6 }
+
+cucsMgmtKmipCertificate OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:certificate managed object property"
+    ::= { cucsMgmtKmipEntry 7 }
+
+cucsMgmtKmipPriConnStatus OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:priConnStatus managed object property"
+    ::= { cucsMgmtKmipEntry 8 }
+
+cucsMgmtKmipSecConnStatus OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Kmip:secConnStatus managed object property"
+    ::= { cucsMgmtKmipEntry 9 }
+
+cucsMgmtKmipCertPolicyTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMgmtKmipCertPolicyEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy managed object table"
+    ::= { cucsMgmtObjects 73 }
+
+cucsMgmtKmipCertPolicyEntry OBJECT-TYPE
+    SYNTAX           CucsMgmtKmipCertPolicyEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMgmtKmipCertPolicyTable table."
+    INDEX { cucsMgmtKmipCertPolicyInstanceId }
+    ::= { cucsMgmtKmipCertPolicyTable 1 }
+
+CucsMgmtKmipCertPolicyEntry ::= SEQUENCE {
+    cucsMgmtKmipCertPolicyInstanceId                                 CucsManagedObjectId,
+    cucsMgmtKmipCertPolicyDn                                         CucsManagedObjectDn,
+    cucsMgmtKmipCertPolicyRn                                         SnmpAdminString,
+    cucsMgmtKmipCertPolicyCountryCode                                SnmpAdminString,
+    cucsMgmtKmipCertPolicyDescr                                      SnmpAdminString,
+    cucsMgmtKmipCertPolicyEmailAddr                                  SnmpAdminString,
+    cucsMgmtKmipCertPolicyIntId                                      SnmpAdminString,
+    cucsMgmtKmipCertPolicyLocality                                   SnmpAdminString,
+    cucsMgmtKmipCertPolicyName                                       SnmpAdminString,
+    cucsMgmtKmipCertPolicyOrgName                                    SnmpAdminString,
+    cucsMgmtKmipCertPolicyOrgUnitName                                SnmpAdminString,
+    cucsMgmtKmipCertPolicyPolicyLevel                                Gauge32,
+    cucsMgmtKmipCertPolicyPolicyOwner                                CucsPolicyPolicyOwner,
+    cucsMgmtKmipCertPolicyState                                      SnmpAdminString,
+    cucsMgmtKmipCertPolicyValidity                                   Gauge32
+}
+
+cucsMgmtKmipCertPolicyInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMgmtKmipCertPolicyEntry 1 }
+
+cucsMgmtKmipCertPolicyDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:dn managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 2 }
+
+cucsMgmtKmipCertPolicyRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:rn managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 3 }
+
+cucsMgmtKmipCertPolicyCountryCode OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:countryCode managed
+        object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 4 }
+
+cucsMgmtKmipCertPolicyDescr OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:descr managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 5 }
+
+cucsMgmtKmipCertPolicyEmailAddr OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:emailAddr managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 6 }
+
+cucsMgmtKmipCertPolicyIntId OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:intId managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 7 }
+
+cucsMgmtKmipCertPolicyLocality OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:locality managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 8 }
+
+cucsMgmtKmipCertPolicyName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:name managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 9 }
+
+cucsMgmtKmipCertPolicyOrgName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:orgName managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 10 }
+
+cucsMgmtKmipCertPolicyOrgUnitName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:orgUnitName managed
+        object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 11 }
+
+cucsMgmtKmipCertPolicyPolicyLevel OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:policyLevel managed
+        object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 12 }
+
+cucsMgmtKmipCertPolicyPolicyOwner OBJECT-TYPE
+    SYNTAX       CucsPolicyPolicyOwner
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:policyOwner managed
+        object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 13 }
+
+cucsMgmtKmipCertPolicyState OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:state managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 14 }
+
+cucsMgmtKmipCertPolicyValidity OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:KmipCertPolicy:validity managed object property"
+    ::= { cucsMgmtKmipCertPolicyEntry 15 }
 
 cucsMgmtPmonEntryTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtPmonEntryEntry
@@ -5973,7 +6436,8 @@ CucsMgmtProfDerivedInterfaceEntry ::= SEQUENCE {
     cucsMgmtProfDerivedInterfaceIpV4State                            CucsVnicExternalMgmtIPMode,
     cucsMgmtProfDerivedInterfaceIpV6State                            CucsVnicExternalMgmtIPMode,
     cucsMgmtProfDerivedInterfaceMode                                 CucsMgmtMode,
-    cucsMgmtProfDerivedInterfaceOperState                            CucsMgmtOperState
+    cucsMgmtProfDerivedInterfaceOperState                            CucsMgmtOperState,
+    cucsMgmtProfDerivedInterfaceMonitorInterval                      Gauge32
 }
 
 cucsMgmtProfDerivedInterfaceInstanceId OBJECT-TYPE
@@ -6052,6 +6516,62 @@ cucsMgmtProfDerivedInterfaceOperState OBJECT-TYPE
         "Cisco UCS mgmt:ProfDerivedInterface:operState
         managed object property"
     ::= { cucsMgmtProfDerivedInterfaceEntry 9 }
+
+cucsMgmtProfDerivedInterfaceMonitorInterval OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:ProfDerivedInterface:monitorInterval
+        managed object property"
+    ::= { cucsMgmtProfDerivedInterfaceEntry 10 }
+
+cucsMgmtSecurityTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMgmtSecurityEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS mgmt:Security managed object table"
+    ::= { cucsMgmtObjects 74 }
+
+cucsMgmtSecurityEntry OBJECT-TYPE
+    SYNTAX           CucsMgmtSecurityEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMgmtSecurityTable table."
+    INDEX { cucsMgmtSecurityInstanceId }
+    ::= { cucsMgmtSecurityTable 1 }
+
+CucsMgmtSecurityEntry ::= SEQUENCE {
+    cucsMgmtSecurityInstanceId                                       CucsManagedObjectId,
+    cucsMgmtSecurityDn                                               CucsManagedObjectDn,
+    cucsMgmtSecurityRn                                               SnmpAdminString
+}
+
+cucsMgmtSecurityInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMgmtSecurityEntry 1 }
+
+cucsMgmtSecurityDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Security:dn managed object property"
+    ::= { cucsMgmtSecurityEntry 2 }
+
+cucsMgmtSecurityRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS mgmt:Security:rn managed object property"
+    ::= { cucsMgmtSecurityEntry 3 }
 
 cucsMgmtVnetTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsMgmtVnetEntry

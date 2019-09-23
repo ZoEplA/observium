@@ -1,5 +1,5 @@
 -- ------------------------------------------------------------------
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2012 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Descripton: Qos MIB
 --
@@ -81,9 +81,9 @@ IMPORTS
   hh3cLswQosAclMib MODULE-IDENTITY
     LAST-UPDATED "200211190000Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085

@@ -36,7 +36,11 @@
           adGenAosMefPerCosPerUniPerfHistoryMib   OBJECT IDENTIFIER ::= { adGenAOSMef 2 }
           adGenAosMefPerEvcPerfHistoryMib         OBJECT IDENTIFIER ::= { adGenAOSMef 3 }
           adGenAosMefPerCosPerEvcPerfHistoryMib   OBJECT IDENTIFIER ::= { adGenAOSMef 4 }
-
+          adGenAosMefPerUniTotalCountMib          OBJECT IDENTIFIER ::= { adGenAOSMef 5 }
+          adGenAosMefPerCosPerUniTotalCountMib    OBJECT IDENTIFIER ::= { adGenAOSMef 6 }
+          adGenAosMefPerEvcTotalCountMib          OBJECT IDENTIFIER ::= { adGenAOSMef 7 }
+          adGenAosMefPerCosPerEvcTotalCountMib    OBJECT IDENTIFIER ::= { adGenAOSMef 8 }
+          adGenAosY1731Mib                        OBJECT IDENTIFIER ::= { adGenAOSMef 9 }
     --
     -- adGenAOS
     --
@@ -83,6 +87,45 @@
     --
     --
 
+    --
+    -- AOS Common Section - adGenAosMefPerUniTotalCountMib
+    --
+    -- Contains total information for UNI interfaces.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.5
+    --
+    --
+    
+    --
+    -- AOS Common Section - adGenAosMefPerCosPerUniTotalCountMib
+    -- 
+    -- Contains total count information for UNI interfaces per queue number.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.6
+    --
+    --
+
+    --
+    -- AOS Common Section - adGenAosMefPerEvcTotalCountMib
+    -- 
+    -- Contains total count information for EVCs.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.7
+    --
+    --
+
+    --
+    -- AOS Common Section - adGenAosMefPerCosPerEvcTotalCountMib 
+    -- 
+    -- Contains total count information for EVCs per queue number.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.8
+    --
+    --
+
+    --
+    -- AOS Common Section - adGenAosY1731Mib 
+    -- 
+    -- Contains alarms information for local MEP for Y1731 implemnetation.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9.9
+    --
+    --
        END
 
 

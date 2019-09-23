@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -42,7 +42,8 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['deviceMaxCurMT']) && $entry['deviceMaxCurMT'] > -3000 ? $entry['deviceMaxCurMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['deviceMinCurMT']) && $entry['deviceMinCurMT'] > -3000 ? $entry['deviceMinCurMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, "deviceIntegerCurrent.$index", 'aten-pe', $descr . ' Current', $scale, $value, $options);
+    $options['rename_rrd'] = "aten-pe-deviceIntegerCurrent.$index";
+        discover_sensor_ng($device,'current', $mib, 'deviceIntegerCurrent', $oid, $index, NULL, $descr . ' Current', $scale, $value, $options);
   }
 
   // Voltage
@@ -53,7 +54,8 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['deviceMaxVolMT']) && $entry['deviceMaxVolMT'] > -3000 ? $entry['deviceMaxVolMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['deviceMinVolMT']) && $entry['deviceMinVolMT'] > -3000 ? $entry['deviceMinVolMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, "deviceIntegerVoltage.$index", 'aten-pe', $descr . ' Voltage', $scale, $value, $options);
+    $options['rename_rrd'] = "aten-pe-deviceIntegerVoltage.$index";
+    discover_sensor_ng($device, 'voltage', $mib, 'deviceIntegerVoltage', $oid, $index, NULL, $descr . ' Voltage', $scale, $value, $options);
   }
 
   // Power
@@ -64,7 +66,8 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['deviceMaxPMT']) && $entry['deviceMaxPMT'] > -3000 ? $entry['deviceMaxPMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['deviceMinPMT']) && $entry['deviceMinPMT'] > -3000 ? $entry['deviceMinPMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'power', $device, $oid, "deviceIntegerPower.$index", 'aten-pe', $descr . ' Power', $scale, $value, $options);
+    $options['rename_rrd'] = "aten-pe-deviceIntegerPower.$index";
+    discover_sensor_ng($device, 'power', $mib, 'deviceIntegerPower', $oid, $index, NULL, $descr . ' Power', $scale, $value, $options);
   }
 
   /* FIXME. Currently unsupported
@@ -76,7 +79,7 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['deviceMaxPDMT']) && $entry['deviceMaxPDMT'] > -3000 ? $entry['deviceMaxPDMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['deviceMinPDMT']) && $entry['deviceMinPDMT'] > -3000 ? $entry['deviceMinPDMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'counter', $device, $oid, "deviceIntegerPowerDissipation.$index", 'aten-pe', $descr . ' Power Dissipation', $scale, $value, $options);
+    discover_sensor('counter', $device, $oid, "deviceIntegerPowerDissipation.$index", 'aten-pe', $descr . ' Power Dissipation', $scale, $value, $options);
   }
   */
 }
@@ -159,7 +162,8 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['sensorMaxTempMT']) && $entry['sensorMaxTempMT'] > -3000 ? $entry['sensorMaxTempMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['sensorMinTempMT']) && $entry['sensorMinTempMT'] > -3000 ? $entry['sensorMinTempMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "sensorIntegerTemperature.$index", 'aten-pe', "Temperature $index", $scale, $value, $options);
+    $options['rename_rrd'] = "aten-pe-sensorIntegerTemperature.$index";
+    discover_sensor_ng($device, 'temperature', $mib, 'sensorIntegerTemperature', $oid, $index, NULL, "Temperature $index", $scale, $value, $options);
   }
 
   // Humidity
@@ -170,7 +174,8 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['sensorMaxHumMT']) && $entry['sensorMaxHumMT'] > -3000 ? $entry['sensorMaxHumMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['sensorMinHumMT']) && $entry['sensorMinHumMT'] > -3000 ? $entry['sensorMinHumMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "sensorIntegerHumidity.$index", 'aten-pe', "Humidity $index", $scale, $value, $options);
+    $options['rename_rrd'] = "aten-pe-sensorIntegerHumidity.$index";
+    discover_sensor_ng($device, 'humidity', $mib, 'sensorIntegerHumidity', $oid, $index, NULL, "Humidity $index", $scale, $value, $options);
   }
 
   // Pressure
@@ -181,7 +186,8 @@ foreach ($oids as $index => $entry)
     $options = array('limit_high' => (isset($entry['sensorMaxPressMT']) && $entry['sensorMaxPressMT'] > -3000 ? $entry['sensorMaxPressMT'] * 0.1 : NULL),
                      'limit_low'  => (isset($entry['sensorMinPressMT']) && $entry['sensorMinPressMT'] > -3000 ? $entry['sensorMinPressMT'] * 0.1 : NULL));
 
-    discover_sensor($valid['sensor'], 'pressure', $device, $oid, "sensorIntegerPressure.$index", 'aten-pe', "Pressure $index", $scale, $value, $options);
+    $options['rename_rrd'] = "aten-pe-sensorIntegerPressure.$index";
+    discover_sensor_ng($device, 'pressure', $mib, 'sensorIntegerPressure', $oid, $index, NULL, "Pressure $index", $scale, $value, $options);
   }
 }
 

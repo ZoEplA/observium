@@ -1,6 +1,6 @@
 ELTEX-MES-PHYSICAL-DESCRIPTION-MIB DEFINITIONS ::= BEGIN
--- Version:              2.0
--- Date:                 14-Sep-2015
+-- Version:              2.1
+-- Date:                 11-Nov-2017
 
 IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY, TimeTicks,
@@ -20,6 +20,11 @@ eltMesPhysicalDescription  MODULE-IDENTITY
                        DESCRIPTION
                             "The private MIB module definition for physical
                              device configuration and information."
+
+                       REVISION "201711110000Z"
+                       DESCRIPTION
+                            "Added fields eltPhdTransceiverInfoPartNumber and
+                            eltPhdTransceiverInfoVendorRev to eltPhdTransceiverInfoTable"
 
                        REVISION "201509140000Z"
                        DESCRIPTION
@@ -59,7 +64,9 @@ EltPhdTransceiverInfoEntry ::=
         eltPhdTransceiverInfoSerialNumber          OCTET STRING,
         eltPhdTransceiverInfoFiberDiameterType     INTEGER,
         eltPhdTransceiverInfoTransferDistance      Integer32,
-        eltPhdTransceiverInfoDiagnostic            TruthValue
+        eltPhdTransceiverInfoDiagnostic            TruthValue,
+        eltPhdTransceiverInfoPartNumber            OCTET STRING,
+        eltPhdTransceiverInfoVendorRev             OCTET STRING
     }
 
 eltPhdTransceiverInfoConnectorType OBJECT-TYPE
@@ -183,104 +190,21 @@ eltPhdTransceiverInfoDiagnostic OBJECT-TYPE
         "Indicating whether the digital diagnostic monitoring function is supported or not."
     ::= { eltPhdTransceiverInfoEntry 9 }
 
-eltPhdTransceiverThresholdTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF EltPhdTransceiverThresholdEntry
-    MAX-ACCESS not-accessible
+eltPhdTransceiverInfoPartNumber OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "This table contains the threshold information of transceiver."
-    ::= { eltMesPhdTransceiver 2 }
+        "Part number provided by SFP vendor."
+    ::= { eltPhdTransceiverInfoEntry 10 }
 
-eltPhdTransceiverThresholdEntry OBJECT-TYPE
-    SYNTAX EltPhdTransceiverThresholdEntry
-    MAX-ACCESS not-accessible
+eltPhdTransceiverInfoVendorRev OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The entry of the eltPhdTransceiverThresholdTable."
-    INDEX { ifIndex, eltPhdTransceiverThresholdType }
-    ::= { eltPhdTransceiverThresholdTable 1 }
-
-EltPhdTransceiverThresholdEntry ::=
-    SEQUENCE {
-        eltPhdTransceiverThresholdType             INTEGER,
-        eltPhdTransceiverThresholdAction           INTEGER,
-        eltPhdTransceiverThresholdHighAlarm        INTEGER,
-        eltPhdTransceiverThresholdHighWarning      INTEGER,
-        eltPhdTransceiverThresholdLowWarning       INTEGER,
-        eltPhdTransceiverThresholdLowAlarm         INTEGER
-    }
-
-eltPhdTransceiverThresholdType OBJECT-TYPE
-    SYNTAX INTEGER
-        {
-        temperature(0),
-        supply(1),
-        txBias(2),
-        txOutput(3),
-        rxOpticalPower(4)
-        }
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-        "A value indicating the threshold to configure.
-        temperature - degree (Celsius) -127-127, voltage - microVolt 0-6550000,
-	    current - microAmper 0-131000, output power or input power - microWatt 0-6553"
-    ::= { eltPhdTransceiverThresholdEntry 1 }
-
-eltPhdTransceiverThresholdAction OBJECT-TYPE
-    SYNTAX INTEGER
-        {
-        none(0),
-        log(1),
-        send-trap(2)
-        }
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-        "What action to perform when value is bad."
-    ::= { eltPhdTransceiverThresholdEntry 2 }
-
-eltPhdTransceiverThresholdHighAlarm OBJECT-TYPE
-    SYNTAX   INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "See eltPhdTransceiverThresholdType for details"
-    ::= { eltPhdTransceiverThresholdEntry 3 }
-
-eltPhdTransceiverThresholdHighWarning OBJECT-TYPE
-    SYNTAX   INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "See eltPhdTransceiverThresholdType for details"
-    ::= { eltPhdTransceiverThresholdEntry 4 }
-
-eltPhdTransceiverThresholdLowWarning OBJECT-TYPE
-    SYNTAX   INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "See eltPhdTransceiverThresholdType for details"
-    ::= { eltPhdTransceiverThresholdEntry 5 }
-
-eltPhdTransceiverThresholdLowAlarm OBJECT-TYPE
-    SYNTAX   INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "See eltPhdTransceiverThresholdType for details"
-    ::= { eltPhdTransceiverThresholdEntry 6 }
-
-eltPhdTransceiverThresholdTimer OBJECT-TYPE
-    SYNTAX   INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Time between 2 generation of snmp/syslog alarm/warning messages in seconds (30-3600)
-         Timer value must be in multiples of 10."
-    DEFVAL { 120 }
-    ::= { eltMesPhdTransceiver 3 }
+        "Revision level for part number provided by vendor."
+    ::= { eltPhdTransceiverInfoEntry 11 }
 
 --
 -- eltPhdUnitGenParamTable
@@ -305,7 +229,9 @@ eltPhdUnitGenParamEntry OBJECT-TYPE
     ::= { eltPhdUnitGenParamTable 1 }
 
 EltPhdUnitGenParamEntry ::= SEQUENCE {
-    eltPhdUnitGenParamCommitHash			   DisplayString
+    eltPhdUnitGenParamCommitHash			   DisplayString,
+    eltPhdUnitGenParamBuildTag				   DisplayString,
+    eltPhdUnitGenParamBuildNumber			   DisplayString
 }
 
 eltPhdUnitGenParamCommitHash OBJECT-TYPE
@@ -314,6 +240,20 @@ eltPhdUnitGenParamCommitHash OBJECT-TYPE
        STATUS      current
        DESCRIPTION "Hash of current commit."
        ::= { eltPhdUnitGenParamEntry 1 }
+
+eltPhdUnitGenParamBuildTag OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Build branch."
+       ::= { eltPhdUnitGenParamEntry 2 }
+
+eltPhdUnitGenParamBuildNumber OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Build describe number."
+       ::= { eltPhdUnitGenParamEntry 3 }
 
 --
 -- eltCascadeTable

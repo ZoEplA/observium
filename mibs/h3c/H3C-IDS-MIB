@@ -1,7 +1,7 @@
 -- ==================================================================
--- Copyright (C) 2005 by HUAWEI-3COM TECHNOLOGIES.  All rights reserved.
+-- Copyright (C) 2005 by H3C TECHNOLOGIES.  All rights reserved.
 --
--- Description:  HUAWEI-3COM IDS Management MIB
+-- Description: IDS Management MIB
 -- Reference:
 -- Version: V1.0
 -- History:
@@ -20,9 +20,13 @@ H3C-IDS-MIB DEFINITIONS ::= BEGIN
         h3cIDSMib MODULE-IDENTITY
             LAST-UPDATED "200507141942Z"
             ORGANIZATION
-                "Huawei-3com Technologies Co., Ltd."
+                "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-                "R&D Hangzhou, Huawei-3com Technologies Co., Ltd."
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
             DESCRIPTION
                 "This MIB describes IDS private information.
                 IDS(Instruction Detecting System) is used to detect intruder activity. "

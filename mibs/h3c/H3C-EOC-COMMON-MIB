@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2009 by H3C Technologies. All rights reserved.
+-- Copyright (c) 2004-2014 by H3C Technologies. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V1.5
+-- Version: V1.7
 -- History:
 -- V1.0 created by liujingya.
 --     Initial version of the MIB
@@ -24,6 +24,10 @@
 --     modified MAX-ACCESS of h3cEOCComCnuDeviceType by liujingya.
 -- V1.5 2010-1-7 Added h3cEocComCnuTypeIdx, h3cEOCComCnuDescripton,
 --     h3cEOCComCltMaxAllowToAccess, h3cEocComCnuNumber by xujun
+-- V1.6 2011-12-28 updated by gaoguangping
+--     Added h3cEOCLoopbackDetectTrap, h3cEOCLoopbackRecoverTrap;
+--     Modified h3cEOCComCnuLinkState.
+-- V1.7 2013-08-20 Added h3cEOCComCnuTempIndex by xujun
 -- =================================================================
 H3C-EOC-COMMON-MIB DEFINITIONS ::= BEGIN
 
@@ -508,7 +512,8 @@ h3cEOCComCnuMacEntry OBJECT-TYPE
 H3cEOCComCnuMacEntry ::= SEQUENCE
     {
         h3cEOCComCnuMacAddress    MacAddress,
-        h3cEOCComCnuRowStatus     RowStatus
+        h3cEOCComCnuRowStatus     RowStatus,
+        h3cEOCComCnuTempIndex     Integer32
     }
 
 h3cEOCComCnuMacAddress OBJECT-TYPE
@@ -530,7 +535,18 @@ h3cEOCComCnuRowStatus OBJECT-TYPE
         Operation status.
         "
     ::= { h3cEOCComCnuMacEntry 2 }
-
+    
+h3cEOCComCnuTempIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CNU's model index from h3cHPEOCTemplateIndex,
+        If configure 0, the CNU select no model.
+        "
+    ::= { h3cEOCComCnuMacEntry 3 }
+    
 --
 -- h3cEOCComCnuInfoTable
 --
@@ -600,7 +616,8 @@ h3cEOCComCnuLinkState OBJECT-TYPE
         {
             physicaldown(1),
             linkdown(2),
-            linkup(3)
+            linkup(3),
+            loopback(4)
         }
     MAX-ACCESS read-only
     STATUS     current
@@ -610,7 +627,8 @@ h3cEOCComCnuLinkState OBJECT-TYPE
         that the CNU is not powered on.  The linkdown(2) state indicates
         that the CNU is powered on, but registers fail.  The linkup(3)
         state indicates that the CNU is powered on, and registers
-        successful.
+        successful.  The loopback(4) state indecates that the CNU is
+        powered on and registers successful, but loopback has detected.
         "
     ::= { h3cEOCComCnuInfoEntry 3 }
 
@@ -1755,6 +1773,36 @@ h3cEOCCnuAutoUpdateSuccTrap NOTIFICATION-TYPE
         auto update successfully.
         "
     ::= { h3cEOCTrapPrefix 22 }
+
+h3cEOCLoopbackDetectTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            h3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A h3cEOCLoopbackDetectTrap notification is sent when the loopback between
+        the ethernet ports of CNU or CLT is found.
+        "
+    ::= { h3cEOCTrapPrefix 23 }
+
+h3cEOCLoopbackRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            h3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A h3cEOCLoopbackRecoverTrap notification is sent when the loopback between
+        the ethernet ports of CNU or CLT is recover.
+        "
+    ::= { h3cEOCTrapPrefix 24 }
 
 --
 -- h3cEOCComOnLineCnuMan

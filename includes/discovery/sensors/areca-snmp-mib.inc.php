@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -29,7 +29,8 @@ foreach (explode("\n", $oids) as $data)
     $oid  = ".1.3.6.1.4.1.18928.1.2.2.1.9.1.3." . $index;
     $value = snmp_get($device, $oid, "-Oqv", "");
 
-    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'areca', trim($descr,'"'), 1, $value);
+    discover_sensor_ng($device,'fanspeed', $mib, 'hwControllerBoardFanSpeed', $oid, $index, 'areca', trim($descr,'"'), 1, $value, ['rename_rrd' => 'areca-$index']);
+
   }
 }
 
@@ -51,7 +52,7 @@ foreach (explode("\n", $oids) as $data)
     $descr = "Hard disk $temperature_id";
     if ($temperature != -128) # -128 = not measured/present
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, zeropad($temperature_id), 'areca', $descr, 1, $temperature);
+      discover_sensor_ng($device,'temperature', $mib, '', $temperature_oid, zeropad($temperature_id), 'areca', $descr, 1, $temperature);
     }
   }
 }
@@ -74,10 +75,10 @@ foreach (explode("\n", $oids) as $data)
     {
       if ($value != 255)
       {
-        discover_sensor($valid['sensor'], 'capacity', $device, $oid, $index, 'areca', trim($descr,'"'), 1, $value);
+        discover_sensor('capacity', $device, $oid, $index, 'areca', trim($descr,'"'), 1, $value);
       }
     } else { # Not a battery
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'areca', trim($descr,'"'), 0.001, $value);
+      discover_sensor('voltage', $device, $oid, $index, 'areca', trim($descr,'"'), 0.001, $value);
     }
   }
 }
@@ -96,7 +97,7 @@ foreach (explode("\n", $oids) as $data)
     $oid  = ".1.3.6.1.4.1.18928.1.2.2.1.10.1.3." . $index;
     $value = snmp_get($device, $oid, "-Oqv", "");
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'areca', trim($descr,'"'), 1, $value);
+    discover_sensor('temperature', $device, $oid, $index, 'areca', trim($descr,'"'), 1, $value);
   }
 }
 
@@ -137,7 +138,7 @@ for ($encNum = 1; $encNum <= 8; $encNum++)
         $value = $entry["hwEnclosure0${encNum}VolValue"];
         $oid   = ".1.3.6.1.4.1.18928.1.2.2." . ($encNum+1) . ".8.1.3.$index";
 
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, "hwEnclosure0${encNum}VolValue.$index", 'areca', $descr, 0.001, $value);
+        discover_sensor('voltage', $device, $oid, "hwEnclosure0${encNum}VolValue.$index", 'areca', $descr, 0.001, $value);
       }
 
       if ($entry["hwEnclosure0${encNum}FanIndex"])
@@ -146,7 +147,7 @@ for ($encNum = 1; $encNum <= 8; $encNum++)
         $value = $entry["hwEnclosure0${encNum}FanSpeed"];
         $oid   = ".1.3.6.1.4.1.18928.1.2.2." . ($encNum+1) . ".9.1.3.$index";
 
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, "hwEnclosure0${encNum}FanSpeed.$index", 'areca', $descr, 1, $value);
+        discover_sensor('fanspeed', $device, $oid, "hwEnclosure0${encNum}FanSpeed.$index", 'areca', $descr, 1, $value);
       }
 
       if ($entry["hwEnclosure0${encNum}TempIndex"])
@@ -155,7 +156,7 @@ for ($encNum = 1; $encNum <= 8; $encNum++)
         $value = $entry["hwEnclosure0${encNum}TempValue"];
         $oid   = ".1.3.6.1.4.1.18928.1.2.2." . ($encNum+1) . ".10.1.3.$index";
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, "hwEnclosure0${encNum}TempValue.$index", 'areca', $descr, 1, $value);
+        discover_sensor('temperature', $device, $oid, "hwEnclosure0${encNum}TempValue.$index", 'areca', $descr, 1, $value);
       }
 
       if ($entry["hwEnclosure0${encNum}PowerIndex"])
@@ -164,7 +165,7 @@ for ($encNum = 1; $encNum <= 8; $encNum++)
         $value = $entry["hwEnclosure0${encNum}PowerState"];
         $oid   = ".1.3.6.1.4.1.18928.1.2.2." . ($encNum+1) . ".7.1.3.$index";
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, "hwEnclosure0${encNum}PowerState.$index", 'areca-power-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+        discover_status($device, $oid, "hwEnclosure0${encNum}PowerState.$index", 'areca-power-state', $descr, $value, array('entPhysicalClass' => 'power'));
       }
     }
   }

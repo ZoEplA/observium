@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -173,12 +173,16 @@ if ($_SESSION['userlevel'] < 10)
               echo('      <div>' . PHP_EOL);
               $item = array('id'       => $htmlname,
                             'size'     => 'small',
-                            'on-text'  => 'True',
-                            'off-text' => 'False',
+                            //'on-text'  => 'True',
+                            //'off-text' => 'False',
                             'readonly' => $readonly,
                             'disabled' => (bool)$locked,
                             'value'    => $content);
-              echo(generate_form_element($item, 'switch'));
+              //echo(generate_form_element($item, 'switch'));
+              $item['view'] = 'toggle';
+              $item['size'] = 'huge';
+              //$item['size'] = 'huge';
+              echo(generate_form_element($item, 'toggle'));
               //echo('        <input data-toggle="switch-bool" type="checkbox" ' . ($content ? 'checked="1" ' : '') . 'id="' . $htmlname . '" name="' . $htmlname . '" ' . ($locked ? 'disabled="1" ' : '').'>' . PHP_EOL);
               echo('      </div>' . PHP_EOL);
               break;

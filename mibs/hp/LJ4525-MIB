@@ -1,9 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<!-- saved from url=(0143)http://hpbs4725.boi.hp.com/sfmain-fw/products/base_product_01/doc/pml/@@/PROD_DOC_PML_KING_SF_06.046.0/lj4525.mib/PROD_DOC_PML_KING_SF_06.046.0 -->
-<HTML><HEAD>
-<META http-equiv=Content-Type content="text/html; charset=windows-1252">
-<META content="MSHTML 6.00.2900.3562" name=GENERATOR></HEAD>
-<BODY><PRE>--  (C) COPYRIGHT HEWLETT-PACKARD COMPANY 2009.
+--  (C) COPYRIGHT HEWLETT-PACKARD COMPANY 2009.
 --
 --  LaserJet 4525 Printer Model Specific MIB.
 --
@@ -382,7 +377,7 @@ print-internal-page OBJECT-TYPE
                 conditions it will succeed or fail is device specific. If the		
                 device supports the requested page, but can not start printing		
                 the page when requested, the device will respond with		
-                &lt;genErr&gt;. RECOMMENDATION: If the		
+                <genErr>. RECOMMENDATION: If the		
                 device is ready (i.e. the NOT-READY-PRINTER object does not		
                 contain any items, except maybe being off-line) and is idle		
                 (i.e. the NOT-IDLE object does not contain any items), this		
@@ -397,7 +392,7 @@ print-internal-page OBJECT-TYPE
                 
                 $product_str does not support continuously printing a demo page.  
                 
-                When this object is set to a valid value, the status returned is &lt;noError&gt;
+                When this object is set to a valid value, the status returned is <noError>
                 and the value returned is ePrintingAnUnknownInternalPage.  If the printer
                 is idle, the page will be printed immediately.  If the printer is
                 currently printing another job, the internal page requested will not print
@@ -453,7 +448,7 @@ printed-media-simplex-count OBJECT-TYPE
                 The format for the OID is as follows:
                 
                 3.4.1.5.x.y
-                &lt;-----&gt; | |
+                <-----> | |
                 |    |  \
                 /     |  paper size
                 /       \
@@ -815,6 +810,7 @@ media-size-count OBJECT-TYPE
                 11 Ledger  
                 15 Statement  
                 17 ROC 16K  
+                18 JIS Executive  
                 19 ROC 8K  
                 24 ISO and JIS A6  
                 25 ISO and JIS A5  
@@ -1001,9 +997,8 @@ control-panel-key-press OBJECT-TYPE
                 panels (ie. Full QWERTY keyboard). The device POS will specify		
                 the full range of keys supported by this object.
                 Additional information:
-                &gt;&gt;&gt;&gt;The description for this object is taken from LaserJet 9000 MFP_mlk.psm.
-                		This object is write-only for hw_rom variant but it is
-                read-write for all other variants.&lt;&lt;&lt;&lt;&lt;
+                >>>>This object is write-only for hw_rom variant but it is
+                read-write for all other variants.<<<<<
                 
                 Writing this object simulates pressing a key on the
                 control panel. Reading it will return the last key pressed
@@ -1042,23 +1037,23 @@ energy-star OBJECT-TYPE
                 never enter sleep mode based on the print engine
                 idle time.  Setting to an unsupported value causes
                 the printer to substitute a value (listed
-                below) and to return &lt;noError&gt;
+                below) and to return <noError>
                 status.  Setting this value when the printer is in
                 sleep mode will not cause it to wakeup unless it is
                 set to 0.  
                 
                 The values are as follow:  
-                &lt;=0                 snap to 0  
-                			&gt;=1    and &lt;= 179   snap to 60 (1 minute)  
-                			&gt;=180  and &lt;= 209   snap to 180   (3 minutes)  
-                			&gt;=210  and &lt;= 449   snap to 300   (5 minutes)  
-                			&gt;=450  and &lt;= 749   snap to 600   (10 minutes)  
-                			&gt;=749  and &lt;= 1349  snap to 900   (15 minutes)  
-                &gt;=1350 and &lt;= 2249  snap to 1800  (30 minutes)  
-                &gt;=2250 and &lt;= 3149  snap to 2700  (45 minutes)  
-                &gt;=3150 and &lt;= 4499  snap to 3600  (1 hour)  
-                &gt;=4500 and &lt;= 6299  snap to 5400  (90 minutes)  
-                &gt;=6300              snap to 7200  (2 hours)."
+                <=0                 snap to 0  
+                			>=1    and <= 179   snap to 60 (1 minute)  
+                			>=180  and <= 209   snap to 180   (3 minutes)  
+                			>=210  and <= 449   snap to 300   (5 minutes)  
+                			>=450  and <= 749   snap to 600   (10 minutes)  
+                			>=749  and <= 1349  snap to 900   (15 minutes)  
+                >=1350 and <= 2249  snap to 1800  (30 minutes)  
+                >=2250 and <= 3149  snap to 2700  (45 minutes)  
+                >=3150 and <= 4499  snap to 3600  (1 hour)  
+                >=4500 and <= 6299  snap to 5400  (90 minutes)  
+                >=6300              snap to 7200  (2 hours)."
 ::= { settings-system 1 }
                
                
@@ -1078,15 +1073,15 @@ sleep-mode OBJECT-TYPE
                 energy saving sleep mode, otherwise it returns eFalse.  
                 Setting this object to eTrue while the printer
                 is awake will not change the printer's current state
-                and will return &lt;genErr&gt;
+                and will return <genErr>
                 status. NOTE: This object should behave this way
                 when the printer does not have an instant-on fuser.  
                 Setting this object to eTrue while printer is already
                 in Sleep Mode will not change the printer's
-                current state and will return &lt;noError&gt; status.  
+                current state and will return <noError> status.  
                 Setting this object to eFalse while printer is already
                 awake will not change the printer's current state and
-                will return &lt;noError&gt; status.  
+                will return <noError> status.  
                 Setting this object to eFalse while the printer is
                 asleep causes the device to wake up.   "
 ::= { settings-system 2 }
@@ -1112,18 +1107,18 @@ on-off-line OBJECT-TYPE
                 
                 Setting to eOnline has the following affect:
                 Printer will immediately go to or remain in the Online
-                state; &lt;noError&gt; status is returned.  
+                state; <noError> status is returned.  
                 If the printer's current state
                 is Offline with a pending error condition that
                 prevents the printer from going to the Online
                 state, the printer will remain in the Offline state;
-                &lt;genErr&gt; status is returned
+                <genErr> status is returned
                 (see the Control Panel ERS for a list of error
                 conditions).  
                 
                 Setting to eOffline has the following affect:
                 Printer will immediately go to or remain in the
-                Offline state; &lt;noError&gt; status is returned.
+                Offline state; <noError> status is returned.
                 If pages are being printed, those pages will complete
                 with the printer in the Offline state.  
                 
@@ -1131,11 +1126,11 @@ on-off-line OBJECT-TYPE
                 affect:  
                 If not in a job or already in the Offline state, the
                 printer will immediately go to or remain in the
-                Offline state; &lt;noError&gt; status is returned.  
+                Offline state; <noError> status is returned.  
                 If in a job and the current state is Online, the
                 printer will remain in the Online state, with the
                 value of this object as eOfflineAtEndOfJob, until the
-                end of the job; &lt;noError&gt; status is returned. At the end of
+                end of the job; <noError> status is returned. At the end of
                 the job, the printer goes to the Offline state and the
                 value of this object becomes eOffline.  
                 Setting this object to eOffline or eOnline before the
@@ -1165,7 +1160,7 @@ continue OBJECT-TYPE
                 to continue. Each device needs to list the continuable errors.		
                 If the device doesn't currently have an unacknowledged		
                 continuable error, the response will contain		
-                &lt;genErr&gt;.
+                <genErr>.
                 Additional information:
                 See the CLEARABLE-WARNING and AUTO-CONTINUE objects for the
                 errors that this object will clear."
@@ -1379,6 +1374,16 @@ simm1-bank2-type OBJECT-TYPE
 ::= { simm1-bank2 1 }
                
                
+simm1-bank2-capacity OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "Returns an indication of the capacity of Bank 2 of the SIMM		
+                installed in SIMM slot 1. See SIMM1-CAPACITY for a		
+                description."
+::= { simm1-bank2 2 }
+               
+               
 simm2-type OBJECT-TYPE
    SYNTAX      INTEGER {
 		   eEmpty(1),
@@ -1397,6 +1402,23 @@ simm2-type OBJECT-TYPE
                 This object is used for describing DIMMs instead
                 of SIMMs on $product_str. eRamRom is used to denote $product_str's combo simm."
 ::= { simm2 4 }
+               
+               
+simm2-capacity OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "Returns an indication of the capacity of the SIMM installed in		
+                SIMM slot 2. See SIMM1-CAPACITY for a description.
+                Additional information:
+                This object is used for describing DIMMs instead
+                of SIMMs on $product_str. Returns an indication of the capacity of the
+                installed option in bytes.  This object is not
+                supported unless the SIMM2-TYPE type is
+                eVolatileRandomAccessMemory, eRamRom, or eFlashMemory.
+                For eRamRom only the size of the Ram portion of the
+                SIMM is returned."
+::= { simm2 5 }
                
                
 simm2-bank1-type OBJECT-TYPE
@@ -1419,6 +1441,23 @@ simm2-bank1-type OBJECT-TYPE
 ::= { simm2-bank1 1 }
                
                
+simm2-bank1-capacity OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "Returns an indication of the capacity of Bank 1 of the SIMM		
+                installed in SIMM slot 2. See SIMM1-CAPACITY for a		
+                description.
+                Additional information:
+                Returns an indication of the capacity of the
+                installed bank option in bytes.  This object is not
+                supported unless the SIMM2-BANK1-TYPE type is
+                eReadOnlyMemory, eFlashMemory, eEDORandomAccessMemory,
+                eSDRandomAccessMemory, eSRandomAccessMemory,
+                or eFPMRandomAccessMemory."
+::= { simm2-bank1 2 }
+               
+               
 simm2-bank2-type OBJECT-TYPE
    SYNTAX      INTEGER {
 		   eEmpty(1),
@@ -1439,6 +1478,16 @@ simm2-bank2-type OBJECT-TYPE
 ::= { simm2-bank2 1 }
                
                
+simm2-bank2-capacity OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "Returns an indication of the capacity of Bank 2 of the SIMM		
+                installed in SIMM slot 2. See SIMM1-CAPACITY for a		
+                description."
+::= { simm2-bank2 2 }
+               
+               
 cancel-job OBJECT-TYPE
    SYNTAX      INTEGER(-1..32767)
    ACCESS      write-only
@@ -1447,16 +1496,16 @@ cancel-job OBJECT-TYPE
                 CANCEL-JOB object. The host first learns the job ID using the		
                 CURRENT-JOB-PARSING-ID command. If the printer has completely		
                 processed the job, the printer responds with		
-                &lt;badValue&gt;. If the value of the		
+                <badValue>. If the value of the		
                 CURRENT-JOB-PARSING-ID is smaller than the value written to the		
                 CANCEL-JOB object, then the printer responds with		
-                &lt;badValue&gt;. When read, returns the value		
+                <badValue>. When read, returns the value		
                 of the last job ID what was canceled, or -1 to indicate no job		
                 has been canceled.
                 Additional information:
                 If the value written matches the ID of a job that is
                 currently being canceled (for any reason),
-                the printer responds with &lt;noError&gt;.  
+                the printer responds with <noError>.  
                 It uses job ID's in the range of -1..32767.
                 Because the ID number can wrap to zero,
                 CURRENT-JOB-PARSING-ID may be smaller than the value
@@ -1502,7 +1551,7 @@ form-feed OBJECT-TYPE
                 in a FORM-FEED-NEEDED state, this causes the device to flush or		
                 finish processing the current page of the current job. If the		
                 device is not in the FORM-FEED-NEEDED state, an		
-                &lt;genErr&gt; will occur."
+                <genErr> will occur."
 ::= { settings-pdl 5 }
                
                
@@ -6583,7 +6632,7 @@ channelprinteralert OBJECT-TYPE
                 prtAlertGroup, prtAlertGroupIndex, prtAlertLocation, and		
                 prtAlertCode for the latest critical evnet in the		
                 prtAlertTable. The binary string is defined as following:    	
-                    &lt;table&gt;
+                    <table>
                     -----------------------------------------------------
                     Field  | Filed  | Description 
                     Offset | Length | 
@@ -6595,7 +6644,7 @@ channelprinteralert OBJECT-TYPE
                      16    |    4   | the value of prtAlertLocation
                      20    |    4   | the value of prtAlertCode
                     ------------------------------------------------------
-                    &lt;/table&gt; 
+                    </table> 
                        	
                 Each field is in Big Endian style.
                 Additional information:
@@ -6641,7 +6690,7 @@ pages-remaining OBJECT-TYPE
                 status menu.
                 Additional information:
                 The PAGES-REMAINING would allow the user to turn off/on
-                'PAGES REMAINING' part of the 'ORDER &lt;COLOR&gt; CARTRIDGE
+                'PAGES REMAINING' part of the 'ORDER <COLOR> CARTRIDGE
                 LESS THAN X PAGES REMAINING ' messages"
 ::= { settings-system 70 }
                
@@ -6656,7 +6705,7 @@ order-cartridge OBJECT-TYPE
    DESCRIPTION "Used to enable/disable the supplies status message that is		
                 shown when the supply reaches low.
                 Additional information:
-                This will allow the user to turn off/on 'ORDER &lt;COLOR&gt;
+                This will allow the user to turn off/on 'ORDER <COLOR>
                 CARTRIDGE LESS THAN X PAGES REMAINING ' messages"
 ::= { settings-system 71 }
                
@@ -6692,7 +6741,7 @@ install-date OBJECT-TYPE
                 Device POS must specify the conditions for setting this		
                 object.
                 Additional information:
-                Setting the SERVICE-&lt;&lt;hidden&gt;&gt; object will
+                Setting the SERVICE-<<hidden>> object will
                 enable setting this object."
 ::= { status-system 8 }
                
@@ -6705,13 +6754,13 @@ service-id OBJECT-TYPE
                 in the printer. The format is 'YYDDD' where:    	
                     YY = calendar year - 1990    	
                     DDD = (calendar month - 1) * 30 + (calendar day of the		
-                        month or 30, if &gt; 30)    	
+                        month or 30, if > 30)    	
                 A write of this object will only succeed if the		
                 MANUFACTURING-CONTROL PML object has been set with the correct		
-                &lt;&lt;hidden&gt;&gt;. If the write operation is not allowed, this object		
-                will return an &lt;genErr&gt; status.
+                <<hidden>>. If the write operation is not allowed, this object		
+                will return an <genErr> status.
                 Additional information:
-                Setting the SERVICE-&lt;&lt;hidden&gt;&gt; object will
+                Setting the SERVICE-<<hidden>> object will
                 enable setting this object."
 ::= { status-system 19 }
                
@@ -6737,7 +6786,7 @@ serial-number OBJECT-TYPE
    DESCRIPTION "Identifies the serial number for the device. If the		
                 SERIAL-NUMBER object is set by the user, then setting the		
                 object does not need to be protected. If the SERIAL-NUMBER		
-                object is set at the factory, then the SERVICE-&lt;&lt;hidden&gt;&gt; object		
+                object is set at the factory, then the SERVICE-<<hidden>> object		
                 must be set correctly before the SERIAL-NUMBER object is		
                 writable. If this is a writable object, the POS should indicate		
                 the maximum supported string length. If possible, encode the		
@@ -6757,11 +6806,11 @@ device-name OBJECT-TYPE
    DESCRIPTION "User defined device name. The POS should indicate the maximum		
                 supported string length. If the user entered string is too		
                 long, the device will store as much as possible and will return		
-                the &lt;OKNearestLegal ValueSubstituted&gt;.Additional information:
+                the <OKNearestLegal ValueSubstituted>.Additional information:
                 The maximum supported string length is 32  
                 characters.  If the user entered string is too long, 
                 the device will store the first 32 characters and will 
-                return the &lt;noError&gt; status."
+                return the <noError> status."
 ::= { id 10 }
                
                
@@ -6772,11 +6821,11 @@ device-location OBJECT-TYPE
    DESCRIPTION "User defined device location. The POS should indicate the		
                 maximum supported string length. If the user entered string is		
                 too long, the device will store as much as possible and will		
-                return the &lt;OKNearestLegal ValueSubstituted&gt;.Additional information:
+                return the <OKNearestLegal ValueSubstituted>.Additional information:
                 The maximum supported string length is 16 
                 characters.  If the user entered string is too long, 
                 the device will store the first 16 characters and will 
-                return the &lt;noError&gt; status."
+                return the <noError> status."
 ::= { id 11 }
                
                
@@ -6787,11 +6836,11 @@ asset-number OBJECT-TYPE
    DESCRIPTION "User defined asset number. The POS should indicate the maximum		
                 supported string length. If the user entered string is too		
                 long, the device will store as much as possible and will return		
-                the &lt;OKNearestLegal ValueSubstituted&gt;.Additional information:
+                the <OKNearestLegal ValueSubstituted>.Additional information:
                 The maximum supported string length is 8 
                 characters.  If the user entered string is too long, 
                 the device will store the first 8 characters and will  
-                return the &lt;noError&gt; status."
+                return the <noError> status."
 ::= { id 12 }
                
                
@@ -6803,12 +6852,12 @@ system-contact OBJECT-TYPE
                 that is responsible for the device. The POS should indicate the		
                 maximum supported string length. If the user entered string is		
                 too long, the device will store as much as possible and will		
-                return the &lt;noError&gt;.
+                return the <noError>.
                 Additional information:
                 The maximum supported string length is 32
                 characters.  If the user entered string is too long,
                 the device will store the first 32 characters and will
-                return the &lt;noError&gt; status.
+                return the <noError> status.
                 This object only supports the transfer of UTF-8 strings"
 ::= { id 13 }
                
@@ -6820,13 +6869,13 @@ company-name OBJECT-TYPE
    DESCRIPTION "The maximum supported string length is 32 characters. If the		
                 user entered string is too long, the device will store the		
                 first 32 characters and will return the		
-                &lt;noError&gt; status. This object only		
+                <noError> status. This object only		
                 supports the transfer of UTF-8 strings
                 Additional information:
                 The maximum supported string length is 32  
                 characters.  If the user entered string is too long, 
                 the device will store the first 32 characters and will 
-                return the &lt;noError&gt; status.
+                return the <noError> status.
                 This object only supports the transfer of UTF-8 strings"
 ::= { id 22 }
                
@@ -6859,10 +6908,10 @@ default-copies OBJECT-TYPE
                 Additional information:
                  The supported values are 1 through 32000.  
                 	  Setting to an unsupported value causes the printer to substitute in a snap
-                	  value and to return &lt;noError&gt; status.   
+                	  value and to return <noError> status.   
                 	  The snaps are as follows:  
-                		  &lt;1 snaps to 1  
-                		  &gt;999 snaps to 32000"
+                		  <1 snaps to 1  
+                		  >999 snaps to 32000"
 ::= { settings-pdl 4 }
                
                
@@ -6873,16 +6922,16 @@ default-lines-per-page OBJECT-TYPE
    DESCRIPTION "Returns or changes the default number of lines per page. The		
                 POS indicates the supported values. An unsupported value causes		
                 the printer to use the closest supported value, causing the		
-                printer to return the &lt;noError&gt;.
+                printer to return the <noError>.
                 Additional information:
                 The supported values in $product_str are 5 to 128. 
                 Setting to an unsupported value causes the  
                 the printer to substitute in a snap value and to return 
-                &lt;noError&gt; 
+                <noError> 
                 status.   
                 The snap values are as follow:   
-                &lt;5 snaps to 5   
-                &gt;128 snaps to 128"
+                <5 snaps to 5   
+                >128 snaps to 128"
 ::= { settings-pdl 11 }
                
                
@@ -6894,7 +6943,7 @@ default-vmi OBJECT-TYPE
                 of measure for VMI is centipoints per line. The POS indicates		
                 the supported values. An unsupported value causes the printer		
                 to use the closest supported value, causing the printer to		
-                return &lt;noError&gt;."
+                return <noError>."
 ::= { settings-pdl 12 }
                
                
@@ -6906,21 +6955,30 @@ default-media-size OBJECT-TYPE
 		   eFoolscap(10),
 		   eStatement(15),
 		   eROC16K(17),
+		   eISOandJISA6(24),
 		   eISOandJISA5(25),
 		   eISOandJISA4(26),
+		   ePRC16K195X270(34),
+		   eJISB6(44),
 		   eJISB5(45),
 		   eJapanesePostcardDouble(72),
+		   eIndexCard4x6(74),
+		   eIndexCard5x8(75),
+		   eIndexCard3x5(78),
 		   eMonarch(80),
 		   eCommercial10(81),
+		   ePRC16K184X260(89),
 		   eInternationalDL(90),
 		   eInternationalC5(91),
 		   eInternationalB5(100),
-		   eCustom(101)
+		   eCustom(101),
+		   ePhoto10x15(118),
+		   eIndexCard5x7(122)
 		   }
    ACCESS      read-write
    STATUS      optional
    DESCRIPTION "This indicates the default media size. A write of an		
-                unsupported value causes an &lt;ErrorInvalidOrUnsupported Value&gt;.		Complete list of supported media sizes along with their		
+                unsupported value causes an <ErrorInvalidOrUnsupported Value>.		Complete list of supported media sizes along with their		
                 dimensions are listed in the ''Media Size Table'' near the end		
                 of this document. (for a full list of media size enums see the		
                 end of this file) "
@@ -7106,17 +7164,17 @@ pcl-default-font-height OBJECT-TYPE
                 in centipoints, by multiplying the point size by 100. The POS		
                 indicates the supported values. An unsupported value causes the		
                 printer to use the closest supported value, causing the printer		
-                to return &lt;noError&gt;. ''Closest'' means		
+                to return <noError>. ''Closest'' means		
                 the smallest absolute difference.
                 Additional information:
                 Supported values range from 400 to 99975, in
                 increments of 25 units.
                 Setting to an unsupported value causes the 
                 printer to substitute in a snap value and to 
-                return &lt;noError&gt; status.   
+                return <noError> status.   
                 The snap values are as follow:   
-                &lt;=400 snaps to 400   
-                &gt;=99975 snaps to 99975   
+                <=400 snaps to 400   
+                >=99975 snaps to 99975   
                 Unsupported values in the range 400 to 99975 snap
                 DOWN to the previous supported value 
                 (i.e 25293 snaps to 25275 or 75038 snaps to 75025)."
@@ -7145,7 +7203,7 @@ pcl-default-font-number OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "Returns or changes the value of the default font number		
                 variable in NVRAM. Writing an unsupported value causes the		
-                printer to generate an &lt;badValue&gt;.
+                printer to generate an <badValue>.
                 Additional information:
                 Valid numbers or 0 - 255, but only font numbers that are 
                 included in the PCL FONT LIST are selectable."
@@ -7163,15 +7221,15 @@ pcl-default-font-width OBJECT-TYPE
                 width, in centipoints, by dividing 7200 by the pitch. The POS		
                 indicates the supported values. An unsupported value causes the		
                 printer to use the closest supported value, causing the printer		
-                to return &lt;noError&gt;. ''Closest'' means		
+                to return <noError>. ''Closest'' means		
                 the smallest absolute difference.
                 Additional information:
                 Setting to an unsupported value causes the 
                 printer to substitue in a snap value (listed below)
-                and return &lt;noError&gt; status.   
+                and return <noError> status.   
                 The snap values for pitch are as follow:   
-                &lt;=44 snaps to 44   
-                &gt;=9999 snaps to 9999"
+                <=44 snaps to 44   
+                >=9999 snaps to 9999"
 ::= { pdl-pcl 16 }
                
                
@@ -7241,7 +7299,7 @@ collated-originals-support OBJECT-TYPE
                         released and the rest of the mopies will print.    	
                     cSecurityPrint - The printer spools the job and holds the		
                         job until the user releases the job by entering a		
-                        &lt;&lt;hidden&gt;&gt; at the printer's control panel.    	
+                        <<hidden>> at the printer's control panel.    	
                     cAutoHighlight - The printer prints the job a number of		
                         times with a mail distribution list prepended to each		
                         job. A different mailing address is highlighted on each		
@@ -7342,15 +7400,15 @@ hold-job-timeout OBJECT-TYPE
                 		A value of 0 means never delete the jobs.
                 		Setting it to an unsupported value causes
                 		the printer to substitute a value (listed
-                		below) and to return &lt;noError&gt;
+                		below) and to return <noError>
                 		status.  
                 		LaserJet 4600 supports values of 0, 60, 240, 1440, and 10080   
                 		The values are as follows:  
-                &lt;=0 snap to 0   (disabled)  
-                &gt;=1 and &lt;=150 snap to 60 (60 minutes)  
-                &gt;=151 and &lt;=840 snap to 240 (4 hours)  
-                &gt;=841 and &lt;=2880 snap to 1440 (1 day)  
-                &gt;=2881 snap to 10080  (1 week)"
+                <=0 snap to 0   (disabled)  
+                >=1 and <=150 snap to 60 (60 minutes)  
+                >=151 and <=840 snap to 240 (4 hours)  
+                >=841 and <=2880 snap to 1440 (1 day)  
+                >=2881 snap to 10080  (1 week)"
 ::= { settings-job 10 }
                
                
@@ -7687,7 +7745,7 @@ job-info-attr-1 OBJECT-TYPE
                 than there are objects to store them, the excess JOBATTR values		
                 are ignored. If the corresponding SET JOBATTR= command has not		
                 been received when a get is done for this object, a status of		
-                &lt;noSuchName&gt; will be returned."
+                <noSuchName> will be returned."
 ::= { job-info-attribute 1 }
                
                
@@ -8135,7 +8193,7 @@ held-job-user-name OBJECT-TYPE
                 The legal PJL commands are SET and INQUIRE.  DEFAULT is not allowed.
                 The variable will appear in the PJL INFO VARIABLES list.
                 
-                @PJL SET USERNAME=&lt;80 bytes&gt;
+                @PJL SET USERNAME=<80 bytes>
                 
                 GENERAL DESCRIPTION: 
                 
@@ -8151,7 +8209,7 @@ held-job-user-name OBJECT-TYPE
                 The legal PJL commands are SET and, INQUIRE. DEFAULT is not allowed.
                 The variable will appear in the PJL INFO VARIABLES list.
                 
-                @PJL SET JOBNAME=&lt;80 bytes&gt;
+                @PJL SET JOBNAME=<80 bytes>
                 
                 GENERAL DESCRIPTION:
                 
@@ -8213,7 +8271,7 @@ held-job-user-name OBJECT-TYPE
                 The format for the OID is as follows:
                 
                 3.4.1.6.x.y
-                &lt;-----&gt; | |
+                <-----> | |
                 |    |  \
                 /     |  job-id in the system
                 /       \   
@@ -8259,7 +8317,7 @@ held-job-user-name OBJECT-TYPE
                 OID    
                 get 3.4.1.6.1.3
                 
-                For example, the &lt;getnext&gt; OID values sequence is as follows:
+                For example, the <getnext> OID values sequence is as follows:
                 
                 OID                returned OID
                 getnext 3.4.1.6         3.4.1.6.1.1
@@ -8274,7 +8332,7 @@ held-job-user-name OBJECT-TYPE
                 held jobs.
                 ***
                 
-                Also supported is &lt;getnext&gt; on the job attributes:
+                Also supported is <getnext> on the job attributes:
                 OID                returned OID
                 getnext 3.4.1.6.1       3.4.1.6.1.1
                 getnext 3.4.1.6.6       3.4.1.6.6.1"
@@ -8375,7 +8433,7 @@ held-job-delete OBJECT-TYPE
                 held job can also be deleted from the control panel.
                 Additional information:
                 Setting this to a value that is not a Held Job on the
-                system or is a Private Held Job returns &lt;ErrUnsupValue&gt;.
+                system or is a Private Held Job returns <ErrUnsupValue>.
                 To delete a private Held Job, you must use the PML object
                 HELD-JOB-PRINT with a quantity of 0 and supply the correct
                 HELD-JOB-PIN with the request. (See HELD-JOB-PRINT)"
@@ -8402,7 +8460,7 @@ held-job-enable OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "Enables or disables Job Retention (Job Hold). The valid values		
                 are eDisabled and eEnabled. (Specifying an invalid mode causes		
-                an &lt;badValue&gt; error to be returned.) When		
+                an <badValue> error to be returned.) When		
                 eDisabled is specified all Job Retention (Hold, Proof, Store,		
                 PIN Printing) is disabled. When eEnabled is specified, the Job		
                 Retention characteristics of a given job are defined by the PJL		
@@ -8495,6 +8553,332 @@ time-display OBJECT-TYPE
                 eTimeDisplayTwelveHour for AM/PM display. Set to
                 eTimeDisplayTwentyFourHour for military-type display."
 ::= { status-system 28 }
+               
+               
+rtc-time-zone OBJECT-TYPE
+   SYNTAX      INTEGER {
+		   eTzDateline(1),
+		   eTzSamoa(2),
+		   eTzHawaiian(3),
+		   eTzAlaskan(4),
+		   eTzPacific(5),
+		   eTzUSMountain(6),
+		   eTzMexico2(7),
+		   eTzMountain(8),
+		   eTzCentralAmerica(9),
+		   eTzCentral(10),
+		   eTzMexico(11),
+		   eTzCanadaCentral(12),
+		   eTzSAPacific(13),
+		   eTzEastern(14),
+		   eTzUSEastern(15),
+		   eTzAtlantic(16),
+		   eTzSAWestern(17),
+		   eTzPacificSA(18),
+		   eTzNewfoundland(19),
+		   eTzESouthAmerica(20),
+		   eTzSAEastern(21),
+		   eTzGreenland(22),
+		   eTzMidAtlantic(23),
+		   eTzAzores(24),
+		   eTzCapeVerde(25),
+		   eTzGreenwich(26),
+		   eTzGMT(27),
+		   eTzWEurope(28),
+		   eTzCentralEurope(29),
+		   eTzRomance(30),
+		   eTzCentralEuropean(31),
+		   eTzWCentralAfrica(32),
+		   eTzGTB(33),
+		   eTzEeurope(34),
+		   eTzEgypt(35),
+		   eTzSouthAfrica(36),
+		   eTzFLE(37),
+		   eTzJerusalem(38),
+		   eTzArabic(39),
+		   eTzArab(40),
+		   eTzRussian(41),
+		   eTzEAfrica(42),
+		   eTzIran(43),
+		   eTzArabian(44),
+		   eTzCaucasus(45),
+		   eTzAfghanistan(46),
+		   eTzEkaterinburg(47),
+		   eTzWestAsia(48),
+		   eTzIndia(49),
+		   eTzNepal(50),
+		   eTzNCentralAsia(51),
+		   eTzCentralAsia(52),
+		   eTzSriLanka(53),
+		   eTzMyanmar(54),
+		   eTzSEAsia(55),
+		   eTzNorthAsia(56),
+		   eTzChina(57),
+		   eTzNorthAsiaEast(58),
+		   eTzMalayPeninsula(59),
+		   eTzWAustralia(60),
+		   eTzTaipei(61),
+		   eTzTokyo(62),
+		   eTzKorea(63),
+		   eTzYakutsk(64),
+		   eTzCenAustralia(65),
+		   eTzAUSCentral(66),
+		   eTzEAustralia(67),
+		   eTzAUSEastern(68),
+		   eTzWestPacific(69),
+		   eTzTasmania(70),
+		   eTzVladivostok(71),
+		   eTzCentralPacific(72),
+		   eTzNewZealand(73),
+		   eTzFiji(74),
+		   eTzTonga(75)
+		   }
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "Controls the time zone, which can be chosen from a list of time		
+                zones similar to the one used by Microsoft Windows operating		
+                system: eTzDateline -12:00 International Date Line West		
+                eTzSamoa -11:00 Midway Island, Samoa eTzHawaiian -10:00 Hawaii		
+                eTzAlaskan -09:00 Alaska eTzPacific -08:00 Pacific Time (US &		
+                Canada); Tijuana eTzUSMountain -07:00 Arizona eTzMexico2 -07:00		
+                Chihuahua, La Paz, Mazatlan eTzMountain -07:00 Mountain Time		
+                (US & Canada) eTzCentralAmerica -06:00 Central America		
+                eTzCentral -06:00 Central Time (US & Canada) eTzMexico -06:00		
+                Guadalajara, Mexico City, Monterrey eTzCanadaCentral -06:00		
+                Saskatchewan eTzSAPacific -05:00 Bogota, Lima, Quito eTzEastern		
+                -05:00 Eastern Time (US & Canada) eTzUSEastern -05:00 Indiana		
+                (East) eTzAtlantic -04:00 Atlantic Time (Canada) eTzSAWestern		
+                -04:00 Caracas, La Paz eTzPacificSA -04:00 Santiago		
+                eTzNewfoundland -03:30 Newfoundland eTzESouthAmerica -03:00		
+                Brasilia eTzSAEastern -03:00 Buenos Aires, Georgetown		
+                eTzGreenland -03:00 Greenland eTzMidAtlantic -02:00		
+                Mid-Atlantic eTzAzores -01:00 Azores eTzCapeVerde -01:00 Cape		
+                Verde Is. eTzGreenwich 00:00 Casablanca, Monrovia eTzGMT 00:00		
+                Greenwich Mean Time : Dublin, Edinburgh, Lisbon, London		
+                eTzWEurope +01:00 Amsterdam, Berlin, Bern, Rome, Stockholm,		
+                Vienna eTzCentralEurope +01:00 Belgrade, Bratislava, Budapest,		
+                Ljubljana, Prague eTzRomance +01:00 Brussels, Copenhagen,		
+                Madrid, Paris eTzCentralEuropean +01:00 Sarajevo, Skopje,		
+                Warsaw, Zagreb eTzWCentralAfrica +01:00 West Central Africa		
+                eTzGTB +02:00 Athens, Beirut, Istanbul, Minsk eTzEeurope +02:00		
+                Bucharest eTzEgypt +02:00 Cairo eTzSouthAfrica +02:00 Harare,		
+                Pretoria eTzFLE +02:00 Helsinki, Kyiv, Riga, Sofia, Tallinn,		
+                Vilnius eTzJerusalem +02:00 Jerusalem eTzArabic +03:00 Baghdad		
+                eTzArab +03:00 Kuwait, Riyadh eTzRussian +03:00 Moscow, St.		
+                Petersburg, Volgograd eTzEAfrica +03:00 Nairobi eTzIran +03:30		
+                Tehran eTzArabian +04:00 Abu Dhabi, Muscat eTzCaucasus +04:00		
+                Baku, Tbilisi, Yerevan eTzAfghanistan +04:30 Kabul		
+                eTzEkaterinburg +05:00 Ekaterinburg eTzWestAsia +05:00		
+                Islamabad, Karachi, Tashkent eTzIndia +05:30 Chennai, Kolkata,		
+                Mumbai, New Delhi eTzNepal +05:45 Kathmandu eTzNCentralAsia		
+                +06:00 Almaty, Novosibirsk eTzCentralAsia +06:00 Astana, Dhaka		
+                eTzSriLanka +06:00 Sri Jayawardenepura eTzMyanmar +06:30		
+                Rangoon eTzSEAsia +07:00 Bangkok, Hanoi, Jakarta eTzNorthAsia		
+                +07:00 Krasnoyarsk eTzChina +08:00 Beijing, Chongqing, Hong		
+                Kong, Urumqi eTzNorthAsiaEast +08:00 Irkutsk, Ulaan Bataar		
+                eTzMalayPeninsula +08:00 Kuala Lumpur, Singapore eTzWAustralia		
+                +08:00 Perth eTzTaipei +08:00 Taipei eTzTokyo +09:00 Osaka,		
+                Sapporo, Tokyo eTzKorea +09:00 Seoul eTzYakutsk +09:00 Yakutsk		
+                eTzCenAustralia +09:30 Adelaide eTzAUSCentral +09:30 Darwin		
+                eTzEAustralia +10:00 Brisbane eTzAUSEastern +10:00 Canberra,		
+                Melbourne, Sydney eTzWestPacific +10:00 Guam, Port Moresby		
+                eTzTasmania +10:00 Hobart eTzVladivostok +10:00 Vladivostok		
+                eTzCentralPacific +11:00 Magadan, Solomon Is., New Caledonia		
+                eTzNewZealand +12:00 Auckland, Wellington eTzFiji +12:00 Fiji,		
+                Kamchatka, MarshallIs. eTzTonga +13:00 Nuku'alofa
+                Additional information:
+                Controls the time zone, which can be chosen from a list of
+                time zones similar to the one used by Microsoft Windows
+                operating system:
+                eTzDateline        -12:00 International Date Line West
+                eTzSamoa           -11:00 Midway Island, Samoa
+                eTzHawaiian        -10:00 Hawaii
+                eTzAlaskan         -09:00 Alaska
+                eTzPacific         -08:00 Pacific Time (US & Canada); Tijuana
+                eTzUSMountain      -07:00 Arizona
+                eTzMexico2         -07:00 Chihuahua, La Paz, Mazatlan
+                eTzMountain        -07:00 Mountain Time (US & Canada)
+                eTzCentralAmerica  -06:00 Central America
+                eTzCentral         -06:00 Central Time (US & Canada)
+                eTzMexico          -06:00 Guadalajara, Mexico City, Monterrey
+                eTzCanadaCentral   -06:00 Saskatchewan
+                eTzSAPacific       -05:00 Bogota, Lima, Quito
+                eTzEastern         -05:00 Eastern Time (US & Canada)
+                eTzUSEastern       -05:00 Indiana (East)
+                eTzAtlantic        -04:00 Atlantic Time (Canada)
+                eTzSAWestern       -04:00 Caracas, La Paz
+                eTzPacificSA       -04:00 Santiago
+                eTzNewfoundland    -03:30 Newfoundland
+                eTzESouthAmerica   -03:00 Brasilia
+                eTzSAEastern       -03:00 Buenos Aires, Georgetown
+                eTzGreenland       -03:00 Greenland
+                eTzMidAtlantic     -02:00 Mid-Atlantic
+                eTzAzores          -01:00 Azores
+                eTzCapeVerde       -01:00 Cape Verde Is.
+                eTzGreenwich        00:00 Casablanca, Monrovia
+                eTzGMT              00:00 Greenwich Mean Time : Dublin,
+                Edinburgh, Lisbon, London
+                eTzWEurope         +01:00 Amsterdam, Berlin, Bern, Rome,
+                Stockholm, Vienna
+                eTzCentralEurope   +01:00 Belgrade, Bratislava, Budapest,
+                Ljubljana, Prague
+                eTzRomance         +01:00 Brussels, Copenhagen, Madrid, Paris
+                eTzCentralEuropean +01:00 Sarajevo, Skopje, Warsaw, Zagreb
+                eTzWCentralAfrica  +01:00 West Central Africa
+                eTzGTB             +02:00 Athens, Beirut, Istanbul, Minsk
+                eTzEeurope         +02:00 Bucharest
+                eTzEgypt           +02:00 Cairo
+                eTzSouthAfrica     +02:00 Harare, Pretoria
+                eTzFLE             +02:00 Helsinki, Kyiv, Riga, Sofia,
+                Tallinn, Vilnius
+                eTzJerusalem       +02:00 Jerusalem
+                eTzArabic          +03:00 Baghdad
+                eTzArab            +03:00 Kuwait, Riyadh
+                eTzRussian         +03:00 Moscow, St. Petersburg, Volgograd
+                eTzEAfrica         +03:00 Nairobi
+                eTzIran            +03:30 Tehran
+                eTzArabian         +04:00 Abu Dhabi, Muscat
+                eTzCaucasus        +04:00 Baku, Tbilisi, Yerevan
+                eTzAfghanistan     +04:30 Kabul
+                eTzEkaterinburg    +05:00 Ekaterinburg
+                eTzWestAsia        +05:00 Islamabad, Karachi, Tashkent
+                eTzIndia           +05:30 Chennai, Kolkata, Mumbai, New Delhi
+                eTzNepal           +05:45 Kathmandu
+                eTzNCentralAsia    +06:00 Almaty, Novosibirsk
+                eTzCentralAsia     +06:00 Astana, Dhaka
+                eTzSriLanka        +06:00 Sri Jayawardenepura
+                eTzMyanmar         +06:30 Rangoon
+                eTzSEAsia          +07:00 Bangkok, Hanoi, Jakarta
+                eTzNorthAsia       +07:00 Krasnoyarsk
+                eTzChina          +08:00 Beijing, Chongqing, Hong Kong,
+                Urumqi
+                eTzNorthAsiaEast   +08:00 Irkutsk, Ulaan Bataar
+                eTzMalayPeninsula  +08:00 Kuala Lumpur, Singapore
+                eTzWAustralia      +08:00 Perth
+                eTzTaipei          +08:00 Taipei
+                eTzTokyo           +09:00 Osaka, Sapporo, Tokyo
+                eTzKorea           +09:00 Seoul
+                eTzYakutsk         +09:00 Yakutsk
+                eTzCenAustralia    +09:30 Adelaide
+                eTzAUSCentral      +09:30 Darwin
+                eTzEAustralia      +10:00 Brisbane
+                eTzAUSEastern      +10:00 Canberra, Melbourne, Sydney
+                eTzWestPacific     +10:00 Guam, Port Moresby
+                eTzTasmania        +10:00 Hobart
+                eTzVladivostok     +10:00 Vladivostok
+                eTzCentralPacific  +11:00 Magadan, Solomon Is., New Caledonia
+                eTzNewZealand      +12:00 Auckland, Wellington
+                eTzFiji            +12:00 Fiji, Kamchatka, Marshall Is.
+                eTzTonga           +13:00 Nuku'alofa"
+::= { status-system 99 }
+               
+               
+automatic-daylight-savings OBJECT-TYPE
+   SYNTAX      INTEGER {
+		   eOff(1),
+		   eOn(2)
+		   }
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "Determines whether or not the automatic adjustment for daylight		
+                savings time is enabled. If it's enabled the device local time		
+                will be automatically adjusted for DST period.
+                Additional information:
+                Determines whether or not the automatic adjustment for
+                daylight savings time is enabled. If its enabled the device
+                local time will be automatically adjusted for DST period"
+::= { status-system 100 }
+               
+               
+daylight-savings-start OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "A C structure containing the following fields:    	
+                    typedef struct {    	
+                    ubyte hour; /* hour: 0 to 23 */    	
+                    ubyte weekday; /* weekday: 0(Sunday) to 6 */    	
+                    ubyte occurrence; /* occurrence in the month: 1 to 5 */    	
+                    ubyte month; /* month: 1 to 12 */    	
+                    } dst;    	
+                where ubyte is an unsigned byte (0-255).
+                Additional information:
+                A C structure containing the following fields:   
+                typedef struct {   
+                ubyte hour; /* hour: 0 to 23 */   
+                ubyte weekday; /* weekday: 0(Sunday) to 6 */   
+                ubyte occurrence; /* occurrence in the month: 1 to 5 */   
+                ubyte month; /* month: 1 to 12 */   
+                } dst;   
+                where ubyte is an unsigned byte (0-255)."
+::= { status-system 101 }
+               
+               
+daylight-savings-end OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "A C structure containing the following fields:    	
+                    typedef struct {    	
+                    ubyte hour; /* hour: 0 to 23 */    	
+                    ubyte weekday; /* weekday: 0(Sunday) to 6 */    	
+                    ubyte occurrence; /* occurrence in the month: 1 to 5 */    	
+                    ubyte month; /* month: 1 to 12 */    	
+                    } dst;    	
+                where ubyte is an unsigned byte (0-255).
+                Additional information:
+                A C structure containing the following fields:   
+                typedef struct {   
+                ubyte hour; /* hour: 0 to 23 */   
+                ubyte weekday; /* weekday: 0(Sunday) to 6 */   
+                ubyte occurrence; /* occurrence in the month: 1 to 5 */   
+                ubyte month; /* month: 1 to 12 */   
+                } dst;   
+                where ubyte is an unsigned byte (0-255)."
+::= { status-system 102 }
+               
+               
+daylight-savings-offset OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "Controls the offset in minutes to be added to the time when DST		
+                is in effect.
+                Additional information:
+                Controls the offset in minutes to be added to the time when
+                DST is in effect"
+::= { status-system 103 }
+               
+               
+daylight-savings-reset OBJECT-TYPE
+   SYNTAX      INTEGER {
+		   eResetToDefault(1),
+		   eCustomized(2)
+		   }
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "This object is used to reset (set back to factory default for		
+                the current time zone) or read the current status of the DST		
+                settings. When Set to eResetToDefault, this object can be used		
+                to reset all the DST related objects back to their factory		
+                default values. Setting this object with an enumerated value of		
+                eCustomized has no effect. When a Get operation is performed on		
+                this object it will return a value eResetToDefault if all DST		
+                settings are still set to they factory value. It will return		
+                eCustomized if any DST parameter has been set to a custom		
+                value.
+                Additional information:
+                This object is used to reset (set back to factory default for
+                the current time zone) or read the current status of the DST
+                settings. When Set to eResetToDefault, this object can be used
+                to reset all the DST related objects back to their factory
+                default values. Setting this object with an enumerated value
+                of eCustomized has no effect. When a Get operation is
+                performed on this object it will return a value
+                eResetToDefault if all DST settings are still set to they
+                factory value. It will return eCustomized if any DST parameter
+                has been set to a custom value."
+::= { status-system 104 }
                
                
 direct-connect-ports-enable OBJECT-TYPE
@@ -8732,7 +9116,7 @@ io-timeout OBJECT-TYPE
                 processed.    
                 The supported values are 5 to 300 seconds. 
                 Setting to a value outside the supported range returns 
-                &lt;noError&gt; status and the
+                <noError> status and the
                 value will be snapped to the nearest supported value."
 ::= { settings-io 1 }
                
@@ -8787,6 +9171,48 @@ port1-parallel-bidirectionality OBJECT-TYPE
 ::= { port1 5 }
                             
                
+channelnumberofchannels OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      write-only
+   STATUS      optional
+   DESCRIPTION "An indication of how many print data channels the I/O card		
+                supports.
+                Additional information:
+                This object is used by the IIO card to tell the peripheral
+                firmware how many logical channels will be used by the card.
+                This object can only be set once per physical channel.  If
+                an attempt is made to set it a subsequent time it is ignored
+                and an return code of <ErrorActionCanNotBePerformedNow.is returned.  
+                
+                If new firmware is dynamically downloaded to the Blazers Plus
+                card, and if that firmware uses more logical channels, it is
+                necessary to reset the printer."
+::= { channel 1 }
+
+
+
+ChannelEntry   ::= SEQUENCE {
+    channelindex             INTEGER,
+    channeltype              INTEGER,
+    channelprotocolversion   OCTET STRING,
+    channelstate             INTEGER,
+    channelifindex           INTEGER,
+    channelstatus            INTEGER,
+    channelinformation       OCTET STRING
+}
+
+
+
+DeviceChannelEntry   ::= SEQUENCE {
+    channel-index              INTEGER,
+    channel-bytes-sent         INTEGER,
+    channel-bytes-received     INTEGER,
+    channel-io-errors          INTEGER,
+    channel-jobs-received      INTEGER,
+    channel-mio                INTEGER
+}
+
+
 rpc-bind-protocol-address OBJECT-TYPE
    SYNTAX      OCTET STRING
    ACCESS      read-only
@@ -8800,24 +9226,24 @@ rpc-bind-protocol-address OBJECT-TYPE
                 mapping information can be found in RFC 1010 Assigned Numbers.		
                 A list of interesting transport protocol number mappings		
                 include:    	
-                    &lt;table&gt;
+                    <table>
                     Protocol | Number
                     ---------+-------
                      UDP/IP  |  17 
                       IPX    |  1000 
                       MLC    |  4660
-                    &lt;/table&gt;
+                    </table>
                     Bytes 3 and 4 indicate the address family. The address		
                         family uses the same mapping as the BSD sockets address		
                         family. A list of interesting address family mappings		
                         include:    	
-                    &lt;table&gt;
+                    <table>
                     Address Family | Number
                     ---------------+-------
                         Internet   |   2
                         NetWare    |   6
                         MLC        | 22136 
-                    &lt;/table&gt;
+                    </table>
                 The format the fifth and following bytes is dependent on the		
                 address family. For the Internet address family, bytes 5 and 6		
                 contain the port number, bytes 7 through 10 contain the IP		
@@ -8829,7 +9255,7 @@ rpc-bind-protocol-address OBJECT-TYPE
                 The length of the binary value is zero
                 if the instance of an object in the rpc-bind-protocol-address
                 array is not in use.
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed."
 ::= { settings-rpc 2 }
@@ -8843,7 +9269,7 @@ rpc-bound-protocol-address OBJECT-TYPE
                 NFS service has been bound to successful. The format is that		
                 same as the array of RPC-BIND-PROTOCOL-ADDRESS of objects.
                 Additional information:
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed."
 ::= { status-rpc 3 }
@@ -8860,7 +9286,7 @@ file-system-max-open-files OBJECT-TYPE
                 personality (e.g. PCL or PostScript) is guaranteed to be
                 able to open before the file system runs out of file handles.
                 		   This object is between 1 and 500.
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed."
 ::= { settings-file-system 2 }
@@ -8873,21 +9299,21 @@ file-system-set-system-partition-writeable OBJECT-TYPE
    DESCRIPTION "This object allows the system partition to be written to. It		
                 consists of a C structure containing the following fields:    	
                     typedef struct {    	
-                    ubyte &lt;&lt;hidden&gt;&gt;[8];    	
+                    ubyte <<hidden>>[8];    	
                     ubyte volumenumber;    	
                     } fs_writeable_system_partition_t;    	
                     which is described below:    	
-                    Bytes 0 - 7: contain the &lt;&lt;hidden&gt;&gt;    	
+                    Bytes 0 - 7: contain the <<hidden>>    	
                     Byte 8 : is the volume number    	
-                Access to this command is controlled by the &lt;&lt;hidden&gt;&gt;. If the		
-                &lt;&lt;hidden&gt;&gt; supplied is incorrect the command will fail. The		
+                Access to this command is controlled by the <<hidden>>. If the		
+                <<hidden>> supplied is incorrect the command will fail. The		
                 volumenumber is a volume number of an existing system		
                 partition.
                 Additional information:
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed.
-                Returns &lt;badValue&gt; if the &lt;&lt;hidden&gt;&gt; is incorrect or if
+                Returns <badValue> if the <<hidden>> is incorrect or if
                 		   the volume requested is not present."
 ::= { settings-file-system 6 }
                
@@ -8900,10 +9326,10 @@ file-system-set-system-partition-readonly OBJECT-TYPE
                 volume number to change. If the volume number specified is NOT		
                 a system partition an error is returned.
                 Additional information:
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed.
-                Returns &lt;badValue&gt; if the volume requested
+                Returns <badValue> if the volume requested
                 		   is not present."
 ::= { settings-file-system 7 }
                
@@ -8939,7 +9365,7 @@ file-system-delete-files OBJECT-TYPE
                         be limited by the remaining space in the object.    	
                 This string represents a fully-qualified path name which may		
                 specify a filename or a regular expression that may match		
-                multiple files (e.g &lt;path&gt;/*.exe). Access to this command is		
+                multiple files (e.g <path>/*.exe). Access to this command is		
                 controlled by the UserId and the authentication data. If the		
                 UserID or authentication data supplied is incorrect the command		
                 will fail. The device POS will specify any limitations to the		
@@ -8981,7 +9407,7 @@ file-system-delete-files OBJECT-TYPE
                 object.  This string represents a fully-qualified path 
                 name which may specify a filename or a file-type regular 
                 expression that may match multiple files (e.g.,
-                &lt;path&gt;/*.exe). 
+                <path>/*.exe). 
                 
                 Access to this command is controlled by the UserId
                 and the authentication data.  If the UserID or 
@@ -9004,16 +9430,16 @@ file-system-external-access-capabilities OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "This object is used to control access to the file system of the		
                 device. It is always readable. It is writable when		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string,		
-                and a successful write to that object with the current &lt;&lt;hidden&gt;&gt;		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string,		
+                and a successful write to that object with the current <<hidden>>		
                 has preceded the write to this object. In other words, the		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must be in the		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must be in the		
                 'authenticated state' for a write on		
                 FILE-SYSTEM-EXTERNAL-ACCESS-CAPABILITIES to succeed. After the		
                 object has successfully been written to, it becomes read-only,		
-                and the FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; object exits the		
-                authenticated state. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must		
-                then be written to again with the current &lt;&lt;hidden&gt;&gt; in order to		
+                and the FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> object exits the		
+                authenticated state. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must		
+                then be written to again with the current <<hidden>> in order to		
                 make another write operation on		
                 FILE-SYSTEM-EXTERNAL-ACCESS-CAPABILITIES possible.    	
                     cDisablePJLFileSystemAccess - All file system access		
@@ -9038,16 +9464,16 @@ file-system-erase-mode OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "This object is used to control how file data is handled when		
                 files are deleted. It is always readable. It is writable when		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or		
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the		
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object. When		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or		
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the		
+                current <<hidden>> has preceeded the write to the object. When		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string		
                 then this object becomes read-only after a successful write to		
-                it. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written		
-                to again with the current &lt;&lt;hidden&gt;&gt; in order to make another		
+                it. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written		
+                to again with the current <<hidden>> in order to make another		
                 write operation on the object possible. If the		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is incorrectly set, this		
-                object becomes read-only until the &lt;&lt;hidden&gt;&gt; is correctly set.		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is incorrectly set, this		
+                object becomes read-only until the <<hidden>> is correctly set.		
                 The logical settings for this object are:    	
                     NonSecureFastErase - When a file is deleted, only the		
                         reference to it in the file system tables is removed.		
@@ -9070,16 +9496,16 @@ file-system-erase-mode OBJECT-TYPE
                 Additional information:
                 This object is used to control how file data is handled when
                 files are deleted. It is always readable. It is writable when
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object. When
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the
+                current <<hidden>> has preceeded the write to the object. When
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string
                 then this object becomes read-only after a successful write to
-                it. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written
-                to again with the current &lt;&lt;hidden&gt;&gt; in order to make another
+                it. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written
+                to again with the current <<hidden>> in order to make another
                 write operation on the object possible. If the
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is incorrectly set, this
-                object becomes read-only until the &lt;&lt;hidden&gt;&gt; is correctly set.
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is incorrectly set, this
+                object becomes read-only until the <<hidden>> is correctly set.
                 The logical settings for this object are:   
                 NonSecureFastErase - When a file is deleted, only the
                 reference to it in the file system tables is removed.
@@ -9129,16 +9555,16 @@ file-system-wipe-disk OBJECT-TYPE
                 contains the permstore, the permstore will be saved off and		
                 restored after the file-system wipe is completed. This object		
                 is always readable. It is writable when		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or		
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the		
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object. When		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or		
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the		
+                current <<hidden>> has preceeded the write to the object. When		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string		
                 then this object becomes read-only after a successful write to		
-                it. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written		
-                to again with the current &lt;&lt;hidden&gt;&gt; in order to make another		
+                it. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written		
+                to again with the current <<hidden>> in order to make another		
                 write operation on the object possible. If the		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is incorrectly set, this		
-                object becomes read-only until the &lt;&lt;hidden&gt;&gt; is correctly set.
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is incorrectly set, this		
+                object becomes read-only until the <<hidden>> is correctly set.
                 Additional information:
                 This object is a non-leaf node which will have one leaf node
                 under it for each file system in the printer. The leaf nodes
@@ -9153,16 +9579,16 @@ file-system-wipe-disk OBJECT-TYPE
                 contains the permstore, the permstore will be saved off and
                 restored after the file-system wipe is completed. This object
                 is always readable. It is writable when
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object. When
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the
+                current <<hidden>> has preceeded the write to the object. When
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string
                 then this object becomes read-only after a successful write to
-                it. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written
-                to again with the current &lt;&lt;hidden&gt;&gt; in order to make another
+                it. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written
+                to again with the current <<hidden>> in order to make another
                 write operation on the object possible. If the
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is incorrectly set, this
-                object becomes read-only until the &lt;&lt;hidden&gt;&gt; is correctly set.
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is incorrectly set, this
+                object becomes read-only until the <<hidden>> is correctly set.
                 This object can also be used to set the following erase modes
                 Erase mode can be set to any of the modes using this object irrespective 
                 of the FILE-SYSTEM-ERASE-MODE .In this no need to use FILE-SYSTEM-ERASE-MODE 
@@ -9214,24 +9640,24 @@ secure-disk-status OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "This object can be used for reading The status of the Secure		
                 disk and non secure disk. Returns		
-                &lt;noSuchName&gt; status if attempting to perform		
+                <noSuchName> status if attempting to perform		
                 a Get on this OID with no mass storage device		
-                installed.Returns:: eSecureDiskLocked&lt;&lt;hidden&gt;&gt;Null : Secure Hard		
-                Disk in locked state &amp; User &lt;&lt;hidden&gt;&gt; in NVRAM is null / still		
+                installed.Returns:: eSecureDiskLocked<<hidden>>Null : Secure Hard		
+                Disk in locked state &amp; User <<hidden>> in NVRAM is null / still		
                 not generated [ Disk NOT Usable ]		
-                eSecureDiskLocked&lt;&lt;hidden&gt;&gt;Wrong : Secure Hard Disk in locked		
-                state as User &lt;&lt;hidden&gt;&gt; in NVRAM does not match / authentic [		
-                Disk NOT Usable ] eSecureDiskLocked&lt;&lt;hidden&gt;&gt;Correct : Secure		
-                Hard Disk in locked state &amp; User &lt;&lt;hidden&gt;&gt; in NVRAM is		
+                eSecureDiskLocked<<hidden>>Wrong : Secure Hard Disk in locked		
+                state as User <<hidden>> in NVRAM does not match / authentic [		
+                Disk NOT Usable ] eSecureDiskLocked<<hidden>>Correct : Secure		
+                Hard Disk in locked state &amp; User <<hidden>> in NVRAM is		
                 correct/matches the Disk [ Disk is usable ]		
-                eSecureDiskUnLocked&lt;&lt;hidden&gt;&gt;Present : Secure Hard Disk in		
-                Unlocked state &amp; a valid User &lt;&lt;hidden&gt;&gt; present in NVRAM [ Disk		
-                is usable ] eSecureDiskUnLocked&lt;&lt;hidden&gt;&gt;Null : Secure Hard Disk		
-                in Unlocked state &amp; User &lt;&lt;hidden&gt;&gt; is null (still not generated		
-                ) [Disk is usable] eNonSecureDisk&lt;&lt;hidden&gt;&gt;Present : Non Secure		
-                Hard Disk present &amp; a valid / user &lt;&lt;hidden&gt;&gt; in NVRAM [Disk is		
-                usable] eNonSecureDisk&lt;&lt;hidden&gt;&gt;Null : Non Secure Hard Disk		
-                present &amp; the User &lt;&lt;hidden&gt;&gt; is not genrated/present in NVRAM		
+                eSecureDiskUnLocked<<hidden>>Present : Secure Hard Disk in		
+                Unlocked state &amp; a valid User <<hidden>> present in NVRAM [ Disk		
+                is usable ] eSecureDiskUnLocked<<hidden>>Null : Secure Hard Disk		
+                in Unlocked state &amp; User <<hidden>> is null (still not generated		
+                ) [Disk is usable] eNonSecureDisk<<hidden>>Present : Non Secure		
+                Hard Disk present &amp; a valid / user <<hidden>> in NVRAM [Disk is		
+                usable] eNonSecureDisk<<hidden>>Null : Non Secure Hard Disk		
+                present &amp; the User <<hidden>> is not genrated/present in NVRAM		
                 [Disk is usable] eDisabledOtherEncryptedDrivePresent: Disk is		
                 disabled because a FDE disk is installed, set on another FDE		
                 disk or a non FDE hard disk [ Disk NOT Usable ]		
@@ -9243,26 +9669,26 @@ secure-disk-status OBJECT-TYPE
                 This object can be used for reading
                 The status of the Secure disk and non secure disk.
                 
-                Returns &lt;noSuchName&gt; status if attempting
+                Returns <noSuchName> status if attempting
                 to perform a Get on this OID with no mass storage device
                 installed.
                 
                 
                 
                 Returns
-                SecureDiskLocked&lt;&lt;hidden&gt;&gt;Null : Secure Hard Disk in locked state &amp; User &lt;&lt;hidden&gt;&gt; in NVRAM is null / still not generated
+                SecureDiskLocked<<hidden>>Null : Secure Hard Disk in locked state &amp; User <<hidden>> in NVRAM is null / still not generated
                 [ Disk NOT Usable ]
-                SecureDiskLocked&lt;&lt;hidden&gt;&gt;Wrong : Secure Hard Disk in locked state  as User &lt;&lt;hidden&gt;&gt; in NVRAM does not match / authentic
+                SecureDiskLocked<<hidden>>Wrong : Secure Hard Disk in locked state  as User <<hidden>> in NVRAM does not match / authentic
                 [ Disk NOT Usable ]
-                SecureDiskLocked&lt;&lt;hidden&gt;&gt;Correct : Secure Hard Disk in locked state &amp; User &lt;&lt;hidden&gt;&gt; in NVRAM is correct/matches the Disk
+                SecureDiskLocked<<hidden>>Correct : Secure Hard Disk in locked state &amp; User <<hidden>> in NVRAM is correct/matches the Disk
                 [ Disk is usable ]
-                SecureDiskUnLocked&lt;&lt;hidden&gt;&gt;Present : Secure Hard Disk in Unlocked state &amp; a valid User &lt;&lt;hidden&gt;&gt; present in NVRAM
+                SecureDiskUnLocked<<hidden>>Present : Secure Hard Disk in Unlocked state &amp; a valid User <<hidden>> present in NVRAM
                 [ Disk is usable ]
-                SecureDiskUnLocked&lt;&lt;hidden&gt;&gt;Null : Secure Hard Disk in Unlocked state &amp; User &lt;&lt;hidden&gt;&gt; is null (still not generated )
+                SecureDiskUnLocked<<hidden>>Null : Secure Hard Disk in Unlocked state &amp; User <<hidden>> is null (still not generated )
                 [Disk is usable]
-                NonSecureDisk&lt;&lt;hidden&gt;&gt;Present : Non Secure Hard Disk present &amp; a valid /  user &lt;&lt;hidden&gt;&gt; in NVRAM
+                NonSecureDisk<<hidden>>Present : Non Secure Hard Disk present &amp; a valid /  user <<hidden>> in NVRAM
                 [Disk is usable]
-                NonSecureDisk&lt;&lt;hidden&gt;&gt;Null : Non Secure Hard Disk present &amp; the User &lt;&lt;hidden&gt;&gt; is not genrated/present in NVRAM
+                NonSecureDisk<<hidden>>Null : Non Secure Hard Disk present &amp; the User <<hidden>> is not genrated/present in NVRAM
                 [Disk is usable]
                 DisabledOtherEncryptedDrivePresent: Disk is disabled because a FDE disk is installed, set on another FDE disk or a non FDE hard disk
                 [ Disk NOT Usable ]
@@ -9281,13 +9707,13 @@ secure-disk-autolock-mode OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "This object is used to control how file data is handled when		
                 files are deleted. It is always readable. It is writable when		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or		
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the		
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object. When		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or		
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the		
+                current <<hidden>> has preceeded the write to the object. When		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string		
                 then this object becomes read-only after a successful write to		
-                it. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written		
-                to again with the current &lt;&lt;hidden&gt;&gt; in order to make another		
+                it. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written		
+                to again with the current <<hidden>> in order to make another		
                 write operation on the object possible. This object can be used		
                 to set/get the auotlock mode . If the autolock mode is TRUE the		
                 Secure Disk will be locked to the printer automatically during		
@@ -9296,13 +9722,13 @@ secure-disk-autolock-mode OBJECT-TYPE
                 Additional information:
                 This object is used to control how file data is handled when
                 files are deleted. It is always readable. It is writable when
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object. When
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is not the empty string
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the
+                current <<hidden>> has preceeded the write to the object. When
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is not the empty string
                 then this object becomes read-only after a successful write to
-                it. FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written
-                to again with the current &lt;&lt;hidden&gt;&gt; in order to make another
+                it. FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written
+                to again with the current <<hidden>> in order to make another
                 write operation on the object possible. This object can be used to 
                 set/get  the auotlock mode . If the autolock mode is TRUE the Secure Disk
                 will be locked to the printer automatically during reboot . 
@@ -9319,31 +9745,31 @@ secure-disk-unlock OBJECT-TYPE
    STATUS      optional
    DESCRIPTION "This object can be used to reinitialize the secure hard disk.		
                 If the value is eTrue the secure disk will be crypto erased,		
-                the NVRAM &lt;&lt;hidden&gt;&gt; will be cleared and the Auotlock mode will		
+                the NVRAM <<hidden>> will be cleared and the Auotlock mode will		
                 be set to TRUE , else otherwise. This Object is writable when		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; is the empty string or		
-                when a write to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; with the		
-                current &lt;&lt;hidden&gt;&gt; has preceeded the write to the object.		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must then be written to		
-                again with the current &lt;&lt;hidden&gt;&gt; in order to make another write		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> is the empty string or		
+                when a write to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> with the		
+                current <<hidden>> has preceeded the write to the object.		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must then be written to		
+                again with the current <<hidden>> in order to make another write		
                 operation on the object possible. A write to this Object		
-                without a preceeding write with current &lt;&lt;hidden&gt;&gt; to		
-                FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt;,when the latter is set		
-                will return &lt;genErr&gt;.
+                without a preceeding write with current <<hidden>> to		
+                FILE-SYSTEM-SECURITY-ACCESS-<<hidden>>,when the latter is set		
+                will return <genErr>.
                 Additional information:
                   This object can be used to reinitialize the secure hard disk . If the value is eTrue the secure disk will be 
-                crypto erased , the NVRAM &lt;&lt;hidden&gt;&gt; will be cleared and the Auotlock mode will be set to TRUE , else otherwise 
+                crypto erased , the NVRAM <<hidden>> will be cleared and the Auotlock mode will be set to TRUE , else otherwise 
                 Successful execution of this PML object cause reboot.
-                This Object is writable when FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt;
+                This Object is writable when FILE-SYSTEM-SECURITY-ACCESS-<<hidden>>
                 is the empty string or when a write to FILE-SYSTEM-SECURITY-
-                ACCESS-&lt;&lt;hidden&gt;&gt; with the current &lt;&lt;hidden&gt;&gt; has preceeded the
-                write to the object.  FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt; must
-                then be written to again with the current &lt;&lt;hidden&gt;&gt; in order to
+                ACCESS-<<hidden>> with the current <<hidden>> has preceeded the
+                write to the object.  FILE-SYSTEM-SECURITY-ACCESS-<<hidden>> must
+                then be written to again with the current <<hidden>> in order to
                 make another write operation on the object possible.
                 A write to this Object without a preceeding write with current
-                &lt;&lt;hidden&gt;&gt; to FILE-SYSTEM-SECURITY-ACCESS-&lt;&lt;hidden&gt;&gt;,when the latter
-                is set will return &lt;genErr&gt;.If the secure disk is 
-                in the SecureDiskLocked&lt;&lt;hidden&gt;&gt;Correct and SecureDiskUnLocked&lt;&lt;hidden&gt;&gt;Null 
+                <<hidden>> to FILE-SYSTEM-SECURITY-ACCESS-<<hidden>>,when the latter
+                is set will return <genErr>.If the secure disk is 
+                in the SecureDiskLocked<<hidden>>Correct and SecureDiskUnLocked<<hidden>>Null 
                 state Unlock operation is going to work like normal diskwipe ,That means  the Crypto erase 
                 is going to happen after the reboot ."
 ::= { settings-file-system 20 }
@@ -9427,7 +9853,7 @@ mass-storage-resource-change-counter OBJECT-TYPE
                 mass storage device is installed.  Initializing all volumes sets 
                 this object back to the factory default value.  A reboot sets
                 	   this object back to the factory devalut value.
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed."
 ::= { mass-storage-resources 1 }
@@ -9442,7 +9868,7 @@ mass-storage-resource-changed OBJECT-TYPE
    DESCRIPTION "Setting to eTrue causes MASS-STORAGE-RESOURCE-CHANGE-COUNTER to		
                 be incremented.
                 Additional information:
-                Returns &lt;noSuchName&gt;
+                Returns <noSuchName>
                 status if attempting to access this object and there
                 is no storage device is installed."
 ::= { mass-storage-resources 2 }
@@ -9532,10 +9958,10 @@ override-media-name OBJECT-TYPE
                 that is currently available in the printer.  If a
                 paper mount request is not pending, attempting to get
                 or set this object will cause
-                &lt;noSuchName&gt; to be returned.
+                <noSuchName> to be returned.
                 Setting this object to a string other than one of the
                 MEDIAn-NAME objects (MEDIA-NAMES-AVAILABLE is applied)
-                will cause a status of &lt;badValue&gt;
+                will cause a status of <badValue>
                 to be returned."
 ::= { settings-prt-eng 2 }
                
@@ -9591,7 +10017,7 @@ override-media-size OBJECT-TYPE
                 contains the desired size as set by the print job. This object
                 should be set to a media size that is currently available to the
                 printer. If a paper mount request is not pending, attempting to
-                get or set this object will cause &lt;noSuchName&gt;
+                get or set this object will cause <noSuchName>
                 to be returned."
 ::= { settings-prt-eng 3 }
                
@@ -9603,15 +10029,15 @@ media-names-available OBJECT-TYPE
    DESCRIPTION "The value of this object controls which of the MEDIAx-NAME		
                 objects are supported. If a bit is set to zero, then attempting		
                 to get or set the corresponding MEDIAx-NAME objects will return		
-                &lt;noSuchName&gt;.
+                <noSuchName>.
                 Additional information:
                 Setting a bit to one will cause the corresponding
                 MEDIAn- objects to be available (attempting to access
-                an unavailable object will return &lt;noSuchName&gt;).
+                an unavailable object will return <noSuchName>).
                 MEDIA1- objects are always present, as this is the default
                 media. If this object is set to a value that does not include
                 cMediaName2Available, that bit will be set and a status of
-                &lt;noError&gt; will be returned.
+                <noError> will be returned.
                 PLEASE NOTE:  This object is bound to 32 bits and in some 
                 products we now will support more than 32 at any given time.
                 If that is the case there is a new Binary object that is now
@@ -9640,15 +10066,15 @@ media-names-enabled OBJECT-TYPE
    DESCRIPTION "The value of this object controls whish of the MEDIAx-NAME		
                 objects are supported. Of a bit is set to zero then the attempt		
                 to get or set the corresponding MEDIAx-NAME objects will return		
-                &lt;noSuchName&gt;
+                <noSuchName>
                 Additional information:
                 Setting a bit to one will cause the corresponding
                 MEDIAn- objects to be available (attempting to access
-                an unavailable object will return &lt;noSuchName&gt;).
+                an unavailable object will return <noSuchName>).
                 MEDIA1- objects are always present, as this is the default
                 media. If this object is set to a value that does not include
                 the 2nd bit , that bit will be set and a status of
-                &lt;noError&gt; will be returned.
+                <noError> will be returned.
                 Each bit represents a supported media type just like
                 the MEDIA-NAMES-AVAILABLE object but we are now not
                 limited to 32 bits. In order to understand which media type
@@ -9695,13 +10121,13 @@ media1-short-name OBJECT-TYPE
                 The maximum supported string length is 9 characters. If 
                 the user entered string is too long, the device will store
                 the first 9 characters and will return the
-                &lt;noError&gt; status.
+                <noError> status.
                 The characters must be in the range 20H to 7FH except 5C
                 cannot be used. The default symbol set is Roman-8 for
                 English; additional legal symbol sets are ISOLatin5,
                 ISOLatin2 and Windows31J. Setting this object with characters
                 outside of the range or of an illegal symbol set will cause an
-                error status of &lt;badValue&gt; to be returned.
+                error status of <badValue> to be returned.
                 This string is localized according to prtConsoleLocalization.
                 If this object represents a standard type, and the user
                 attempts to set the object, 'OK Nearest Legal Value Substituted'
@@ -11488,8 +11914,8 @@ device-configure-printer-parameters OBJECT-TYPE
    ACCESS      read-write
    STATUS      optional
    DESCRIPTION "Allow the printer to be configured as a duplex or simplex		
-                printer. There will be a &lt;&lt;hidden&gt;&gt; encoded in this string and		
-                decoded by the printer firmware. If the &lt;&lt;hidden&gt;&gt; check passes		
+                printer. There will be a <<hidden>> encoded in this string and		
+                decoded by the printer firmware. If the <<hidden>> check passes		
                 the printer will be configured accordingly.
                 Additional information:
                 Used to configure engines for duplex enabled or not.
@@ -11499,6 +11925,19 @@ device-configure-printer-parameters OBJECT-TYPE
                 Expandable to accommodate future products configuration needs."
 ::= { device-configure 12 }
                
+               
+device-configure-quiet-mode-printing OBJECT-TYPE
+   SYNTAX      INTEGER {
+		   eDisabled(1),
+		   eEnabled(2),
+		   eSelected(3)
+		   }
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "Return or set the value of the quiet mode setting.
+                Additional information:
+                Return or set the value of the quiet mode setting."
+::= { device-configure 15 }
                
 speed-energy-usage OBJECT-TYPE
    SYNTAX      INTEGER {
@@ -11667,7 +12106,7 @@ job-input-auto-continue-mode OBJECT-TYPE
                 --                              (letter, etc.).
                 At least one bit of the collection must be set; setting
                 this object to zero will cause a status of
-                &lt;badValue&gt; to be returned.
+                <badValue> to be returned.
                 This object describes the action that is performed when the
                 JOB-INPUT-AUTO-CONTINUE-TIMEOUT expires. "
 ::= { status-system 36 }
@@ -11775,6 +12214,25 @@ formatter-serial-number OBJECT-TYPE
 ::= { id 20 }
                
                
+print-density OBJECT-TYPE
+   SYNTAX      INTEGER(0..5)
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "Returns or sets the print density setting. Print density is the		
+                instantaneous amount of marking agent applied to the paper		
+                while printing. A value of zero has the lowest print density,		
+                yielding a lighter page. A value of 10 has the highest print		
+                density, yielding a darker page. Each POS should document what		
+                values in the 0 to 10 range are supported.
+                Additional information:
+                Returns or sets the print density setting. Print density is the
+                instantaneous amount of marking agent applied to the paper
+                while printing. A value of zero has the lowest print density,
+                yielding a lighter page. A value of 10 has the highest print
+                density, yielding a darker page. Each POS should document what
+                values in the 0 to 10 range are supported."
+::= { settings-prt-eng 5 }
+               
 engine-self-diagnostic OBJECT-TYPE
    SYNTAX      OCTET STRING
    ACCESS      read-only
@@ -11803,6 +12261,26 @@ engine-parameter OBJECT-TYPE
                 values. It will be necessary to have a decoder for each
                 engine to interpret the data."
 ::= { test 8 }
+               
+marking-agent-density-setting OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "Returns or sets the marking agent density setting for each of		
+                the marking agents installed. The Marking Agent (aka Print)		
+                density is the instantaneous amount of marking agent applied to		
+                the media while printing. A value of zero has the lowest print		
+                density, yielding a lighter page. A value of 10 has the highest		
+                print density, yielding a darker page. The device POS will		
+                document what values are supported.
+                Additional information:
+                Returns or sets the print density setting.  Print
+                density is the instantaneous amount of marking agent
+                applied to the paper while printing.  A value of zero
+                has the lowest print density, yielding a lighter page.
+                A value of 10 has the highest print density, yielding a
+                darker page."
+::= { marking-agent-density 1 }
                
                
 marking-agent-highlights-density-setting OBJECT-TYPE
@@ -11859,6 +12337,33 @@ marking-agent-shadows-density-setting OBJECT-TYPE
                 for a more specific description."
 ::= { marking-agent-density 4 }
                
+autocleaning-page-enable OBJECT-TYPE
+   SYNTAX      INTEGER {
+		   eDisabled(1),
+		   eEnabled(2)
+		   }
+   ACCESS      read-write
+   STATUS      optional
+   DESCRIPTION "When set to eEnabled this object will enable the periodic		
+                printing of a page designed to clean the fuser on an EP		
+                printing system. The interval between cleaning pages is		
+                determied by the setting of the AUTOCLEANING-PAGE-FREQUENCY		
+                object and the media size is determined by the		
+                AUTOCLEANING-PAGE-SIZE object. This object could also be used		
+                in the future to clean the inkjet heads on an inkjet system.
+                Additional information:
+                When set to eEnabled this object will enable the periodic
+                printing of a page designed to clean the fuser on an EP
+                printing system. The interval between cleaning pages is
+                determied by the setting of the AUTOCLEANING-PAGE-FREQUENCY
+                object and the media size is determined by the
+                AUTOCLEANING-PAGE-SIZE object. This object could also be used
+                in the future to clean the inkjet heads on an inkjet system.
+                If duplexer is installed, attempting to get or set this
+                object will cause <noSuchName>
+                to be returned."
+::= { settings-prt-eng 10 }
+               
                
 autocleaning-page-frequency OBJECT-TYPE
    SYNTAX      INTEGER
@@ -11870,7 +12375,7 @@ autocleaning-page-frequency OBJECT-TYPE
                 Additional information:
                 Controls the number of pages between printing of the auto
                 cleaning page (if enabled).
-                The legal values are 1000, 2000, 5000, 10000, and 20000.
+                The legal values are 500, 1000, 2000, 5000, 10000, and 20000.
                 All other values will return OK_NEAREST_LEGAL_VALUE_SUBSTITUTED."
 ::= { settings-prt-eng 11 }
                
@@ -12569,16 +13074,19 @@ tray1-media-size-loaded OBJECT-TYPE
 		   eUSExecutive(1),
 		   eUSLetter(2),
 		   eUSLegal(3),
+		   eFoolscap(10),
 		   eStatement(15),
 		   eROC16K(17),
 		   eISOandJISA6(24),
 		   eISOandJISA5(25),
 		   eISOandJISA4(26),
 		   ePRC16K195X270(34),
+		   eJISB5(45),
 		   eJapansePostcardDouble(72),
 		   eIndexCard4x6(74),
 		   eIndexCard5x8(75),
 		   eMonarch(80),
+		   eCommercial10(81),
 		   ePRC16K184X260(89),
 		   eInternationalDL(90),
 		   eInternationalC5(91),
@@ -12625,7 +13133,10 @@ tray2-media-size-loaded OBJECT-TYPE
 		   eUSExecutive(1),
 		   eUSLetter(2),
 		   eUSLegal(3),
+		   eFoolscap(10),
+		   eStatement(15),
 		   eROC16K(17),
+		   eISOandJISA6(24),
 		   eISOandJISA5(25),
 		   eISOandJISA4(26),
 		   ePRC16K195X270(34),
@@ -12662,6 +13173,7 @@ tray3-media-size-loaded OBJECT-TYPE
 		   eUSExecutive(1),
 		   eUSLetter(2),
 		   eUSLegal(3),
+		   eFoolscap(10),
 		   eROC16K(17),
 		   eISOandJISA5(25),
 		   eISOandJISA4(26),
@@ -12700,6 +13212,7 @@ tray5-media-size-loaded OBJECT-TYPE
 		   eUSExecutive(1),
 		   eUSLetter(2),
 		   eUSLegal(3),
+		   eFoolscap(10),
 		   eROC16K(17),
 		   eISOandJISA5(25),
 		   eISOandJISA4(26),
@@ -12863,7 +13376,7 @@ phd2-device-specific-command OBJECT-TYPE
                 handling device. The meaning of the device-specific command is		
                 dependent on the paper handling device and must be specified in		
                 the POS. If the paper handling device does not accept the		
-                command, then an &lt;badValue&gt; will be		
+                command, then an <badValue> will be		
                 returned. If the device accepts the command, it may still be		
                 processing the command after the response has been returned.		
                 Depending on the device, the application may need to query		
@@ -12874,7 +13387,7 @@ phd2-device-specific-command OBJECT-TYPE
                 specific command is dependent on the paper handling
                 device and must be specified in the POS.
                 If the paper handling device does not accept the
-                command, then an &lt;badValue&gt; will
+                command, then an <badValue> will
                 be returned. If the device accepts the command, it may
                 still be processing the command after the response has
                 been returned. Depending on the device, the application
@@ -13275,6 +13788,45 @@ consumable-status-toner-low-sensing-level OBJECT-TYPE
                 This object returns the toner low sensing level for the consumable."
 ::= { consumable-status 99 }
                
+consumable-current-pixels-printed-for-iso-page OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "This object is used to get Current value of Pixels Page Page		
+                Value in firmware for each color type. Returns integer value of		
+                current pixels per page.
+                Additional information:
+                This object is used to get Current value of Pixels Page Page
+                Value in firmware for each color type. Returns integer value
+                of current pixels per page."
+::= { consumable-status 100 }
+               
+               
+consumable-last-pixels-printed-for-iso-page OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "This object is used to get Pixels Page Page Value for last		
+                printed page for each color type. Returns integer value of		
+                current pixels per page.
+                Additional information:
+                This object is used to get Pixels Page Page Value for last printed page for each color type.
+                Returns integer value of current pixels per page."
+::= { consumable-status 101 }
+               
+               
+consumable-status-formatter-mono-page-count OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      optional
+   DESCRIPTION "This object is used for getting current value of formatter mono		
+                page count on e lable. This object will be applocable for mono		
+                procuts only.
+                Additional information:
+                 This object is used to report the number of A4 equivalent Pages that
+                have been printed by a Mono consumable."
+::= { consumable-status 102 }
+
                
 consumable-string-information OBJECT-TYPE
    SYNTAX      OCTET STRING (SIZE(0..287))
@@ -13369,8 +13921,9 @@ consumable-current-state OBJECT-TYPE
                 cAuthLevel1 - Consumable is at Authentication Level 1
                 cAuthLevel2 - Consumable is at Authentication Level 2
                 cAuthLevel3 - Consumable is at Authentication Level 3
-                cAuthLevel6 - Consumable is at Authentication Level 6
-                cAuthLevel7 - Consumable is at Authentication Level 7 
+                cAuthLevel4 - Consumable is at Authentication Level 4
+                cAuthLevel6 - Consumable is at Authentication Level 6 
+                cAuthLevel7 - Consumable is at Authentication Level 7
                 cGenuineHPUnsupported - Cartridge is GenuineHP intended for another product
                 cDefectiveMemory - Cartridge has a Defective Memory Chip
                 cMissingMemory - Memory Chip is missing from the cartridge
@@ -13380,7 +13933,7 @@ consumable-current-state OBJECT-TYPE
                 cMissing - Consumable is Missing from the Printer
                 cPastOutCondition - Set when one or more pages are printed after Very Low
                 cConfigurableLow - Consumable has reached the actual low threshold
-                cIncompatible(23) – Installed consumable is incompatible with this printer.
+                cIncompatible(23) ? Installed consumable is incompatible with this printer.
                 cStatusAreValid - The Status reported on other bits are valid only if
                 this bit is set to 1. If it is 0, the values are invalid.
                 These are the possible states and whenever a Consumable is in any of these
@@ -13473,7 +14026,7 @@ supply-override-activated-pagecount OBJECT-TYPE
    SYNTAX      INTEGER
    ACCESS      read-only
    STATUS      optional
-   DESCRIPTION "This object reports the printer’s historical page count at		
+   DESCRIPTION "This object reports the printer?s historical page count at		
                 which the last override activation occurred for a given		
                 supply.
                 Additional information:
@@ -13621,17 +14174,17 @@ default-vertical-black-resolution OBJECT-TYPE
                 LaserJet 9000: 300, 600   
                 Setting to an unsupported value causes the printer
                 to substitute in a snap value and
-                to return &lt;noError&gt; status.  
+                to return <noError> status.  
                 The snap values are as follow:  
                 LaserJet 4100:  
-                450 &gt;= n &lt; 900 snaps to 600  
-                n &gt;= 900 snaps to 1200   
+                450 >= n < 900 snaps to 600  
+                n >= 900 snaps to 1200   
                 Color Products:  
-                			  n &lt;= 900 snaps to 600  
-                			  n &gt;  900 snaps to 1200   			  
+                			  n <= 900 snaps to 600  
+                			  n >  900 snaps to 1200   			  
                 LaserJet 9000:  
-                n &lt; 450 snaps to 300  
-                n &gt;=450 snaps to 600  "
+                n < 450 snaps to 300  
+                n >=450 snaps to 600  "
 ::= { settings-pdl 8 }
                
                
@@ -13652,18 +14205,18 @@ default-horizontal-black-resolution OBJECT-TYPE
                 LaserJet 9000: 300, 600   
                 Setting to an unsupported value causes the printer
                 to substitute in a snap value and to
-                return &lt;noError&gt; status.  
+                return <noError> status.  
                 The snap values are as follow:  
                 LaserJet 4100:  
-                n &lt; 450 snaps to 300  
-                450 &gt;= n &lt; 900 snaps to 600  
-                n &gt;= 900 snaps to 1200   
+                n < 450 snaps to 300  
+                450 >= n < 900 snaps to 600  
+                n >= 900 snaps to 1200   
                 Color Products:  
-                			  n &lt;= 900 snaps to 600  
-                			  n &gt; 900  snaps to 1200   
+                			  n <= 900 snaps to 600  
+                			  n > 900  snaps to 1200   
                 LaserJet 9000:  
-                n &lt; 450 snaps to 300  
-                n &gt;=450 snaps to 600  "
+                n < 450 snaps to 300  
+                n >=450 snaps to 600  "
 ::= { settings-pdl 9 }
                
                
@@ -13921,4 +14474,3 @@ upgradeable-devices-generic-name OBJECT-TYPE
                
                
 END
-</PRE></BODY></HTML>

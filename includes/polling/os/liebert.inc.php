@@ -7,13 +7,14 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$lgpAgentDeviceId = snmp_get($device, 'lgpAgentDeviceId.1', '-Oqvs', 'LIEBERT-GP-AGENT-MIB');
+$lgpAgentDeviceId = snmp_get_oid($device, 'lgpAgentDeviceId.1', 'LIEBERT-GP-AGENT-MIB');
+list(, $lgpAgentDeviceId) = explode('::', $lgpAgentDeviceId); // LIEBERT-GP-REGISTRATION-MIB::lgpNX
 
-if ($GLOBALS['snmp_status'])
+if (snmp_status())
 {
   $hardware = rewrite_liebert_hardware($lgpAgentDeviceId);
 

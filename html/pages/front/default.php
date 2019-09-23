@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -116,14 +116,14 @@ function show_map($config)
     case 'google-mc':
     case 'google':
       // Check if key exist
-      if (strlen($config['remote_api']['maps']['google']['key']))
+      if (strlen($config['geo_api']['google']['key']))
       {
         $map = $config['frontpage']['map']['api'];
       }
       break;
     case 'mapbox':
       // Check if key exist
-      if (!strlen($config['remote_api']['maps']['mapbox']['key']))
+      if (!strlen($config['geo_api']['mapbox']['key']))
       {
         // If api key not set, reset to default map provider
         $config['frontpage']['map']['api'] = 'carto';
@@ -405,7 +405,7 @@ function show_micrographs($config)
 function show_status($config)
 {
   echo generate_box_open(array('title' => 'Status Warnings and Notifications', 'url' => '/alerts/', 'header-border' => TRUE));
-  print_status($config['frontpage']['device_status']);
+  generate_status_table($config['frontpage']['device_status']);
   echo generate_box_close();
 }
 

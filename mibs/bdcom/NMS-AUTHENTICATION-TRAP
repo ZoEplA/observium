@@ -24,7 +24,7 @@ IMPORTS
     
 -- Notifications
           authenIpAddr OBJECT-TYPE
-              SYNTAX  IpAddress
+              SYNTAX  OCTET STRING
               ACCESS  not-accessible
               STATUS  mandatory
               DESCRIPTION

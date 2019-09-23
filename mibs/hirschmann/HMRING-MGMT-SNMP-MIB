@@ -664,7 +664,6 @@ hmMrpDomainID   OBJECT-TYPE
                 DESCRIPTION
                 "Universally unique identifier belongs to the MRP domain
                 which represents a ring."
-                DEFVAL   { 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'H }
                 ::= { hmMrpEntry 1 }
 
 hmMrpRingport1GroupID   OBJECT-TYPE

@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -92,7 +92,8 @@ include($config['html_dir']."/pages/usermenu.inc.php");
                                       'show_password' => TRUE,
                                       'value'       => escape_html($vars['new_password'])); // FIXME. For passwords we should use filter instead escape!
       $form['row'][3]['can_modify_passwd'] = array(
-                                      'type'        => 'checkbox',
+                                      'type'        => 'toggle',
+                                      'view'        => 'toggle',
                                       'fieldset'    => 'user',
                                       'name'        => '',
                                       'placeholder' => 'Allow the user to change his password',

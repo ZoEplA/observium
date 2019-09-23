@@ -82,6 +82,12 @@ CascadePortSpeed ::= INTEGER {
    port-speed-auto                    (14)
 }
 
+LedLocatorPattern ::= INTEGER {
+   pattern-unknown                 (0),
+   pattern-blink                   (1),
+   pattern-alternating             (2),
+   pattern-system                  (3)
+}
 
 
 rlPhdMibVersion OBJECT-TYPE
@@ -656,7 +662,8 @@ RlPhdUnitGenParamEntry ::= SEQUENCE {
     rlPhdUnitGenParamMd5ChksumImage1 DisplayString,
     rlPhdUnitGenParamMd5ChksumImage2 DisplayString,
     rlPhdUnitGenParamRegistrationDone          TruthValue,
-    rlPhdUnitGenParamRegistrationSuppressed    TruthValue
+    rlPhdUnitGenParamRegistrationSuppressed    TruthValue,
+	rlPhdUnitGenParamCpldVersion	 DisplayString
 }
 
 rlPhdUnitGenParamStackUnit OBJECT-TYPE
@@ -770,6 +777,16 @@ rlPhdUnitGenParamRegistrationSuppressed OBJECT-TYPE
        STATUS      current
        DESCRIPTION "Registration Suppressed."
        ::= { rlPhdUnitGenParamEntry 16 }
+
+rlPhdUnitGenParamCpldVersion OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "CPLD version"
+       ::= { rlPhdUnitGenParamEntry 17 }
+
+
+	   
 
 rlPhdUnitEnvParamTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlPhdUnitEnvParamEntry
@@ -1371,5 +1388,12 @@ rlPhdPhyLedTimeRemaining OBJECT-TYPE
          - stack light command timeour expired."
     ::= { rlPhysicalDescription 27 }
 
+rlPhdPhyLedPattern OBJECT-TYPE
+    SYNTAX      LedLocatorPattern
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the pattern configuration required for the stack light command."
+    ::= { rlPhysicalDescription 28 }
 
 END

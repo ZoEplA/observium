@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2001,2002 by  HUAWEI 3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: description of Port Security
 -- Reference:
--- Version: V1.6
+-- Version: V1.8
 -- History:
 --   V1.0 2004-11-24, Created by lijian
 --   V1.1 2005-2-23,  Modified by Zhangmin
@@ -20,6 +20,8 @@
 --   V1.6 2006-11-16, Add macAddressAndUserLoginSecure
 --                    and macAddressAndUserLoginSecureExt for h3cSecurePortMode
 --                    by huangyang
+--   V1.7 2012-04-11, Modified the range of h3cSecureRalmAuthOfflineTime by xuyonggang
+--   V1.8 2014-06-05, Modified the range of h3cSecureRalmAuthDomain by wuqiang
 -- =================================================================
 H3C-PORT-SECURITY-MIB DEFINITIONS ::= BEGIN
 
@@ -40,15 +42,13 @@ IMPORTS
 
 h3cPortSecurityMIB MODULE-IDENTITY
     LAST-UPDATED "200411240000Z"
-    ORGANIZATION "Huawei-3COM Technologies Co.,Ltd."
+    ORGANIZATION
+        "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "R&D Beijing, Huawei-3COM Technologies Co.,Ltd.
-        Huawei Bld.,NO.3 Xinxi Rd.,
-        Shang-Di Information Industry Base,
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
-        Zip:100085
-        Http://www.huawei-3com.com
-        E-mail:support@huawei-3com.com "
+        http://www.h3c.com
+        Zip:100085"
     DESCRIPTION
         "The MIB module is used for managing port security."
     REVISION "200411240000Z"
@@ -57,7 +57,7 @@ h3cPortSecurityMIB MODULE-IDENTITY
     ::= { h3cPortSecurity 1 }
 
 
-h3cPortSecurityLeaf OBJECT IDENTIFIER ::= { h3cPortSecurityMIB 1}
+h3cPortSecurityLeaf OBJECT IDENTIFIER ::= {h3cPortSecurityMIB 1}
 
 --
 -- SECURITY ACCESS CONTROL OBJECT
@@ -71,7 +71,7 @@ h3cSecurePortSecurityControl OBJECT-TYPE
         "This attribute controls the system wide operation of network
         access control.  The configured port security options only become
         operational when this attribute is set to enabled."
-    ::= { h3cPortSecurityLeaf 1}
+    ::= {h3cPortSecurityLeaf 1}
 
 
 
@@ -89,7 +89,7 @@ h3cSecurePortVlanMembershipList OBJECT-TYPE
         the VLAN identifiers (0-4095) assigned to a port.  A tagged VLAN has a
         'T' suffix after the VLAN number and an untagged VLAN may have an
         optional 'U' suffix."
-    ::= { h3cPortSecurityLeaf 2}
+    ::= {h3cPortSecurityLeaf 2}
 
 --
 -- RADIUS Authenticated Login using MAC-address GROUP
@@ -178,17 +178,17 @@ h3cSecureRalmAuthPassword OBJECT-TYPE
     ::= { h3cSecureRalmObjects 6 }
 
 h3cSecureRalmAuthDomain OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(1..24))
+    SYNTAX      DisplayString(SIZE(1..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "MAC-authentication users may be configured in a specific domain,
         which excludes 802.1x and other authentication users. This
         specifies the domain of all MAC-authentication users."
-    ::= { h3cSecureRalmObjects 7}
+    ::= {h3cSecureRalmObjects 7}
 
 h3cSecureRalmAuthOfflineTime OBJECT-TYPE
-    SYNTAX      INTEGER(1..65535)
+    SYNTAX      Integer32 (60..2147483647)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -198,7 +198,7 @@ h3cSecureRalmAuthOfflineTime OBJECT-TYPE
         This attribute configures the timer interval of offline-detect.
         The default time is 300 seconds."
     DEFVAL { 300 }
-    ::= { h3cSecureRalmObjects 8}
+    ::= {h3cSecureRalmObjects 8}
 
 h3cSecureRalmAuthServerTimeoutTime OBJECT-TYPE
     SYNTAX      INTEGER(1..65535)
@@ -211,7 +211,7 @@ h3cSecureRalmAuthServerTimeoutTime OBJECT-TYPE
         process. This attribute configures the timer interval of
         server-timeout. The default time is 100 seconds."
     DEFVAL { 100 }
-    ::= { h3cSecureRalmObjects 9}
+    ::= {h3cSecureRalmObjects 9}
 
 h3cSecureMacControl OBJECT-TYPE
     SYNTAX      INTEGER{enabled(1),disabled(2)}
@@ -224,7 +224,7 @@ h3cSecureMacControl OBJECT-TYPE
         This is required for h3cSecurePortSecurityControl to be enabled."
     ::= { h3cSecureRalmObjects 10 }
 
-h3cPortSecurityTables OBJECT IDENTIFIER ::= { h3cPortSecurityMIB 2}
+h3cPortSecurityTables OBJECT IDENTIFIER ::= {h3cPortSecurityMIB 2}
 
 h3cSecurePortTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF H3cSecurePortEntry
@@ -234,7 +234,7 @@ h3cSecurePortTable OBJECT-TYPE
         "This table defines the security status of each secure port.
         Each port can have a number of authorised MAC addresses, and these are
         stored in the h3cSecureAddressTable."
-    ::= { h3cPortSecurityTables 1}
+    ::= {h3cPortSecurityTables 1}
 
 
 h3cSecurePortEntry OBJECT-TYPE
@@ -249,7 +249,7 @@ h3cSecurePortEntry OBJECT-TYPE
         {
             ifIndex
         }
-    ::= { h3cSecurePortTable 1}
+    ::= {h3cSecurePortTable 1}
 
 
 H3cSecurePortEntry ::= SEQUENCE
@@ -387,7 +387,7 @@ h3cSecurePortMode OBJECT-TYPE
             authenticated and only if this succeeds does the userLoginSecure then attempt
             user authentication.
         "
-    ::= { h3cSecurePortEntry 1}
+    ::= {h3cSecurePortEntry 1}
 
 
 h3cSecureNeedToKnowMode OBJECT-TYPE
@@ -422,7 +422,7 @@ h3cSecureNeedToKnowMode OBJECT-TYPE
         If this object returns 1,6,7 or 8, it means that the Need To Know
         configuration cannot be changed, and any attempt to write to this object
         will cause an error."
-    ::= { h3cSecurePortEntry 2}
+    ::= {h3cSecurePortEntry 2}
 
 
 h3cSecureIntrusionAction OBJECT-TYPE
@@ -440,7 +440,7 @@ h3cSecureIntrusionAction OBJECT-TYPE
     DESCRIPTION
         "Attribute to determine the action if an unauthorised device
         transmits on this port."
-    ::= { h3cSecurePortEntry 3}
+    ::= {h3cSecurePortEntry 3}
 
 --
 -- The following 3 objects are used to allow multiple MAC addresses to be
@@ -461,7 +461,7 @@ h3cSecureNumberAddresses OBJECT-TYPE
         h3cSecureNumberAddressesStored <= h3cSecureNumberAddresses <=
         h3cSecureMaximumAddresses
         "
-    ::= { h3cSecurePortEntry 4}
+    ::= {h3cSecurePortEntry 4}
 
 
 h3cSecureNumberAddressesStored OBJECT-TYPE
@@ -479,7 +479,7 @@ h3cSecureNumberAddressesStored OBJECT-TYPE
         h3cSecureNumberAddressesStored <= h3cSecureNumberAddresses <=
         h3cSecureMaximumAddresses
         "
-    ::= { h3cSecurePortEntry 5}
+    ::= {h3cSecurePortEntry 5}
 
 
 h3cSecureMaximumAddresses OBJECT-TYPE
@@ -497,7 +497,7 @@ h3cSecureMaximumAddresses OBJECT-TYPE
         h3cSecureNumberAddressesStored <= h3cSecureNumberAddresses <=
         h3cSecureMaximumAddresses
         "
-    ::= { h3cSecurePortEntry 6}
+    ::= {h3cSecurePortEntry 6}
 
 --
 -- SECURE ADDRESS TABLE
@@ -511,7 +511,7 @@ h3cSecureAddressTable OBJECT-TYPE
         "This table stores the MAC addresses assigned to each
         port.  This table can be written to by the agent as well as the
         management station."
-    ::= { h3cPortSecurityTables 2}
+    ::= {h3cPortSecurityTables 2}
 
 
 h3cSecureAddressEntry OBJECT-TYPE
@@ -528,7 +528,7 @@ h3cSecureAddressEntry OBJECT-TYPE
             h3cSecureAddrMAC,
             h3cSecureAddrVlanID
         }
-    ::= { h3cSecureAddressTable 1}
+    ::= {h3cSecureAddressTable 1}
 
 
 H3cSecureAddressEntry ::= SEQUENCE
@@ -547,7 +547,7 @@ h3cSecureAddrMAC OBJECT-TYPE
     DESCRIPTION
         "The MAC address of a station assigned to this port.
         This is the second index into the h3cSecureAddressTable."
-    ::= { h3cSecureAddressEntry 1}
+    ::= {h3cSecureAddressEntry 1}
 
 h3cSecureAddrVlanID OBJECT-TYPE
     SYNTAX      Integer32
@@ -556,7 +556,7 @@ h3cSecureAddrVlanID OBJECT-TYPE
     DESCRIPTION
         "The Vlan ID associate with the port and the MAC address.
         This is the third index into the h3cSecureAddressTable."
-    ::= { h3cSecureAddressEntry 2}
+    ::= {h3cSecureAddressEntry 2}
 
 h3cSecureAddrMACStatus OBJECT-TYPE
     SYNTAX      INTEGER
@@ -583,7 +583,7 @@ h3cSecureAddrMACStatus OBJECT-TYPE
             User can not configure this mac address.  This value is used for GET
             and GETNEXT operation.
         "
-    ::= { h3cSecureAddressEntry 3}
+    ::= {h3cSecureAddressEntry 3}
 
 
 h3cSecureAddrRowStatus OBJECT-TYPE
@@ -607,7 +607,7 @@ h3cSecureAddrRowStatus OBJECT-TYPE
         When reading this object, only active(1) will be
         returned.
         "
-    ::= { h3cSecureAddressEntry 4}
+    ::= {h3cSecureAddressEntry 4}
 
 
 --
@@ -621,7 +621,7 @@ h3cSecureOUITable OBJECT-TYPE
     DESCRIPTION
         "This table stores the OUI values for OUI based
         authentication."
-    ::= { h3cPortSecurityTables 3}
+    ::= {h3cPortSecurityTables 3}
 
 
 h3cSecureOUIEntry OBJECT-TYPE
@@ -634,7 +634,7 @@ h3cSecureOUIEntry OBJECT-TYPE
         {
             h3cSecureOUIIndex
         }
-    ::= { h3cSecureOUITable 1}
+    ::= {h3cSecureOUITable 1}
 
 
 H3cSecureOUIEntry ::= SEQUENCE
@@ -652,7 +652,7 @@ h3cSecureOUIIndex OBJECT-TYPE
     DESCRIPTION
         "The index number.  This is the first index into the
         h3cSecureOUITable."
-    ::= { h3cSecureOUIEntry 1}
+    ::= {h3cSecureOUIEntry 1}
 
 
 h3cSecureOUI OBJECT-TYPE
@@ -661,7 +661,7 @@ h3cSecureOUI OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The OUI value for an authorised device."
-    ::= { h3cSecureOUIEntry 2}
+    ::= {h3cSecureOUIEntry 2}
 
 
 h3cSecureOUIRowStatus OBJECT-TYPE
@@ -683,7 +683,7 @@ h3cSecureOUIRowStatus OBJECT-TYPE
         When creating a new entry, index a new row and use createAndGo(4) .
         When reading this object, only active(1) will be returned.
         "
-    ::= { h3cSecureOUIEntry 3}
+    ::= {h3cSecureOUIEntry 3}
 
 --
 -- IP+MAC+PORT BINDING TABLE
@@ -698,7 +698,7 @@ h3cSecureBindingTable OBJECT-TYPE
         MAC addresses, the IP address and the port.  Only the frame exactly
         matching the binding rules can be forwarded.  This table can be
         written to by the agent as well as the management station."
-    ::= { h3cPortSecurityTables 4}
+    ::= {h3cPortSecurityTables 4}
 
 
 h3cSecureBindingEntry OBJECT-TYPE
@@ -712,7 +712,7 @@ h3cSecureBindingEntry OBJECT-TYPE
         {
             h3cSecureBindingIndex
         }
-    ::= { h3cSecureBindingTable 1}
+    ::= {h3cSecureBindingTable 1}
 
 
 H3cSecureBindingEntry ::= SEQUENCE
@@ -731,7 +731,7 @@ h3cSecureBindingIndex OBJECT-TYPE
     DESCRIPTION
         "The index number.  This is the first index into the
         h3cSecureBindingTable."
-    ::= { h3cSecureBindingEntry 1}
+    ::= {h3cSecureBindingEntry 1}
 
 h3cSecureBindingPort OBJECT-TYPE
     SYNTAX      Integer32
@@ -740,7 +740,7 @@ h3cSecureBindingPort OBJECT-TYPE
     DESCRIPTION
         "The port number of the port bound with the IP address
         and the MAC address."
-    ::= { h3cSecureBindingEntry 2}
+    ::= {h3cSecureBindingEntry 2}
 
 h3cSecureBindingAddrMAC OBJECT-TYPE
     SYNTAX      MacAddress
@@ -748,7 +748,7 @@ h3cSecureBindingAddrMAC OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The MAC address bound with the port and the IP address."
-    ::= { h3cSecureBindingEntry 3}
+    ::= {h3cSecureBindingEntry 3}
 
 h3cSecureBindingAddrIp OBJECT-TYPE
     SYNTAX      IpAddress
@@ -756,7 +756,7 @@ h3cSecureBindingAddrIp OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The IP address bound with the port and the MAC address."
-    ::= { h3cSecureBindingEntry 4}
+    ::= {h3cSecureBindingEntry 4}
 
 h3cSecureBindingRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -778,7 +778,7 @@ h3cSecureBindingRowStatus OBJECT-TYPE
         When reading this object, only active(1) will be
         returned.
         "
-    ::= { h3cSecureBindingEntry 5}
+    ::= {h3cSecureBindingEntry 5}
 --
 -- PORT ASSIGN TABLE
 --
@@ -788,7 +788,7 @@ h3cSecureAssignTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Table of port assignment management information about authorised user."
-    ::= { h3cPortSecurityTables 5}
+    ::= {h3cPortSecurityTables 5}
 
 
 h3cSecureAssignEntry OBJECT-TYPE
@@ -802,7 +802,7 @@ h3cSecureAssignEntry OBJECT-TYPE
         {
             ifIndex
         }
-    ::= { h3cSecureAssignTable 1}
+    ::= {h3cSecureAssignTable 1}
 
 
 H3cSecureAssignEntry ::= SEQUENCE
@@ -841,7 +841,7 @@ h3cSecureVlanAssignment OBJECT-TYPE
 -- varbind must be from a table in which the first qualifier on the
 -- object id is the service identifier of the 'thing' causing the trap.
 -- **********************************************************************
-h3cPortSecurityNotifications OBJECT IDENTIFIER ::= { h3cPortSecurityMIB 3}
+h3cPortSecurityNotifications OBJECT IDENTIFIER ::= {h3cPortSecurityMIB 3}
 
 h3cSecureAddressLearned NOTIFICATION-TYPE
     OBJECTS
@@ -854,7 +854,7 @@ h3cSecureAddressLearned NOTIFICATION-TYPE
         "This trap is sent when a new station has been learned.  The
         port on which the address was received is the first object,
         and the MAC address of the learned station is in the second object."
-    ::= { h3cPortSecurityNotifications 1}
+    ::= {h3cPortSecurityNotifications 1}
 
 
 h3cSecureViolation NOTIFICATION-TYPE
@@ -872,7 +872,7 @@ h3cSecureViolation NOTIFICATION-TYPE
         ifAdminStatus indicates if the port has been disabled because of the violation.
         The implementation may not send violation traps from the same port
         at intervals of less than 5 seconds."
-    ::= { h3cPortSecurityNotifications 2}
+    ::= {h3cPortSecurityNotifications 2}
 
 
 h3cSecureLoginFailure NOTIFICATION-TYPE
@@ -889,7 +889,7 @@ h3cSecureLoginFailure NOTIFICATION-TYPE
         the first object, and the MAC address of the offending station is in
         the second object.  The dot1xAuthSessionUserName is the identity supplied
         during the user authentication."
-    ::= { h3cPortSecurityNotifications 3}
+    ::= {h3cPortSecurityNotifications 3}
 
 
 h3cSecureLogon NOTIFICATION-TYPE
@@ -912,7 +912,7 @@ h3cSecureLogon NOTIFICATION-TYPE
         user was authorised.  The h3cSecurePortVlanMembershipList object
         identifies the VLAN membership assigned to the port on session
         activation."
-    ::= { h3cPortSecurityNotifications 4}
+    ::= {h3cPortSecurityNotifications 4}
 
 
 h3cSecureLogoff NOTIFICATION-TYPE
@@ -934,7 +934,7 @@ h3cSecureLogoff NOTIFICATION-TYPE
         reason why the session was terminated.
         The h3cSecurePortVlanMembershipList object identifies the VLAN
         membership assigned to the port on session termination."
-    ::= { h3cPortSecurityNotifications 5}
+    ::= {h3cPortSecurityNotifications 5}
 
 h3cSecureRalmLoginFailure NOTIFICATION-TYPE
     OBJECTS
@@ -952,7 +952,7 @@ h3cSecureRalmLoginFailure NOTIFICATION-TYPE
         offending station is in the second object. The authentication mode
         indicates how the user was authorised. The h3cSecureRalmAuthUsername
         is the identity supplied during the user authentication."
-    ::= { h3cPortSecurityNotifications 6}
+    ::= {h3cPortSecurityNotifications 6}
 
 
 h3cSecureRalmLogon NOTIFICATION-TYPE
@@ -974,7 +974,7 @@ h3cSecureRalmLogon NOTIFICATION-TYPE
         the identity supplied during the user authentication. The
         h3cSecurePortVlanMembershipList object identifies the VLAN
         membership assigned to the port on session activation."
-    ::= { h3cPortSecurityNotifications 7}
+    ::= {h3cPortSecurityNotifications 7}
 
 
 h3cSecureRalmLogoff NOTIFICATION-TYPE
@@ -996,5 +996,5 @@ h3cSecureRalmLogoff NOTIFICATION-TYPE
         the identity supplied during the user authentication. The
         h3cSecurePortVlanMembershipList object identifies the VLAN
         membership assigned to the port on session activation."
-    ::= { h3cPortSecurityNotifications 8}
+    ::= {h3cPortSecurityNotifications 8}
 END

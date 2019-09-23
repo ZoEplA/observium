@@ -44,7 +44,6 @@ DESCRIPTION
 REVISION "200011031930Z"
 DESCRIPTION
 "Modified by Richard Woundy to fix problems identified by the MIB
-
 doctor. I marked docsBpiCmtsDefaultAuthGraceTime and
 docsBpiCmtsDefaultTEKGraceTime as obsolete objects, to prevent OID
 reassignment. Several object descriptions were also corrected."
@@ -141,7 +140,7 @@ REFERENCE
 
 docsBpiCmAuthState      OBJECT-TYPE
 SYNTAX                  INTEGER {
-
+                                start(1),
                                 authWait(2),
                                 authorized(3),
                                 reauthWait(4),
@@ -383,7 +382,6 @@ STATUS                          current
 DESCRIPTION
 "The value of this object is the Display-String in most recent
 Authorization Invalid message received by the CM.  This is a zero
-
 length string if no Authorization Invalid message has been received
 since reboot."
 REFERENCE
@@ -673,7 +671,6 @@ REFERENCE
 ::= { docsBpiCmtsBaseEntry 2 }
 
 -- Note: the following two objects have been obsoleted from this MIB.
-
 docsBpiCmtsDefaultAuthGraceTime OBJECT-TYPE
 SYNTAX                          Integer32 (1..1800)
 UNITS                           "seconds"
@@ -722,7 +719,6 @@ MAX-ACCESS              read-only
 STATUS                  current
 DESCRIPTION
 "The value of this object is the count of times the CMTS has
-
 transmitted an Authorization Reject message to any CM."
 REFERENCE
 "DOCSIS Baseline Privacy Interface Specification, Section 4.2.1.3."
@@ -1107,7 +1103,6 @@ DESCRIPTION
 active TEK(s) (plural due to key transition periods), and to generate
 a new TEK for the associated SID; the CMTS MAY also generate an
 unsolicited TEK Invalid message, to optimize the TEK synchronization
-
 between the CMTS and the CM. Reading this object always returns
 FALSE."
 REFERENCE
@@ -1204,7 +1199,6 @@ DESCRIPTION
 Error-Code in the most recent TEK Invalid message sent in association
 with this BPI SID.  This has value unknown(2) if the last Error-Code
 value was 0, and none(1) if no TEK Invalid message has been received
-
 since reboot."
 REFERENCE
 "DOCSIS Baseline Privacy Interface Specification, Sections 4.2.1.8
@@ -1468,6 +1462,7 @@ operational networks, according to Appendix A.2 in [18]."
 -- DESCRIPTION
 -- "The refined range corresponds to the minimum and maximum values in
 -- operational networks, according to Appendix A.2 in [18]."
+
 ::= { docsBpiCompliances 1 }
 
 docsBpiCmGroup  OBJECT-GROUP
@@ -1567,3 +1562,4 @@ DESCRIPTION
 ::= { docsBpiGroups 3 }
 
 END
+

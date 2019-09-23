@@ -5,6 +5,10 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-HW-MONITOR-MIB.mib $ 
+-- Revision 1.10  2016/02/24 03:52:13  Viktor 
+-- Add new MIB feature "HwmonitorPowerSourceStatusChange" trap for multi-power source model (XGS3700).  
+-- Revision 1.9  2015/05/27 07:08:12  Shinge 
+-- add power source trap  
 -- Revision 1.8  2013/12/06 07:05:10  ccho 
 -- remove uncessary imports 
 -- Revision 1.7  2013/06/26 07:14:07  Mandy 
@@ -50,7 +54,8 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
 		::= { esMgmt 26 }
 
 	zyxelHwMonitorStatus 			OBJECT IDENTIFIER ::= { zyxelHwMonitor 1 }		
-	zyxelHwMonitorNotifications 	OBJECT IDENTIFIER ::= { zyxelHwMonitor 2 }		
+	zyxelHwMonitorNotifications 	OBJECT IDENTIFIER ::= { zyxelHwMonitor 2 }
+	zyxelHwMonitorTrapInfoObject	OBJECT IDENTIFIER ::= { zyxelHwMonitor 3 }	
 
 --  26.HwMonitor
 
@@ -356,9 +361,11 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
 
         ZyxelHwMonitorPowerSourceEntry ::=
            SEQUENCE {
-        	zyHwMonitorPowerSourceIndex		INTEGER,
-        	zyHwMonitorPowerSourceType		DisplayString, 
-        	zyHwMonitorPowerSourceStatus	DisplayString
+        	zyHwMonitorPowerSourceIndex			        INTEGER,
+        	zyHwMonitorPowerSourceType			        DisplayString, 
+        	zyHwMonitorPowerSourceStatus		        DisplayString,
+			zyHwMonitorPowerSourceDescription	        DisplayString,
+			zyHwMonitorPowerSourcePreviousStatus	    DisplayString
          }
 
         zyHwMonitorPowerSourceIndex OBJECT-TYPE
@@ -382,10 +389,25 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-        "The current power source status (absent/present/on)."
-        ::= { zyxelHwMonitorPowerSourceEntry 3 }  
-
-
+        "The current power source status  (normal, error, absent, present, active, standby, N/A)."
+        ::= { zyxelHwMonitorPowerSourceEntry 3 } 
+		
+		zyHwMonitorPowerSourceDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"Power source Description."
+        ::= { zyxelHwMonitorPowerSourceEntry 4 }
+		
+		zyHwMonitorPowerSourcePreviousStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"Power source Previous Status  (normal/error/absent/present)."
+        ::= { zyxelHwMonitorPowerSourceEntry 5 }
+		
 	   zyHwMonitorFanSpeedOutOfRange NOTIFICATION-TYPE
        OBJECTS {
 				zyHwMonitorFanRpmIndex,
@@ -463,6 +485,55 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
        "Power supply voltage is recovered from out of the normal operation range."
        ::= { zyxelHwMonitorNotifications 9 }
-	
+	   
+	   zyHwMonitorPowerSourceAbnormal NOTIFICATION-TYPE
+		OBJECTS {
+				zyHwMonitorPowerSourceIndex,
+				zyHwMonitorPowerSourceStatus,
+				zyHwMonitorPowerSourceDescription,
+				zyHwMonitorTrapPowerSourceErrorType
+         }   	   
+	   STATUS  current
+       DESCRIPTION
+       "Power source status is change."
+       ::= { zyxelHwMonitorNotifications 10 }
+	   
+	   zyHwMonitorPowerSourceAbnormalRecovered NOTIFICATION-TYPE 
+		OBJECTS {
+				zyHwMonitorPowerSourceIndex,
+				zyHwMonitorPowerSourceStatus,
+				zyHwMonitorPowerSourceDescription		
+         }   	   
+	   STATUS  current
+       DESCRIPTION
+       "Power source status change to normal."
+       ::= { zyxelHwMonitorNotifications 11 }
+	   
+	  zyHwMonitorPowerSourceStatusChange NOTIFICATION-TYPE 
+		OBJECTS {
+				zyHwMonitorPowerSourceIndex,
+				zyHwMonitorPowerSourcePreviousStatus,
+				zyHwMonitorPowerSourceStatus,
+				zyHwMonitorPowerSourceDescription,
+				zyHwMonitorTrapPowerSourceErrorType
+				
+         }   	   
+	   STATUS  current
+       DESCRIPTION
+       "Check power source status change situation."
+       ::= { zyxelHwMonitorNotifications 12 } 	   
+	   
+-- *******************************************************************
+-- *
+-- * zyxelHwMonitorTrapInfoObject
+-- *
+-- *******************************************************************		
+		zyHwMonitorTrapPowerSourceErrorType OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"There are the error type of power source."  
+        ::= { zyxelHwMonitorTrapInfoObject 1 }  
   END
 

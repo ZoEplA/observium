@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -15,37 +15,31 @@ $mib = 'DISMAN-PING-MIB';
 
 $flags = OBS_SNMP_ALL ^ OBS_QUOTES_STRIP;
 
-// Additional mibs for vendor specific Types
-if (is_device_mib($device, 'JUNIPER-PING-MIB'))
+// Additional vendor specific mibs used only for translate vendor specific RTT Types
+$vendor_mibs = ['JUNIPER-PING-MIB', 'HH3C-NQA-MIB', 'HUAWEI-DISMAN-PING-MIB', 'ZHONE-DISMAN-PING-MIB']; //, 'H3C-NQA-MIB'];
+$mibs = $mib;
+foreach ($vendor_mibs as $vendor_mib)
 {
-  // JUNIPER-PING-MIB
-  $vendor_mib = 'JUNIPER-PING-MIB';
-  echo("$vendor_mib ");
-  $mibs     = $mib . ':' . $vendor_mib;
+  if (is_device_mib($device, $vendor_mib))
+  {
+    echo("$vendor_mib ");
+    $mibs .= ':' . $vendor_mib;
+    break;
+  }
 }
-else if (is_device_mib($device, 'HH3C-NQA-MIB'))
-{
-  // HH3C-NQA-MIB
-  $vendor_mib = 'HH3C-NQA-MIB';
-  echo("$vendor_mib ");
-  $mibs     = $mib . ':' . $vendor_mib;
-} else {
-  $mibs     = $mib;
-}
+
 $oids = snmpwalk_cache_twopart_oid($device, "pingCtlEntry", array(), $mibs, NULL, $flags);
 //print_vars($oids);
-if ($GLOBALS['snmp_status'] === FALSE)
+if (!snmp_status())
 {
   return;
 }
-
-$mib_lower = strtolower($mib);
 
 foreach ($oids as $sla_owner => $entry2)
 {
   foreach ($entry2 as $sla_name => $entry)
   {
-    if (!isset($entry['pingCtlAdminStatus']) ||        // Skip additional multiindex entries from table
+    if (!isset($entry['pingCtlAdminStatus']) ||        // Skip additional multi-index entries from table
         ($sla_owner == 'imclinktopologypleaseignore')) // Skip this weird SLAs by HH3C-NQA-MIB
     {
       continue;
@@ -69,15 +63,16 @@ foreach ($oids as $sla_owner => $entry2)
 
     if ($entry['pingCtlAdminStatus'] == 'disabled')
     {
-      // If SLA administarively disabled, exclude from polling
+      // If SLA administratively disabled, exclude from polling
       $data['deleted'] = 1;
     }
 
     // Type conversions
-    // Standart types: pingIcmpEcho, pingUdpEcho, pingSnmpQuery, pingTcpConnectionAttempt
+    // Standard types: pingIcmpEcho, pingUdpEcho, pingSnmpQuery, pingTcpConnectionAttempt
     // Juniper types:  jnxPingIcmpTimeStamp, jnxPingHttpGet, jnxPingHttpGetMetadata, jnxPingDnsQuery, jnxPingNtpQuery, jnxPingUdpTimestamp
+    // Huawei types:   hwpingUdpEcho, hwpingTcpconnect, hwpingjitter, hwpingHttp, hwpingdlsw, hwpingdhcp, hwpingftp
     // HH3C types:
-    $data['rtt_type'] = str_replace(array('ping', 'jnxPing', 'hh3cNqa'), '', $entry['pingCtlType']);
+    $data['rtt_type'] = str_replace(['jnxPing', 'hh3cNqa', 'hwping', 'ping'], '', $entry['pingCtlType']);
 
     // Tag / Target
     if (isHexString($entry['pingCtlTargetAddress']) ||

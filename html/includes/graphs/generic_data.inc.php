@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,7 +21,28 @@ $graph_return['valid_options'][] = "previous";
 $graph_return['valid_options'][] = "trend";
 $graph_return['valid_options'][] = "inverse";
 
-
+switch ($format)
+{
+  case 'octets':
+  case 'bytes':
+    //$units = "Bps";
+    $units = "Bytes/sec";
+    $format = "octets";
+    $unit_text = "Bytes/s";
+    break;
+  case 'blocks':
+    // only change unit text
+    $units = "Blocks/sec";
+    $format = "octets";
+    $unit_text = "Blocks/s";
+    break;
+  case 'bits':
+  default:
+    $units = "Bits/sec";
+    $format = "bits";
+    $unit_text = "Bits/s";
+}
+/*
 if ($format == "octets" || $format == "bytes")
 {
   $units = "Bps";
@@ -32,6 +53,7 @@ if ($format == "octets" || $format == "bytes")
   $format = "bits";
   $unit_text = "Bits/s";
 }
+*/
 
 $i = 0;
 $unit_text = rrdtool_escape($unit_text, 9);
@@ -132,23 +154,25 @@ $rrd_options .= " VDEF:95thin=inbits,95,PERCENT";
 $rrd_options .= " VDEF:95thout=outbits,95,PERCENT";
 $rrd_options .= " CDEF:pout_tmp=doutbits,".$out_scale.",* VDEF:dpout_tmp=pout_tmp,95,PERCENT CDEF:dpout_tmp2=doutbits,doutbits,-,dpout_tmp,".$out_scale.",*,+ VDEF:d95thout=dpout_tmp2,FIRST";
 
+/*
 if ($format == "octets" || $format == "bytes")
 {
   $units = "Bytes/sec";
   $format = "octets";
 } else {
-  $units = "bits/sec";
+  $units = "Bits/sec";
   $format = "bits";
 }
+*/
 
 if ($graph_max)
 {
-  $rrd_options .= " AREA:in".$format."_max#C4E5AC:";
+  $rrd_options .= " AREA:in".$format."_max#".$config['colours']['graphs']['data']['in_max'].":";
 }
-$rrd_options .= " AREA:in".$format."#84BB5C";
+$rrd_options .= " AREA:in".$format."#".$config['colours']['graphs']['data']['in_area'];
 if ($graph_style != 'mrtg')
 {
-  $rrd_options .= " LINE1.25:in".$format."#357F44";
+  $rrd_options .= " LINE1.25:in".$format."#".$config['colours']['graphs']['data']['in_line'];
 }
 $rrd_options .= ":'In '";
 $rrd_options .= " GPRINT:in".$format.":LAST:%6.2lf%s";
@@ -164,13 +188,15 @@ if ($graph_max)
   } else {
     $rrd_options .= " AREA:dout";
   }
-  $rrd_options .= $format."_max#ACC2E5:";
+  $rrd_options .= $format."_max#".$config['colours']['graphs']['data']['out_max'].":";
 }
+
 if ($graph_style != 'mrtg')
 {
-  $rrd_options .= " AREA:dout".$format."#7394CB";
+  $rrd_options .= " AREA:dout".$format."#".$config['colours']['graphs']['data']['out_area'];
 }
-$rrd_options .= " LINE1.25:dout".$format."#284C7F:'Out'";
+
+$rrd_options .= " LINE1.25:dout".$format."#".$config['colours']['graphs']['data']['out_line'].":'Out'";
 $rrd_options .= " GPRINT:out".$format.":LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:out".$format.":AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:out".$format."_max:MAX:%6.2lf%s";
@@ -181,8 +207,10 @@ if ($config['rrdgraph_real_95th'])
   $rrd_options .= " HRULE:95thhigh#FF0000:'Highest'";
   $rrd_options .= " GPRINT:95thhigh:%30.2lf%s\\n";
 } else {
-  $rrd_options .= " LINE1:95thin#aa0000";
-  $rrd_options .= " LINE1:d95thout#bb0000";
+//$rrd_options .= " LINE1:95thin#aa0000";
+//$rrd_options .= " LINE1:d95thout#bb0000";
+  $rrd_options .= " HRULE:95thin#aa0000";
+  $rrd_options .= " HRULE:d95thout#aa0000";
 }
 
 $rrd_options .= " GPRINT:tot:'Total %6.2lf%s'";

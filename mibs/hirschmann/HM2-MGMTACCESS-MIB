@@ -77,6 +77,44 @@ Hm2TlsCipherSuites ::= TEXTUAL-CONVENTION
 									tls-ecdhe-rsa-with-aes-256-gcm-sha384(7)
 								}
 
+Hm2SshHmacAlgorithms ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION   "The Secure Shell algorithms for HMAC available on the device."
+      SYNTAX      BITS {
+                  hmac-sha1(0),
+                  hmac-sha2-256(1),
+                  hmac-sha2-512(2),
+                  hmac-sha1-etm-at-openssh-com(3),
+                  hmac-sha2-256-etm-at-openssh-com(4),
+                  hmac-sha2-512-etm-at-openssh-com(5)
+                }
+
+Hm2SshKexAlgorithms ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION   "The Secure Shell algorithms for key exchange available on the device."
+      SYNTAX      BITS {
+                  diffie-hellman-group1-sha1(0),
+                  diffie-hellman-group14-sha1(1),
+                  diffie-hellman-group14-sha256(2),
+                  diffie-hellman-group16-sha512(3),
+                  diffie-hellman-group18-sha512(4),
+                  diffie-hellman-group-exchange-sha256(5),
+                  ecdh-sha2-nistp256(6),
+                  ecdh-sha2-nistp384(7)
+                }
+
+Hm2SshEncryptionAlgorithms ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION   "The Secure Shell algorithms for encryption available on the device."
+      SYNTAX      BITS {
+                  aes128-ctr(0),
+                  aes192-ctr(1),
+                  aes256-ctr(2),
+                  aes128-gcm-at-openssh-com(3),
+                  aes256-gcm-at-openssh-com(4),
+                  chacha20-poly1305-at-openssh-com(5)
+                }
+
 --
 -- *************************************************************
 -- hm2MgmtAccessMib
@@ -328,7 +366,7 @@ hm2WebHttpsServerTlsVersions OBJECT-TYPE
       DESCRIPTION
                    "The TLS version supported by the HTTPS server.
                     Changing the value has only effect after restarting the HTTPS Server."
-      DEFVAL       {{ tlsv1-0, tlsv1-2 }}
+      DEFVAL       {{ tlsv1-2 }}
       ::= { hm2MgmtAccessWebGroup  17 }
 
 hm2WebHttpsServerTlsCipherSuites OBJECT-TYPE
@@ -339,7 +377,6 @@ hm2WebHttpsServerTlsCipherSuites OBJECT-TYPE
                    "The cipher suite used by the HTTPS server.
                     Changing the value has only effect after restarting the HTTPS server."
       DEFVAL       {{
-                     tls-rsa-with-rc4-128-sha,
                      tls-dhe-rsa-with-aes-128-cbc-sha,
                      tls-ecdhe-rsa-with-aes-128-cbc-sha,
                      tls-ecdhe-rsa-with-aes-128-gcm-sha256
@@ -556,7 +593,7 @@ hm2SshDSAKeyControl OBJECT-TYPE
                  delete(3)
                  }
      MAX-ACCESS  read-write
-     STATUS      current
+     STATUS      obsolete
      DESCRIPTION
                  "Controls DSA key generation and deletion.  Always returns noop(1)."
      ::= { hm2MgmtAccessSshGroup 10 }
@@ -564,7 +601,7 @@ hm2SshDSAKeyControl OBJECT-TYPE
 hm2SshFingerPrintDSA  	OBJECT-TYPE
 	 SYNTAX 		DisplayString (SIZE (0..128))
 	 MAX-ACCESS		read-only
-	 STATUS			current
+	 STATUS			obsolete
 	 DESCRIPTION
 		"The local DSA fingerprint for SSH connections."						
 	 ::= { hm2MgmtAccessSshGroup 11 }
@@ -574,7 +611,7 @@ hm2SshFingerPrintRSA  	OBJECT-TYPE
 	 MAX-ACCESS		read-only
 	 STATUS			current
 	 DESCRIPTION
-	 	"The local RSA fingerprint for SSH connections."						
+		"The local RSA key fingerprint for SSH connections. The type of the hash is defined with hm2SshKeyFingerPrintType."
 	 ::= { hm2MgmtAccessSshGroup 12 }
 
 hm2SshTrapEnable  OBJECT-TYPE
@@ -619,6 +656,60 @@ hm2SshLastLoginInetAddress OBJECT-TYPE
                     "IP address or DNS name specified in the last request for this application."
         ::= { hm2MgmtAccessSshGroup 17 }
 
+hm2SshKeyFingerPrintType OBJECT-TYPE 
+       SYNTAX INTEGER {
+                   md5(1),
+                   sha256(2)
+                   }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+          "Controls SSH key fingerprint display. If set to 'md5' SSH will show the MD5 fingerprint of a key."
+      DEFVAL { sha256 }
+     ::= { hm2MgmtAccessSshGroup 18 }
+
+hm2SshHmacAlgorithms OBJECT-TYPE
+      SYNTAX       Hm2SshHmacAlgorithms
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The HMAC algorithms supported by the SSH server."
+      DEFVAL       {{
+      						hmac-sha1,
+      						hmac-sha2-256,
+      						hmac-sha1-etm-at-openssh-com,
+      						hmac-sha2-256-etm-at-openssh-com
+                   }}
+      ::= { hm2MgmtAccessSshGroup 19 }
+
+hm2SshKexAlgorithms OBJECT-TYPE
+      SYNTAX       Hm2SshKexAlgorithms
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The key exchange algorithms supported by the SSH server."
+      DEFVAL       {{
+      						diffie-hellman-group1-sha1,
+							diffie-hellman-group14-sha1,
+							diffie-hellman-group16-sha512,
+							diffie-hellman-group18-sha512,
+							diffie-hellman-group-exchange-sha256,
+							ecdh-sha2-nistp256
+                   }}
+      ::= { hm2MgmtAccessSshGroup 20 }
+
+hm2SshEncryptionAlgorithms OBJECT-TYPE
+      SYNTAX       Hm2SshEncryptionAlgorithms
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+                   "The encryption algorithms supported by the SSH server."
+      DEFVAL       {{
+      						aes128-ctr,
+							aes128-gcm-at-openssh-com,
+							chacha20-poly1305-at-openssh-com
+                   }}
+      ::= { hm2MgmtAccessSshGroup 21 }
 
 -- *************************************************************
 -- Outbound SSH client MIB objects

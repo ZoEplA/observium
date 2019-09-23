@@ -1,26 +1,26 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Description Of Portal
 -- Reference:
--- Version: V1.4
+-- Version: V1.7
 -- History:
 --   V1.0 2008-12-30, Created by d04528
 --   V1.1 2009-4-30, Modified by h02978
 --        Added node h3cPortalServerPort
---        Added table h3cPortalIfInfoTable, including the following nodes,
+--        Added table h3cPortalIfInfoTable, including the following nodes:
 --            h3cPortalAuthReqNumber
 --            h3cPortalAuthSuccNumber
 --            h3cPortalAuthFailNumber
 --        Added trap node h3cPortalServerGet
 --   V1.2 2010-5-31, Modified by y07111
---        Added table h3cPortalIfServerTable, including the following nodes,
+--        Added table h3cPortalIfServerTable, including the following nodes:
 --            h3cPortalIfServerIndex
 --            h3cPortalIfServerUrl
 --            h3cPortalIfServerRowStatus
 --        Added h3cPortalNasId
 --   V1.3 2010-11-8, Modified by y07111
---        Added table h3cPortalStatistic,including the following nodes,
+--        Added table h3cPortalStatistic,including the following nodes:
 --        h3cPortalStatAuthReq
 --        h3cPortalStatAckLogout
 --        h3cPortalStatNotifyLogout
@@ -34,26 +34,26 @@
 --        h3cPortalStatAuthDisordered
 --        h3cPortalStatAuthUnknownError
 --   V1.4 2011-08-18, Added by liqian 04379
---        Added table h3cPortalIfVlanNasIDTable, including the following nodes,
+--        Added table h3cPortalIfVlanNasIDTable, including the following nodes:
 --        h3cPortalIfVlanNasIDIfIndex
 --        h3cPortalIfVlanNasIDVlanID
 --        h3cPortalIfVlanNasIDNasID
---        Added table h3cPortalSSIDFreeRuleTable, including the following nodes,
+--        Added table h3cPortalSSIDFreeRuleTable, including the following nodes:
 --        h3cPortalSSIDFreeRuleIndex
 --        h3cPortalSSIDFreeRuleSrcSSID
 --        h3cPortalSSIDFreeRuleRowStatus
---        Added table h3cPortalMacTriggerSrvTable, including the following nodes,
+--        Added table h3cPortalMacTriggerSrvTable, including the following nodes:
 --        h3cPortalMacTriggerSrvIndex
 --        h3cPortalMacTriggerSrvIPAddrType
 --        h3cPortalMacTriggerSrvIP
 --        h3cPortalMacTriggerSrvPort
 --        h3cPortalMacTriggerSrvRowStatus
---        Added table h3cPortalMacTriggerOnIfTable, including the following nodes,
+--        Added table h3cPortalMacTriggerOnIfTable, including the following nodes:
 --        h3cPortalMacTriggerOnIfIfIndex
 --        h3cPortalMacTriggerOnIfDetctFlowPeriod
 --        h3cPortalMacTriggerOnIfThresholdFlow
 --        h3cPortalMacTriggerOnIfRowStatus
---        Added table h3cPortalPktStatistic ,including the following nodes,
+--        Added table h3cPortalPktStatistic ,including the following nodes:
 --        h3cPortalPktStaReqAuthNum
 --        h3cPortalPktStaAckAuthSuccess
 --        h3cPortalPktStaAckAuthReject
@@ -67,9 +67,9 @@
 --        h3cPortalPktStaAckChallengeBusy
 --        h3cPortalPktStaAckChallengeAuthFail
 --        2011-11-8, Added by q04356
---        Added table h3cPortalTrapVarObjects, including the following nodes,
+--        Added table h3cPortalTrapVarObjects, including the following nodes:
 --        h3cPortalFirstTrapTime
---        Added table h3cPortalFreeRuleTable, including the following nodes,
+--        Added table h3cPortalFreeRuleTable, including the following nodes:
 --        h3cPortalFreeRuleIndex
 --        h3cPortalFreeRuleSrcIfIndex
 --        h3cPortalFreeRuleSrcVlanID
@@ -83,7 +83,7 @@
 --        h3cPortalFreeRuleSrcPort
 --        h3cPortalFreeRuleDstPort
 --        h3cPortalFreeRuleRowStatus
---        Added table h3cPortalForbiddenRuleTable, including the following nodes,
+--        Added table h3cPortalForbiddenRuleTable, including the following nodes:
 --        h3cPortalForbiddenRuleIndex
 --        h3cPortalForbiddenRuleSrcIfIndex
 --        h3cPortalForbiddenRuleSrcVlanID
@@ -101,6 +101,72 @@
 --        h3cPortalStatAuthResp
 --        h3cPortalStatChallengeReq
 --        h3cPortalStatChallengeResp
+--   V1.5 2012-11-21, Added by l09300
+--        Added node in table h3cPortalSSIDFreeRuleTable
+--        h3cPortalSSIDFreeRuleSrcSpot
+--   V1.6 2013-08-29, Added by q04356
+--        Added nodes in table h3cPortalStatistic
+--        h3cPortalStatHttpReq
+--        h3cPortalStatHttpResp
+--        Added node in table h3cPortalTrapVarObjects
+--        h3cPortalServerIP
+--        Added objects h3cPortalServerPort and h3cPortalServerIP in
+--        trap nodes h3cPortalServerGet and h3cPortalServerLost
+--   V1.7 2015-10-08, Added by zkf4839
+--        Added nodes in table h3cPortalStatistic
+--        h3cPortalStatHttpsReq
+--        h3cPortalStatHttpsResp
+--        Added nodes in table h3cPortalExtConfig, including the following nodes:
+--        h3cPortalExtMaxUserNumber
+--        h3cPortalExtCurrentUserNumber
+--        h3cPortalExtStatus
+--        Added table h3cPortalExtSrvTable, including the following nodes:
+--        h3cPortalExtSrvName
+--        h3cPortalExtSrvIPAddrType
+--        h3cPortalExtSrvIP
+--        h3cPortalExtSrvPort
+--        h3cPortalExtSrvRowStatus
+--        Added table h3cPortalExtWebSrvTable, including the following nodes:
+--        h3cPortalExtWebSrvName
+--        h3cPortalExtWebSrvUrl
+--        h3cPortalExtWebSrvRowStatus
+--        Added table h3cPortalExtMTSrvTable, including the following nodes:
+--        h3cPortalExtMTSrvName
+--        h3cPortalExtMTSrvIPAddrType
+--        h3cPortalExtMTSrvIP
+--        h3cPortalExtMTSrvPort
+--        h3cPortalExtMTDetctFlowPeriod
+--        h3cPortalExtMTThresholdFlow
+--        h3cPortalExtMTSrvRowStatus
+--        Added table h3cPortalExtIfConfigTable, including the following nodes:
+--        h3cPortalExtIfIndex
+--        h3cPortalExtIfWebSrvName
+--        h3cPortalExtIfDomainName
+--        h3cPortalExtIfAuthMethod
+--        h3cPortalExtIfMTSrvName
+--        h3cPortalExtIfMaxUser
+--        Added table h3cPortalExtIfIpv6ConfigTable, including the following nodes:
+--        h3cPortalExtIfIpv6Index
+--        h3cPortalExtIfIpv6WebSrvName
+--        h3cPortalExtIfIpv6DomainName
+--        h3cPortalExtIfIpv6AuthMethod
+--        h3cPortalExtIfIpv6MaxUser
+--        Added table h3cPortalDot11SrvTable, including the following nodes:
+--        h3cPortalDot11SrvTemName
+--        h3cPortalDot11WebSrvName
+--        h3cPortalDot11DomainName
+--        h3cPortalDot11AuthMethod
+--        h3cPortalDot11MTSrvName
+--        h3cPortalDot11MaxUser
+--        Added table h3cPortalDot11Ipv6SrvTable, including the following nodes:
+--        h3cPortalDot11Ipv6SrvTemName
+--        h3cPortalDot11Ipv6WebSrvName
+--        h3cPortalDot11Ipv6DomainName
+--        h3cPortalDot11Ipv6AuthMethod
+--        h3cPortalDot11Ipv6MaxUser
+--        2016-07-14, Added by xkf6915
+--        Added nodes in table h3cPortalForbiddenRuleTable
+--        h3cPortalForbiddenRuleSsidName
 -- =================================================================
 H3C-PORTAL-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -109,15 +175,15 @@ IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32, Counter64, Unsigned32,
     TimeTicks
         FROM SNMPv2-SMI
-    RowStatus, TruthValue, MacAddress
+    RowStatus, MacAddress, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
     ifIndex, InterfaceIndex
         FROM IF-MIB
-    InetAddressPrefixLength, InetAddressType, InetAddress
+    InetAddressPrefixLength, InetAddressType, InetAddress, InetAddressIPv4
         FROM INET-ADDRESS-MIB;
 
 h3cPortal MODULE-IDENTITY
-    LAST-UPDATED "201111080000Z"            -- Nov 8th, 2011 at 00:00 GMT
+    LAST-UPDATED "201607141020Z"        -- Jul 14, 2016 at 10:20 GMT
     ORGANIZATION
         "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -128,8 +194,25 @@ h3cPortal MODULE-IDENTITY
         "
     DESCRIPTION
         "The MIB module is used for managing portal."
+    REVISION "201607141020Z"        -- Jul 14, 2016 at 10:20 GMT
+    DESCRIPTION
+        "Modified to add new node in table h3cPortalForbiddenRuleTable."
+    REVISION "201510081020Z"        -- Oct 8, 2015 at 10:20 GMT
+    DESCRIPTION
+        "Modified to add new table."
     ::= { h3cCommon 99 }
 
+H3cPortalAuthMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Specify the portal authentication method."
+    SYNTAX      INTEGER
+    {
+        invalid(1),
+        direct(2),
+        layer3(3),
+        redhcp(4)
+    }
 
 h3cPortalConfig OBJECT IDENTIFIER ::= { h3cPortal 1 }
 
@@ -500,7 +583,8 @@ H3cPortalSSIDFreeRuleEntry ::= SEQUENCE
     {
         h3cPortalSSIDFreeRuleIndex                   Integer32,
         h3cPortalSSIDFreeRuleSrcSSID                 OCTET STRING,
-        h3cPortalSSIDFreeRuleRowStatus               RowStatus
+        h3cPortalSSIDFreeRuleRowStatus               RowStatus,
+        h3cPortalSSIDFreeRuleSrcSpot                 OCTET STRING
     }
 
 h3cPortalSSIDFreeRuleIndex  OBJECT-TYPE
@@ -529,6 +613,14 @@ h3cPortalSSIDFreeRuleRowStatus OBJECT-TYPE
         modification of rows, which support active status and CreateAndGo,
         Destroy operation."
     ::= { h3cPortalSSIDFreeRuleEntry 3 }
+
+h3cPortalSSIDFreeRuleSrcSpot  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The spot match against the packet's source spot."
+    ::={ h3cPortalSSIDFreeRuleEntry 4 }
 
 --
 -- PORTAL MAC Trigger Server
@@ -657,20 +749,26 @@ h3cPortalMacTriggerOnIfIfIndex  OBJECT-TYPE
 
 h3cPortalMacTriggerOnIfDetctFlowPeriod  OBJECT-TYPE
     SYNTAX      Integer32
+    UNITS       "seconds"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "It shows the period of detecting the user flow when
-        MAC Trigger and Portal is enabled.  The unit is second."
+        "It shows the user flow detection interval (in seconds) when
+        MAC Trigger and Portal are enabled.
+        Default value is 300."
+    DEFVAL { 300 }
     ::={ h3cPortalMacTriggerOnIfEntry 2 }
 
 h3cPortalMacTriggerOnIfThresholdFlow  OBJECT-TYPE
     SYNTAX      Unsigned32
+    UNITS       "bytes"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "It shows the threshold flow of the user to triggering authentication
-        when MAC Trigger and Portal is enabled.  The unit is byte."
+        "It shows the user traffic threshold (in bytes) that triggers authentication
+        when MAC Trigger and Portal are enabled.
+        Default value is 0."
+    DEFVAL { 0 }
     ::={ h3cPortalMacTriggerOnIfEntry 3 }
 
 h3cPortalMacTriggerOnIfRowStatus OBJECT-TYPE
@@ -711,7 +809,7 @@ h3cPortalFreeRuleEntry OBJECT-TYPE
 
 H3cPortalFreeRuleEntry ::= SEQUENCE
     {
-	h3cPortalFreeRuleIndex                   Integer32,
+        h3cPortalFreeRuleIndex                   Integer32,
         h3cPortalFreeRuleSrcIfIndex              InterfaceIndex,
         h3cPortalFreeRuleSrcVlanID               Integer32,
         h3cPortalFreeRuleSrcMac                  MacAddress,
@@ -776,7 +874,7 @@ h3cPortalFreeRuleSrcAddr  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The IP address to match against the packet's source IP
-       address. This may be a DNS name or an IPv4 or IPv6
+       address.  This may be a DNS name or an IPv4 or IPv6
        prefix.  h3cPortalFreeRuleSrcPrefix indicates the
        number of bits that are relevant."
     ::={ h3cPortalFreeRuleEntry 6 }
@@ -787,10 +885,10 @@ h3cPortalFreeRuleSrcPrefix  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The length of the CIDR Prefix carried in
-       h3cPortalFreeRuleSrcAddr. In IPv4 addresses, a length of 0
+       h3cPortalFreeRuleSrcAddr.  In IPv4 addresses, a length of 0
        indicates a match of any address; a length of 32 indicates a
        match of a single host address, and a length between 0 and 32
-       indicates the use of a CIDR Prefix. IPv6 is similar, except that
+       indicates the use of a CIDR Prefix.  IPv6 is similar, except that
        prefix lengths range from 0..128."
     ::={ h3cPortalFreeRuleEntry 7 }
 
@@ -800,7 +898,7 @@ h3cPortalFreeRuleDstAddr  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The IP address to match against the packet's destination IP
-       address. This may be a DNS name or an IPv4 or IPv6
+       address.  This may be a DNS name or an IPv4 or IPv6
        prefix.  h3cPortalFreeRuleDstPrefix indicates the
        number of bits that are relevant."
     ::={ h3cPortalFreeRuleEntry 8 }
@@ -811,10 +909,10 @@ h3cPortalFreeRuleDstPrefix  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The length of the CIDR Prefix carried in
-       h3cPortalFreeRuleDstAddr. In IPv4 addresses, a length of 0
+       h3cPortalFreeRuleDstAddr.  In IPv4 addresses, a length of 0
        indicates a match of any address; a length of 32 indicates a
        match of a single host address, and a length between 0 and 32
-       indicates the use of a CIDR Prefix. IPv6 is similar, except that
+       indicates the use of a CIDR Prefix.  IPv6 is similar, except that
        prefix lengths range from 0..128."
     ::={ h3cPortalFreeRuleEntry 9 }
 
@@ -885,7 +983,7 @@ h3cPortalForbiddenRuleEntry OBJECT-TYPE
 
 H3cPortalForbiddenRuleEntry ::= SEQUENCE
     {
-	h3cPortalForbiddenRuleIndex                   Integer32,
+        h3cPortalForbiddenRuleIndex                   Integer32,
         h3cPortalForbiddenRuleSrcIfIndex              InterfaceIndex,
         h3cPortalForbiddenRuleSrcVlanID               Integer32,
         h3cPortalForbiddenRuleSrcMac                  MacAddress,
@@ -897,7 +995,8 @@ H3cPortalForbiddenRuleEntry ::= SEQUENCE
         h3cPortalForbiddenRuleProtocol                INTEGER,
         h3cPortalForbiddenRuleSrcPort                 Integer32,
         h3cPortalForbiddenRuleDstPort                 Integer32,
-        h3cPortalForbiddenRuleRowStatus               RowStatus
+        h3cPortalForbiddenRuleRowStatus               RowStatus,
+        h3cPortalForbiddenRuleSsidName                OCTET STRING
     }
 
 h3cPortalForbiddenRuleIndex  OBJECT-TYPE
@@ -950,7 +1049,7 @@ h3cPortalForbiddenRuleSrcAddr  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The IP address to match against the packet's source IP
-       address. This may be a DNS name or an IPv4 or IPv6
+       address.  This may be a DNS name or an IPv4 or IPv6
        prefix.  h3cPortalForbiddenRuleSrcPrefix indicates the
        number of bits that are relevant."
     ::={ h3cPortalForbiddenRuleEntry 6 }
@@ -961,10 +1060,10 @@ h3cPortalForbiddenRuleSrcPrefix  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The length of the CIDR Prefix carried in
-       h3cPortalFreeRuleSrcAddr. In IPv4 addresses, a length of 0
+       h3cPortalFreeRuleSrcAddr.  In IPv4 addresses, a length of 0
        indicates a match of any address; a length of 32 indicates a
        match of a single host address, and a length between 0 and 32
-       indicates the use of a CIDR Prefix. IPv6 is similar, except that
+       indicates the use of a CIDR Prefix.  IPv6 is similar, except that
        prefix lengths range from 0..128."
     ::={ h3cPortalForbiddenRuleEntry 7 }
 
@@ -974,7 +1073,7 @@ h3cPortalForbiddenRuleDstAddr  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The IP address to match against the packet's destination IP
-       address. This may be a DNS name or an IPv4 or IPv6
+       address.  This may be a DNS name or an IPv4 or IPv6
        prefix.  h3cPortalForbiddenRuleDstPrefix indicates the
        number of bits that are relevant."
     ::={ h3cPortalForbiddenRuleEntry 8 }
@@ -985,10 +1084,10 @@ h3cPortalForbiddenRuleDstPrefix  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The length of the CIDR Prefix carried in
-       h3cPortalFreeRuleDstAddr. In IPv4 addresses, a length of 0
+       h3cPortalFreeRuleDstAddr.  In IPv4 addresses, a length of 0
        indicates a match of any address; a length of 32 indicates a
        match of a single host address, and a length between 0 and 32
-       indicates the use of a CIDR Prefix. IPv6 is similar, except that
+       indicates the use of a CIDR Prefix.  IPv6 is similar, except that
        prefix lengths range from 0..128."
     ::={ h3cPortalForbiddenRuleEntry 9 }
 
@@ -1031,6 +1130,13 @@ h3cPortalForbiddenRuleRowStatus OBJECT-TYPE
         Destroy operation."
     ::= { h3cPortalForbiddenRuleEntry 13 }
 
+h3cPortalForbiddenRuleSsidName OBJECT-TYPE
+    SYNTAX   OCTET STRING (SIZE(1..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to match packet's source SSID."
+    ::= { h3cPortalForbiddenRuleEntry 14 }
 --
 -- Define the portal Traps.
 --
@@ -1043,26 +1149,32 @@ h3cPortalServerLost NOTIFICATION-TYPE
     OBJECTS
         {
             h3cPortalServerName,
-            h3cPortalFirstTrapTime
+            h3cPortalFirstTrapTime,
+            h3cPortalServerIP,
+            h3cPortalServerPort
         }
     STATUS      current
     DESCRIPTION
         "This trap is generated when the device finds that the portal server
-        is unreachable, the portal server's name is h3cPortalServerName,
-        and the portal server has been enabled."
+        is unreachable, the portal server's name is h3cPortalServerName, and
+        the portal server's IP is h3cPortalServerIP, and the portal server's
+        port is h3cPortalServerPort, and the portal server has been enabled."
     ::= { h3cPortalTrapPrefix 1 }
 
 h3cPortalServerGet NOTIFICATION-TYPE
     OBJECTS
         {
             h3cPortalServerName,
-            h3cPortalFirstTrapTime
+            h3cPortalFirstTrapTime,
+            h3cPortalServerIP,
+            h3cPortalServerPort
         }
     STATUS      current
     DESCRIPTION
         "This trap is generated when the device finds that the state of portal
         server changes from unreachable state to reachable,
-        the portal server's name is h3cPortalServerName,
+        the portal server's name is h3cPortalServerName, and the portal server's
+        IP is h3cPortalServerIP, and the portal server's port is h3cPortalServerPort,
         and the portal server has been enabled."
     ::= { h3cPortalTrapPrefix 2 }
 
@@ -1075,6 +1187,14 @@ h3cPortalFirstTrapTime OBJECT-TYPE
     DESCRIPTION
         "Represents the first trap time."
     ::= { h3cPortalTrapVarObjects 1 }
+
+h3cPortalServerIP OBJECT-TYPE
+    SYNTAX      InetAddressIPv4
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The portal server's IP."
+    ::= { h3cPortalTrapVarObjects 2 }
 
 -- PORTAL STATISTIC
 
@@ -1215,7 +1335,7 @@ h3cPortalStatAuthResp OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "It shows the number of authentication response messages
-        which are sent by AC to portal server."
+        which are sent by device to portal server."
     ::= { h3cPortalStatistic 13 }
 
 -- PORTAL authenticate challenge request STATISTIC
@@ -1226,7 +1346,7 @@ h3cPortalStatChallengeReq OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "It shows the number of challenge request messages
-        which are sent by portal server to AC."
+        which are sent by portal server to device."
     ::= { h3cPortalStatistic 14 }
 
 -- PORTAL authenticate challenge response STATISTIC
@@ -1237,8 +1357,53 @@ h3cPortalStatChallengeResp OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "It shows the number of challenge response messages
-        which are sent by AC to portal server."
+        which are sent by device to portal server."
     ::= { h3cPortalStatistic 15 }
+
+-- PORTAL http request statistic
+
+h3cPortalStatHttpReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of http request messages
+        which are sent by portal user to device."
+    ::= { h3cPortalStatistic 16 }
+
+-- PORTAL http response statistic
+
+h3cPortalStatHttpResp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of http response messages
+        which are sent by  device to portal user."
+    ::= { h3cPortalStatistic 17 }
+
+-- PORTAL HTTPS  request statistic
+
+h3cPortalStatHttpsReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of HTTPS request messages
+        sent from portal users to the device."
+    ::= { h3cPortalStatistic 18 }
+
+-- PORTAL HTTPS response statistic
+
+h3cPortalStatHttpsResp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of HTTPS response messages
+         sent from the device to portal users."
+    ::= { h3cPortalStatistic 19 }
+
 
 -- PORTAL PACKET STATISTIC BY ERROR CODE
 
@@ -1363,6 +1528,615 @@ h3cPortalPktStaAckChallengeAuthFail OBJECT-TYPE
         portal server including error code 4 in the packet, that is
         authentication fail."
     ::= { h3cPortalPktStatistic 12 }
+
+h3cPortalExtConfig OBJECT IDENTIFIER ::= { h3cPortal 6 }
+
+--
+-- PORTAL MAX USER NUMBER
+--
+
+h3cPortalExtMaxUserNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the maximum number of online users."
+    ::= { h3cPortalExtConfig 1 }
+
+--
+-- PORTAL CURRENT USER NUMBER
+--
+
+h3cPortalExtCurrentUserNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of online portal users."
+    ::= { h3cPortalExtConfig 2 }
+
+--
+-- PORTAL STATUS
+--
+
+h3cPortalExtStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+         enabled(1),
+         disabled(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It indicates the portal status.
+         enabled:
+            Portal is enabled on one or more interfaces.
+         disabled:
+            Portal is not enabled on any interface."
+    ::= { h3cPortalExtConfig 3 }
+
+h3cPortalExtTables OBJECT IDENTIFIER ::= { h3cPortal 7 }
+
+--
+-- PORTAL server table
+--
+h3cPortalExtSrvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalExtSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the name of the portal server.  It can be created
+        and destroyed by MIB."
+    ::= { h3cPortalExtTables 1 }
+
+h3cPortalExtSrvEntry OBJECT-TYPE
+    SYNTAX      H3cPortalExtSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for each name and URL of the portal server.
+        It is indexed by using the object h3cPortalExtSrvName."
+    INDEX
+        {
+            h3cPortalExtSrvName
+        }
+    ::= { h3cPortalExtSrvTable 1 }
+
+
+H3cPortalExtSrvEntry ::= SEQUENCE
+    {
+        h3cPortalExtSrvName          OCTET STRING,
+        h3cPortalExtSrvIPAddrType    InetAddressType,
+        h3cPortalExtSrvIP            InetAddress,
+        h3cPortalExtSrvPort          Integer32,
+        h3cPortalExtSrvRowStatus     RowStatus
+    }
+
+h3cPortalExtSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the index of the table h3cPortalExtSrvTable.  It shows
+        the name of the portal server."
+    ::= { h3cPortalExtSrvEntry 1 }
+
+h3cPortalExtSrvIPAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of the portal server IP address."
+    ::={ h3cPortalExtSrvEntry 2 }
+
+h3cPortalExtSrvIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "It shows the IP address of the portal server."
+    ::= { h3cPortalExtSrvEntry 3 }
+
+h3cPortalExtSrvPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It shows the UDP port of the portal server.
+        The port will be used when clients send packets to the portal server.
+        Default value is 50100.
+        It is not configurable when the portal server has been enabled."
+    ::= { h3cPortalExtSrvEntry 4 }
+
+h3cPortalExtSrvRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo and
+        Destroy operations.  To create a new row, the portal server must be
+        specified.
+        To destroy an existing row, the portal server MUST NOT be referenced by
+        an interface."
+    ::= { h3cPortalExtSrvEntry 5 }
+
+--
+-- PORTAL web server table
+--
+h3cPortalExtWebSrvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalExtWebSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the name of the portal Web server.  It can be created
+         and destroyed by MIB."
+    ::= { h3cPortalExtTables 2 }
+
+h3cPortalExtWebSrvEntry OBJECT-TYPE
+    SYNTAX      H3cPortalExtWebSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for each name and portal Web server.
+        It is indexed by using the object h3cPortalExtWebSrvName."
+    INDEX
+        {
+            h3cPortalExtWebSrvName
+        }
+    ::= { h3cPortalExtWebSrvTable 1 }
+
+
+H3cPortalExtWebSrvEntry ::= SEQUENCE
+    {
+        h3cPortalExtWebSrvName         OCTET STRING,
+        h3cPortalExtWebSrvUrl          OCTET STRING,
+        h3cPortalExtWebSrvRowStatus    RowStatus
+    }
+
+h3cPortalExtWebSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the index of the table h3cPortalExtWebSrvTable.  It shows
+        the name of the portal Web server."
+    ::= { h3cPortalExtWebSrvEntry 1 }
+
+h3cPortalExtWebSrvUrl OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "It shows the URL to the portal Web server.
+        Users which have not logged on to portal will be redirected to the
+        portal server according to h3cPortalServerIfUrl.
+        The value is consisted of protocol, IP address and relative path.
+        For example: http://10.1.1.1/portal."
+    ::= { h3cPortalExtWebSrvEntry 2 }
+
+h3cPortalExtWebSrvRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo and
+        Destroy operations.  To create a new row, the portal server must be specified.
+        To destroy an existing row, the portal Web server MUST NOT be referenced by an
+        interface."
+    ::= { h3cPortalExtWebSrvEntry 3 }
+
+h3cPortalExtMTSrvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalExtMTSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes the configuration of the MAC Trigger server."
+    ::= { h3cPortalExtTables 3 }
+
+h3cPortalExtMTSrvEntry OBJECT-TYPE
+    SYNTAX      H3cPortalExtMTSrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in the table for the MAC Trigger server.  It is indexed by using the object Index."
+    INDEX
+        {
+            h3cPortalExtMTSrvName
+        }
+    ::= { h3cPortalExtMTSrvTable 1 }
+
+H3cPortalExtMTSrvEntry ::= SEQUENCE
+    {
+        h3cPortalExtMTSrvName          OCTET STRING,
+        h3cPortalExtMTSrvIPAddrType    InetAddressType,
+        h3cPortalExtMTSrvIP            InetAddress,
+        h3cPortalExtMTSrvPort          Integer32,
+        h3cPortalExtMTDetctFlowPeriod  Integer32,
+        h3cPortalExtMTThresholdFlow    Unsigned32,
+        h3cPortalExtMTSrvRowStatus     RowStatus
+    }
+
+h3cPortalExtMTSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the index of the table h3cPortalExtMTSrvTable.  It shows
+         the name of the MAC Trigger server."
+    ::= { h3cPortalExtMTSrvEntry 1 }
+
+h3cPortalExtMTSrvIPAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of the MAC Trigger server IP address."
+    ::={ h3cPortalExtMTSrvEntry 2 }
+
+h3cPortalExtMTSrvIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "It shows the IP address of the MAC Trigger server."
+    ::= { h3cPortalExtMTSrvEntry 3 }
+
+h3cPortalExtMTSrvPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "It shows the UDP port of the MAC Trigger server.
+        The port will be used when clients send packets to the MAC Trigger server.
+        Default value is 50100."
+    DEFVAL { 50100 }
+    ::= { h3cPortalExtMTSrvEntry 4 }
+
+h3cPortalExtMTDetctFlowPeriod  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "It shows the user flow detection interval (in seconds) when
+        MAC Trigger and Portal are enabled.
+        Default value is 300."
+    DEFVAL { 300 }
+    ::= { h3cPortalExtMTSrvEntry 5 }
+
+h3cPortalExtMTThresholdFlow  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "It shows the user traffic threshold (in bytes) that triggers authentication
+        when MAC Trigger and Portal are enabled.
+        Default value is 0."
+    DEFVAL { 0 }
+    ::= { h3cPortalExtMTSrvEntry 6 }
+
+h3cPortalExtMTSrvRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo and
+        Destroy operations."
+    ::= { h3cPortalExtMTSrvEntry 7 }
+--
+-- PORTAL extend if table
+--
+h3cPortalExtIfConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalExtIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes portal information on interfaces."
+    ::= { h3cPortalExtTables 4 }
+
+h3cPortalExtIfConfigEntry OBJECT-TYPE
+    SYNTAX      H3cPortalExtIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for an interface on which
+        portal has been enabled.
+        It is indexed by using the object ifIndex."
+    INDEX
+        {
+            h3cPortalExtIfIndex
+        }
+    ::= { h3cPortalExtIfConfigTable 1 }
+
+H3cPortalExtIfConfigEntry ::= SEQUENCE
+    {
+        h3cPortalExtIfIndex            InterfaceIndex,
+        h3cPortalExtIfWebSrvName       OCTET STRING,
+        h3cPortalExtIfDomainName       OCTET STRING,
+        h3cPortalExtIfAuthMethod       H3cPortalAuthMethod,
+        h3cPortalExtIfMTSrvName        OCTET STRING,
+        h3cPortalExtIfMaxUser          Unsigned32
+    }
+
+h3cPortalExtIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the interface index and the index of h3cPortalExtIfConfigTable."
+    ::= { h3cPortalExtIfConfigEntry 1 }
+
+h3cPortalExtIfWebSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Portal Web server name must exist.  It references
+        h3cPortalExtWebSrvName."
+    ::= { h3cPortalExtIfConfigEntry 2 }
+
+h3cPortalExtIfDomainName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication domain."
+    ::= { h3cPortalExtIfConfigEntry 3 }
+
+h3cPortalExtIfAuthMethod OBJECT-TYPE
+    SYNTAX      H3cPortalAuthMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the portal authentication method."
+    ::= { h3cPortalExtIfConfigEntry 4 }
+
+h3cPortalExtIfMTSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC trigger server name must exist.  It references h3cPortalExtMTSrvName."
+    ::= { h3cPortalExtIfConfigEntry 5 }
+
+h3cPortalExtIfMaxUser OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of portal users."
+    ::= { h3cPortalExtIfConfigEntry 6 }
+
+h3cPortalExtIfIpv6ConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalExtIfIpv6ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes IPv6 portal information on interfaces."
+    ::= { h3cPortalExtTables 5 }
+
+h3cPortalExtIfIpv6ConfigEntry OBJECT-TYPE
+    SYNTAX      H3cPortalExtIfIpv6ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for an interface on which
+        IPv6 portal has been enabled.
+        It is indexed by using the object ifIndex."
+    INDEX
+        {
+            h3cPortalExtIfIpv6Index
+        }
+    ::= { h3cPortalExtIfIpv6ConfigTable 1 }
+
+H3cPortalExtIfIpv6ConfigEntry ::= SEQUENCE
+    {
+        h3cPortalExtIfIpv6Index            InterfaceIndex,
+        h3cPortalExtIfIpv6WebSrvName       OCTET STRING,
+        h3cPortalExtIfIpv6DomainName       OCTET STRING,
+        h3cPortalExtIfIpv6AuthMethod       H3cPortalAuthMethod,
+        h3cPortalExtIfIpv6MaxUser          Unsigned32
+    }
+
+h3cPortalExtIfIpv6Index OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the interface index and the index of h3cPortalExtIfIpv6ConfigTable."
+    ::= { h3cPortalExtIfIpv6ConfigEntry 1 }
+
+h3cPortalExtIfIpv6WebSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Portal Web server name must exist.  It references h3cPortalExtWebSrvName."
+    ::= { h3cPortalExtIfIpv6ConfigEntry 2 }
+
+h3cPortalExtIfIpv6DomainName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Authentication domain."
+    ::= { h3cPortalExtIfIpv6ConfigEntry 3 }
+
+h3cPortalExtIfIpv6AuthMethod  OBJECT-TYPE
+    SYNTAX      H3cPortalAuthMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the portal authentication method."
+    ::= { h3cPortalExtIfIpv6ConfigEntry 4 }
+
+
+h3cPortalExtIfIpv6MaxUser OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of IPv6 portal users."
+    ::= { h3cPortalExtIfIpv6ConfigEntry 5 }
+--
+-- PORTAL dot11 configuration table
+--
+h3cPortalDot11SrvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalDot11SrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes the portal information on service templates."
+    ::= { h3cPortalExtTables 6 }
+
+h3cPortalDot11SrvEntry OBJECT-TYPE
+    SYNTAX      H3cPortalDot11SrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for a service template on which
+        portal has been enabled.
+        It is indexed by using the object wlan service-template name."
+    INDEX
+        {
+            h3cPortalDot11SrvTemName
+        }
+    ::= { h3cPortalDot11SrvTable 1 }
+
+H3cPortalDot11SrvEntry ::= SEQUENCE
+    {
+        h3cPortalDot11SrvTemName     OCTET STRING,
+        h3cPortalDot11WebSrvName     OCTET STRING,
+        h3cPortalDot11DomainName     OCTET STRING,
+        h3cPortalDot11AuthMethod     H3cPortalAuthMethod,
+        h3cPortalDot11MTSrvName      OCTET STRING,
+        h3cPortalDot11MaxUser        Unsigned32
+    }
+
+h3cPortalDot11SrvTemName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..63))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the index of the table h3cPortalDot11SrvTable, it shows
+        the name of the wlan service-template."
+    ::= { h3cPortalDot11SrvEntry 1 }
+
+h3cPortalDot11WebSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It shows portal web-server name."
+    ::= { h3cPortalDot11SrvEntry 2 }
+
+h3cPortalDot11DomainName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It shows portal authentication domain name."
+    ::= { h3cPortalDot11SrvEntry 3 }
+
+h3cPortalDot11AuthMethod  OBJECT-TYPE
+    SYNTAX      H3cPortalAuthMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "Specify the portal authentication method on service templates."
+    ::= { h3cPortalDot11SrvEntry 4 }
+
+h3cPortalDot11MTSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC trigger server name must exist.  It references h3cPortalExtMTSrvName."
+    ::= { h3cPortalDot11SrvEntry 5 }
+
+h3cPortalDot11MaxUser OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of portal users."
+    ::= { h3cPortalDot11SrvEntry 6 }
+
+h3cPortalDot11Ipv6SrvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cPortalDot11Ipv6SrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes IPv6 portal information on service templates."
+    ::= { h3cPortalExtTables 7 }
+
+h3cPortalDot11Ipv6SrvEntry OBJECT-TYPE
+    SYNTAX      H3cPortalDot11Ipv6SrvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for a service template on which
+        IPv6 portal has been enabled.
+        It is indexed by using the object wlan service-template name."
+    INDEX
+        {
+            h3cPortalDot11Ipv6SrvTemName
+        }
+    ::= { h3cPortalDot11Ipv6SrvTable 1 }
+
+H3cPortalDot11Ipv6SrvEntry ::= SEQUENCE
+    {
+        h3cPortalDot11Ipv6SrvTemName     OCTET STRING,
+        h3cPortalDot11Ipv6WebSrvName     OCTET STRING,
+        h3cPortalDot11Ipv6DomainName     OCTET STRING,
+        h3cPortalDot11Ipv6AuthMethod     H3cPortalAuthMethod,
+        h3cPortalDot11Ipv6MaxUser        Unsigned32
+    }
+
+h3cPortalDot11Ipv6SrvTemName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..63))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It is the index of the table h3cPortalDot11Ipv6SrvTable.  It shows
+        the name of the IPv6 portal server."
+    ::= { h3cPortalDot11Ipv6SrvEntry 1 }
+
+h3cPortalDot11Ipv6WebSrvName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It shows the IPv6 portal Web server name."
+    ::= { h3cPortalDot11Ipv6SrvEntry 2 }
+
+h3cPortalDot11Ipv6DomainName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IPv6 portal authentication domain name."
+    ::= { h3cPortalDot11Ipv6SrvEntry 3 }
+
+h3cPortalDot11Ipv6AuthMethod  OBJECT-TYPE
+    SYNTAX      H3cPortalAuthMethod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+     "Specify the IPv6 portal authentication method on service templates."
+    ::= { h3cPortalDot11Ipv6SrvEntry 4 }
+
+h3cPortalDot11Ipv6MaxUser OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of IPv6 portal users."
+    ::= { h3cPortalDot11Ipv6SrvEntry 5 }
 
 END
 

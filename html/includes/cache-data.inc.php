@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -100,25 +100,34 @@ if (!ishit_cache_item($cache_item))
         $cache['devices']['stat']['disabled']++;
         $cache['devices']['disabled'][] = (int)$device['device_id']; // Collect IDs for disabled
         if (!$config['web_show_disabled']) { continue; }
+        // Stat for disabled collect after web_show_disabled
+        $cache['devices']['types'][$device['type']]['disabled']++;
       }
 
       if ($device['ignore'])
       {
         $cache['devices']['stat']['ignored']++;
         $cache['devices']['ignored'][] = (int)$device['device_id']; // Collect IDs for ignored
+        $cache['devices']['types'][$device['type']]['ignored']++;
       }
 
       $cache['devices']['stat']['count']++;
 
       if (!$device['ignore'])
       {
-        if ($device['status']) { $cache['devices']['stat']['up']++; }
-        else { $cache['devices']['stat']['down']++; }
+        if ($device['status']) {
+          $cache['devices']['stat']['up']++;
+          $cache['devices']['types'][$device['type']]['up']++;
+        } else {
+          $cache['devices']['stat']['down']++;
+          $cache['devices']['types'][$device['type']]['down']++;
+        }
       }
 
       $cache['devices']['timers']['polling'] += $device['last_polled_timetaken'];
       $cache['devices']['timers']['discovery'] += $device['last_discovered_timetaken'];
 
+      $cache['devices']['types'][$device['type']]['count']++;
       $cache['device_types'][$device['type']]++;
       $cache['device_locations'][$device['location']]++;
 
@@ -192,94 +201,6 @@ if (!ishit_cache_item($cache_item))
                                   'alerts'   => 0,
                                   'deleted'  => 0);
 
-/*
-
-// Possible out of memory error: dbFetchRows() -> mysqli_fetch_assoc()
-// with 220000 entries and increment:
-//  1000: peak memory usage ~  87MB, execute time ~40s
-//  5000: peak memory usage ~  89MB, execute time ~21s
-// 10000: peak memory usage ~  96MB, execute time ~19s
-// 20000: peak memory usage ~ 112MB, execute time ~18s
-// 50000: peak memory usage ~ 188MB, execute time ~17s
-$ports_count = dbFetchCell("SELECT COUNT(*) FROM `ports`;");
-$increment = 15000;
-$query = "SELECT `device_id`, `port_id`, `ifAdminStatus`, `ifOperStatus`, `deleted`, `ignore`, `ifOutErrors_delta`, `ifInErrors_delta` FROM `ports`
-          LEFT JOIN `ports-state` USING(`port_id`)";
-$i = 0;
-while ($i <= $ports_count)
-{
-  $ports_array = dbFetchRows($query . " LIMIT $i, $increment;");
-  port_permitted_array($ports_array);
-  //print_vars("TOTAL $ports_count, LIMIT $i, $increment;");
-
-  foreach ($ports_array as $port)
-  {
-    if (!$config['web_show_disabled'])
-    {
-      if ($cache['devices']['id'][$port['device_id']]['disabled'])
-      {
-        $cache['ports']['device_disabled'][] = (int)$port['port_id']; // Collect IDs for disabled device
-        continue;
-      }
-    }
-
-    if ($port['deleted'])
-    {
-      $cache['ports']['stat']['deleted']++;
-      $cache['ports']['deleted'][] = (int)$port['port_id']; // Collect IDs for deleted
-      continue; // Complete don't count port if it deleted
-    }
-
-    if ($cache['devices']['id'][$port['device_id']]['ignore'])
-    {
-      $cache['ports']['device_ignored'][] = (int)$port['port_id']; // Collect IDs for ignored device
-    }
-
-    $cache['ports']['stat']['count']++;
-    $cache['ports']['permitted'][] = (int)$port['port_id']; // Collect IDs for permitted
-
-    // Don't count alerts/errored ports if device down
-    $device_status = (bool)$cache['devices']['id'][$port['device_id']]['status'];
-
-    if ($port['ifAdminStatus'] == "down")
-    {
-      $cache['ports']['stat']['disabled']++;
-      //$cache['ports']['disabled'][] = (int)$port['port_id']; // Collect IDs for disabled
-    } else {
-      if ($port['ifOperStatus'] == "up" || $port['ifOperStatus'] == "monitoring")
-      {
-        $cache['ports']['stat']['up']++;
-        if ($device_status && ($port['ifOutErrors_delta'] > 0 || $port['ifInErrors_delta'] > 0 ))
-        {
-          $cache['ports']['stat']['errored']++;
-          $cache['ports']['errored'][] = (int)$port['port_id']; // Collect IDs for errored
-        }
-      }
-      else if ($port['ifOperStatus'] == "down" || $port['ifOperStatus'] == "lowerLayerDown")
-      {
-        // $cache['ports']['stat']['down']++;
-        if ($device_status && !$port['ignore']) { $cache['ports']['stat']['alerts']++; $cache['ports']['stat']['down']++; }
-        //if (!$port['ignore']) { $cache['ports']['stat']['alerts']++; $cache['ports']['stat']['down']++; }
-      } else {
-        // All other states: testing, unknown, dormant, notPresent
-        $cache['ports']['stat']['other']++;
-        //$cache['ports']['other'][] = (int)$port['port_id']; // Collect IDs for other
-      }
-    }
-
-    if ($port['disabled'])
-    {
-      $cache['ports']['poll_disabled'][] = (int)$port['port_id']; // Collect IDs for poll disabled
-    }
-    if ($port['ignore'])
-    {
-      $cache['ports']['stat']['ignored']++;
-      $cache['ports']['ignored'][] = (int)$port['port_id']; // Collect IDs for ignored
-    }
-  }
-  $i += $increment;
-}
-*/
 
   $where_permitted = generate_query_permitted(array('device', 'port'));
 
@@ -348,7 +269,8 @@ while ($i <= $ports_count)
                                     'ignored'  => 0,
                                     'disabled' => 0,
                                     'deleted'  => 0);
-  $cache['sensor_types'] = array(); // FIXME -> $cache['sensors']['types']
+  $cache['sensors']['devices'] = array(); // Stats per device ids
+  $cache['sensor_types']       = array(); // FIXME -> $cache['sensors']['types']
 
   $sensors_array = dbFetchRows('SELECT `device_id`, `sensor_id`, `sensor_class`, `sensor_type`, `sensor_ignore`, `sensor_disable`,
                                        `sensor_value`, `sensor_deleted`, `sensor_event` FROM `sensors` WHERE 1 ' . generate_query_permitted(array('device', 'sensor')));
@@ -366,17 +288,23 @@ while ($i <= $ports_count)
     if ($sensor['sensor_deleted']) { $cache['sensors']['stat']['deleted']++; continue; }
 
     $cache['sensors']['stat']['count']++;
+    $cache['sensors']['devices'][$sensor['device_id']]['count']++;
+    $cache['sensors']['types'][$sensor['sensor_class']]['count']++;
     $cache['sensor_types'][$sensor['sensor_class']]['count']++;
 
     if ($sensor['sensor_disable'])
     {
       $cache['sensors']['stat']['disabled']++;
+      $cache['sensors']['devices'][$sensor['device_id']]['disabled']++;
+      $cache['sensors']['types'][$sensor['sensor_class']]['disabled']++;
       continue;
     }
 
     if ($sensor['sensor_event'] == 'ignore' || $sensor['sensor_ignore'])
     {
       $cache['sensors']['stat']['ignored']++;
+      $cache['sensors']['devices'][$sensor['device_id']]['ignored']++;
+      $cache['sensors']['types'][$sensor['sensor_class']]['ignored']++;
       continue;
     }
 
@@ -384,18 +312,28 @@ while ($i <= $ports_count)
     {
       case 'warning':
         $cache['sensors']['stat']['warning']++;
+        $cache['sensors']['devices'][$sensor['device_id']]['warning']++;
+        $cache['sensors']['types'][$sensor['sensor_class']]['warning']++;
         break;
       case 'ok':
         $cache['sensors']['stat']['ok']++;
+        $cache['sensors']['devices'][$sensor['device_id']]['ok']++;
+        $cache['sensors']['types'][$sensor['sensor_class']]['ok']++;
         break;
       case 'alert':
         $cache['sensors']['stat']['alert']++;
+        $cache['sensors']['devices'][$sensor['device_id']]['alert']++;
+        $cache['sensors']['types'][$sensor['sensor_class']]['alert']++;
         $cache['sensor_types'][$sensor['sensor_class']]['alert']++;
         break;
       default:
         $cache['sensors']['stat']['alert']++; // unknown event (empty) also alert
+        $cache['sensors']['devices'][$sensor['device_id']]['alert']++;
+        $cache['sensors']['types'][$sensor['sensor_class']]['alert']++;
     }
   }
+  //r($cache['sensors']);
+  //r($cache['sensor_types']);
 
   // Statuses
   $cache['statuses']['stat'] = array('count'    => 0,
@@ -405,7 +343,8 @@ while ($i <= $ports_count)
                                      'ignored'  => 0,
                                      'disabled' => 0,
                                      'deleted'  => 0);
-  $cache['status_classes'] = array();
+  $cache['statuses']['devices'] = array(); // Stats per device id
+  $cache['status_classes'] = array();      // FIXME -> $cache['statuses']['classes']
 
   $status_array = dbFetchRows('SELECT `device_id`, `status_id`, `entPhysicalClass`, `status_ignore`, `status_disable`,
                                       `status_deleted`, `status_event` FROM `status`');
@@ -421,35 +360,114 @@ while ($i <= $ports_count)
     if ($status['status_deleted']) { $cache['statuses']['stat']['deleted']++; continue; }
 
     $cache['statuses']['stat']['count']++;
+    $cache['statuses']['devices'][$status['device_id']]['count']++;
     $cache['status_classes'][$status['entPhysicalClass']]['count']++;
 
     if ($status['status_disable'])
     {
       $cache['statuses']['stat']['disabled']++;
+      $cache['statuses']['devices'][$status['device_id']]['disabled']++;
       continue;
     }
 
     if ($status['status_event'] == 'ignore' || $status['status_ignore'])
     {
       $cache['statuses']['stat']['ignored']++;
+      $cache['statuses']['devices'][$status['device_id']]['ignored']++;
       continue;
     }
 
     switch ($status['status_event'])
     {
       case 'warning':
-        $cache['statuses']['stat']['warning']++; // 'warning' also 'ok'
+        $cache['statuses']['stat']['warning']++; // 'warning' also 'ok', hrm but now I not sure
+        $cache['statuses']['devices'][$status['device_id']]['warning']++;
+        break;
       case 'ok':
         $cache['statuses']['stat']['ok']++;
+        $cache['statuses']['devices'][$status['device_id']]['ok']++;
         break;
       case 'alert':
         $cache['statuses']['stat']['alert']++;
+        $cache['statuses']['devices'][$status['device_id']]['alert']++;
         $cache['status_classes'][$status['entPhysicalClass']]['alert']++;
         break;
       default:
         $cache['statuses']['stat']['alert']++; // unknown event (empty) also alert
+        $cache['statuses']['devices'][$status['device_id']]['alert']++;
     }
   }
+  //r($cache['statuses']);
+
+  // Counters
+  $cache['counters']['stat'] = array('count'    => 0,
+                                    'ok'       => 0,
+                                    'alert'    => 0,
+                                    'warning'  => 0,
+                                    'ignored'  => 0,
+                                    'disabled' => 0,
+                                    'deleted'  => 0);
+  $cache['counters']['devices'] = array(); // Stats per device ids
+
+  $counters_array = dbFetchRows('SELECT `device_id`, `counter_id`, `counter_class`, `counter_ignore`, `counter_disable`,
+                                       `counter_value`, `counter_deleted`, `counter_event` FROM `counters` WHERE 1 ' . generate_query_permitted(array('device', 'counter')));
+
+  foreach ($counters_array as $counter)
+  {
+
+    //if (!is_entity_permitted($counter['counter_id'], 'counter', $counter['device_id'])) { continue; } // Check device permitted
+
+    if (!$config['web_show_disabled'])
+    {
+      if ($cache['devices']['id'][$counter['device_id']]['disabled']) { continue; }
+    }
+
+    if ($counter['counter_deleted']) { $cache['counters']['stat']['deleted']++; continue; }
+
+    $cache['counters']['stat']['count']++;
+    $cache['counters']['devices'][$counter['device_id']]['count']++;
+    //$cache['counters']['types'][$counter['counter_class']]['count']++;
+
+    if ($counter['counter_disable'])
+    {
+      $cache['counters']['stat']['disabled']++;
+      $cache['counters']['devices'][$counter['device_id']]['disabled']++;
+      //$cache['counters']['types'][$counter['counter_class']]['disabled']++;
+      continue;
+    }
+
+    if ($counter['counter_event'] == 'ignore' || $counter['counter_ignore'])
+    {
+      $cache['counters']['stat']['ignored']++;
+      $cache['counters']['devices'][$counter['device_id']]['ignored']++;
+      //$cache['counters']['types'][$counter['counter_class']]['ignored']++;
+      continue;
+    }
+
+    switch ($counter['counter_event'])
+    {
+      case 'warning':
+        $cache['counters']['stat']['warning']++;
+        $cache['counters']['devices'][$counter['device_id']]['warning']++;
+        //$cache['counters']['types'][$counter['counter_class']]['warning']++;
+        break;
+      case 'ok':
+        $cache['counters']['stat']['ok']++;
+        $cache['counters']['devices'][$counter['device_id']]['ok']++;
+        //$cache['counters']['types'][$counter['counter_class']]['ok']++;
+        break;
+      case 'alert':
+        $cache['counters']['stat']['alert']++;
+        $cache['counters']['devices'][$counter['device_id']]['alert']++;
+        //$cache['counters']['types'][$counter['counter_class']]['alert']++;
+        break;
+      default:
+        $cache['counters']['stat']['alert']++; // unknown event (empty) also alert
+        $cache['counters']['devices'][$counter['device_id']]['alert']++;
+        //$cache['counters']['types'][$counter['counter_class']]['alert']++;
+    }
+  }
+  //r($cache['counters']);
 
   // Alerts
 
@@ -584,7 +602,8 @@ while ($i <= $ports_count)
   //unset($cache['devices']['permitted']);
   //$cache['where']['devices_ports_permitted'] = generate_query_permitted(array('device', 'port'));
   $cache['where']['devices_permitted']       = generate_query_permitted(array('device'));
-  $cache['where']['ports_permitted']         = generate_query_permitted(array('port'));
+    // This needs to do both, otherwise it only permits permitted ports and not ports on permitted devices.s
+  $cache['where']['ports_permitted']         = generate_query_permitted(array('port', 'device'));
 
   // CEF
   $cache['routing']['cef']['count'] = count(dbFetchColumn("SELECT `cef_switching_id` FROM `cef_switching` WHERE 1 ".$cache['where']['devices_permitted']." GROUP BY `device_id`, `afi`;"));
@@ -593,6 +612,8 @@ while ($i <= $ports_count)
 
   // Status
   $cache['status']['count'] = $cache['statuses']['stat']['count']; //dbFetchCell("SELECT COUNT(`status_id`) FROM `status` WHERE 1 ".$cache['where']['devices_permitted']);
+  // Counter
+  $cache['counter']['count'] = $cache['counters']['stat']['count'];
 
   // Additional common counts
   if ($config['enable_pseudowires'])
@@ -630,6 +651,9 @@ while ($i <= $ports_count)
   }
 
   $cache['neighbours']['count'] = dbFetchCell("SELECT COUNT(*) FROM `neighbours` WHERE `active` = 1 "  . $cache['where']['ports_permitted']);
+
+  //r("SELECT COUNT(*) FROM `neighbours` WHERE `active` = 1 "  . $cache['where']['ports_permitted']);
+
   $cache['sla']['count']        = dbFetchCell("SELECT COUNT(*) FROM `slas` WHERE `deleted` = 0 "       . $cache['where']['devices_permitted']);
   $cache['p2pradios']['count']  = dbFetchCell("SELECT COUNT(*) FROM `p2p_radios` WHERE `deleted` = 0 " . $cache['where']['devices_permitted']);
   $cache['vm']['count']         = dbFetchCell("SELECT COUNT(*) FROM `vminfo` WHERE 1 "                 . $cache['where']['devices_permitted']);

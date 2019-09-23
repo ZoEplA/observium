@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -71,8 +71,8 @@ foreach ($oids as $index => $entry)
 
   $status_current = $entry['smartPortStatus'];
 
-  discover_sensor($valid['sensor'], 'dbm',   $device, "$pwr_pfx.$index",    $index, 'mseries-port-power', $entry['smartPortName'], 0.1, $pwr_current, $options);
-  discover_sensor($valid['sensor'], 'state', $device, "$status_pfx.$index", $index, 'mseries-port-status-state', $entry['smartPortName'], NULL, $status_current);
+  discover_sensor('dbm',   $device, "$pwr_pfx.$index",    $index, 'mseries-port-power', $entry['smartPortName'], 0.1, $pwr_current, $options);
+  discover_status($device, "$status_pfx.$index", $index, 'mseries-port-status-state', $entry['smartPortName'],  $status_current);
 }
 
 // EOF

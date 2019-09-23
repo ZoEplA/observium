@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -26,6 +26,8 @@ foreach (dbFetchColumn("SELECT DISTINCT `rtt_type` FROM `slas` WHERE `device_id`
   switch ($rtt_type)
   {
     case 'jitter': // Additional data for Jitter
+    case 'pathjitter':
+    case 'ethernetJitter':
       $sla_poll = snmpwalk_cache_multi_oid($device, "rttMonLatestJitterOperEntry", $sla_poll, 'CISCO-RTTMON-MIB');
       break;
     case 'icmpjitter': // Additional data for ICMP jitter
@@ -61,6 +63,8 @@ foreach ($sla_poll as $sla_index => $entry)
   switch($sla_db[$mib_lower][$sla_index]['rtt_type'])
   {
     case 'jitter':
+    case 'pathjitter':
+    case 'ethernetJitter':
       if (is_numeric($entry['rttMonLatestJitterOperNumOfRTT']))
       {
         $sla_state['rtt_minimum'] = $entry['rttMonLatestJitterOperRTTMin'];

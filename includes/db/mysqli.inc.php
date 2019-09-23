@@ -7,11 +7,14 @@
  *
  * @package    observium
  * @subpackage db
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 /* Specific mysqli function calls, uses procedural style. */
+
+// Set to TRUE if MySQLnd driver is being used
+define('OBS_DB_MYSQLND', function_exists('mysqli_get_client_stats'));
 
 /**
  * Get MySQL client info
@@ -111,6 +114,16 @@ function dbOpen($host = 'localhost', $user, $password, $database, $charset = 'ut
       $client_flags |= MYSQLI_CLIENT_COMPRESS;
     }
 
+    // Convert integer and float columns back to PHP numbers. Only valid for mysqlnd.
+    /*
+    if (defined('OBS_DB_MYSQLND') && OBS_DB_MYSQLND)
+    {
+      mysqli_options($connection, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, TRUE);
+    }
+    */
+    // Report if no index or bad index was used in a query
+    mysqli_report(MYSQLI_REPORT_INDEX);
+
     if (!mysqli_real_connect($connection, $host, $user, $password, $database, (int)$port, $socket, $client_flags))
     {
       if (OBS_DEBUG)
@@ -199,6 +212,28 @@ function dbErrorNo($connection = NULL)
   }
 
   return mysqli_errno($connection);
+}
+
+function dbWarnings($connection = NULL)
+{
+  // Observium uses $observium_link global variable name for db link
+  if      ($connection === (object)$connection) {}
+  else if ($GLOBALS[OBS_DB_LINK] === (object)$GLOBALS[OBS_DB_LINK])
+  {
+    $connection = $GLOBALS[OBS_DB_LINK];
+  } else {
+    return;
+  }
+
+  $warning = [];
+  if (mysqli_warning_count($connection)) {
+    $e = mysqli_get_warnings($connection);
+    do {
+      //echo "Warning: $e->errno: $e->message\n";
+      $warning[] = "$e->errno: $e->message";
+    } while ($e->next());
+  }
+  return $warning;
 }
 
 function dbPing($connection = NULL)

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -31,6 +31,18 @@ foreach ($oids as $sla_index => $entry)
 {
   if (!isset($entry['rttMonCtrlAdminStatus'])) { continue; } // Skip additional multiindex entries from table
 
+  // FIXME. Temporary hack, while this type of Jitter unsupported by Cisco
+  switch ($entry['rttMonCtrlAdminRttType'])
+  {
+    case '34':
+      // See: https://jira.observium.org/browse/OBS-3053
+      // https://community.cisco.com/t5/routing/ip-sla-path-jitter-snmp-mib/td-p/2890302
+      // https://community.cisco.com/t5/switching/ipsla-path-jitter-monitoring/td-p/2131136
+      // CISCO-RTTMON-MIB::rttMonCtrlAdminRttType.200 = INTEGER: 34
+      $entry['rttMonCtrlAdminRttType'] = 'pathjitter';
+      break;
+  }
+
   $data = array(
     'device_id'  => $device['device_id'],
     'sla_mib'    => 'CISCO-RTTMON-MIB',
@@ -39,7 +51,8 @@ foreach ($oids as $sla_index => $entry)
     'sla_tag'    => $entry['rttMonCtrlAdminTag'],
     'rtt_type'   => $entry['rttMonCtrlAdminRttType'], // Possible: echo, pathEcho, fileIO, script, udpEcho, tcpConnect, http, dns, jitter, dlsw, dhcp,
                                                       // ftp, voip, rtp, lspGroup, icmpjitter, lspPing, lspTrace, ethernetPing, ethernetJitter,
-                                                      // lspPingPseudowire, video, y1731Delay, y1731Loss, mcastJitter
+                                                      // lspPingPseudowire, video, y1731Delay, y1731Loss, mcastJitter,
+                                                      // (currently unsupported by vendor MIBs): pathjitter
     'sla_status' => $entry['rttMonCtrlAdminStatus'],  // Possible: active, notInService, notReady, createAndGo, createAndWait, destroy
     'deleted'    => 0,
   );

@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     definitions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 $mib = 'ECS4120-MIB';
@@ -72,7 +72,7 @@ foreach ($cache as $ifIndex => $data)
       $oid_num = snmp_translate("portOpticalMonitoringInfo{$prop}.{$ifIndex}", $mib);
       $value = $data["portOpticalMonitoringInfo{$prop}"];
       $descr = "{$port['port_label']} {$sensor['descr']}";
-      discover_sensor($valid['sensor'], $sensor['class'], $device, $oid_num, $ifIndex, "{$mib}-portOpticalMonitoringInfo{$prop}", $descr, $sensor['scale'], $value, $options);
+      discover_sensor($sensor['class'], $device, $oid_num, $ifIndex, "{$mib}-portOpticalMonitoringInfo{$prop}", $descr, $sensor['scale'], $value, $options);
     }
   } // for each sensor
 } // for each port

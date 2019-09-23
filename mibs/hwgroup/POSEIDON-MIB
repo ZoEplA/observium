@@ -1,5 +1,6 @@
---	POSEIDON-MIB 2.06
+--	POSEIDON-MIB 2.08
 --		History:
+--	2.08	29. 3.2016 Marek Hummel  - sensPortID added
 --	2.07	7. 10.2009 Marek Koci    - sensorUnitString added, traps renamed
 --	2.06	10. 9.2009 Marek Koci    - universal 1-wire sensor supported
 --	2.05	11. 9.2008 Marek Koci    - new sensor units added
@@ -20,17 +21,8 @@
 --
 --  ---------------------  Poseidon Family ----------------------
 --
---  Poseidon model 3262:     6 sensors
---  Poseidon model 3265:     5 sensors,  GSM
---  Poseidon model 3266:     3 sensors,  4 Inputs
---  Poseidon model 3268:     4 sensors,  4 Inputs, 2 Outputs
---  Poseidon model 1250:    42 sensors,  3 Inputs, 2 Outputs, GSM
---  Poseidon model 2250:    42 sensors,  3 Inputs, 2 Outputs, GSM
---  Poseidon model 2261:    42 sensors,  3 Inputs, 2 Outputs
---  Poseidon model 3468:     4 sensors,  4 Inputs, 2 Outputs
---  Poseidon model Sitemon: 12 sensors, 16 Inputs, 4 Outputs
---  Poseidon model 4001:    16 sensors,  8 Inputs, 4 Outputs, GSM
---  Poseidon model 4002:    16 sensors,  6 Inputs, 2 Outputs, GSM
+--  Poseidon model 2250:    42 sensors,  8 Inputs, 2 Outputs, GSM
+
 
 POSEIDON-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -296,7 +288,8 @@ SensEntry ::= SEQUENCE {
 	sensValueRaw		SensorValue,
 	sensID			SensorID,
 	sensUnit		UnitType,
-	sensUnitString		SensorUnitString
+	sensUnitString		SensorUnitString,
+	sensPortID		INTEGER
 }
 
 sensIndex OBJECT-TYPE
@@ -374,6 +367,13 @@ sensUnitString OBJECT-TYPE
 		"The string representation of sensor unit."
 	::= { sensEntry 10 }
 
+sensPortID OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The sensor port ID."
+	::= { sensEntry 11 }
 
 -- The Alarm group.
 
@@ -632,4 +632,3 @@ tsTrapAlarmEnd TRAP-TYPE
 
 
 END
-

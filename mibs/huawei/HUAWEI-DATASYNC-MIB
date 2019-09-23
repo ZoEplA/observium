@@ -1,9 +1,9 @@
 --==================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI DATASYNC MIB
 -- Reference:
--- Version: V2.02
+-- Version: V2.01
 -- History:
 -- <author>,  <date>,  <contents>
 -- fengchong   2009-03-17
@@ -29,7 +29,7 @@
                 FROM SNMPv2-TC;
     
         hwDataSync MODULE-IDENTITY 
-            LAST-UPDATED "201507161349Z"        
+            LAST-UPDATED "201409041710Z"        
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -40,9 +40,6 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                 "
-              DESCRIPTION 
-                "Modified hwCfgChgTerminalID."
-                        REVISION "201507161349Z"         
             DESCRIPTION 
                 "Add hwCfgLastSaveFailNotify ."
                         REVISION "201409041710Z"               
@@ -234,7 +231,7 @@
             ::= { hwCfgChgEntry 3 }
          
         hwCfgChgTerminalID OBJECT-TYPE
-            SYNTAX Integer32 (0..2147483647) 
+            SYNTAX Integer32 (0..15) 
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION

@@ -1,19 +1,21 @@
 -- ==================================================================
--- Copyright (C) 2004 by Huawei 3Com Technologies. All rights reserved.
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
--- Description:  Huawei 3Com LAN Switch Storm-Constrain MIB
+-- Description: Storm-Constrain MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 -- V1.0 2005-11-19 Created by XueCong
 -- V1.1 2008-06-06 Modified the description of H3cStormConstrainUnit
---                 add h3cStormCtrlPortMode by jinyi
+--                 Added h3cStormCtrlPortMode by jinyi
+-- V1.2 2015-06-17 Modified the description of H3cStormConstrainUnit
+--                 Added knownUnicast to h3cStormTrapType by yangyiquan
 -- ==================================================================
 H3C-STORM-CONSTRAIN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY,
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
 
@@ -21,19 +23,19 @@ IMPORTS
         FROM SNMPv2-TC
 
     ifIndex
-        FROM RFC1213-MIB
+        FROM IF-MIB
 
     h3cCommon
         FROM HUAWEI-3COM-OID-MIB;
 
 h3cStormConstrain MODULE-IDENTITY
-    LAST-UPDATED "200806060000Z"
+    LAST-UPDATED "201506170000Z"
     ORGANIZATION
-        "Huawei 3Com Technologies Co., Ltd."
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Huawei 3Com Technologies Co., Ltd.
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
-         http://www.huawei-3com.com
+         http://www.h3c.com
          Zip:100085"
     DESCRIPTION
         "The Storm-Constrain function is used to avoid the
@@ -48,6 +50,9 @@ h3cStormConstrain MODULE-IDENTITY
          forwarding to avoid storm.  Only when all the observed
          fluxes are not over-upper-flux, will the port return to
          normal(forwarding) status."
+    REVISION        "201506170000Z"
+    DESCRIPTION
+        "To add knownUnicast to h3cStormTrapType."
     ::= { h3cCommon  66 }
 
 H3cStormConstrainUnit ::= TEXTUAL-CONVENTION
@@ -56,7 +61,7 @@ H3cStormConstrainUnit ::= TEXTUAL-CONVENTION
         "The unit of the flux.
          none: not define.
          packetsPerSecond: packets per second.
-         ratio: unit is 1%. For example, if the value is 40, it means 40%.
+         ratio: unit is 1%.  For example, if the value is 40, it means 40%.
          bytesPerSecond: bytes per second.
          kbitsPerSecond: kilobits per second."
     SYNTAX INTEGER
@@ -81,18 +86,21 @@ h3cStormTrapType OBJECT-TYPE
         {
         broadcast(1),
         multicast(2),
-        unicast(3)
+        unicast(3),
+        knownUnicast(4)
         }
     MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
         "This value is used to identify the type of trap.
-         broadcast: trap message is generated for broadcast flux exceeds
-                    upper limit or falls under lower limit on a port.
-         multicast: trap message is generated for multicast flux exceeds
-                    upper limit or falls under lower limit on a port.
-         unicast  : trap message is generated for unicast flux exceeds
-                    upper limit or falls under lower limit on a port."
+         broadcast: Trap message generated when broadcast traffic exceeds
+                    the upper limit or falls below the lower limit on a port.
+         multicast: Trap message generated when multicast traffic exceeds
+                    the upper limit or falls below the lower limit on a port.
+         unicast  : Trap message generated when unknown unicast traffic exceeds
+                    the upper limit or falls below the lower limit on a port.
+         knownUnicast: Trap message generated when known unicast traffic exceeds
+                    the upper limit or falls below the lower limit on a port."
     ::= { h3cStormScalarGroup 1 }
 
 h3cStormTrapThreshold OBJECT-TYPE

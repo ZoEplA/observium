@@ -1,5 +1,7 @@
 -- ------------------------------------------------------------------
--- Descripton: Huawei-3com draft for Lan Switch Qos MIB
+-- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Descripton: Qos MIB
 --
 -- History V2.3
 --     V1.0 2002-11-18 created by qizhenglin
@@ -78,9 +80,14 @@ IMPORTS
 ---------- Following is for Node£ºhwLswQosMib --------
   hwLswQosAclMib MODULE-IDENTITY
     LAST-UPDATED "200211190000Z"
-    ORGANIZATION "HUAWEI LANSWITCH"
+    ORGANIZATION
+        "Hangzhou H3C Tech. Co., Ltd."
     CONTACT-INFO
-    "huawei beiyan"
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
     DESCRIPTION
       "Module node for qos and acl."
     REVISION "200211190000Z"
@@ -3403,7 +3410,7 @@ IMPORTS
     STATUS      current
     DESCRIPTION
           "The vlan ID of MAC address ."
-    ::= { hwMirroringGroupMirrorMacEntry 3}
+    ::= { hwMirroringGroupMirrorMacEntry 3 }
 
   hwMirroringGroupMirroMacStatus   OBJECT-TYPE
     SYNTAX      RowStatus

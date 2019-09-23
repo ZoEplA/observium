@@ -1,9 +1,9 @@
 -- ====================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: Huawei Acl MIB Definition
 -- Reference:   Huawei Enterprise MIB
--- Version:     V2.17
+-- Version:     V2.22
 -- History:
 --         Version:     V2.0
 --             Wang Ning,2002-11-29,Reunification version based on the Fix-Net MIBs 
@@ -68,6 +68,19 @@
 --             1, Add hwAclIpv6AdvancedSrcPoolName in hwAclIpv6AdvancedRuleTable, based on V2.16
 --             2, Add hwAclIPPoolApplyBGPPeer in hwAclIPPoolTable, based on V2.16
 --             3, Add hwAclIPPool6Table, based on V2.16
+--         Version:     V2.18
+--             fuzhichao, 2017-6-6.
+--             1, Add hwAclIpv6AdvancedVni in hwAclIpv6AdvancedRuleTable, based on V2.17
+--         Version:     V2.19
+--             qiujindou, 2017-7-3.
+--             1, Amend some English descriptions, based on V2.18
+--         Version:     V2.21
+--             chenyang, 2018-5-22.
+--             1, Add hwAclIpv6AdvancedTcpFlag and hwAclIpv6AdvancedTcpFlagMask in hwAclIpv6AdvancedRuleTable, based on V2.20
+--         Version:     V2.22
+--             chenyang, 2018-6-1.
+--             1, Change description of hwAclAdvancedPrecedence, hwAclAdvancedTos and hwAclAdvancedDscp in hwAclAdvancedRuleTable, based on V2.21
+--             2, Change description of hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos and hwAclIpv6AdvancedDscp in hwAclIpv6AdvancedRuleTable, based on V2.21
 -- ========================================================================
 
 HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
@@ -85,7 +98,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         Ipv6Address                        FROM IPV6-TC;
 
     hwAcl MODULE-IDENTITY 
-        LAST-UPDATED "201612261200Z"        -- December 26, 2016 at 12:00 GMT
+        LAST-UPDATED "201806012200Z"        -- June 1, 2018 at 22:00 GMT
         ORGANIZATION "Huawei Technologies Co.,Ltd."
         CONTACT-INFO                           
            "Huawei Industrial Base            
@@ -112,11 +125,30 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             ACL classifies data packets through these device interface applied
             rules, by which the device decides which packets can be received 
             and which should be rejected."
+        REVISION "201806012200Z"
+        DESCRIPTION
+            "Change description of hwAclAdvancedPrecedence, hwAclAdvancedTos and hwAclAdvancedDscp in hwAclAdvancedRuleTable.
+             Change description of hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos and hwAclIpv6AdvancedDscp in hwAclIpv6AdvancedRuleTable."
+        REVISION "201805221200Z"
+        DESCRIPTION
+            "Add hwAclIpv6AdvancedTcpFlag and hwAclIpv6AdvancedTcpFlagMask in hwAclIpv6AdvancedRuleTable"
+        REVISION "201708171200Z"
+        DESCRIPTION
+            "modify description of hwAclNumGroupTable and hwAclIpv6NumGroupTable"
+        REVISION "201707031200Z"
+        DESCRIPTION
+            "Amend some English descriptions"
+        REVISION "201706061200Z"
+        DESCRIPTION
+            "Add hwAclIpv6AdvancedVni in hwAclIpv6AdvancedRuleTable"
         REVISION "201612261200Z"
         DESCRIPTION
             "Add hwAclIpv6AdvancedSrcPoolName in hwAclIpv6AdvancedRuleTable
              Add hwAclIPPoolApplyBGPPeer in hwAclIPPoolTable.
              Add hwAclIPPool6Table."
+        REVISION "201608260000Z"
+        DESCRIPTION
+            " hwAclIpv6NumGroupAclType, add key interface(3) "	    
         REVISION "201605061200Z"
         DESCRIPTION
             "Add hwAclBasicVrfAny in hwAclBasicRuleTable
@@ -143,6 +175,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         REVISION "201410282100Z"
         DESCRIPTION
             "Add hwAclAdvancedPktLenOp, hwAclAdvancedPktLenBegin and hwAclAdvancedPktLenEnd in hwAclAdvancedRuleTable." 
+        REVISION "201408051606Z"
+        DESCRIPTION
+           "Chang  hwAclNumGroupAclName in hwAclIpv6NumGroupTable and hwAclIpv6NumGroupAclName in hwAclNumGroupTable  value length"
         REVISION "201406200948Z"
         DESCRIPTION
             "Add hwAclAdvancedVni, hwAclAdvancedIgmpType, hwAclAdvancedTtlOp, hwAclAdvancedTtlExpire, hwAclAdvancedTtlExpireEnd in hwAclAdvancedRuleTable." 
@@ -168,12 +203,6 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         REVISION "201309050000Z"
         DESCRIPTION
             "Add hwAclIpv6BasicSrcMask in hwAclIpv6BasicRuleTable; Add hwAclIpv6AdvancedSrcMask, hwAclIpv6AdvancedDestMask in hwAclIpv6AdvancedRuleTable"
-        REVISION "201408051606Z"
-        DESCRIPTION
-           "Chang  hwAclNumGroupAclName in hwAclIpv6NumGroupTable and hwAclIpv6NumGroupAclName in hwAclNumGroupTable  value length"
-        REVISION "201608260000Z"
-        DESCRIPTION
-            " hwAclIpv6NumGroupAclType, add key interface(3) "	    
          ::= { huaweiMgmt 1 }
 
     --
@@ -189,8 +218,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "The table of ACL group information including
-            match order, step, description and so on"
+            "This table is used to query information about an ACL rule group, including the ACL configuration order, step length, and description."
         ::= { hwAclMibObjects 2 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.2.1
@@ -292,8 +320,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the description of this acl group.
-            The object describes the usage of an ACL with a word or a sentence."
+            "This object indicates the description of a rule group.
+            The description length cannot exceed 127 characters."
         ::= { hwAclNumGroupEntry 5 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.2.1.6
@@ -306,7 +334,11 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "Reset the statistics of ACL group."
+            "The value of this object identifies whether to clear up the count of rule groups.
+		The value can be:
+		cleared(1)
+		notUsed(2)
+	This field is effective only when you perform the Set operation to this object."
         ::= { hwAclNumGroupEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.2.1.7
@@ -460,7 +492,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the source IP-address wild of a basic acl rule."
+            "The value of this object identifies the wildcard mask of the source IP address.
+	The value ranges from 0.0.0.0 to 255.255.255.255."
         ::= { hwAclBasicRuleEntry 5 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.4.1.6
@@ -469,10 +502,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the time range of a basic acl rule.
-            When the current time is in time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.
-            The invalid value is 0."
+            "The value of this object identifies the index of a time range of an ACL rule.
+	     The value ranges from 0 to 256. 
+	     The value 0 is invalid, indicating that no time range is specified for the rule."
         ::= { hwAclBasicRuleEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.4.1.7
@@ -535,8 +567,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the VRF name of this rule. 
-            It specifies the VPN-instance to which the packet belongs."
+            "This object indicates an VPN instance.
+	     The length of a VPN instance name cannot exceed 31 characters."
         ::= { hwAclBasicRuleEntry 11 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.4.1.12
@@ -732,8 +764,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the protocol type of the rule.
-            It specifies the protocol type over IP.The number of IP protocol is 0."
+            "The value of this object identifies the number of the protocol over IP. 
+             The value ranges from 0 to 255. The value 0 indicates the IP protocol."
         ::= { hwAclAdvancedRuleEntry 4 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.5
@@ -742,7 +774,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the source IP-address of an advanced acl rule."
+            "The value of this object identifies the source IP address.
+	     The value ranges from 0.0.0.0 to 255.255.255.255."
         ::= { hwAclAdvancedRuleEntry 5 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.6
@@ -751,7 +784,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the source IP-address wild of an advanced acl rule."
+            "The value of this object identifies the wildcard mask of the source IP address.
+             The value ranges from 0.0.0.0 to 255.255.255.255."
         ::= { hwAclAdvancedRuleEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.7
@@ -784,8 +818,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer sourec port 1.
-            It specifies the source port information of UDP or TCP packets."
+            "This object indicates the end source port number."
         ::= { hwAclAdvancedRuleEntry 8 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.9
@@ -794,7 +827,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer source port2."
+            "This object indicates the start source port number."
         ::= { hwAclAdvancedRuleEntry 9 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.10
@@ -803,7 +836,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the destination IP-address of an advanced acl rule."
+            "This object indicates the destination IP address.
+	     The value ranges from 0.0.0.0 to 255.255.255.255."
         ::= { hwAclAdvancedRuleEntry 10 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.11
@@ -812,7 +846,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the destination IP-address wild of an advanced acl rule."
+            "This object indicates the mask of the destination IP address.
+             The value ranges from 0.0.0.0 to 255.255.255.255."
         ::= { hwAclAdvancedRuleEntry 11 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.12
@@ -845,7 +880,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer destination port1."
+            "This object indicates the end destination port number."
         ::= { hwAclAdvancedRuleEntry 13 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.14
@@ -854,7 +889,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer destination port2."
+            "This object indicates the start destination port number."
         ::= { hwAclAdvancedRuleEntry 14 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.15
@@ -863,9 +898,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the value of IP-packet's precedence, 
-            It filters packets according to precedence field.The invalid
-            value is 255."
+            "The value of this object identifies the precedence sub-field.
+	     It is the higher three bits of the ToS field in an IP header.
+	     The value ranges from 0 to 7. The invalid value is 255."
         ::= { hwAclAdvancedRuleEntry 15 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.16
@@ -874,9 +909,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the value of IP-packet's TOS,
-            It filters packets according to type of service.The invalid
-            value is 255."
+            "The value of this object identifies the ToS sub-field.
+	     This field covers four bits after the higher three bits of the ToS field in an IP header.
+	     The value ranges from 0 to 15. The invalid value is 255."
         ::= { hwAclAdvancedRuleEntry 16 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.17
@@ -885,8 +920,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the value of frame.The invalid 
-            value is 255."
+            "The value of this object identifies the higher six bits of the ToS field in an IP header.
+	     The value ranges from 0 to 63. The invalid value is 255."
         ::= { hwAclAdvancedRuleEntry 17 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.18
@@ -1195,9 +1230,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the type of ICMP packet. 
-            It filters ICMP packets according to the ICMP message type.
-            The invalid value is 65535."
+            "The value of this object identifies the ICMP message type.
+	    The value ranges from 0 to 255. The value 65535 is invalid.
+	    This object is used together with hwAclAdvancedIcmpType to indicate the value range of the ICMP message type."
         ::= { hwAclAdvancedRuleEntry 44 }
                     
     -- 1.3.6.1.4.1.2011.5.1.1.5.1.45
@@ -1326,10 +1361,11 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the time range of an interface-based acl rule. 
-            when the current time is in time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.
-            The invalid value is 0."
+            "The value of this object identifies the index of the time 
+	    range during which an ACL rule can be applied. When the current 
+	    time is in the time range, the rule is valid. The value 0 is 
+	    invalid, indicating that no time range is specified for the rule.
+	    The value ranges from 0 to 256."
         ::= { hwAclIfRuleEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.6.1.7
@@ -2046,7 +2082,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the source IPv6-address prefix length of a ipv6 basic acl rule."
+            "The value of this object identifies the mask length of the source IPv6 address. 
+	    The value ranges from 0 to 128."
         ::= { hwAclIpv6BasicRuleEntry 5 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.12.1.6
@@ -2055,10 +2092,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the time range of a ipv6 basic acl rule.
-            When the current time is in time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.
-            The invalid value is 0."
+            "The value of this object identifies the index of the time range during which an 
+	    ACL6 rule can be applied.The value ranges from 0 to 256.The value 0 is invalid, 
+	    indicating that no time range is specified for the rule."
         ::= { hwAclIpv6BasicRuleEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.12.1.7
@@ -2105,7 +2141,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The object indicates the statistics of matched packets by the rule."
+            "This object indicates the number of matched packets by a rule. A maximum 
+	    of 64 bits are supported."
         ::= { hwAclIpv6BasicRuleEntry 10 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.12.1.11
@@ -2114,8 +2151,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the VRF name of this rule. 
-            It specifies the VPN-instance to which the packet belongs."
+            "This object indicates a VPN instance. The length of a VPN instance name cannot exceed 31 characters."
         ::= { hwAclIpv6BasicRuleEntry 11 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.12.1.12
@@ -2243,7 +2279,13 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             hwAclIpv6AdvancedVrfAny
                 TruthValue,
             hwAclIpv6AdvancedSrcPoolName
-                OCTET STRING
+                OCTET STRING,
+            hwAclIpv6AdvancedVni
+                Integer32,
+            hwAclIpv6AdvancedTcpFlag
+                Integer32,
+            hwAclIpv6AdvancedTcpFlagMask
+                Integer32
          }
 
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.1
@@ -2298,8 +2340,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the protocol type of the rule.
-            It specifies the protocol type over IP.The number of IPv6 protocol is 0."
+            "The value of this object identifies the number of the protocol over IPv6. 
+	    The value ranges from 0 to 255. The value 0 indicates the IPv6 protocol."
         ::= { hwAclIpv6AdvancedRuleEntry 4 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.5
@@ -2317,7 +2359,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the source IPv6-address prefix length of an ipv6 advanced acl rule."
+            "The value of this object identifies the mask length of the source IPv6 address. 
+	    The value ranges from 0 to 128."
         ::= { hwAclIpv6AdvancedRuleEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.7
@@ -2350,8 +2393,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer sourec port 1.
-            It specifies the source port information of UDP or TCP packets."
+            "This object indicates the end source port number."
         ::= { hwAclIpv6AdvancedRuleEntry 8 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.9
@@ -2360,7 +2402,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer source port2."
+            "This object indicates the start source port number."
         ::= { hwAclIpv6AdvancedRuleEntry 9 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.10
@@ -2378,7 +2420,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the destination IPv6-address prefix length of an ipv6 advanced acl rule."
+            "The value of this object identifies the mask length of the destination IPv6 address. The value ranges from 0 to 128."
         ::= { hwAclIpv6AdvancedRuleEntry 11 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.12
@@ -2411,7 +2453,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer destination port1."
+            "This object indicates the largest destination port number."
         ::= { hwAclIpv6AdvancedRuleEntry 13 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.14
@@ -2420,7 +2462,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the fourth layer destination port2."
+            "This object indicates the smallest destination port number."
         ::= { hwAclIpv6AdvancedRuleEntry 14 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.15
@@ -2429,9 +2471,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the value of IPv6-packet's precedence, 
-            It filters packets according to precedence field. The invalid
-            value is 255."
+            "The value of this object identifies the precedence sub-field.
+	    It is the higher three bits of the ToS field in an IPv6 header.
+	    The value ranges from 0 to 7. The invalid value is 255."
         ::= { hwAclIpv6AdvancedRuleEntry 15 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.16
@@ -2440,9 +2482,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the value of IPv6-packet's TOS,
-            It filters packets according to type of service. The invalid
-            value is 255."
+            "The value of this object identifies the ToS sub-field.
+	    This field covers four bits after the higher three bits of the ToS field in an IPv6 header.
+	    The value ranges from 0 to 15. The invalid value is 255."
         ::= { hwAclIpv6AdvancedRuleEntry 16 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.17
@@ -2451,8 +2493,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the value of frame.The invalid 
-            value is 255."
+            "The value of this object identifies the higher seven bits of the ToS field in an IPv6 header.
+	    The value ranges from 0 to 63. The invalid value is 255."
         ::= { hwAclIpv6AdvancedRuleEntry 17 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.18
@@ -2471,10 +2513,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the time range of an ipv6 advanced acl rule. 
-            When the current time is in the time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.The 
-            invalid value is 0."
+            "The value of this object identifies the index of the time range during which an ACL6 rule can be applied. 
+	    The value ranges from 0 to 256.
+	    The value 0 indicates that no time range is specified for the rule."
         ::= { hwAclIpv6AdvancedRuleEntry 19 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.20
@@ -2483,9 +2524,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the type of ICMPv6 packet. 
-            It filters ICMP packets according to the ICMPv6 message type.
-            The invalid value is 65535."
+            "The value of this object identifies the ICMPv6 message type.
+	    The value ranges from 0 to 255. The value 65535 is invalid."
         ::= { hwAclIpv6AdvancedRuleEntry 20 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.21
@@ -2494,9 +2534,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the code of ICMPv6 packet.
-            It filters ICMPv6 packets according to the message code.
-            The invalid value is 65535."
+            "The value of this obejct identifies the code of an ICMPv6 message. 
+	    The value ranges from 0 to 255. The value 65535 is invalid."
         ::= { hwAclIpv6AdvancedRuleEntry 21 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.22
@@ -2544,7 +2583,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only        
         STATUS current
         DESCRIPTION
-            "The object indicates the statistics of matched packets by the rule."
+            "This object indicates the number of packets matched by a rule. A maximum of 64 bits are supported."
         ::= { hwAclIpv6AdvancedRuleEntry 25 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.26
@@ -2553,8 +2592,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the VRF name of this rule, 
-            It specifies the VPN-instance to which the packet belongs."
+            "This object indicates a VPN instance. 
+	    The length of a VPN instance name cannot exceed 31 characters."
         ::= { hwAclIpv6AdvancedRuleEntry 26 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.27
@@ -2610,9 +2649,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the type of ICMPv6 packet. 
-            It filters ICMP packets according to the ICMPv6 message type.
-            The invalid value is 65535."
+            "The value of this object identifies the ICMPv6 message type.
+	    The value ranges from 0 to 255. The value 65535 is invalid.
+	    This object is used together with hwAclIpv6AdvancedIcmpType to indicate the value range of the ICMPv6 type."
         ::= { hwAclIpv6AdvancedRuleEntry 32 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.13.1.33
@@ -2633,7 +2672,37 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             "The object indicates the source Ipv6 pool name."
         ::= { hwAclIpv6AdvancedRuleEntry 34 }
         
-    -- 1.3.6.1.4.1.2011.5.1.1.14
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.35
+    hwAclIpv6AdvancedVni OBJECT-TYPE
+        SYNTAX Integer32 (0..16777215)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the ID of VXLAN,
+             The invalid value is 0."
+        ::= { hwAclIpv6AdvancedRuleEntry 35 }
+        
+    -- 1.3.6.1.4.1.2011.5.1.1.13.1.36   
+    hwAclIpv6AdvancedTcpFlag OBJECT-TYPE
+        SYNTAX Integer32 (-1|0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the code of TCP Sync flag(0~63),
+             The invalid value is -1."
+        ::= { hwAclIpv6AdvancedRuleEntry 36 }
+
+        -- 1.3.6.1.4.1.2011.5.1.1.13.1.37
+    hwAclIpv6AdvancedTcpFlagMask OBJECT-TYPE
+        SYNTAX Integer32 (0..63)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object indicates the mask of tcp-flag.
+            The invalid value is 0."
+        ::= { hwAclIpv6AdvancedRuleEntry 37 }
+
+        -- 1.3.6.1.4.1.2011.5.1.1.14
     hwAclEthernetFrameRuleTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwAclEthernetFrameRuleEntry
         MAX-ACCESS not-accessible
@@ -2754,9 +2823,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the type of an ethernet frame. 
-            It specifies the interface information of the packets. The invalid
-            ethernet frame type is 0."
+            "The value of this object identifies the protocol type of an Ethernet frame. 
+	    The value ranges from 0 to 65535."
         ::= { hwAclEthernetFrameRuleEntry 4 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.14.1.5
@@ -2765,7 +2833,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the mask of ethernet frame."
+            "The value of this object identifies the mask of the protocol type of an Ethernet frame. 
+	    The value ranges from 0 to 65535."
         ::= { hwAclEthernetFrameRuleEntry 5 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.14.1.6
@@ -2843,7 +2912,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The object indicates the statistics of matched packets by rule."
+            "This object indicates the number of matched packets by a rule. A maximum of 64 bits are supported."
         ::= { hwAclEthernetFrameRuleEntry 13 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.14.1.14
@@ -3389,7 +3458,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The table of IPv6 ACL group information."
+                "This table is used to query information about an ACL rule group, including the ACL configuration order, step length, and description."
             ::= { hwAclMibObjects 16 }
 
         hwAclIpv6NumGroupEntry OBJECT-TYPE
@@ -3429,7 +3498,12 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The index of IPv6 ACL group, identifying an IPv6 ACL."
+                "The value of this object identifies a table index, representing the number of an IPv6 ACL rule group. 
+		The value range is as follows:
+		Interface-based ACL6: 1000 to 1999
+		Basic ACL6: 2000 to 2999
+		Advanced ACL6: 3000 to 3999 
+		Named ACL6: 42768 to 75535"
             ::= { hwAclIpv6NumGroupEntry 1 }
 
         
@@ -3468,7 +3542,10 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Reset the statistics of ACL6 group."
+                "This object indicates whether to clear the statistics of an ACL6 rule group.
+		cleared(1): clear
+		notUsed(2): not clear
+		This object is valid only when the Set operation is performed for this object."
             ::= { hwAclIpv6NumGroupEntry 4 }
 
      hwAclIpv6NumGroupAclName OBJECT-TYPE
@@ -3486,8 +3563,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the description of this acl6 group.
-            The object describes the usage of an ACL6 with a word or a sentence."
+            "This object indicates the description of an ACL6 rule group. 
+	    The description length cannot exceed 127 characters."
         ::= { hwAclIpv6NumGroupEntry 6 }
         
     -- 1.3.6.1.4.1.2011.5.1.1.16.1.7
@@ -3634,10 +3711,9 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the time range of an interface-based acl6 rule. 
-            when the current time is in time range, the rule is valid.
-            Zero value declares that the acl rule has no time range.
-            The invalid value is 0."
+            "The value of this object identifies the index of the time range during which an ACL rule can be applied. 
+	    When the current time is in the time range, the rule is valid. The value 0 is invalid, 
+	    indicating that no time range is specified for the rule.The value ranges from 0 to 256."
         ::= { hwAclIpv6IfRuleEntry 6 }
     
     hwAclIpv6IfLog OBJECT-TYPE
@@ -3796,7 +3872,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the exp1 of a mpls acl rule."
+            "The value of this object identifies the EXP value in the first label of an MPLS packet. 
+	    The value ranges from 0 to 7. The default value is 255."
         ::= { hwAclMplsRuleEntry 4 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.5
@@ -3805,7 +3882,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the exp2 of a mpls acl rule."
+            "The value of this object identifies the EXP value in the second label of an MPLS packet. 
+	    The value ranges from 0 to 7. The default value is 255."
         ::= { hwAclMplsRuleEntry 5 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.6
@@ -3814,7 +3892,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the exp3 of a mpls acl rule."
+            "The value of this object identifies the EXP value in the third label of an MPLS packet. 
+	    The value ranges from 0 to 7. The default value is 255."
         ::= { hwAclMplsRuleEntry 6 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.7
@@ -3823,7 +3902,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the exp4 of a mpls acl rule."
+            "The value of this object identifies the EXP value in the fourth label of an MPLS packet. 
+	    The value ranges from 0 to 7. The default value is 255."
         ::= { hwAclMplsRuleEntry 7 }
             
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.8
@@ -3832,7 +3912,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the label1 of a mpls acl rule."
+            "The value of this object identifies the Label value in the first label of an MPLS packet.
+	    The value ranges from 0 to 1048575. The default value is -1."
         ::= { hwAclMplsRuleEntry 8 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.9
@@ -3841,7 +3922,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the label2 of a mpls acl rule."
+            "The value of this object identifies the Label value in the second label of an MPLS packet. 
+	    The value ranges from 0 to 1048575. The default value is -1."
         ::= { hwAclMplsRuleEntry 9 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.10
@@ -3850,7 +3932,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the label3 of a mpls acl rule."
+            "The value of this object identifies the Label value in the third label of an MPLS packet. 
+	    The value ranges from 0 to 1048575. The default value is -1."
         ::= { hwAclMplsRuleEntry 10 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.11
@@ -3859,7 +3942,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "The object indicates the label4 of a mpls acl rule."
+            "The value of this object identifies the Label value in the fourth label of an MPLS packet. 
+	    The value ranges from 0 to 1048575. The default value is -1."
         ::= { hwAclMplsRuleEntry 11 }
     
     -- 1.3.6.1.4.1.2011.5.1.1.18.1.12
@@ -4170,7 +4254,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The index of ACL IP pool table."
+            "This object indicates the level 1 index, that is, the index of an IP address pool used by an ACL."
         ::= { hwAclIPPoolIPEntry 1 }
 
     -- 1.3.6.1.4.1.2011.5.1.1.21.1.2
@@ -4179,7 +4263,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The IP index."
+            "This object indicates the level 2 index, that is, the index of an IPv4 address in an IP address pool used by an ACL."
         ::= { hwAclIPPoolIPEntry 2 }
 
     -- 1.3.6.1.4.1.2011.5.1.1.21.1.3
@@ -4306,7 +4390,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-        "The index of ACL port pool table."
+        "This object indicates the level 1 index, that is, the index of an ACL port pool."
         ::= { hwAclPortPoolPortEntry 1 }
 
     -- 1.3.6.1.4.1.2011.5.1.1.23.1.2
@@ -4315,7 +4399,7 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The port index."
+            "This object indicates the level 2 index, that is, the index of a port number in the ACL port pool."
         ::= { hwAclPortPoolPortEntry 2 }
 
     -- 1.3.6.1.4.1.2011.5.1.1.23.1.3
@@ -4673,7 +4757,8 @@ HUAWEI-ACL-MIB DEFINITIONS ::= BEGIN
         hwAclIpv6AdvancedDestIp, hwAclIpv6AdvancedDestPrefix, hwAclIpv6AdvancedDestOp, hwAclIpv6AdvancedDestPort1, hwAclIpv6AdvancedDestPort2, 
         hwAclIpv6AdvancedPrecedence, hwAclIpv6AdvancedTos, hwAclIpv6AdvancedDscp, hwAclIpv6AdvancedEstablish, hwAclIpv6AdvancedTimeRangeIndex, 
         hwAclIpv6AdvancedIcmpType, hwAclIpv6AdvancedIcmpCode, hwAclIpv6AdvancedFragment, hwAclIpv6AdvancedLog, hwAclIpv6AdvancedEnable, 
-        hwAclIpv6AdvancedCount, hwAclIpv6AdvancedVrfName, hwAclIpv6AdvancedRowStatus, hwAclIpv6AdvancedProtocolNew, hwAclIpv6AdvancedIcmpTypeEnd, hwAclIpv6AdvancedVrfAny, hwAclEthernetFrameAct, hwAclEthernetFrameType, 
+        hwAclIpv6AdvancedCount, hwAclIpv6AdvancedVrfName, hwAclIpv6AdvancedRowStatus, hwAclIpv6AdvancedProtocolNew, hwAclIpv6AdvancedIcmpTypeEnd, hwAclIpv6AdvancedVrfAny,
+        hwAclIpv6AdvancedSrcPoolName, hwAclIpv6AdvancedVni, hwAclIpv6AdvancedTcpFlag, hwAclIpv6AdvancedTcpFlagMask, hwAclEthernetFrameAct, hwAclEthernetFrameType, 
         hwAclEthernetFrameTypeMask, hwAclEthernetFrameSrcMac, hwAclEthernetFrameSrcMacMask, hwAclEthernetFrameDstMac, hwAclEthernetFrameDstMacMask, 
         hwAclEthernetFrameTimeRangeIndex, hwAclEthernetFrameLog, hwAclEthernetFrameEnable, hwAclEthernetFrameCount,  
         hwAclEthernetFrameRowStatus, hwAclEthernetFrameRule8021p, hwAclEthernetFrameRuleCVlan8021p,

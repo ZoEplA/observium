@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -16,6 +16,12 @@ register_html_title("Printing");
 $navbar = array();
 $navbar['brand'] = "Printer supplies";
 $navbar['class'] = "navbar-narrow";
+// Convert generic view to supply var
+if (!isset($vars['supply']) && isset($vars['view']))
+{
+  $vars['supply'] = $vars['view'];
+  unset($vars['view']);
+}
 
 foreach ($printing_tabs as $type)
 {
@@ -27,11 +33,11 @@ foreach ($printing_tabs as $type)
 
 }
 
-if (dbFetchCell('SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_descr` LIKE ?', array($device['device_id'], 'counter', '%print%')) > 0)
+if (dbExist('counters', '`device_id` = ? AND `counter_class` = ?', array($device['device_id'], 'printersupply')))
 {
-  $navbar['options']['pagecount']['url'] = generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'printing', 'supply' => 'pagecount'));
-  $navbar['options']['pagecount']['text'] = 'Printed counters';
-  if ($vars['supply'] == 'pagecount') { $navbar['options']['pagecount']['class'] = "active"; }
+  $navbar['options']['counters']['url'] = generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'printing', 'supply' => 'counters'));
+  $navbar['options']['counters']['text'] = 'Printed counters';
+  if ($vars['supply'] == 'counters') { $navbar['options']['counters']['class'] = "active"; }
 }
 
 print_navbar($navbar);
@@ -39,11 +45,27 @@ unset($navbar);
 
 switch ($vars['supply'])
 {
-  case 'pagecount':
+  case 'counter':
+  case 'counters':
     echo generate_box_open();
     echo('<table class="table table-condensed table-striped  table-striped">');
 
-    $graph_title = "Printed counters";
+    $graph_title = "Counters";
+    $graph_type = "device_counter";
+
+    include("includes/print-device-graph.php");
+
+    echo('</table>');
+    echo generate_box_close();
+
+    print_counter_table(array('device_id' => $device['device_id'], 'class' => 'printersupply', 'page' => 'device'));
+    break;
+  case 'sensor':
+  case 'sensors':
+    echo generate_box_open();
+    echo('<table class="table table-condensed table-striped  table-striped">');
+
+    $graph_title = "Sensors";
     $graph_type = "device_pagecount";
 
     include("includes/print-device-graph.php");

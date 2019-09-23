@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage ajax
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -222,12 +222,25 @@ switch ($vars['entity_type'])
     break;
 
   default:
-    if (is_array($config['entities'][$vars['entity_type']]))
+    if (isset($config['entities'][$vars['entity_type']]))
     {
-      if (is_numeric($vars['entity_id']) && (is_entity_permitted($vars['entity_id'], $vars['entity_type'])))
+      $entity_ids = array();
+      foreach (explode(',', $vars['entity_id']) as $id)
       {
-        $entity = get_entity_by_id_cache($vars['entity_type'], $vars['entity_id']);
-        echo generate_entity_popup($entity, $vars);
+        // Filter permitted IDs
+        if (is_numeric($id) && (is_entity_permitted($id, $vars['entity_type'])))
+        {
+          $entity_ids[] = $id;
+        }
+      }
+      if (count($entity_ids))
+      {
+        echo generate_entity_popup_multi($entity_ids, $vars);
+      //}
+      //else if (is_numeric($vars['entity_id']) && (is_entity_permitted($vars['entity_id'], $vars['entity_type'])))
+      //{
+      //  $entity = get_entity_by_id_cache($vars['entity_type'], $vars['entity_id']);
+      //  echo generate_entity_popup($entity, $vars);
       } else {
         print_warning("You are not permitted to view this entity.");
       }

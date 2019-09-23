@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -20,7 +20,6 @@ echo(" F10-S-SERIES-CHASSIS-MIB ");
 
 $units = array();
 
-$oids = snmpwalk_cache_oid($device, "chStackUnitTemp",       array(), "F10-S-SERIES-CHASSIS-MIB");
 $oids = snmpwalk_cache_oid($device, "chStackUnitStatus",       $oids, "F10-S-SERIES-CHASSIS-MIB");
 //$oids = snmpwalk_cache_oid($device, "chStackUnitRowStatus",    $oids, "F10-S-SERIES-CHASSIS-MIB"); // Ignore this Row, in some cases it return incorrect data
 
@@ -34,11 +33,6 @@ foreach ($oids as $index => $entry)
 
   $descr = "Unit " . strval($index - 1);
   $units[$index] = $descr; // Store Unit name for other sensors
-
-  $oid   = ".1.3.6.1.4.1.6027.3.10.1.2.2.1.14.".$index;
-  $value = $entry['chStackUnitTemp'];
-
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, 1, $value);
 
   $oid_name = 'chStackUnitStatus';
   $oid_num  = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.8.'.$index;
@@ -125,7 +119,7 @@ if (count($oids))
       $descr   = $port['ifDescr'] . " RX Power";
       $value   = $entry['chSysPortXfpRecvPower'] * 100;
 
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'f10-s-series-dom-rx', $descr, 0.01, $value, $options);
+      discover_sensor('dbm', $device, $oid, $index, 'f10-s-series-dom-rx', $descr, 0.01, $value, $options);
     }
 
     if (is_numeric($entry['chSysPortXfpTxPower']))
@@ -134,7 +128,7 @@ if (count($oids))
       $descr   = $port['ifDescr'] . " TX Power";
       $value   = $entry['chSysPortXfpTxPower'] * 100;
 
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'f10-s-series-dom-tx', $descr, 0.01, $value, $options);
+      discover_sensor('dbm', $device, $oid, $index, 'f10-s-series-dom-tx', $descr, 0.01, $value, $options);
     }
 
     if (is_numeric($entry['chSysPortXfpRecvTemp']))
@@ -143,7 +137,7 @@ if (count($oids))
       $descr   = $port['ifDescr'] . " DOM";
       $value   = $entry['chSysPortXfpRecvTemp'];
 
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'f10-s-series-dom', $descr, 1, $value, $options);
+      discover_sensor('temperature', $device, $oid, $index, 'f10-s-series-dom', $descr, 1, $value, $options);
     }
   }
 }

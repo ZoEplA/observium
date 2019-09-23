@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage syslog
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -92,7 +92,8 @@ function get_cache($host, $value)
             }
 
             // Detect associated device by IP address, exclude deleted ports
-            $query = 'SELECT * FROM `ipv'.$ip_version.'_addresses` LEFT JOIN `ports` USING (`port_id`) WHERE `ipv'.$ip_version.'_address` = ? AND `deleted` = ?;';
+            // IS NULL allow to search addresses without associated port
+            $query = 'SELECT * FROM `ipv'.$ip_version.'_addresses` LEFT JOIN `ports` USING (`port_id`) WHERE `ipv'.$ip_version.'_address` = ? AND (`deleted` = ? OR `deleted` IS NULL);';
             $addresses = dbFetchRows($query, array($ip, 0));
             $address_count = count($addresses);
 
@@ -705,6 +706,8 @@ function process_syslog_line($line)
     }
 
     // Always clear timestamp from beginig of message (if still leaved), test strings:
+    //2018-10-16T18:13:03+02:00 hostname
+    $pettern_timestamp_rfc3339 = '/^\s*\*?(?<year>[0-9]{4})\-(?<month>[0-9]{2})\-(?<day>[0-9]{2})(?:[Tt](?<hour>[0-9]{2}):(?<minute>[0-9]{2}):(?<second>(?:[0-9]{2})(?:\.[0-9]+)?)?)(?<tz>(?:[Zz]|[+\-](?:[0-9]{2}):(?:[0-9]{2})))?/';
     //Wed Mar 26 12:54:17 2014 :
     //May 30 15:33:20.636 UTC :
     //May 30 15:33:20.636 2014 UTC :
@@ -718,11 +721,11 @@ function process_syslog_line($line)
     //033884: Nov  8 07:19:23.993:
     // Should be false:
     //CompDHCP assigned 10.0.0.222 to 4C:32:75:90:69:33
-    $pattern_timestamp = '/^(?<max2words>\s*(?:\S+\s+)?\S+?:)?\s*\*?(?<wmd>(?<week>[a-z]{3,} +)?(?<month>[a-z]{3,} +)(?<date>\d{1,2} +)(?<year0>[12]\d{3} +)?)?(?<hms>\d{1,2}\:\d{1,2}\:\d{1,2}(?:\.\d+)?)(?<year>\s+[12]\d{3})?(?<tz>\s+[a-z][\w\/\-]+)?\s*:\s/i';
+    $pattern_timestamp = '/^(?<max2words>\s*(?:\S+\s+)?\S+?:)?\s*\*?(?<wmd>(?<week>[a-z]{3,} +)?(?<month>[a-z]{3,} +)(?<day>\d{1,2} +)(?<year0>[12]\d{3} +)?)?(?<hms>\d{1,2}\:\d{1,2}\:\d{1,2}(?:\.\d+)?)(?<year>\s+[12]\d{3})?(?<tz>\s+[a-z][\w\/\-]+)?\s*:\s/i';
     // without TZ, example:
     //Mar 21 13:07:05 netflow syslogd:
     $pattern_timestamp_wo_tz = '/^\s*\*?(?<wmd>(?<week>[a-z]{3,} +)?(?<month>[a-z]{3,} +)(?<date>\d{1,2} +)(?<year0>[12]\d{3} +)?)?(?<hms>\d{1,2}\:\d{1,2}\:\d{1,2}(?:\.\d+)?)(?<year>\s+[12]\d{3})?/i';
-    $entry['msg']      = preg_replace(array($pattern_timestamp, $pattern_timestamp_wo_tz), '', $entry['msg']);
+    $entry['msg']      = preg_replace(array($pattern_timestamp, $pattern_timestamp_wo_tz, $pettern_timestamp_rfc3339), '', $entry['msg']);
 
     if (!strlen($entry['msg']))
     {

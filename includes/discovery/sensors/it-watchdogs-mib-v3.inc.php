@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Nick Schmalenberger <nick@schmalenberger.us>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -62,7 +62,7 @@ foreach ($sensor_array as $indexof_climateTables => $climateTable)
       if ($ok)
       {
         #this is what actually adds the sensor
-        discover_sensor($valid['sensor'], $type, $device, $oid, $oidname, 'it-watchdogs-mib-v3', $descr, 1, $value);
+        discover_sensor($type, $device, $oid, $oidname, 'it-watchdogs-mib-v3', $descr, 1, $value);
       }
     }
   }

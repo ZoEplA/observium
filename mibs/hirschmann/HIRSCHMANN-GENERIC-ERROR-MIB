@@ -131,8 +131,12 @@ hm2NetPrefixLengthInvalid OBJECT-IDENTITY
            DESCRIPTION "Subnet mask must have contiguous ones and be no longer than 30 bits."
            ::= { hmMgmtSEEErrorIDGroup 303 }
 
+hm2VlanIdNotExists OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION "VLAN {0} does not exist. Please create VLAN {1} before using it."
+           ::= { hmMgmtSEEErrorIDGroup 304 }
 
--- 
+--
 -- ***********************************************************
 -- hmMgmtSEInfoIDGroup
 -- ***********************************************************

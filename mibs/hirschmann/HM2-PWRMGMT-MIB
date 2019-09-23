@@ -334,7 +334,7 @@ hm2PSUUnitPoeBudget	 OBJECT-TYPE
 			 MAX-ACCESS    	read-only
 			 STATUS 		current
 			 DESCRIPTION
-				 "The Poe budget of the associated power supply
+				 "The PoE budget of the associated power supply
 				 slot module unit."
 			 ::= { hm2PSUUnitInfoEntry 6 }
 

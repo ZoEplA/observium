@@ -1,5 +1,5 @@
 --==============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: PPP Over Sonet MIB
 -- Reference:
@@ -16,7 +16,8 @@
 --                  add hh3cPosB1TCAlarm, hh3cPosB2TCAlarm and hh3cPosB3TCAlarm
 --                      in hh3cPosMIBNotifications
 --  V1.5 2013-10-10 modify hh3cPosEncapsulation and hh3cPosMTU
---                  in hh3cPosParamTable by chenzhouhui.
+--                  in hh3cPosParamTable by chenzhouhui.  
+--  V1.6 2016-09-09 modify hh3cPosEncapsulation in hh3cPosParamTable by zhengwei.
 --==============================================================================
 HH3C-PPP-OVER-SONET-MIB DEFINITIONS ::= BEGIN
 
@@ -31,11 +32,11 @@ IMPORTS
     FROM HH3C-OID-MIB;
 
 hh3cPos MODULE-IDENTITY
-    LAST-UPDATED "201310101700Z"        -- Oct 10, 2013  GMT
+    LAST-UPDATED "201609091700Z"        -- Sep 09, 2016  GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
@@ -44,6 +45,8 @@ hh3cPos MODULE-IDENTITY
         an operational table which controls parameters of each POS
         interface and reports alarm conditions.
         "
+    REVISION "201609091700Z"        -- Sep 09, 2016 at 17:00 GMT
+    DESCRIPTION "Update the version of this MIB module"
     REVISION "201310101700Z"        -- Oct 10, 2013 at 17:00 GMT
     DESCRIPTION "Update the version of this MIB module"
     REVISION "201005191700Z"        -- May 19, 2010 at 17:00 GMT
@@ -209,7 +212,7 @@ hh3cPosBindVlanId OBJECT-TYPE
     ::={ hh3cPosParamTableEntry 11 }
 
 hh3cPosEncapsulation OBJECT-TYPE
-    SYNTAX      INTEGER{ppp(1),hdlc(2),fr(3)}
+    SYNTAX      INTEGER{ppp(1),hdlc(2),fr(3),mfr(4)}
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -222,7 +225,7 @@ hh3cPoskeepaliveTimeout OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The keeplive of ppp, hdlc or fr. It is the query interval of link status. Two
+        "The keeplive of ppp, hdlc, fr or mfr. It is the query interval of link status. Two
         members of a link should have same keeplive. The default 0 prohibits
         detecting status of link."
     ::={ hh3cPosParamTableEntry 13 }

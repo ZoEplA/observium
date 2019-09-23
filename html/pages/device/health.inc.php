@@ -6,20 +6,41 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $datas = array('overview' => array('icon' => $config['icon']['overview']));
 
-if (dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ?", array($device['device_id']))) { $datas['processor'] = array('icon' => $config['entities']['processor']['icon']); }
-if (dbFetchCell("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = ?", array($device['device_id']))) { $datas['mempool'] = array('icon' => $config['entities']['mempool']['icon']); }
-if (dbFetchCell("SELECT COUNT(*) FROM `storage` WHERE `device_id` = ?", array($device['device_id']))) { $datas['storage'] = array('icon' => $config['entities']['storage']['icon']); }
-if (dbFetchCell("SELECT COUNT(*) FROM `ucd_diskio` WHERE `device_id` = ?", array($device['device_id']))) { $datas['diskio'] = array('icon' => $config['icon']['diskio']); }
-if (dbFetchCell("SELECT COUNT(*) FROM `status` WHERE `device_id` = ? AND `status_deleted` = ?", array($device['device_id'], 0))) { $datas['status'] = array('icon' => $config['entities']['status']['icon']); }
+if ($health_exist['processors']) { $datas['processor'] = array('icon' => $config['entities']['processor']['icon']); }
+if ($health_exist['mempools'])   { $datas['mempool']   = array('icon' => $config['entities']['mempool']['icon']); }
+if ($health_exist['storage'])    { $datas['storage']   = array('icon' => $config['entities']['storage']['icon']); }
+if ($health_exist['diskio'])     { $datas['diskio']    = array('icon' => $config['icon']['diskio']); }
 
-$sensors_device = dbFetchRows("SELECT DISTINCT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = ?", array($device['device_id'], 0));
-foreach ($sensors_device as $sensor) { $datas[$sensor['sensor_class']] = array('icon' => $config['sensor_types'][$sensor['sensor_class']]['icon']); }
+if ($health_exist['status'])     { $datas['status']    = array('icon' => $config['entities']['status']['icon']); }
+
+if ($health_exist['sensors'])
+{
+  $sensors_device = dbFetchRows("SELECT DISTINCT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = ?", array($device['device_id'], 0));
+  foreach ($sensors_device as $sensor)
+  {
+    if ($sensor['sensor_class'] == 'counter') { continue; } // DEVEL
+    $datas[$sensor['sensor_class']] = array('icon' => $config['sensor_types'][$sensor['sensor_class']]['icon']);
+  }
+}
+
+// All counters in single page?
+if ($health_exist['counter'])    { $datas['counter']   = array('icon' => $config['entities']['counter']['icon']); }
+/*
+if ($health_exist['counter'])
+{
+  $counters_device = dbFetchRows("SELECT DISTINCT `counter_class` FROM `counters` WHERE `device_id` = ? AND `counter_deleted` = ?", array($device['device_id'], 0));
+  foreach ($counters_device as $counter)
+  {
+    $datas[$counter['counter_class']] = array('icon' => $config['counter_types'][$counter['counter_class']]['icon']);
+  }
+}
+*/
 
 $link_array = array('page'    => 'device',
                     'device'  => $device['device_id'],
@@ -59,9 +80,13 @@ if ($vars['view'] == "graphs")
 print_navbar($navbar);
 unset($navbar);
 
-if ($config['sensor_types'][$vars['metric']] || $vars['metric'] == "sensors")
+if (isset($config['sensor_types'][$vars['metric']]) || $vars['metric'] == "sensors")
 {
   include($config['html_dir']."/pages/device/health/sensors.inc.php");
+}
+elseif (isset($config['counter_types'][$vars['metric']]) || $vars['metric'] == "counter")
+{
+  include($config['html_dir']."/pages/device/health/counter.inc.php");
 }
 elseif (is_file($config['html_dir']."/pages/device/health/".$vars['metric'].".inc.php"))
 {

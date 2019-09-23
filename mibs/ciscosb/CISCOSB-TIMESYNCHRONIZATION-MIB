@@ -1771,7 +1771,8 @@ RlSntpAllServerInetEntry ::=
 rlSntpAllServerSource OBJECT-TYPE
         SYNTAX INTEGER {
          static(1),
-         dhcpv6(2)
+         dhcpv6(2),
+		 dhcpv4(3)
         }
         MAX-ACCESS  not-accessible
         STATUS      current

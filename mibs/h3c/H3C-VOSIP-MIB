@@ -1,5 +1,5 @@
 -- =========================================================================
--- Copyright (C) 2004 by Huawei 3Com Technologies. All rights reserved.
+-- Copyright (C) 2004 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: Implement the parameters configuration and information browser
 --              of the SIP module.
@@ -9,40 +9,41 @@
 -- V1.0 2005-03-22 Initial version by Yang Youku
 -- =========================================================================
 H3C-VOSIP-MIB DEFINITIONS ::= BEGIN
-    IMPORTS
-        OBJECT-TYPE, MODULE-IDENTITY, IpAddress
-             FROM SNMPv2-SMI
-        Integer32, Counter32, NOTIFICATION-TYPE
-             FROM SNMPv2-SMI
-        RowStatus
-             FROM SNMPv2-TC
-        InetAddressType, InetAddress
-             FROM INET-ADDRESS-MIB
-        h3cVoice
-             FROM HUAWEI-3COM-OID-MIB;
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, IpAddress
+         FROM SNMPv2-SMI
+    Integer32, Counter32, NOTIFICATION-TYPE
+         FROM SNMPv2-SMI
+    RowStatus
+         FROM SNMPv2-TC
+    InetAddressType, InetAddress
+         FROM INET-ADDRESS-MIB
+    h3cVoice
+         FROM HUAWEI-3COM-OID-MIB;
 
 
-        h3cVoSIP MODULE-IDENTITY
-            LAST-UPDATED "200503150000Z"
-            ORGANIZATION
-                "Huawei 3Com Technologies co., Ltd."
-            CONTACT-INFO
-                "Platform Team Huawei 3Com Technologies co., Ltd.
-                Hai-Dian District Beijing P.R. China
-                http://www.huawei-3com.com
-                Zip:100085
-                "
-            DESCRIPTION
-                "This MIB contains objects to manage the SIP client configuration.
-                 Session Initiation Protocol (SIP) is an application layer control
-                 protocol that can establish, modify, and terminate multimedia
-                 sessions such as IP phone calls, multimedia distribution, and
-                 multimedia conferences.
-                 "
-            REVISION "200503150000Z"
-            DESCRIPTION
-                 "The initial revision of this MIB module."
-            ::= { h3cVoice 12 }
+    h3cVoSIP MODULE-IDENTITY
+        LAST-UPDATED "200503150000Z"
+        ORGANIZATION                                   
+            "Hangzhou H3C Tech. Co., Ltd."             
+        CONTACT-INFO                                   
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China       
+            http://www.h3c.com                         
+            Zip:100085                                 
+            "                                          
+        DESCRIPTION
+            "This MIB contains objects to manage the SIP client configuration.
+             Session Initiation Protocol (SIP) is an application layer control
+             protocol that can establish, modify, and terminate multimedia
+             sessions such as IP phone calls, multimedia distribution, and
+             multimedia conferences.
+             "
+        REVISION "200503150000Z"
+        DESCRIPTION
+             "The initial revision of this MIB module."
+        ::= { h3cVoice 12 }
 
 --================================
 -- Structure declaration

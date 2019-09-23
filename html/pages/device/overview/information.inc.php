@@ -7,13 +7,11 @@
  *
  * @package        observium
  * @subpackage     webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 echo generate_box_open(array('box-class' => 'hidden-xl'));
-
-if ($device['os'] == "ios") { formatCiscoHardware($device); } // FIXME or do this in a general function for all OS types with a switch($device['os']) ?
 
 echo('<table class="table table-condensed table-striped table-hover">');
 
@@ -32,9 +30,25 @@ if ($device['purpose'])
 
 if ($device['hardware'])
 {
+  if ($device['vendor'])
+  {
+    echo('<tr>
+          <td class="entity">Vendor/Hardware</td>
+          <td>' . escape_html($device['vendor'].' '.$device['hardware']) . '</td>
+        </tr>');
+  } else {
+    echo('<tr>
+          <td class="entity">Hardware</td>
+          <td>' . escape_html($device['hardware']) . '</td>
+        </tr>');
+  }
+}
+else if ($device['vendor'])
+{
+  // Only Vendor exist
   echo('<tr>
-        <td class="entity">Hardware</td>
-        <td>' . escape_html($device['hardware']) . '</td>
+        <td class="entity">Vendor</td>
+        <td>' . escape_html($device['vendor']) . '</td>
       </tr>');
 }
 
@@ -126,6 +140,27 @@ if ($device['uptime'])
   echo('<tr>
         <td class="entity">Uptime</td>
         <td>' . deviceUptime($device) . '</td>
+      </tr>');
+}
+if (FALSE &&
+    $device['status_type'] && $device['status_type'] != 'ok')
+{
+  if ($device['status_type'] == 'ping')
+  {
+    $reason = 'not Pingable';
+  }
+  else if ($device['status_type'] == 'snmp')
+  {
+    $reason = 'not SNMPable';
+  }
+  else if ($device['status_type'] == 'dns')
+  {
+    $reason = 'DNS hostname unresolved';
+  }
+
+  echo('<tr>
+        <td class="entity">Down reason</td>
+        <td>' . $reason . '</td>
       </tr>');
 }
 

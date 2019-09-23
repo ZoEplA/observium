@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -27,7 +27,7 @@ foreach ($oids as $index => $entry)
 
   if ($entry['rlEnvMonFanState'] != 'notPresent')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "rlEnvMonFanState.$index", 'radlan-hwenvironment-state', $descr, NULL, $value, array('entPhysicalClass' => 'fan'));
+    discover_status($device, $oid, "rlEnvMonFanState.$index", 'radlan-hwenvironment-state', $descr, $value, array('entPhysicalClass' => 'fan'));
   }
 }
 
@@ -49,7 +49,7 @@ foreach ($oids as $index => $entry)
 
   if ($entry['rlEnvMonSupplyState'] != 'notPresent')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "rlEnvMonSupplyState.$index", 'radlan-hwenvironment-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+    discover_status($device, $oid, "rlEnvMonSupplyState.$index", 'radlan-hwenvironment-state', $descr, $value, array('entPhysicalClass' => 'power'));
   }
 }
 

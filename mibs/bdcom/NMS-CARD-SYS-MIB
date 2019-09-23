@@ -59,7 +59,15 @@ IMPORTS
                        cardCPUTempThreshold
                        	   INTEGER,
                        cardCPUTempCurr
-                       	   INTEGER
+                       	   INTEGER,
+                       cardCPUTempThresholdLow
+                       	   INTEGER,
+                       cardCPUTempStatus
+                       	   INTEGER,
+                       cardMemUtilThresholdMax
+                       	   INTEGER,
+                      cardSystemTemptureNodeNumber 
+                      `	   INTEGER
                   }
 
 
@@ -121,6 +129,44 @@ IMPORTS
                            "Card CPU current temperature."
                    ::= { cardSystemSetEntry 7 }
 
+               cardCPUTempThresholdLow OBJECT-TYPE
+                   SYNTAX  INTEGER(-125..125)
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Minimal threshold of card CPU temperature. The range is (-125~+125)."
+                   ::= { cardSystemSetEntry 8 }
+
+
+               cardCPUTempStatus OBJECT-TYPE
+                   SYNTAX  INTEGER{ 
+                                   normal(1),
+                                   alarm(2)
+                                  }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The card CPU temperature status, 1 means normal, 2 means alarm. "
+                   ::= { cardSystemSetEntry 9 }
+
+
+               cardMemUtilThresholdMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Maximal value of card memory utilization . For example, 60 means the maxmial value of memory utilization is 60%, maximal value is 100."
+                   ::= { cardSystemSetEntry 10 }
+
+               cardSystemTemptureNodeNumber OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Total number of  tempture Node."
+                   ::= { cardSystemSetEntry 11 }
+
+
 
 	        
                cardElementStatus OBJECT-TYPE
@@ -164,6 +210,74 @@ IMPORTS
     		DESCRIPTION
         	"The agent generates this notification when certain card element value exceeds upper limit defined above. "
     		::= { cardSysNotifications 1 }
+
+
+-- cardSystemTemptureNodeTable(板卡温度节点温度列表)
+
+
+               cardSystemTemptureNodeTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF CardSystemTemptureNodeEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A list of cards system temparature related set value entries."
+                   ::= { cardSys 5 }
+
+               cardSystemTemptureNodeEntry OBJECT-TYPE
+                   SYNTAX  CardSystemTemptureNodeEntry
+                   ACCESS  not-accessible
+                   STATUS  mandatory
+                   DESCRIPTION
+                            "A collection of cards to be reset."
+                   INDEX { cardSysTempIndex, temptureNodeIndex}
+               ::= { cardSystemTemptureNodeTable 1 }
+
+               CardSystemTemptureNodeEntry::=
+                   SEQUENCE {
+                       cardSysTempIndex
+                           INTEGER,
+                       temptureNodeIndex
+                           INTEGER,
+                       temptureNodeDescr
+                       	   DisplayString,
+                       temptureNodeCur
+                       	   INTEGER
+                  }
+
+
+               cardSysIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index of slot. "
+                   ::= { cardSystemTemptureNodeEntry 1 }
+
+               temptureNodeIndex OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Index of tempture node. "
+                   ::= { cardSystemTemptureNodeEntry 2 }
+
+               temptureNodeDescr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Descript of tempture node. "
+                   ::= { cardSystemTemptureNodeEntry 3 }
+
+               temptureNodeCur OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current tempture of tempture node. "
+                   ::= { cardSystemTemptureNodeEntry 4 }
+
+
 
 
 

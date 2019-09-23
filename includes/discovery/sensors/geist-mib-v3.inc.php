@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -114,7 +114,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$oid_name.'.'.$index]) ? $geist_alarms[$oid_name.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
   }
 }
 
@@ -144,7 +144,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$oid_name.'.'.$index]) ? $geist_alarms[$oid_name.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
 
     $oid_name = 'dewPointSensorDewPointC';
     $oid_num  = ".1.3.6.1.4.1.21239.2.17.1.8.{$index}";
@@ -154,7 +154,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$oid_name.'.'.$index]) ? $geist_alarms[$oid_name.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'dewpoint', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
+    discover_sensor('dewpoint', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
 
     $descr    = $entry['dewPointSensorName'] . ' Humidity ' . $index;
     $oid_name = 'dewPointSensorHumidity';
@@ -165,7 +165,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$prefix.'.'.$index]) ? $geist_alarms[$prefix.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
   }
 }
 
@@ -196,7 +196,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$oid_name.'.'.$index]) ? $geist_alarms[$oid_name.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
 
     /* I'm not sure what is this
     $descr    = $entry['sc10Name'] . ' Set Point ' . $index;
@@ -208,7 +208,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$oid_name.'.'.$index]) ? $geist_alarms[$oid_name.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $temp_scale, $value, $limits);
     */
 
     $descr    = $entry['sc10Name'] . ' Fan Capacity ' . $index;
@@ -220,7 +220,7 @@ foreach ($oids as $index => $entry)
 
     $limits = (is_array($geist_alarms[$prefix.'.'.$index]) ? $geist_alarms[$prefix.'.'.$index] : array());
 
-    discover_sensor($valid['sensor'], 'capacity', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
+    discover_sensor('capacity', $device, $oid_num, $index, $type, $descr, 1, $value, $limits);
   }
 }
 
@@ -265,7 +265,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.8.$index";
@@ -276,7 +276,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
     }
 
     $oid    = ".1.3.6.1.4.1.21239.2.25.1.10.$index";
@@ -287,7 +287,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid    = ".1.3.6.1.4.1.21239.2.25.1.11.$index";
@@ -298,7 +298,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.12.$index";
@@ -307,7 +307,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
     }
 
     // Phase 2
@@ -321,7 +321,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.16.$index";
@@ -332,7 +332,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.18.$index";
@@ -343,7 +343,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.19.$index";
@@ -354,7 +354,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.20.$index";
@@ -363,7 +363,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
     }
 
     // Phase 3
@@ -377,7 +377,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.24.$index";
@@ -388,7 +388,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.26.$index";
@@ -399,7 +399,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.27.$index";
@@ -410,7 +410,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.25.1.28.$index";
@@ -419,7 +419,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
     }
 
     // Total
@@ -432,7 +432,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
   }
 }
@@ -461,7 +461,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
+      discover_sensor('temperature', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
     }
 
     $descr  = $entry['airFlowSensorName'] . ' Dew Point';
@@ -478,7 +478,7 @@ foreach ($oids as $index => $entry)
       rename_rrd_entity($device, 'sensor', $old_rrd_array, array('class' => 'dewpoint'));
       unset($old_rrd_array);
 
-      discover_sensor($valid['sensor'], 'dewpoint', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
+      discover_sensor('dewpoint', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
     }
 
     $descr  = $entry['airFlowSensorName'] . ' Air Flow';
@@ -490,7 +490,10 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'airflow', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      //discover_sensor('airflow', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      // Air Flow: 0 to 100 (relative value)
+      // I not keep compatibility, because previously used incorrect class
+      discover_sensor_ng($device, 'load', 'GEIST-MIB-V3', 'airFlowSensorFlow', $oid, $index, NULL, $descr, 1, $value, $limits);
     }
 
     $descr  = $entry['airFlowSensorName'] . ' Humidity';
@@ -502,7 +505,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('humidity', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
   }
 }
@@ -512,10 +515,10 @@ foreach ($oids as $index => $entry)
 // GEIST-MIB-V3::doorSensorAvail.1 = Gauge32: 1
 // GEIST-MIB-V3::doorSensorStatus.1 = INTEGER: 99
 
-$oids = snmpwalk_cache_multi_oid($device, 'doorSensorTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'doorSensorTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
-foreach ($cache['geist']['doorSensorTable'] as $index => $entry)
+foreach ($oids as $index => $entry)
 {
   if ($entry['doorSensorAvail'])
   {
@@ -526,7 +529,7 @@ foreach ($cache['geist']['doorSensorTable'] as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'doorSensorStatus.'.$index, 'geist-mib-v3-door-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'doorSensorStatus.'.$index, 'geist-mib-v3-door-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
   }
 }
@@ -536,7 +539,7 @@ foreach ($cache['geist']['doorSensorTable'] as $index => $entry)
 // GEIST-MIB-V3::digitalSensorAvail.1 = Gauge32: 1
 // GEIST-MIB-V3::digitalSensorDigital.1 = INTEGER: 99
 
-$cache['geist']['digitalSensorTable'] = snmpwalk_cache_multi_oid($device, 'digitalSensorTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'digitalSensorTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -550,7 +553,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'digitalSensorDigital.'.$index, 'geist-mib-v3-digital-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'digitalSensorDigital.'.$index, 'geist-mib-v3-digital-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
   }
 }
@@ -560,7 +563,7 @@ foreach ($oids as $index => $entry)
 // GEIST-MIB-V3::smokeAlarmAvail.1 = Gauge32: 1
 // GEIST-MIB-V3::smokeAlarmStatus.1 = INTEGER: 99
 
-$oids = snmpwalk_cache_multi_oid($device, 'smokeAlarmTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'smokeAlarmTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -574,7 +577,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'smokeAlarmStatus.'.$index, 'geist-mib-v3-smokealarm-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'smokeAlarmStatus.'.$index, 'geist-mib-v3-smokealarm-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
   }
 }
@@ -607,7 +610,7 @@ foreach ($oids as $index => $entry)
 
 // We don't do power factor yet.
 
-$oids = snmpwalk_cache_multi_oid($device, 'climateTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'climateTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -623,7 +626,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
+      discover_sensor('temperature', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
     }
 
     $descr  = $entry['climateName'] . ' Dew Point';
@@ -640,7 +643,7 @@ foreach ($oids as $index => $entry)
       rename_rrd_entity($device, 'sensor', $old_rrd_array, array('class' => 'dewpoint'));
       unset($old_rrd_array);
 
-      discover_sensor($valid['sensor'], 'dewpoint', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
+      discover_sensor('dewpoint', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
     }
 
     $descr  = $entry['climateName'] . ' Air Flow';
@@ -652,7 +655,10 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'airflow', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      //discover_sensor('airflow', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      // Air Flow: 0 to 100 (relative value)
+      // I not keep compatibility, because previously used incorrect class
+      discover_sensor_ng($device, 'load', 'GEIST-MIB-V3', 'climateAirflow', $oid, $index, NULL, $descr, 1, $value, $limits);
     }
 
     $descr  = $entry['climateName'] . ' Humidity';
@@ -664,7 +670,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('humidity', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $descr  = $entry['climateName'];
@@ -676,7 +682,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     // Phase 1
@@ -691,7 +697,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
     }
 
     $oid    = ".1.3.6.1.4.1.21239.2.2.1.18.$index";
@@ -702,7 +708,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid    = ".1.3.6.1.4.1.21239.2.2.1.19.$index";
@@ -713,7 +719,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.2.1.20.$index";
@@ -724,7 +730,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value, $limits);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value, $limits);
     }
 
     // Phase 2
@@ -739,7 +745,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
     }
 
     $oid    = ".1.3.6.1.4.1.21239.2.2.1.23.$index";
@@ -750,7 +756,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid    = ".1.3.6.1.4.1.21239.2.2.1.24.$index";
@@ -761,7 +767,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.2.1.25.$index";
@@ -772,7 +778,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value, $limits);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value, $limits);
     }
 
     // Phase 3
@@ -793,12 +799,12 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
     }
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('power', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.2.1.29.$index";
@@ -809,7 +815,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value, $limits);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.2.1.30.$index";
@@ -820,7 +826,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value, $limits);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value, $limits);
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 1';
@@ -830,7 +836,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'climateIO1.'.$index, 'geist-mib-v3-climateio-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'climateIO1.'.$index, 'geist-mib-v3-climateio-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 2';
@@ -840,7 +846,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'climateIO2.'.$index, 'geist-mib-v3-climateio-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'climateIO2.'.$index, 'geist-mib-v3-climateio-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
 
     $descr = $entry['climateName'] . ' Analog I/O Sensor 3';
@@ -850,7 +856,7 @@ foreach ($oids as $index => $entry)
 
     if ($value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, 'climateIO3.'.$index, 'geist-mib-v3-climateio-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+      discover_status($device, $oid, 'climateIO3.'.$index, 'geist-mib-v3-climateio-state', $descr, $value, array('entPhysicalClass' => 'other'));
     }
   }
 }
@@ -869,7 +875,7 @@ foreach ($oids as $index => $entry)
 
 // Oh dear, 48 possible OIDs done separately instead of indexed.
 
-$oids = snmpwalk_cache_multi_oid($device, 'powerDMTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'powerDMTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -888,7 +894,7 @@ foreach ($oids as $index => $entry)
 
       if (is_numeric($value))
       {
-        discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
+        discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value, $limits); // $scale = 0.1
       }
     }
   }
@@ -911,7 +917,7 @@ foreach ($oids as $index => $entry)
 //GEIST-MIB-V3::powMonOutlet1StatusTime.1 = Gauge32: 15617626 seconds
 //GEIST-MIB-V3::powMonOutlet2StatusTime.1 = Gauge32: 15617626 seconds
 
-$oids = snmpwalk_cache_multi_oid($device, 'powMonTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'powMonTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -926,7 +932,7 @@ foreach ($oids as $index => $entry)
     $value  = $entry[$prefix];
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value);
+      discover_sensor('voltage', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value);
     }
 
     // Current
@@ -935,7 +941,7 @@ foreach ($oids as $index => $entry)
     $value  = $entry[$prefix];
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value); // $scale = 0.1
+      discover_sensor('current', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $scale, $value); // $scale = 0.1
     }
 
     // Apparent Power
@@ -944,7 +950,7 @@ foreach ($oids as $index => $entry)
     $value  = $entry[$prefix];
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value);
+      discover_sensor('apower', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 1, $value);
     }
 
     $oid   = ".1.3.6.1.4.1.21239.2.3.1.13.$index";
@@ -953,7 +959,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value) && $value != 0)
     {
-      discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
+      discover_sensor('powerfactor', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, 0.01, $value);
     }
 
     // FIXME. Not know, what mean values in powMonOutlet1 and powMonOutlet2, seems as status but not has value descriptions
@@ -966,7 +972,7 @@ foreach ($oids as $index => $entry)
 // GEIST-MIB-V3::ctrlRelayOverride.1 = Gauge32: 0
 // GEIST-MIB-V3::ctrlRelayAcknowledge.1 = Gauge32: 0
 
-$oids = snmpwalk_cache_multi_oid($device, 'ctrlRelayTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'ctrlRelayTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -978,7 +984,7 @@ foreach ($oids as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, 'ctrlRelayState.'.$index, 'geist-mib-v3-relay-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+    discover_status($device, $oid, 'ctrlRelayState.'.$index, 'geist-mib-v3-relay-state', $descr, $value, array('entPhysicalClass' => 'other'));
   }
 }
 
@@ -993,7 +999,7 @@ foreach ($oids as $index => $entry)
 // GEIST-MIB-V3::climateRelayIO5.1 = INTEGER: 99
 // GEIST-MIB-V3::climateRelayIO6.1 = INTEGER: 99
 
-$oids = snmpwalk_cache_multi_oid($device, 'climateRelayTable', array(), 'GEIST-MIB-V3');
+$oids = snmp_cache_table($device, 'climateRelayTable', array(), 'GEIST-MIB-V3');
 print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
@@ -1010,7 +1016,7 @@ foreach ($oids as $index => $entry)
 
     if (is_numeric($value))
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
+      discover_sensor('temperature', $device, $oid, $prefix.'.'.$index, 'geist-mib-v3', $descr, $temp_scale, $value, $limits);
     }
 
     for ($i = 0; $i <= 6; $i++)
@@ -1021,7 +1027,7 @@ foreach ($oids as $index => $entry)
 
       if ($value != '')
       {
-        discover_sensor($valid['sensor'], 'state', $device, $oid, "climateRelayIO$i.".$index, 'geist-mib-v3-climateio-state', $descr, NULL, $value, array('entPhysicalClass' => 'other'));
+        discover_status($device, $oid, "climateRelayIO$i.".$index, 'geist-mib-v3-climateio-state', $descr, $value, array('entPhysicalClass' => 'other'));
       }
     }
   }

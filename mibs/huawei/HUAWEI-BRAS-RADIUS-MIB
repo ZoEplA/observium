@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:HUAWEI-BRAS-RADIUS-MIB
 -- Reference:
--- Version: V2.27
+-- Version: V2.32
 -- History:
 --         v1.1
 --         modified by huangjun 2009-12-08  
@@ -24,7 +24,7 @@
                  Ipv6Address
                 FROM IPV6-TC;    
         hwBRASRadius MODULE-IDENTITY 
-            LAST-UPDATED "201611011613Z"        
+            LAST-UPDATED "201802021655Z"        
             ORGANIZATION 
                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -34,6 +34,21 @@
 		   People's Republic of China
 		   Website: http://www.huawei.com
 		   Email: support@huawei.com "
+           DESCRIPTION 
+                "Add  hwRadiusAcctServerUpCp, hwRadiusAcctServerDownCp, hwRadiusAuthServerUpCp, hwRadiusAuthServerDownCp, hwRadiusCachePacketThresholdCpAlarm, hwRadiusCachePacketThresholdCpResume."
+           REVISION "201802021655Z"
+           DESCRIPTION 
+                "Add  hwRadiusCalledIDFormatType, hwRadiusCalledIDIncSSID, hwRadiusCalledIDSSIDSep."
+           REVISION "201801311613Z"
+          DESCRIPTION 
+                "Modified  translation information."
+           REVISION "201801161613Z"
+          DESCRIPTION 
+                "Modified  translation information."
+           REVISION "201709121613Z"
+          DESCRIPTION 
+                "Add hwRadiusServerSourceVlanifEachServer."
+           REVISION "201705281613Z" 
            DESCRIPTION 
                 "Add hwRadiusGlobalSettingTable, hwRadiusGlobalSettingEntry, hwRadiusGlobalServerSourceIp, hwRadiusGlobalServerSourceIpv6, hwRadiusGlobalAttrNasIp, hwRadiusGlobalAttrNasIpv6."
            REVISION "201611011613Z" 
@@ -78,12 +93,12 @@
             REVISION "201302181634Z"
            DESCRIPTION 
                 "The MIB contains objects of module Radius."
-            REVISION "201307271419Z"
+            REVISION "201207271419Z"
             DESCRIPTION "V1.0-V1.1."
-           REVISION "201402150000Z"    -- February 15, 2014 at 13:34 GMT
+           REVISION "201203150000Z"    -- February 15, 2014 at 13:34 GMT
            DESCRIPTION 
                 "Revision 2.17"   
-           REVISION "201412311457Z" 
+           REVISION "201202111457Z" 
            DESCRIPTION
                 "The MIB contains objects of module Radius."   
 
@@ -170,7 +185,13 @@
               hwRadiusServerNasIpv6Address		
                     Ipv6Address,
                 hwRadiusStateInRequest	
-                    Integer32				
+                    Integer32,	
+              hwRadiusCalledIDFormatType
+                    INTEGER,
+              hwRadiusCalledIDIncSSID
+                    TruthValue,	
+              hwRadiusCalledIDSSIDSep		
+                   OCTET STRING		
              }
 
         hwRadiusGroupName OBJECT-TYPE
@@ -178,7 +199,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius Group name.
+                "This object indicates the name of a RADIUS server group.
                 "
             ::= { hwRadiusGroupEntry 1 }
 
@@ -187,7 +208,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Radius Server secret.
+                "This object indicates the shared key of a RADIUS server.
                 "
             ::= { hwRadiusGroupEntry 2 }
 
@@ -201,7 +222,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Radius protocol.
+                "This object indicates the RADIUS protocol type used between the BRAS device and RADIUS server. The values are as follows: 1. Standard RADIUS protocol, which is used to set the standard server and is used by default. 2. RADIUS+1.0, which is extended by Huawei and is used to set the IPHotel server. 3. RADIUS+1.1, which is extended by Huawei and is used to set the Portal server.
                 "
             ::= { hwRadiusGroupEntry 3 }
 
@@ -210,7 +231,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Max number of radius packet retransmission.
+                "This object indicates the number of times RADIUS packets are retransmitted.  The value is an integer ranging from 1 to 5. The default value is 3.
                 "
             ::= { hwRadiusGroupEntry 4 }
 
@@ -219,7 +240,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Radius packet retransmission interval.
+                "This object indicates the interval at which RADIUS packets are retransmitted.  The value is an integer ranging from 3 to 25, in seconds. The default value is 5s.
                 "
             ::= { hwRadiusGroupEntry 5 }   
             
@@ -281,7 +302,9 @@
             SYNTAX INTEGER
                 {
                     masterbackup(1),
-                    shareloading(2)
+                    shareloading(2),
+                   shareloadingbyuser(3)
+
                 }
             MAX-ACCESS read-write
             STATUS current
@@ -458,6 +481,41 @@
             DESCRIPTION
                 "Take state in authentication request."
             ::= { hwRadiusGroupEntry 27 }
+
+                          hwRadiusCalledIDFormatType OBJECT-TYPE
+                SYNTAX INTEGER
+                {
+                    apmac(1),
+                    acmac(2),
+                    apname(3),
+                    apgroupname(4),	
+                    aplocation(5),	
+                    acip(6),	
+                    vlanid(7)	
+                }
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The format of wlan user's called-station-id."
+                
+            ::= { hwRadiusGroupEntry 28 }
+
+        hwRadiusCalledIDIncSSID OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether the ssid of wlan user's called-station-id is included"
+            DEFVAL { false }
+            ::= { hwRadiusGroupEntry 29 }
+			
+        hwRadiusCalledIDSSIDSep OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The delimiter before ssid in called-station-id."
+            ::= { hwRadiusGroupEntry 30 }
 		  			
         hwRadiusServerTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwRadiusServerEntry
@@ -518,6 +576,8 @@
                hwRadiusServerSourceIPv6AddressEachServer
                Ipv6Address,
                hwRadiusServerSourceLoopBackEachServer
+               Unsigned32,
+               hwRadiusServerSourceVlanifEachServer
                Unsigned32
                 }  
                
@@ -527,7 +587,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "IP address index of authentication and accounting server, read-only.
+                "This object indicates the index of a RADIUS server group.
                 "
             ::= { hwRadiusServerEntry 1 } 
        
@@ -540,7 +600,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Type of authentication and accounting server, read-only.
+                "This object indicates the server type. The values are as follows: 1. authentication server 2. accounting server
                 "
             ::= { hwRadiusServerEntry 2 }  
             
@@ -558,7 +618,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "IP address of authentication and accounting server which is unnecessary to configure.
+                "This object indicates the IPv4 address of the RADIUS server.
                 "
             ::= { hwRadiusServerEntry 4} 
             
@@ -568,7 +628,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Port number of authentication and accounting server. Use the default value, if it is not configured.
+                "Specifies a RADIUS server destination port ID.
                 "
             ::= { hwRadiusServerEntry 5 }  
             
@@ -710,6 +770,14 @@
             DESCRIPTION
                 "Source loopback of each server."
             ::= { hwRadiusServerEntry 20 }
+
+          hwRadiusServerSourceVlanifEachServer  OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4094)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Source vlanif of each server."
+            ::= { hwRadiusServerEntry 21 }
 			
         hwRadiusClientTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwRadiusClientEntry
@@ -1037,7 +1105,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius server IP.
+                "This object indicates the IPv4 address of the RADIUS server.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 1 }     
        
@@ -1046,7 +1114,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "VPN-instance name.
+                "This object indicates the name of the VPN where the RADIUS server resides.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 2 }          
         
@@ -1055,7 +1123,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Request packets.
+                "This object indicates the number of authentication request packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 3 }   
 
@@ -1064,7 +1132,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Accept packets.
+                "This object indicates the number of authentication accept packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 4 }   
 
@@ -1073,7 +1141,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Reject packets.
+                "This object indicates the number of authentication reject packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 5 }          
             
@@ -1082,7 +1150,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Retransmission packets.
+                "This object indicates the number of retransmitted authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 6 }    
         
@@ -1091,7 +1159,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Challenge packets.
+                "This object indicates the number of authentication challenge packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 7 }     
        
@@ -1100,7 +1168,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Malformed response packets.
+                "This object indicates the number of error authentication response packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 8 }          
         
@@ -1109,7 +1177,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Bad packets.
+                "This object indicates the number of authentication packets with incorrect authenticators.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 9 }   
 
@@ -1118,7 +1186,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending packets.
+                "This object indicates the number of pending authentication request packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 10 }   
 
@@ -1127,7 +1195,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Timeout packets.
+                "This object indicates the number of timeout authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 11 }          
             
@@ -1136,7 +1204,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Unknown packets.
+                "This object indicates the number of unknown authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 12 }   
         
@@ -1145,7 +1213,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Dropped packets.
+                "This object indicates the number of discarded authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 13 } 
                     
@@ -1154,7 +1222,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Speed-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the speed limit.  The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 14 }   
                                                                                                        
@@ -1163,7 +1231,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the pending limit.  The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 15 }   
 
@@ -1172,7 +1240,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Server down block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because the server was Down. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 16 }   
 
@@ -1181,7 +1249,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No source IP block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because no source interface IP address is available. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 17 }   
 
@@ -1190,7 +1258,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Server not reply packets.
+                "This object indicates the number of packets to which the RADIUS server does not give a response. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv4Entry 18 }   
 
@@ -1253,7 +1321,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius server IP.
+                "This object indicates the IPv4 address of the RADIUS server.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 1 }     
        
@@ -1262,7 +1330,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "VPN-instance name.
+                "This object indicates the name of the VPN where the RADIUS server resides.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 2 }          
         
@@ -1271,7 +1339,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Request packets.
+                "This object indicates the number of accounting request packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 3 }   
 
@@ -1280,7 +1348,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Response packets.
+                "This object indicates the number of accounting response packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 4 }   
 
@@ -1289,7 +1357,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Retransmission packets.
+                "This object indicates the number of retransmitted accounting packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 5 }    
         
@@ -1298,7 +1366,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Malformed response packets.
+                "This object indicates the number of error authentication response packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 6 }     
                             
@@ -1307,7 +1375,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Bad packets.
+                "This object indicates the number of authentication packets with incorrect authenticators.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 7 }          
             
@@ -1317,7 +1385,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending packets.
+                "This object indicates the number of pending accounting request packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 8 }          
         
@@ -1326,7 +1394,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Timeout packets.
+                "This object indicates the number of timeout accounting packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 9 }   
 
@@ -1335,7 +1403,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Unknown packets.
+                "This object indicates the number of unknown authentication packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 10 }   
 
@@ -1344,7 +1412,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Dropped packets.
+                "This object indicates the number of discarded accounting packets.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 11 }      
             
@@ -1353,7 +1421,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Speed-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the speed limit.  The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 12 }    
             
@@ -1362,7 +1430,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the pending limit.  The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 13 }    
             
@@ -1371,7 +1439,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Server down block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because the server was Down. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 14 }    
             
@@ -1380,7 +1448,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No route block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because no source interface IP address is available. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 15 }    
             
@@ -1389,7 +1457,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No reply packets.
+                "This object indicates the number of packets to which the RADIUS server does not give a response. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAcctIpv4Entry 16 }     
              
@@ -1443,7 +1511,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius server type.
+                "This object indicates the type of the RADIUS server.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 1 }
              
@@ -1452,7 +1520,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius server IP.
+                "This object indicates the IPv4 address of the RADIUS server.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 2 }     
        
@@ -1461,7 +1529,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "VPN-instance name.
+                "This object indicates the name of the VPN where the RADIUS server resides.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 3 }          
         
@@ -1470,7 +1538,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Request packets.
+                "This object indicates the number of authorization request packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 4 }   
 
@@ -1479,7 +1547,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Accept packets.
+                "This object indicates the number of authorization accept packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 5 }   
 
@@ -1488,7 +1556,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Reject packets.
+                "This object indicates the number of rejected authorization request packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 6 }
                       
@@ -1497,7 +1565,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Bad packets.
+                "This object indicates the number of authentication packets with incorrect authenticators.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 7 } 
                          
@@ -1506,7 +1574,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Retransmission packets.
+                "This object indicates the number of retransmitted authorization packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 8 }
                 
@@ -1515,7 +1583,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Malformed response packets.
+                "This object indicates the number of error authentication response packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 9 }          
  
@@ -1524,7 +1592,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Timeout packets.
+                "This object indicates the number of timeout authorization packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 10 }          
             
@@ -1533,7 +1601,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Unknown packets.
+                "This object indicates the number of unknown authentication packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 11 }   
         
@@ -1542,7 +1610,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Dropped packets.
+                "This object indicates the number of discarded authorization packets.
                 "
             ::= { hwRadiusStatAuthorIpv4Entry 12 }
             
@@ -1607,7 +1675,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius server IP.
+                "This object indicates the IPv6 address of the RADIUS server.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 1 }     
         
@@ -1616,7 +1684,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Request packets.
+                "This object indicates the number of authentication request packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 3 }   
 
@@ -1625,7 +1693,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Accept packets.
+                "This object indicates the number of authentication accept packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 4 }   
 
@@ -1634,7 +1702,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Reject packets.
+                "This object indicates the number of authentication reject packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 5 }          
             
@@ -1643,7 +1711,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Retransmission packets.
+                "This object indicates the number of retransmitted authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 6 }    
         
@@ -1652,7 +1720,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Challenge packets.
+                "This object indicates the number of authentication challenge packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 7 }     
        
@@ -1661,7 +1729,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Malformed response packets.
+                "This object indicates the number of error authentication response packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 8 }          
         
@@ -1670,7 +1738,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Bad packets.
+                "This object indicates the number of authentication packets with incorrect authenticators.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 9 }   
 
@@ -1679,7 +1747,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending packets.
+                "This object indicates the number of pending authentication request packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 10 }   
 
@@ -1688,7 +1756,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Timeout packets.
+                "This object indicates the number of timeout authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 11 }          
             
@@ -1697,7 +1765,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Unknown packets.
+                "This object indicates the number of unknown authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 12 }   
         
@@ -1706,7 +1774,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Dropped packets.
+                "This object indicates the number of discarded authentication packets.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 13 }     
             
@@ -1715,7 +1783,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Speed-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the speed limit.  The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 14 }     
    
@@ -1724,7 +1792,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the pending limit.  The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 15 }       
        
@@ -1733,7 +1801,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Server down block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because the server was Down. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 16 }     
 
@@ -1742,7 +1810,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No route block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because no source interface IP address is available. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 17 }     
 
@@ -1751,7 +1819,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No reply packets.
+                "This object indicates the number of packets to which the RADIUS server does not give a response. The value is an integer ranging from 0 to 4294967295.
                 "
             ::= { hwRadiusStatAuthenIpv6Entry 18 }     
             
@@ -1812,7 +1880,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Radius server IP.
+                "This object indicates the IPv6 address of the RADIUS server.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 1 }     
        
@@ -1821,7 +1889,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Request packets.
+                "This object indicates the number of accounting request packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 3 }   
 
@@ -1830,7 +1898,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Response packets.
+                "This object indicates the number of accounting response packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 4 }   
 
@@ -1839,7 +1907,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Retransmission packets.
+                "This object indicates the number of retransmitted accounting packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 5 }    
         
@@ -1848,7 +1916,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Malformed response packets.
+                "This object indicates the number of error authentication response packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 6 }     
                             
@@ -1857,7 +1925,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Bad packets.
+                "This object indicates the number of authentication packets with incorrect authenticators.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 7 }          
             
@@ -1867,7 +1935,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending packets.
+                "This object indicates the number of pending accounting request packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 8 }          
         
@@ -1876,7 +1944,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Timeout packets.
+                "This object indicates the number of timeout accounting packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 9 }   
 
@@ -1885,7 +1953,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Unknown packets.
+                "This object indicates the number of unknown authentication packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 10 }   
 
@@ -1894,7 +1962,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Dropped packets.
+                "This object indicates the number of discarded accounting packets.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 11 }    
             
@@ -1903,7 +1971,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Speed-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the speed limit. 
                 "
             ::= { hwRadiusStatAcctIpv6Entry 12 }    
 
@@ -1912,7 +1980,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Pending-limit block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server due to the pending limit. 
                 "
             ::= { hwRadiusStatAcctIpv6Entry 13 }    
 
@@ -1921,7 +1989,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Server down block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because the server was Down.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 14 }    
 
@@ -1930,7 +1998,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No route block packets.
+                "This object indicates the number of packets that are retransmitted to the RADIUS server because no source interface IP address is available.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 15 }      
             
@@ -1939,7 +2007,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "No reply packets.
+                "This object indicates the number of packets to which the RADIUS server does not give a response.
                 "
             ::= { hwRadiusStatAcctIpv6Entry 16 }   
             
@@ -1990,7 +2058,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The attribute name.
+                "This object indicates the attribute name.
                 "
                 ::= { hwRadiusAttrCountEntry 1 } 
 
@@ -1999,7 +2067,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in authentication request packet.
+                "This object indicates the number of times the attribute occurs in an authentication request packet.
                 "
                 ::= { hwRadiusAttrCountEntry 2 }
             
@@ -2008,7 +2076,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in authentication accept packet.
+                "This object indicates the number of times the attribute occurs in an authentication accept packet.
                 "
                 ::= { hwRadiusAttrCountEntry 3 }
            
@@ -2017,7 +2085,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in authentication reject packet.
+                "This object indicates the number of times the attribute occurs in an authentication reject packet.
                 "
                 ::= { hwRadiusAttrCountEntry 4 }
 
@@ -2026,7 +2094,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in accounting request packet.
+                "This object indicates the number of times the attribute occurs in an accounting request packet.
                 "
                 ::= { hwRadiusAttrCountEntry 5 }
      hwAcctResponsePacketNum OBJECT-TYPE
@@ -2034,7 +2102,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in accounting response packet.
+                "This object indicates the number of times the attribute occurs in an accounting response packet.
                 "
                 ::= { hwRadiusAttrCountEntry 6 }
 
@@ -2043,7 +2111,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in COA request packet.
+                "This object indicates the number of times the attribute occurs in a CoA request packet.
                 "
                 ::= { hwRadiusAttrCountEntry 7 }
 
@@ -2052,7 +2120,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in COA acknowledge packet.
+                "This object indicates the number of times the attribute occurs in a CoA ACK packet.
                 "
                 ::= { hwRadiusAttrCountEntry 8 }
                 
@@ -2061,7 +2129,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in DM request packet.
+                "This object indicates the number of times the attribute occurs in a DM request packet.
                 "
                 ::= { hwRadiusAttrCountEntry 9 }
 
@@ -2070,7 +2138,7 @@
 			MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The number of attribute in DM acknowledge packet.
+                "This object indicates the number of times the attribute occurs in a DM ACK packet.
                 "
                 ::= { hwRadiusAttrCountEntry 10 }
                 
@@ -2536,8 +2604,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                "IP address of authentication or accounting server which state is changed.
-
+                "This object indicates the IP address of the RADIUS server.
                 "
             ::= { hwRadiusTrapObject 1 } 
             
@@ -2546,8 +2613,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " VPN-instance of authentication or accounting server which state is changed.
-
+                "This object indicates the VPN where the RADIUS server resides.
                 "   
             ::= { hwRadiusTrapObject 2 }        
 
@@ -2556,8 +2622,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " port of authentication or accounting server which state is changed.
-
+                "This object indicates the port number of a RADIUS server.
                 "   
             ::= { hwRadiusTrapObject 3 }   
            
@@ -2566,8 +2631,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " The memory usage.
-
+                "This object indicates the memory usage of the master main control board.
                 "   
             ::= { hwRadiusTrapObject 4 }   
       
@@ -2576,8 +2640,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " The threshold.
-
+                "This object indicates the master MPU memory usage threshold over which the system stops caching RADIUS accounting packets.
                 "   
             ::= { hwRadiusTrapObject 5 }   
 
@@ -2586,7 +2649,7 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " The number of cached packets.
+                "This object indicates the current number of cached packets.
                 "   
             ::= { hwRadiusTrapObject 6 }   
         
@@ -2596,11 +2659,73 @@
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " The max cache packets limit.
+                "This object indicates the upper limit on the number of packets that can be cached.
                 "   
             ::= { hwRadiusTrapObject 7 }   
 
-             
+        hwStateChangeServerCpIp OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..40))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the RADIUS server.
+                "
+            ::= { hwRadiusTrapObject 8 } 
+            
+            hwStateChangeServerCpVrf OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN where the RADIUS server resides.
+                "   
+            ::= { hwRadiusTrapObject 9 }        
+
+           hwStateChangeServerCpPort OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the port number of a RADIUS server.
+                "   
+            ::= { hwRadiusTrapObject 10 }   
+
+            hwStateChangeServerCpInstanceId OBJECT-TYPE
+            SYNTAX Integer32(0..128)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the form of a equipment.
+                "
+            ::= { hwRadiusTrapObject 11 }
+
+	    hwRadiusMaxCachePacketsCp OBJECT-TYPE
+            SYNTAX Integer32 (0..256000)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the upper limit on the number of packets that can be cached.
+                "   
+            ::= { hwRadiusTrapObject 12 }   
+
+	    hwRadiusThresholdCp OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the master MPU memory usage threshold over which the system stops caching RADIUS accounting packets.
+                "    
+            ::= { hwRadiusTrapObject 13 }   
+
+            hwRadiusInstanceIdCp OBJECT-TYPE
+            SYNTAX Integer32(0..128)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the form of a equipment.
+                "
+            ::= { hwRadiusTrapObject 14 }
+           
            
            
         hwRadiusTrapsDefine OBJECT IDENTIFIER ::= { hwRadiusMIBTrap 2 }
@@ -2611,10 +2736,7 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  Radius authentication server up
-                2 Notice/Trap generation cause:  Radius authentication server up 
-                3 Repair suggestions:
-                    Check radius authentication server status .                
+This object indicates that the RADIUS authentication server is Up.            
                 "
             ::= { hwRadiusServerTraps 1 }
             
@@ -2623,10 +2745,7 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  Radius authentication server down
-                2 Notice/Trap generation cause:  Radius authentication server down 
-                3 Repair suggestions:
-                    Check radius authentication server status .
+This object indicates that the RADIUS authentication server is Down.
                 "
             ::= { hwRadiusServerTraps 2 }            
 
@@ -2635,10 +2754,7 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  Radius accounting server up
-                2 Notice/Trap generation cause:  Radius accounting server up 
-                3 Repair suggestions:
-                    Check radius accounting server status .
+This object indicates that the RADIUS accounting server is Up.
                 "
             ::= { hwRadiusServerTraps 3 }
 
@@ -2647,10 +2763,7 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  Radius accounting server down
-                2 Notice/Trap generation cause:  Radius accounting server down 
-                3 Repair suggestions:
-                    Check radius accounting server status .
+This object indicates that the RADIUS accounting server is Down.
                 "
             ::= { hwRadiusServerTraps 4 }
         
@@ -2659,10 +2772,7 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  Packets buffered earliest were dropped because the memory usage reached the threshold.
-                2 Notice/Trap generation cause:  Packets buffered earliest were dropped because the memory usage reached the threshold. 
-                3 Repair suggestions:
-                    Check the memory usage.
+This object indicates that the memory usage reaches the threshold and the device discards all packets of the earliest user from the cache queue.
                 "
             ::= { hwRadiusServerTraps 5 }  
             
@@ -2671,10 +2781,7 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  The number of cached packets reached the upper limit. 
-                2 Notice/Trap generation cause:  The number of cached packets reached the upper limit. 
-                3 Repair suggestions:
-                    Check the cached packets.
+This object indicates that the number of cached packets reaches the upper alarm threshold.
                 "
             ::= { hwRadiusServerTraps 6 }
        
@@ -2683,13 +2790,61 @@
             STATUS current
             DESCRIPTION
                 "
-                1 Notice/Trap name:  The number of cached packets fell below the lower limit.
-                2 Notice/Trap generation cause: The number of cached packets fell below the lower limit. 
-                3 Repair suggestions:
-                    Check the cached packets.
+This object indicates that the number of cached packets falls below the lower alarm threshold.
                 "
             ::= { hwRadiusServerTraps 7 }
 
+        hwRadiusAcctServerUpCp NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerCpIp,hwStateChangeServerCpVrf,hwStateChangeServerCpPort,hwStateChangeServerCpInstanceId}
+            STATUS current
+            DESCRIPTION
+                "
+This object indicates that the RADIUS accounting server is Up.
+                "
+            ::= { hwRadiusServerTraps 8 }
+
+		hwRadiusAcctServerDownCp NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerCpIp,hwStateChangeServerCpVrf,hwStateChangeServerCpPort,hwStateChangeServerCpInstanceId}
+            STATUS current
+            DESCRIPTION
+                "
+This object indicates that the RADIUS accounting server is Down.
+                "
+            ::= { hwRadiusServerTraps 9 }
+        hwRadiusAuthServerUpCp NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerCpIp,hwStateChangeServerCpVrf,hwStateChangeServerCpPort,hwStateChangeServerCpInstanceId}
+            STATUS current
+            DESCRIPTION
+                "
+This object indicates that the RADIUS authentication server is Up.                     
+                "
+            ::= { hwRadiusServerTraps 10 }
+            
+        hwRadiusAuthServerDownCp NOTIFICATION-TYPE
+            OBJECTS { hwStateChangeServerCpIp,hwStateChangeServerCpVrf,hwStateChangeServerCpPort,hwStateChangeServerCpInstanceId}
+            STATUS current
+            DESCRIPTION
+                "
+This object indicates that the RADIUS authentication server is Down.
+                "
+            ::= { hwRadiusServerTraps 11 }            
+        hwRadiusCachePacketThresholdCpAlarm NOTIFICATION-TYPE
+            OBJECTS {hwRadiusMaxCachePacketsCp,hwRadiusThresholdCp,hwRadiusInstanceIdCp}
+            STATUS current
+            DESCRIPTION
+                "
+This object indicates that the number of cached packets reaches the upper alarm threshold.
+                "
+            ::= { hwRadiusServerTraps 12 }
+       
+        hwRadiusCachePacketThresholdCpResume NOTIFICATION-TYPE
+            OBJECTS {hwRadiusMaxCachePacketsCp,hwRadiusThresholdCp,hwRadiusInstanceIdCp}
+            STATUS current
+            DESCRIPTION
+                "
+This object indicates that the number of cached packets falls below the lower alarm threshold.
+                "
+            ::= { hwRadiusServerTraps 13 }
             
  
     --  ============== conformance information ==============
@@ -2761,7 +2916,8 @@
                 hwRadiusServerIPv6Address,
                 hwRadiusServerSourceIPAddressEachServer,
                hwRadiusServerSourceIPv6AddressEachServer,
-               hwRadiusServerSourceLoopBackEachServer  
+               hwRadiusServerSourceLoopBackEachServer,
+               hwRadiusServerSourceVlanifEachServer
             }          
             STATUS current
             DESCRIPTION 

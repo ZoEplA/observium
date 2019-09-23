@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Observium
  *
@@ -7,11 +6,11 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$version = snmp_get($device, 'ceAssetSoftwareRevision.1', '-OQv', 'CISCO-ENTITY-ASSET-MIB');
-$hardware = snmp_get($device, 'entPhysicalDescr.1', '-OQv', 'ENTITY-MIB');
+$version = snmp_get_oid($device, 'ceAssetSoftwareRevision.1', 'CISCO-ENTITY-ASSET-MIB');
+$hardware = snmp_get_oid($device, 'entPhysicalDescr.1', 'ENTITY-MIB');
 
 // EOF

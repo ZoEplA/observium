@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -71,7 +71,7 @@ $oids_array = array(
 
 foreach ($oids_array as $graph => $oids)
 {
-  $graphs[$graph] = FALSE; // Set graph disabled by default
+  //$graphs[$graph] = FALSE; // Set graph disabled by default
 
   if (!isset($graphs_db[$graph]) || $graphs_db[$graph] === TRUE)
   {

@@ -1,21 +1,23 @@
 -- =====================================================================
--- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --      This MIB module is for the management of N_Port Virtualization or
 --      NPV within the framework of N_Port virtualization(NPV) architecture.
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --      V1.0 Initial version created by wangxu 2013-04-02
+--      V1.1 Added hh3cNPVLoadBalanceTable by liukui 2014-07-21
 -- =====================================================================
 HH3C-NPV-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE
-        FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, RowStatus, TimeStamp
-        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32                  FROM SNMPv2-SMI         -- [RFC2578]
+    RowStatus, TimeStamp,
+    TruthValue,
+    TEXTUAL-CONVENTION          FROM SNMPv2-TC          -- [RFC2578]
     ifIndex, InterfaceIndex
         FROM IF-MIB
     Hh3cFcVsanIndex
@@ -24,10 +26,10 @@ IMPORTS
         FROM HH3C-VSAN-MIB;
 
 hh3cNpv  MODULE-IDENTITY
-    LAST-UPDATED "201304020000Z"
-    ORGANIZATION "Hangzhou H3C Tech. Co., Ltd."
+    LAST-UPDATED "201407210000Z"
+    ORGANIZATION "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
@@ -37,11 +39,14 @@ hh3cNpv  MODULE-IDENTITY
          architecture.
 
          N_Port virtualization reduces the number of Fibre Channel
-         domain IDs in SANs(Storage Aera Network).  Switches operating
+         domain IDs in SANs(Storage Area Network).  Switches operating
          in the NPV mode do not join a fabric; rather, they pass traffic
          between NPV core switch links and end-devices, which eliminates
          the domain IDs for these edge switches.  NPV core switch is a
          fibre channel edge switch connected to one or more NPV devices."
+    REVISION       "201407210000Z"
+    DESCRIPTION
+        "Added hh3cNPVLoadBalanceTable."
     REVISION "201304020000Z"
     DESCRIPTION
         "Initial version of this MIB module."
@@ -70,14 +75,14 @@ hh3cNpvConfiguration          OBJECT IDENTIFIER
 hh3cNpvGlobalObjects          OBJECT IDENTIFIER
     ::= { hh3cNpvConfiguration 1 }
 
--- NPV Traffic Loadbalance
+-- NPV Traffic Load balance
 
 hh3cNpvLoadbalanceVsan OBJECT-TYPE
     SYNTAX          Hh3cFcVsanIndex
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "Used to trigger a load-banlancing in the specified VSAN (Virtual
+        "Used to trigger a load-balancing in the specified VSAN (Virtual
          Storage Area Network).
 
          When the hh3cNpvLoadbalanceVsan is set to a specific VSAN, a
@@ -130,7 +135,7 @@ hh3cNpvTrafficMapConfigEntry OBJECT-TYPE
         valid external interface.
 
         If an interface comes up as a server interface and it
-        can not find an entry in this table, then any of the
+        cannot find an entry in this table, then any of the
         available external interfaces can be assigned to that
         server interface.
 
@@ -233,5 +238,56 @@ hh3cNpvExternalIfIndex OBJECT-TYPE
         "This value of this object is the external interface assigned
         for the server interface associated with the server interface."
     ::= { hh3cNpvServerIfEntry 1 }
+
+-- NPV Auto Load Balance Configuration
+
+hh3cNpvLoadBalanceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cNpvLoadBalanceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "This table contains NPV load balancing parameters of each VSAN."
+    ::= { hh3cNpvConfiguration 4 }
+
+hh3cNpvLoadBalanceEntry  OBJECT-TYPE
+    SYNTAX          Hh3cNpvLoadBalanceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "An entry provides NPV load balancing parameters for a VSAN."
+    INDEX           {
+                        hh3cVsanIndex
+                    }
+    ::= { hh3cNpvLoadBalanceTable 1 }
+
+Hh3cNpvLoadBalanceEntry ::= SEQUENCE {
+       hh3cNpvAutoLoadBalanceEnable                 TruthValue,
+       hh3cNpvAutoLoadBalanceInterval               Unsigned32
+}
+
+hh3cNpvAutoLoadBalanceEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable or disable NPV auto load balance
+         on this VSAN to equalize server login distribution when server
+         logins are not evenly distributed across uplinks."
+    DEFVAL { false }
+    ::= { hh3cNpvLoadBalanceEntry 1 }
+
+hh3cNpvAutoLoadBalanceInterval OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..300)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+           "This object is used to start an auto load balance timer
+            on this VSAN when the failed uplink is up.  A NPV auto
+            load balance will be triggered when the timer expires.
+
+           If this object is not configured, the default value is 30."
+    DEFVAL { 30 }
+    ::= { hh3cNpvLoadBalanceEntry 2 }
 
 END

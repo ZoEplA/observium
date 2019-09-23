@@ -27,9 +27,9 @@ IMPORTS
 h3cVoCallHistory MODULE-IDENTITY
     LAST-UPDATED "200802170000Z"
     ORGANIZATION
-        "H3C Technologies Co., Ltd."
+        "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team H3C Technologies Co., Ltd.
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          Http://www.h3c.com
          Zip:100085"

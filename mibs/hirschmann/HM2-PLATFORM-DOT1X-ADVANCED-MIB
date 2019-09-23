@@ -14,7 +14,8 @@ IMPORTS
     MacAddress, DisplayString	        FROM SNMPv2-TC
     hm2PlatformMibs, HmTimeSeconds1970,
     HmEnabledStatus	
-    									FROM HM2-TC-MIB;
+    									FROM HM2-TC-MIB
+    SnmpAdminString                     FROM SNMP-FRAMEWORK-MIB;
 
 hm2PlatformDot1xAdvanced  MODULE-IDENTITY
 	LAST-UPDATED "201110180000Z" -- October 18, 2011
@@ -95,7 +96,56 @@ hm2AgentDot1xEnhancementConfigGroup OBJECT IDENTIFIER ::= { hm2PlatformDot1xAdva
 		DESCRIPTION 
 			"A table to clear the dot1x statistics per interface."
 		::= { hm2AgentDot1xEnhancementConfigGroup 249 }
-
+		
+	hm2AgentDot1xMABFormatGroupSize OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        group-size-1(1),
+                        group-size-2(2),
+                        group-size-4(4),
+                        group-size-12(12)  
+                        }  
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies the number of characters the MAC address will be splitted into and separated by the character specified by hm2AgentDot1xMABFormatGroupSeparator. For the value of 2, the separator - and the MAC address 001122334455 the username MAB will use to authenticate the client will be 00-11-22-33-44-55 ."
+        DEFVAL { group-size-12 }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 250}
+        
+    hm2AgentDot1xMABFormatGroupSeparator OBJECT-TYPE
+        SYNTAX          INTEGER {
+                        hyphen(1),
+                        colon(2),
+                        dot(3)  
+                        }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies which one of {- | : | .} characters separates the groups of characters of size defined by hm2AgentDot1xMABFormatGroupSize. "
+        DEFVAL { hyphen }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 251}
+      
+    hm2AgentDot1xMABFormatLetterCase OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        lower-case(1),
+                        upper-case(2)
+                            }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies how MAB formats the letters of the username and password. "
+        DEFVAL { upper-case }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 252}
+        
+    hm2AgentDot1xMABPassword OBJECT-TYPE
+        SYNTAX       SnmpAdminString(SIZE(0..64))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            " Specifies a global password for all MAB clients. 
+            If the password is an empty string then client's username is used as password. The password is displayed as an empty string or asterisks."
+        DEFVAL { "" }
+        ::= {  hm2AgentDot1xEnhancementConfigGroup 253}
+        
 	hm2AgentDot1xPortStatsClearEntry OBJECT-TYPE
 		SYNTAX      	Hm2AgentDot1xPortStatsClearEntry
 		MAX-ACCESS  	not-accessible

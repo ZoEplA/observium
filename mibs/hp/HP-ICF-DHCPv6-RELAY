@@ -33,7 +33,7 @@ hpicfDhcpv6Relay MODULE-IDENTITY
          manner.This MIB provides a means to configure and monitor
          DHCPv6 Relay feature on the Switch."
 
-    REVISION     "201402120000Z"     -- Feb 12, 2014 
+    REVISION     "201402120000Z"
     DESCRIPTION  "Added hpicfDhcpv6RelayOptions scalar group 
                   and added the following object,
                     hpicfDhcpv6RelayOption79Status.
@@ -42,7 +42,7 @@ hpicfDhcpv6Relay MODULE-IDENTITY
                     deprecated hpicfDhcpRelayConfigGroup and
                     hpicfDhcpRelayCompliance1."
 
-    REVISION     "201204240000Z"   -- April 24, 2012
+    REVISION     "201204240000Z"
     DESCRIPTION  "Added hpicfDhcpRelayGlobalStatistics scalar group 
                   and added the following statistical objects,
                     hpicfDhcpRelayPktsDropped,
@@ -69,7 +69,7 @@ hpicfDhcpv6Relay MODULE-IDENTITY
                     deprecated hpicfDhcpRelayStatsGroup and
                     hpicfDhcpRelayCompliance."
 
-    REVISION     "200804080605Z"   -- April 08, 2008
+    REVISION     "200804080605Z" 
     DESCRIPTION  "Initial Revision"
 
     ::= { hpSwitch 50 }

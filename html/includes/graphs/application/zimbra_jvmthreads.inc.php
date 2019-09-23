@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -49,7 +49,7 @@ if (is_file($rrd_filename))
     $rrd_list[$i]['colour'] = ($variables['colour'] ? $variables['colour'] : $config['graph_colours'][$colours][$i]);
     $i++;
   }
-} else { echo("file missing: $file");  }
+} else { echo("file missing: $rrd_filename");  }
 
 include($config['html_dir']."/includes/graphs/generic_multi_simplex_separated.inc.php");
 
@@ -71,7 +71,7 @@ if (is_file($rrd_filename))
     $rrd_list[$i]['colour'] = ($variables['colour'] ? $variables['colour'] : $config['graph_colours'][$colours][$i]);
     $i++;
   }
-} else { echo("file missing: $file"); }
+} else { echo("file missing: $rrd_filename"); }
 
 include($config['html_dir']."/includes/graphs/generic_multi_line.inc.php");
 

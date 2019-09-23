@@ -344,6 +344,14 @@ rlGroupMngDeviceLastSeen  OBJECT-TYPE
        this device. "
      ::=  { rlGroupMngDeviceEntry 10 }
 
+rlPrivateMIBroot OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the object identifier of the private MIB root in this device."
+    ::= { rndMng 12 }
+
 rlRunningCDBequalToStartupCDB OBJECT-TYPE
 
    SYNTAX     TruthValue

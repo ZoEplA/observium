@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -34,6 +34,9 @@ $navbar = array('brand' => "Performance", 'class' => "navbar-narrow");
 
 $navbar['options']['overview']['text']       = 'Overview';
 $navbar['options']['poller']['text']         = 'Poller Modules';
+$navbar['options']['memory']['text']         = 'Poller Memory';
+$navbar['options']['snmp']['text']           = 'Poller SNMP';
+$navbar['options']['db']['text']             = 'Poller DB';
 
 foreach ($navbar['options'] as $option => $array)
 {
@@ -47,12 +50,79 @@ unset($navbar);
 
 arsort($device['state']['poller_mod_perf']);
 
+if ($vars['view'] == 'db')
+{
+  echo generate_box_open();
+  echo '<table class="' .OBS_CLASS_TABLE_STRIPED_TWO.' table-hover"><tbody>' . PHP_EOL;
 
-if ($vars['view'] == 'poller')
+  foreach (array('device_pollerdb_count' => 'MySQL Operations',
+                 'device_pollerdb_times' => 'MySQL Times') as $graphtype => $name)
+  {
+
+    echo '<tr><td><h3>'.$name.'</h3></td></tr>';
+    echo '<tr><td>';
+
+    $graph = array('type'   => $graphtype,
+                   'device' => $device['device_id']);
+
+    print_graph_row($graph);
+
+    echo '</td></tr>';
+
+  }
+
+  echo '</tbody></table>';
+  echo generate_box_close();
+}
+else if ($vars['view'] == 'snmp')
+{
+  echo generate_box_open();
+  echo '<table class="' .OBS_CLASS_TABLE_STRIPED_TWO.' table-hover"><tbody>' . PHP_EOL;
+
+  foreach (array('device_pollersnmp_count' => 'SNMP Requests',
+                 'device_pollersnmp_times' => 'SNMP Times',
+                 'device_pollersnmp_errors_count' => 'SNMP Errors',
+                 'device_pollersnmp_errors_times' => 'SNMP Errors Times') as $graphtype => $name)
+  {
+
+    echo '<tr><td><h3>'.$name.'</h3></td></tr>';
+    echo '<tr><td>';
+
+    $graph = array('type'   => $graphtype,
+                   'device' => $device['device_id']);
+
+    print_graph_row($graph);
+
+    echo '</td></tr>';
+
+  }
+
+  echo '</tbody></table>';
+  echo generate_box_close();
+}
+else if ($vars['view'] == 'memory')
+{
+  echo generate_box_open();
+  echo '<table class="' .OBS_CLASS_TABLE_STRIPED_TWO.' table-hover"><tbody>' . PHP_EOL;
+
+  echo '<tr><td><h3>Memory usage</h3></td></tr>';
+  echo '<tr><td>';
+
+  $graph = array('type'   => 'device_pollermemory_perf',
+                 'device' => $device['device_id']);
+
+  print_graph_row($graph);
+
+  echo '</td></tr>';
+
+  echo '</tbody></table>';
+  echo generate_box_close();
+}
+else if ($vars['view'] == 'poller')
 {
 
   echo generate_box_open();
-  echo '<table class="' .OBS_CLASS_TABLE_STRIPED_TWO.' table-hover">' . PHP_EOL;
+  echo '<table class="' .OBS_CLASS_TABLE_STRIPED_TWO.' table-hover"><tbody>' . PHP_EOL;
 
   foreach ($device['state']['poller_mod_perf'] as $module => $time)
   {

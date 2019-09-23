@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -68,7 +68,7 @@ foreach ($oids as $index => $entry)
     // 32768 = No sensor connected
     if ($value != 32768 && $value != '')
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, "isDeviceMonitorTemperature.$index", 'ispro-mib', $descr, 0.01, $value, $options);
+      discover_sensor('temperature', $device, $oid, "isDeviceMonitorTemperature.$index", 'ispro-mib', $descr, 0.01, $value, $options);
     }
 
     $oid     = ".1.3.6.1.4.1.19011.1.3.2.1.3.1.1.1.4.$index";
@@ -79,7 +79,7 @@ foreach ($oids as $index => $entry)
     // unknown = No sensor connected
     if ($value != 'unknown' && $value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, "isDeviceMonitorTemperatureAlarm.$index", 'ispro-mib-threshold-state', $descr, 1, $value);
+      discover_status($device, $oid, "isDeviceMonitorTemperatureAlarm.$index", 'ispro-mib-threshold-state', $descr,  $value);
     }
 
     // Humidity
@@ -116,7 +116,7 @@ foreach ($oids as $index => $entry)
     // 32768 = No sensor connected
     if ($value != 32768 && $value != '')
     {
-      discover_sensor($valid['sensor'], 'humidity', $device, $oid, "isDeviceMonitorHumidity.$index", 'ispro-mib', $descr, 0.01, $value, $options);
+      discover_sensor('humidity', $device, $oid, "isDeviceMonitorHumidity.$index", 'ispro-mib', $descr, 0.01, $value, $options);
     }
 
     $oid     = ".1.3.6.1.4.1.19011.1.3.2.1.3.1.2.1.4.$index";
@@ -127,7 +127,7 @@ foreach ($oids as $index => $entry)
     // unknown = No sensor connected
     if ($value != 'unknown' && $value != '')
     {
-      discover_sensor($valid['sensor'], 'state', $device, $oid, "isDeviceMonitorHumidityAlarm.$index", 'ispro-mib-threshold-state', $descr, 1, $value);
+      discover_status($device, $oid, "isDeviceMonitorHumidityAlarm.$index", 'ispro-mib-threshold-state', $descr,  $value);
     }
   }
 }
@@ -152,7 +152,7 @@ foreach ($oids as $index => $entry)
 
   if ($entry['isDeviceConfigDigitalInState'] != 'disabled' && $value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "isDeviceMonitorDigitalInAlarm.$index", 'ispro-mib-trigger-state', $descr, 1, $value);
+    discover_status($device, $oid, "isDeviceMonitorDigitalInAlarm.$index", 'ispro-mib-trigger-state', $descr,  $value);
   }
 }
 

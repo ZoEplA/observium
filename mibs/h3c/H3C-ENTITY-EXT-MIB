@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: description of entity extend properties.
 -- Reference:
--- History V2.8
+-- History V3.2
 -- V1.0 Created by weixinzhe, Thursday, April 22, 2004 at 18:26:02
 -- V1.1 modified by yelinhui, add h3cEntityExtMacAddress
 -- V1.2 modified by panxidong, add h3cEntityExtErrorStatus
@@ -62,9 +62,23 @@
 --      from Integer32 to Unsigned32 by songhao 02718.
 -- V2.8 2011-08-30
 --      Added h3cEntityExtCpuUsageRecoverThreshold;
---      Added h3cEntityExtCpuUsageRecoverThreshold to h3cEntityExtCpuUsageThresholdNotfication and 
+--      Added h3cEntityExtCpuUsageRecoverThreshold to h3cEntityExtCpuUsageThresholdNotfication and
 --      h3cEntityExtCpuUsageThresholdRecover by shuaixiaojuan 04117.
 --      Added h3cEntityExtFirstTrapTime by duyanbing 04404.
+-- V2.9 2013-04-27
+--      Added h3cEntityExtMemSizeRev by fangliwen 08502.
+--      Added trap nodes h3cEntityExtMemUsageThresholdOverTrap and
+--      h3cEntityExtMemUsageThresholdRecoverTrap by fangliwen 08502.
+-- V3.0 2013-12-16
+--      Added h3cEntityExtCpuUsageIn1Minute and h3cEntityExtCpuUsageIn5Minutes
+--      by fangliwen 08502.
+-- V3.1 2014-01-24
+--      Added h3cEntityExtVoltageObjects by fangliwen 08502.
+--      Added trap nodes h3cEntityExtVoltageNormal, h3cEntityExtVoltageTooLow,
+--      h3cEntityExtVoltageLower, h3cEntityExtVoltageHigher and
+--      h3cEntityExtVoltageTooHigh by fangliwen 08502.
+-- V3.2 2015-01-12
+--      Added trap nodes h3cEntityExtSFPAlarmOnEx, h3cEntityExtSFPAlarmOffEx by fangliwen 08502.
 -- =================================================================
 H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
 
@@ -81,10 +95,12 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         SnmpAdminString
             FROM SNMP-FRAMEWORK-MIB
         entPhysicalIndex, entPhysicalName, entPhysicalDescr
-            FROM ENTITY-MIB;
+            FROM ENTITY-MIB
+        CounterBasedGauge64
+            FROM HCNUM-TC;
 
     h3cEntityExtend MODULE-IDENTITY
-        LAST-UPDATED "201111260000Z"
+        LAST-UPDATED "201501120000Z"
         ORGANIZATION
             "Hangzhou H3C Technologies Co., Ltd."
         CONTACT-INFO
@@ -293,6 +309,12 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         h3cEntityExtShutdownLowerTemperatureThreshold
             Integer32,
         h3cEntityExtCpuUsageRecoverThreshold
+            Integer32,
+        h3cEntityExtMemSizeRev
+            CounterBasedGauge64,
+        h3cEntityExtCpuUsageIn1Minute
+            Integer32,
+        h3cEntityExtCpuUsageIn5Minutes
             Integer32
      }
 
@@ -346,9 +368,9 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The CPU usage for this entity. Generally, the CPU usage
-            will calculate the overall CPU usage on the entity, and it
-            is not sensible with the number of CPU on the entity."
+            "The CPU usage for this entity. Generally, the overall
+            CPU usage on the entity is calculated, independent of
+            the number of CPUs on the entity."
         ::= { h3cEntityExtStateEntry 6 }
 
     h3cEntityExtCpuUsageThreshold OBJECT-TYPE
@@ -384,7 +406,10 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The size of memory for the entity."
+            "The size of memory for the entity.
+
+            If the amount of memory exceeds 4,294,967,295 bytes,
+            the value remains 4,294,967,295 bytes."
         ::= { h3cEntityExtStateEntry 10 }
 
     h3cEntityExtUpTime OBJECT-TYPE
@@ -489,7 +514,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             board/Subcard. It may have one of these values.
             The following four values  can be used for all kinds of entities.
 
-            notSupported(1) means this entity can not support this function.
+            notSupported(1) means this entity cannot support this function.
             normal(2) means the statement of this entity is normal. for ports,
             it doesn't differentiate 10M/s, 100M/s, 1000M/s, duplex and
             half-duplex. For fan, power supply and board-Subcard, it means
@@ -498,7 +523,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             entityAbsent(4) means the entity is absent now.
 
 
-            The following values is depended on the entity .
+            The following values is depended on the entity.
 
             For Port entities, it may have the following  values. If its POST
             is failure,
@@ -512,7 +537,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             For stack port, if it connects to another stack port normally, and
             these two units merge into one stack, then the value of this
             instance will be normal(2).
-            If something wrong occurs and the unit can not merge into stack,
+            If something wrong occurs and the unit cannot merge into stack,
             the value of this instance will be stackPortFailed(23).  If the
             stack port forms resilient daisy chain with another stack port
             on the other unit, the value of this instance will be
@@ -641,11 +666,43 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "The recover threshold for the CPU usage.  When the CPU usage falls down to
-            the threshold, a notification is sent.  The h3cEntityExtCpuUsageRecoverThreshold 
+            the threshold, a notification is sent.  The h3cEntityExtCpuUsageRecoverThreshold
             must be less than or equal to the h3cEntityExtCpuUsageThreshold."
         DEFVAL      { 100 }
         ::= { h3cEntityExtStateEntry 31 }
 
+    h3cEntityExtMemSizeRev OBJECT-TYPE
+        SYNTAX CounterBasedGauge64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Size of memory space for the entity.
+
+            This node is used to replace h3cEntityExtMemSize."
+        ::= { h3cEntityExtStateEntry 32 }
+
+    h3cEntityExtCpuUsageIn1Minute OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The CPU usage in last one minute for this entity.
+            Generally, the overall CPU usage on the entity is
+            calculated, independent of the number of CPUs on
+            the entity."
+        ::= { h3cEntityExtStateEntry 33 }
+
+    h3cEntityExtCpuUsageIn5Minutes OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The CPU usage in last five minutes for this entity.
+            Generally, the overall CPU usage on the entity is
+            calculated, independent of the number of CPUs on
+            the entity."
+        ::= { h3cEntityExtStateEntry 34 }
 
     h3cEntityExtManu OBJECT IDENTIFIER ::= { h3cEntityExtObjects 2 }
 
@@ -702,7 +759,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             into the SCB directly; for middle level or high level frame-device,
             the manufacture serial number is the device-numbers of SCB and
             Service Board, because the SCB, Service Board and chassis are
-            separate to sale and the device-number of chassis can not be
+            separate to sale and the device-number of chassis cannot be
             written into board."
         ::= { h3cEntityExtManuEntry 2 }
 
@@ -872,6 +929,120 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             the processor to be over a 5 minute period.  The ratio is calculated
             by the overall CPU usage caused by the process."
     ::= { h3cProcessEntry 3 }
+
+    h3cEntityExtVoltageObjects OBJECT IDENTIFIER ::= { h3cEntityExtObjects 5 }
+
+    h3cEntityExtVoltageTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF H3cEntityExtVoltageEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table describes the voltage information of the voltage sensor
+            entities on the device."
+        ::= { h3cEntityExtVoltageObjects 1 }
+
+    h3cEntityExtVoltageEntry OBJECT-TYPE
+        SYNTAX H3cEntityExtVoltageEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The voltage information of the voltage sensor entity."
+        INDEX { h3cEntityExtPhysicalIndex }
+        ::= { h3cEntityExtVoltageTable 1 }
+
+    H3cEntityExtVoltageEntry ::= SEQUENCE {
+        h3cEntityExtCurrentVoltage
+            Integer32,
+        h3cEntityExtNominalVoltage
+            Integer32,
+        h3cEntityExtVoltageState
+            INTEGER,
+        h3cEntityExtVoltageMajorLowThreshold
+            Integer32,
+        h3cEntityExtVoltageFatalLowThreshold
+            Integer32,
+        h3cEntityExtVoltageMajorHighThreshold
+            Integer32,
+        h3cEntityExtVoltageFatalHighThreshold
+            Integer32
+     }
+
+    h3cEntityExtCurrentVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The current voltage in millivolts of the voltage
+            sensor entity."
+    ::= { h3cEntityExtVoltageEntry 1 }
+
+    h3cEntityExtNominalVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The nominal voltage in millivolts of the voltage
+            sensor entity."
+    ::= { h3cEntityExtVoltageEntry 2 }
+
+    h3cEntityExtVoltageState OBJECT-TYPE
+        SYNTAX          INTEGER
+        {
+             normal   (0),
+             low      (1),
+             tooLow  (2),
+             high     (3),
+             tooHigh (4)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The voltage state of the voltage sensor entity."
+    ::= { h3cEntityExtVoltageEntry 3 }
+
+    h3cEntityExtVoltageMajorLowThreshold OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The low threshold for the voltage sensor entity.
+
+            When the voltage is lower than the threshold, a notification
+            will be sent."
+    ::= { h3cEntityExtVoltageEntry 4 }
+
+    h3cEntityExtVoltageFatalLowThreshold OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The fatal low voltage threshold for the voltage sensor entity.
+
+            When the voltage is lower than the threshold, a notification
+            will be sent."
+    ::= { h3cEntityExtVoltageEntry 5 }
+
+    h3cEntityExtVoltageMajorHighThreshold OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The high threshold for the voltage sensor entity.
+
+            When the voltage is higher than the threshold, a notification
+            will be sent."
+    ::= { h3cEntityExtVoltageEntry 6 }
+
+    h3cEntityExtVoltageFatalHighThreshold OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The fatal high threshold for the voltage sensor entity.
+
+            When the voltage is higher than the threshold, a notification
+            will be sent."
+    ::= { h3cEntityExtVoltageEntry 7 }
 
 -- End
 
@@ -1048,7 +1219,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         OBJECTS { entPhysicalDescr, h3cEntityExtAdminStatus, h3cEntityExtOperStatus }
         STATUS current
         DESCRIPTION
-            "The trap is generated when a removeable entity inserting to
+            "The trap is generated when a removable entity inserting to
             device."
         ::= { h3cEntityExtTrapsPrefix 12 }
 
@@ -1056,7 +1227,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         OBJECTS { entPhysicalDescr, h3cEntityExtAdminStatus, h3cEntityExtOperStatus }
         STATUS current
         DESCRIPTION
-            "The trap is generated when a removeable entity removing from
+            "The trap is generated when a removable entity removing from
             device."
         ::= { h3cEntityExtTrapsPrefix 13 }
 
@@ -1094,7 +1265,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             }
         STATUS current
         DESCRIPTION
-            "The trap indicates a fault occures on the specified entity."
+            "The trap indicates a fault occurs on the specified entity."
         ::= { h3cEntityExtTrapsPrefix 16 }
 
     h3cEntityExtFaultAlarmOff NOTIFICATION-TYPE
@@ -1339,6 +1510,137 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             has been found."
         ::= { h3cEntityExtTrapsPrefix 34 }
 
+    h3cEntityExtMemUsageThresholdOverTrap NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtMemUsage,
+            h3cEntityExtMemUsageThreshold,
+            h3cEntityExtMemSizeRev,
+            h3cEntityExtAdminStatus,
+            h3cEntityExtAlarmLight
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the memory usage of the entity is
+            overloaded.
+
+            This trap is used to replace
+            h3cEntityExtMemUsageThresholdNotification."
+        ::= { h3cEntityExtTrapsPrefix 35 }
+
+    h3cEntityExtMemUsageThresholdRecoverTrap NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtMemUsage,
+            h3cEntityExtMemUsageThreshold,
+            h3cEntityExtMemSizeRev,
+            h3cEntityExtAdminStatus,
+            h3cEntityExtAlarmLight
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the memory usage decreased below
+            the threshold.
+
+            This trap is used to replace
+            h3cEntityExtMemUsageThresholdRecover."
+        ::= { h3cEntityExtTrapsPrefix 36 }
+
+    h3cEntityExtVoltageNormal NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtCurrentVoltage,
+            h3cEntityExtNominalVoltage,
+            h3cEntityExtVoltageMajorLowThreshold,
+            h3cEntityExtVoltageMajorHighThreshold
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the voltage recovers to normal."
+        ::= { h3cEntityExtTrapsPrefix 37 }
+
+    h3cEntityExtVoltageLower NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtCurrentVoltage,
+            h3cEntityExtNominalVoltage,
+            h3cEntityExtVoltageMajorLowThreshold
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the voltage is lower than the
+            low threshold."
+        ::= { h3cEntityExtTrapsPrefix 38 }
+
+    h3cEntityExtVoltageTooLow NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtCurrentVoltage,
+            h3cEntityExtNominalVoltage,
+            h3cEntityExtVoltageFatalLowThreshold
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the voltage is lower than the
+            fatal low threshold."
+        ::= { h3cEntityExtTrapsPrefix 39 }
+
+    h3cEntityExtVoltageHigher NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtCurrentVoltage,
+            h3cEntityExtNominalVoltage,
+            h3cEntityExtVoltageMajorHighThreshold
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the voltage is higher than the
+            high threshold."
+        ::= { h3cEntityExtTrapsPrefix 40 }
+
+    h3cEntityExtVoltageTooHigh NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            h3cEntityExtCurrentVoltage,
+            h3cEntityExtNominalVoltage,
+            h3cEntityExtVoltageFatalHighThreshold
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap indicates that the voltage is higher than the
+            fatal high threshold."
+        ::= { h3cEntityExtTrapsPrefix 41 }
+
+    h3cEntityExtSFPAlarmOnEx NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            h3cEntityExtAdminStatus,
+            h3cEntityExtAlarmLight,
+            h3cEntityExtErrorStatus
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when the SFP module fails
+            or runs abnormally for some particular reason.
+            This trap is used to replace h3cEntityExtSFPAlarmOn."
+        ::= { h3cEntityExtTrapsPrefix 42 }
+
+    h3cEntityExtSFPAlarmOffEx NOTIFICATION-TYPE
+        OBJECTS {
+            h3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            h3cEntityExtAdminStatus,
+            h3cEntityExtAlarmLight,
+            h3cEntityExtErrorStatus
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when the SFP module is restored to
+            normal status.
+            This trap is used to replace h3cEntityExtSFPAlarmOff."
+        ::= { h3cEntityExtTrapsPrefix 43 }
+
     h3cEntityExtTrapDescription OBJECT-TYPE
         SYNTAX      SnmpAdminString (SIZE (0..255))
         MAX-ACCESS  accessible-for-notify
@@ -1372,7 +1674,7 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION
             "The days when the transceiver module is still valid,
-            but after those days, it will be invaldated."
+            but after those days, it will be invalidated."
         ::= { h3cEntityExtTrapsInfor 3 }
 
     h3cEntityExtFirstTrapTime OBJECT-TYPE
@@ -1456,7 +1758,10 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             h3cEntityExtMemType,
             h3cEntityExtCriticalLowerTemperatureThreshold,
             h3cEntityExtShutdownLowerTemperatureThreshold,
-            h3cEntityExtCpuUsageRecoverThreshold
+            h3cEntityExtCpuUsageRecoverThreshold,
+            h3cEntityExtMemSizeRev,
+            h3cEntityExtCpuUsageIn1Minute,
+            h3cEntityExtCpuUsageIn5Minutes
             }
         STATUS current
         DESCRIPTION
@@ -1497,7 +1802,16 @@ H3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
                 h3cEntityExtFanDirectionNotPreferred,
                 h3cEntityExtFanDirectionNotAccord,
                 h3cEntityExtSFPInvalid,
-                h3cEntityExtSFPInvalidNow
+                h3cEntityExtSFPInvalidNow,
+                h3cEntityExtMemUsageThresholdOverTrap,
+                h3cEntityExtMemUsageThresholdRecoverTrap,
+                h3cEntityExtVoltageNormal,
+                h3cEntityExtVoltageTooLow,
+                h3cEntityExtVoltageLower,
+                h3cEntityExtVoltageHigher,
+                h3cEntityExtVoltageTooHigh,
+                h3cEntityExtSFPAlarmOnEx,
+                h3cEntityExtSFPAlarmOffEx
                 }
         STATUS current
         DESCRIPTION

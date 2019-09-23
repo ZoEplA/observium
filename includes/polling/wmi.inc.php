@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -48,12 +48,12 @@ if ($device['os'] == "windows")
     );
   }
 
-// Computer Name - This is set for WMI classes that need a non-FQDN hostname
+  // Computer Name - This is set for WMI classes that need a non-FQDN hostname
 
   $wql = "SELECT Name FROM Win32_ComputerSystem";
   $wmi['computer_name'] = wmi_parse(wmi_query($wql, $override), TRUE, "Name");
 
-// Operating System - Updates device info to exact OS version installed
+  // Operating System - Updates device info to exact OS version installed
 
   if ($wmi_attribs['wmi_poll_os'])
   {
@@ -66,7 +66,7 @@ if ($device['os'] == "windows")
     }
   }
 
-// Processors - Fixes "Unknown Processor Type" and "Intel" values
+  // Processors - Fixes "Unknown Processor Type" and "Intel" values
 
   if ($wmi_attribs['wmi_poll_processors'])
   {

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -23,8 +23,8 @@ if ($width > "500")
 {
   $descr_len=18;
 } else {
-  $descr_len=8;
-  $descr_len += round(($width - 215) / 9.5);
+  $descr_len=4;
+  $descr_len += round(($width - 215) / 10);
 }
 
 $unit_text = "bps";
@@ -37,7 +37,7 @@ if (!$noheader)
     if (!$nototal) { $rrd_options .= " COMMENT:'Total      '"; }
     $rrd_options .= " COMMENT:'\l'";
   } else {
-    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."     Now       Avg       Max\l'";
+    $rrd_options .= " COMMENT:'".substr(str_pad($unit_text, $descr_len+5),0,$descr_len+5)."     Now         Avg         Max\l'";
   }
 }
 
@@ -70,8 +70,8 @@ foreach ($rrd_list as $rrd)
   $rrd_options .= " CDEF:outB".$i."_neg=outB".$i.",-1,*";
   $rrd_options .= " CDEF:octets".$i."=inB".$i.",outB".$i.",+";
 
-  $rrd_multi['in_thing'][]  = $in.$i  . ",UN,0," . $in.$i  . ",IF";
-  $rrd_multi['out_thing'][] = $out.$i . ",UN,0," . $out.$i . ",IF";
+  $rrd_multi['in_thing'][]  = $in.$i;
+  $rrd_multi['out_thing'][] = $out.$i;
 
   $rrd_options .= " VDEF:totin".$i."=inB".$i.",TOTAL";
   $rrd_options .= " VDEF:totout".$i."=outB".$i.",TOTAL";
@@ -91,7 +91,7 @@ foreach ($rrd_list as $rrd)
 
   if (!$nototal && $width > "500") { $rrd_options .= " GPRINT:totin".$i.":%6.2lf%s$total_units"; }
 
-  $rrd_options .= " 'COMMENT:\\n'";
+  $rrd_options .= " COMMENT:'\\l'";
 
   if ($vars['line_graph'])
   {
@@ -110,11 +110,9 @@ foreach ($rrd_list as $rrd)
   $i++; $iter++;
 }
 
-$in_thing  = implode(',', $rrd_multi['in_thing']);
-$out_thing = implode(',', $rrd_multi['out_thing']);
-$pluses    = str_repeat(',+', count($rrd_multi['in_thing']) - 1);
-$rrd_options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
-$rrd_options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
+$rrd_options .= " CDEF:".$in."octets=" . rrd_aggregate_dses($rrd_multi['in_thing']);
+$rrd_options .= " CDEF:".$out."octets=" . rrd_aggregate_dses($rrd_multi['out_thing']);
+
 $rrd_options .= " CDEF:doutoctets=outoctets,-1,*";
 $rrd_options .= " CDEF:inbits=inoctets,8,*";
 $rrd_options .= " CDEF:outbits=outoctets,8,*";

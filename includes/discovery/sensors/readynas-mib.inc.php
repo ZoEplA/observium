@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -43,7 +43,7 @@ foreach ($cache['readynas-mib']['diskTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'diskTemperature.'.$index, 'readynas-mib_diskTemperature', $descr, 1, $value, array('entPhysicalClass' => 'storage'));
+    discover_sensor_ng($device, 'temperature', $mib, 'diskTemperature', $oid, 'diskTemperature.'.$index, 'readynas-mib_diskTemperature', $descr, 1, $value, array('entPhysicalClass' => 'storage'));
   }
 
   $oid   = ".1.3.6.1.4.1.4526.18.3.1.4.$index";
@@ -51,7 +51,7 @@ foreach ($cache['readynas-mib']['diskTable'] as $index => $entry)
 
   if ($value != '')
   {
-    //discover_sensor($valid['sensor'], 'state', $device, $oid, 'diskState.'.$index, 'readynas-mib_diskState', $descr, NULL, $value, array('entPhysicalClass' => 'storage'));
+    //discover_status($device, $oid, 'diskState.'.$index, 'readynas-mib_diskState', $descr, $value, array('entPhysicalClass' => 'storage'));
   }
 }
 
@@ -71,7 +71,7 @@ foreach ($cache['readynas-mib']['fanTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, 'fanRPM.'.$index, 'readynas-mib_fanRPM', $descr, 1, $value, array('entPhysicalClass' => 'device'));
+    discover_sensor_ng($device, 'fanspeed', $mib, 'fanRPM', $oid, 'fanRPM.'.$index, 'readynas-mib_fanRPM', $descr, 1, $value, array('entPhysicalClass' => 'device'));
   }
 
   $oid   = ".1.3.6.1.4.1.4526.22.4.1.3.$index";
@@ -79,7 +79,7 @@ foreach ($cache['readynas-mib']['fanTable'] as $index => $entry)
 
   if ($value != '')
   {
-    //discover_sensor($valid['sensor'], 'state', $device, $oid, 'fanStatus.'.$index, 'readynas-mib_fanStatus', $descr, NULL, $value, array('entPhysicalClass' => 'storage'));
+    //discover_status($device, $oid, 'fanStatus.'.$index, 'readynas-mib_fanStatus', $descr, $value, array('entPhysicalClass' => 'storage'));
   }
 
 }
@@ -100,7 +100,7 @@ foreach ($cache['readynas-mib']['temperatureTable'] as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'temperatureValue.'.$index, 'readynas-mib_temperatureValue', $descr, 1, $value, array('entPhysicalClass' => 'device'));
+    discover_sensor_ng($device,'temperature', $mib, 'temperatureValue', $oid, 'temperatureValue.'.$index, 'readynas-mib_temperatureValue', $descr, 1, $value, array('entPhysicalClass' => 'device'));
   }
 
   $oid   = ".1.3.6.1.4.1.4526.22.5.1.3.$index";
@@ -108,7 +108,7 @@ foreach ($cache['readynas-mib']['temperatureTable'] as $index => $entry)
 
   if ($value != '')
   {
-    //discover_sensor($valid['sensor'], 'state', $device, $oid, 'fanStatus.'.$index, 'readynas-mib_fanStatus', $descr, NULL, $value, array('entPhysicalClass' => 'storage'));
+    //discover_status($device, $oid, 'fanStatus.'.$index, 'readynas-mib_fanStatus', $descr, $value, array('entPhysicalClass' => 'storage'));
   }
 
 }

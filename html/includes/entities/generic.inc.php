@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     functions
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -116,6 +116,7 @@ function generate_entity_popup_header($entity, $vars)
 
   $vars['popup']       = TRUE;
   $vars['entity_icon'] = TRUE;
+  $contents = '';
 
   switch($vars['entity_type'])
   {
@@ -130,10 +131,12 @@ function generate_entity_popup_header($entity, $vars)
       break;
 
     case "toner":
+    case "printersupply":
+    case "supply":
 
       $contents .= generate_box_open();
       $contents .= '<table class="'. OBS_CLASS_TABLE .'">';
-      $contents .= generate_toner_row($entity, $vars);
+      $contents .= generate_printersupplies_row($entity, $vars);
       $contents .= '</table>';
       $contents .= generate_box_close();
 
@@ -220,6 +223,16 @@ function generate_entity_popup_header($entity, $vars)
 
       break;
 
+    case "counter":
+
+      $contents .= generate_box_open();
+      $contents .= '<table class="'. OBS_CLASS_TABLE .'">';
+      $contents .= generate_counter_row($entity, $vars);
+      $contents .= '</table>';
+      $contents .= generate_box_close();
+
+      break;
+
     case "storage":
 
       $contents .= generate_box_open();
@@ -279,7 +292,7 @@ function generate_entity_popup_header($entity, $vars)
 
 function generate_entity_popup($entity, $vars)
 {
-  if (is_numeric($entity)) { $entity = get_entity_by_id_cache($entity, $vars['entity_type']); }
+  if (is_numeric($entity)) { $entity = get_entity_by_id_cache($vars['entity_type'], $entity); }
   $device = device_by_id_cache($entity['device_id']);
 
   $content  = generate_device_popup_header($device);
@@ -287,6 +300,147 @@ function generate_entity_popup($entity, $vars)
   $content .= generate_entity_popup_graphs($entity, $vars);
 
   return $content;
+}
+
+function generate_entity_popup_multi($entities, $vars)
+{
+  // Note here limited only to one entity_type and one device_id
+
+  $count = count($entities);
+  // First element
+  $entity = array_shift($entities);
+  if (is_numeric($entity))
+  {
+    $entity = get_entity_by_id_cache($vars['entity_type'], $entity);
+  }
+  $device = device_by_id_cache($entity['device_id']);
+
+  $header   = generate_entity_popup_header($entity, $vars);
+  if ($count > 1)
+  {
+    // Multiple entities graph
+    /// FIXME. Need add multi-graphs
+    $graphs   = generate_entity_popup_graphs($entity, $vars);// This is incorrect, only first graph
+  } else {
+    // Single entity graph
+    $graphs   = generate_entity_popup_graphs($entity, $vars);
+  }
+
+  // All other elements
+  foreach ($entities as $entity)
+  {
+    if (is_numeric($entity))
+    {
+      $entity = get_entity_by_id_cache($vars['entity_type'], $entity);
+    }
+    if ($entity['device_id'] != $device['device_id'])
+    {
+      // Skip if passed entity from different device
+      continue;
+    }
+
+    $header .= generate_entity_popup_header($entity, $vars);
+    //$graphs .= generate_entity_popup_graphs($entity, $vars); // Currently disabled, need multi graph
+  }
+
+  $content  = generate_device_popup_header($device);
+  $content .= $header;
+  $content .= $graphs;
+
+  return $content;
+}
+
+// Measured specific functions
+
+function build_entity_measured_where($entity_type, $vars)
+{
+  $entity_array = entity_type_translate_array($entity_type);
+
+  $column_measured_id   = $entity_array['table_fields']['measured_id'];
+  $column_measured_type = $entity_array['table_fields']['measured_type'];
+  $measure_array = [];
+
+  // Build query
+  foreach($vars as $var => $value)
+  {
+    if (!is_array($value)) { $value = explode(',', $value); }
+
+    switch ($var)
+    {
+      case 'measured_group':
+        foreach (dbFetchColumn('SELECT DISTINCT `'.$column_measured_type.'` FROM `'.$entity_array['table'].'` WHERE `'.$entity_array['table_fields']['deleted'].'` = ?', [0]) as $measured_type)
+        {
+          if (!$measured_type) { continue; }
+
+          $entities = get_group_entities($value, $measured_type);
+          $measure_sql = '';
+
+          switch ($measured_type)
+          {
+            case 'port':
+            case 'printersupply':
+              $measure_sql  = generate_query_values($measured_type, $column_measured_type, NULL, FALSE);
+              $measure_sql .= generate_query_values($entities,      $column_measured_id);
+              break;
+          }
+          if ($measure_sql) { $measure_array[] = $measure_sql; }
+        }
+        break;
+      case 'measured_state':
+        // UP / DOWN / STUTDOWN / NONE states
+        //$value = (array)$value;
+        // Select all without measured entities
+        if (in_array('none', $value))
+        {
+          $measure_array[] = generate_query_values(1, $column_measured_id, 'NULL', FALSE);
+          $value = array_diff($value, ['none']);
+        }
+        if (count($value))
+        {
+          // Limit statuses with measured entities
+          foreach (dbFetchColumn('SELECT DISTINCT `'.$column_measured_type.'` FROM `'.$entity_array['table'].'` WHERE `'.$entity_array['table_fields']['deleted'].'` = ?', [0]) as $measured_type)
+          {
+            if (!$measured_type) { continue; }
+
+            $measure_sql = '';
+            $measure_entities = dbFetchColumn('SELECT DISTINCT `'.$column_measured_id.'` FROM `'.$entity_array['table'].'` WHERE `'.$column_measured_type.'` = ? AND `'.$entity_array['table_fields']['deleted'].'` = ?', [$measured_type, 0]);
+            switch ($measured_type)
+            {
+              case 'port':
+                $where_array = build_ports_where_array(['port_id' => $measure_entities, 'state' => $value]);
+
+                $entity_sql  = 'SELECT `port_id` FROM `ports` WHERE 1 ';
+                $entity_sql .= implode('', $where_array);
+                $entities = dbFetchColumn($entity_sql);
+                //$entities = dbFetchColumn($entity_sql, NULL, TRUE);
+                //r($entities);
+                $measure_sql  = generate_query_values($measured_type, $column_measured_type, NULL, FALSE);
+                $measure_sql .= generate_query_values($entities,      $column_measured_id);
+                break;
+              case 'printersupply':
+                break;
+            }
+            if ($measure_sql) { $measure_array[] = $measure_sql; }
+
+          }
+        }
+        break;
+    }
+  }
+
+  switch (count($measure_array))
+  {
+    case 0:
+      $sql = '';
+      break;
+    case 1:
+      $sql = ' AND ' . $measure_array[0];
+      break;
+    default:
+      $sql = ' AND (('.implode(') OR (', $measure_array).'))';
+  }
+
+  return $sql;
 }
 
 // EOF

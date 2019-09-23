@@ -1,9 +1,9 @@
 -- =============================================================
--- Copyright (c) 2004-2014 by H3C Technologies. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V1.4
+-- Version: V1.6
 -- History:
 --   V1.0 2009-04-30 Initial Version by jinyi
 --   V1.1 2009-12-30 Added hh3cAccessMediaChanged by jinyi
@@ -24,6 +24,11 @@
 --   V1.4 2013-08-13 Added hh3cLteCurrentRssi,hh3cLteRssiMediumThreshold and
 --                   hh3cLteRssiWeakThreshold in Hh3cLteInfoEntry.
 --                   Added lte(5) in hh3c3GCurrentService by zuowenzhong.
+--   V1.5 2014-09-04 Added hh3c3GCdma1xRttBID, hh3c3GCdma1xRttSID and
+--                   hh3c3GCdma1xRttNID in hh3c3GCdma1xRttTable.
+--                   Added hh3c3GCdmaEvDoSubNetID in hh3c3GCdmaEvDoTable by lijuan.
+--   V1.6 2015-12-01 Modified description and added lte(5) in
+--                   hh3cWirelessCardModemMode by maqianli.
 -- =============================================================
 HH3C-3GMODEM-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -40,17 +45,23 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
 hh3c3GModem MODULE-IDENTITY
-    LAST-UPDATED    "200904301200Z"
+    LAST-UPDATED    "201512011200Z"
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip: 100085"
     DESCRIPTION
         "The information about the wireless card and the UIM
          (User Identification Module)."
+    REVISION        "201512011200Z"
+    DESCRIPTION
+        "Modified description and added lte(5) in hh3cWirelessCardModemMode."
+    REVISION        "201409091200Z"
+    DESCRIPTION
+        "Added hh3c3GCdma1xRttTable and hh3c3GCdmaEvDoTable."
     REVISION        "200904301200Z"
     DESCRIPTION
         "Initial version of this MIB module."
@@ -228,12 +239,13 @@ hh3cWirelessCardModemMode OBJECT-TYPE
                         unknown(1),
                         tdscdma(2),
                         wcdma(3),
-                        cdma(4)
+                        cdma(4),
+                        lte(5)
                 }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The mode of the 3G-Modem."
+        "The mode of the 3G and 4G Modem."
     ::= { hh3cWirelessCardEntry 12 }
 
 hh3cWirelessCardCurNetConn OBJECT-TYPE
@@ -291,7 +303,7 @@ hh3cSmsOperationEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The infomation about the short message."
+        "The information about the short message."
     INDEX { hh3cWirelessCardIndex }
     ::= { hh3cSmsOperationTable 1 }
 
@@ -540,7 +552,10 @@ Hh3c3GCdma1xRttEntry ::= SEQUENCE
         hh3c3GCdma1xRttRssiMediumThreshold   Integer32,
         hh3c3GCdma1xRttRssiWeakThreshold     Integer32,
         hh3c3GCdma1xRttCurServiceStatus      INTEGER,
-        hh3c3GCdma1xRttCurRoamingStatus      INTEGER
+        hh3c3GCdma1xRttCurRoamingStatus      INTEGER,
+        hh3c3GCdma1xRttBID                   Unsigned32,
+        hh3c3GCdma1xRttSID                   Unsigned32,
+        hh3c3GCdma1xRttNID                   Unsigned32
     }
 
 hh3c3GCdma1xRttCurrentRssi OBJECT-TYPE
@@ -604,6 +619,32 @@ hh3c3GCdma1xRttCurRoamingStatus OBJECT-TYPE
         "The status of roaming."
     ::= { hh3c3GCdma1xRttEntry 5 }
 
+hh3c3GCdma1xRttBID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Base Station ID(BID) of CDMA 1xRTT.
+        The invalid value is 4294967295(0xFFFFFFFF)."
+    ::= { hh3c3GCdma1xRttEntry 6 }
+
+hh3c3GCdma1xRttSID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The System ID(SID) of CDMA 1xRTT.
+        The invalid value is 4294967295(0xFFFFFFFF)."
+    ::= { hh3c3GCdma1xRttEntry 7 }
+
+hh3c3GCdma1xRttNID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Network ID(NID) of CDMA 1xRTT.
+        The invalid value is 4294967295(0xFFFFFFFF)."
+    ::= { hh3c3GCdma1xRttEntry 8 }
 
 -- The CDMA information table of EvDo
 hh3c3GCdmaEvDoTable OBJECT-TYPE
@@ -629,7 +670,8 @@ Hh3c3GCdmaEvDoEntry ::= SEQUENCE
         hh3c3GCdmaEvDoRssiMediumThreshold   Integer32,
         hh3c3GCdmaEvDoRssiWeakThreshold     Integer32,
         hh3c3GCdmaEvDoCurServiceStatus      INTEGER,
-        hh3c3GCdmaEvDoCurRoamingStatus      INTEGER
+        hh3c3GCdmaEvDoCurRoamingStatus      INTEGER,
+        hh3c3GCdmaEvDoSubNetID              SnmpAdminString
     }
 
 hh3c3GCdmaEvDoCurrentRssi OBJECT-TYPE
@@ -693,6 +735,14 @@ hh3c3GCdmaEvDoCurRoamingStatus OBJECT-TYPE
         "The status of roaming."
     ::= { hh3c3GCdmaEvDoEntry 5 }
 
+hh3c3GCdmaEvDoSubNetID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Sub Net ID of CDMA EvDo.
+        The invalid value is a zero-length string."
+    ::= { hh3c3GCdmaEvDoEntry 6 }
 
 -- The GSM information table
 hh3c3GGsmInfoTable OBJECT-TYPE
@@ -1043,7 +1093,7 @@ hh3c3GCurrentService OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The current service type which binded in the notifications."
+            "The current service type that is bound in the notifications."
     ::= { hh3c3GModemTrap 4 }
 
 hh3c3GCurrentRssiBind OBJECT-TYPE
@@ -1052,7 +1102,7 @@ hh3c3GCurrentRssiBind OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The current RSSI which binded in the notifications."
+            "The current RSSI that is bound in the notifications."
     ::= { hh3c3GModemTrap 5 }
 
 hh3c3GImsiBind OBJECT-TYPE
@@ -1060,7 +1110,7 @@ hh3c3GImsiBind OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The IMSI which binded in the notifications."
+            "The IMSI that is bound in the notifications."
     ::= { hh3c3GModemTrap 6 }
 
 hh3cSmsSrcNumberBind OBJECT-TYPE
@@ -1068,7 +1118,7 @@ hh3cSmsSrcNumberBind OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The source number which binded in the notifications."
+            "The source number that is bound in the notifications."
     ::= { hh3c3GModemTrap 7 }
 
 hh3cSmsTimeBind OBJECT-TYPE
@@ -1076,7 +1126,7 @@ hh3cSmsTimeBind OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The sending time which binded in the notifications."
+            "The sending time that is bound in the notifications."
     ::= { hh3c3GModemTrap 8 }
 
 hh3cSmsEncodeBind OBJECT-TYPE
@@ -1084,7 +1134,7 @@ hh3cSmsEncodeBind OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The encoded type which binded in the notifications."
+            "The encoded type that is bound in the notifications."
     ::= { hh3c3GModemTrap 9 }
 
 hh3cSmsContentBind OBJECT-TYPE
@@ -1092,7 +1142,7 @@ hh3cSmsContentBind OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
-            "The content of short message which binded in the notifications."
+            "The content of short message that is bound in the notifications."
     ::= { hh3c3GModemTrap 10 }
 
 
@@ -1243,7 +1293,7 @@ hh3cSmsRxNotification NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
         "A hh3cSmsRxNotification notification is generated
-        when a short message is recieved."
+        when a short message is received."
     ::= { hh3c3GModemTrapPrefix 10 }
 
 END

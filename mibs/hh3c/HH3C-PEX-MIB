@@ -1,12 +1,14 @@
 -- ============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Port Extender (PEX) information MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --   V1.0 2012-11-12 Initial version by Yang Fan
 --   V1.1 2014-03-31 Changed MIB node name to PEX by zushuzhi
+--   V1.2 2015-10-15 Added hh3cPexDeviceInfoTable and hh3cPexTopoTable
+--                   by zushuzhi
 -- ============================================================================
 HH3C-PEX-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -20,18 +22,21 @@ IMPORTS
         FROM SNMPv2-TC;
 
 hh3cPex MODULE-IDENTITY
-    LAST-UPDATED "201211121129Z"        -- 12th November, 2012 at 11:29 GMT
+    LAST-UPDATED "201510151129Z"        -- 15th October, 2015 at 11:29 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Haidian District Beijing P.R. China
          Http://www.h3c.com
          Zip:100085"
     DESCRIPTION
         "This MIB is used to manage Port Extender (PEX)
          information.  This MIB is applicable to products that support PEX."
-    REVISION "201211121129Z"             -- 12th November, 2012 at 11:29 GMT
+    REVISION "201510151129Z"
+    DESCRIPTION
+        "Added hh3cPexDeviceInfoTable and hh3cPexTopoTable."
+    REVISION "201211121129Z"
     DESCRIPTION
         "Initial version of this MIB module."
     ::= { hh3cCommon 129 }
@@ -107,7 +112,7 @@ hh3cPexPortEntry OBJECT-TYPE
 Hh3cPexPortEntry ::= SEQUENCE
     {
         hh3cPexPortId               Integer32,
-        hh3cPexPortAssociateId     Integer32,
+        hh3cPexPortAssociateId      Integer32,
         hh3cPexPortEntPhysicalIndex Integer32,
         hh3cPexPortDescr            DisplayString,
         hh3cPexPortStatus           INTEGER,
@@ -259,6 +264,90 @@ hh3cPexPhyPortNeighborEntIndex OBJECT-TYPE
         A value of zero indicates that the physical port is not bound to any
         PEX port or is not up."
     ::= { hh3cPexPhyPortEntry 3 }
+
+-- PEX Topology Information
+hh3cPexDeviceInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPexDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains online PEXs in the IRF system."
+    ::= { hh3cPexTable 3 }
+
+hh3cPexDeviceInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cPexDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX in the IRF system.  The index is the PEX
+        entity index."
+    INDEX
+        {
+            entPhysicalIndex
+        }
+    ::= { hh3cPexDeviceInfoTable 1 }
+
+Hh3cPexDeviceInfoEntry ::= SEQUENCE
+    {
+        hh3cPexDeviceStatus           INTEGER,
+        hh3cPexDeviceAssociateId      Integer32
+    }
+
+hh3cPexDeviceStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(1),
+            faulty(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the PEX.
+        normal: The PEX is operating correctly.
+        faulty: The PEX is faulty."
+    ::= { hh3cPexDeviceInfoEntry 1 }
+
+hh3cPexDeviceAssociateId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ID assigned to the PEX."
+    ::= { hh3cPexDeviceInfoEntry 2 }
+
+hh3cPexTopoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cPexTopoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the PEX physical ports and
+        neighbor ports on PEXs."
+    ::= { hh3cPexTable 4 }
+
+hh3cPexTopoEntry OBJECT-TYPE
+    SYNTAX      Hh3cPexTopoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a PEX link."
+    INDEX
+        {
+            entPhysicalIndex
+        }
+    ::= { hh3cPexTopoTable 1 }
+
+Hh3cPexTopoEntry ::= SEQUENCE
+    {
+        hh3cPexNeighborEntIndex Integer32
+    }
+
+hh3cPexNeighborEntIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Entity index of a PEX in the IRF system."
+    ::= { hh3cPexTopoEntry 1 }
 
 -- PEX Traps
 

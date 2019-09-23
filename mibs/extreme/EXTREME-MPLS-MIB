@@ -1,19 +1,9 @@
---/* 
--- *
-
--- *
--- */
-
-
-
-
-
 -- ################################################################################
 
    EXTREME-MPLS-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32, Counter64
          FROM SNMPv2-SMI                   -- [RFC2578]
 
      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
@@ -44,8 +34,15 @@
                                             --  [RFC3289]               
 
      MplsTunnelIndex, MplsTunnelInstanceIndex,
-     MplsExtendedTunnelId, MplsLdpIdentifier
+     MplsExtendedTunnelId, MplsLdpIdentifier, 
+     MplsLsrIdentifier
         FROM MPLS-TC-STD-MIB               -- [RFC3811]
+
+     pwIndex
+          FROM PW-STD-MIB                    -- [PWMIB]
+
+     MplsIndexType
+          FROM MPLS-LSR-STD-MIB              -- [RFC3813]
   ;
 
     extremeMplsMIB MODULE-IDENTITY
@@ -66,6 +63,8 @@
    extremeVplsObjects       OBJECT IDENTIFIER ::= { extremeMplsMIB 3 }
 
    extremeL2VpnMplsNotificationHandler OBJECT IDENTIFIER ::= { extremeMplsMIB 4 }
+
+   extremePwObjects         OBJECT IDENTIFIER ::= { extremeMplsMIB 5 }
 
 
 IndexInteger ::= TEXTUAL-CONVENTION
@@ -753,7 +752,334 @@ IndexInteger ::= TEXTUAL-CONVENTION
                  ::= { extremeL2VpnMplsNotificationHandler 2 }
 
 
-          
-    
+   -- Extreme PW performance table 
+   extremePwPerfTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF ExtremePwPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides per-PW performance information."
+
+      ::= { extremePwObjects 1 }
+
+   extremePwPerfEntry OBJECT-TYPE
+      SYNTAX        ExtremePwPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the agent for
+           every PW."
+
+      INDEX { pwIndex }
+      ::= { extremePwPerfTable 1 }
+
+   ExtremePwPerfEntry ::= SEQUENCE {
+        pwPerfInPackets            Counter32,
+        pwPerfInBytes              Counter32,
+        pwPerfOutPackets           Counter32,
+        pwPerfOutBytes             Counter32,
+        pwPerfInHCPackets          Counter64,
+        pwPerfInHCBytes            Counter64,
+        pwPerfOutHCPackets         Counter64,
+        pwPerfOutHCBytes           Counter64         
+      }
+
+   pwPerfInPackets OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "The counter for the total number of packets received 
+            by the PW (from the PSN). This is the 32-bit value of 
+            the least significant part of the 64-bit value 
+            pwPerfInHCPackets."
+      ::= { extremePwPerfEntry 1 }
+
+    pwPerfInBytes OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "The counter for the total number of bytes received 
+            by the PW (from the PSN). This is the 32-bit value of 
+            the least significant part of the 64-bit value  
+            pwPerfInHCBytes."
+      ::= { extremePwPerfEntry 2 }
+
+   pwPerfOutPackets OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "The counter for the total number of packets forwarded 
+            by the PW (to the PSN). This is the 32-bit value of 
+            the least significant part of the 64-bit value  
+            pwPerfOutHCPackets."
+      ::= { extremePwPerfEntry 3 }
+
+    pwPerfOutBytes OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "The counter for the total number of bytes forwarded 
+            by the PW (to the PSN). This is the 32-bit value of 
+            the least significant part of the 64-bit value 
+            pwPerfOutHCBytes."
+      ::= { extremePwPerfEntry 4 }
+
+     pwPerfInHCPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "High-capacity counter for the total number of packets
+           received by the PW (from the PSN)."
+      ::= { extremePwPerfEntry 5 }
+
+    pwPerfInHCBytes OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "High-capacity counter for the total number of bytes
+           received by the PW (from the PSN)."
+      ::= { extremePwPerfEntry 6 }
+
+   pwPerfOutHCPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "High-capacity counter for the total number of packets 
+            forwarded by the PW (to the PSN)."
+      ::= { extremePwPerfEntry 7 }
+
+    pwPerfOutHCBytes OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "High-capacity counter for the total number of bytes 
+            forwarded by the PW (to the PSN)."
+      ::= { extremePwPerfEntry 8 }
+
+   -- end of Extreme PW performance table 
+
+-- Extreme PW LSP Mapping table 
+
+   extremePwLspOutboundMappingTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF ExtremePwLspOutboundMappingEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides mappings between PW and LSP  
+           outbound tunnels."
+
+      ::= { extremePwObjects 2 }
+
+   extremePwLspOutboundMappingEntry OBJECT-TYPE
+      SYNTAX        ExtremePwLspOutboundMappingEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the agent for
+           each LSP in-use by a PW."
+
+      INDEX {  pwIndex,
+               lspIndex
+            }
+      ::= { extremePwLspOutboundMappingTable 1 }
+
+   ExtremePwLspOutboundMappingEntry ::= SEQUENCE {
+         lspIndex                          Unsigned32,
+         pwLspOutboundLsrXcIndex           MplsIndexType,
+         pwLspOutboundTunnelIndex          MplsTunnelIndex,
+         pwLspOutboundTunnelInstance       MplsTunnelInstanceIndex,
+         pwLspOutboundTunnelLclLSR         MplsLsrIdentifier,
+         pwLspOutboundTunnelPeerLSR        MplsLsrIdentifier,
+         pwLspOutboundTunnelTypeInUse      INTEGER
+      }
+
+   lspIndex OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "The second index for the table. It contains 
+           the unique id assigned to a tunnel used by the PW."
+      ::= { extremePwLspOutboundMappingEntry 1 }
+
+    pwLspOutboundLsrXcIndex      OBJECT-TYPE
+      SYNTAX        MplsIndexType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object is applicable if pwLspOutboundTunnelTypeInUse 
+           is mplsNonTe(2), and MUST return a value of zero otherwise. 
+           If the outer tunnel is signaled, it indicates the XC index 
+           in the MPLS-LSR-STD-MIB of the outer tunnel toward the peer. 
+           Otherwise if tunnel is set up manually, it indicates 
+           the XC index of the manually created outer tunnel."
+      ::= { extremePwLspOutboundMappingEntry 2 }
+
+
+   pwLspOutboundTunnelIndex         OBJECT-TYPE
+      SYNTAX        MplsTunnelIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object is applicable if pwLspOutboundTunnelTypeInUse 
+           is mplsTe(1), and MUST return a value of zero otherwise."
+      ::= { extremePwLspOutboundMappingEntry 3 }
+
+   pwLspOutboundTunnelInstance      OBJECT-TYPE
+      SYNTAX        MplsTunnelInstanceIndex
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object is applicable if pwLspOutboundTunnelTypeInUse 
+           is mplsTe(1), and MUST return a value of zero otherwise."
+      ::= { extremePwLspOutboundMappingEntry 4 }
+
+   pwLspOutboundTunnelLclLSR        OBJECT-TYPE
+      SYNTAX        MplsLsrIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object is applicable if pwLspOutboundTunnelTypeInUse 
+           is mplsTe(1), and MUST return a value of all zeros otherwise."
+      ::= { extremePwLspOutboundMappingEntry 5 }
+
+   pwLspOutboundTunnelPeerLSR       OBJECT-TYPE
+      SYNTAX        MplsLsrIdentifier
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object is applicable if pwLspOutboundTunnelTypeInUse 
+           is mplsTe(1), and MUST return a value of zero otherwise."
+      ::= { extremePwLspOutboundMappingEntry 6 }
+
+   pwLspOutboundTunnelTypeInUse OBJECT-TYPE
+      SYNTAX         INTEGER {
+                     mplsTe      (1),
+                     mplsNonTe   (2)
+      }
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION
+          "This object indicates the current tunnel that is carrying
+           the PW traffic."
+      ::= { extremePwLspOutboundMappingEntry 7 }
+
+   -- end of Extreme PW LSP Mapping table
+
+   -- Extreme PW LSP performance table 
+
+   extremePwLspPerfTable  OBJECT-TYPE
+      SYNTAX        SEQUENCE OF ExtremePwLspPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "This table provides performance information for each LSP 
+           in-use by a PW."
+
+      ::= { extremePwObjects 3 }
+
+   extremePwLspPerfEntry OBJECT-TYPE
+      SYNTAX        ExtremePwLspPerfEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+           "An entry in this table is created by the agent for
+           each LSP in-use by a PW."
+
+      INDEX {  pwIndex,
+               lspIndex
+            }
+      ::= { extremePwLspPerfTable 1 }
+
+   ExtremePwLspPerfEntry ::= SEQUENCE {
+        pwLspPerfOutPackets            Counter32,
+        pwLspPerfOutBytes              Counter32,
+        pwLspPerfOutHCPackets          Counter64,
+        pwLspPerfOutHCBytes            Counter64
+      }
+
+   pwLspPerfOutPackets OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "The counter for the number of packets forwarded 
+            by the LSP for the given PW (to the PSN). This is 
+            the 32-bit value of the least significant part of 
+            the 64-bit value pwLspPerfOutHCPackets."
+      ::= { extremePwLspPerfEntry 1 }
+
+    pwLspPerfOutBytes OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "The counter for the number of bytes forwarded 
+            by the LSP for the given PW (to the PSN). This is 
+            the 32-bit value of the least significant part of 
+            the 64-bit value pwLspPerfOutHCBytes."
+      ::= { extremePwLspPerfEntry 2 }
+
+    pwLspPerfOutHCPackets OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "High-capacity counter for the number of packets forwarded 
+            by the LSP for the given PW (to the PSN)."
+      ::= { extremePwLspPerfEntry 3 }
+
+    pwLspPerfOutHCBytes OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+            "High-capacity counter for the number of bytes forwarded 
+            by the LSP for the given PW (to the PSN)."
+      ::= { extremePwLspPerfEntry 4 }
+
+   -- end of Extreme PW LSP performance table 
+
+    extremePwNotificationLspIndex OBJECT-TYPE
+      SYNTAX       Unsigned32
+      MAX-ACCESS   accessible-for-notify
+      STATUS       current
+      DESCRIPTION
+           "This variable indicates the index of the LSP
+	     that was added to or deleted from a given PW as reported
+	     by the corresponding notification."
+
+      ::= { extremeMplsScalars 27 }
+
+   extremePwLspAdded NOTIFICATION-TYPE
+     OBJECTS { extremePwNotificationPwIndex,
+               extremePwNotificationLspIndex
+     }
+     STATUS  current
+     DESCRIPTION
+         "This notification is generated when an entry is added to the  
+          extremePwLspOutboundMappingTable table and the extremePwLspPerfTable 
+          table."
+     ::= { extremeMplsNotifications  6 }
+
+   extremePwLspDeleted NOTIFICATION-TYPE
+     OBJECTS { extremePwNotificationPwIndex,
+               extremePwNotificationLspIndex
+     }
+     STATUS  current
+     DESCRIPTION
+         "This notification is generated when an entry is deleted from the  
+          extremePwLspOutboundMappingTable table and the extremePwLspPerfTable 
+          table."
+     ::= { extremeMplsNotifications  7 }
+
 
 END

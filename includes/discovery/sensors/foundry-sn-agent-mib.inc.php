@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -30,7 +30,7 @@ foreach ($cache['fnsnagent'] as $index => $entry)
   $value    = $entry[$oid_name];
   $scale    = 0.5;
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, 'ironware', $descr, $scale, $value);
+  discover_sensor_ng($device,'temperature', $mib, 'snAgentTempValue', $oid_num, $index, 'ironware', $descr, $scale, $value, ['rename_rrd' => "ironware-$index"]);
 }
 
 // Module statuses

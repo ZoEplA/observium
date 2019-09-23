@@ -7,16 +7,12 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $oids  = snmpwalk_cache_multi_oid($device, 'nbsDevPSTable',  array(), 'DEV-CFG-MIB');
-$count = count($oids);
-if (OBS_DEBUG > 1 && $count)
-{
-  print_vars($oids);
-}
+print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
 {
@@ -31,15 +27,11 @@ foreach ($oids as $index => $entry)
   $type     = 'nbsDevOperStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'powerSupply'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'powerSupply'));
 }
 
 $oids  = snmpwalk_cache_multi_oid($device, 'nbsDevFANTable',  array(), 'DEV-CFG-MIB');
-$count = count($oids);
-if (OBS_DEBUG > 1 && $count)
-{
-  print_vars($oids);
-}
+print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
 {
@@ -54,7 +46,7 @@ foreach ($oids as $index => $entry)
   $type     = 'nbsDevOperStatus';
   $value    = $entry[$oid_name];
 
-  discover_status($device, $oid_num, $oid_name.'.'.$index, $type, $descr, $value, array('entPhysicalClass' => 'fan'));
+  discover_status_ng($device, $mib, $oid_name, $oid_num, $index, $type, $descr, $value, array('entPhysicalClass' => 'fan'));
 }
 
 // Yah, wee have too old MRV mibs, that why here used "known" numeric oids
@@ -65,10 +57,7 @@ foreach ($oids as $index => $entry)
 $oids = snmp_get_multi_oid($device, array('.1.3.6.1.4.1.629.1.50.11.1.13.1.0',
                                            '.1.3.6.1.4.1.629.1.50.11.1.13.2.0',
                                            '.1.3.6.1.4.1.629.1.50.11.1.13.3.0'), array(), 'DEV-CFG-MIB', NULL, OBS_SNMP_ALL_NUMERIC);
-if (OBS_DEBUG > 1 && $oids)
-{
-  print_vars($oids);
-}
+print_debug_vars($oids);
 
   // nbsDevPhParamCpuTempC
   $index    = 0;
@@ -80,7 +69,7 @@ if (OBS_DEBUG > 1 && $oids)
   $value    = $oids[$oid_num];
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor_ng($device, 'temperature', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value);
   }
 
 /* All this skipped anyway, since data too same
@@ -98,7 +87,7 @@ if (OBS_DEBUG > 1 && $oids)
   $value    = $oids[$oid_num];
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 
   // nbsDevPhParamPackProcTempC
@@ -111,7 +100,7 @@ if (OBS_DEBUG > 1 && $oids)
   $value    = $oids[$oid_num];
   if ($value != 0)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
+    discover_sensor('temperature', $device, $oid_num, $index, $type, $descr, $scale, $value);
   }
 */
 

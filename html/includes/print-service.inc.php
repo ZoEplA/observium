@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -26,12 +26,12 @@ $message = trim($service['service_message']);
 $message = str_replace("\n", "<br />", $message);
 
 $since = time() - $service['service_changed'];
-$since = formatUptime($since);
+$since = format_uptime($since);
 
 if ($service['service_checked'])
 {
   $checked = time() - $service['service_checked'];
-  $checked = formatUptime($checked);
+  $checked = format_uptime($checked);
 } else { $checked = "Never"; }
 
 $mini_url = "graph.php?id=".$service['service_id']."&amp;type=service_availability&amp;from=".$config['time']['day']."&amp;to=".$config['time']['now']."&amp;width=80&amp;height=20&amp;bg=efefef";

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Lan Switch VLAN MIB
 -- Reference:
--- Version: V2.1
+-- Version: V2.3
 -- History:
 -- (1) Created by Zhangshilin, 2001.06.29
 -- (2) Revised by Qi Zhenglin, 2002.01.08
@@ -40,12 +40,14 @@
 --        2012-08-13
 --        Add hh3cPrivateVlanMappingTable by chenkaiping
 --        Add primaryVlan for hh3cdot1qVlanType by xiedong
+--   V2.2 2015-11-12 Modify hh3cdot1qVlanName by yuhaiyan
+--   V2.3 2016-08-29 Modify hh3cdot1qVlanMIBTable,add VLAN statistics related entries by niuchuanzheng
 -- ==================================================================
 HH3C-LswVLAN-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     TimeInterval, TEXTUAL-CONVENTION, TruthValue, RowStatus
         FROM SNMPv2-TC
-    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY, TimeTicks, IpAddress
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY, TimeTicks, IpAddress, Counter64
         FROM SNMPv2-SMI
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
@@ -57,15 +59,18 @@ IMPORTS
         FROM HH3C-LswINF-MIB;
 
     hh3cLswVlan MODULE-IDENTITY
-            LAST-UPDATED "200112261452Z"
+            LAST-UPDATED "201608310000Z"
             ORGANIZATION
-                "Hangzhou H3C Technologies Co., Ltd."
+                "New H3C Technologies Co., Ltd."
             CONTACT-INFO
-                "Platform Team Hangzhou H3C Technologies Co., Ltd.
+                "Platform Team New H3C Technologies Co., Ltd.
                  Hai-Dian District Beijing P.R. China
                  http://www.h3c.com
                  Zip:100085"
             DESCRIPTION ""
+            REVISION        "201608310000Z"
+            DESCRIPTION
+                "To modify size of hh3cdot1qVlanName."
             ::= { hh3clswCommon 2 }
 
     Hh3cVlanIndex ::= TEXTUAL-CONVENTION
@@ -133,7 +138,17 @@ IMPORTS
         hh3cdot1qVlanMulticast INTEGER,
         hh3cdot1qVlanTaggedPorts    PortList,
         hh3cdot1qVlanUntaggedPorts    PortList,
-        hh3cdot1qVlanPortIndexs    OCTET STRING
+        hh3cdot1qVlanPortIndexs    OCTET STRING,
+        hh3cdot1qVlanStatisticStatus    TruthValue,
+        hh3cdot1qVlanStatisticClear    INTEGER,
+        hh3cdot1qVlanStatisticInTotalPkts    Counter64,
+        hh3cdot1qVlanStatisticInTotalBytes    Counter64,
+        hh3cdot1qVlanStatisticInPPS    Counter64,
+        hh3cdot1qVlanStatisticInBPS    Counter64,
+        hh3cdot1qVlanStatisticOutTotalPkts    Counter64,
+        hh3cdot1qVlanStatisticOutTotalBytes    Counter64,
+        hh3cdot1qVlanStatisticOutPPS    Counter64,
+        hh3cdot1qVlanStatisticOutBPS    Counter64
         }
 
 
@@ -148,7 +163,7 @@ IMPORTS
 
 
     hh3cdot1qVlanName  OBJECT-TYPE
-        SYNTAX  SnmpAdminString (SIZE (0..32))
+        SYNTAX  SnmpAdminString (SIZE (0..80))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -327,6 +342,90 @@ IMPORTS
         DESCRIPTION
             "PortIndex list of the VLAN, that delimited by comma, such as 1,3,4,7."
         ::= { hh3cdot1qVlanMIBEntry 19 }
+
+    hh3cdot1qVlanStatisticStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "VLAN traffic statistics switch.
+            The default value is false, which means the switch is off."
+        ::= { hh3cdot1qVlanMIBEntry 20 }
+
+    hh3cdot1qVlanStatisticClear  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            clear(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear statistics for the specified VLANs. Operation read is not supported."
+        ::= { hh3cdot1qVlanMIBEntry 21 }
+
+    hh3cdot1qVlanStatisticInTotalPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound packets."
+        ::= { hh3cdot1qVlanMIBEntry 22 }
+
+    hh3cdot1qVlanStatisticInTotalBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound bytes."
+        ::= { hh3cdot1qVlanMIBEntry 23 }
+
+    hh3cdot1qVlanStatisticInPPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound packets per second."
+        ::= { hh3cdot1qVlanMIBEntry 24 }
+
+    hh3cdot1qVlanStatisticInBPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound bytes per second."
+        ::= { hh3cdot1qVlanMIBEntry 25 }
+
+    hh3cdot1qVlanStatisticOutTotalPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound packets."
+        ::= { hh3cdot1qVlanMIBEntry 26 }
+
+    hh3cdot1qVlanStatisticOutTotalBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound bytes."
+        ::= { hh3cdot1qVlanMIBEntry 27 }
+
+    hh3cdot1qVlanStatisticOutPPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound packets per second."
+        ::= { hh3cdot1qVlanMIBEntry 28 }
+
+    hh3cdot1qVlanStatisticOutBPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound bytes per second."
+        ::= { hh3cdot1qVlanMIBEntry 29 }
 
     hh3cVlanInterfaceTable OBJECT-TYPE
         SYNTAX SEQUENCE OF Hh3cVlanInterfaceEntry
@@ -820,7 +919,7 @@ IMPORTS
         DESCRIPTION
             "Each octet within this value specifies a set of eight
             VLANs, with the first octet specifying VLANs 1 through
-            8, the second octet specifying VLANs 9 through 16, etc.  
+            8, the second octet specifying VLANs 9 through 16, etc.
             Within each octet, the most significant bit represents
             the highest numbered VLAN, and the least significant bit
             represents the lowest numbered VLAN.  Thus, each secondary

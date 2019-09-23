@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -22,8 +22,9 @@ if (!$ports_modules[$port_module] || is_device_mib($device, 'CISCO-VTP-MIB'))
   return;
 }
 
-// Juniper specific
+// Vendor specific
 $is_juniper = is_device_mib($device, 'JUNIPER-VLAN-MIB');
+//$is_hpe = $device['os'] == 'hh3c';
 
 $start = microtime(TRUE); // Module timing start
 
@@ -69,6 +70,15 @@ if (snmp_status() && $use_baseports)
   }
   print_debug_vars($dot1q_ports);
 
+  // Collect trunk port ids and vlans
+  //$trunk_ports = dbFetchColumn('SELECT DISTINCT `port_id` FROM `ports_vlans` WHERE `device_id` = ?', [ $device['device_id'] ]);
+  $trunk_ports = [];
+  foreach (dbFetchRows('SELECT `port_id`, `vlan` FROM `ports_vlans` WHERE `device_id` = ?', [ $device['device_id'] ]) as $entry)
+  {
+    $trunk_ports[$entry['port_id']][] = $entry['vlan'];
+  }
+  print_debug_vars($trunk_ports);
+
   $vlan_rows = array();
   foreach ($dot1q_ports as $index => $entry)
   {
@@ -78,10 +88,21 @@ if (snmp_status() && $use_baseports)
     {
       $trunk = 'dot1Q';
     }
-    else if ((isset($entry['dot1qPortIngressFiltering']) && $entry['dot1qPortIngressFiltering'] == 'true') ||
-             (isset($entry['dot1qPortAcceptableFrameTypes']) && $entry['dot1qPortAcceptableFrameTypes'] == 'admitOnlyVlanTagged'))
+    elseif (isset($entry['dot1qPortAcceptableFrameTypes']) && $entry['dot1qPortAcceptableFrameTypes'] == 'admitOnlyVlanTagged')
     {
       $trunk = 'dot1Q';
+    }
+    elseif ((isset($entry['dot1qPortIngressFiltering']) && $entry['dot1qPortIngressFiltering'] == 'true'))
+    {
+      // Additionally check if port have trunk ports
+      $port = get_port_by_index_cache($device, $ifIndex);
+      print_debug("CHECK. ifIndex: $ifIndex, port_id: ".$port['port_id']);
+      if (isset($trunk_ports[$port['port_id']]) && (count($trunk_ports[$port['port_id']]) > 1 || $trunk_ports[$port['port_id']][0] != $vlan_num))
+      {
+        $trunk = 'dot1Q';
+      } else {
+        $trunk = ''; // access
+      }
     } else {
       $trunk = ''; // access
     }
@@ -96,7 +117,7 @@ if (snmp_status() && $use_baseports)
   }
 
 }
-else if ($is_juniper)
+elseif ($is_juniper)
 {
   // For juniper Q-BRIDGE is derp, but still required for trunk ports
   // skipped here, use only dot1qPvid

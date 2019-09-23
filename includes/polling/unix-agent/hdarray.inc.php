@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -40,12 +40,12 @@ if ($agent_data['array'] != '|')
       echo "Status: $status istatus: $istatus";
       if ($param == 'Controller Status')
       {
-        discover_sensor($valid['sensor'], 'state', $device, '', $itemcount, 'unix-agent-state', $param, NULL, $istatus, array('entPhysicalClass' => 'controller'), 'agent');
+        discover_status($device, '', $itemcount, 'unix-agent-state', $param, $istatus, array('entPhysicalClass' => 'controller'), 'agent');
         $agent_sensors['state']['unix-agent-state'][$itemcount] = array('description' => $param, 'current' => $istatus, 'index' => $itemcount);
       }
-      else if (preg_match('/^Drive \d/', $param))
+      elseif (preg_match('/^Drive \d/', $param))
       {
-        discover_sensor($valid['sensor'], 'state', $device, '', $itemcount, 'unix-agent-state', $param, NULL, $istatus, array('entPhysicalClass' => 'storage'), 'agent');
+        discover_status($device, '', $itemcount, 'unix-agent-state', $param, $istatus, array('entPhysicalClass' => 'storage'), 'agent');
         $agent_sensors['state']['unix-agent-state'][$itemcount] = array('description' => $param, 'current' => $istatus, 'index' => $itemcount);
       }
     }

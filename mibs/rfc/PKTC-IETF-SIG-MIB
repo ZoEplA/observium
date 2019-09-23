@@ -22,9 +22,8 @@ IMPORTS
     SnmpAdminString
           FROM SNMP-FRAMEWORK-MIB           -- [RFC3411]
     ifIndex
-          FROM IF-MIB                       -- [RFC2863]
-    Dscp
-          FROM DIFFSERV-DSCP-TC;            -- [RFC3289]
+          FROM IF-MIB;                      -- [RFC2863]
+
 
 pktcIetfSigMib MODULE-IDENTITY
     LAST-UPDATED    "200712180000Z" -- December 18, 2007
@@ -58,12 +57,12 @@ pktcIetfSigMib MODULE-IDENTITY
          Archive: ftp://ftp.ietf.org/ietf-mail-archive/ipcdn
          Co-Chair: Jean-Francois Mule, jf.mule@cablelabs.com
          Co-Chair: Richard Woundy, Richard_Woundy@cable.comcast.com"
+
     DESCRIPTION
        "This MIB module supplies the basic management
         objects for the PacketCable and IPCablecom Signaling
         protocols.  This version of the MIB includes
         common signaling and Network Call Signaling
-
         (NCS)-related signaling objects.
 
         Copyright (C) The IETF Trust (2008).  This version of
@@ -72,6 +71,7 @@ pktcIetfSigMib MODULE-IDENTITY
     REVISION                "200712180000Z"
     DESCRIPTION
        "Initial version, published as RFC 5098."
+
 ::=  { mib-2 169 }
 
 -- Textual Conventions
@@ -84,6 +84,16 @@ TenthdBm ::= TEXTUAL-CONVENTION
          normally expressed in dBm.  Units are in tenths of a dBm;
          for example, -13.5 dBm will be represented as -135."
     SYNTAX       Integer32
+
+Dscp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS   current
+    DESCRIPTION
+       "A Differentiated Services Code-Point that may be used for
+       marking a traffic stream."
+    REFERENCE
+        "RFC 2474, RFC 2780"
+    SYNTAX   Integer32 (0..63)
 
 PktcCodecType ::= TEXTUAL-CONVENTION
     STATUS       current
@@ -111,7 +121,6 @@ PktcCodecType ::= TEXTUAL-CONVENTION
 
           The list of codecs is consistent with the IETF
           Real-Time Transport Protocol (RTP) Profile registry and
-
           the RTP Map Parameters Table in PacketCable Audio/Video
           Codecs Specification [PKT-SP-CODEC].  The literal codec
           name for each codec is listed below:
@@ -160,7 +169,6 @@ PktcRingCadence   ::= TEXTUAL-CONVENTION
     STATUS        current
     DESCRIPTION
           "This object provides an encoding scheme for ring
-
           cadences, including repeatability characteristics.  All
           fields in this object MUST be encoded in network-byte
           order.
@@ -188,7 +196,10 @@ PktcRingCadence   ::= TEXTUAL-CONVENTION
 
           The MTA MUST reject attempts to set a value that violates
           any of the above requirements."
+
+
     SYNTAX  OCTET STRING (SIZE(4..36))
+
 
 PktcSigType     ::= TEXTUAL-CONVENTION
     STATUS       current
@@ -253,7 +264,6 @@ PktcSubscriberSideSigProtocol::=TEXTUAL-CONVENTION
 
 pktcSigMibObjects OBJECT IDENTIFIER ::= { pktcIetfSigMib 1 }
 pktcSigDevObjects OBJECT IDENTIFIER ::=
-
                                         { pktcSigMibObjects 1 }
 pktcSigEndPntConfigObjects OBJECT IDENTIFIER ::=
                                         { pktcSigMibObjects 2 }
@@ -302,7 +312,6 @@ pktcSigDevCodecTable OBJECT-TYPE
                  1               pcma                3
                  2               pcma                2
                  2               pcmu                1
-
                  3               pcma                1
                  3               pcmu                2
                  4               pcmu                3
@@ -399,7 +408,6 @@ pktcSigDevCidSigProtocol  OBJECT-TYPE
     DESCRIPTION
         "This object is used to configure the subscriber-line
          protocol used for signaling on-hook caller id information.
-
          Different countries define different caller id signaling
          protocols to support caller identification.
 
@@ -447,7 +455,6 @@ pktcSigDevR2Cadence     OBJECT-TYPE
     DESCRIPTION
         " This object specifies ring cadence 2 (a user-defined
           field).
-
           The value of this MIB object MUST NOT persist across MTA
           reboots."
     ::= { pktcSigDevObjects 7 }
@@ -495,7 +502,6 @@ pktcSigDevR6Cadence     OBJECT-TYPE
     DESCRIPTION
         " This object specifies ring cadence 6 (a user-defined
           field).
-
           The value of this MIB object MUST NOT persist across MTA
           reboots."
     ::= { pktcSigDevObjects 11 }
@@ -544,7 +550,6 @@ pktcSigDefCallSigDscp  OBJECT-TYPE
     DESCRIPTION
         " The default value used in the IP header for setting the
           Differentiated Services Code Point (DSCP) value for call
-
           signaling.
 
           The value of this MIB object MUST NOT persist across MTA
@@ -593,7 +598,6 @@ pktcSigCapabilityEntry    OBJECT-TYPE
     DESCRIPTION
         " Entries in pktcMtaDevSigCapabilityTable - list of
           supported signaling types, versions, and vendor extensions
-
           for this MTA.  Each entry in the list provides for one
           signaling type and version combination.  If the device
           supports multiple versions of the same signaling type, it
@@ -642,7 +646,6 @@ pktcSigCapabilityVendorExt      OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         " The vendor extension allows vendors to provide a list of
-
           additional capabilities.
 
           The syntax for this MIB object in ABNF ([RFC5234]) is
@@ -654,6 +657,7 @@ pktcSigCapabilityVendorExt      OBJECT-TYPE
            ext      = DQUOTE %x58 DQUOTE
            symbol   = (DQUOTE %x2D DQUOTE)/(DQUOTE %x2D DQUOTE)
            alphanum = 1*6(ALPHA/DIGIT)
+
         "
     ::= { pktcSigCapabilityEntry 4 }
 
@@ -690,7 +694,6 @@ pktcSigPowerRingFrequency    OBJECT-TYPE
     DESCRIPTION
         " This object must only be provided via the configuration
           file during the provisioning process.  The power ring
-
           frequency is the frequency at which the sinusoidal voltage
           must travel down the twisted pair to make terminal
           equipment ring.  Different countries define different
@@ -739,7 +742,6 @@ pktcSigPulseSignalEntry    OBJECT-TYPE
           each particular value of pktcSigPulseSignalType.  Each
           entry in the pktcSigPulseSignalTable is indexed by the
           pktcSigPulseSignalType object.
-
           The conceptual rows MUST NOT persist across MTA reboots."
     INDEX { pktcSigPulseSignalType }
     ::= { pktcSigPulseSignalTable 1 }
@@ -782,6 +784,7 @@ pktcSigPulseSignalType    OBJECT-TYPE
          pulse reverse polarity"
     REFERENCE
         "ETSI-EN-300-324-1 Specification"
+
     ::= { pktcSigPulseSignalEntry 1 }
 
 pktcSigPulseSignalFrequency    OBJECT-TYPE
@@ -830,6 +833,7 @@ pktcSigPulseSignalDbLevel    OBJECT-TYPE
           an 'inconsistentValue' error."
     REFERENCE
         "ETSI-EN-300-001 Specification"
+
     DEFVAL { -135 }
     ::={pktcSigPulseSignalEntry 3 }
 
@@ -882,7 +886,6 @@ pktcSigPulseSignalPulseInterval     OBJECT-TYPE
           initialRing                 200             50
           pulseLoopClose             1000             10
           pulseLoopOpen              1000             10
-
           enableMeterPulse           1000             10
           meterPulseBurst            1000             10
           pulseNoBattery             1000             10
@@ -961,6 +964,7 @@ pktcSigDevCidMode    OBJECT-TYPE
 
           The value of this MIB object MUST NOT persist across MTA
           reboots."
+
     DEFVAL { rpAsETS}
     ::= {pktcSigDevObjects 21 }
 
@@ -978,7 +982,6 @@ pktcSigDevCidAfterRing     OBJECT-TYPE
 
           The following table defines the default values
           for this MIB object, depending on the signal type
-
          (pktcSigDevCidMode), and MUST be followed:
 
           Value of pktcSigDevCidMode       Default value
@@ -1019,6 +1022,7 @@ pktcSigDevCidAfterDTAS    OBJECT-TYPE
 
           Value of pktcSigDevCidMode       Default value
 
+
           duringringingETS                 any value (not used)
           dtAsETS                          50 ms
           rpAsETS                          any value (not used)
@@ -1026,7 +1030,6 @@ pktcSigDevCidAfterDTAS    OBJECT-TYPE
           lrETS                            any value (not used)
 
           An attempt to set this object while the value of
-
           pktcSigDevCidMode is not 'dtAsETS' or 'lrAsETS' will
           result in an 'inconsistentValue' error.
 
@@ -1122,7 +1125,6 @@ pktcSigDevCidDTASAfterLR    OBJECT-TYPE
           The following table defines the default values
           for this MIB object, depending on the signal type
          (pktcSigDevCidMode), and MUST be followed:
-
           Value of pktcSigDevCidMode       Default value
 
           duringringingETS                 any value  (not used)
@@ -1140,6 +1142,7 @@ pktcSigDevCidDTASAfterLR    OBJECT-TYPE
     REFERENCE
         "ETSI-EN-300-659-1 Specification"
     DEFVAL { 250 }
+
     ::= {pktcSigDevObjects 26 }
 
 pktcSigDevVmwiMode    OBJECT-TYPE
@@ -1169,12 +1172,12 @@ pktcSigDevVmwiMode    OBJECT-TYPE
 
           For the OSI method, the FSK or DTMF is sent after the Open
           Switching Interval.
-
           For the lrETS method, the Line Reversal occurs first,
           then the FSK or DTMF is sent.
 
           The value of this MIB object MUST NOT persist across MTA
           reboots."
+
     DEFVAL { rpAsETS }
     ::= {pktcSigDevObjects 27 }
 
@@ -1213,6 +1216,7 @@ pktcSigDevVmwiAfterDTAS    OBJECT-TYPE
         "ETSI-EN-300-659-1 Specification"
     DEFVAL { 50 }
     ::= {pktcSigDevObjects 28 }
+
 
 pktcSigDevVmwiAfterRPAS    OBJECT-TYPE
     SYNTAX       Unsigned32 (0|500..800)
@@ -1264,7 +1268,6 @@ pktcSigDevVmwiDTASAfterLR    OBJECT-TYPE
           The following table defines the default values
           for this MIB object, depending on the signal type
          (pktcSigDevVmwiMode), and MUST be followed:
-
           Value of pktcSigDevVmwiMode       Default value
 
           dtAsETS                           any value  (not used)
@@ -1345,6 +1348,7 @@ pktcSigDevRingCadence    OBJECT-TYPE
         "This is the Ring Cadence."
     ::= { pktcSigDevRingCadenceEntry 2 }
 
+
 pktcSigDevToneTable    OBJECT-TYPE
     SYNTAX       SEQUENCE OF PktcSigDevToneEntry
     MAX-ACCESS   not-accessible
@@ -1358,7 +1362,6 @@ pktcSigDevToneTable    OBJECT-TYPE
           audible tone itself; the delay between tones or the value
           of the tone repeat count are not applicable for the call
           waiting tones.
-
           The delay between tones or the repeat count is controlled
           by the objects pktcSigEndPntConfigCallWaitingDelay and
           pktcSigEndPntConfigCallWaitingMaxRep.  If the
@@ -1407,7 +1410,6 @@ pktcSigDevToneEntry    OBJECT-TYPE
 
           Each entry contains the tone generation parameters for
           a specific frequency group of the specific Tone Type.
-
           The different parameters can be provisioned via MTA
           configuration based on country specific needs.
           An MTA MUST populate all entries of this table for each
@@ -1648,7 +1650,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
        SYNTAX       INTEGER {
                      firstModulatedBySecond(1),
                      summation(2)
-
                     }
        MAX-ACCESS   read-only
        STATUS       current
@@ -1745,7 +1746,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
        STATUS       current
        DESCRIPTION
           "This MIB object represents the duration for which the
-
            frequency reference corresponding to the tone type
            is turned off."
        ::={ pktcSigDevMultiFreqToneEntry 10}
@@ -1794,7 +1794,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
             This MIB object is used only when pktcSigDevCidMode is
             set to a value of 'lrETS'.  This timing has a range of
             300 to 800 ms.
-
             The following table defines the default values
             for this MIB object, depending on the signal type
            (pktcSigDevCidMode), and MUST be followed:
@@ -1843,7 +1842,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
             instead of 'A', 'B', 'C', or 'D'.
 
             The value of this MIB object MUST NOT persist across MTA
-
             reboots."
        REFERENCE
             "ETSI-EN-300-659-1 specification"
@@ -1892,7 +1890,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
             for signaling the information on Visual Message Waiting
             Indicator (VMWI).  Different countries define different
             VMWI signaling protocols to support VMWI service.
-
             Frequency shift keying (FSK) is most commonly used.
             DTMF is an alternative.
 
@@ -1931,6 +1928,7 @@ pktcSigDevToneSteady    OBJECT-TYPE
 
             The value of this MIB object MUST NOT persist across MTA
             reboots."
+
        DEFVAL {400}
            ::= {pktcSigDevObjects 38 }
 
@@ -1940,7 +1938,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
        STATUS       current
        DESCRIPTION
            "This object identifies optional start codes used when
-
             the pktcSigDevVmwiSigProtocol is set to a value of
             'dtmf(2)'.  Different countries define different On Hook
             Data Transmission Protocol signaling codes to support
@@ -1988,7 +1985,6 @@ pktcSigDevToneSteady    OBJECT-TYPE
 
             For example,
               <A><S1>...<Sn> <D><S1>...<Sn> <B><S1>...<Sn> <C>.
-
             The DTMF code 'C' may be sent by the network as an end code
             for the transfer of information values, through which
             special events can be indicated to the user.  In some
@@ -2229,7 +2225,6 @@ pktcSigEndPntConfigDialToneTO     OBJECT-TYPE
         " This object contains the default time out value for dial
           tone.  The MTA MUST NOT update this object with the
           value provided in the NCS message (if present).  If
-
           the value of the object is modified by the SNMP Management
           Station, the MTA MUST use the new value as a default only
           for a new signal requested by the NCS message.
@@ -2278,7 +2273,6 @@ pktcSigEndPntConfigOffHookWarnToneTO     OBJECT-TYPE
           off-hook warning tone.  The MTA MUST NOT update this object
           with the value provided in the NCS message (if present).  If
           the value of the object is modified by the SNMP Manager
-
           application, the MTA MUST use the new value as a default
           only for a new signal requested by the NCS message.  The
           time out (TO) elements are intended to limit the time a tone
@@ -2327,7 +2321,6 @@ pktcSigEndPntConfigRingBackTO     OBJECT-TYPE
           Station, the MTA MUST use the new value as a default only
           for a new signal requested by the NCS message.
           The time out (TO) elements are intended to limit the time
-
           a tone or frequency is generated.  When this MIB object is
           set to a value of '0', the MTA MUST NOT generate the
           corresponding frequency or tone, regardless of the
@@ -2376,7 +2369,6 @@ pktcSigEndPntConfigStutterDialToneTO     OBJECT-TYPE
           The time out (TO) elements are intended to limit the time
           a tone or frequency is generated.  When this MIB object is
           set to a value of '0', the MTA MUST NOT generate the
-
           corresponding frequency or tone, regardless of the
           definitions pertaining to frequency, tone duration, or
           cadence."
@@ -2637,6 +2629,7 @@ pktcSigEndPntStatusCallIpAddressType  OBJECT-TYPE
 
          Since pktcSigEndPntStatusCallIpAddress is expected to
          contain an IP address, a value of dns(16) is disallowed."
+
     ::= { pktcSigEndPntConfigEntry 29 }
 
 pktcSigEndPntStatusCallIpAddress  OBJECT-TYPE
@@ -2760,7 +2753,6 @@ pktcSigEndPntConfigPulseDialMaxMakeTime    OBJECT-TYPE
     STATUS       current
     DESCRIPTION
         " This is the maximum make pulse width for the dial pulse.
-
           The value of pktcSigEndPntConfigPulseDialMaxMakeTime MUST
           be greater than pktcSigEndPntConfigPulseDialMinMakeTime.
           This object MUST only be provided via the configuration
@@ -2809,7 +2801,6 @@ pktcSigCompliances   OBJECT IDENTIFIER ::= { pktcSigConformance 1 }
 pktcSigGroups        OBJECT IDENTIFIER ::= { pktcSigConformance 2 }
 
 --
-
 -- compliance statements
 --
 

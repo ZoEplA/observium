@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,11 +18,13 @@ foreach ($oids as $index => $entry)
 {
   $descr = "Chassis ".$entry['drsChassisIndex'];
   $oid = ".1.3.6.1.4.1.674.10892.2.4.1.1.14.$index";
-  discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'dell-rac', $descr, 1, $entry['drsAmpsReading']);
+  $object = 'drsAmpsReading';
+  discover_sensor_ng($device, 'current', $mib, $object, $oid, $index, 'dell-rac', $descr, 1, $entry[$object]);
 
   $limits = array('limit_high' => $entry['drsMaxPowerSpecification']);
   $oid = ".1.3.6.1.4.1.674.10892.2.4.1.1.13.$index";
-  discover_sensor($valid['sensor'], 'power', $device, $oid, $index, 'dell-rac', $descr, 1, $entry['drsWattsReading'], $limits);
+  $object = 'drsWattsReading';
+  discover_sensor_ng($device, 'power', $mib, $object, $oid, $index, 'dell-rac', $descr, 1, $entry[$object]);
 }
 
 unset($oids);
@@ -34,7 +36,8 @@ foreach ($oids as $index => $entry)
 {
   $descr = 'Chassis '.$entry['drsPSUChassisIndex'].' '.$entry['drsPSULocation'];
   $oid = ".1.3.6.1.4.1.674.10892.2.4.2.1.6.$index";
-  discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'dell-rac', $descr, 1, $entry['drsPSUAmpsReading']);
+  $object = 'drsPSUAmpsReading';
+  discover_sensor_ng($device, 'current', $mib, $object, $oid, $index, 'dell-rac', $descr, 1, $entry[$object]);
 
   $oid = ".1.3.6.1.4.1.674.10892.2.4.2.1.5.$index";
   $limits = array();
@@ -55,8 +58,8 @@ foreach ($oids as $index => $entry)
     // american 110V +/- 10%
     $limits = array('limit_high' => 99,  'limit_low' => 121);
   }
-
-  discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'dell-rac', $descr, 1, $entry['drsPSUVoltsReading'], $limits);
+  $object = 'drsPSUVoltsReading';
+  discover_sensor_ng($device, 'voltage', $mib, $object, $oid, $index, 'dell-rac', $descr, 1, $entry[$object]);
 }
 
 // EOF

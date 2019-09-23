@@ -7,16 +7,16 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 $ds  = "SurgeCount";
 
-$colour_area = "AA66AA";
-$colour_line = "330033";
+$colour_area = $config['colours']['graphs']['pkts']['in_area'];
+$colour_line = $config['colours']['graphs']['pkts']['in_line'];
 
-$colour_area_in = "cc88cc";
+$colour_area_in = $config['colours']['graphs']['pkts']['in_max'];
 
 $text  = "Client";
 

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2010 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Lan Switch VLAN MIB
 -- Reference:
--- Version: V2.0
+-- Version: V2.3
 -- History:
 -- (1) Created by Zhangshilin, 2001.06.29
 -- (2) Revised by Qi Zhenglin, 2002.01.08
@@ -36,12 +36,18 @@
 --        hwdot1qVlanBatchMIBTable and hwDot1qVlanBatchMIBEntry by hejunwei
 --   V1.9 2007-12-18 Add enmu 'vrrp' for hwVlanInterfaceIpType by Zhangyinfei
 --   V2.0 2010-01-18 Add hwdot1qVlanPortIndexs and hwVlanInterfaceIfIndex by duyanbing
+--   V2.1 2012-06-11 Modify hwVlanInterfaceIpAddr, hwVlanInterfaceIpMask and hwVlanInterfaceIpType by liuxibo
+--        2012-08-13
+--        Add hwPrivateVlanMappingTable by chenkaiping
+--        Add primaryVlan for hwdot1qVlanType by xiedong
+--   V2.2 2015-11-12 Modify hwdot1qVlanName by yuhaiyan
+--   V2.3 2016-08-29 Modify hwdot1qVlanMIBTable,add VLAN statistics related entries by niuchuanzheng
 -- ==================================================================
 HUAWEI-LswVLAN-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     TimeInterval, TEXTUAL-CONVENTION, TruthValue, RowStatus
         FROM SNMPv2-TC
-    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY, TimeTicks, IpAddress
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY, TimeTicks, IpAddress, Counter64
         FROM SNMPv2-SMI
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
@@ -53,15 +59,18 @@ IMPORTS
         FROM HUAWEI-LswINF-MIB;
 
     hwLswVlan MODULE-IDENTITY
-            LAST-UPDATED "200112261452Z"
+            LAST-UPDATED "201608310000Z"
             ORGANIZATION
-                "Hangzhou H3C Tech. Co., Ltd."
+                "Hangzhou H3C Technologies Co., Ltd."
             CONTACT-INFO
-                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                "Platform Team Hangzhou H3C Technologies Co., Ltd.
                  Hai-Dian District Beijing P.R. China
                  http://www.h3c.com
                  Zip:100085"
             DESCRIPTION ""
+            REVISION        "201608310000Z"
+            DESCRIPTION
+                "To modify size of hwdot1qVlanName."
             ::= { lswCommon 2 }
 
     HwVlanIndex ::= TEXTUAL-CONVENTION
@@ -129,7 +138,17 @@ IMPORTS
         hwdot1qVlanMulticast INTEGER,
         hwdot1qVlanTaggedPorts    PortList,
         hwdot1qVlanUntaggedPorts    PortList,
-        hwdot1qVlanPortIndexs    OCTET STRING
+        hwdot1qVlanPortIndexs    OCTET STRING,
+        hwdot1qVlanStatisticStatus    TruthValue,
+        hwdot1qVlanStatisticClear    INTEGER,
+        hwdot1qVlanStatisticInTotalPkts    Counter64,
+        hwdot1qVlanStatisticInTotalBytes    Counter64,
+        hwdot1qVlanStatisticInPPS    Counter64,
+        hwdot1qVlanStatisticInBPS    Counter64,
+        hwdot1qVlanStatisticOutTotalPkts    Counter64,
+        hwdot1qVlanStatisticOutTotalBytes    Counter64,
+        hwdot1qVlanStatisticOutPPS    Counter64,
+        hwdot1qVlanStatisticOutBPS    Counter64
         }
 
 
@@ -144,7 +163,7 @@ IMPORTS
 
 
     hwdot1qVlanName  OBJECT-TYPE
-        SYNTAX  SnmpAdminString (SIZE (0..32))
+        SYNTAX  SnmpAdminString (SIZE (0..80))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -168,7 +187,8 @@ IMPORTS
         common-vlan (2),
         sub-vlan    (3),
         isolate-user-vlan(4),
-        secondary-vlan(5)
+        secondary-vlan(5),
+        primaryVlan(6)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -322,6 +342,90 @@ IMPORTS
         DESCRIPTION
             "PortIndex list of the VLAN, that delimited by comma, such as 1,3,4,7."
         ::= { hwdot1qVlanMIBEntry 19 }
+
+    hwdot1qVlanStatisticStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "VLAN traffic statistics switch.
+            The default value is false, which means the switch is off."
+        ::= { hwdot1qVlanMIBEntry 20 }
+
+    hwdot1qVlanStatisticClear  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            clear(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear statistics for the specified VLANs. Operation read is not supported."
+        ::= { hwdot1qVlanMIBEntry 21 }
+
+    hwdot1qVlanStatisticInTotalPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound packets."
+        ::= { hwdot1qVlanMIBEntry 22 }
+
+    hwdot1qVlanStatisticInTotalBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound bytes."
+        ::= { hwdot1qVlanMIBEntry 23 }
+
+    hwdot1qVlanStatisticInPPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound packets per second."
+        ::= { hwdot1qVlanMIBEntry 24 }
+
+    hwdot1qVlanStatisticInBPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound bytes per second."
+        ::= { hwdot1qVlanMIBEntry 25 }
+
+    hwdot1qVlanStatisticOutTotalPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound packets."
+        ::= { hwdot1qVlanMIBEntry 26 }
+
+    hwdot1qVlanStatisticOutTotalBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound bytes."
+        ::= { hwdot1qVlanMIBEntry 27 }
+
+    hwdot1qVlanStatisticOutPPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound packets per second."
+        ::= { hwdot1qVlanMIBEntry 28 }
+
+    hwdot1qVlanStatisticOutBPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound bytes per second."
+        ::= { hwdot1qVlanMIBEntry 29 }
 
     hwVlanInterfaceTable OBJECT-TYPE
         SYNTAX SEQUENCE OF HwVlanInterfaceEntry
@@ -552,17 +656,15 @@ IMPORTS
 
     hwVlanInterfaceIpAddr OBJECT-TYPE
         SYNTAX  IpAddress
-        MAX-ACCESS read-write
+        MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "IP address of VLAN interface. When taking destory operation,
-            you could set it zero to destory all IP addresses(but cluster
-            IP address) in this VLAN interface."
+            "IP address of VLAN interface."
         ::= { hwVlanInterfaceAddrEntry 2 }
 
     hwVlanInterfaceIpMask OBJECT-TYPE
         SYNTAX  IpAddress
-        MAX-ACCESS read-write
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
             "IP address mask of VLAN interface. When destory single IP address,
@@ -577,12 +679,10 @@ IMPORTS
         cluster     (3),
         vrrp        (4)
         }
-        MAX-ACCESS read-write
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
-            "IP address type. cluster(3) will only be set when taking GET or
-            GET NEXT operation. primary(1) is optional when taking SET primary
-            IP address operation."
+            "IP address type."
         ::= { hwVlanInterfaceAddrEntry 4 }
 
     hwVlanInterfaceIpRowStatus OBJECT-TYPE
@@ -779,6 +879,74 @@ IMPORTS
             VLAN is not a sub VLAN of the super VLAN if its bit has
             a value of '0'."
         ::= { hwifSuperVlanMappingEntry 3 }
+
+    hwPrivateVlanMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwPrivateVlanMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Secondary vlan lists of Primary-VLANs."
+        ::= { hwLswVlanMngObject  8 }
+
+    hwPrivateVlanMappingEntry OBJECT-TYPE
+        SYNTAX HwPrivateVlanMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             "Secondary vlan lists of Primary-VLANs."
+        INDEX   { hwPrimaryVlanID }
+        ::= { hwPrivateVlanMappingTable 1}
+
+    HwPrivateVlanMappingEntry   ::=
+    SEQUENCE {
+        hwPrimaryVlanID  HwVlanIndex,
+        hwSecondaryVlanlistLow   OCTET STRING,
+        hwSecondaryVlanlistHigh OCTET STRING
+        }
+
+    hwPrimaryVlanID OBJECT-TYPE
+        SYNTAX  HwVlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Primary VLAN-ID."
+        ::= { hwPrivateVlanMappingEntry 1 }
+
+    hwSecondaryVlanlistLow OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 1 through
+            8, the second octet specifying VLANs 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN.  Thus, each secondary
+            VLAN of the primary VLAN is represented by a single bit
+            within the value of this object.  If that bit has a value
+            of '1' then that VLAN is secondary VLAN in the set of VLANs;
+            the VLAN is not secondary VLAN if its bit has a value of
+            '0'."
+        ::= { hwPrivateVlanMappingEntry 2 }
+
+    hwSecondaryVlanlistHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 2049 through
+            2056, the second octet specifying VLANs 2057 through 2064,
+            etc.  Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN.  Thus, each secondary
+            VLAN of the primary VLAN is represented by a single bit
+            within the value of this object.  If that bit has a value
+            of '1' then that VLAN is secondary VLAN in the set of VLANs;
+            the VLAN is not secondary VLAN if its bit has a value of
+            '0'."
+        ::= { hwPrivateVlanMappingEntry 3 }
 
     hwLswVlanProtoObject OBJECT-IDENTITY
             STATUS current

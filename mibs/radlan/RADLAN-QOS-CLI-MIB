@@ -32,6 +32,7 @@ RADLAN-QOS-CLI-MIB DEFINITIONS ::= BEGIN
 --             Add rlQosAceTidxTuple9, rlQosAceTidxTuple10 to rlQosAceTidxTable
 -- 18-Aug-2009 Removed Time Based Tables : code moved to general TimeBasedInfrastrucure
 -- 22-Oct-2009 Added rlQosAceTidxTuple11 to rlQosAceTidxTable in order to keep Src MAC addr of Dynamic ACLs
+-- 3-Jul-2013  rlQosOffsetTable is allowed again
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,Counter32,
     Gauge32, Unsigned32, IpAddress, TimeTicks   FROM SNMPv2-SMI
@@ -113,7 +114,10 @@ ClassOffsetType ::= TEXTUAL-CONVENTION
          10-VPT.
          11-EtherType.
          12-innerVlan.
-         13-Layer 3 IPv6 - start of layer 3 IPv6 header"
+         13-Layer 3 IPv6 - start of layer 3 IPv6 header.
+         14-Layer 4 IPv6 - start of layer 4 IPv6 header.
+         15-Source MAC.
+         16-Destination MAC."
     SYNTAX  INTEGER {
          packetStart(1),
          layer2-start(2),
@@ -127,7 +131,10 @@ ClassOffsetType ::= TEXTUAL-CONVENTION
          vpt(10),
          ethertype(11),
          inner-vlan(12),
-         layer3-ipv6-start(13)
+         layer3-ipv6-start(13),
+         layer4-ipv6-start(14),
+         src-mac(15),
+         dst-mac(16)
         }
 
 ClassTupleType ::= TEXTUAL-CONVENTION
@@ -513,7 +520,7 @@ rlQosMaxNumOfAce OBJECT-TYPE
 rlQosOffsetTable OBJECT-TYPE
     SYNTAX SEQUENCE OF RlQosOffsetEntry
     MAX-ACCESS not-accessible
-    STATUS deprecated
+    STATUS current
     DESCRIPTION
         "This table specifies Offset Table information"
     ::= { rlQosCliMib 4 }
@@ -521,7 +528,7 @@ rlQosOffsetTable OBJECT-TYPE
 rlQosOffsetEntry OBJECT-TYPE
     SYNTAX     RlQosOffsetEntry
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
         "Each entry in this table describes one classifier field.
         The information includes: Offset Type the offset the mask and the
@@ -545,7 +552,7 @@ RlQosOffsetEntry ::= SEQUENCE {
 rlQosOffsetIndex OBJECT-TYPE
     SYNTAX     INTEGER
     MAX-ACCESS not-accessible
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
         "An arbitrary incremental Index
          for the offset table."
@@ -554,7 +561,7 @@ rlQosOffsetIndex OBJECT-TYPE
 rlQosOffsetType OBJECT-TYPE
     SYNTAX     ClassOffsetType
     MAX-ACCESS read-create
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
         "Start of the offset."
     ::= { rlQosOffsetEntry 2 }
@@ -562,7 +569,7 @@ rlQosOffsetType OBJECT-TYPE
 rlQosOffsetValue OBJECT-TYPE
     SYNTAX     INTEGER
     MAX-ACCESS read-create
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
         "The Offset value."
     ::= { rlQosOffsetEntry 3 }
@@ -570,16 +577,17 @@ rlQosOffsetValue OBJECT-TYPE
 rlQosOffsetMask OBJECT-TYPE
     SYNTAX     INTEGER(0..255)
     MAX-ACCESS read-create
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
-        "Define which bit to be extracted from the offset."
+        "Define which bit to be extracted from the offset.
+        This field is a wildcard, i.e. 0 - significant bit, 1 - not significant."
     ::= { rlQosOffsetEntry 4 }
 
 
 rlQosOffsetPattern OBJECT-TYPE
     SYNTAX     INTEGER(0..255)
     MAX-ACCESS read-create
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
         "The value to match too."
     ::= { rlQosOffsetEntry 5 }
@@ -587,7 +595,7 @@ rlQosOffsetPattern OBJECT-TYPE
 rlQosOffsetTuplePointer OBJECT-TYPE
     SYNTAX     INTEGER
     MAX-ACCESS read-create
-    STATUS     deprecated
+    STATUS     current
     DESCRIPTION
         "Pointer for the relevant Tuple."
     ::= { rlQosOffsetEntry 6 }
@@ -595,7 +603,7 @@ rlQosOffsetTuplePointer OBJECT-TYPE
 rlQosOffsetStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      deprecated
+    STATUS      current
     DESCRIPTION
        "The status of a table entry.
         It is used to delete/Add an entry from this table."

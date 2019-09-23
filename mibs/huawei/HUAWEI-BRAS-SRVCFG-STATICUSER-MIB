@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:HUAWEI-BRAS-SRVCFG-STATICUSER-MIB
 -- Reference:
@@ -25,7 +25,7 @@
                                 FROM MPLS-VPN-MIB;
         
                 hwBRASSrvcfgStaticUser MODULE-IDENTITY 
-                        LAST-UPDATED "201306261608Z"
+                        LAST-UPDATED "200403041608Z"
                         ORGANIZATION
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -39,13 +39,6 @@
             
                 DESCRIPTION 
                         "The MIB contains objects of module SRVCFG."
-
-                REVISION     "201306261608Z"
-                DESCRIPTION   " V2.01, Inital version. "
-
-                REVISION     "200908091850Z"
-                DESCRIPTION   " V2.00, Inital version. " 
-
                 ::= { hwBRASMib 5 }
        --
 -- Node definitions
@@ -400,27 +393,6 @@
                         
              --  ============== hwStaticUserV2Entry  define end ==============      
        --  ============== hwStaticUserV2Table define end ============== 
-	hwStaticUserPassowrd OBJECT-TYPE
-	        SYNTAX OCTET STRING (SIZE (0..16 | 32))
-	        MAX-ACCESS read-write
-	        STATUS current
-	        DESCRIPTION
-	                "Description."
-	        ::= { hwSrvcfgStaticUserMibObjects 3 }
-
-	hwStaticUserUserNameFormatInclude OBJECT-TYPE
-	        SYNTAX INTEGER
-	        {
-	                default(1),
-	                ipaddress(2),
-	                macaddress(3),
-	                sysname(4)
-	        }
-	        MAX-ACCESS read-write
-	        STATUS current
-	        DESCRIPTION
-	                "Description."
-	        ::= { hwSrvcfgStaticUserMibObjects 4 }
 
    
        --  ============== conformance information ==============
@@ -458,9 +430,7 @@
                       hwStaticUserQinQVlan,
                       hwStaticUserDescription,
                       hwStaticUserGatewayIpAddr,
-                      hwStaticUserVrfName,
-                      hwStaticUserPassowrd,
-                      hwStaticUserUserNameFormatInclude}
+                      hwStaticUserVrfName}
             STATUS current
             DESCRIPTION 
                 "Static user configuraion table."

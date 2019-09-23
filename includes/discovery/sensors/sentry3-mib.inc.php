@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -32,7 +32,7 @@ foreach ($sentry3_InfeedEntry as $tower => $feeds)
                       'limit_high_warn' => $entry['infeedLoadHighThresh']);
       $value  = $entry['infeedLoadValue'];
 
-      discover_sensor($valid['sensor'], 'current', $device, $oid, "infeedLoad.$index", 'sentry3', $descr, $scale, $value, $limits);
+      discover_sensor('current', $device, $oid, "infeedLoad.$index", 'sentry3', $descr, $scale, $value, $limits);
     } else {
       // FIXME. States for $entry['infeedLoadStatus']
     }
@@ -43,7 +43,7 @@ foreach ($sentry3_InfeedEntry as $tower => $feeds)
     {
       $value = $entry['infeedVoltage'];
 
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, "infeedVoltage.$index", 'sentry3', $descr, $scale_voltage, $value);
+      discover_sensor('voltage', $device, $oid, "infeedVoltage.$index", 'sentry3', $descr, $scale_voltage, $value);
     }
 
     // infeedPower
@@ -52,7 +52,7 @@ foreach ($sentry3_InfeedEntry as $tower => $feeds)
     {
       $value = $entry['infeedPower'];
 
-      discover_sensor($valid['sensor'], 'power', $device, $oid, "infeedPower.$index", 'sentry3', $descr, 1, $value);
+      discover_sensor('power', $device, $oid, "infeedPower.$index", 'sentry3', $descr, 1, $value);
     }
 
     // outletLoadValue
@@ -69,7 +69,7 @@ foreach ($sentry3_InfeedEntry as $tower => $feeds)
                         'limit_low'  => $ou_entry['outletLoadLowThresh']);
         $value  = $ou_entry['outletLoadValue'];
 
-        discover_sensor($valid['sensor'], 'current', $device, $oid, "outletLoad.$index", 'sentry3', $descr, $scale, $value, $limits);
+        discover_sensor('current', $device, $oid, "outletLoad.$index", 'sentry3', $descr, $scale, $value, $limits);
       } else {
         // FIXME. States for $ou_entry['outletLoadStatus'], $ou_entry['outletStatus']
       }
@@ -107,7 +107,7 @@ foreach ($sentry3_TempHumidSensorEntry as $index => $entry)
       $options['sensor_unit'] = 'F';
     }
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "tempHumidSensor.$index", 'sentry3', $descr, $scale_temp, $value, $options);
+    discover_sensor('temperature', $device, $oid, "tempHumidSensor.$index", 'sentry3', $descr, $scale_temp, $value, $options);
   }
 
   // tempHumidSensorHumidValue
@@ -118,7 +118,7 @@ foreach ($sentry3_TempHumidSensorEntry as $index => $entry)
                         'limit_low'  => (isset($entry['tempHumidSensorHumidLowThresh'])  ? $entry['tempHumidSensorHumidLowThresh']  : NULL));
     $value      = $entry['tempHumidSensorHumidValue'];
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "tempHumidSensor.$index", 'sentry3', $descr, 1, $value, $options);
+    discover_sensor('humidity', $device, $oid, "tempHumidSensor.$index", 'sentry3', $descr, 1, $value, $options);
   }
 }
 

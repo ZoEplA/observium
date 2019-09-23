@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -97,7 +97,7 @@ foreach(array('', 'b', 'c') as $trio)
   $pluses_name = 'pluses'.$trio;
   $$in_name  = implode(',', $rrd_multi[$in_name]);
   $$out_name = implode(',', $rrd_multi[$out_name]);
-  $$pluses_name = str_repeat(',+', count($rrd_multi[$in_name]) - 1);
+  $$pluses_name = str_repeat(',ADDNAN', count($rrd_multi[$in_name]) - 1);
   unset($in_name, $out_name, $pluses_name);
 }
 

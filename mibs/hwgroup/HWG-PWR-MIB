@@ -1,9 +1,10 @@
---	HWg-PWR MIB 1.00
+--	HWg-PWR MIB 1.02
 --		History:
 --
 --		1.00	 2.04.2010 Marek Hummel  - Created
 --		1.01	 2.04.2010 Marek Hummel  - Add Input Dry Contacts
---
+--		1.02	 20.2.2017 Marek Hummel  - Fix pwrStateToAlarm, pwrStateToNormal trap definition, rename mtvalValue to mtvalMbusValue								
+-- 		1.03	 9.10.201  Marek Hummel  - Add meter secondary address in text format 
 --
 
 HWG-PWR-MIB DEFINITIONS ::= BEGIN
@@ -89,7 +90,8 @@ MtEntry ::= SEQUENCE {
 	mtName		Txt16,
 	mtAddr		PositiveInteger,
 	mtSecAddr	PositiveInteger,
-	mtValNumber PositiveInteger
+	mtValNumber PositiveInteger,
+	mtSecAddrTxt Txt8	
 }
 
 mtIndex OBJECT-TYPE
@@ -97,7 +99,7 @@ mtIndex OBJECT-TYPE
 	ACCESS	read-only
 	STATUS	mandatory
 	DESCRIPTION
-		"The sensor index."
+		"The meter index."
 	::= { mtEntry 1 }
 
 mtName OBJECT-TYPE
@@ -105,7 +107,7 @@ mtName OBJECT-TYPE
 	ACCESS	read-write
 	STATUS	mandatory
 	DESCRIPTION
-		"Jmeno merice."
+		"Mater name."
 	::= { mtEntry 2 }
 
 mtAddr OBJECT-TYPE
@@ -113,7 +115,7 @@ mtAddr OBJECT-TYPE
 	ACCESS	read-only
 	STATUS	mandatory
 	DESCRIPTION
-		"Primarni adresa."
+		"Meter primary address."
 	::= { mtEntry 3 }
 
 mtSecAddr OBJECT-TYPE
@@ -121,7 +123,7 @@ mtSecAddr OBJECT-TYPE
 	ACCESS	read-only
 	STATUS	mandatory
 	DESCRIPTION
-		"Sekundarni adresa."
+		"Meter secondary address int format."
 	::= { mtEntry 4 }
 
 mtValNumber OBJECT-TYPE
@@ -129,8 +131,16 @@ mtValNumber OBJECT-TYPE
 	ACCESS	read-only
 	STATUS	mandatory
 	DESCRIPTION
-		"Pocet merenych hodnot merice."
+		"Number of values."
 	::= { mtEntry 5 }
+
+mtSecAddrTxt OBJECT-TYPE
+	SYNTAX	Txt8
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Secondary address text format."
+	::= { mtEntry 6 }	
 
 
 -- Meter Value Table  -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -316,14 +326,14 @@ inpAlarmState OBJECT-TYPE
 
 pwrStateToAlarm	TRAP-TYPE
 	ENTERPRISE	hwgpwr
-	VARIABLES	{ mtvalIndex, mtvalName, mtvalUnit, mtvalTarif, mtvalExp, mtvalValue, mtvalTxtValue, mtvalAlarmState }
+	VARIABLES	{ mtvalIndex, mtvalName, mtvalUnit, mtvalTarif, mtvalExp, mtvalMbusValue, mtvalTxtValue, mtvalAlarmState }
 	DESCRIPTION
 		"Value changed to Alarm state."
 	::= 1
 
 pwrStateToNormal	TRAP-TYPE
 	ENTERPRISE	hwgpwr
-	VARIABLES	{ mtvalIndex, mtvalName, mtvalUnit, mtvalTarif, mtvalExp, mtvalValue, mtvalTxtValue, mtvalAlarmState }
+	VARIABLES	{ mtvalIndex, mtvalName, mtvalUnit, mtvalTarif, mtvalExp, mtvalMbusValue, mtvalTxtValue, mtvalAlarmState }
 	DESCRIPTION
 		"Value changed to Normal state."
 	::= 2

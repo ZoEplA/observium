@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage alerting
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -55,14 +55,17 @@ $time_rfc = date('r', time());
 $headers = array();
 if (empty($config['email']['from']))
 {
-  $config['email']['from'] = 'Observium <observium@'.$localhost.'>'; // Default "From:"
-}
-
-foreach (parse_email($config['email']['from']) as $from => $from_name)
-{
-  $headers['From'] = (empty($from_name) ? $from : '"'.$from_name.'" <'.$from.'>'); // From:
-  $headers['Return-Path'] = $from;
-  break; // use only first entry
+  // Default "From:"
+  $headers['From'] = 'Observium <observium@'.$localhost.'>';
+  $headers['Return-Path'] = 'observium@'.$localhost;
+} else {
+  // Validate configured mail from
+  foreach (parse_email($config['email']['from']) as $from => $from_name)
+  {
+    $headers['From'] = (empty($from_name) ? $from : '"'.$from_name.'" <'.$from.'>'); // From:
+    $headers['Return-Path'] = $from;
+    break; // use only first entry
+  }
 }
 
 $rcpts = array();
@@ -182,9 +185,9 @@ $status = $mail->send($rcpts, $headers, $body);
 
 if (PEAR::isError($status))
 {
-  // FIXME error should go into $notify_status
   print_message('%rMailer Error%n: ' . $status->getMessage(), 'color');
   $notify_status['success'] = FALSE;
+  $notify_status['error']   = $status->getMessage();
 } else {
   $notify_status['success'] = TRUE;
 }

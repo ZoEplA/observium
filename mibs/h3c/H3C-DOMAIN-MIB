@@ -1,35 +1,48 @@
 -- ==================================================================
--- Copyright (C) 2009 by H3C Technologies. All rights reserved.
+-- Copyright (C) 2004-2017 by H3C Technologies. All rights reserved.
 --
 -- Description: Domain MIB
 -- Reference:
--- Version: V1.6
+-- Version: V2.1
 -- History:
 -- V1.0 2005.03.23 The initial version, created by Xulei
 -- V1.1 2005.06.03 updated by Xulei
---      Update SMIv2 syntax of some MIB objects
+--      Updated the SMIv2 syntax of some MIB objects
 -- V1.2 2006.03.27 updated by yuanzhijie
 --      1. Modified the description of h3cDomainSchemeRowStatus
---      2. Add h3cDomainSchemeAAAType, h3cDomainSchemeAAAName,
---         h3cDomainSchemeAccessMode
---      3. Change the value range of the object h3cDomainAuthSchemeName
+--      2. Added h3cDomainSchemeAAAType, h3cDomainSchemeAAAName,
+--         and h3cDomainSchemeAccessMode
+--      3. Changed the value range for objects h3cDomainAuthSchemeName
 --         and h3cDomainAcctSchemeName
 -- V1.3 2007.03.07 updated by yangyang
---      Change SYNTAX of h3cDomainName and h3cDomainDefault
+--      Changed the SYNTAX of h3cDomainName and h3cDomainDefault
 -- V1.4 2008.11.25 updated by ouzhili
---      Add an enumeration vlanlist(3) to object h3cDomainVlanAssignMode
+--      Added enumeration value vlanlist(3) to object h3cDomainVlanAssignMode
 -- V1.5 2008.12.30 updated by dupengfei
---      Add h3cDomainCurrentAccessNum
+--      Added h3cDomainCurrentAccessNum
 -- V1.6 2009.08.05 updated by huxiulan
---      Add an enumeration wapi(12) to object h3cAccessModeofDomainScheme
+--      Added enumeration value reserved(12) to object h3cAccessModeofDomainScheme
+-- V1.7 2012.05.20 updated by qiuchunxia
+--      Added h3cDomainIdleCutTime
+--      2012.10.15 updated by liubo
+--      Added enumeration value ldap(5) to object h3cDomainSchemeMode
+-- V1.8 2013.02.28 updated by xuyonggang
+--      Changed h3cDomainSchemeAccessMode
+-- V1.9 2013.4.25 updated by qiuchunxia
+--      Deleted the range of h3cDomainIdleCutMaxTime
+-- V2.0 2013.11.25 updated by zhangdexu
+--      Changed the range of h3cDomainDefault and h3cDomainName
+-- V2.1 2017.6.3 updated by yuhua
+--      Added h3cDomainGlobalStat, h3cDomainStatTable, h3cDomainIPPoolStatTable,
+--      h3cDomainServiceType, h3cDomainIpPoolName, and h3cDomainIpv6PoolName
+--      2017.10.13 updated by yangliping
+--      Changed h3cDomainGlobalStat and h3cDomainStatTable
 -- ==================================================================
 H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
     IMPORTS
         h3cCommon
             FROM HUAWEI-3COM-OID-MIB
-        OBJECT-GROUP, MODULE-COMPLIANCE
-            FROM SNMPv2-CONF
-        Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, Unsigned32
             FROM SNMPv2-SMI
         InetAddressType, InetAddress
             FROM INET-ADDRESS-MIB
@@ -37,15 +50,67 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-TC;
 
     h3cDomain MODULE-IDENTITY
-        LAST-UPDATED "200908050000Z"            -- August 05, 2009 at 00:00 GMT
+        LAST-UPDATED "201710130000Z"            -- October 13, 2017 at 00:00 GMT
         ORGANIZATION
-            "H3C Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Beijing Institute H3C Tech, Inc.
-            Http://www.h3c.com
-            E-mail:support@h3c.com "
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             "The MIB module is used for managing domain."
+
+--  Revision history
+
+    REVISION     "201710130000Z"          -- October 13, 2017 at 00:00 GMT
+        DESCRIPTION  "Changed h3cDomainGlobalStat and h3cDomainStatTable"
+
+    REVISION     "201706030000Z"          -- June 03, 2017 at 00:00 GMT
+        DESCRIPTION  "Added h3cDomainGlobalStat, h3cDomainStatTable, h3cDomainIPPoolStatTable,
+                  h3cDomainServiceType, h3cDomainIpPoolName, and h3cDomainIpv6PoolName"
+
+    REVISION     "201311250000Z"          -- November 25, 2013 at 00:00 GMT
+        DESCRIPTION  "Changed the range of h3cDomainDefault and h3cDomainName"
+
+    REVISION     "201304250000Z"          -- April 25, 2013 at 00:00 GMT
+        DESCRIPTION  "Deleted the range of h3cDomainIdleCutMaxTime"
+
+    REVISION     "201302280000Z"          -- February 28, 2013 at 00:00 GMT
+        DESCRIPTION  "Changed h3cDomainSchemeAccessMode"
+
+    REVISION     "201210150000Z"          -- October 15, 2012 at 00:00 GMT
+        DESCRIPTION  "Added enumeration value ldap(5) to object h3cDomainSchemeMode"
+
+    REVISION     "201205200000Z"          -- May 20, 2012 at 00:00 GMT
+        DESCRIPTION  "Added h3cDomainIdleCutTime"
+
+    REVISION     "200908050000Z"          -- August 5, 2009 at 00:00 GMT
+        DESCRIPTION  "Added enumeration value reserved(12) to object h3cAccessModeofDomainScheme"
+
+    REVISION     "200812300000Z"          -- December 30, 2008 at 00:00 GMT
+        DESCRIPTION  "Added h3cDomainCurrentAccessNum"
+
+    REVISION     "200811250000Z"          -- November 25, 2008 at 00:00 GMT
+        DESCRIPTION  "Added enumeration value vlanlist(3) to object h3cDomainVlanAssignMode"
+
+    REVISION     "200703070000Z"          -- March 7, 2007 at 00:00 GMT
+        DESCRIPTION  "Changed the SYNTAX of h3cDomainName and h3cDomainDefault"
+
+    REVISION     "200603270000Z"          -- March 27, 2006 at 00:00 GMT
+        DESCRIPTION  "1. Modified the description of h3cDomainSchemeRowStatus
+                  2. Added h3cDomainSchemeAAAType, h3cDomainSchemeAAAName,
+                     and h3cDomainSchemeAccessMode
+                  3. Changed the value range for objects h3cDomainAuthSchemeName
+                     and h3cDomainAcctSchemeName"
+
+    REVISION     "200506300000Z"          -- June 30, 2005 at 00:00 GMT
+        DESCRIPTION  "Updated the SMIv2 syntax of some MIB objects"
+
+    REVISION     "200503230000Z"          -- March 23, 2005 at 00:00 GMT
+        DESCRIPTION  "The initial version, created"
+
     ::= { h3cCommon 46 }
 
     H3cModeOfDomainScheme ::= TEXTUAL-CONVENTION
@@ -55,13 +120,15 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         none: indicates the domain has no scheme.
         local:indicates the domain will use local-server as a scheme.
         radius:indicates the domain will use radius scheme.
-        tacacs:indicates the domain will use tacacs scheme."
+        tacacs:indicates the domain will use tacacs scheme.
+        ldap:indicates the domain will use ldap scheme."
         SYNTAX INTEGER
         {
             none(1),
             local(2),
             radius(3),
-            tacacs(4)
+            tacacs(4),
+            ldap(5)
         }
 
     H3cAAATypeDomainScheme ::= TEXTUAL-CONVENTION
@@ -93,13 +160,13 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             voice(9),
             superauthen(10),
             command(11),
-            wapi(12)
+            reserved(12)
         }
 
     h3cDomainControl OBJECT IDENTIFIER ::= { h3cDomain 1 }
 
     h3cDomainDefault OBJECT-TYPE
-        SYNTAX      OCTET STRING (SIZE (1..128))
+        SYNTAX      OCTET STRING (SIZE (1..255))
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
@@ -141,10 +208,14 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         h3cDomainSelfServiceURL         OCTET STRING,
         h3cDomainAccFailureAction       INTEGER,
         h3cDomainRowStatus              RowStatus,
-        h3cDomainCurrentAccessNum       Integer32 }
+        h3cDomainCurrentAccessNum       Integer32,
+        h3cDomainIdleCutTime            TimeTicks,
+        h3cDomainServiceType            INTEGER,
+        h3cDomainIpPoolName             OCTET STRING,
+        h3cDomainIpv6PoolName           OCTET STRING }
 
     h3cDomainName   OBJECT-TYPE
-        SYNTAX  OCTET STRING (SIZE (1..128))
+        SYNTAX  OCTET STRING (SIZE (1..255))
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
@@ -202,7 +273,7 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
     ::= { h3cDomainInfoEntry  5 }
 
     h3cDomainIdleCutMaxTime   OBJECT-TYPE
-        SYNTAX Integer32(1..120)
+        SYNTAX Integer32
         MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
@@ -306,6 +377,60 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         "The current access number of the domain."
     ::= { h3cDomainInfoEntry 15 }
 
+    h3cDomainIdleCutTime   OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Authentication aging time.  If no packet is transmitted during the aging time,
+        the authentication is aged out."
+    ::= { h3cDomainInfoEntry  16 }
+
+    h3cDomainServiceType   OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            hsi(1),
+            stb(2),
+            voip(3)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Service type of users in the domain, including hsi(1), stb(2), and voip(3).
+         The default value is hsi.
+
+         The High Speed Internet (hsi) service is applicable to users that access the
+         network through PPP, 802.1X, or IPoE. If this service is used, the multicast feature of
+         the access module is disabled to save system resources.
+
+         The Set Top Box (stb) service is applicable to users that access the network
+         through stb. If this service is used, the multicast feature of the access module
+         is enabled to improve the performance of the multicast module.
+
+         The Voice over IP (voip) service is applicable to users that access the network
+         through IP phones. If this service is used, the Quality of Service (QoS) module
+         increases the priority of voice traffic to reduce the transmission delay for
+         IP phone users.
+
+        Default value is hsi."
+    ::= { h3cDomainInfoEntry  17 }
+
+    h3cDomainIpPoolName   OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..63))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Specifies an IPv4 address pool for users in the domain."
+    ::= { h3cDomainInfoEntry  18 }
+
+    h3cDomainIpv6PoolName   OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..63))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Specifies an IPv6 address pool for users in the domain."
+    ::= { h3cDomainInfoEntry  19 }
+
     -- ----------------------------------------------------------------------
     -- Scheme Table
     -- ----------------------------------------------------------------------
@@ -335,7 +460,6 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         h3cDomainSchemeAAAType          H3cAAATypeDomainScheme,
         h3cDomainSchemeAAAName          OCTET STRING,
         h3cDomainSchemeAccessMode       H3cAccessModeofDomainScheme
-
         }
 
     h3cDomainSchemeIndex   OBJECT-TYPE
@@ -353,9 +477,9 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
         "The scheme mode of the domain.  Setting h3cDomainSchemeMode to none(1) indicates
         the domain has none scheme.  Setting h3cDomainSchemeMode to local(2) indicates the
-        domain will use local-server as a scheme.  Setting h3cDomainSchemeMode to radius(3)
-        or tacacs(4) indicates the domain will use radius or tacacs scheme.  If set
-        h3cDomainSchemeMode to radius(3) or tacacs(4), h3cDomainAuthSchemeName and
+        domain will use local-server as a scheme.  Setting h3cDomainSchemeMode to radius(3),
+        tacacs(4) or ldap(5) indicates the domain will use radius, tacacs or ldap scheme.  If set
+        h3cDomainSchemeMode to radius(3), tacacs(4) or ldap(5), h3cDomainAuthSchemeName and
         h3cDomainAcctSchemeName must be set to valid values.  And if h3cDomainSchemeMode is
         set to none(1) or local(2), the value of h3cDomainAuthSchemeName and h3cDomainAcctSchemeName
         will be ignored."
@@ -366,8 +490,8 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
-        "The authentication scheme name of domain.  If h3cDomainSchemeMode is set to radius
-        or tacacs, the h3cDomainAuthSchemeName must be configured with a valid value."
+        "The authentication scheme name of domain.  If h3cDomainSchemeMode is set to radius,
+        tacacs or ldap, the h3cDomainAuthSchemeName must be configured with a valid value."
     ::= { h3cDomainSchemeEntry  3 }
 
     h3cDomainAcctSchemeName   OBJECT-TYPE
@@ -493,4 +617,317 @@ H3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         create a new row, h3cDomainIpPoolNum and h3cDomainIpPoolLowIpAddr must be specified.
         To destroy an existent row, the IP pool of this row MUST NOT be used by user."
     ::= { h3cDomainIpPoolEntry 5 }
+
+    -- ----------------------------------------------------------------------
+    -- Domain Statistics Table
+    -- ----------------------------------------------------------------------
+    h3cDomainStatTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF H3cDomainStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The (conceptual) table listing Domain statistics."
+    ::= { h3cDomainTables 4 }
+
+    h3cDomainStatEntry OBJECT-TYPE
+        SYNTAX  H3cDomainStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An entry (conceptual row) representing statistics of a domain."
+        INDEX { h3cDomainName }
+    ::= { h3cDomainStatTable 1 }
+
+    H3cDomainStatEntry ::= SEQUENCE {
+        h3cDomainAccessedNum          Unsigned32,
+        h3cDomainOnlineNum            Unsigned32,
+        h3cDomainOnlinePPPUser        Unsigned32,
+        h3cDomainOnlineIPoEUser       Unsigned32,
+        h3cDomainOnlinePPPoEUser      Unsigned32,
+        h3cDomainOnlinePPPoAUser      Unsigned32,
+        h3cDomainOnlinePPPoFRUser     Unsigned32,
+        h3cDomainOnlineLacUser        Unsigned32,
+        h3cDomainOnlineLnsUser        Unsigned32,
+        h3cDomainOnlineIPoEBindAuthUser   Unsigned32,
+        h3cDomainOnlineIPoEWebAuthUser    Unsigned32,
+        h3cDomainOnlineLeasedUser     Unsigned32}
+
+    h3cDomainAccessedNum   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Total number of users in the domain."
+    ::= { h3cDomainStatEntry 1 }
+
+
+    h3cDomainOnlineNum   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online users in the domain."
+    ::= { h3cDomainStatEntry 2 }
+
+
+    h3cDomainOnlinePPPUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPP users in the domain."
+    ::= { h3cDomainStatEntry 3 }
+
+    h3cDomainOnlineIPoEUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE users in the domain."
+    ::= { h3cDomainStatEntry 4 }
+
+    h3cDomainOnlinePPPoEUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPPoE users in the domain."
+    ::= { h3cDomainStatEntry 5 }
+
+    h3cDomainOnlinePPPoAUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPPoA users in the domain."
+    ::= { h3cDomainStatEntry 6 }
+
+    h3cDomainOnlinePPPoFRUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPPoFR users in the domain."
+    ::= { h3cDomainStatEntry 7 }
+
+    h3cDomainOnlineLacUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online LAC users in the domain."
+    ::= { h3cDomainStatEntry 8 }
+
+    h3cDomainOnlineLnsUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online LNS users in the domain."
+    ::= { h3cDomainStatEntry 9 }
+
+    h3cDomainOnlineIPoEBindAuthUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE users that use bind authentication in the domain."
+    ::= { h3cDomainStatEntry 10 }
+
+    h3cDomainOnlineIPoEWebAuthUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE users that use WEB authentication in the domain."
+    ::= { h3cDomainStatEntry 11 }
+
+    h3cDomainOnlineLeasedUser   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE Leased users in the domain."
+    ::= { h3cDomainStatEntry 12 }
+
+    -- ----------------------------------------------------------------------
+    -- Domain IP Pool Statistics Table
+    -- ----------------------------------------------------------------------
+    h3cDomainIPPoolStatTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF H3cDomainIPPoolStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The (conceptual) table listing IP pool statistics."
+    ::= { h3cDomainTables 5 }
+
+    h3cDomainIPPoolStatEntry OBJECT-TYPE
+        SYNTAX  H3cDomainIPPoolStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An entry (conceptual row) representing statistics of an IP pool."
+        INDEX { h3cDomainName }
+    ::= { h3cDomainIPPoolStatTable 1 }
+
+    H3cDomainIPPoolStatEntry ::= SEQUENCE {
+        h3cDomainIPTotalNum      Unsigned32,
+        h3cDomainIPUsedNum       Unsigned32,
+        h3cDomainIPConflictNum   Unsigned32,
+        h3cDomainIPExcludeNum    Unsigned32,
+        h3cDomainIPIdleNum       Unsigned32,
+        h3cDomainIPUsedPercent   OCTET STRING }
+
+
+    h3cDomainIPTotalNum   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Total number of addresses in the IP pool."
+    ::= { h3cDomainIPPoolStatEntry 1 }
+
+
+    h3cDomainIPUsedNum    OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of addresses already used in the IP pool."
+    ::= { h3cDomainIPPoolStatEntry 2 }
+
+
+    h3cDomainIPConflictNum   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of conflicting addresses in the IP pool."
+    ::= { h3cDomainIPPoolStatEntry 3 }
+
+
+    h3cDomainIPExcludeNum   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of addresses excluded from the IP pool."
+    ::= { h3cDomainIPPoolStatEntry 4 }
+
+   h3cDomainIPIdleNum   OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Number of idle addresses in the IP pool."
+    ::= { h3cDomainIPPoolStatEntry 5 }
+
+    h3cDomainIPUsedPercent   OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Address occupancy rate in the IP pool."
+    ::= { h3cDomainIPPoolStatEntry 6 }
+
+    -- ----------------------------------------------------------------------
+    -- Domain Global Statistics Table
+    -- ----------------------------------------------------------------------
+    h3cDomainGlobalStat OBJECT IDENTIFIER ::= { h3cDomain 3 }
+
+    h3cDomainGlobalAccessedNum  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of users in all domains."
+    ::=  { h3cDomainGlobalStat 1 }
+
+    h3cDomainGlobalOnlineNum  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online users in all domains."
+    ::=  { h3cDomainGlobalStat 2 }
+
+    h3cDomainGlobalOnlinePPPUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPP users in all domains."
+    ::=  { h3cDomainGlobalStat 3 }
+
+    h3cDomainGlobalOnlineIPoEUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE users in all domains."
+    ::=  { h3cDomainGlobalStat 4 }
+
+    h3cDomainGlobalOnlinePPPoEUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPPoE users in all domains."
+    ::=  { h3cDomainGlobalStat 5 }
+
+    h3cDomainGlobalOnlinePPPoAUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPPoA users in all domains."
+    ::=  { h3cDomainGlobalStat 6 }
+
+    h3cDomainGlobalOnlinePPPoFRUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online PPPoFR users in all domains."
+    ::=  { h3cDomainGlobalStat 7 }
+
+    h3cDomainGlobalOnlineLacUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online LAC users in all domains."
+    ::=  { h3cDomainGlobalStat 8 }
+
+    h3cDomainGlobalOnlineLnsUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online LNS users in all domains."
+    ::=  { h3cDomainGlobalStat 9 }
+
+    h3cDomainGlobalOnlineIPoEBindAuthUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE users that use bind authentication in all domains."
+    ::=  { h3cDomainGlobalStat 10 }
+
+    h3cDomainGlobalOnlineIPoEWebAuthUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE users that use WEB authentication in all domains."
+    ::=  { h3cDomainGlobalStat 11 }
+
+    h3cDomainGlobalOnlineLeasedUser  OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS  read-only
+        STATUS   current
+        DESCRIPTION
+        "Number of online IPoE Leased users in all domains."
+    ::=  { h3cDomainGlobalStat 12 }
 END

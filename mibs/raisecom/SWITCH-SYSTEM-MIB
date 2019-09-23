@@ -59,10 +59,7 @@ rcSwitchConfig          OBJECT IDENTIFIER ::= { rcSystem 3 }
 rcPortInfoConfig     	OBJECT IDENTIFIER ::= { rcSystem 4 }
 rcLoopbackTrap      	OBJECT IDENTIFIER ::= { rcSystem 5 } 
 rcPorConnectorChangeTrap      	OBJECT IDENTIFIER ::= { rcSystem 6 }  
-rcMacMoveTrap           OBJECT IDENTIFIER ::= { rcSystem 8 }    
-
-rcPortStormControlTrap    OBJECT IDENTIFIER ::= { rcPortInfoConfig 4 } 
-
+rcMacMoveTrap           OBJECT IDENTIFIER ::= { rcSystem 8 }
 
 
 -- ----------------------------------------------------------------------------
@@ -730,15 +727,7 @@ rcSlotType OBJECT-TYPE
             "This object is used as a variable in the mac-move notification
             to contain the value of the VLAN received the mac address which caused the mac-move."
         ::= { rcSwitchConfig 39 } 
-        
-     rcStormControlDetectEnable OBJECT-TYPE
-    	SYNTAX  EnableVar
-        MAX-ACCESS read-write
-        STATUS mandatory
-        DESCRIPTION
-                "Enable or disable storm-detect shutdown action."
-         DEFVAL  { disable }       
-        ::= { rcSwitchConfig 40 }                                
+                                  
 -- rcPortInfoConfig 
     rcPortTable OBJECT-TYPE
         SYNTAX SEQUENCE OF RcPortEntry
@@ -789,22 +778,7 @@ rcSlotType OBJECT-TYPE
         rcPortMDIXMode                  INTEGER,
         rcPortMDIXStatus                INTEGER,
         rcportDiscPKts                  Counter32,
-        rcPortMacThresholdVlan		    INTEGER,
-        rcPortStormControlBcastPps		INTEGER,
-        rcPortStormControlMcastPps      INTEGER,
-        rcPortStormControlDlfPps		INTEGER,
-        rcPortStormControlDetectAction  INTEGER, 
-        rcPortStormControlRecoverTimer  INTEGER, 
-        rcPortStormControlStatus		INTEGER,
-        rcStormCtrlTrapEnable			EnableVar,
-        rcPortStormControlBcastBps		INTEGER,
-        rcPortStormControlMcastBps      INTEGER,
-        rcPortStormControlDlfBps		INTEGER,
-        rcPortStormControlBcastBurst	INTEGER,
-        rcPortStormControlMcastBurst    INTEGER,
-        rcPortStormControlDlfBurst		INTEGER,
-        rcPortStormControlCtrlMode		INTEGER
-
+        rcPortMacThresholdVlan		INTEGER
      }      
      
    	rcPortIndex OBJECT-TYPE
@@ -1153,129 +1127,6 @@ rcSlotType OBJECT-TYPE
                 it indicates the VlanId;when the mac limits mac-thredshold on interface, 
                 its value is 4095."
         ::= { rcPortEntry 32 }
-     rcPortStormControlBcastPps      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config broadcast packet per second value for storm control."
-        ::= { rcPortEntry 33 }    
-        
-    rcPortStormControlMcastPps      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config multicast packet per second value for storm control."
-        ::= { rcPortEntry 34}    
-        
-    rcPortStormControlDlfPps      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config dlf packet per second value for storm control."
-        ::= { rcPortEntry 35}
- 
-     rcPortStormControlDetectAction  OBJECT-TYPE
-        SYNTAX  INTEGER
-        		{
-        			drop(1),
-        			shutdown(2)
-        		}
-        ACCESS read-write
-        STATUS current
-        DESCRIPTION
-                "set storm control-detect action"
-        DEFVAL  { drop }
-        ::= { rcPortEntry 36 } 
-          
-      rcPortStormControlRecoverTimer OBJECT-TYPE
-        SYNTAX  INTEGER (0..150)
-        ACCESS read-write
-        STATUS current
-        DESCRIPTION
-                "set storm control-detect revover timer(unit:min)"
-        ::= { rcPortEntry 37 }
-      rcPortStormControlStatus   OBJECT-TYPE
-      	SYNTAX  INTEGER 
-      			{
-        			drop(1)
-        		}
-        ACCESS write-only
-        STATUS current
-        DESCRIPTION
-                "set storm control-detect to no shutdown on port "
-        ::= { rcPortEntry 38 }
-        
-      rcStormCtrlTrapEnable OBJECT-TYPE
-        SYNTAX  EnableVar
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "Enable or disable stormcontrol trap function."
-        ::= { rcPortEntry 39 }   
-
-     rcPortStormControlBcastBps      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config broadcast packet config rate value for storm control."
-        ::= { rcPortEntry 40 }    
-        
-    rcPortStormControlMcastBps      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config multicast packet config rate value for storm control."
-        ::= { rcPortEntry 41}    
-        
-    rcPortStormControlDlfBps      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config dlf packet config rate value for storm control."
-        ::= { rcPortEntry 42}
-
-    rcPortStormControlBcastBurst      OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config broadcast packet config burst size value for storm control."
-        ::= { rcPortEntry 43 }    
-        
-    rcPortStormControlMcastBurst       OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config multicast packet config burst size value for storm control."
-        ::= { rcPortEntry 44}    
-        
-    rcPortStormControlDlfBurst       OBJECT-TYPE 
-    	SYNTAX INTEGER  
-    	MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "config dlf packet config burst size value for storm control."
-        ::= { rcPortEntry 45}
-
-   rcPortStormControlCtrlMode        OBJECT-TYPE
-        SYNTAX INTEGER
-	        {
-	             pps(1),
-	             bps(2),
-	             default(3)
-	        }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-             "Storm-control type pps or bps."
-        ::= { rcPortEntry 46 } 
 --
 -- Combo port property
 -- 
@@ -1423,14 +1274,6 @@ rcMacMoveVioTrap   NOTIFICATION-TYPE
 				DESCRIPTION
 					"Mac-move violation trap."
 				::= { rcMacMoveTrap 1 } 
-
-
-rcPortstormCtrlopenTrap NOTIFICATION-TYPE
-           OBJECTS { rcPortIndex }
-           STATUS  current
-           DESCRIPTION
-               "One of the stormcontrol type over the max limit value."
-       ::= { rcPortStormControlTrap 1 }
 				
 --
 -- END of ROSE-SYSINFO-MIB                

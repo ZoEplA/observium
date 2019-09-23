@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: description of Port Security
 -- Reference:
--- Version: V1.7
+-- Version: V1.8
 -- History:
 --   V1.0 2004-11-24, Created by lijian
 --   V1.1 2005-2-23,  Modified by Zhangmin
@@ -21,6 +21,7 @@
 --                    and macAddressAndUserLoginSecureExt for hh3cSecurePortMode
 --                    by huangyang
 --   V1.7 2012-04-11, Modified the range of hh3cSecureRalmAuthOfflineTime by xuyonggang
+--   V1.8 2014-06-05, Modified the range of hh3cSecureRalmAuthDomain by wuqiang
 -- =================================================================
 HH3C-PORT-SECURITY-MIB DEFINITIONS ::= BEGIN
 
@@ -42,9 +43,9 @@ IMPORTS
 hh3cPortSecurityMIB MODULE-IDENTITY
     LAST-UPDATED "200411240000Z"
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085"
@@ -177,7 +178,7 @@ hh3cSecureRalmAuthPassword OBJECT-TYPE
     ::= { hh3cSecureRalmObjects 6 }
 
 hh3cSecureRalmAuthDomain OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(1..24))
+    SYNTAX      DisplayString(SIZE(1..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION

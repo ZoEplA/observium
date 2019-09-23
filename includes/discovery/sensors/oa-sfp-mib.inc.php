@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -33,7 +33,7 @@ foreach ($oids as $index => $entry)
     $value = intval($entry['oaSfpDiagnosticTemperature']);
     if ($value <> 0)
     {
-      discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'lambdadriver-dom-temp', $descr, $scale, $value);
+      discover_sensor('temperature', $device, $oid, $index, 'lambdadriver-dom-temp', $descr, $scale, $value);
     }
   }
 
@@ -45,7 +45,7 @@ foreach ($oids as $index => $entry)
     $value = intval($entry['oaSfpDiagnosticVcc']);
     if ($value <> 0)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'lambdadriver-dom-voltage', $descr, $scale, $value);
+      discover_sensor('voltage', $device, $oid, $index, 'lambdadriver-dom-voltage', $descr, $scale, $value);
     }
   }
 
@@ -57,7 +57,7 @@ foreach ($oids as $index => $entry)
     $value = intval($entry['oaSfpDiagnosticTxBias']);
     if ($value <> 0)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'lambdadriver-dom-current', $descr, $scale, $value);
+      discover_sensor('current', $device, $oid, $index, 'lambdadriver-dom-current', $descr, $scale, $value);
     }
   }
 
@@ -69,7 +69,7 @@ foreach ($oids as $index => $entry)
     $value = intval($entry['oaSfpDiagnosticRxPower']);
     if ($value <> -5000)
     {
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'lambdadriver-dom-rxpower', $descr, $scale, $value);
+      discover_sensor('dbm', $device, $oid, $index, 'lambdadriver-dom-rxpower', $descr, $scale, $value);
     }
   }
 
@@ -81,7 +81,7 @@ foreach ($oids as $index => $entry)
     $value = intval($entry['oaSfpDiagnosticRxPower']);
     if ($value <> -5000)
     {
-      discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'lambdadriver-dom-txpower', $descr, $scale, $value);
+      discover_sensor('dbm', $device, $oid, $index, 'lambdadriver-dom-txpower', $descr, $scale, $value);
     }
   }
 }

@@ -7,14 +7,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-if (!isset($cache_discovery['cpqrack-mib']))
-{
-  $cache_discovery['cpqrack-mib'] = snmpwalk_cache_oid($device, 'cpqRackServerBlade', NULL, 'CPQRACK-MIB');
-}
+$oids = snmp_cache_table($device, 'cpqRackServerBladeTable', NULL, 'CPQRACK-MIB'); // This table also used in statuses
 
 // Chassis
 $index = 1;
@@ -31,10 +28,10 @@ $inventory[$index] = array(
     'entPhysicalParentRelPos' => -1,
     'entPhysicalMfgName'      => 'HP'
 );
-discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'cpqrack-mib');
+discover_inventory($device, $index, $inventory[$index], $mib);
 
 // Blades
-foreach ($cache_discovery['cpqrack-mib'] as $tmp => $entry)
+foreach ($oids as $tmp => $entry)
 {
   if ($entry['cpqRackServerBladeEntry'] == "0") { continue; }
   if ($entry['cpqRackServerBladeSlotsUsed'] == "0") { continue; }
@@ -50,7 +47,9 @@ foreach ($cache_discovery['cpqrack-mib'] as $tmp => $entry)
     'entPhysicalMfgName'      => 'HP'
   );
   $model = $entry['cpqRackServerBladeProductId'];
-  if ( $entry['cpqRackServerBladePowered'] === "off") {
+
+  if ($entry['cpqRackServerBladePowered'] === "off")
+  {
     $model .= ' (OFF)';
   }
   $inventory[$index+1] = array(
@@ -64,17 +63,14 @@ foreach ($cache_discovery['cpqrack-mib'] as $tmp => $entry)
     'entPhysicalParentRelPos' => 1,
     'entPhysicalMfgName'      => 'HP'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'cpqrack-mib');
-  discover_inventory($valid['inventory'], $device, $index+1, $inventory[$index+1], 'cpqrack-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
+  discover_inventory($device, $index+1, $inventory[$index+1], $mib);
   unset($model);
 }
 
-if (!isset($cache_discovery['cpqrack-mib_power']))
-{
-  $cache_discovery['cpqrack-mib_power'] = snmpwalk_cache_oid($device, 'cpqRackPowerSupplyTable', NULL, 'CPQRACK-MIB');
-}
+$oids = snmp_cache_table($device, 'cpqRackPowerSupplyTable', NULL, 'CPQRACK-MIB'); // This table also used in sensors
 
-foreach ($cache_discovery['cpqrack-mib_power'] as $pwr => $entry)
+foreach ($oids as $pwr => $entry)
 {
   $index += 2;
 
@@ -97,8 +93,8 @@ foreach ($cache_discovery['cpqrack-mib_power'] as $pwr => $entry)
     'entPhysicalParentRelPos' => 1,
     'entPhysicalMfgName'      => 'HP'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'cpqrack-mib');
-  discover_inventory($valid['inventory'], $device, $index+1, $inventory[$index+1], 'cpqrack-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
+  discover_inventory($device, $index+1, $inventory[$index+1], $mib);
 }
 
 $nets = snmpwalk_cache_oid($device, 'cpqRackNetConnectorTable', array(), 'CPQRACK-MIB');
@@ -127,8 +123,8 @@ foreach ($nets as $net => $entry)
     'entPhysicalParentRelPos' => 1,
     'entPhysicalMfgName'      => 'HP'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'cpqrack-mib');
-  discover_inventory($valid['inventory'], $device, $index+1, $inventory[$index+1], 'cpqrack-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
+  discover_inventory($device, $index+1, $inventory[$index+1], $mib);
 }
 
 $oas = snmpwalk_cache_oid($device, 'cpqRackCommonEnclosureManagerTable', array(), 'CPQRACK-MIB');
@@ -159,8 +155,8 @@ foreach ($oas as $oa => $entry)
     'entPhysicalParentRelPos' => 1,
     'entPhysicalMfgName'      => 'HP'
   );
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'cpqrack-mib');
-  discover_inventory($valid['inventory'], $device, $index+1, $inventory[$index+1], 'cpqrack-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
+  discover_inventory($device, $index+1, $inventory[$index+1], $mib);
 }
 
 unset($power, $net, $oa, $oa_state);

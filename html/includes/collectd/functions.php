@@ -100,18 +100,18 @@ function error_collectd($code, $code_msg, $title, $msg) {
  * No RRD files found that could match request
  */
 function error404($title, $msg) {
-  return error_collectd(404, "Not found", $title, $msg);
+  error_collectd(404, "Not found", $title, $msg);
 }
 
 function error500($title, $msg) {
-  return error_collectd(500, "Not found", $title, $msg);
+  error_collectd(500, "Not found", $title, $msg);
 }
 
 /**
  * Incomplete / invalid request
  */
 function error400($title, $msg) {
-  return error_collectd(400, "Bad request", $title, $msg);
+  error_collectd(400, "Bad request", $title, $msg);
 }
 
 
@@ -129,8 +129,10 @@ function read_var($name, &$array, $default = null) {
 		if (is_array($array[$name])) {
 			if (get_magic_quotes_gpc()) {
 				$ret = array();
-				while (list($k, $v) = each($array[$name]))
+				foreach ($array[$name] as $k => $v)
+				{
 					$ret[stripslashes($k)] = stripslashes($v);
+				}
 				return $ret;
 			} else
 				return $array[$name];
@@ -159,7 +161,7 @@ function collectd_compare_host($a, $b) {
 
 /**
  * Fetch list of hosts found in collectd's datadirs.
- * @return Sorted list of hosts (sorted by label from rigth to left)
+ * @return array Sorted list of hosts (sorted by label from right to left)
  */
 function collectd_list_hosts() {
 	global $config;
@@ -181,7 +183,7 @@ function collectd_list_hosts() {
 /**
  * Fetch list of plugins found in collectd's datadirs for given host.
  * @arg_host Name of host for which to return plugins
- * @return Sorted list of plugins (sorted alphabetically)
+ * @return array Sorted list of plugins (sorted alphabetically)
  */
 function collectd_list_plugins($arg_host) {
 	global $config;
@@ -207,7 +209,7 @@ function collectd_list_plugins($arg_host) {
  * Fetch list of plugin instances found in collectd's datadirs for given host+plugin
  * @arg_host Name of host
  * @arg_plugin Name of plugin
- * @return Sorted list of plugin instances (sorted alphabetically)
+ * @return array Sorted list of plugin instances (sorted alphabetically)
  */
 function collectd_list_pinsts($arg_host, $arg_plugin) {
 	global $config;
@@ -320,10 +322,13 @@ function collectd_identifier($host, $plugin, $pinst, $type, $tinst) {
 	$orig_identifier = sprintf('%s/%s%s%s/%s%s%s', $host, $plugin, strlen($pinst) ? '-' : '', $pinst, $type, strlen($tinst) ? '-' : '', $tinst);
 	$identifier      = null;
 	foreach ($config['datadirs'] as $datadir)
-		if (is_file($datadir.'/'.$orig_identifier.'.rrd')) {
-			$rrd_realpath = realpath($datadir.'/'.$orig_identifier.'.rrd');
+	{
+		if (is_file($datadir . '/' . $orig_identifier . '.rrd'))
+		{
+			$rrd_realpath = realpath($datadir . '/' . $orig_identifier . '.rrd');
 			break;
 		}
+	}
 	if ($rrd_realpath) {
 		$identifier   = basename($rrd_realpath);
 		$identifier   = substr($identifier, 0, strlen($identifier)-4);
@@ -507,7 +512,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 
 	$rrdinfo = null;
 	$rrdfile = sprintf('%s/%s%s%s/%s%s%s', $host, $plugin, is_null($pinst) ? '' : '-', $pinst, $type, is_null($tinst) ? '' : '-', $tinst);
-	foreach ($config['datadirs'] as $datadir)
+	foreach ($config['datadirs'] as $datadir) {
 		if (is_file($datadir.'/'.$rrdfile.'.rrd')) {
 			$rrdinfo = rrdtool_file_info($datadir.'/'.$rrdfile.'.rrd');
 			if (isset($rrdinfo['RRA']) && is_array($rrdinfo['RRA']))
@@ -515,9 +520,12 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 			else
 				$rrdinfo = null;
 		}
+	}
 
 	if (is_null($rrdinfo))
-		return false;
+	{
+		return FALSE;
+	}
 
 	$graph = array();
 	$has_avg = false;
@@ -525,7 +533,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 	$has_min = false;
 	reset($rrdinfo['RRA']);
 	$l_max = 0;
-	while (list($k, $v) = each($rrdinfo['RRA'])) {
+	foreach ($rrdinfo['RRA'] as $k => $v) {
 		if ($v['cf'] == 'MAX')
 			$has_max = true;
 		else if ($v['cf'] == 'AVERAGE')
@@ -546,7 +554,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 
 
 	reset($rrdinfo['DS']);
-	while (list($k, $v) = each($rrdinfo['DS'])) {
+	foreach ($rrdinfo['DS'] as $k => $v) {
 		if (strlen($k) > $l_max)
 			$l_max = strlen($k);
 		if ($has_min)
@@ -559,7 +567,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 	if ($has_min && $has_max || $has_min && $has_avg || $has_avg && $has_max) {
 		$n = 1;
 		reset($rrdinfo['DS']);
-		while (list($k, $v) = each($rrdinfo['DS'])) {
+		foreach ($rrdinfo['DS'] as $k => $v) {
 			$graph[] = sprintf('LINE:%s_%s', $k, $has_min ? 'min' : 'avg');
 			$graph[] = sprintf('CDEF:%s_var=%s_%s,%s_%s,-', $k, $k, $has_max ? 'max' : 'avg', $k, $has_min ? 'min' : 'avg');
 			$graph[] = sprintf('AREA:%s_var#%s::STACK', $k, rrd_get_color($n++, false));
@@ -568,7 +576,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 
 	reset($rrdinfo['DS']);
 	$n = 1;
-	while (list($k, $v) = each($rrdinfo['DS'])) {
+	foreach ($rrdinfo['DS'] as $k => $v) {
 		$graph[] = sprintf('LINE1:%s_avg#%s:%s ', $k, rrd_get_color($n++, true), $k.substr('                  ', 0, $l_max-strlen($k)));
 		if (isset($opts['tinylegend']) && $opts['tinylegend'])
 			continue;

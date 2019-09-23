@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2005 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -31,13 +31,14 @@ BRCM-CM-MGMT-EXT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY,
-    OBJECT-TYPE
+    OBJECT-TYPE,
+    Integer32
         FROM SNMPv2-SMI
     broadcomCableDataMgmt
         FROM BRCM-CABLEDATA-MGMT-MIB;
                 
 cmMgmtExt MODULE-IDENTITY
-    LAST-UPDATED "200504180000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -55,6 +56,12 @@ cmMgmtExt MODULE-IDENTITY
     DESCRIPTION
         "Broadcom CM management extension MIB.  This MIB is supported only for 
          products implementing the Broadcom CM vendor extension."
+    REVISION      "200702050000Z"
+    DESCRIPTION
+        "Range restrictions for objects cmScanPushFrequency and cmScanIndex 
+         were adjusted.
+         Compilability issues were cleaned up: 
+         - Missing imports were added."
     REVISION      "200504180000Z"
     DESCRIPTION
             "Initial version of this MIB module."
@@ -65,7 +72,7 @@ cmMgmtExtBase OBJECT IDENTIFIER ::= { cmMgmtExt 1 }
 cmMgmtExtScan OBJECT IDENTIFIER ::= { cmMgmtExt 2 }
 
 cmScanPushFrequency OBJECT-TYPE
-    SYNTAX      Integer32 (0..1000000000)
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -109,7 +116,7 @@ CmScanEntry ::=
     }
     
 cmScanIndex OBJECT-TYPE
-    SYNTAX      Integer32 (0..1000000000)
+    SYNTAX      Integer32 (1..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -147,7 +154,6 @@ cmMgmtExtBaseStandbySwitchStatus OBJECT-TYPE
 	  
          When standby-mode is enabled 'on(1)', the device blocks WAN data traffic
          to/from the CPEs."  
-                   
     ::= { cmMgmtExtBase 1 }
 
         

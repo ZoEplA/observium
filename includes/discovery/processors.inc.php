@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -19,36 +19,17 @@ include("includes/include-dir-mib.inc.php");
 
 // Detect processors by simple MIB-based discovery :
 // FIXME - this should also be extended to understand multiple entries in a table, and take descr from an OID but this is all I need right now :)
-foreach (get_device_mibs($device) as $mib)
+foreach (get_device_mibs_permitted($device) as $mib)
 {
   if (is_array($config['mibs'][$mib]['processor']))
   {
-     print_cli_data_field("$mib ");
+    print_cli_data_field("$mib ");
     foreach ($config['mibs'][$mib]['processor'] as $entry_name => $entry)
     {
       $entry['found'] = FALSE;
 
       // Check duplicate processors by $valid['processor'] array
-      if (isset($entry['skip_if_valid_exist']) && $tree = explode('->', $entry['skip_if_valid_exist']))
-      {
-        switch (count($tree))
-        {
-          case 1:
-            if (isset($valid['processor'][$tree[0]]) &&
-                count($valid['processor'][$tree[0]])) { continue 2; }
-            break;
-          case 2:
-            if (isset($valid['processor'][$tree[0]][$tree[1]]) &&
-                count($valid['processor'][$tree[0]][$tree[1]])) { continue 2; }
-            break;
-          case 3:
-            if (isset($valid['processor'][$tree[0]][$tree[1]][$tree[2]]) &&
-                count($valid['processor'][$tree[0]][$tree[1]][$tree[2]])) { continue 2; }
-            break;
-          default:
-            print_debug("Too many array levels for valid sensor!");
-        }
-      }
+      if (discovery_check_if_type_exist($GLOBALS['valid'], $entry, 'processor')) { continue 2; }
 
       // Precision (scale)
       $precision = 1;
@@ -60,11 +41,15 @@ foreach (get_device_mibs($device) as $mib)
 
       if ($entry['type'] == 'table')
       {
-        $processors_array = snmpwalk_cache_oid($device, $entry['table'], array(), $mib);
+
+        // Use the type as the table if no table is set.
+        if(!isset($entry['table'])) { $entry['table'] = $entry_name; }
+
+        $processors_array = snmpwalk_cache_oid($device, $entry['table'], array(), $mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
         if ($entry['table_descr'])
         {
           // If descr in separate table with same indexes
-          $processors_array = snmpwalk_cache_oid($device, $entry['table_descr'], $processors_array, $mib);
+          $processors_array = snmpwalk_cache_oid($device, $entry['table_descr'], $processors_array, $mib, NULL, OBS_SNMP_ALL_NUMERIC_INDEX);
         }
         if (empty($entry['oid_num']))
         {
@@ -73,46 +58,20 @@ foreach (get_device_mibs($device) as $mib)
         }
 
         $i = 1; // Used in descr as $i++
+        $processors_count = count($processors_array);
         foreach ($processors_array as $index => $processor)
         {
-          unset($descr);
           $dot_index = '.' . $index;
           $oid_num   = $entry['oid_num'] . $dot_index;
-          if ($entry['oid_descr'] && $processor[$entry['oid_descr']])
-          {
-            $descr = $processor[$entry['oid_descr']];
-            if (isset($entry['descr']) && str_contains($entry['descr'], '%oid_descr%'))
-            {
-              // If descr definition have this magic key, use combination of static 'descr' and named 'descr' from oid
-              $descr = array_tag_replace(array('oid_descr' => $descr), $entry['descr']);
-            }
-          }
-          if (!$descr)
-          {
-            if (isset($entry['descr']))
-            {
-              if (!str_contains($entry['descr'], array('%i%', '%index')))
-              {
-                $descr = $entry['descr'] . ' ' . $index;
-              } else {
-                $replace_array = array(
-                  'index' => $index,    // Index in descr
-                  'i'     => $i,        // i++ counter in descr
-                );
-                // Multipart index: Oid.0.1.2 -> %index0%, %index1%, %inde20%
-                if (preg_match('/%index\d+%/', $entry['descr']))
-                {
-                  foreach (explode('.', $index) as $k => $k_index)
-                  {
-                    $replace_array['index'.$k] = $k_index; // Multipart indexes
-                  }
-                }
-                $descr = array_tag_replace($replace_array, $entry['descr']);
-              }
-            } else {
-              $descr = 'Processor ' . $index;
-            }
-          }
+
+          // Rewrite specific keys
+          $replace_array = array(
+            'index' => $index,    // Index in descr
+            'i'     => $i,        // i++ counter in descr
+          );
+
+          $descr = entity_descr_definition('processor', $entry, array_merge($replace_array, $processor), $processors_count);
+
           $idle  = (isset($entry['idle']) && $entry['idle'] ? 1 : 0);
 
           $usage = snmp_fix_numeric($processor[$entry['oid']]);
@@ -133,41 +92,35 @@ foreach (get_device_mibs($device) as $mib)
       } else {
         // Static processor
         $index = 0; // FIXME. Need use same indexes style as in sensors
-        if (isset($entry['oid_descr']) && $entry['oid_descr'])
+
+        // Fetch description from oid if specified
+        $replace_array = array('index' => $index);
+        if (isset($entry['oid_descr']))
         {
-          // Get description from specified OID
-          $descr = snmp_get($device, $entry['oid_descr'], '-OQUvs', $mib);
+          $replace_array[$entry['oid_descr']] = snmp_get_oid($device, $entry['oid_descr'], $mib);
         }
-        if (!$descr)
-        {
-          if (isset($entry['descr']))
-          {
-            $descr = $entry['descr'];
-          } else {
-            $descr = 'Processor';
-          }
-        }
-        if (empty($entry['oid_num']))
-        {
-          // Use snmptranslate if oid_num not set
-          $entry['oid_num'] = snmp_translate($entry['oid'], $mib);
-        }
+        $descr = entity_descr_definition('processor', $entry, $replace_array);
 
         if (isset($entry['oid_count']) && $entry['oid_count'])
         {
           // Get processors count if exist for MIB
-          $processor_count = snmp_get($device, $entry['oid_count'], '-OQUvs', $mib);
+          $processor_count = snmp_get_oid($device, $entry['oid_count'], $mib);
           if ($processor_count > 1)
           {
             $descr .= ' x'.$processor_count;
           }
         }
 
+        if (empty($entry['oid_num']))
+        {
+          // Use snmptranslate if oid_num not set
+          $entry['oid_num'] = snmp_translate($entry['oid'], $mib);
+        }
+
         // Idle
         $idle  = (isset($entry['idle']) && $entry['idle'] ? 1 : 0);
 
-        $usage = snmp_get($device, $entry['oid'], '-OQUvs', $mib);
-        $usage = snmp_fix_numeric($usage);
+        $usage = snmp_fix_numeric(snmp_get_oid($device, $entry['oid'], $mib));
 
         // If we have valid usage, discover the processor
         if (is_numeric($usage) && $usage != '4294967295')

@@ -1,23 +1,23 @@
---**MOD+***********************************************************************
---* Module:    hpicfOpenFlow.mib
---*
--- Copyright (C) 2012,2014-2015 Hewlett Packard Enterprise Development LP
--- * All Rights Reserved.
--- * 
--- * The contents of this software are proprietary and confidential
--- * to the Hewlett Packard Enterprise Development LP.  No part of this
--- * program may be photocopied, reproduced, or translated into another
--- * programming language without prior written consent of the
--- * Hewlett Packard Enterprise Development LP.
---*
---* Purpose: This file contains MIB definition of HP-ICF-OPENFLOW-MIB 
---*
---**MOD-***********************************************************************
+-- ***********************************************************************
+-- Module:    hpicfOpenFlow.mib
+-- 
+-- Copyright (C) 2012,2014-2017 Hewlett Packard Enterprise Development LP
+-- All Rights Reserved.
+--  
+-- The contents of this software are proprietary and confidential to
+-- the Hewlett Packard Enterprise Development LP. No part of this
+-- program may be photocopied, reproduced, or translated into another
+-- programming language without prior written consent of the
+-- Hewlett Packard Enterprise Development LP.
+--
+-- Purpose: This file contains MIB definition of HP-ICF-OPENFLOW-MIB 
+--
+-- ***********************************************************************
+
 HP-ICF-OPENFLOW-MIB  DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
-    Unsigned32
           FROM SNMPv2-SMI
     TruthValue, RowStatus, DisplayString
           FROM SNMPv2-TC
@@ -37,14 +37,75 @@ IMPORTS
           FROM HP-ICF-TC;
 
     hpicfOpenFlowMIB MODULE-IDENTITY
-      LAST-UPDATED "201501110000Z"   -- January 11, 2015
+      LAST-UPDATED "201803270000Z"   -- March 27, 2018
       ORGANIZATION "HP Networking"
       CONTACT-INFO
              "Hewlett Packard Company
               8000 Foothills Blvd.
               Roseville, CA 95747"
       DESCRIPTION
+             "Added all option
+             hpicfOpenFlowInstanceOverrideProtocol mib object."
+
+      REVISION     "201803270000Z"   -- March 27, 2018
+      DESCRIPTION
              "The MIB module for configuring OpenFlow."
+
+      REVISION     "201707160000Z"   -- July 16, 2017
+      DESCRIPTION
+              "Added a mib object hpicfOpenFlowControllerSourceAddressType
+              corresponding to the source IP when configuring a controller.
+              Updated compliance."
+
+      REVISION     "201706180000Z"   -- June 18, 2017
+      DESCRIPTION
+              "Added a mib object hpicfOpenFlowControllerSourceAddress
+              for source IP when configuring a controller."
+
+      REVISION     "201704280000Z"   -- April 28, 2017
+      DESCRIPTION
+              "Added traditionalPipeline option
+               hpicfOpenFlowInstanceOverrideProtocol mib object."
+
+      REVISION     "201610250000Z"   -- October 25, 2016
+      DESCRIPTION
+              "Removed bfd protocol in
+               hpicfOpenFlowInstanceOverrideProtocol mib object."
+
+      REVISION     "201610050000Z"   -- October 05, 2016
+      DESCRIPTION
+            "Added mib object
+               hpicfOpenFlowInstanceMeterPrecedenceLevel."
+
+      REVISION     "201608060000Z"   -- August 6, 2016
+      DESCRIPTION
+              "Removed two protocols, dtiscp and webmacauth in
+               hpicfOpenFlowInstanceOverrideProtocol mib object.
+               Also modified the BITS numbering of other protocols."
+
+      REVISION     "201607310000Z"   -- July 31, 2016
+      DESCRIPTION
+              "Added mib object
+               hpicfOpenFlowInstanceMissRuleDefaultAction
+               hpicfOpenFlowInstanceOverrideProtocol
+               hpicfOpenFlowInstancePktInVlanTagging"
+
+      REVISION     "201604210000Z"   -- April 21, 2016
+      DESCRIPTION
+            "Removed mib object
+              hpicfOpenFlowInstanceGroupHWCounterAvailability."
+
+      REVISION      "201512100000Z"   -- December 10, 2015
+      DESCRIPTION
+             "Added new enum in following MIB object hpicfOpenFlowInstanceOperStatusReason,
+              disabled enum is added in this MIB object"
+
+      REVISION      "201509290000Z"   -- September 29, 2015
+      DESCRIPTION
+             "The following MIB object changes in hpicfOpenFlowInstanceOperStatusReason,
+              hardwareFailure is renamed to enableFailedInHardware.        
+              controllerVLANRemoved is removed"
+
       REVISION      "201501110000Z"   -- January 11, 2015
       DESCRIPTION
              "Added support for OpenFlow MAC group tables in the pipeline"
@@ -60,9 +121,9 @@ IMPORTS
               hpicfOpenFlowIpControlTableMode.
               Deprecated groups are
               hpicfOpenFlowInstanceGroup
-              hpicfOpenFlowInstanceMembershipGroup and
+              hpicfOpenFlowInstanceMembershipGroup
               hpicfOpenFlowScalarsGroup. Added new groups
-              hpicfOpenFlowInstanceGroup1 and
+              hpicfOpenFlowInstanceGroup1
               hpicfOpenFlowScalarsGroup1.
               Deprecated the compliance
               hpicfOpenFlowCompliance and added hpicfOpenFlowCompliance1."
@@ -103,8 +164,6 @@ hpicfOpenFlowConformance   OBJECT IDENTIFIER ::= { hpicfOpenFlowMIB 2 }
                           OpenFlow related configuration."
           DEFVAL          { disable }
           ::= { hpicfOpenFlowObjects 1}
-
-
 
 ----------------------------------------------------------
 -- OpenFlow instance table
@@ -160,7 +219,10 @@ hpicfOpenFlowConformance   OBJECT IDENTIFIER ::= { hpicfOpenFlowMIB 2 }
                   hpicfOpenFlowInstancePipelineModel      INTEGER,
                   hpicfOpenFlowInstanceDatapathDesc       DisplayString,
                   hpicfOpenFlowInstanceSourceMacGrpTable  INTEGER,
-                  hpicfOpenFlowInstanceDestMacGrpTable    INTEGER
+                  hpicfOpenFlowInstanceDestMacGrpTable    INTEGER,
+                  hpicfOpenFlowInstanceMissRuleDefaultAction  INTEGER,
+                  hpicfOpenFlowInstanceOverrideProtocol   BITS,
+                  hpicfOpenFlowInstancePktInVlanTagging   INTEGER
                   }
 
   hpicfOpenFlowInstanceName       OBJECT-TYPE
@@ -426,7 +488,10 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                                     hardwareResourcesUnavailable(2),
                                     memberVLANNotConfigured(3),
                                     memberVLANRemoved(4),
-                                    noValidPortsInMemberVLAN(5)
+                                    noValidPortsInMemberVLAN(5),
+                                    controllerVLANNotConfigured(6),
+                                    enableFailedInHardware(7),
+                                    disabled(8)
                                   }
           MAX-ACCESS      read-only
           STATUS          current
@@ -550,7 +615,86 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
          DEFVAL          { disable }
           ::= { hpicfOpenFlowInstanceEntry 30}
 
+  hpicfOpenFlowInstanceMissRuleDefaultAction OBJECT-TYPE
+          SYNTAX         INTEGER     {
+                                     none(0),
+                                     drop(1),
+                                     normal(2),
+                                     ctrl(3)
+                                     }
+          MAX-ACCESS     read-write
+          STATUS         current
+          DESCRIPTION    "This MIB object is used to configure the flow miss
+                          action associated with the instance.
+                          A value of 0(none) indicates no flow miss action 
+                          specified, which is to drop all unknown packets.
+                          A value of 1(drop) enables an instance to drop all
+                          unknown packets.
+                          A value of 2(normal) enables an instance to forward
+                          all unknown packets using non-OpenFlow pipeline.
+                          A value of 3(ctrl) enables an instance to forward
+                          all unknown packets to the OpenFlow controller."
 
+          DEFVAL          { none }
+          ::=   { hpicfOpenFlowInstanceEntry 31}
+
+  hpicfOpenFlowInstanceOverrideProtocol OBJECT-TYPE
+          SYNTAX         BITS     {
+                                     stp(0),
+                                     gvrp(1),
+                                     mvrp(2),
+                                     lacp(3),
+                                     dot1x(4),
+                                     udld(5),
+                                     loopprotect(6),
+                                     pvst(7),
+                                     smartlink(8),
+                                     dldp(9),
+                                     bonjour(10),
+                                     traditionalPipeline(11),
+                                     all(31)
+                                     }
+          MAX-ACCESS     read-write
+          STATUS         current
+          DESCRIPTION    "This MIB object is used to configure the Override
+                          protocol associated with the instance."
+          ::=   { hpicfOpenFlowInstanceEntry 32}
+
+  hpicfOpenFlowInstancePktInVlanTagging OBJECT-TYPE
+          SYNTAX         INTEGER     {
+                                     default(0),
+                                     inputForm(1),
+                                     tagAlways(2),
+                                     untagAlways(3)
+                                     }
+          MAX-ACCESS     read-write
+          STATUS         current
+          DESCRIPTION    "This MIB object is used to configure the 802.1q
+                          tagging property for a packet encapsulated inside
+                          the OpenFlow packet-in header.
+                          A value of 0 (default) indicates the default behavior
+                          which is the packet encapsulated inside a packet-in
+                          message will be tagged in the following cases
+                          a) the instance type is aggregate.
+                          b) the instance is a named instance with more than one
+                             member VLAN.
+                          c) the instance is a named instance and the packet was
+                             received with a tag.
+                          It will be untagged in all other cases.
+                          A value of 1 (inputForm) directs the instance to send
+                          the encapsulated packet as it was received on the
+                          physical port.
+                          A value of 2 (tagAlways) directs the instance to send
+                          the encapsulated packet always with an 802.1q tag
+                          irrespective of how it was received on the physical
+                          port.
+                          A value of 3 (untagAlways) directs the instance to
+                          send the encapsulated packet always without an 802.1q
+                          tag irrespective of how it was received on the
+                          physical port."
+
+          DEFVAL          { default }
+          ::=   { hpicfOpenFlowInstanceEntry 33}
 
 ----------------------------------------------------------
 -- OpenFlow member table for OpenFlow instances
@@ -615,12 +759,14 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
 
   HpicfOpenFlowControllerEntry ::= 
           SEQUENCE {
-                  hpicfOpenFlowControllerID              Integer32,
-                  hpicfOpenFlowControllerInetAddressType InetAddressType,
-                  hpicfOpenFlowControllerInetAddress     InetAddress,
-                  hpicfOpenFlowControllerPort            InetPortNumber, 
-                  hpicfOpenFlowControllerInterface       InterfaceIndex,
-                  hpicfOpenFlowControllerRowStatus       RowStatus
+                  hpicfOpenFlowControllerID                    Integer32,
+                  hpicfOpenFlowControllerInetAddressType       InetAddressType,
+                  hpicfOpenFlowControllerInetAddress           InetAddress,
+                  hpicfOpenFlowControllerPort                  InetPortNumber,
+                  hpicfOpenFlowControllerInterface             InterfaceIndex,
+                  hpicfOpenFlowControllerRowStatus             RowStatus,
+                  hpicfOpenFlowControllerSourceAddressType     InetAddressType,
+                  hpicfOpenFlowControllerSourceAddress         InetAddress
                   }
 
   hpicfOpenFlowControllerID OBJECT-TYPE
@@ -677,30 +823,23 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceControllerTable." 
           ::=   {hpicfOpenFlowControllerEntry 6}
 
+  hpicfOpenFlowControllerSourceAddressType  OBJECT-TYPE
+          SYNTAX          InetAddressType
+          MAX-ACCESS      read-create
+          STATUS          current
+          DESCRIPTION     "Address type of the Source IP. This
+                          implementation supports only ipv4 type."
+          ::=   {hpicfOpenFlowControllerEntry 7}
+
+  hpicfOpenFlowControllerSourceAddress      OBJECT-TYPE
+          SYNTAX          InetAddress
+          MAX-ACCESS      read-create
+          STATUS          current
+          DESCRIPTION     "Source IP address to use when connecting
+                           to the controller."
+          ::=   {hpicfOpenFlowControllerEntry 8}
+
 ----------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- OpenFlow Instance-Controller Connection State table
 ----------------------------------------------------------
 
@@ -815,14 +954,6 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           'notInService' states are not allowed."
           ::= { hpicfOpenFlowInstanceControllerEntry 5}   
 
-
-
-
-          
-
-                    
-                    
-
 -- ------------------------------------------------------------
 -- OpenFlow - Scalar Objects
 -- ------------------------------------------------------------
@@ -853,54 +984,6 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
           DESCRIPTION     "This MIB object specifies the maximum number 
                           of OpenFlow controllers."
           ::=   { hpicfOpenFlowObjects 12}
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          
-
-
-
-  
-
-  
-  
-
-
-
-
-  
-
-  
-  
-  
-  
-
-
-
-
-
 
   ----------------------------------------------------------
   -- OpenFlow Instance Meter table
@@ -1005,11 +1088,12 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
   HpicfOpenFlowInstanceMeterBandEntry ::= 
           SEQUENCE {
                   hpicfOpenFlowInstanceMeterBandID           Unsigned32,
-                  hpicfOpenFlowInstanceMeterBandType         INTEGER,                
+                  hpicfOpenFlowInstanceMeterBandType         INTEGER,
                   hpicfOpenFlowInstanceMeterBandRate         Unsigned32,
                   hpicfOpenFlowInstanceMeterBandRateUnit     INTEGER,
                   hpicfOpenFlowInstanceMeterInBandPktCount   Counter64,
-                  hpicfOpenFlowInstanceMeterInBandByteCount  Counter64 
+                  hpicfOpenFlowInstanceMeterInBandByteCount  Counter64,
+                  hpicfOpenFlowInstanceMeterPrecedenceLevel  Unsigned32
                   }
   hpicfOpenFlowInstanceMeterBandID   OBJECT-TYPE       
           SYNTAX          Unsigned32
@@ -1067,6 +1151,13 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
           STATUS         current
           DESCRIPTION    "Number of bytes processed by this meter." 
           ::=   {hpicfOpenFlowInstanceMeterBandEntry 6}
+
+  hpicfOpenFlowInstanceMeterPrecedenceLevel   OBJECT-TYPE
+          SYNTAX          Unsigned32
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION     "DSCP Precedence level of the band in a meter."
+          ::=   {hpicfOpenFlowInstanceMeterBandEntry 7}
           
 ----------------------------------------------------------
 -- OpenFlow Scalar Objects
@@ -1096,12 +1187,6 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                         A value of '0' would mean that the hardware will no 
                         longer be polled to update the statistics."
         ::= { hpicfOpenFlowScalarObjects 2} 
-
-
-
-
-
-
 
    hpicfOpenFlowIpControlTableMode             OBJECT-TYPE
           SYNTAX         INTEGER  {   
@@ -1164,8 +1249,8 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceFlowLocationMode,
                           hpicfOpenFlowConnectionInterruptionMode,        
                           hpicfOpenFlowInstanceHwRateLimit,
-                          hpicfOpenFlowInstanceSwRateLimit,                                                    
-                          hpicfOpenFlowInstanceDatapathID,                                
+                          hpicfOpenFlowInstanceSwRateLimit, 
+                          hpicfOpenFlowInstanceDatapathID,
                           hpicfOpenFlowInstanceNumOfHwFlows,
                           hpicfOpenFlowInstanceNumOfSwFlows,
                           hpicfOpenFlowInstanceOperStatus,
@@ -1186,6 +1271,7 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                   OpenFlow instance."
       ::= { hpicfOpenFlowGroups   2 }
 
+
   hpicfOpenFlowInstanceMembershipGroup OBJECT-GROUP
       OBJECTS {
                   hpicfOpenFlowInstanceMembershipRowStatus    
@@ -1203,11 +1289,10 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                   hpicfOpenFlowControllerInterface,  
                   hpicfOpenFlowControllerRowStatus
                   }
-      STATUS      current
+      STATUS      deprecated
       DESCRIPTION "A collection of objects used to define 
                   controllers."
       ::= { hpicfOpenFlowGroups   4 }
-
 
   hpicfOpenFlowInstanceControllerGroup    OBJECT-GROUP
           OBJECTS {
@@ -1223,11 +1308,6 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                       connection."        
           ::= { hpicfOpenFlowGroups   6 }
 
-
-
-
-
-
   hpicfOpenFlowInstanceMeterGroup OBJECT-GROUP
           OBJECTS {                           
                           hpicfOpenFlowInstanceMeterFlowCount,
@@ -1237,7 +1317,7 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                   }
           STATUS          current
           DESCRIPTION     "A collection of objects used to retrieve 
-                          details about instance specific meters."
+                          details about instance-specific meters."
           ::= { hpicfOpenFlowGroups   13 }
 
   hpicfOpenFlowInstanceMeterBandGroup OBJECT-GROUP
@@ -1246,7 +1326,8 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceMeterBandRate,
                           hpicfOpenFlowInstanceMeterBandRateUnit,
                           hpicfOpenFlowInstanceMeterInBandPktCount,
-                          hpicfOpenFlowInstanceMeterInBandByteCount   
+                          hpicfOpenFlowInstanceMeterInBandByteCount,
+                          hpicfOpenFlowInstanceMeterPrecedenceLevel
                   }
           STATUS          current
           DESCRIPTION     "A collection of objects used to retrieve 
@@ -1275,8 +1356,8 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceFlowLocationMode,
                           hpicfOpenFlowConnectionInterruptionMode,        
                           hpicfOpenFlowInstanceHwRateLimit,
-                          hpicfOpenFlowInstanceSwRateLimit,                                                    
-                          hpicfOpenFlowInstanceDatapathID,                                
+                          hpicfOpenFlowInstanceSwRateLimit,
+                          hpicfOpenFlowInstanceDatapathID,
                           hpicfOpenFlowInstanceNumOfHwFlows,
                           hpicfOpenFlowInstanceNumOfSwFlows,
                           hpicfOpenFlowInstanceOperStatus,
@@ -1310,6 +1391,7 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
           DESCRIPTION     "Basic Scalars required for OpenFlow 
                           implementation."
       ::= { hpicfOpenFlowGroups   17 }
+
  hpicfOpenFlowInstanceGroup2 OBJECT-GROUP
               OBJECTS {
                           hpicfOpenFlowInstanceAdminStatus,
@@ -1342,11 +1424,65 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceSourceMacGrpTable,
                           hpicfOpenFlowInstanceDestMacGrpTable
               }
-      STATUS      current
+      STATUS      deprecated
       DESCRIPTION "A collection of objects used to define an 
                   OpenFlow instance."
       ::= { hpicfOpenFlowGroups   20 }
 
+ hpicfOpenFlowInstanceGroup3 OBJECT-GROUP
+              OBJECTS {
+                          hpicfOpenFlowInstanceAdminStatus,
+                          hpicfOpenFlowInstanceListenPortCfg,
+                          hpicfOpenFlowInstanceListenPort,
+                          hpicfOpenFlowInstanceListenPortIsOobm,
+                          hpicfOpenFlowInstanceMode,
+                          hpicfOpenFlowInstanceFlowLocationMode,
+                          hpicfOpenFlowConnectionInterruptionMode,
+                          hpicfOpenFlowInstanceHwRateLimit,
+                          hpicfOpenFlowInstanceSwRateLimit,
+                          hpicfOpenFlowInstanceDatapathID,
+                          hpicfOpenFlowInstanceNumOfHwFlows,
+                          hpicfOpenFlowInstanceNumOfSwFlows,
+                          hpicfOpenFlowInstanceOperStatus,
+                          hpicfOpenFlowInstanceMaxBackOffInterval,
+                          hpicfOpenFlowInstanceRowStatus,
+                          hpicfOpenFlowInstanceProbeInterval,
+                          hpicfOpenFlowInstanceProtoVersion,
+                          hpicfOpenFlowInstanceProtoVersionOnly,
+                          hpicfOpenFlowInstanceNumOfSwFlowTable,
+                          hpicfOpenFlowInstanceOperStatusReason,
+                          hpicfOpenFlowInstanceEgressOnlyPorts,
+                          hpicfOpenFlowInstanceCapabilities,
+                          hpicfOpenFlowInstanceHwTableMissCount,
+                          hpicfOpenFlowInstanceTableModel,
+                          hpicfOpenFlowInstanceMembers,
+                          hpicfOpenFlowInstancePipelineModel,
+                          hpicfOpenFlowInstanceDatapathDesc,
+                          hpicfOpenFlowInstanceSourceMacGrpTable,
+                          hpicfOpenFlowInstanceDestMacGrpTable,
+                          hpicfOpenFlowInstanceMissRuleDefaultAction,
+                          hpicfOpenFlowInstanceOverrideProtocol,
+                          hpicfOpenFlowInstancePktInVlanTagging
+              }
+      STATUS      current
+      DESCRIPTION "A collection of objects used to define an
+                  OpenFlow instance."
+      ::= { hpicfOpenFlowGroups   21 }
+
+  hpicfOpenFlowControllerGroup1 OBJECT-GROUP
+      OBJECTS     {
+                  hpicfOpenFlowControllerInetAddressType,
+                  hpicfOpenFlowControllerInetAddress,
+                  hpicfOpenFlowControllerPort,
+                  hpicfOpenFlowControllerInterface,
+                  hpicfOpenFlowControllerRowStatus,
+                  hpicfOpenFlowControllerSourceAddressType,
+                  hpicfOpenFlowControllerSourceAddress
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects used to define
+                  controllers."
+      ::= { hpicfOpenFlowGroups   22 }
 
 -- =============================================================
 -- OpenFlow - Compliance Statements
@@ -1371,11 +1507,10 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
       DESCRIPTION         "This group is optional whose objects are used
                           to monitor the status and state of connection
                           between an OpenFlow instance and a controller."
-
-
+                                     
       GROUP              hpicfOpenFlowInstanceMeterGroup
       DESCRIPTION        "A collection of objects used to retrieve 
-                          details about instance specific meters."  
+                          details about instance-specific meters."  
                                      
       GROUP              hpicfOpenFlowInstanceMeterBandGroup
       DESCRIPTION        "A collection of objects used to retrieve 
@@ -1399,13 +1534,12 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceGroup1, 
                           hpicfOpenFlowControllerGroup 
                           }
-     
 
       GROUP               hpicfOpenFlowInstanceControllerGroup
       DESCRIPTION         "This group is optional whose objects are used
                           to monitor the status and state of connection
                           between an OpenFlow instance and a controller."
-
+                                     
       GROUP              hpicfOpenFlowInstanceMeterGroup
       DESCRIPTION        "A collection of objects used to retrieve 
                           details about instance-specific meters."  
@@ -1416,11 +1550,12 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                                      
       GROUP              hpicfOpenFlowScalarsGroup1
       DESCRIPTION        "A collection of scalar objects."                    
+                                                                  
       ::= { hpicfOpenFlowCompliances 2 }
 
 
   hpicfOpenFlowCompliance2 MODULE-COMPLIANCE
-      STATUS              current
+      STATUS              deprecated
       DESCRIPTION         "This compliance statement is for devices 
                           supporting OpenFlow. The basic support for 
                           OpenFlow requires implementation of the 
@@ -1432,14 +1567,11 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
                           hpicfOpenFlowInstanceGroup2, 
                           hpicfOpenFlowControllerGroup 
                           }
-      
 
       GROUP               hpicfOpenFlowInstanceControllerGroup
       DESCRIPTION         "This group is optional whose objects are used
                           to monitor the status and state of connection
                           between an OpenFlow instance and a controller."
-
-      
                                      
       GROUP              hpicfOpenFlowInstanceMeterGroup
       DESCRIPTION        "A collection of objects used to retrieve 
@@ -1455,4 +1587,67 @@ hpicfOpenFlowConnectionInterruptionMode   OBJECT-TYPE
       ::= { hpicfOpenFlowCompliances 3 }
 
 
+  hpicfOpenFlowCompliance3 MODULE-COMPLIANCE
+      STATUS              deprecated
+      DESCRIPTION         "This compliance statement is for devices
+                          supporting OpenFlow. The basic support for
+                          OpenFlow requires implementation of the
+                          objects listed in the mandatory groups."
+
+      MODULE
+          MANDATORY-GROUPS {
+                          hpicfOpenFlowGlobalConfigGroup,
+                          hpicfOpenFlowInstanceGroup3,
+                          hpicfOpenFlowControllerGroup
+                          }
+
+      GROUP               hpicfOpenFlowInstanceControllerGroup
+      DESCRIPTION         "This group is optional whose objects are used
+                          to monitor the status and state of connection
+                          between an OpenFlow instance and a controller."
+
+      GROUP              hpicfOpenFlowInstanceMeterGroup
+      DESCRIPTION        "A collection of objects used to retrieve
+                          details about instance-specific meters."
+
+      GROUP              hpicfOpenFlowInstanceMeterBandGroup
+      DESCRIPTION        "A collection of objects used to retrieve
+                          details about meter band types."
+
+      GROUP              hpicfOpenFlowScalarsGroup1
+      DESCRIPTION        "A collection of scalar objects."
+
+      ::= { hpicfOpenFlowCompliances 4 }
+
+  hpicfOpenFlowCompliance4 MODULE-COMPLIANCE
+      STATUS              current
+      DESCRIPTION         "This compliance statement is for devices
+                          supporting OpenFlow. The basic support for
+                          OpenFlow requires implementation of the
+                          objects listed in the mandatory groups."
+
+      MODULE
+          MANDATORY-GROUPS {
+                          hpicfOpenFlowGlobalConfigGroup,
+                          hpicfOpenFlowInstanceGroup3,
+                          hpicfOpenFlowControllerGroup1
+                          }
+
+      GROUP               hpicfOpenFlowInstanceControllerGroup
+      DESCRIPTION         "This group is optional whose objects are used
+                          to monitor the status and state of connection
+                          between an OpenFlow instance and a controller."
+
+      GROUP              hpicfOpenFlowInstanceMeterGroup
+      DESCRIPTION        "A collection of objects used to retrieve
+                          details about instance-specific meters."
+
+      GROUP              hpicfOpenFlowInstanceMeterBandGroup
+      DESCRIPTION        "A collection of objects used to retrieve
+                          details about meter band types."
+
+      GROUP              hpicfOpenFlowScalarsGroup1
+      DESCRIPTION        "A collection of scalar objects."
+
+      ::= { hpicfOpenFlowCompliances 5 }
 END

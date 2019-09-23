@@ -4,28 +4,29 @@ ENTERASYS-MIB-ORG DEFINITIONS ::= BEGIN
 --
 --
 
---  This module provides authoritative definitions for Enterasys
---  Networks' MIB OIDs.  
---
+--  This module provides authoritative definitions and defines
+--  notifications for Extreme Networks' Netsight Alarm Manager
+--  MIB.
+
 --  This module will be extended, as needed.
 
---  Enterasys Networks reserves the right to make changes in this
+--  Extreme Networks reserves the right to make changes in this
 --  specification and other information contained in this document
---  without prior notice.  The reader should consult Enterasys
---  Networks to determine whether any such changes have been made.
+--  without prior notice.  The reader should consult Extreme Networks
+--  to determine whether any such changes have been made.
 --
---  In no event shall Enterasys Networks be liable for any incidental,
+--  In no event shall Extreme Networks be liable for any incidental,
 --  indirect, special, or consequential damages whatsoever (including
 --  but not limited to lost profits) arising out of or related to this
---  document or the information contained in it, even if Enterasys
+--  document or the information contained in it, even if Extreme
 --  Networks has been advised of, known, or should have known, the
 --  possibility of such damages.
 --
---  Enterasys Networks grants vendors, end-users, and other interested
---  parties a non-exclusive license to use this Specification in connection
---  with the management of Enterasys Networks products.
+--  Extreme Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Extreme Networks products.
 
---  Copyright August, (2000-2010) Enterasys Networks, Inc.
+--  Copyright May, (2000-2016) Extreme Networks, Inc.
 
 IMPORTS
     MODULE-IDENTITY
@@ -34,23 +35,22 @@ IMPORTS
         FROM ENTERASYS-MIB-NAMES;
 
 etsysMibOrg MODULE-IDENTITY
-    LAST-UPDATED "201008171215Z"  -- Tue Aug 17 12:15 UTC 2010
-    ORGANIZATION "Enterasys Networks, Inc."
+     LAST-UPDATED "201605111256Z"  -- Wed May 11 12:56 UTC 2016
+    ORGANIZATION "Extreme Networks, Inc."
     CONTACT-INFO
-        "Postal:  Enterasys Networks
-                  50 Minuteman Rd.
-                  Andover, MA 01810-1008
-                  USA
-         Phone:   +1 978 684 1000
-         E-mail:  support@enterasys.com
-         WWW:     http://www.enterasys.com"
+        "Postal:  Extreme Networks, Inc.
+                  145 Rio Robles
+                  San Jose, CA 95134 USA
 
+         Phone:   +1 408 579 2800
+         E-mail:  support@extremenetworks.com
+         WWW:     http://www.extremenetworks.com"
     DESCRIPTION
         "This MIB module defines a portion of the SNMP enterprise
          MIBs under Enterasys Networks' enterprise OID.
 
          This module defines OBJECT-IDENTIFIER(s) to be used for 
-         the registration of MODULE-IDENTITY in all Enterasys Networks'
+         the registration of MODULE-IDENTITY in all Extreme Networks'
          MIB modules.
 
          The naming of OIDs should be based upon the name of the
@@ -58,8 +58,97 @@ etsysMibOrg MODULE-IDENTITY
          if the MODULE-IDENTITY for the MIB is fooBarMIB then the
          OBJECT IDENTIFIER should be named fooBarOID.
 
-         All Enterasys MIBs should follow the format specified by
+         All Extreme MIBs should follow the format specified by
          enterasys-mib-template.txt."
+
+    REVISION    "201605111256Z"  -- Wed May 11 12:56 UTC 2016
+    DESCRIPTION "Added an OID for the etsysApplicationSignatureMIB."
+
+    REVISION    "201601180900Z"  -- Mon Jan 18 09:00 UTC 2016
+    DESCRIPTION "Added an OID for the extremeNetsightAlarmMIB."
+
+    REVISION    "201312161622Z"  -- Mon Dec 16 16:22 UTC 2013
+    DESCRIPTION "Added an OID for the etsysResourceLimitsMIB."
+
+    REVISION    "201308281751Z"  -- Wed Aug 28 17:51 UTC 2013
+    DESCRIPTION "Added an OID for the etsysDot3LldpExtMIB."
+
+    REVISION    "201307251224Z"  -- Thu Jul 25 12:24 UTC 2013
+    DESCRIPTION "Added an OID for the etsysSpbExtMIB."
+
+    REVISION    "201303291620Z"  -- Fri Mar 29 16:20 UTC 2013
+    DESCRIPTION "Added an OID for the etsysRmonMibExtMIB.
+
+    REVISION    "201303271108Z"  -- Wed Mar 27 11:08 UTC 2013
+    DESCRIPTION "Added an OID for the etsysPkiMIB."
+
+    REVISION    "201303111501Z"  -- Mon Mar 11 15:01 UTC 2013
+    DESCRIPTION "Added an OID for the etsysPtopoMibExtMIB."
+
+    REVISION    "201302151717Z"  -- Fri Feb 15 17:17 UTC 2013
+    DESCRIPTION "Added an OID for the etsysIeee8021CfmMibExtMIB."
+
+    REVISION    "201302151553Z"  -- Fri Feb 15 15:53 UTC 2013
+    DESCRIPTION "Added an OID for the etsysTransmitQueueMonitorMIB."
+
+    REVISION    "201211282106Z"  -- Wed Nov 28 21:06 UTC 2012
+    DESCRIPTION "Added an OID for the etsysRfLocationMIB."
+
+    REVISION    "201207191709Z"  -- Thu Jul 19 17:09 UTC 2012
+    DESCRIPTION "Added an OID for the etsysPfcMibExtMIB."
+
+    REVISION    "201207121821Z"  -- Thu Jul 12 18:21 UTC 2012
+    DESCRIPTION "Added an OID for the etsysAntiSpoofMIB."
+
+    REVISION    "201207101427Z"  -- Tue Jul 10 14:27 UTC 2012
+    DESCRIPTION "Added an OID for the etsysCnMibExtMIB."
+
+    REVISION    "201206151440Z"  -- Fri Jun 15 14:40 UTC 2012
+    DESCRIPTION "Added an OID for the etsysIpSlaMIB."
+
+    REVISION    "201206051410Z"  -- Tue Jun  5 14:10 UTC 2012
+    DESCRIPTION "Added OIDS for the following MIB modules:
+                 etsysAutoTrackingMIB and etsysQuarantineAgentMIB."
+    
+    REVISION    "201203141458Z"  -- Wed Mar 14 14:58 UTC 2012
+    DESCRIPTION "Added an OID for the etsysMultiTopologyRoutingMIB."
+
+    REVISION    "201201311546Z"  -- Tue Jan 31 15:46 UTC 2012
+    DESCRIPTION "Added an OID for the etsysIeee8021BridgeMibExtMIB."
+
+    REVISION    "201201161522Z"  -- Mon Jan 16 15:22 UTC 2012
+    DESCRIPTION "Added OIDS for the following MIB modules:
+                 etsysIeee8021QBridgeMibExtMIB and
+                 etsysIeee8021StpMibExtMIB."
+    
+    REVISION    "201201091608Z"  -- Mon Jan  9 16:08 UTC 2012
+    DESCRIPTION "Added an OID for the etsysPbExtMIB."
+
+    REVISION    "201112131953Z"  -- Tue Dec 13 19:53 UTC 2011
+    DESCRIPTION "Added an OID for the etsysLinkstateTrackingMIB."
+
+    REVISION    "201110141222Z"  -- Fri Oct 14 12:22 UTC 2011
+    DESCRIPTION "Added an OID for the etsysEntitySensorExtMIB."
+
+    REVISION    "201109291526Z"  -- Thu Sep 29 15:26 UTC 2011
+    DESCRIPTION "Added an OID for the etsysHighAvailabilityUpgradeMIB."
+
+    REVISION    "201106141332Z"  -- Tue Jun 14 13:32 UTC 2011
+    DESCRIPTION "Added an OID for the etsysVirtualSwitchBondingMIB."
+
+    REVISION    "201106141323Z"  -- Tue Jun 14 13:23 UTC 2011
+    DESCRIPTION "Added OIDs for etsysRadiusDynAuthorServerMIB, 
+                 etsysIpSecNotificationMIB and 
+                 etsysRtrAdvertNotificationMIB."
+
+    REVISION    "201011191850Z"  -- Fri Nov 19 18:50 UTC 2010
+    DESCRIPTION "Added an OID for the etsysTrackedObjectMIB."
+
+    REVISION    "201011181452Z"  -- Thu Nov 18 14:52 UTC 2010
+    DESCRIPTION "Added an OID for the etsysEthOamExtMIB."
+
+    REVISION    "201011092007Z"  -- Tue Nov  9 20:07 UTC 2010
+    DESCRIPTION "Added an OID for the etsysRs232MibExtMIB."
 
     REVISION    "201008171215Z"  -- Tue Aug 17 12:15 UTC 2010
     DESCRIPTION "Added an OID for the etsysTWCBMIB."
@@ -479,5 +568,101 @@ etsysMibOrg MODULE-IDENTITY
 
 -- OID for the etsysTWCBMIB.
 -- etsysTWCBOID                    OBJECT IDENTIFIER ::= { etsysModules 76 }
+
+-- OID for the etsysRs232MibExtMIB.
+-- etsysRs232MibExtOID             OBJECT IDENTIFIER ::= { etsysModules 77 }
+
+-- OID for the etsysEthOamExtMIB.
+-- etsysEthOamExtOID               OBJECT IDENTIFIER ::= { etsysModules 78 }
+
+-- OID for the etsysTrackedObjectMIB.
+-- etsysTrackedObjectOID           OBJECT IDENTIFIER ::= { etsysModules 79 }
+
+-- OID for the etsysRadiusDynAuthorServerMIB.
+-- etsysRadiusDynAuthorServerOID   OBJECT IDENTIFIER ::= { etsysModules 80 }
+
+-- OID for the etsysIpSecNotificationMIB.
+-- etsysIpSecNotificationOID       OBJECT IDENTIFIER ::= { etsysModules 81 }
+
+-- OID for the etsysRtrAdvertNotificationMIB.
+-- etsysRtrAdvertNotificationOID   OBJECT IDENTIFIER ::= { etsysModules 82 }
+
+-- OID for the etsysVirtualSwitchBondingMIB.
+-- etsysVirtualSwitchBondingOID    OBJECT IDENTIFIER ::= { etsysModules 83 }
+
+-- OID for the etsysHighAvailabilityUpgradeMIB.
+-- etsysHighAvailabilityUpgradeOID OBJECT IDENTIFIER ::= { etsysModules 84 }
+
+-- OID for the etsysEntitySensorExtMIB.
+-- etsysEntitySensorExtOID         OBJECT IDENTIFIER ::= { etsysModules 85 }
+
+-- OID for the etsysLinkstateTrackingMIB.
+-- etsysLinkstateTrackingOID       OBJECT IDENTIFIER ::= { etsysModules 86 }
+
+-- OID for the etsysPbExtMIB.
+-- etsysPbExtOID                   OBJECT IDENTIFIER ::= { etsysModules 87 }
+
+-- OID for the etsysIeee8021QBridgeMibExtMIB.
+-- etsysIeee8021QBridgeMibExtOID   OBJECT IDENTIFIER ::= { etsysModules 88 }
+
+-- OID for the etsysIeee8021StpMibExtMIB.
+-- etsysIeee8021StpMibExtOID       OBJECT IDENTIFIER ::= { etsysModules 89 }
+
+-- OID for the etsysIeee8021BridgeMibExtMIB.
+-- etsysIeee8021BridgeMibExtOID    OBJECT IDENTIFIER ::= { etsysModules 90 }
+
+-- OID for the etsysMultiTopologyRoutingMIB.
+-- etsysMultiTopologyRoutingOID    OBJECT IDENTIFIER ::= { etsysModules 91 }
+
+-- OID for the etsysAutoTrackingMIB.
+-- etsysAutoTrackingOID            OBJECT IDENTIFIER ::= { etsysModules 92 }
+
+-- OID for the etsysQuarantineAgentMIB.
+-- etsysQuarantineAgentOID         OBJECT IDENTIFIER ::= { etsysModules 93 }
+
+-- OID for the etsysIpSlaMIB.
+-- etsysIpSlaOID                   OBJECT IDENTIFIER ::= { etsysModules 94 }
+
+-- OID for the etsysCnMibExtMIB.
+-- etsysCnMibExtOID                OBJECT IDENTIFIER ::= { etsysModules 95 }
+
+-- OID for the etsysAntiSpoofMIB.
+-- etsysAntiSpoofOID               OBJECT IDENTIFIER ::= { etsysModules 96 }
+
+-- OID for the etsysPfcMibExtMIB.
+-- etsysPfcMibExtOID               OBJECT IDENTIFIER ::= { etsysModules 97 }
+
+-- OID for the etsysRfLocationMIB.
+-- etsysRfLocationOID              OBJECT IDENTIFIER ::= { etsysModules 98 }
+
+-- OID for the etsysTransmitQueueMonitorMIB.
+-- etsysTransmitQueueMonitorOID    OBJECT IDENTIFIER ::= { etsysModules 99 }
+
+-- OID for the etsysPtopoMibExtMIB.
+-- etsysPtopoMibExtOID             OBJECT IDENTIFIER ::= { etsysModules 100 }
+
+-- OID for the etsysPkiMIB.
+-- etsysPkiOID                     OBJECT IDENTIFIER ::= { etsysModules 101 }
+
+-- OID for the etsysRmonMibExtMIB.
+-- etsysRmonMibExtOID              OBJECT IDENTIFIER ::= { etsysModules 102 }
+
+-- OID for the etsysSpbExtMIB.
+-- etsysSpbExtOID                  OBJECT IDENTIFIER ::= { etsysModules 103 }
+
+-- OID for the etsysDot3LldpExtMIB.
+-- etsysDot3LldpExtOID             OBJECT IDENTIFIER ::= { etsysModules 104 }
+
+-- OID for the extremeNetsightAlarmMIB.
+-- extremeNetsightAlarmOID         OBJECT IDENTIFIER ::= { etsysModules 105 }
+
+-- OID for the etsysApplicationSignatureMIB.
+-- etsysApplicationSignatureOID    OBJECT IDENTIFIER ::= { etsysModules 107 }
+
+-- OID for the etsysIeee8021CfmMibExtMIB.
+-- etsysIeee8021CfmMibExtOID       OBJECT IDENTIFIER ::= { etsysModules 524 }
+
+-- OID for the etsysResourceLimitsMIB.
+-- etsysResourceLimitsOID          OBJECT IDENTIFIER ::= { etsysModules 876 }
 
 END

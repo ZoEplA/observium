@@ -85,9 +85,9 @@ class Crypt_CHAP extends PEAR
      * Generates a random challenge
      * @return void
      */
-    function Crypt_CHAP()
+    function __construct()
     {
-        $this->PEAR();
+        //$this->PEAR();
         $this->generateChallenge();
     }
     
@@ -167,9 +167,9 @@ class Crypt_CHAP_MSv1 extends Crypt_CHAP
      * Loads the hash extension
      * @return void
      */
-    function Crypt_CHAP_MSv1()
+    function __construct()
     {
-        $this->Crypt_CHAP();
+        //$this->Crypt_CHAP();
         $this->loadExtension('hash');        
     }
     
@@ -181,7 +181,8 @@ class Crypt_CHAP_MSv1 extends Crypt_CHAP
      */
     function ntPasswordHash($password = null) 
     {
-        if (isset($password)) {
+        //if (isset($password)) {
+        if (!is_null($password)) {
             return pack('H*',hash('md4', $this->str2unicode($password)));
         } else {
             return pack('H*',hash('md4', $this->str2unicode($this->password)));
@@ -255,27 +256,37 @@ class Crypt_CHAP_MSv1 extends Crypt_CHAP
             $hash = $this->ntPasswordHash();
         }
 
-        while (strlen($hash) < 21) {
-            $hash .= "\0";
+        $hash = str_pad($hash, 21, "\0");
+
+        if (!extension_loaded('mcrypt') && extension_loaded('openssl')) {
+            // added openssl routines for dapphp/radius
+            $key   = $this->_desAddParity(substr($hash, 0, 7));
+            $resp1 = openssl_encrypt($this->challenge, 'des-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+
+            $key   = $this->_desAddParity(substr($hash, 7, 7));
+            $resp2 = openssl_encrypt($this->challenge, 'des-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+
+            $key   = $this->_desAddParity(substr($hash, 14, 7));
+            $resp3 = openssl_encrypt($this->challenge, 'des-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+        } else {
+            $td = mcrypt_module_open(MCRYPT_DES, '', MCRYPT_MODE_ECB, '');
+            $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+            $key = $this->_desAddParity(substr($hash, 0, 7));
+            mcrypt_generic_init($td, $key, $iv);
+            $resp1 = mcrypt_generic($td, $this->challenge);
+            mcrypt_generic_deinit($td);
+
+            $key = $this->_desAddParity(substr($hash, 7, 7));
+            mcrypt_generic_init($td, $key, $iv);
+            $resp2 = mcrypt_generic($td, $this->challenge);
+            mcrypt_generic_deinit($td);
+
+            $key = $this->_desAddParity(substr($hash, 14, 7));
+            mcrypt_generic_init($td, $key, $iv);
+            $resp3 = mcrypt_generic($td, $this->challenge);
+            mcrypt_generic_deinit($td);
+            mcrypt_module_close($td);
         }
-
-        $td = mcrypt_module_open(MCRYPT_DES, '', MCRYPT_MODE_ECB, '');
-        $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-        $key = $this->_desAddParity(substr($hash, 0, 7));
-        mcrypt_generic_init($td, $key, $iv);
-        $resp1 = mcrypt_generic($td, $this->challenge);
-        mcrypt_generic_deinit($td);
-
-        $key = $this->_desAddParity(substr($hash, 7, 7));
-        mcrypt_generic_init($td, $key, $iv);
-        $resp2 = mcrypt_generic($td, $this->challenge);
-        mcrypt_generic_deinit($td);
-
-        $key = $this->_desAddParity(substr($hash, 14, 7));
-        mcrypt_generic_init($td, $key, $iv);
-        $resp3 = mcrypt_generic($td, $this->challenge);
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
 
         return $resp1 . $resp2 . $resp3;
     }
@@ -306,14 +317,23 @@ class Crypt_CHAP_MSv1 extends Crypt_CHAP
      */
     function _desHash($plain)
     {
-        $key = $this->_desAddParity($plain);
-        $td = mcrypt_module_open(MCRYPT_DES, '', MCRYPT_MODE_ECB, '');
-        $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
-        mcrypt_generic_init($td, $key, $iv);
-        $hash = mcrypt_generic($td, 'KGS!@#$%');
-        mcrypt_generic_deinit($td);
-        mcrypt_module_close($td);
-        return $hash;
+        if (!extension_loaded('mcrypt') && extension_loaded('openssl')) {
+            // added openssl routines for dapphp/radius
+            $key = $this->_desAddParity($plain);
+            $hash = openssl_encrypt('KGS!@#$%', 'des-ecb', $key, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
+
+            return $hash;
+        } else {
+            $key = $this->_desAddParity($plain);
+            $td = mcrypt_module_open(MCRYPT_DES, '', MCRYPT_MODE_ECB, '');
+            $iv = mcrypt_create_iv (mcrypt_enc_get_iv_size($td), MCRYPT_RAND);
+            mcrypt_generic_init($td, $key, $iv);
+            $hash = mcrypt_generic($td, 'KGS!@#$%');
+            mcrypt_generic_deinit($td);
+            mcrypt_module_close($td);
+
+            return $hash;
+        }
     }
 
     /**
@@ -415,9 +435,9 @@ class Crypt_CHAP_MSv2 extends Crypt_CHAP_MSv1
      * Generates the 16 Bytes peer and authentication challenge
      * @return void
      */
-    function Crypt_CHAP_MSv2()
+    function __construct()
     {
-        $this->Crypt_CHAP_MSv1();
+        //$this->Crypt_CHAP_MSv1();
         $this->generateChallenge('peerChallenge', 16);
         $this->generateChallenge('authChallenge', 16);
     }    
@@ -459,5 +479,3 @@ class Crypt_CHAP_MSv2 extends Crypt_CHAP_MSv1
     }    
 }
 
-
-?>

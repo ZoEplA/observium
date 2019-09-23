@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: MIB interface of BFD protocol configuration.
 --              The Bidirectional Forwarding Detection (BFD) protocol
 --              is standardized by the IETF. BFD detects the
@@ -7,7 +7,7 @@
 --              quickly sending BFD control packets (the UDP packets in
 --              a specified format) at intervals between two nodes.
 -- Reference:
--- Version:     V1.55
+-- Version:     V1.56
 --
 -- =================================================================
 
@@ -32,7 +32,7 @@
 
 
         hwBFDMIB MODULE-IDENTITY
-            LAST-UPDATED "201601080000Z"
+            LAST-UPDATED "201711210000Z"
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
                 "Huawei Industrial Base
@@ -52,7 +52,10 @@
                 "
 
             -- Revision history
-              REVISION    "201601080000Z"
+            REVISION    "201711210000Z"
+            DESCRIPTION "V1.56, modify the DESCRIPTION of hwBfdSessionConfTable and hwBfdSessionTable."
+
+            REVISION    "201601080000Z"
             DESCRIPTION "V1.55, add hwBfdSessConfbImpactFlag and hwBfdSessConfbImpactFlag."
 
             REVISION    "201601080000Z"
@@ -424,7 +427,6 @@
             STATUS current
             DESCRIPTION
                 "The interface configuration table of BFD.
-                 The index of this table is hwBfdIfConfIndex.
                 "
             ::= { hwBfdObjects 1 }
 
@@ -542,8 +544,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "BFD Session Configuration Table. Use this table to get/configure BFD sessions.
-                 The index of this table is hwBfdSessConfName.
+                "This table describes information about configuration entries of BFD sessions.
                 "
             ::= { hwBfdObjects 2 }
 
@@ -1350,8 +1351,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The BFD Session Table describes the BFD sessions.
-                 The index of this table is hwBfdSessIndex.
+                "This table describes the query items of BFD sessions.
                 "
             ::= { hwBfdObjects 3 }
 
@@ -2680,7 +2680,6 @@
             STATUS current
             DESCRIPTION
                 "This table specifies BFD Session performance counters.
-                 The index of this table is hwBfdSessPerIndex.
                 "
             ::= { hwBfdObjects 4 }
 
@@ -2874,7 +2873,6 @@
             DESCRIPTION
                 "The Slot table of BFD.
                  BFD statistics on specify board of containing the following objects.
-                 The index of this table is hwBfdSlotID.
                 "
             ::= { hwBfdObjects 5 }
 
@@ -2956,8 +2954,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The TTL configuration table.
-                 The index of this table is hwBfdTtlConfAddr, hwBfdTtlConfMaskLen and hwBfdTtlConfType."
+                "The TTL configuration table."
             ::= { hwBfdObjects 6 }
 
 
@@ -3046,7 +3043,6 @@
             STATUS current
             DESCRIPTION
                 "The authentication configuration table for entire dynamic bfd session on egress.
-                 The index of this table is hwBfdPassiveAuthPeerAddr and hwBfdPassiveAuthProtocol.
                 "
             ::= { hwBfdObjects 7 }
 

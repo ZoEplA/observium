@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -103,7 +103,7 @@ elseif ($vars['view'] == "outgoing")
 
     unset($graph_array['legend']);
 
-    ksort($smokeping_files['outgoing'][$device['hostname']]);
+    asort($smokeping_files['outgoing'][$device['hostname']]);
     foreach ($smokeping_files['outgoing'][$device['hostname']] AS $host)
     {
       $hostname = basename($host,".rrd");

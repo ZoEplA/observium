@@ -6,9 +6,11 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
+
+// FIXME this is not working statuses, need move to ports module or separate FC ports module
 
 $atto_fc_ports = snmpwalk_cache_oid($device, 'fcPortPortNumber', array(), $mib);
 

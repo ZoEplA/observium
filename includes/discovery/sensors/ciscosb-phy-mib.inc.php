@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -48,7 +48,7 @@ $oids = snmpwalk_cache_twopart_oid($device, 'rlPhyTestGetStatus',   $oids, 'CISC
 
 foreach ($new_oids as $index => $entry1)
 {
-  foreach ($oids[$index] as $type => $entry)
+  foreach ($oids[$index] as $oid_name => $entry)
   {
     if (!in_array($entry['rlPhyTestGetStatus'], array('success', 'inProgress'))) { continue; }
 
@@ -81,7 +81,7 @@ foreach ($new_oids as $index => $entry1)
       $entry['ifDescr'] = snmp_get($device, "ifDescr.".$index, "-Oqv", "IF-MIB");
     }
 
-    switch ($type)
+    switch ($oid_name)
     {
       case 'rlPhyTestTableTransceiverTemp':
         $descr = $entry['ifDescr'] . " Temperature";
@@ -113,7 +113,7 @@ foreach ($new_oids as $index => $entry1)
         continue 2;
     }
     $value = $entry['rlPhyTestGetResult'];
-    discover_sensor($valid['sensor'], $class, $device, $oid, $index, 'CISCOSB-PHY-MIB-'.$type, $descr, $scale, $value, $options); // Note, same rrd index format as in mibs definitions
+    discover_sensor_ng($device, $class, $mib, 'rlPhyTestGetResult', $oid, "$index.$oid_name", NULL, $descr, $scale, $value, $options); // Note, same rrd index format as in mibs definitions
   }
 }
 

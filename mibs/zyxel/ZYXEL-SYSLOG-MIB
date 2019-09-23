@@ -40,7 +40,13 @@ ZYXEL-SYSLOG-MIB DEFINITIONS ::= BEGIN
 		FROM  P-BRIDGE-MIB
 	
     IpAddress
-        FROM SNMPv2-SMI
+        FROM SNMPv2-SMI   
+    
+    InetAddressType
+    	FROM INET-ADDRESS-MIB
+   
+   	InetAddress
+   		FROM INET-ADDRESS-MIB
 
 	esMgmt			
 		FROM ZYXEL-ES-SMI;
@@ -147,42 +153,61 @@ ZYXEL-SYSLOG-MIB DEFINITIONS ::= BEGIN
                     "The maximum number of sys log servers that can be created."
         ::= { zyxelSysLogSetup 3 }
 		
+-- *******************************************************************
+-- *
+-- * zyxelSysLogsServerSetup
+-- *
+-- *******************************************************************
 		
--- zyxelSysLogServerTable
-       	zyxelSysLogServerTable	OBJECT-TYPE
-        SYNTAX	SEQUENCE OF ZyxelSysLogServerEntry
+ --Inet syslog server table
+       	zyxelSysLogServerInetTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelSysLogServerInetEntry
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
-                 	"The table contains system logs server configuration."
-        ::= { zyxelSysLogSetup 4 }
-        
-		zyxelSysLogServerEntry OBJECT-TYPE
-        SYNTAX	ZyxelSysLogServerEntry
+                 	"The table contains syslog server configuration."
+        ::= { zyxelSysLogSetup 5 }
+
+		zyxelSysLogServerInetEntry OBJECT-TYPE
+        SYNTAX	ZyxelSysLogServerInetEntry
         MAX-ACCESS	not-accessible
         STATUS	current
         DESCRIPTION    	
-					"An entry contains system logs server configuration."
-        INDEX          	{ zySysLogServerIpAddress }
-        ::= { zyxelSysLogServerTable 1 }
+					"An entry contains syslog server configuration."
+        INDEX          	{ zySysLogServerInetAddressType,
+						  zySysLogServerInetAddress }
+        ::= { zyxelSysLogServerInetTable 1 }
 
-        ZyxelSysLogServerEntry ::=
-           SEQUENCE {
-         	zySysLogServerIpAddress	IpAddress,
-        	zySysLogServerLogLevel	INTEGER,
-        	zySysLogServerRowStatus	RowStatus
-           }
-       
-        zySysLogServerIpAddress OBJECT-TYPE
-        SYNTAX  IpAddress
-        MAX-ACCESS  not-accessible
-        STATUS  current
+ZyxelSysLogServerInetEntry ::=
+        SEQUENCE {
+                zySysLogServerInetAddressType InetAddressType,
+                zySysLogServerInetAddress     InetAddress,
+                zySysLogServerInetLogLevel    INTEGER,
+                zySysLogServerInetUdpPort	  INTEGER,
+                zySysLogServerInetRowStatus	  RowStatus
+        }				
+
+zySysLogServerInetAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
         DESCRIPTION
-                      	"The IP address of the syslog server."
-        ::= { zyxelSysLogServerEntry 1 }
+                "The type of Internet address of this syslog server."
+        ::= { zyxelSysLogServerInetEntry 1 }
 
-        zySysLogServerLogLevel OBJECT-TYPE
-        SYNTAX  INTEGER {
+zySysLogServerInetAddress OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE(0..64))
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The Internet address of this syslog server.
+                 The type of this address is determined by the
+                 value of the zySysLogServerInetAddressType object."
+        ::= { zyxelSysLogServerInetEntry 2 }
+
+
+zySysLogServerInetLogLevel OBJECT-TYPE
+        SYNTAX  INTEGER{
         	level0(0),
         	level0To1(1),
         	level0To2(2),
@@ -195,16 +220,25 @@ ZYXEL-SYSLOG-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
-                      	"Enter the severity level(s) of the logs that you want the device to send to this syslog server. 
+        "Enter the severity level(s) of the logs that you want the device to send to this syslog server. 
 						The lower the number, the more critical the logs are."
-        ::= { zyxelSysLogServerEntry 2 }
+        ::= { zyxelSysLogServerInetEntry 3 }
 
-        zySysLogServerRowStatus OBJECT-TYPE
+
+zySysLogServerInetUdpPort OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Enter the preference Udp port number, default port number is 514."
+        ::= { zyxelSysLogServerInetEntry 4 }
+
+
+zySysLogServerInetRowStatus OBJECT-TYPE
         SYNTAX  RowStatus
         MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
-                      	"This object allows entry to be created and deleted syslog servers configuration."
-        ::= { zyxelSysLogServerEntry 3 }
-
+				"This object allows entry to be created and deleted syslog servers configuration."
+        ::= { zyxelSysLogServerInetEntry 5 }
 END 

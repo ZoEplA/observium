@@ -1,7 +1,7 @@
 DELL-REF-MIB DEFINITIONS ::= BEGIN
 
 -- DELL NETWORKING OS Reference MIB
--- Copyright Dell (2001-2013) All rights reserved.
+-- Copyright 2016-2017 Broadcom.
 
 -- This SNMP Management Information Specification
 -- embodies Dell confidential and proprietary
@@ -22,7 +22,7 @@ IMPORTS
 
     lvl7 MODULE-IDENTITY
         LAST-UPDATED "201304120000Z" -- 12 Apr 2013 12:00:00 GMT
-        ORGANIZATION "Dell, Inc."
+        ORGANIZATION "Dell EMC"
         CONTACT-INFO ""
         DESCRIPTION
           ""
@@ -33,11 +33,11 @@ IMPORTS
         DESCRIPTION
           "Revisions made for new release."
         REVISION
-	      "201303270000Z" -- 27 Mar 2013 12:00:00 GMT
+        "201303270000Z" -- 27 Mar 2013 12:00:00 GMT
         DESCRIPTION
           "Updated for new release."
         REVISION
-	      "201104140000Z" -- 14 Apr 2011 12:00:00 GMT
+        "201104140000Z" -- 14 Apr 2011 12:00:00 GMT
         DESCRIPTION
           "Revisions made for new release."
         REVISION
@@ -129,8 +129,36 @@ IMPORTS
  dellN3048PSwitch     OBJECT IDENTIFIER ::= { dellLan 3060 }
 -- sysObjId for 3024F
  dellN3024FSwitch     OBJECT IDENTIFIER ::= { dellLan 3061 }
+-- sysObjId for 3048EP-ON
+ dellN3048EP-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3084 }
 
--- New Textual Conventions
+-- sysObjId for 1524
+ dellN1524Switch      OBJECT IDENTIFIER ::= { dellLan 3063 }
+-- sysObjId for 1524P
+ dellN1524PSwitch     OBJECT IDENTIFIER ::= { dellLan 3064 }
+-- sysObjId for 1548
+ dellN1548Switch      OBJECT IDENTIFIER ::= { dellLan 3065 }
+-- sysObjId for 1548P
+ dellN1548PSwitch     OBJECT IDENTIFIER ::= { dellLan 3066 }
+
+-- sysObjId for N3132PX
+ dellN3132PXSwitch    OBJECT IDENTIFIER ::= { dellLan 3076 }
+-- sysObjId for N2128PX
+ dellN2128PXSwitch    OBJECT IDENTIFIER ::= { dellLan 3077 }
+
+-- sysObjId for N1108T-ON
+ dellN1108T-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3078 }
+-- sysObjId for N1108P-ON
+ dellN1108P-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3079 }
+-- sysObjId for N1124T-ON
+ dellN1124T-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3080 }
+-- sysObjId for N1124P-ON
+ dellN1124P-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3081 }
+-- sysObjId for N1148T-ON
+ dellN1148T-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3082 }
+-- sysObjId for N1148P-ON
+ dellN1148P-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3083 }
+
 AgentPortMask ::= TEXTUAL-CONVENTION
    DISPLAY-HINT "255x"
    STATUS  current
@@ -156,4 +184,3 @@ AgentPortMask ::= TEXTUAL-CONVENTION
 
 
 END
-

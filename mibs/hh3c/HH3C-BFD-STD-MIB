@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: The MIB is extracted from draft-ietf-bfd-base-04.txt.
 -- This file defines a portion of the Management Information Base (MIB) for use
@@ -7,10 +7,12 @@
 -- managed objects to configure or monitor Bi-Directional Forwarding Detection
 -- on devices supporting this feature.
 -- Reference:
--- Version: V1.1
+-- Version: V1.3
 -- History:
 -- V1.0  2006-05-15 created by huanglina and xuqigang
 -- V1.1  2014-01-20 modified by wangxingying
+-- V1.2  2014-12-23 modified by wangxingying
+-- V1.3  2016-03-12 modified by guobin
 -- ============================================================================
 HH3C-BFD-STD-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -33,11 +35,11 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
 hh3cBfdMIB MODULE-IDENTITY
-    LAST-UPDATED "201401171200Z"  -- 17 Jan 2014 12:00:00 Beijing time
+    LAST-UPDATED "201412131200Z"  -- 13 Dec 2014 12:00:00 Beijing time
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -46,6 +48,10 @@ hh3cBfdMIB MODULE-IDENTITY
         "Bidirectional Forwarding Management Information Base."
 
     -- Revision history.
+    REVISION "201412131200Z"  -- 13 Dec 2014 12:00:00 Beijing time
+    DESCRIPTION
+        "Modified the objects of hh3cBfdSessEntry."
+
     REVISION "201401171200Z"  -- 17 Jan 2014 12:00:00 Beijing time
     DESCRIPTION
         "Modified for bfd trap."
@@ -287,13 +293,12 @@ hh3cBfdSessEntry OBJECT-TYPE
     STATUS        current
     DESCRIPTION
         "This Entry describes the BFD sessions."
-    INDEX { hh3cBfdSessIfIndex,
-            hh3cBfdSessIndex }
+    INDEX { hh3cBfdSessIndex }
     ::= { hh3cBfdSessTable 1 }
 
 Hh3cBfdSessEntry ::= SEQUENCE {
-        hh3cBfdSessIfIndex                  InterfaceIndex,
         hh3cBfdSessIndex                    BfdSessIndexTC,
+        hh3cBfdSessIfIndex                  InterfaceIndex,
         hh3cBfdSessAppSupportId             BITS,
         hh3cBfdSessLocalDiscr               Unsigned32,
         hh3cBfdSessRemoteDiscr              Unsigned32,
@@ -309,15 +314,6 @@ Hh3cBfdSessEntry ::= SEQUENCE {
         hh3cBfdSessDemandModeFlag           TruthValue
     }
 
-hh3cBfdSessIfIndex  OBJECT-TYPE
-    SYNTAX        InterfaceIndex
-    MAX-ACCESS    accessible-for-notify
-    STATUS        current
-    DESCRIPTION
-        "This variable contains an interface's index under which the BFD
-         session runs."
-    ::= { hh3cBfdSessEntry 1 }
-
 hh3cBfdSessIndex OBJECT-TYPE
     SYNTAX        BfdSessIndexTC
     MAX-ACCESS    accessible-for-notify
@@ -325,6 +321,15 @@ hh3cBfdSessIndex OBJECT-TYPE
     DESCRIPTION
         "This variable contains an index which represents a
          unique BFD session on this device."
+    ::= { hh3cBfdSessEntry 1 }
+
+hh3cBfdSessIfIndex  OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable contains an interface's index under which the BFD
+         session runs."
     ::= { hh3cBfdSessEntry 2 }
 
 hh3cBfdSessAppSupportId OBJECT-TYPE
@@ -543,7 +548,7 @@ hh3cBfdSessControlPlanIndepFlag OBJECT-TYPE
          can continue to work while the control plane is out
          of work. Specifically, it is set to true(1) if the
          local system is independent of the control plane. Otherwise,
-         the value is set to false(0)"
+         the value is set to false(2)"
     DEFVAL { true }
     ::= { hh3cBfdSessEntry 13 }
 
@@ -555,7 +560,7 @@ hh3cBfdSessAuthFlag OBJECT-TYPE
         "This variable indicates that the local system wants
          to use Authentication. Specifically, it is set
          to true(1) if the local system wishes the session
-         to be authenticated or false(0) if not."
+         to be authenticated or false(2) if not."
     DEFVAL { false }
     ::= { hh3cBfdSessEntry 14 }
 
@@ -567,7 +572,7 @@ hh3cBfdSessDemandModeFlag OBJECT-TYPE
         "This variable indicates that the local system wants
          to use Demand mode. Specifically, it is set
          to true(1) if the local system wishes to use
-         Demand mode or false(0) if not"
+         Demand mode or false(2) if not"
     DEFVAL { false }
     ::= { hh3cBfdSessEntry 15 }
 

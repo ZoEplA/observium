@@ -42,7 +42,7 @@ rlRadiusServEnable OBJECT-TYPE
    ::= { rlRadiusServ 1 }
 
 rlRadiusServAcctPort  OBJECT-TYPE
-    SYNTAX INTEGER (1..65535)
+    SYNTAX INTEGER (1..59999)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -51,7 +51,7 @@ rlRadiusServAcctPort  OBJECT-TYPE
 	::= { rlRadiusServ 2 }
 
 rlRadiusServAuthPort  OBJECT-TYPE
-    SYNTAX INTEGER (1..65535)
+    SYNTAX INTEGER (1..59999)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -68,7 +68,7 @@ rlRadiusServDefaultKey OBJECT-TYPE
     ::= { rlRadiusServ 4 }
 
 rlRadiusServDefaultKeyMD5 OBJECT-TYPE
-    SYNTAX DisplayString
+    SYNTAX OCTET STRING
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -212,7 +212,7 @@ rlRadiusServUserEntry OBJECT-TYPE
 RlRadiusServUserEntry ::= SEQUENCE {
     rlRadiusServUserName                    DisplayString,
     rlRadiusServUserPassword                DisplayString,
-	rlRadiusServUserPasswordMD5             DisplayString,
+    rlRadiusServUserPasswordMD5             OCTET STRING,
     rlRadiusServUserGroupName               DisplayString,
 	rlRadiusServUserStatus                  RowStatus
 }
@@ -232,7 +232,7 @@ rlRadiusServUserPassword OBJECT-TYPE
    ::= { rlRadiusServUserEntry 2 }
 
 rlRadiusServUserPasswordMD5 OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -280,7 +280,7 @@ RlRadiusServClientInetEntry ::= SEQUENCE {
     rlRadiusServClientInetAddressType   InetAddressType,
     rlRadiusServClientInetAddress       InetAddress,
     rlRadiusServClientInetKey           DisplayString,
-	rlRadiusServClientInetKeyMD5        DisplayString,
+    rlRadiusServClientInetKeyMD5        OCTET STRING,
 	rlRadiusServClientInetStatus        RowStatus,
 	rlRadiusServClientInetUseGlobalKey  TruthValue
 }
@@ -313,7 +313,7 @@ rlRadiusServClientInetKey  OBJECT-TYPE
     ::= { rlRadiusServClientInetEntry 3 }
 
 rlRadiusServClientInetKeyMD5 OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

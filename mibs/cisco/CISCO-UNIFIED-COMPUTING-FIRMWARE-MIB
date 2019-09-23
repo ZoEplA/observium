@@ -4,9 +4,9 @@
 -- MIB representation of the Cisco Unified Computing System
 -- FIRMWARE management information model package
 -- 
--- Created January 2016 by Charles Bullis
+-- Created July 2018 by Charles Bullis
 -- 
--- Copyright (c) 2005-2016 Cisco Systems, Inc. All rights reserved.
+-- Copyright (c) 2005-2018 Cisco Systems, Inc. All rights reserved.
 -- 
 -- *********************************************************************
 
@@ -58,6 +58,7 @@ IMPORTS
     CucsFirmwareBootUnitImage,
     CucsFirmwareBootUnitMode,
     CucsFirmwareCatalogPackConfigState,
+    CucsFirmwareChassisType,
     CucsFirmwareCompleteness,
     CucsFirmwareComponentType,
     CucsFirmwareDependencyRelationship,
@@ -84,6 +85,7 @@ IMPORTS
     CucsFirmwareImagePresence,
     CucsFirmwareImageState,
     CucsFirmwareImpactType,
+    CucsFirmwareInstallSpState,
     CucsFirmwareInstallState,
     CucsFirmwareItemType,
     CucsFirmwarePackItemPresence,
@@ -98,6 +100,7 @@ IMPORTS
     CucsFirmwareTransport,
     CucsFirmwareTriggerState,
     CucsFirmwareType,
+    CucsFirmwareTypeInstallPath,
     CucsFirmwareUpdatableDeployment,
     CucsFirmwareUpgradeCategory,
     CucsFirmwareUpgradeSeverity,
@@ -117,7 +120,7 @@ IMPORTS
         FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
 
 cucsFirmwareObjects MODULE-IDENTITY
-    LAST-UPDATED    "201601180000Z"
+    LAST-UPDATED    "201807260000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
         "Cisco Systems
@@ -173,7 +176,7 @@ CucsFirmwareAckEntry ::= SEQUENCE {
     cucsFirmwareAckOperState                                         CucsTrigAckOperState,
     cucsFirmwareAckPolicyLevel                                       Gauge32,
     cucsFirmwareAckPolicyOwner                                       CucsPolicyPolicyOwner,
-    cucsFirmwareAckPrevOperState                                     CucsTrigAckPrevOperState,
+    cucsFirmwareAckPrevOperState                                     CucsTrigAckOperState,
     cucsFirmwareAckScheduler                                         SnmpAdminString,
     cucsFirmwareAckTriggerConfigState                                CucsTrigTrigState
 }
@@ -339,7 +342,7 @@ cucsFirmwareAckPolicyOwner OBJECT-TYPE
     ::= { cucsFirmwareAckEntry 20 }
 
 cucsFirmwareAckPrevOperState OBJECT-TYPE
-    SYNTAX       CucsTrigAckPrevOperState
+    SYNTAX       CucsTrigAckOperState
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -387,7 +390,8 @@ CucsFirmwareActivityEntry ::= SEQUENCE {
     cucsFirmwareActivityChassisCompInActivationDn                    SnmpAdminString,
     cucsFirmwareActivityServerCompInActivationDn                     SnmpAdminString,
     cucsFirmwareActivityServersPowerState                            CucsFirmwareActivityServersPowerState,
-    cucsFirmwareActivityUpgradePriorityInfo                          CucsFirmwareActivityUpgradePriorityInfo
+    cucsFirmwareActivityUpgradePriorityInfo                          CucsFirmwareActivityUpgradePriorityInfo,
+    cucsFirmwareActivityActivityTriggerTime                          DateAndTime
 }
 
 cucsFirmwareActivityInstanceId OBJECT-TYPE
@@ -449,6 +453,62 @@ cucsFirmwareActivityUpgradePriorityInfo OBJECT-TYPE
         "Cisco UCS firmware:Activity:upgradePriorityInfo
         managed object property"
     ::= { cucsFirmwareActivityEntry 7 }
+
+cucsFirmwareActivityActivityTriggerTime OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Activity:activityTriggerTime
+        managed object property"
+    ::= { cucsFirmwareActivityEntry 8 }
+
+cucsFirmwareActivityTriggerTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareActivityTriggerEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:ActivityTrigger managed object table"
+    ::= { cucsFirmwareObjects 83 }
+
+cucsFirmwareActivityTriggerEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareActivityTriggerEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareActivityTriggerTable table."
+    INDEX { cucsFirmwareActivityTriggerInstanceId }
+    ::= { cucsFirmwareActivityTriggerTable 1 }
+
+CucsFirmwareActivityTriggerEntry ::= SEQUENCE {
+    cucsFirmwareActivityTriggerInstanceId                            CucsManagedObjectId,
+    cucsFirmwareActivityTriggerDn                                    CucsManagedObjectDn,
+    cucsFirmwareActivityTriggerRn                                    SnmpAdminString
+}
+
+cucsFirmwareActivityTriggerInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareActivityTriggerEntry 1 }
+
+cucsFirmwareActivityTriggerDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ActivityTrigger:dn managed object property"
+    ::= { cucsFirmwareActivityTriggerEntry 2 }
+
+cucsFirmwareActivityTriggerRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ActivityTrigger:rn managed object property"
+    ::= { cucsFirmwareActivityTriggerEntry 3 }
 
 cucsFirmwareAutoSyncPolicyTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareAutoSyncPolicyEntry
@@ -1408,6 +1468,257 @@ cucsFirmwareCatalogueSyncTrigger OBJECT-TYPE
         "Cisco UCS firmware:Catalogue:syncTrigger managed object property"
     ::= { cucsFirmwareCatalogueEntry 4 }
 
+cucsFirmwareChassisComponentSpecTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareChassisComponentSpecEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisComponentSpec managed object table"
+    ::= { cucsFirmwareObjects 76 }
+
+cucsFirmwareChassisComponentSpecEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareChassisComponentSpecEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareChassisComponentSpecTable table."
+    INDEX { cucsFirmwareChassisComponentSpecInstanceId }
+    ::= { cucsFirmwareChassisComponentSpecTable 1 }
+
+CucsFirmwareChassisComponentSpecEntry ::= SEQUENCE {
+    cucsFirmwareChassisComponentSpecInstanceId                       CucsManagedObjectId,
+    cucsFirmwareChassisComponentSpecDn                               CucsManagedObjectDn,
+    cucsFirmwareChassisComponentSpecRn                               SnmpAdminString,
+    cucsFirmwareChassisComponentSpecExcludeByDefault                 TruthValue,
+    cucsFirmwareChassisComponentSpecType                             CucsFirmwareChassisType
+}
+
+cucsFirmwareChassisComponentSpecInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareChassisComponentSpecEntry 1 }
+
+cucsFirmwareChassisComponentSpecDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisComponentSpec:dn managed
+        object property"
+    ::= { cucsFirmwareChassisComponentSpecEntry 2 }
+
+cucsFirmwareChassisComponentSpecRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisComponentSpec:rn managed
+        object property"
+    ::= { cucsFirmwareChassisComponentSpecEntry 3 }
+
+cucsFirmwareChassisComponentSpecExcludeByDefault OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisComponentSpec:excludeByDefault
+        managed object property"
+    ::= { cucsFirmwareChassisComponentSpecEntry 4 }
+
+cucsFirmwareChassisComponentSpecType OBJECT-TYPE
+    SYNTAX       CucsFirmwareChassisType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisComponentSpec:type managed
+        object property"
+    ::= { cucsFirmwareChassisComponentSpecEntry 5 }
+
+cucsFirmwareChassisPackTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareChassisPackEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack managed object table"
+    ::= { cucsFirmwareObjects 77 }
+
+cucsFirmwareChassisPackEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareChassisPackEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareChassisPackTable table."
+    INDEX { cucsFirmwareChassisPackInstanceId }
+    ::= { cucsFirmwareChassisPackTable 1 }
+
+CucsFirmwareChassisPackEntry ::= SEQUENCE {
+    cucsFirmwareChassisPackInstanceId                                CucsManagedObjectId,
+    cucsFirmwareChassisPackDn                                        CucsManagedObjectDn,
+    cucsFirmwareChassisPackRn                                        SnmpAdminString,
+    cucsFirmwareChassisPackChassisBundleName                         SnmpAdminString,
+    cucsFirmwareChassisPackChassisBundleVersion                      SnmpAdminString,
+    cucsFirmwareChassisPackDescr                                     SnmpAdminString,
+    cucsFirmwareChassisPackForceDeploy                               TruthValue,
+    cucsFirmwareChassisPackIntId                                     SnmpAdminString,
+    cucsFirmwareChassisPackMode                                      CucsFirmwarePackMode,
+    cucsFirmwareChassisPackName                                      SnmpAdminString,
+    cucsFirmwareChassisPackOverrideDefaultExclusion                  TruthValue,
+    cucsFirmwareChassisPackPolicyLevel                               Gauge32,
+    cucsFirmwareChassisPackPolicyOwner                               CucsPolicyPolicyOwner,
+    cucsFirmwareChassisPackStageSize                                 Gauge32,
+    cucsFirmwareChassisPackUpdateTrigger                             DateAndTime,
+    cucsFirmwareChassisPackServicePackBundleName                     SnmpAdminString,
+    cucsFirmwareChassisPackServicePackBundleVersion                  SnmpAdminString
+}
+
+cucsFirmwareChassisPackInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareChassisPackEntry 1 }
+
+cucsFirmwareChassisPackDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:dn managed object property"
+    ::= { cucsFirmwareChassisPackEntry 2 }
+
+cucsFirmwareChassisPackRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:rn managed object property"
+    ::= { cucsFirmwareChassisPackEntry 3 }
+
+cucsFirmwareChassisPackChassisBundleName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:chassisBundleName
+        managed object property"
+    ::= { cucsFirmwareChassisPackEntry 4 }
+
+cucsFirmwareChassisPackChassisBundleVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:chassisBundleVersion
+        managed object property"
+    ::= { cucsFirmwareChassisPackEntry 5 }
+
+cucsFirmwareChassisPackDescr OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:descr managed object property"
+    ::= { cucsFirmwareChassisPackEntry 6 }
+
+cucsFirmwareChassisPackForceDeploy OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:forceDeploy managed
+        object property"
+    ::= { cucsFirmwareChassisPackEntry 7 }
+
+cucsFirmwareChassisPackIntId OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:intId managed object property"
+    ::= { cucsFirmwareChassisPackEntry 8 }
+
+cucsFirmwareChassisPackMode OBJECT-TYPE
+    SYNTAX       CucsFirmwarePackMode
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:mode managed object property"
+    ::= { cucsFirmwareChassisPackEntry 9 }
+
+cucsFirmwareChassisPackName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:name managed object property"
+    ::= { cucsFirmwareChassisPackEntry 10 }
+
+cucsFirmwareChassisPackOverrideDefaultExclusion OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:overrideDefaultExclusion
+        managed object property"
+    ::= { cucsFirmwareChassisPackEntry 11 }
+
+cucsFirmwareChassisPackPolicyLevel OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:policyLevel managed
+        object property"
+    ::= { cucsFirmwareChassisPackEntry 12 }
+
+cucsFirmwareChassisPackPolicyOwner OBJECT-TYPE
+    SYNTAX       CucsPolicyPolicyOwner
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:policyOwner managed
+        object property"
+    ::= { cucsFirmwareChassisPackEntry 13 }
+
+cucsFirmwareChassisPackStageSize OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:stageSize managed object property"
+    ::= { cucsFirmwareChassisPackEntry 14 }
+
+cucsFirmwareChassisPackUpdateTrigger OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:updateTrigger managed
+        object property"
+    ::= { cucsFirmwareChassisPackEntry 15 }
+
+cucsFirmwareChassisPackServicePackBundleName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:servicePackBundleName
+        managed object property"
+    ::= { cucsFirmwareChassisPackEntry 16 }
+
+cucsFirmwareChassisPackServicePackBundleVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ChassisPack:servicePackBundleVersion
+        managed object property"
+    ::= { cucsFirmwareChassisPackEntry 17 }
+
 cucsFirmwareCompSourceTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareCompSourceEntry
     MAX-ACCESS       not-accessible
@@ -1632,6 +1943,72 @@ cucsFirmwareCompTargetPolicyOwner OBJECT-TYPE
         object property"
     ::= { cucsFirmwareCompTargetEntry 10 }
 
+cucsFirmwareComponentSpecTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareComponentSpecEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:ComponentSpec managed object table"
+    ::= { cucsFirmwareObjects 62 }
+
+cucsFirmwareComponentSpecEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareComponentSpecEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareComponentSpecTable table."
+    INDEX { cucsFirmwareComponentSpecInstanceId }
+    ::= { cucsFirmwareComponentSpecTable 1 }
+
+CucsFirmwareComponentSpecEntry ::= SEQUENCE {
+    cucsFirmwareComponentSpecInstanceId                              CucsManagedObjectId,
+    cucsFirmwareComponentSpecDn                                      CucsManagedObjectDn,
+    cucsFirmwareComponentSpecRn                                      SnmpAdminString,
+    cucsFirmwareComponentSpecExcludeByDefault                        TruthValue,
+    cucsFirmwareComponentSpecType                                    CucsFirmwareBladeType
+}
+
+cucsFirmwareComponentSpecInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareComponentSpecEntry 1 }
+
+cucsFirmwareComponentSpecDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ComponentSpec:dn managed object property"
+    ::= { cucsFirmwareComponentSpecEntry 2 }
+
+cucsFirmwareComponentSpecRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ComponentSpec:rn managed object property"
+    ::= { cucsFirmwareComponentSpecEntry 3 }
+
+cucsFirmwareComponentSpecExcludeByDefault OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ComponentSpec:excludeByDefault
+        managed object property"
+    ::= { cucsFirmwareComponentSpecEntry 4 }
+
+cucsFirmwareComponentSpecType OBJECT-TYPE
+    SYNTAX       CucsFirmwareBladeType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ComponentSpec:type managed object property"
+    ::= { cucsFirmwareComponentSpecEntry 5 }
+
 cucsFirmwareComputeHostPackTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareComputeHostPackEntry
     MAX-ACCESS       not-accessible
@@ -1667,8 +2044,9 @@ CucsFirmwareComputeHostPackEntry ::= SEQUENCE {
     cucsFirmwareComputeHostPackPolicyOwner                           CucsPolicyPolicyOwner,
     cucsFirmwareComputeHostPackRackBundleName                        SnmpAdminString,
     cucsFirmwareComputeHostPackRackBundleVersion                     SnmpAdminString,
-    cucsFirmwareComputeHostPackMSeriesBundleName                     SnmpAdminString,
-    cucsFirmwareComputeHostPackMSeriesBundleVersion                  SnmpAdminString
+    cucsFirmwareComputeHostPackOverrideDefaultExclusion              TruthValue,
+    cucsFirmwareComputeHostPackServicePackBundleName                 SnmpAdminString,
+    cucsFirmwareComputeHostPackServicePackBundleVersion              SnmpAdminString
 }
 
 cucsFirmwareComputeHostPackInstanceId OBJECT-TYPE
@@ -1817,23 +2195,32 @@ cucsFirmwareComputeHostPackRackBundleVersion OBJECT-TYPE
         managed object property"
     ::= { cucsFirmwareComputeHostPackEntry 17 }
 
-cucsFirmwareComputeHostPackMSeriesBundleName OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+cucsFirmwareComputeHostPackOverrideDefaultExclusion OBJECT-TYPE
+    SYNTAX       TruthValue
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
-        "Cisco UCS firmware:ComputeHostPack:mSeriesBundleName
+        "Cisco UCS firmware:ComputeHostPack:overrideDefaultExclusion
         managed object property"
-    ::= { cucsFirmwareComputeHostPackEntry 19 }
+    ::= { cucsFirmwareComputeHostPackEntry 21 }
 
-cucsFirmwareComputeHostPackMSeriesBundleVersion OBJECT-TYPE
+cucsFirmwareComputeHostPackServicePackBundleName OBJECT-TYPE
     SYNTAX       SnmpAdminString
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
-        "Cisco UCS firmware:ComputeHostPack:mSeriesBundleVersion
+        "Cisco UCS firmware:ComputeHostPack:servicePackBundleName
         managed object property"
-    ::= { cucsFirmwareComputeHostPackEntry 20 }
+    ::= { cucsFirmwareComputeHostPackEntry 22 }
+
+cucsFirmwareComputeHostPackServicePackBundleVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ComputeHostPack:servicePackBundleVersion
+        managed object property"
+    ::= { cucsFirmwareComputeHostPackEntry 23 }
 
 cucsFirmwareComputeMgmtPackTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareComputeMgmtPackEntry
@@ -2273,7 +2660,8 @@ CucsFirmwareDistributableEntry ::= SEQUENCE {
     cucsFirmwareDistributableDescr                                   SnmpAdminString,
     cucsFirmwareDistributableIntId                                   SnmpAdminString,
     cucsFirmwareDistributablePolicyLevel                             Gauge32,
-    cucsFirmwareDistributablePolicyOwner                             CucsPolicyPolicyOwner
+    cucsFirmwareDistributablePolicyOwner                             CucsPolicyPolicyOwner,
+    cucsFirmwareDistributableMd5sum                                  SnmpAdminString
 }
 
 cucsFirmwareDistributableInstanceId OBJECT-TYPE
@@ -2505,6 +2893,14 @@ cucsFirmwareDistributablePolicyOwner OBJECT-TYPE
         "Cisco UCS firmware:Distributable:policyOwner managed
         object property"
     ::= { cucsFirmwareDistributableEntry 27 }
+
+cucsFirmwareDistributableMd5sum OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Distributable:md5sum managed object property"
+    ::= { cucsFirmwareDistributableEntry 47 }
 
 cucsFirmwareDistributableFsmTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareDistributableFsmEntry
@@ -3372,6 +3768,292 @@ cucsFirmwareDownloaderFsmTaskSeqId OBJECT-TYPE
         "Cisco UCS firmware:DownloaderFsmTask:seqId managed
         object property"
     ::= { cucsFirmwareDownloaderFsmTaskEntry 7 }
+
+cucsFirmwareDriveSecurityConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareDriveSecurityConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:DriveSecurityConstraint managed object table"
+    ::= { cucsFirmwareObjects 85 }
+
+cucsFirmwareDriveSecurityConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareDriveSecurityConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareDriveSecurityConstraintTable table."
+    INDEX { cucsFirmwareDriveSecurityConstraintInstanceId }
+    ::= { cucsFirmwareDriveSecurityConstraintTable 1 }
+
+CucsFirmwareDriveSecurityConstraintEntry ::= SEQUENCE {
+    cucsFirmwareDriveSecurityConstraintInstanceId                    CucsManagedObjectId,
+    cucsFirmwareDriveSecurityConstraintDn                            CucsManagedObjectDn,
+    cucsFirmwareDriveSecurityConstraintRn                            SnmpAdminString,
+    cucsFirmwareDriveSecurityConstraintCheckRunningVer               TruthValue,
+    cucsFirmwareDriveSecurityConstraintMinBiosVersion                SnmpAdminString,
+    cucsFirmwareDriveSecurityConstraintMinCimcVersion                SnmpAdminString
+}
+
+cucsFirmwareDriveSecurityConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareDriveSecurityConstraintEntry 1 }
+
+cucsFirmwareDriveSecurityConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DriveSecurityConstraint:dn
+        managed object property"
+    ::= { cucsFirmwareDriveSecurityConstraintEntry 2 }
+
+cucsFirmwareDriveSecurityConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DriveSecurityConstraint:rn
+        managed object property"
+    ::= { cucsFirmwareDriveSecurityConstraintEntry 3 }
+
+cucsFirmwareDriveSecurityConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DriveSecurityConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareDriveSecurityConstraintEntry 4 }
+
+cucsFirmwareDriveSecurityConstraintMinBiosVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DriveSecurityConstraint:minBiosVersion
+        managed object property"
+    ::= { cucsFirmwareDriveSecurityConstraintEntry 5 }
+
+cucsFirmwareDriveSecurityConstraintMinCimcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DriveSecurityConstraint:minCimcVersion
+        managed object property"
+    ::= { cucsFirmwareDriveSecurityConstraintEntry 6 }
+
+cucsFirmwareDualVicChassisConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareDualVicChassisConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicChassisConstraint managed object table"
+    ::= { cucsFirmwareObjects 86 }
+
+cucsFirmwareDualVicChassisConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareDualVicChassisConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareDualVicChassisConstraintTable table."
+    INDEX { cucsFirmwareDualVicChassisConstraintInstanceId }
+    ::= { cucsFirmwareDualVicChassisConstraintTable 1 }
+
+CucsFirmwareDualVicChassisConstraintEntry ::= SEQUENCE {
+    cucsFirmwareDualVicChassisConstraintInstanceId                   CucsManagedObjectId,
+    cucsFirmwareDualVicChassisConstraintDn                           CucsManagedObjectDn,
+    cucsFirmwareDualVicChassisConstraintRn                           SnmpAdminString,
+    cucsFirmwareDualVicChassisConstraintMinCmcVersion                SnmpAdminString
+}
+
+cucsFirmwareDualVicChassisConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareDualVicChassisConstraintEntry 1 }
+
+cucsFirmwareDualVicChassisConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicChassisConstraint:dn
+        managed object property"
+    ::= { cucsFirmwareDualVicChassisConstraintEntry 2 }
+
+cucsFirmwareDualVicChassisConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicChassisConstraint:rn
+        managed object property"
+    ::= { cucsFirmwareDualVicChassisConstraintEntry 3 }
+
+cucsFirmwareDualVicChassisConstraintMinCmcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicChassisConstraint:minCmcVersion
+        managed object property"
+    ::= { cucsFirmwareDualVicChassisConstraintEntry 4 }
+
+cucsFirmwareDualVicServerConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareDualVicServerConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicServerConstraint managed object table"
+    ::= { cucsFirmwareObjects 87 }
+
+cucsFirmwareDualVicServerConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareDualVicServerConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareDualVicServerConstraintTable table."
+    INDEX { cucsFirmwareDualVicServerConstraintInstanceId }
+    ::= { cucsFirmwareDualVicServerConstraintTable 1 }
+
+CucsFirmwareDualVicServerConstraintEntry ::= SEQUENCE {
+    cucsFirmwareDualVicServerConstraintInstanceId                    CucsManagedObjectId,
+    cucsFirmwareDualVicServerConstraintDn                            CucsManagedObjectDn,
+    cucsFirmwareDualVicServerConstraintRn                            SnmpAdminString,
+    cucsFirmwareDualVicServerConstraintCheckRunningVer               TruthValue,
+    cucsFirmwareDualVicServerConstraintMinBiosVersion                SnmpAdminString,
+    cucsFirmwareDualVicServerConstraintMinCimcVersion                SnmpAdminString
+}
+
+cucsFirmwareDualVicServerConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareDualVicServerConstraintEntry 1 }
+
+cucsFirmwareDualVicServerConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicServerConstraint:dn
+        managed object property"
+    ::= { cucsFirmwareDualVicServerConstraintEntry 2 }
+
+cucsFirmwareDualVicServerConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicServerConstraint:rn
+        managed object property"
+    ::= { cucsFirmwareDualVicServerConstraintEntry 3 }
+
+cucsFirmwareDualVicServerConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicServerConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareDualVicServerConstraintEntry 4 }
+
+cucsFirmwareDualVicServerConstraintMinBiosVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicServerConstraint:minBiosVersion
+        managed object property"
+    ::= { cucsFirmwareDualVicServerConstraintEntry 5 }
+
+cucsFirmwareDualVicServerConstraintMinCimcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:DualVicServerConstraint:minCimcVersion
+        managed object property"
+    ::= { cucsFirmwareDualVicServerConstraintEntry 6 }
+
+cucsFirmwareExcludeChassisComponentTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareExcludeChassisComponentEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:ExcludeChassisComponent managed object table"
+    ::= { cucsFirmwareObjects 81 }
+
+cucsFirmwareExcludeChassisComponentEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareExcludeChassisComponentEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareExcludeChassisComponentTable table."
+    INDEX { cucsFirmwareExcludeChassisComponentInstanceId }
+    ::= { cucsFirmwareExcludeChassisComponentTable 1 }
+
+CucsFirmwareExcludeChassisComponentEntry ::= SEQUENCE {
+    cucsFirmwareExcludeChassisComponentInstanceId                    CucsManagedObjectId,
+    cucsFirmwareExcludeChassisComponentDn                            CucsManagedObjectDn,
+    cucsFirmwareExcludeChassisComponentRn                            SnmpAdminString,
+    cucsFirmwareExcludeChassisComponentChassisComponent              CucsFirmwareChassisType,
+    cucsFirmwareExcludeChassisComponentPropAcl                       Unsigned64
+}
+
+cucsFirmwareExcludeChassisComponentInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareExcludeChassisComponentEntry 1 }
+
+cucsFirmwareExcludeChassisComponentDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ExcludeChassisComponent:dn
+        managed object property"
+    ::= { cucsFirmwareExcludeChassisComponentEntry 2 }
+
+cucsFirmwareExcludeChassisComponentRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ExcludeChassisComponent:rn
+        managed object property"
+    ::= { cucsFirmwareExcludeChassisComponentEntry 3 }
+
+cucsFirmwareExcludeChassisComponentChassisComponent OBJECT-TYPE
+    SYNTAX       CucsFirmwareChassisType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ExcludeChassisComponent:chassisComponent
+        managed object property"
+    ::= { cucsFirmwareExcludeChassisComponentEntry 4 }
+
+cucsFirmwareExcludeChassisComponentPropAcl OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ExcludeChassisComponent:propAcl
+        managed object property"
+    ::= { cucsFirmwareExcludeChassisComponentEntry 5 }
 
 cucsFirmwareExcludeServerComponentTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareExcludeServerComponentEntry
@@ -4338,7 +5020,8 @@ CucsFirmwareInfraEntry ::= SEQUENCE {
     cucsFirmwareInfraOperVersion                                     SnmpAdminString,
     cucsFirmwareInfraPolicyLevel                                     Gauge32,
     cucsFirmwareInfraPolicyOwner                                     CucsPolicyPolicyOwner,
-    cucsFirmwareInfraScheduler                                       SnmpAdminString
+    cucsFirmwareInfraScheduler                                       SnmpAdminString,
+    cucsFirmwareInfraOperServicePackVersion                          SnmpAdminString
 }
 
 cucsFirmwareInfraInstanceId OBJECT-TYPE
@@ -4461,6 +5144,15 @@ cucsFirmwareInfraScheduler OBJECT-TYPE
         "Cisco UCS firmware:Infra:scheduler managed object property"
     ::= { cucsFirmwareInfraEntry 15 }
 
+cucsFirmwareInfraOperServicePackVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Infra:operServicePackVersion
+        managed object property"
+    ::= { cucsFirmwareInfraEntry 16 }
+
 cucsFirmwareInfraPackTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareInfraPackEntry
     MAX-ACCESS       not-accessible
@@ -4493,7 +5185,10 @@ CucsFirmwareInfraPackEntry ::= SEQUENCE {
     cucsFirmwareInfraPackPolicyOwner                                 CucsPolicyPolicyOwner,
     cucsFirmwareInfraPackStageSize                                   Gauge32,
     cucsFirmwareInfraPackUpdateTrigger                               DateAndTime,
-    cucsFirmwareInfraPackSkipValidation                              TruthValue
+    cucsFirmwareInfraPackSkipValidation                              TruthValue,
+    cucsFirmwareInfraPackEvacuate                                    TruthValue,
+    cucsFirmwareInfraPackServicePackBundleName                       SnmpAdminString,
+    cucsFirmwareInfraPackServicePackBundleVersion                    SnmpAdminString
 }
 
 cucsFirmwareInfraPackInstanceId OBJECT-TYPE
@@ -4619,6 +5314,32 @@ cucsFirmwareInfraPackSkipValidation OBJECT-TYPE
         "Cisco UCS firmware:InfraPack:skipValidation managed
         object property"
     ::= { cucsFirmwareInfraPackEntry 15 }
+
+cucsFirmwareInfraPackEvacuate OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:InfraPack:evacuate managed object property"
+    ::= { cucsFirmwareInfraPackEntry 16 }
+
+cucsFirmwareInfraPackServicePackBundleName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:InfraPack:servicePackBundleName
+        managed object property"
+    ::= { cucsFirmwareInfraPackEntry 17 }
+
+cucsFirmwareInfraPackServicePackBundleVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:InfraPack:servicePackBundleVersion
+        managed object property"
+    ::= { cucsFirmwareInfraPackEntry 18 }
 
 cucsFirmwareInstallImpactTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareInstallImpactEntry
@@ -4861,6 +5582,107 @@ cucsFirmwareInstallableVersion OBJECT-TYPE
         "Cisco UCS firmware:Installable:version managed object property"
     ::= { cucsFirmwareInstallableEntry 13 }
 
+cucsFirmwareModuleTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareModuleEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:Module managed object table"
+    ::= { cucsFirmwareObjects 88 }
+
+cucsFirmwareModuleEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareModuleEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareModuleTable table."
+    INDEX { cucsFirmwareModuleInstanceId }
+    ::= { cucsFirmwareModuleTable 1 }
+
+CucsFirmwareModuleEntry ::= SEQUENCE {
+    cucsFirmwareModuleInstanceId                                     CucsManagedObjectId,
+    cucsFirmwareModuleDn                                             CucsManagedObjectDn,
+    cucsFirmwareModuleRn                                             SnmpAdminString,
+    cucsFirmwareModuleDescription                                    SnmpAdminString,
+    cucsFirmwareModuleModel                                          SnmpAdminString,
+    cucsFirmwareModuleName                                           SnmpAdminString,
+    cucsFirmwareModuleType                                           SnmpAdminString,
+    cucsFirmwareModuleVendor                                         SnmpAdminString,
+    cucsFirmwareModuleVersion                                        SnmpAdminString
+}
+
+cucsFirmwareModuleInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareModuleEntry 1 }
+
+cucsFirmwareModuleDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:dn managed object property"
+    ::= { cucsFirmwareModuleEntry 2 }
+
+cucsFirmwareModuleRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:rn managed object property"
+    ::= { cucsFirmwareModuleEntry 3 }
+
+cucsFirmwareModuleDescription OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:description managed object property"
+    ::= { cucsFirmwareModuleEntry 4 }
+
+cucsFirmwareModuleModel OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:model managed object property"
+    ::= { cucsFirmwareModuleEntry 5 }
+
+cucsFirmwareModuleName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:name managed object property"
+    ::= { cucsFirmwareModuleEntry 6 }
+
+cucsFirmwareModuleType OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:type managed object property"
+    ::= { cucsFirmwareModuleEntry 7 }
+
+cucsFirmwareModuleVendor OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:vendor managed object property"
+    ::= { cucsFirmwareModuleEntry 8 }
+
+cucsFirmwareModuleVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Module:version managed object property"
+    ::= { cucsFirmwareModuleEntry 9 }
+
 cucsFirmwarePCHStorageConfigConstraintTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwarePCHStorageConfigConstraintEntry
     MAX-ACCESS       not-accessible
@@ -4884,7 +5706,8 @@ CucsFirmwarePCHStorageConfigConstraintEntry ::= SEQUENCE {
     cucsFirmwarePCHStorageConfigConstraintDn                         CucsManagedObjectDn,
     cucsFirmwarePCHStorageConfigConstraintRn                         SnmpAdminString,
     cucsFirmwarePCHStorageConfigConstraintMinBiosVersion             SnmpAdminString,
-    cucsFirmwarePCHStorageConfigConstraintMinCimcVersion             SnmpAdminString
+    cucsFirmwarePCHStorageConfigConstraintMinCimcVersion             SnmpAdminString,
+    cucsFirmwarePCHStorageConfigConstraintCheckRunningVer            TruthValue
 }
 
 cucsFirmwarePCHStorageConfigConstraintInstanceId OBJECT-TYPE
@@ -4930,6 +5753,15 @@ cucsFirmwarePCHStorageConfigConstraintMinCimcVersion OBJECT-TYPE
         "Cisco UCS firmware:PCHStorageConfigConstraint:minCimcVersion
         managed object property"
     ::= { cucsFirmwarePCHStorageConfigConstraintEntry 5 }
+
+cucsFirmwarePCHStorageConfigConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:PCHStorageConfigConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwarePCHStorageConfigConstraintEntry 6 }
 
 cucsFirmwarePackItemTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwarePackItemEntry
@@ -5206,7 +6038,8 @@ CucsFirmwareProcessorTypeConstraintEntry ::= SEQUENCE {
     cucsFirmwareProcessorTypeConstraintRn                            SnmpAdminString,
     cucsFirmwareProcessorTypeConstraintMinBiosVersion                SnmpAdminString,
     cucsFirmwareProcessorTypeConstraintMinCimcVersion                SnmpAdminString,
-    cucsFirmwareProcessorTypeConstraintType                          SnmpAdminString
+    cucsFirmwareProcessorTypeConstraintType                          SnmpAdminString,
+    cucsFirmwareProcessorTypeConstraintCheckRunningVer               TruthValue
 }
 
 cucsFirmwareProcessorTypeConstraintInstanceId OBJECT-TYPE
@@ -5261,6 +6094,15 @@ cucsFirmwareProcessorTypeConstraintType OBJECT-TYPE
         "Cisco UCS firmware:ProcessorTypeConstraint:type
         managed object property"
     ::= { cucsFirmwareProcessorTypeConstraintEntry 6 }
+
+cucsFirmwareProcessorTypeConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ProcessorTypeConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareProcessorTypeConstraintEntry 7 }
 
 cucsFirmwareRackTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareRackEntry
@@ -5318,6 +6160,85 @@ cucsFirmwareRackOperVersion OBJECT-TYPE
         "Cisco UCS firmware:Rack:operVersion managed object property"
     ::= { cucsFirmwareRackEntry 4 }
 
+cucsFirmwareRackPowerCapConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareRackPowerCapConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:RackPowerCapConstraint managed object table"
+    ::= { cucsFirmwareObjects 84 }
+
+cucsFirmwareRackPowerCapConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareRackPowerCapConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareRackPowerCapConstraintTable table."
+    INDEX { cucsFirmwareRackPowerCapConstraintInstanceId }
+    ::= { cucsFirmwareRackPowerCapConstraintTable 1 }
+
+CucsFirmwareRackPowerCapConstraintEntry ::= SEQUENCE {
+    cucsFirmwareRackPowerCapConstraintInstanceId                     CucsManagedObjectId,
+    cucsFirmwareRackPowerCapConstraintDn                             CucsManagedObjectDn,
+    cucsFirmwareRackPowerCapConstraintRn                             SnmpAdminString,
+    cucsFirmwareRackPowerCapConstraintMinBiosVersion                 SnmpAdminString,
+    cucsFirmwareRackPowerCapConstraintMinCimcVersion                 SnmpAdminString,
+    cucsFirmwareRackPowerCapConstraintCheckRunningVer                TruthValue
+}
+
+cucsFirmwareRackPowerCapConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareRackPowerCapConstraintEntry 1 }
+
+cucsFirmwareRackPowerCapConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:RackPowerCapConstraint:dn managed
+        object property"
+    ::= { cucsFirmwareRackPowerCapConstraintEntry 2 }
+
+cucsFirmwareRackPowerCapConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:RackPowerCapConstraint:rn managed
+        object property"
+    ::= { cucsFirmwareRackPowerCapConstraintEntry 3 }
+
+cucsFirmwareRackPowerCapConstraintMinBiosVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:RackPowerCapConstraint:minBiosVersion
+        managed object property"
+    ::= { cucsFirmwareRackPowerCapConstraintEntry 4 }
+
+cucsFirmwareRackPowerCapConstraintMinCimcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:RackPowerCapConstraint:minCimcVersion
+        managed object property"
+    ::= { cucsFirmwareRackPowerCapConstraintEntry 5 }
+
+cucsFirmwareRackPowerCapConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:RackPowerCapConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareRackPowerCapConstraintEntry 6 }
+
 cucsFirmwareRunningTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareRunningEntry
     MAX-ACCESS       not-accessible
@@ -5339,7 +6260,7 @@ CucsFirmwareRunningEntry ::= SEQUENCE {
     cucsFirmwareRunningInstanceId                                    CucsManagedObjectId,
     cucsFirmwareRunningDn                                            CucsManagedObjectDn,
     cucsFirmwareRunningRn                                            SnmpAdminString,
-    cucsFirmwareRunningDeployment                                    CucsFirmwareRunningDeployment,
+    cucsFirmwareRunningDeployment                                    CucsFirmwareDeployment,
     cucsFirmwareRunningType                                          CucsFirmwareType,
     cucsFirmwareRunningVersion                                       SnmpAdminString,
     cucsFirmwareRunningPackageVersion                                SnmpAdminString,
@@ -5371,7 +6292,7 @@ cucsFirmwareRunningRn OBJECT-TYPE
     ::= { cucsFirmwareRunningEntry 3 }
 
 cucsFirmwareRunningDeployment OBJECT-TYPE
-    SYNTAX       CucsFirmwareRunningDeployment
+    SYNTAX       CucsFirmwareDeployment
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -5411,6 +6332,146 @@ cucsFirmwareRunningInvTag OBJECT-TYPE
         "Cisco UCS firmware:Running:invTag managed object property"
     ::= { cucsFirmwareRunningEntry 8 }
 
+cucsFirmwareSecondControllerChassisConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareSecondControllerChassisConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerChassisConstraint
+        managed object table"
+    ::= { cucsFirmwareObjects 89 }
+
+cucsFirmwareSecondControllerChassisConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareSecondControllerChassisConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareSecondControllerChassisConstraintTable table."
+    INDEX { cucsFirmwareSecondControllerChassisConstraintInstanceId }
+    ::= { cucsFirmwareSecondControllerChassisConstraintTable 1 }
+
+CucsFirmwareSecondControllerChassisConstraintEntry ::= SEQUENCE {
+    cucsFirmwareSecondControllerChassisConstraintInstanceId          CucsManagedObjectId,
+    cucsFirmwareSecondControllerChassisConstraintDn                  CucsManagedObjectDn,
+    cucsFirmwareSecondControllerChassisConstraintRn                  SnmpAdminString,
+    cucsFirmwareSecondControllerChassisConstraintMinCmcVersion       SnmpAdminString
+}
+
+cucsFirmwareSecondControllerChassisConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareSecondControllerChassisConstraintEntry 1 }
+
+cucsFirmwareSecondControllerChassisConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerChassisConstraint:dn
+        managed object property"
+    ::= { cucsFirmwareSecondControllerChassisConstraintEntry 2 }
+
+cucsFirmwareSecondControllerChassisConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerChassisConstraint:rn
+        managed object property"
+    ::= { cucsFirmwareSecondControllerChassisConstraintEntry 3 }
+
+cucsFirmwareSecondControllerChassisConstraintMinCmcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerChassisConstraint:minCmcVersio
+        n managed object property"
+    ::= { cucsFirmwareSecondControllerChassisConstraintEntry 4 }
+
+cucsFirmwareSecondControllerServerConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareSecondControllerServerConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerServerConstraint
+        managed object table"
+    ::= { cucsFirmwareObjects 90 }
+
+cucsFirmwareSecondControllerServerConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareSecondControllerServerConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareSecondControllerServerConstraintTable table."
+    INDEX { cucsFirmwareSecondControllerServerConstraintInstanceId }
+    ::= { cucsFirmwareSecondControllerServerConstraintTable 1 }
+
+CucsFirmwareSecondControllerServerConstraintEntry ::= SEQUENCE {
+    cucsFirmwareSecondControllerServerConstraintInstanceId           CucsManagedObjectId,
+    cucsFirmwareSecondControllerServerConstraintDn                   CucsManagedObjectDn,
+    cucsFirmwareSecondControllerServerConstraintRn                   SnmpAdminString,
+    cucsFirmwareSecondControllerServerConstraintCheckRunningVer      TruthValue,
+    cucsFirmwareSecondControllerServerConstraintMinBiosVersion       SnmpAdminString,
+    cucsFirmwareSecondControllerServerConstraintMinCimcVersion       SnmpAdminString
+}
+
+cucsFirmwareSecondControllerServerConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareSecondControllerServerConstraintEntry 1 }
+
+cucsFirmwareSecondControllerServerConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerServerConstraint:dn
+        managed object property"
+    ::= { cucsFirmwareSecondControllerServerConstraintEntry 2 }
+
+cucsFirmwareSecondControllerServerConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerServerConstraint:rn
+        managed object property"
+    ::= { cucsFirmwareSecondControllerServerConstraintEntry 3 }
+
+cucsFirmwareSecondControllerServerConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerServerConstraint:checkRunningV
+        er managed object property"
+    ::= { cucsFirmwareSecondControllerServerConstraintEntry 4 }
+
+cucsFirmwareSecondControllerServerConstraintMinBiosVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerServerConstraint:minBiosVersio
+        n managed object property"
+    ::= { cucsFirmwareSecondControllerServerConstraintEntry 5 }
+
+cucsFirmwareSecondControllerServerConstraintMinCimcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:SecondControllerServerConstraint:minCimcVersio
+        n managed object property"
+    ::= { cucsFirmwareSecondControllerServerConstraintEntry 6 }
+
 cucsFirmwareServerTypeConstraintTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareServerTypeConstraintEntry
     MAX-ACCESS       not-accessible
@@ -5433,7 +6494,8 @@ CucsFirmwareServerTypeConstraintEntry ::= SEQUENCE {
     cucsFirmwareServerTypeConstraintDn                               CucsManagedObjectDn,
     cucsFirmwareServerTypeConstraintRn                               SnmpAdminString,
     cucsFirmwareServerTypeConstraintMinBiosVersion                   SnmpAdminString,
-    cucsFirmwareServerTypeConstraintMinCimcVersion                   SnmpAdminString
+    cucsFirmwareServerTypeConstraintMinCimcVersion                   SnmpAdminString,
+    cucsFirmwareServerTypeConstraintCheckRunningVer                  TruthValue
 }
 
 cucsFirmwareServerTypeConstraintInstanceId OBJECT-TYPE
@@ -5479,6 +6541,91 @@ cucsFirmwareServerTypeConstraintMinCimcVersion OBJECT-TYPE
         "Cisco UCS firmware:ServerTypeConstraint:minCimcVersion
         managed object property"
     ::= { cucsFirmwareServerTypeConstraintEntry 5 }
+
+cucsFirmwareServerTypeConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ServerTypeConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareServerTypeConstraintEntry 6 }
+
+cucsFirmwareServicePackTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareServicePackEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:ServicePack managed object table"
+    ::= { cucsFirmwareObjects 91 }
+
+cucsFirmwareServicePackEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareServicePackEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareServicePackTable table."
+    INDEX { cucsFirmwareServicePackInstanceId }
+    ::= { cucsFirmwareServicePackTable 1 }
+
+CucsFirmwareServicePackEntry ::= SEQUENCE {
+    cucsFirmwareServicePackInstanceId                                CucsManagedObjectId,
+    cucsFirmwareServicePackDn                                        CucsManagedObjectDn,
+    cucsFirmwareServicePackRn                                        SnmpAdminString,
+    cucsFirmwareServicePackDefaultSpVersion                          SnmpAdminString,
+    cucsFirmwareServicePackLastKnownStatus                           CucsFirmwareInstallSpState,
+    cucsFirmwareServicePackModules                                   SnmpAdminString
+}
+
+cucsFirmwareServicePackInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareServicePackEntry 1 }
+
+cucsFirmwareServicePackDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ServicePack:dn managed object property"
+    ::= { cucsFirmwareServicePackEntry 2 }
+
+cucsFirmwareServicePackRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ServicePack:rn managed object property"
+    ::= { cucsFirmwareServicePackEntry 3 }
+
+cucsFirmwareServicePackDefaultSpVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ServicePack:defaultSpVersion
+        managed object property"
+    ::= { cucsFirmwareServicePackEntry 4 }
+
+cucsFirmwareServicePackLastKnownStatus OBJECT-TYPE
+    SYNTAX       CucsFirmwareInstallSpState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ServicePack:lastKnownStatus
+        managed object property"
+    ::= { cucsFirmwareServicePackEntry 5 }
+
+cucsFirmwareServicePackModules OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:ServicePack:modules managed object property"
+    ::= { cucsFirmwareServicePackEntry 6 }
 
 cucsFirmwareSpecTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareSpecEntry
@@ -5599,7 +6746,9 @@ CucsFirmwareStatusEntry ::= SEQUENCE {
     cucsFirmwareStatusPackageVersion                                 SnmpAdminString,
     cucsFirmwareStatusCimcVersion                                    SnmpAdminString,
     cucsFirmwareStatusFirmwareState                                  CucsFirmwareFirmwareState,
-    cucsFirmwareStatusPldVersion                                     SnmpAdminString
+    cucsFirmwareStatusPldVersion                                     SnmpAdminString,
+    cucsFirmwareStatusServicePackOperState                           CucsFirmwareImageState,
+    cucsFirmwareStatusServicePackVersion                             SnmpAdminString
 }
 
 cucsFirmwareStatusInstanceId OBJECT-TYPE
@@ -5666,6 +6815,24 @@ cucsFirmwareStatusPldVersion OBJECT-TYPE
         "Cisco UCS firmware:Status:pldVersion managed object property"
     ::= { cucsFirmwareStatusEntry 8 }
 
+cucsFirmwareStatusServicePackOperState OBJECT-TYPE
+    SYNTAX       CucsFirmwareImageState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Status:servicePackOperState
+        managed object property"
+    ::= { cucsFirmwareStatusEntry 9 }
+
+cucsFirmwareStatusServicePackVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Status:servicePackVersion managed
+        object property"
+    ::= { cucsFirmwareStatusEntry 10 }
+
 cucsFirmwareSystemTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareSystemEntry
     MAX-ACCESS       not-accessible
@@ -5699,7 +6866,9 @@ CucsFirmwareSystemEntry ::= SEQUENCE {
     cucsFirmwareSystemFsmStatus                                      SnmpAdminString,
     cucsFirmwareSystemFsmTry                                         Gauge32,
     cucsFirmwareSystemOperState                                      CucsFirmwareInstallState,
-    cucsFirmwareSystemState                                          CucsFirmwareFwState
+    cucsFirmwareSystemState                                          CucsFirmwareFwState,
+    cucsFirmwareSystemServicePackOperState                           CucsFirmwareInstallState,
+    cucsFirmwareSystemServicePackState                               CucsFirmwareFwState
 }
 
 cucsFirmwareSystemInstanceId OBJECT-TYPE
@@ -5831,6 +7000,24 @@ cucsFirmwareSystemState OBJECT-TYPE
     DESCRIPTION
         "Cisco UCS firmware:System:state managed object property"
     ::= { cucsFirmwareSystemEntry 16 }
+
+cucsFirmwareSystemServicePackOperState OBJECT-TYPE
+    SYNTAX       CucsFirmwareInstallState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:System:servicePackOperState
+        managed object property"
+    ::= { cucsFirmwareSystemEntry 17 }
+
+cucsFirmwareSystemServicePackState OBJECT-TYPE
+    SYNTAX       CucsFirmwareFwState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:System:servicePackState managed
+        object property"
+    ::= { cucsFirmwareSystemEntry 18 }
 
 cucsFirmwareSystemCompCheckResultTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareSystemCompCheckResultEntry
@@ -6238,6 +7425,93 @@ cucsFirmwareSystemFsmTaskSeqId OBJECT-TYPE
         "Cisco UCS firmware:SystemFsmTask:seqId managed object property"
     ::= { cucsFirmwareSystemFsmTaskEntry 7 }
 
+cucsFirmwareTPMConstraintTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsFirmwareTPMConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint managed object table"
+    ::= { cucsFirmwareObjects 74 }
+
+cucsFirmwareTPMConstraintEntry OBJECT-TYPE
+    SYNTAX           CucsFirmwareTPMConstraintEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsFirmwareTPMConstraintTable table."
+    INDEX { cucsFirmwareTPMConstraintInstanceId }
+    ::= { cucsFirmwareTPMConstraintTable 1 }
+
+CucsFirmwareTPMConstraintEntry ::= SEQUENCE {
+    cucsFirmwareTPMConstraintInstanceId                              CucsManagedObjectId,
+    cucsFirmwareTPMConstraintDn                                      CucsManagedObjectDn,
+    cucsFirmwareTPMConstraintRn                                      SnmpAdminString,
+    cucsFirmwareTPMConstraintMinBiosVersion                          SnmpAdminString,
+    cucsFirmwareTPMConstraintMinCimcVersion                          SnmpAdminString,
+    cucsFirmwareTPMConstraintTpmRevision                             SnmpAdminString,
+    cucsFirmwareTPMConstraintCheckRunningVer                         TruthValue
+}
+
+cucsFirmwareTPMConstraintInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsFirmwareTPMConstraintEntry 1 }
+
+cucsFirmwareTPMConstraintDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint:dn managed object property"
+    ::= { cucsFirmwareTPMConstraintEntry 2 }
+
+cucsFirmwareTPMConstraintRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint:rn managed object property"
+    ::= { cucsFirmwareTPMConstraintEntry 3 }
+
+cucsFirmwareTPMConstraintMinBiosVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint:minBiosVersion
+        managed object property"
+    ::= { cucsFirmwareTPMConstraintEntry 4 }
+
+cucsFirmwareTPMConstraintMinCimcVersion OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint:minCimcVersion
+        managed object property"
+    ::= { cucsFirmwareTPMConstraintEntry 5 }
+
+cucsFirmwareTPMConstraintTpmRevision OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint:tpmRevision managed
+        object property"
+    ::= { cucsFirmwareTPMConstraintEntry 6 }
+
+cucsFirmwareTPMConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:TPMConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareTPMConstraintEntry 7 }
+
 cucsFirmwareTypeTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareTypeEntry
     MAX-ACCESS       not-accessible
@@ -6263,7 +7537,8 @@ CucsFirmwareTypeEntry ::= SEQUENCE {
     cucsFirmwareTypeInvTag                                           SnmpAdminString,
     cucsFirmwareTypeMaxVer                                           SnmpAdminString,
     cucsFirmwareTypeMinVer                                           SnmpAdminString,
-    cucsFirmwareTypeFwFpgaRevisionSupported                          TruthValue
+    cucsFirmwareTypeFwFpgaRevisionSupported                          TruthValue,
+    cucsFirmwareTypeInstallPath                                      CucsFirmwareTypeInstallPath
 }
 
 cucsFirmwareTypeInstanceId OBJECT-TYPE
@@ -6330,6 +7605,14 @@ cucsFirmwareTypeFwFpgaRevisionSupported OBJECT-TYPE
         "Cisco UCS firmware:Type:fwFpgaRevisionSupported
         managed object property"
     ::= { cucsFirmwareTypeEntry 9 }
+
+cucsFirmwareTypeInstallPath OBJECT-TYPE
+    SYNTAX       CucsFirmwareTypeInstallPath
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:Type:installPath managed object property"
+    ::= { cucsFirmwareTypeEntry 10 }
 
 cucsFirmwareUcscInfoTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareUcscInfoEntry
@@ -6757,7 +8040,8 @@ CucsFirmwareVicSlotConstraintEntry ::= SEQUENCE {
     cucsFirmwareVicSlotConstraintRn                                  SnmpAdminString,
     cucsFirmwareVicSlotConstraintMinBiosVersion                      SnmpAdminString,
     cucsFirmwareVicSlotConstraintMinCimcVersion                      SnmpAdminString,
-    cucsFirmwareVicSlotConstraintVicSlot                             SnmpAdminString
+    cucsFirmwareVicSlotConstraintVicSlot                             SnmpAdminString,
+    cucsFirmwareVicSlotConstraintCheckRunningVer                     TruthValue
 }
 
 cucsFirmwareVicSlotConstraintInstanceId OBJECT-TYPE
@@ -6811,6 +8095,15 @@ cucsFirmwareVicSlotConstraintVicSlot OBJECT-TYPE
         object property"
     ::= { cucsFirmwareVicSlotConstraintEntry 6 }
 
+cucsFirmwareVicSlotConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:VicSlotConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareVicSlotConstraintEntry 7 }
+
 cucsFirmwareVnicCdnConstraintTable OBJECT-TYPE
     SYNTAX           SEQUENCE OF CucsFirmwareVnicCdnConstraintEntry
     MAX-ACCESS       not-accessible
@@ -6834,7 +8127,8 @@ CucsFirmwareVnicCdnConstraintEntry ::= SEQUENCE {
     cucsFirmwareVnicCdnConstraintRn                                  SnmpAdminString,
     cucsFirmwareVnicCdnConstraintMinBiosVersion                      SnmpAdminString,
     cucsFirmwareVnicCdnConstraintMinCimcVersion                      SnmpAdminString,
-    cucsFirmwareVnicCdnConstraintType                                SnmpAdminString
+    cucsFirmwareVnicCdnConstraintType                                SnmpAdminString,
+    cucsFirmwareVnicCdnConstraintCheckRunningVer                     TruthValue
 }
 
 cucsFirmwareVnicCdnConstraintInstanceId OBJECT-TYPE
@@ -6887,5 +8181,14 @@ cucsFirmwareVnicCdnConstraintType OBJECT-TYPE
         "Cisco UCS firmware:VnicCdnConstraint:type managed
         object property"
     ::= { cucsFirmwareVnicCdnConstraintEntry 6 }
+
+cucsFirmwareVnicCdnConstraintCheckRunningVer OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS firmware:VnicCdnConstraint:checkRunningVer
+        managed object property"
+    ::= { cucsFirmwareVnicCdnConstraintEntry 7 }
 
 END

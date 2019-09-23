@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (C) 2002 by HUAWEI 3COM TECHNOLOGIES.  All rights reserved.
+-- Copyright (C) 2002 by H3C TECHNOLOGIES.  All rights reserved.
 --
 -- Description: protocol priority mib
 -- Reference:
@@ -21,11 +21,11 @@ H3C-PROT-PRIORITY-MIB DEFINITIONS ::= BEGIN
     h3cProtocolPriority MODULE-IDENTITY
         LAST-UPDATED "200501171633Z"        -- January 17, 2005 at 16:33 GMT
         ORGANIZATION
-            "Huawei 3Com Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Huawei 3Com Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
+            http://www.h3c.com
             Zip:100085
             "
         DESCRIPTION

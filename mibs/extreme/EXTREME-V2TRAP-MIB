@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
@@ -450,7 +444,7 @@ EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
         ::= { extremeSecurityTraps 11}
 
         extremeNetloginSrcVlan  OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(1..64))
+        SYNTAX DisplayString (SIZE(0..64))
         MAX-ACCESS accessible-for-notify
           STATUS       current
          DESCRIPTION
@@ -463,7 +457,7 @@ EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
         ::= { extremeSecurityTraps 12}
 
         extremeNetloginDestVlan  OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(1..64))
+        SYNTAX DisplayString (SIZE(0..64))
         MAX-ACCESS accessible-for-notify
           STATUS       current
          DESCRIPTION
@@ -487,7 +481,10 @@ EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
                         linkDownInitiatedLogout (9),
 						reauthenticationFailure (10),
                         successWithRestrictedAccess (11),
-                        successWithTimeLimitedAccess (12)
+                        successWithTimeLimitedAccess (12),
+                        frameworkInitiatedLogout(13),
+                        l2ProtoInitiatedLogout(14),
+                        preferredProtocolInitiatedLogout(15)
                 }
          MAX-ACCESS accessible-for-notify
            STATUS       current
@@ -514,6 +511,12 @@ EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
             802.1X supplicant will be authenticated but with restricted network access
         -successWithTimeLimitedAccess (12)
             802.1X supplicant will be given full network access for a limited time period
+        -frameworkInitiatedLogout
+            Netlogin Framework Initiated Logout
+        -l2ProtoInitiatedLogout
+            l2protocol(like STP) Initiated Logout
+        -preferredProtocolInitiatedLogout
+            In Multi-auth scenario, Preferred protocol initiated Logout.
         "
         ::= { extremeSecurityTraps 14 }
         
@@ -526,7 +529,7 @@ EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
         ::= {extremeSecurityTraps 20}
 
     extremeNetloginMoveFromVlanList OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(1..256))
+        SYNTAX DisplayString (SIZE(0..256))
         MAX-ACCESS accessible-for-notify
             STATUS current
         DESCRIPTION
@@ -536,7 +539,7 @@ EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
         ::= {extremeSecurityTraps 21}
 
     extremeNetloginMoveToVlanList OBJECT-TYPE
-        SYNTAX DisplayString (SIZE(1..256))
+        SYNTAX DisplayString (SIZE(0..256))
         MAX-ACCESS accessible-for-notify
             STATUS current
         DESCRIPTION
@@ -872,12 +875,11 @@ extremeLacpTraps  OBJECT IDENTIFIER ::= {extremeV2Traps 13}
           extremeOverheat NOTIFICATION-TYPE
               OBJECTS   { sysUpTime, sysDescr, extremeCurrentTemperature }
               STATUS  current
-              DESCRIPTION "A overheat trap indicates that the on board
-                          tempature sensor has reported a overheat 
-                          condition.  System will shutdown until unit has
-			              sufficiently cooled such that operation may begin
-                          again.  A cold start trap will be issued when
-                          the unit has come back on line."
+              DESCRIPTION "An overheat notification indicates that the on-board 
+                          temperature sensor has reported a temperature that is 
+                          outside the normal operating range (either higher than 
+                          the maximum or lower than the minimum of the range) and 
+                          the switch is in an overheat (or overcold) condition."
               ::= { extremeV1Traps 6 }
 
           extremeFanfailed NOTIFICATION-TYPE
@@ -949,26 +951,37 @@ extremeLacpTraps  OBJECT IDENTIFIER ::= {extremeV2Traps 13}
               ::= { extremeV1Traps 15 }
 
 	extremeEdpNeighborAdded NOTIFICATION-TYPE
-        	OBJECTS {sysUpTime, extremeEdpPortIfIndex,
+                OBJECTS {sysUpTime, extremeEdpPortIfIndex,
 			         extremeEdpNeighborId, extremeEdpEntryAge,
 			         ifAlias, ifDescr
                 }
-        STATUS  current
-        DESCRIPTION
-        "This node discovers a new neighbor through Extreme Discovery
-	 Protocol."
-              ::= { extremeV1Traps 20 }
+                STATUS  current
+                DESCRIPTION
+                "This node discovers a new neighbor through Extreme Discovery
+	        Protocol."
+                ::= { extremeV1Traps 20 }
 
-	extremeEdpNeighborRemoved NOTIFICATION-TYPE
-        	OBJECTS { sysUpTime, extremeEdpPortIfIndex,
+        extremeEdpNeighborRemoved NOTIFICATION-TYPE
+                OBJECTS { sysUpTime, extremeEdpPortIfIndex,
 			          extremeEdpNeighborId, extremeEdpEntryAge,
 			          ifAlias, ifDescr
                     }
-        STATUS  current
-        DESCRIPTION
-        "No EDP updates are received from this neighbor within
-	the configured timeout period and this neighbor entry is aged
-	out by the device."
-              ::= { extremeV1Traps 21 }
+                STATUS  current
+                DESCRIPTION
+                "No EDP updates are received from this neighbor within
+	         the configured timeout period and this neighbor entry is aged
+	         out by the device."
+                ::= { extremeV1Traps 21 }
         
+        extremeOverheatNormal NOTIFICATION-TYPE
+                OBJECTS   { sysDescr, extremeCurrentTemperature }
+                STATUS  current
+                DESCRIPTION "An overheat (return to) normal notification indicates 
+                            that the on-board tempature sensor has reported a 
+                            temperature that has returned to within the normal 
+                            operating range from having been in an overheat (or 
+                            overcold) condition.  The temperature of the unit has 
+                            sufficiently cooled to be below the maximum (or warmed 
+                            to be above the minimum) of the normal operating range."
+                ::= { extremeCoreSCTrapPrefix 8 }
 END

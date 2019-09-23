@@ -1,9 +1,16 @@
---MibName=raisecomOpticalMonitorMIB
+-- MibName=raisecomOpticalMonitorMIB
 -- *****************************************************************
 -- RAISECOM-OPTICAL-TRANSCEIVER-MIB.my
 --
 -- Copyright(c) 2003-2005 by RAISECOM TECH, Ltd. 
 -- All rights reserved.
+-- *****************************************************************       
+
+-- *****************************************************************
+-- Modi Report：Format: <number>, <time>, <author>, <desc> 
+-- 01, 20110623, yangzhognhong, change the value of the node raisecomOpticalTransceiverMediaType 
+--                              for SFP+ development
+--
 -- *****************************************************************
 
 
@@ -25,7 +32,7 @@ IMPORTS
     raisecomNotificationLocation        FROM RAISECOM-COMMON-MANAGEMENT-MIB;
 
 raisecomOpticalTransceiver MODULE-IDENTITY
-    LAST-UPDATED   "201806250000Z"
+    LAST-UPDATED   "201005190000Z"
     ORGANIZATION   "Raisecom, Inc."
     CONTACT-INFO  
                 "       Raise Systems
@@ -39,10 +46,6 @@ raisecomOpticalTransceiver MODULE-IDENTITY
     DESCRIPTION
         "This MIB module defines objects to monitor optical
         characteristics on the optical interfaces in a network element. "
-        REVISION   "201806250000Z"
-        DESCRIPTION
-            "Fix a few syntax errors (replace underscores with hyphens
-             in descriptors) so that Net-SNMP tools can now load the MIB."
         REVISION   "201005190000Z"
         DESCRIPTION
             "The initial revision of this MIB."
@@ -81,8 +84,7 @@ OpticalParameterType ::= TEXTUAL-CONVENTION
         n5V2supplyCurrent(14)     		:-5.2V supply currnet
         tecCurrent(15)          		:TEC currnet
         laserWavelength(16)      		:laser wavelength
-        aux1_1G_BiasCurrent(17)         :1G TX bias current for ccsa
-        aux2_1G_Tx_Power(18)            :1G TX output power for ccsa     
+
        " 
         
     SYNTAX    INTEGER {
@@ -101,9 +103,8 @@ OpticalParameterType ::= TEXTUAL-CONVENTION
         			p1V8supplyCurrent(13),     
         			n5V2supplyCurrent(14),    
         			tecCurrent(15),          
-       			    laserWavelength(16),
-                    aux1-1G-BiasCurrent(17),
-                    aux2-1G-Tx-Power(18)
+       			    laserWavelength(16)
+   
               }
 
 
@@ -295,7 +296,7 @@ raisecomOpticalTransceiverType OBJECT-TYPE
 						xpak(10),
 						x2(11)						
 	       			   }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"TThis object specifies the physical type of the transceiver, 
@@ -325,7 +326,7 @@ raisecomOpticalTransceiverConnectorType OBJECT-TYPE
 			copper (15),
 			rj45 (16)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the connector type of the transceiver，
@@ -339,7 +340,7 @@ raisecomOpticalTransceiverConnectorType OBJECT-TYPE
 				
 raisecomOpticalTransceiverVendorName OBJECT-TYPE
 		SYNTAX	OCTET STRING
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Vendor name of the interface.
@@ -350,7 +351,7 @@ raisecomOpticalTransceiverVendorName OBJECT-TYPE
 		
 raisecomOpticalTransceiverVendorPN OBJECT-TYPE
 		SYNTAX	OCTET STRING
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Vendor part number of the interface.
@@ -361,7 +362,7 @@ raisecomOpticalTransceiverVendorPN OBJECT-TYPE
 		
 raisecomOpticalTransceiverVendorSN OBJECT-TYPE
 		SYNTAX	OCTET STRING
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Vendor serial number of the interface.
@@ -372,19 +373,21 @@ raisecomOpticalTransceiverVendorSN OBJECT-TYPE
 		
 raisecomOpticalTransceiverMediaType OBJECT-TYPE
 		SYNTAX INTEGER
-       {    
-       		unknown(1),
-			single-mode(2),
-       		multi-modeE50(3),
-            multi-mode50(4),
-            multi-mode625(5),
-			copper(6)                 
+       {
+            single-mode(1),
+            multi-modeE50(2),
+            multi-mode50(3),
+            multi-mode625(4),
+            copper(5),
+            single-modeKm(6), 
+            multi-modeOM3(7)                 
         }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Types of the fiber, 
             single_mode, multi_modeE50, multi_mode50,multi_mode625,copper.
+            single_modeKm,multi_modeOM3
             
             this object belongs to xfp and sfp.
 			"
@@ -392,7 +395,7 @@ raisecomOpticalTransceiverMediaType OBJECT-TYPE
 		
 raisecomOpticalTransceiverTransmissionDistance OBJECT-TYPE
 		SYNTAX	Integer32
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The max distance which the interface could transmit,
@@ -405,7 +408,7 @@ raisecomOpticalTransceiverTransmissionDistance OBJECT-TYPE
 
 raisecomOpticalTransceiverAbility  OBJECT-TYPE
 		SYNTAX	Unsigned32
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the ability of optical module digitaldiagnotic
@@ -419,6 +422,28 @@ raisecomOpticalTransceiverAbility  OBJECT-TYPE
 			 relative parameter.
 			 
 			 this object belongs to xfp and sfp.
+			 
+			 The relation between parameters and bits is following: 
+			32……16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1:
+			The relation between parameters and bits is following: 
+			32……16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1:
+			| 1bit           | 2bit           | 3bit             | 4bit           
+			| APD偏置电压    | 0（保留）      | TEC电流        | 激光器温度
+
+			| 5bit           | 6bit          |7bit             | 8bit
+			| 激光器波长     | +5V供电电压   | +3.3V供电电压  | +1.8V供电电压
+
+			| 9bit           | 10bit         |11bit             | 12bit
+			| -5.2V供电电压  | +5V供电电流   | 0（无）          | 0（无）
+
+			| 13bit           | 14bit         | 15bit            | 16bit 
+			| +3.3V供电电流   | +1.8V供电电流 | -5.2V供电电流   | 模块温度
+
+			| 17bit           | 18bit         | 19bit            | 20bit ~ 31bit 
+			| 激光器偏置电流  | 发送光功率    |接收光功率       |  0
+
+            But when the optical module is sfp, the 6bit will represents 
+            the supplyVoltage of sfp.
             "
 		::= { raisecomOpticalTransceiverInfoEntry 8 }		      
 		
@@ -427,7 +452,7 @@ raisecomOpticalTransceiverDDM     OBJECT-TYPE
 	 			        support(1),
 	       			    notsupport(2)
 	       			   }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"This object specifies if the transceiver supports on digital diagnostic function, 
@@ -443,7 +468,7 @@ raisecomOpticalTransceiverCalibrationType   OBJECT-TYPE
 	 			        internal(2),
 	       			    external(3)
 	      			   }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the calibration type of the transceiver, 
@@ -458,7 +483,7 @@ raisecomOpticalTransceiverRSSI   OBJECT-TYPE
 	 			        support(1),
 	       			    notsupport(2)
 	       			   }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"This object specifies the calibration type of the transceiver, 
@@ -470,7 +495,7 @@ raisecomOpticalTransceiverRSSI   OBJECT-TYPE
  
 raisecomOpticalTransceiverVendorRev    OBJECT-TYPE
 		SYNTAX	OCTET STRING
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			" the version number of the transceiver.
@@ -480,7 +505,7 @@ raisecomOpticalTransceiverVendorRev    OBJECT-TYPE
 
 raisecomOpticalTransceiverBRMax      OBJECT-TYPE
 		SYNTAX	INTEGER
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			" the min data rate of the transceiver,mesured in Mbps .
@@ -492,7 +517,7 @@ raisecomOpticalTransceiverBRMax      OBJECT-TYPE
 		
 raisecomOpticalTransceiverBRMin       OBJECT-TYPE
 		SYNTAX	INTEGER
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			" the min data rate of the transceiver,mesured in Mbps.
@@ -510,7 +535,7 @@ raisecomOpticalTransceiverWavelengthContrl   OBJECT-TYPE
 	       support(1),
      	   notsupport (2)
         }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"if the transceiver supports on wavelength control
@@ -521,7 +546,7 @@ raisecomOpticalTransceiverWavelengthContrl   OBJECT-TYPE
 
 raisecomOpticalTransceiverWavelength OBJECT-TYPE
 		SYNTAX	Integer32
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"Wavelength of the interface, measured in pm(0.001nm).
@@ -532,7 +557,7 @@ raisecomOpticalTransceiverWavelength OBJECT-TYPE
 
 raisecomOpticalTransceiverWaveTolerance   OBJECT-TYPE
 		SYNTAX	Integer32
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"the range of laser wavelength from nominal wavelength,mesured in pm(0.001*nm).
@@ -543,7 +568,7 @@ raisecomOpticalTransceiverWaveTolerance   OBJECT-TYPE
 
 raisecomOpticalTransceiverCompatibility   OBJECT-TYPE
 		SYNTAX	OCTET STRING
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"the compatibility type that the transceiver supports,such as 10GBASE-SR.
@@ -559,7 +584,7 @@ raisecomOpticalTransceiverPowerDissipation   OBJECT-TYPE
 			p3W5(3),
 			exceed(4)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"the max power dissipation of the transceiver, 
@@ -574,7 +599,7 @@ raisecomOpticalTransceiverCDR             OBJECT-TYPE
  		   support(1),
            notsupport(2)
         }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"the optical module supports on CDR fundtion.
@@ -589,7 +614,7 @@ raisecomOpticalTransceiverRefClock           OBJECT-TYPE
  	       required(1),
      	   notrequired (2)
         }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			" if the transceiver requires outside reference clock
@@ -612,7 +637,7 @@ raisecomOpticalTransceiverTransmitterType     OBJECT-TYPE
 			copper-others(9)
        }
 
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transmitter type of the transceiver,such as 850 nm VCSEL.
@@ -626,7 +651,7 @@ raisecomOpticalTransceiverCooled	         OBJECT-TYPE
  	       cooled(1),
      	   uncooled (2)
         }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transmitter cooled type of the transceiver
@@ -641,7 +666,7 @@ raisecomOpticalTransceiverTunalbe            OBJECT-TYPE
  	       tunable (1),
     	   untunable (2)
         }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transmitter tunable type of the transceiver
@@ -656,7 +681,7 @@ raisecomOpticalTransceiverDetectorType       OBJECT-TYPE
 	       pin(1),
 		   apd(2)
 	    }
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The detector type of the transceiver
@@ -671,7 +696,7 @@ raisecomOpticalTransceiverLineLoopBack       OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transceiver support status of sideline loop-back control
@@ -686,7 +711,7 @@ raisecomOpticalTransceiverXFILoopBack        OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transceiver support status of XFI loop-back control
@@ -701,7 +726,7 @@ raisecomOpticalTransceiverVps                OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"This object specifies if the optical module supports on VPS
@@ -716,7 +741,7 @@ raisecomOpticalTransceiverTxDis              OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transceiver support status of software control the transmitter status
@@ -731,7 +756,7 @@ raisecomOpticalTransceiverStandby              OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The transceiver support status of software control the standby mode.
@@ -746,7 +771,7 @@ raisecomOpticalTransceiverInVpsLowPower      OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The VPS in low power support status of the transceiver
@@ -761,7 +786,7 @@ raisecomOpticalTransceiverOutVpsLowPower     OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The VPS out low power support status of the transceiver
@@ -776,7 +801,7 @@ raisecomOpticalTransceiverFEC                OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The FEC support status of transceiver
@@ -791,7 +816,7 @@ raisecomOpticalTransceiverCMU                OBJECT-TYPE
  			support(1),
        		notsupport(2)
        	}
-		MAX-ACCESS	read-only
+		ACCESS	read-only
 		STATUS	current
 		DESCRIPTION
 			"The CMU support status of transceiver
@@ -1546,7 +1571,6 @@ raisecomOpticalTransceiverRxLosNormaTrap   NOTIFICATION-TYPE
     ::={ raisecomOpticalTransceiverNotifications 6 }
 
 raisecomOpticalTransceiverCheckPwdFailureTrap  NOTIFICATION-TYPE
-    OBJECTS     { null }
     STATUS      current
     DESCRIPTION
         "This notification is sent when the optical module password checking is failed.
@@ -1558,7 +1582,6 @@ raisecomOpticalTransceiverCheckPwdFailureTrap  NOTIFICATION-TYPE
     ::={ raisecomOpticalTransceiverNotifications 7 }
 
 raisecomOpticalTransceiverCheckPwdSucceedTrap  NOTIFICATION-TYPE
-    OBJECTS     { null }
     STATUS      current
     DESCRIPTION
         "This notification is sent when the optical module password cheching is successful.
@@ -2679,133 +2702,6 @@ raisecomOpticalTransceiverLaserWavelengthAlarmNormalTrap   NOTIFICATION-TYPE
         conditions:
         - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
         "
-    ::={ raisecomOpticalTransceiverParamNotifications 64 }   
-     
-raisecomOpticalTransceiverCCSA1GTxbiasCurrentAlarmTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value increase to above 
-         the high alarm threshold or dicrease to under the low alarm threshold.
-
-
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 65 }
-   
-raisecomOpticalTransceiverCCSA1GTxbiasCurrentWarningTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value increase to above 
-         the high warning threshold or dicrease to under the low warning threshold.
-
-
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 66 }
-   
-raisecomOpticalTransceiverCCSA1GTxbiasCurrentWarningNormalTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value dicrease to
-         under the high warning threshold or increase to above the low warning threshold.
-         
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 67 }
-
-raisecomOpticalTransceiverCCSA1GTxbiasCurrenthAlarmNormalTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value dicrease to
-         under the high alarm threshold or increase to above the low alarm threshold.
-
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 68 }
-
-raisecomOpticalTransceiverCCSA1GTxPowerAlarmTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value increase to above 
-         the high alarm threshold or dicrease to under the low alarm threshold.
-
-
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 69 }
-   
-raisecomOpticalTransceiverCCSA1GTxPowerWarningTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value increase to above 
-         the high warning threshold or dicrease to under the low warning threshold.
-
-
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 70 }
-   
-raisecomOpticalTransceiverCCSA1GTxPowerWarningNormalTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value dicrease to
-         under the high warning threshold or increase to above the low warning threshold.
-         
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 71 }
-
-raisecomOpticalTransceiverCCSA1GTxPowerhAlarmNormalTrap   NOTIFICATION-TYPE
-    OBJECTS     {  raisecomNotificationLocation,
-                   raisecomOpticalTransceiverParameterValue,
-                   raisecomOpticalTransceiverParamAlarmStatus  }
-    STATUS      current
-    DESCRIPTION
-        "This notification is sent when the optical module laserWavelength value dicrease to
-         under the high alarm threshold or increase to above the low alarm threshold.
-
-        This notification may be suppressed under the following
-        conditions:
-        - depending on the value of the raisecomOpticalNotifyEnable and raisecomOpticalPortNotifyEnable objects.
-        "
-    ::={ raisecomOpticalTransceiverParamNotifications 72 }
-
-        
+    ::={ raisecomOpticalTransceiverParamNotifications 64 } 
+    
 END

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -44,7 +44,7 @@ foreach ($oids as $index => $entry)
 
   if ($entry['envMonFanState'] != 'notPresent' && !count(dbFetchRows($query, array($device['device_id'], 'rlEnvMonFanState.'.$index, $descr))))
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "envMonFanState.$index", 'dell-vendor-state', $descr, NULL, $value, array('entPhysicalClass' => 'fan'));
+    discover_status_ng($device, $mib, 'envMonFanState', $oid, $index, 'dell-vendor-state', $descr, $value, array('entPhysicalClass' => 'fan'));
   }
 }
 
@@ -75,7 +75,7 @@ foreach ($oids as $index => $entry)
   if ($entry['envMonSupplyState'] != 'notPresent' && !count(dbFetchRows($query, array($device['device_id']))))
   {
     // FIXME Is it possible to add stack member number to description?
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "envMonSupplyState.$index", 'dell-vendor-state', $descr, NULL, $value, array('entPhysicalClass' => 'power'));
+    discover_status_ng($device, $mib, 'envMonSupplyState', $oid, $index, 'dell-vendor-state', $descr, $value, array('entPhysicalClass' => 'power'));
   }
 }
 

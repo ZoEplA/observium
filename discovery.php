@@ -9,7 +9,7 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -32,32 +32,31 @@ $runtime_stats = array();
 
 if (isset($options['V']))
 {
-  print_message(OBSERVIUM_PRODUCT." ".OBSERVIUM_VERSION);
+  print_message(OBSERVIUM_PRODUCT . " " . OBSERVIUM_VERSION);
   if (is_array($options['V'])) { print_versions(); }
   exit;
 }
-else if (isset($options['M']))
+elseif (isset($options['M']))
 {
-  print_message(OBSERVIUM_PRODUCT." ".OBSERVIUM_VERSION);
+  print_message(OBSERVIUM_PRODUCT . " " . OBSERVIUM_VERSION);
 
   print_message('Enabled discovery modules:');
   $m_disabled = array();
   foreach ($config['discovery_modules'] as $module => $ok)
   {
-    if ($ok) { print_message('  '.$module); }
-     else { $m_disabled[] = $module; }
+    if ($ok) { print_message('  ' . $module); }
+    else { $m_disabled[] = $module; }
   }
   if (count($m_disabled))
   {
     print_message('Disabled discovery modules:');
-    print_message('  '.implode("\n  ", $m_disabled));
+    print_message('  ' . implode("\n  ", $m_disabled));
   }
   exit;
 }
 
 if (!isset($options['q']))
 {
-
   print_cli_banner();
 
   if (OBS_DEBUG) { print_versions(); }
@@ -100,32 +99,31 @@ if (isset($options['h']))
         $params[] = $options['h'];
       } else {
         $where = 'AND `hostname` LIKE ?';
-        $params[] = str_replace('*','%', $options['h']);
+        $params[] = str_replace('*', '%', $options['h']);
       }
   }
 }
 
-if (isset($options['i']) && $options['i'] && isset($options['n']))
-{
-  $where = 'AND MOD(device_id,'.$options['i'].') = ?';
+if (isset($options['i']) && $options['i'] && isset($options['n'])) {
+  $where = 'AND MOD(device_id,' . $options['i'] . ') = ?';
   $params[] = $options['n'];
-  $doing = $options['n'] .'/'.$options['i'];
+  $doing = $options['n'] . '/' . $options['i'];
 }
 
 if (isset($options['u']) || ($where && in_array($options['h'], array('all', 'odd', 'even'))))
 {
   $options['u'] = TRUE;
 
-  include($config['install_dir'].'/includes/update/update.php');
+  include($config['install_dir'] . '/includes/update/update.php');
 }
-else if (!isset($options['q']))
+elseif (!isset($options['q']))
 {
   // Warn about need DB schema update
   $db_version = get_db_version();
-  $db_version = sprintf("%03d", $db_version+1);
-  if (is_file($config['install_dir']."/update/$db_version.sql") || is_file($config['install_dir']."/update/$db_version.php"))
+  $db_version = sprintf("%03d", $db_version + 1);
+  if (is_file($config['install_dir'] . "/update/$db_version.sql") || is_file($config['install_dir'] . "/update/$db_version.php"))
   {
-    print_warning("Your database schema is old and needs updating. Run from console:\n  ".$config['install_dir']."/discovery.php -u");
+    print_warning("Your database schema is old and needs updating. Run from console:\n  " . $config['install_dir'] . "/discovery.php -u");
   }
   unset($db_version);
 }
@@ -165,7 +163,7 @@ DEBUGGING OPTIONS:
 
 if ($config['version_check'] && ($options['h'] != 'new' || $options['u']))
 {
-  include($config['install_dir'].'/includes/versioncheck.inc.php');
+  include($config['install_dir'] . '/includes/versioncheck.inc.php');
 }
 
 if (!$where) { exit; }
@@ -179,7 +177,10 @@ if ($options['h'] != 'new')
 
 $discovered_devices = 0;
 
-print_cli_heading("%WStarting discovery run at ".date("Y-m-d H:i:s"), 0);
+print_cli_heading("%WStarting discovery run at " . date("Y-m-d H:i:s"), 0);
+
+$where .= ' AND `poller_id` = ?';
+$params[] = $config['poller_id'];
 
 foreach (dbFetchRows("SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `last_discovered_timetaken` ASC", $params) as $device)
 {
@@ -188,7 +189,8 @@ foreach (dbFetchRows("SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER 
   if ($options['h'] == 'new' || isSNMPable($device))
   {
     discover_device($device, $options);
-    if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_group_tables')) { update_group_tables(); } // Not exist in CE
+    // Not exist in CE
+    if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_group_tables')) { update_group_tables(); }
     if ((!isset($options['m']) || isset($options['r'])) && function_exists('update_alert_tables')) { update_alert_tables(); }
   } else {
     $string = "Device '" . $device['hostname'] . "' skipped, because switched off during runtime discovery process.";
@@ -197,18 +199,18 @@ foreach (dbFetchRows("SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER 
   }
 }
 
-print_cli_heading("%WFinished discovery run at ".date("Y-m-d H:i:s"), 0);
+print_cli_heading("%WFinished discovery run at " . date("Y-m-d H:i:s"), 0);
 
-$end = utime(); $run = $end - $start;
+$end = utime();
+$run = $end - $start;
 $discovery_time = substr($run, 0, 5);
 
-if ($discovered_devices)
-{
+if ($discovered_devices) {
   if (is_numeric($doing)) { $doing = $device['hostname']; } // Single device ID convert to hostname for log
 }
-else if (!isset($options['q']) && !$options['u'])
+elseif (!isset($options['q']) && !$options['u'])
 {
-  print_warning("WARNING: 0 devices discovered.".($options['h'] != 'new' ? " Did you specify a device that does not exist?" : ''));
+  print_warning("WARNING: 0 devices discovered." . ($options['h'] != 'new' ? " Did you specify a device that does not exist?" : ''));
 }
 
 $string = $argv[0] . ": $doing - $discovered_devices devices discovered in $discovery_time secs";
@@ -227,7 +229,7 @@ foreach (dbFetchRows("SELECT * FROM `observium_processes` WHERE `process_start` 
   } else {
     // Remove stalled DB entries
     dbDelete('observium_processes', '`process_id` = ?', array($process['process_id']));
-    print_debug("Removed stale process entry from DB (cmd: '".$process['process_command']."', PID: '".$process['process_pid']."')");
+    print_debug("Removed stale process entry from DB (cmd: '" . $process['process_command'] . "', PID: '" . $process['process_pid'] . "')");
   }
 }
 
@@ -239,23 +241,23 @@ if (!isset($options['q']))
   }
 
   print_cli_data('Devices Discovered', $discovered_devices, 0);
-  print_cli_data('Discovery Time', $discovery_time ." secs", 0);
-  print_cli_data('Memory usage', formatStorage(memory_get_usage(TRUE), 2, 4).' (peak: '.formatStorage(memory_get_peak_usage(TRUE), 2, 4).')', 0);
-  print_cli_data('MySQL Usage', 'Cell['.($db_stats['fetchcell']+0).'/'.round($db_stats['fetchcell_sec']+0,3).'s]'.
-                       ' Row['.($db_stats['fetchrow']+0). '/'.round($db_stats['fetchrow_sec']+0,3).'s]'.
-                      ' Rows['.($db_stats['fetchrows']+0).'/'.round($db_stats['fetchrows_sec']+0,3).'s]'.
-                    ' Column['.($db_stats['fetchcol']+0). '/'.round($db_stats['fetchcol_sec']+0,3).'s]'.
-                    ' Update['.($db_stats['update']+0).'/'.round($db_stats['update_sec']+0,3).'s]'.
-                    ' Insert['.($db_stats['insert']+0). '/'.round($db_stats['insert_sec']+0,3).'s]'.
-                    ' Delete['.($db_stats['delete']+0). '/'.round($db_stats['delete_sec']+0,3).'s]', 0);
+  print_cli_data('Discovery Time', $discovery_time . " secs", 0);
+  print_cli_data('Memory usage', formatStorage(memory_get_usage(TRUE), 2, 4) .
+                 ' (peak: ' . formatStorage(memory_get_peak_usage(TRUE), 2, 4) . ')', 0);
+  print_cli_data('MySQL Usage', 'Cell[' . ($db_stats['fetchcell'] + 0) . '/' . round($db_stats['fetchcell_sec'] + 0, 3) . 's]' .
+                       ' Row[' . ($db_stats['fetchrow'] + 0) . '/' . round($db_stats['fetchrow_sec'] + 0, 3) . 's]' .
+                      ' Rows[' . ($db_stats['fetchrows'] + 0) . '/' . round($db_stats['fetchrows_sec'] + 0, 3) . 's]' .
+                    ' Column[' . ($db_stats['fetchcol'] + 0) . '/' . round($db_stats['fetchcol_sec'] + 0, 3) . 's]' .
+                    ' Update[' . ($db_stats['update'] + 0) . '/' . round($db_stats['update_sec'] + 0, 3) . 's]' .
+                    ' Insert[' . ($db_stats['insert'] + 0) . '/' . round($db_stats['insert_sec'] + 0, 3) . 's]' .
+                    ' Delete[' . ($db_stats['delete'] + 0) . '/' . round($db_stats['delete_sec'] + 0, 3) . 's]', 0);
 
-  foreach($GLOBALS['rrdtool'] AS $cmd => $data)
+  foreach ($GLOBALS['rrdtool'] as $cmd => $data)
   {
-    $rrd_times[] = $cmd."[".$data['count']."/".round($data['time'],3)."s]";
+    $rrd_times[] = $cmd . "[" . $data['count'] . "/" . round($data['time'], 3) . "s]";
   }
 
   print_cli_data('RRDTool Usage', implode(" ", $rrd_times), 0);
-
 }
 
 // EOF

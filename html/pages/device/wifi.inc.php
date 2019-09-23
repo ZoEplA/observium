@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -18,9 +18,9 @@ $link_array = array('page'    => 'device',
 $navbar = array('brand' => "WiFi", 'class' => "navbar-narrow");
 
 //$navbar['options']['overview']['text']       = 'Overview';
-if ($device_ap_count    > 0) { $navbar['options']['accesspoints']['text'] = 'Access Points'; }
-if ($device_radio_count > 0) { $navbar['options']['radios']['text']       = 'Radios'; }
-if ($device_wlan_count  > 0) { $navbar['options']['wlans']['text']        = 'WLANs'; }
+if ($device_ap_exist)    { $navbar['options']['accesspoints']['text'] = 'Access Points'; }
+if ($device_radio_exist) { $navbar['options']['radios']['text']       = 'Radios'; }
+if ($device_wlan_exist)  { $navbar['options']['wlans']['text']        = 'WLANs'; }
 //$navbar['options']['clients']['text']      = 'Clients';
 
 foreach ($navbar['options'] as $option => $array)

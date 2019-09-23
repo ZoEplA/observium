@@ -48,7 +48,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-MGMT-MIB;
                 
 sshMgmt MODULE-IDENTITY
-    LAST-UPDATED "200609290000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -64,16 +64,26 @@ sshMgmt MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom SSH (Secure Shell) management MIB"
-    REVISION      "200510270000Z"
+        "Broadcom proprietary MIB for runtime management and configuration
+         of objects related to SSH (Secure Shell)."
+    REVISION      "200702050000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
-    REVISION      "200602020000Z"
-    DESCRIPTION
-            "Added object sshSessionInactivityTimeout."
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Chronological order of revision history was corrected.
+         - Changed access of objects sshHackerAddressType and 
+           sshHackerAddress from not-accessible to accessible-for-notify
+           so that they may legally be included in the object list for
+           the sshHackerTrap notification."
     REVISION      "200609290000Z"
     DESCRIPTION
-            "Added object sshHackerInactivityTimeout."
+        "Added object sshHackerInactivityTimeout."    
+    REVISION      "200602020000Z"
+    DESCRIPTION
+        "Added object sshSessionInactivityTimeout."    
+    REVISION      "200510270000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { cableDataMgmtBase 4 }
     
 sshIpStackInterfaces OBJECT-TYPE
@@ -202,7 +212,7 @@ SshHackerEntry ::=
 
 sshHackerAddressType OBJECT-TYPE
     SYNTAX      InetAddressType
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "The type of internet address used for sshHackerAddress."
@@ -210,7 +220,7 @@ sshHackerAddressType OBJECT-TYPE
     
 sshHackerAddress OBJECT-TYPE
     SYNTAX      InetAddress
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "The address of an device which has unsuccessfully attempted to log in 

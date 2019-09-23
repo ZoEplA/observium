@@ -7,13 +7,13 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 // Try to discover Libvirt Virtual Machines.
 
-if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
+if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" ) // FIXME. need os definition 'libvirt' = 1
 {
   $libvirt_vmlist = array();
 
@@ -23,11 +23,17 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
 
   foreach ($config['libvirt_protocols'] as $method)
   {
+    $uri = $method.'://' . $device['hostname'];
+
+    if (strstr($method, 'ssh') && !$ssh_ok)
+    {
+      // Append ssh port to uri
+      $uri .= ':'.$device['ssh_port'];
+    }
+
     if (strstr($method,'qemu'))
     {
-      $uri = $method.'://' . $device['hostname'] . '/system';
-    } else {
-      $uri = $method.'://' . $device['hostname'];
+      $uri .= '/system';
     }
 
     if (isset($config['libvirt_socket']) && $config['libvirt_socket'] != "")

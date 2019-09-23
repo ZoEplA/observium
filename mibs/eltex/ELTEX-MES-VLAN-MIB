@@ -27,6 +27,9 @@ eltMesVlan MODULE-IDENTITY
                       "www.eltex.nsk.ru"
               DESCRIPTION
                       "The private MIB module definition for IP Multicast support in Eltex devices."
+              REVISION "201706050000Z"
+              DESCRIPTION
+                       "Add VLAN CoS priority"
               REVISION "201311180000Z"
               DESCRIPTION
                        "Editorial changes to support new MIB compilers."
@@ -43,10 +46,9 @@ EltVlanMode ::= TEXTUAL-CONVENTION
     REFERENCE
        "TR-101"
     SYNTAX      INTEGER {
-                        basic(1),
-                        tr101(2)
+	                basic(1),
+	                tr101(2)
                 }
-
 
 eltVlanMulticastTvTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF EltVlanMulticastTvEntry
@@ -86,61 +88,40 @@ eltVlanMode OBJECT-TYPE
         "Global VLAN QinQ operation mode"
     ::= { eltMesVlan 2 }
 
-eltdot1qPortVlanCurrentTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF Eltdot1qPortVlanCurrentEntry
+
+--
+-- eltDot1qVlanStaticTable
+--
+
+eltDot1qVlanStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltDot1qVlanStaticEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table containing current vlan port membership information."
-    ::= { eltMesVlan 3 }
+        "The table lists the per vlan parameters."
+    ::= { eltMesVlan 4 }
 
-eltdot1qPortVlanCurrentEntry OBJECT-TYPE
-    SYNTAX      Eltdot1qPortVlanCurrentEntry
+eltDot1qVlanStaticEntry OBJECT-TYPE
+    SYNTAX      EltDot1qVlanStaticEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Current vlan membership information per port"
-    INDEX   {ifIndex}
-    ::= { eltdot1qPortVlanCurrentTable 1 }
+        "This table expands existing table dot1qVlanStaticTable."
+	INDEX   {dot1qVlanIndex}
+    ::= { eltDot1qVlanStaticTable 1 }
 
-Eltdot1qPortVlanCurrentEntry ::=SEQUENCE {
-
-    eltdot1qPortVlanCurrentEgressList1to1024              OCTET STRING,
-    eltdot1qPortVlanCurrentEgressList1025to2048           OCTET STRING,
-    eltdot1qPortVlanCurrentEgressList2049to3072           OCTET STRING,
-    eltdot1qPortVlanCurrentEgressList3073to4094           OCTET STRING
+EltDot1qVlanStaticEntry ::= SEQUENCE {
+        eltDot1qVlanStaticCos  INTEGER
 }
 
-eltdot1qPortVlanCurrentEgressList1to1024 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
-   MAX-ACCESS  read-only
-   STATUS      current
-   DESCRIPTION
-     "The port egress vlan current list."
-   ::= { eltdot1qPortVlanCurrentEntry 1 }
+eltDot1qVlanStaticCos OBJECT-TYPE
+    SYNTAX      INTEGER (0..7 | 255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Vlan egress CoS value for traffic being sent from CPU."
+    DEFVAL {255}
+    ::= { eltDot1qVlanStaticEntry  1 }
 
-eltdot1qPortVlanCurrentEgressList1025to2048 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
-   MAX-ACCESS  read-only
-   STATUS      current
-   DESCRIPTION
-     "The port egress vlan current list."
-   ::= { eltdot1qPortVlanCurrentEntry 2 }
-
-eltdot1qPortVlanCurrentEgressList2049to3072 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
-   MAX-ACCESS  read-only
-   STATUS      current
-   DESCRIPTION
-     "The port egress vlan current list."
-   ::= { eltdot1qPortVlanCurrentEntry 3 }
-
-eltdot1qPortVlanCurrentEgressList3073to4094 OBJECT-TYPE
-   SYNTAX      OCTET STRING(SIZE(0..128))
-   MAX-ACCESS  read-only
-   STATUS      current
-   DESCRIPTION
-     "The port egress vlan current list."
-   ::= { eltdot1qPortVlanCurrentEntry 4}
 
 END

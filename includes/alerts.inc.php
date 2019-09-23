@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage alerter
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -384,6 +384,13 @@ function update_alert_tables($silent = TRUE)
 {
 
    $alerts = cache_alert_rules();
+   $assocs   = cache_alert_assoc();
+
+   // Populate associations table into alerts array for legacy association styles
+   foreach($assocs as $assoc)
+   {
+      $alerts[$assoc['alert_test_id']]['assocs'][] = $assoc;
+   }
 
    foreach($alerts AS $alert)
    {
@@ -1435,8 +1442,8 @@ function alert_notifier($entry, $type = "alert", $log_id = NULL)
       'ALERT_MESSAGE'       => $alert['alert_message'],
       'CONDITIONS'          => implode(PHP_EOL . '             ', $condition_array),
       'METRICS'             => implode(PHP_EOL . '             ', $metric_array),
-      'DURATION'            => ($entry['alert_status'] == '1' ? ($entry['last_ok'] > 0 ? formatUptime($alert_unixtime - $entry['last_ok']) . " (" . format_unixtime($entry['last_ok']) . ")" : "Unknown")
-                               : ($entry['last_ok'] > 0 ? formatUptime($alert_unixtime - $entry['last_ok']) . " (" . format_unixtime($entry['last_ok']) . ")" : "Unknown")),
+      'DURATION'            => ($entry['alert_status'] == '1' ? ($entry['last_ok'] > 0 ? format_uptime($alert_unixtime - $entry['last_ok']) . " (" . format_unixtime($entry['last_ok']) . ")" : "Unknown")
+                               : ($entry['last_ok'] > 0 ? format_uptime($alert_unixtime - $entry['last_ok']) . " (" . format_unixtime($entry['last_ok']) . ")" : "Unknown")),
 
       // Entity TAGs
       'ENTITY_LINK'         => generate_entity_link($entry['entity_type'], $entry['entity_id'], $entity['entity_name']),
@@ -1662,7 +1669,7 @@ function process_notifications($vars = array())
         }
         if (isset($message_tags['ALERT_UNIXTIME']) && empty($message_tags['DURATION']))
         {
-            $message_tags['DURATION'] = formatUptime(time() - $message_tags['ALERT_UNIXTIME']) . ' (' . $message_tags['ALERT_TIMESTAMP'] . ')';
+            $message_tags['DURATION'] = format_uptime(time() - $message_tags['ALERT_UNIXTIME']) . ' (' . $message_tags['ALERT_TIMESTAMP'] . ')';
         }
 
         if (isset($GLOBALS['config']['alerts']['disable'][$endpoint['contact_method']]) && $GLOBALS['config']['alerts']['disable'][$endpoint['contact_method']]) {
@@ -1806,15 +1813,30 @@ function threshold_string($alert_low, $warn_low, $warn_high, $alert_high, $symbo
 function check_thresholds($alert_low, $warn_low, $warn_high, $alert_high, $value)
 {
 
-  $status = ok;
+  if (!is_numeric($value)) { return 'alert'; } // Not numeric value always alert
 
+  if ((is_numeric($alert_low)  && $value <= $alert_low) ||
+      (is_numeric($alert_high) && $value >= $alert_high))
+  {
+    $event = 'alert';
+  }
+  elseif ((is_numeric($warn_low)  && $value < $warn_low) ||
+          (is_numeric($warn_high) && $value > $warn_high))
+  {
+    $event = 'warning';
+  } else {
+    $event = 'ok';
+  }
+
+  /*
   if(is_numeric($warn_low) && $warn_low > $value)   { $status = 'warn'; }
   if(is_numeric($warn_high) && $warn_high < $value) { $status = 'warn'; }
 
   if(is_numeric($alert_low)  && $alert_low > $value)   { $status = 'alert'; }
   if(is_numeric($alert_high) && $alert_high < $value)  { $status = 'alert'; }
+  */
 
-  return $status;
+  return $event;
 
 }
 
@@ -1835,10 +1857,10 @@ function get_alert_entities_from_assocs($alert)
 
    $sql .= ' FROM `'.$entity_type_data['table'].'` ';
 
-   if (isset($entity_type_data['state_table']))
-   {
-      $sql .= ' LEFT JOIN `'.$entity_type_data['state_table'].'` USING (`'.$entity_type_data['id_field'].'`)';
-   }
+//   if (isset($entity_type_data['state_table']))
+//   {
+//      $sql .= ' LEFT JOIN `'.$entity_type_data['state_table'].'` USING (`'.$entity_type_data['id_field'].'`)';
+//   }
 
    if (isset($entity_type_data['parent_table']))
    {
@@ -1852,7 +1874,7 @@ function get_alert_entities_from_assocs($alert)
 
 
 
-   foreach($alert['assocs'] AS $assoc)
+   foreach ($alert['assocs'] as $assoc)
    {
 
       $where = ' (( 1';
@@ -2072,6 +2094,7 @@ function get_alert_entities_from_assocs($alert)
    $entities  = dbFetchRows($query, $params);
    //$entities  = dbFetchRows($query, $params, TRUE);
 
+  $return = [];
    foreach($entities as $entry)
    {
       $return[$entry['entity_id']] = array('entity_id' => $entry['entity_id'], 'device_id' => $entry['device_id']);
@@ -2120,6 +2143,7 @@ function generate_attrib_values($attrib, $vars)
 {
 
   $values = array();
+  //r($vars);
 
   switch ($attrib)
   {
@@ -2137,9 +2161,16 @@ function generate_attrib_values($attrib, $vars)
         $values[$os] = $os_array['text'];
       }
       break;
+    case "measured_group":
+      $groups = get_groups_by_type($vars['measured_type']);
+      foreach ($groups[$vars['measured_type']] as $group_id => $array)
+      {
+        $values[$array['group_id']] = $array['group_name'];
+      }
+      break;
     case "group":
       $groups = get_groups_by_type($vars['entity_type']);
-      foreach ($groups[$vars['entity_type']] AS $group_id => $array)
+      foreach ($groups[$vars['entity_type']] as $group_id => $array)
       {
         $values[$array['group_id']] = $array['group_name'];
       }
@@ -2153,6 +2184,19 @@ function generate_attrib_values($attrib, $vars)
         $values[$type['type']] = $type['text'];
       }
       break;
+    case "device_vendor":
+    case "device_hardware":
+    case "device_distro":
+    case "device_distro_ver":
+      list(, $column) = explode('_', $attrib, 2);
+      $query  = "SELECT DISTINCT `$column` FROM `devices`";
+      foreach (dbFetchColumn($query) as $item)
+      {
+        if (strlen($item)) { $values[$item] = $item; }
+      }
+      ksort($values);
+      break;
+    /*
     case "device_distro":
       $query  = "SELECT `distro` FROM `devices` GROUP BY `distro` ORDER BY `distro`";
       foreach (dbFetchColumn($query) as $item)
@@ -2167,11 +2211,20 @@ function generate_attrib_values($attrib, $vars)
         if (strlen($item)) { $values[$item] = $item; }
       }
       break;
+    */
     case "sensor_class":
       foreach($GLOBALS['config']['sensor_types'] AS $class => $data)
       {
         $values[$class] = nicecase($class);
       }
+      break;
+     case "status_type":
+        $query  = "SELECT `status_type` FROM `status` GROUP BY `status_type` ORDER BY `status_type`";
+        foreach (dbFetchColumn($query) as $item)
+        {
+           if (strlen($item)) { $values[$item] = $item; }
+        }
+        break;
   }
 
   return $values;
@@ -2206,7 +2259,9 @@ function generate_querybuilder_filter($attrib)
   $attrib['attrib_id'] = ($attrib['entity_type'] == 'device' ? 'device.' : 'entity.').$attrib['attrib_id'];
   $attrib['label'] = ($attrib['entity_type'] == 'device' ? 'Device ' : nicecase($attrib['entity_type']).' ').$attrib['label'];
 
-  $attrib['label'] = str_replace("Device Device", "Device", $attrib['label']);
+  // Clean label duplicates
+  $attrib['label'] = implode(' ', array_unique(explode(' ', $attrib['label'])));
+  //$attrib['label'] = str_replace("Device Device", "Device", $attrib['label']);
   //r($attrib);
 
   $filter_array[] = "id: '".$attrib['attrib_id']. ($attrib['free'] ? '.free': '')."'";
@@ -2236,7 +2291,7 @@ function generate_querybuilder_filter($attrib)
       }
 
     } else {
-      $value_list = generate_attrib_values($attrib['values'], array('entity_type' => $attrib['entity_type']));
+      $value_list = generate_attrib_values($attrib['values'], array('entity_type' => $attrib['entity_type'], 'measured_type' => $attrib['measured_type']));
     }
 
     asort($value_list);
@@ -2472,10 +2527,10 @@ function parse_qb_ruleset($entity_type, $rules, $ignore = FALSE)
 
   $sql .= ' FROM `'.$entity_type_data['table'].'` ';
 
-  if (isset($entity_type_data['state_table']))
-  {
-    $sql .= ' LEFT JOIN `'.$entity_type_data['state_table'].'` USING (`'.$entity_type_data['id_field'].'`)';
-  }
+//  if (isset($entity_type_data['state_table']))
+//  {
+//    $sql .= ' LEFT JOIN `'.$entity_type_data['state_table'].'` USING (`'.$entity_type_data['id_field'].'`)';
+//  }
 
   if (isset($entity_type_data['parent_table']))
   {
@@ -2525,6 +2580,7 @@ function parse_qb_rules($entity_type, $rules, $ignore = FALSE)
   global $config;
 
   $entity_type_data = entity_type_translate_array($entity_type);
+  $entity_attribs   = $config['entities'][$entity_type]['attribs'];
   $parts = array();
   foreach ($rules['rules'] as $rule)
   {
@@ -2540,57 +2596,101 @@ function parse_qb_rules($entity_type, $rules, $ignore = FALSE)
 
       list($table, $field) = explode('.', $rule['field']);
 
-      // Pre Transform value according to DB field (see port ARP/MAC)
-      if (isset($config['entities'][$entity_type]['attribs'][$field]['transformations']))
+      if ($table == 'entity' || $table == $entity_type)
       {
-        $rule['value'] = string_transform($rule['value'], $config['entities'][$entity_type]['attribs'][$field]['transformations']);
+        $table_type_data = $entity_type_data;
+      } else {
+        // This entity can be not same as main entity!
+        $table_type_data = entity_type_translate_array($table);
       }
 
-      if (isset($config['entities'][$entity_type]['attribs'][$field]['function']) &&
-          function_exists($config['entities'][$entity_type]['attribs'][$field]['function']))
+      // Pre Transform value according to DB field (see port ARP/MAC)
+      if (isset($entity_attribs[$field]['transformations']))
+      {
+        $rule['value'] = string_transform($rule['value'], $entity_attribs[$field]['transformations']);
+      }
+
+      $part = '';
+      // Check if field is measured entity
+      $field_measured = isset($entity_attribs[$field]['measured_type']) &&                    // Attrib have measured type param
+                        isset($config['entities'][$entity_attribs[$field]['measured_type']]); // And this entity type exist
+
+      if (isset($entity_attribs[$field]['function']) &&
+          function_exists($entity_attribs[$field]['function']))
       {
         // Pass original rule value, which translated to entity_id(s) by function call
         $function_args = array($entity_type, $rule['value']);
-        $rule['value'] = call_user_func_array($config['entities'][$entity_type]['attribs'][$field]['function'], $function_args);
+        $rule['value'] = call_user_func_array($entity_attribs[$field]['function'], $function_args);
         // Override $field by entity_id
         $rule['field_quoted'] = '`'.$entity_type_data['table'].'`.`'.$entity_type_data['table_fields']['id'].'`';
 
         //print_vars($function_args);
         //print_vars($rule['value']);
+      }
+      else if ($field_measured) {
+        // This attrib is measured entity
+        //$measured_type      = $entity_attribs[$field]['measured_type'];
+        //$measured_type_data = entity_type_translate_array($measured_type);
+
+        switch ($entity_attribs[$field]['values']) {
+          case 'measured_group':
+            // When values used as measured group, convert it to entity ids
+            //logfile('groups.log', 'passed value: '.var_export($rule['value'], TRUE)); /// DEVEL
+            $group_ids = !is_array($rule['value']) ? explode(',', $rule['value']) : $rule['value'];
+            $rule['value'] = get_group_entities($group_ids);
+            //logfile('groups.log', 'groups value: '.var_export($rule['value'], TRUE)); /// DEVEL
+            break;
+          default:
+            //$rule['field_quoted'] = '`'.$table_type_data['table'].'`.`'.$field.'`';
+        }
+        // Override $field by measured entity_id
+        $rule['field_quoted'] = '`'.$table_type_data['table'].'`.`'.$entity_type_data['table_fields']['measured_id'].'`';
+        //logfile('groups.log', 'value: '.var_export($rule['value'], TRUE)); /// DEVEL
+        //logfile('groups.log', 'field: '.$rule['field_quoted']);            /// DEVEL
+
+      }
+      else if (isset($entity_attribs[$field]['table']))
+      {
+        // This attrib specifies a table name (used for oid, since there is no parent)
+        $rule['field_quoted'] = '`'.$entity_attribs[$field]['table'].'`.`'.$field.'`';
+      }
+      else if (!isset($entity_attribs[$field])
+                 && isset($config['entities'][$entity_type]['parent_type'])
+                 && isset($config['entities'][$config['entities'][$entity_type]['parent_type']]['attribs'][$field]))
+      {
+        // This attrib does not exist on this entity && this entity has a parent && this attrib exists on the parent
+        $rule['field_quoted'] = '`'.$config['entities'][$config['entities'][$entity_type]['parent_type']]['table'].'`.`'.$field.'`';
+
       } else {
 
-        if ($table == 'entity' || $table == $entity_type)
-        {
-          $table_type_data = $entity_type_data;
-        } else {
-          // This entity can be not same as main entity!
-          $table_type_data = entity_type_translate_array($table);
-        }
         //$rule['field_quoted'] = '`'.$field.'`';
         // Always use full table.column, for do not get errors ambiguous (after JOINs)
+
         $rule['field_quoted'] = '`'.$table_type_data['table'].'`.`'.$field.'`';
       }
 
 
+      $operator_negative = FALSE; // Need for measured
       switch ($rule['operator'])
       {
         case 'ge':
-          $parts[] = ' ' . $rule['field_quoted'] . " >= '" . dbEscape($rule['value']) . "'";
+          $part = ' ' . $rule['field_quoted'] . " >= '" . dbEscape($rule['value']) . "'";
           break;
         case 'le':
-          $parts[] = ' ' . $rule['field_quoted'] . " <= '" . dbEscape($rule['value']) . "'";
+          $part = ' ' . $rule['field_quoted'] . " <= '" . dbEscape($rule['value']) . "'";
           break;
         case 'gt':
-          $parts[] = ' ' . $rule['field_quoted'] . " > '" . dbEscape($rule['value']) . "'";
+          $part = ' ' . $rule['field_quoted'] . " > '" . dbEscape($rule['value']) . "'";
           break;
         case 'lt':
-          $parts[] = ' ' . $rule['field_quoted'] . " < '" . dbEscape($rule['value']) . "'";
+          $part = ' ' . $rule['field_quoted'] . " < '" . dbEscape($rule['value']) . "'";
           break;
         case 'notequals':
-          $parts[] = ' ' . $rule['field_quoted'] . " != '" . dbEscape($rule['value']) . "'";
+          $operator_negative = TRUE;
+          $part = ' ' . $rule['field_quoted'] . " != '" . dbEscape($rule['value']) . "'";
           break;
         case 'equals':
-          $parts[] = ' ' . $rule['field_quoted'] . " = '" . dbEscape($rule['value']) . "'";
+          $part = ' ' . $rule['field_quoted'] . " = '" . dbEscape($rule['value']) . "'";
           break;
         case 'match':
           switch ($field)
@@ -2599,44 +2699,46 @@ function parse_qb_rules($entity_type, $rules, $ignore = FALSE)
               $group = get_group_by_name($rule['value']);
               if ($group['entity_type'] == $table) {
                 $values = get_group_entities($group['group_id']);
-                $parts[] = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table.'.'.$entity_type_data['table_fields']['id']), NULL, FALSE);
+                $part = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table_type_data['table'].'.'.$entity_type_data['table_fields']['id']), NULL, FALSE);
               }
               break;
             default:
               $rule['value'] = str_replace('*', '%', $rule['value']);
               $rule['value'] = str_replace('?', '_', $rule['value']);
-              $parts[] = ' IFNULL(' . $rule['field_quoted'] . ', "") LIKE' . " '" . dbEscape($rule['value']) . "'";
+              $part = ' IFNULL(' . $rule['field_quoted'] . ', "") LIKE' . " '" . dbEscape($rule['value']) . "'";
               break;
           }
           break;
         case 'notmatch':
+          $operator_negative = TRUE;
           switch ($field)
           {
             case 'group':
               $group = get_group_by_name($rule['value']);
               if ($group['entity_type'] == $table) {
                 $values = get_group_entities($group['group_id']);
-                $parts[] = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table.'.'.$entity_type_data['table_fields']['id']), '!=', FALSE);
+                $part = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table_type_data['table'].'.'.$entity_type_data['table_fields']['id']), '!=', FALSE);
               }
               break;
             default:
               $rule['value'] = str_replace('*', '%', $rule['value']);
               $rule['value'] = str_replace('?', '_', $rule['value']);
-              $parts[] = ' IFNULL(' . $rule['field_quoted'] . ', "") NOT LIKE' . " '" . dbEscape($rule['value']) . "'";
+              $part = ' IFNULL(' . $rule['field_quoted'] . ', "") NOT LIKE' . " '" . dbEscape($rule['value']) . "'";
               break;
           }
           break;
         case 'regexp':
-          $parts[] = ' IFNULL(' . $rule['field_quoted'] . ', "") REGEXP' . " '" . dbEscape($rule['value']) . "'";
+          $part = ' IFNULL(' . $rule['field_quoted'] . ', "") REGEXP' . " '" . dbEscape($rule['value']) . "'";
           break;
         case 'notregexp':
-          $parts[] = ' IFNULL(' . $rule['field_quoted'] . ', "") NOT REGEXP' . " '" . dbEscape($rule['value']) . "'";
+          $operator_negative = TRUE;
+          $part = ' IFNULL(' . $rule['field_quoted'] . ', "") NOT REGEXP' . " '" . dbEscape($rule['value']) . "'";
           break;
         case 'isnull':
-          $parts[] = ' ' .$rule['field_quoted'] . ' IS NULL';
+          $part = ' ' .$rule['field_quoted'] . ' IS NULL';
           break;
         case 'isnotnull':
-          $parts[] = ' ' .$rule['field_quoted'] . ' IS NOT NULL';
+          $part = ' ' .$rule['field_quoted'] . ' IS NOT NULL';
           break;
         case 'in':
           //print_vars($field);
@@ -2645,34 +2747,54 @@ function parse_qb_rules($entity_type, $rules, $ignore = FALSE)
           {
             case 'group_id':
               $values = get_group_entities($rule['value']);
-              $parts[] = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table.'.'.$entity_type_data['table_fields']['id']), NULL, FALSE);
+              $part = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table_type_data['table'].'.'.$entity_type_data['table_fields']['id']), NULL, FALSE);
               break;
             default:
-              $parts[] = generate_query_values($rule['value'], $rule['field_quoted'], NULL, FALSE);
+              $part = generate_query_values($rule['value'], $rule['field_quoted'], NULL, FALSE);
               break;
           }
           //print_vars($parts);
           break;
         case 'notin':
+          $operator_negative = TRUE;
           switch ($field) {
             case 'group_id':
               $values = get_group_entities($rule['value']);
-              $parts[] = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table.'.'.$entity_type_data['table_fields']['id']), '!=', FALSE);
+              $part = generate_query_values($values, ($table == "device" ? "devices.device_id" : $table_type_data['table'].'.'.$entity_type_data['table_fields']['id']), '!=', FALSE);
               break;
             default;
-              $parts[] = generate_query_values($rule['value'], $rule['field_quoted'], '!=', FALSE);
+              $part = generate_query_values($rule['value'], $rule['field_quoted'], '!=', FALSE);
               break;
           }
           break;
       }
+      // For measured field append measured
+      if ($field_measured && strlen($part)) {
+        $measured_type      = $entity_attribs[$field]['measured_type'];
+        $part = ' (`'.$table_type_data['table'].'`.`'.$entity_type_data['table_fields']['measured_type'] .
+                "` = '" . dbEscape($measured_type) . "' AND (" . $part . '))';
+        // For negative rule operators append all entities without measured type field
+        if ($operator_negative) {
+          $part = ' (`'.$table_type_data['table'].'`.`'.$entity_type_data['table_fields']['measured_type'] . '` IS NULL OR' . $part . ')';
+        }
+      }
+      //if ($field_measured) { logfile('groups.log', $part); } /// DEVEL
+      if (strlen($part))
+      {
+        $parts[] = $part;
+      }
 
     }
   }
-  //print_r($parts);
 
   $sql = '(' . implode(" " . $rules['condition'], $parts) . ')';
 
+  //print_vars($parts);
   //print_vars($sql);
+  //if ($field_measured) { logfile('groups.log', $sql); }
+  //logfile('groups.log', $sql); /// DEVEL
+  print_debug_vars($sql);
+
   return $sql;
 
 }

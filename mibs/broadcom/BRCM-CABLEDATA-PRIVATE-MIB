@@ -1,6 +1,6 @@
 --**************************************************************************
 --                                                                          
---    Copyright 2002 Broadcom Corporation                                   
+--    Copyright 2007 Broadcom Corporation                                   
 --    All Rights Reserved                                                   
 --    No portions of this material may be reproduced in any form without the
 --    written permission of:                                                
@@ -40,7 +40,7 @@ IMPORTS
         FROM BRCM-CABLEDATA-SMI;
                 
 cableDataPrivateMIB MODULE-IDENTITY
-    LAST-UPDATED "200206040000Z"
+    LAST-UPDATED "200702050000Z"
     ORGANIZATION "Broadcom Corporation"
     CONTACT-INFO
         "	BANANA-CABLEDATA
@@ -56,10 +56,20 @@ cableDataPrivateMIB MODULE-IDENTITY
 
         E-mail: banana-cabledata@broadcom.com"
     DESCRIPTION
-        "Broadcom cabledata private MIB"
+        "Broadcom proprietary MIB which defines a root node for the 'private'
+         branch of the MIB tree.  This branch is only accessible in factory
+         and engineering configurations and is not intended for runtime use.
+         
+         This MIB also provides a mechanism for entering factory or engineering
+         modes and for securing the mechanism."
+    REVISION      "200702050000Z"
+    DESCRIPTION
+        "Module description was updated. 
+         Compilability issues were cleaned up: 
+         - Range restriction was added to object cdPvtMibEnableKeyIndex."
     REVISION      "200206040000Z"
     DESCRIPTION
-            "Initial version of this MIB module."
+        "Initial version of this MIB module."
     ::= { cableDataPrivate 1 }
         
 cableDataPrivateMIBObjects OBJECT IDENTIFIER ::= { cableDataPrivateMIB 1}
@@ -124,7 +134,7 @@ CdPrivateMibEnableKeyEntry ::=
     }
     
 cdPvtMibEnableKeyIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32 (1..8)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION

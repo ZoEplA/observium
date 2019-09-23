@@ -849,6 +849,13 @@ rlRadiusServTrapAuthSuccess NOTIFICATION-TYPE
     DESCRIPTION
         "Radius server authentication success event trap."
     ::=  { rndNotifications 257 }
+   
+rlRedundantFanStateChange NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Trap indicating the redundant fan status change."
+    ::=  { rndNotifications 258 }
 
 rldot1xSupplicantPortAuthorizedTrap NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
@@ -870,14 +877,51 @@ rldot1xCredentialTrap NOTIFICATION-TYPE
     DESCRIPTION
         "Warning trap indicating that credential is changed, rejected or not updated."
     ::=  { rndNotifications 262 }
-    
-rlRedundantFanStateChange NOTIFICATION-TYPE
+	
+poeNonPOEDetected NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
-        "Trap indicating the redundant fan status change."
-    ::=  { rndNotifications 258 }
+        "Informational trap indicating Non POE Detected unit"
+    ::=  { rndNotifications 263}	
 
+rlBoxUtilI2CReadFailureTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::=  { rndNotifications 264 }
 
+rlBoxUtilI2CWriteFailureTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        ""
+    ::=  { rndNotifications 265 }
+	
+rlHostHlibCpldUpdateTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "Informational trap indicating CPLD update FW is in progress"
+    ::=  { rndNotifications 266 }
+	
+rlBrgPvstInconsistencyEnterStateTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "The trap is sent by a bridge when any of its configured ports
+         transitions to new inconsistency mode."
+    ::= { rndNotifications 268 }
+	
+rlBrgPvstInconsistencyExitStateTrap NOTIFICATION-TYPE
+    OBJECTS   { rndErrorDesc, rndErrorSeverity }
+    STATUS  current
+    DESCRIPTION
+        "The trap is sent by a bridge when any of its configured ports
+         transitions from inconsistency mode to resolved mode."
+    ::= { rndNotifications 269 }
+
+	
 END
 

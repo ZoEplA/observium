@@ -8,19 +8,21 @@
  * @package    observium
  * @subpackage discovery
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
 // FIXME. UCD-CPU already polled by ucd-mib poller
-$count_processors = dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ? AND `processor_type` != ?", array($device['device_id'], 'ucd-old'));
+//$count_processors = dbFetchCell("SELECT COUNT(*) FROM `processors` WHERE `device_id` = ? AND `processor_type` != ?", array($device['device_id'], 'ucd-old'));
 
 //if ($device['os_group'] == 'unix' && $count == 0)
-if ($count_processors == 0)
+//if ($count_processors == 0)
+if (!dbExist('processors', '`device_id` = ? AND `processor_type` != ?', array($device['device_id'], 'ucd-old')))
 {
   //$system = snmp_get($device, 'ssCpuSystem.0', '-OvQ', $mib);
   //$user   = snmp_get($device, 'ssCpuUser.0'  , '-OvQ', $mib);
-  $idle   = snmp_get($device, 'ssCpuIdle.0'  , '-OvQ', $mib);
+  //$idle   = snmp_get($device, 'ssCpuIdle.0'  , '-OvQ', $mib);
+  $idle   = snmp_get_oid($device, 'ssCpuIdle.0', $mib);
 
   if (is_numeric($idle))
   {

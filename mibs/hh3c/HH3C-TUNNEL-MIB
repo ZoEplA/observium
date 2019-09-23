@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Generic Routing Encapsulation configuration MIB
 -- Reference: INET-ADDRESS-MIB, IPV6-FLOW-LABEL-MIB, IF-MIB
@@ -37,9 +37,9 @@ hh3cTunnel MODULE-IDENTITY
     LAST-UPDATED
         "201302280000Z"                              -- Feb 28, 2013 at 00:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085

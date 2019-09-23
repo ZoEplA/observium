@@ -20,6 +20,9 @@ IMPORTS
 	
 	DisplayString
 	FROM SNMPv2-TC
+
+	ifEntry
+	FROM IF-MIB
 	
         wsMgmt,
         wsExperiment
@@ -2050,6 +2053,135 @@ wsXFPRXPower	OBJECT-TYPE
 		DESCRIPTION
 			"Measured RX power (uW)."
 		::= { wsXFPEntry 19 }
+
+--
+--   Waystream Extension to the interface table
+--
+
+wsIfXTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF WsIfXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by the value of ifNumber.  This table contains
+            additional objects for the interface table."
+    ::= { ibos 7 }
+
+
+wsIfXEntry        OBJECT-TYPE
+    SYNTAX      WsIfXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing additional management information
+            applicable to a particular interface."
+    AUGMENTS    { ifEntry }
+    ::= { wsIfXTable 1 }
+
+WsIfXEntry ::=
+    SEQUENCE {
+	ifHCInErrors		Counter64,
+	ifHCInRunts		Counter64,
+	ifHCInOversized		Counter64,
+	ifHCInCRCErrors		Counter64,
+	ifHCInJabbers		Counter64,
+	ifHCInFragments		Counter64,
+	ifHCInSymbolErrors	Counter64,
+	ifHCInAlignmentErrors	Counter64,
+	ifHCOutErrors		Counter64,
+	ifHCOutCollisions	Counter64,
+	ifHCOutDeferred		Counter64
+    }
+
+ifHCInErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of input errors."
+    ::= { wsIfXEntry 1 }
+
+ifHCInRunts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of input runt (too small) packets."
+    ::= { wsIfXEntry 2 }
+
+ifHCInOversized OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of input oversized packets."
+    ::= { wsIfXEntry 3 }
+
+ifHCInCRCErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of input packets dropped because of invalid CRC."
+    ::= { wsIfXEntry 4 }
+
+ifHCInJabbers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of input jabber (too big) packets."
+    ::= { wsIfXEntry 5 }
+
+ifHCInFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of input fragmented frames."
+    ::= { wsIfXEntry 6 }
+
+ifHCInSymbolErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of symbol errors."
+    ::= { wsIfXEntry 7 }
+
+ifHCInAlignmentErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of alignment errors."
+    ::= { wsIfXEntry 8 }
+
+ifHCOutErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of output errors."
+    ::= { wsIfXEntry 9 }
+
+ifHCOutCollisions OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of output collision errors."
+    ::= { wsIfXEntry 10 }
+
+ifHCOutDeferred OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of deferred errors."
+    ::= { wsIfXEntry 11 }
+
 
 --
 -- Waystream ibos environment related notifications

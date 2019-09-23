@@ -5,6 +5,10 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-STORM-CONTROL-MIB.mib $ 
+-- Revision 1.7  2016/06/17 06:59:13  Viktor 
+-- add new object in storm control trap to show storm type 
+-- Revision 1.6  2015/02/09 08:51:41  neng 
+-- support storm control log trap. 
 -- Revision 1.5  2013/12/06 07:08:31  ccho 
 -- remove uncessary imports 
 -- Revision 1.4  2012/09/19 07:46:51  Kevin 
@@ -33,7 +37,10 @@ ZYXEL-STORM-CONTROL-MIB DEFINITIONS ::= BEGIN
        	FROM BRIDGE-MIB
 
 	esMgmt			
-		FROM ZYXEL-ES-SMI;
+		FROM ZYXEL-ES-SMI
+		
+	ifIndex
+    	FROM IF-MIB;				-- RFC2863
 
 	zyxelStormControl MODULE-IDENTITY
 		LAST-UPDATED	"201207010000Z"    
@@ -44,8 +51,10 @@ ZYXEL-STORM-CONTROL-MIB DEFINITIONS ::= BEGIN
 			"The subtree for storm control"
 		::= { esMgmt 78 }
 
-	zyxelStormControlSetup   	OBJECT IDENTIFIER ::= { zyxelStormControl 1 }
-  
+	zyxelStormControlSetup   		OBJECT IDENTIFIER ::= { zyxelStormControl 1 }
+	zyxelStormControlNotifications	OBJECT IDENTIFIER ::= { zyxelStormControl 2 }
+	zyxelStormControlTrapInfoObject OBJECT IDENTIFIER ::= { zyxelStormControl 3 }	
+	
 -- *******************************************************************
 -- *
 -- * zyxelStormControlSetup
@@ -143,5 +152,39 @@ ZYXEL-STORM-CONTROL-MIB DEFINITIONS ::= BEGIN
 						For GE port, the maximum value is 262143 pkts/s."
         ::= { zyxelStromControlPortEntry 6 }
 
-
+-- *******************************************************************
+-- *
+-- * zyxelStormControlNotifications
+-- *
+-- *******************************************************************
+    
+	   zyPortStormControlTrap NOTIFICATION-TYPE
+       OBJECTS {
+				ifIndex,
+				zyStormControlType
+        }       
+	   STATUS  current
+       DESCRIPTION
+						"A storm control is detected on specific port. 
+						A packet filter action has been applied on the interface."
+       ::= { zyxelStormControlNotifications 1 }
+	   
+-- *******************************************************************
+-- *
+-- * zyxelStormControlTrapInfoObject
+-- *
+-- *******************************************************************	
+		
+		zyStormControlType OBJECT-TYPE
+        SYNTAX  INTEGER
+		{
+        	broadcast-storm(1),
+			multicast-storm(2),
+        }
+        MAX-ACCESS   read-only
+        STATUS  current
+        DESCRIPTION
+						"The detected storm control type."             
+        ::= { zyxelStormControlTrapInfoObject 1 } 
+  
 END  

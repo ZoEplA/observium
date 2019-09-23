@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech.  Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech.  Co., Ltd.  All rights reserved.
 --
 -- Description: Network Time Protocol (NTP) Version 3, is used to synchronize
 --              timekeeping among a set of distributed time servers and clients.
 -- Reference:
--- Version: V1.7
+-- Version: V1.8
 -- History:
 -- V1.0   <sunhaipeng>, <2003-03-19>, <initial>
 -- V1.1   jinyi, 2004-12-02,
@@ -22,6 +22,8 @@
 -- V1.7  2014-03-03 by wangjianming
 --       Changed the state of hh3cNTPSysPeer to obsolete.
 --       Added hh3cNTPSysSrcPeer.
+-- V1.8  2016-09-14 by chenzichao
+--       Corrected spelling of the word 'message'.
 -- =================================================================
 HH3C-NTP-MIB DEFINITIONS ::= BEGIN
 
@@ -36,9 +38,9 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
         hh3cNTP MODULE-IDENTITY
             LAST-UPDATED "200303150000Z"
             ORGANIZATION
-                "Hangzhou H3C Tech.  Co., Ltd."
+                "New H3C Tech.  Co., Ltd."
             CONTACT-INFO
-                "Platform Team Hangzhou H3C Tech.  Co., Ltd.
+                "Platform Team New H3C Tech.  Co., Ltd.
                 Hai-Dian District Beijing P.R.  China
                 http://www.h3c.com
                 Zip:100085
@@ -396,7 +398,7 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "This is a bit indicating that massage pass authentication which is authentic."
+            "This is a bit indicating that message pass authentication which is authentic."
         ::= { hh3cNTPPeerEntry 3 }
 
     hh3cNTPPeerRemAdr OBJECT-TYPE
@@ -835,7 +837,7 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of received massages."
+            "The number of received messages."
         ::= { hh3cNTPPeerEntry 33 }
 
     hh3cNTPPeerSent OBJECT-TYPE
@@ -843,15 +845,15 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The number of send massages."
+            "The number of send messages."
         ::= { hh3cNTPPeerEntry 34 }
 
     hh3cNTPPeerFlash OBJECT-TYPE
         SYNTAX      BITS
             {
-                recvRepeatMsg(0),              -- received repeated massage
-                recvremanMsg(1),               -- received remanufactured massage
-                unSynMsg(2),                   -- unsynchronized massage
+                recvRepeatMsg(0),              -- received repeated message
+                recvremanMsg(1),               -- received remanufactured message
+                unSynMsg(2),                   -- unsynchronized message
                 dispBeyond(3),                 -- the peer dispersion beyond the mark
                 unauthenticate(4),             -- the peer unauthenticate
                 unSynClock(5),                 -- the peer clock is unsynchronized
@@ -863,7 +865,7 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The information about the massage."
+            "The information about the message."
         ::= { hh3cNTPPeerEntry 35 }
 
 

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -27,7 +27,7 @@ foreach ($tempoid as $key => $dummy)
   {
     $descr = snmp_get($device, $tempoid[$key]['descr'], '-Oqv');
     $descr = preg_replace('/"/','',$descr);
-    discover_sensor($valid['sensor'], 'temperature', $device, $tempoid[$key]['value'], $key, 'infratec-rms', $descr, 1, $value);
+    discover_sensor('temperature', $device, $tempoid[$key]['value'], $key, 'infratec-rms', $descr, 1, $value);
   }
 }
 
@@ -43,7 +43,7 @@ foreach ($humoid as $key => $dummy)
   {
     $descr = snmp_get($device, $humoid[$key]['descr'], '-Oqv');
     $descr = preg_replace('/"/','',$descr);
-    discover_sensor($valid['sensor'], 'humidity', $device, $humoid[$key]['value'], $key, 'infratec-rms', $descr, 1, $value);
+    discover_sensor('humidity', $device, $humoid[$key]['value'], $key, 'infratec-rms', $descr, 1, $value);
   }
 }
 
@@ -58,7 +58,7 @@ foreach ($mainsoid as $key => $dummy)
   {
     $descr = snmp_get($device, $mainsoid[$key]['descr'], '-Oqv');
     $descr = preg_replace('/"/','',$descr);
-    discover_sensor($valid['sensor'], 'voltage', $device, $mainsoid[$key]['value'], $key, 'infratec-rms', $descr, 1, $value);
+    discover_sensor('voltage', $device, $mainsoid[$key]['value'], $key, 'infratec-rms', $descr, 1, $value);
   }
 }
 

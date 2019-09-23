@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -24,7 +24,7 @@ foreach ($lm_array['temp'] as $index => $entry)
   $value = $entry['lmTempSensorsValue'];
   if ($entry['lmTempSensorsValue'] > 0 && $value * $scale <= 1000)
   {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'lmsensors', $descr, $scale, $value);
+    discover_sensor_ng($device,'temperature', $mib, 'lmTempSensorsValue', $oid, $index, NULL, $descr, $scale, $value, ['rename_rrd' => "lmsensors-$index"]);
   }
 }
 
@@ -36,7 +36,7 @@ foreach ($lm_array['fan'] as $index => $entry)
   $value = $entry['lmFanSensorsValue'];
   if ($entry['lmFanSensorsValue'] > 0)
   {
-    discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, $scale, $value);
+    discover_sensor_ng($device,'fanspeed', $mib, 'lmFanSensorsValue', $oid, $index, NULL, $descr, $scale, $value, ['rename_rrd' => "lmsensors-$index"]);
   }
 }
 
@@ -48,7 +48,7 @@ foreach ($lm_array['volt'] as $index => $entry)
   $value = $entry['lmVoltSensorsValue'];
   if (is_numeric($entry['lmVoltSensorsValue']))
   {
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'lmsensors', $descr, $scale, $value);
+    discover_sensor_ng($device,'voltage', $mib, 'lmVoltSensorsValue', $oid, $index, NULL, $descr, $scale, $value, ['rename_rrd' => "lmsensors-$index"]);
   }
 }
 

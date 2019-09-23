@@ -1,7 +1,7 @@
  --**MOD+***********************************************************************
  -- Module:   hpicfBfd.mib 
  --
- -- Copyright (C) 2000-2015 Hewlett Packard Enterprise Development LP
+ -- Copyright (C) 2000-2016 Hewlett Packard Enterprise Development LP
  -- All Rights Reserved.
  -- 
  -- The contents of this software are proprietary and confidential
@@ -50,13 +50,17 @@ HP-ICF-BFD-MIB DEFINITIONS ::= BEGIN
 
 
         hpicfBfd MODULE-IDENTITY
-        LAST-UPDATED "201010281000Z" -- October 28, 2010
+        LAST-UPDATED "201611281000Z" -- November 28, 2016
         ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd. M/S 5557
                       Roseville, CA 95747-5557"
         DESCRIPTION  "This MIB module contains HP proprietary
                                  extensions to the OSPF-MIB module."
+
+        REVISION     "201611281000Z"   -- November 28th, 2016
+        DESCRIPTION  "Added Static Support on Application ID
+                      to create BFD Sessions on Static Routes"
 
         REVISION     "201010281000Z"   -- February 2nd, 2015
 
@@ -309,12 +313,13 @@ HP-ICF-BFD-MIB DEFINITIONS ::= BEGIN
 
     hpicfBfdSessApplicationID OBJECT-TYPE
         SYNTAX      INTEGER {
-                                         none(0),
-                                         ospf(1),
-                                         vrrp(2),
-                                         bgp(3),
-                                         multiple(4)
-                        }
+                              none(0),
+                              ospf(1),
+                              vrrp(2),
+                              bgp(3),
+                              multiple(4),
+                              static(5)
+                            }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION " Name of application above BFD session."

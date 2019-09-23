@@ -15,7 +15,7 @@ class I18n
         'My name is {{ name }}.' => 'Me llamo {{ name }}.',
     );
 
-    public static function __trans($text)
+    public static function _trans($text)
     {
         return isset(self::$dictionary[$text]) ? self::$dictionary[$text] : $text;
     }

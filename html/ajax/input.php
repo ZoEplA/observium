@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage ajax
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -34,6 +34,7 @@ if (strlen($vars['field']) && $vars['cache'] != 'no' && empty($vars['query']) &&
 } else {
   $query  = '';
   $params = array();
+  $array_filter = FALSE;
   //print_vars($vars);
   switch ($vars['field'])
   {
@@ -58,6 +59,12 @@ if (strlen($vars['field']) && $vars['cache'] != 'no' && empty($vars['query']) &&
       $query = 'SELECT `ifSpeed`, COUNT(ifSpeed) as `count` FROM `ports` WHERE `ifSpeed` > 0 '. $query_permitted .' GROUP BY ifSpeed ORDER BY `count` DESC';
       $call_function = 'formatRates';
       $call_params   = array(4, 4);
+      break;
+
+    case 'syslog_program':
+      //$query_permitted   = generate_query_permitted();
+      $query = 'SELECT DISTINCT `program` FROM `syslog`';
+      $array_filter = TRUE; // Search query string in array instead sql query (when this faster)
       break;
 
     case 'bgp_peer_as':
@@ -110,6 +117,19 @@ if (strlen($vars['field']) && $vars['cache'] != 'no' && empty($vars['query']) &&
         }
         $options = $call_options;
       }
+
+      // Filter/search query string in array, instead sql query, when this is faster (ie syslog program)
+      if ($array_filter)
+      {
+        $new_options = [];
+        foreach ($options as $option)
+        {
+          if (stripos($option, $vars['query']) !== FALSE) { $new_options[] = $option; }
+        }
+        $options = $new_options;
+      }
+
+      // Cache request in session var (need convert to common caching lib)
       if ($vars['cache'] != 'no' && empty($vars['query']))
       {
         @session_start();

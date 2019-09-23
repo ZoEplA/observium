@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -28,7 +28,7 @@ if (is_device_mib($device, 'JUNIPER-PING-MIB', FALSE))
   //$sla_poll = snmpwalk_cache_multi_oid($device, "jnxPingResultsStatus", $sla_poll, $vendor_mib);
   //$sla_poll = snmpwalk_cache_multi_oid($device, "jnxPingResultsTime", $sla_poll, $vendor_mib);
 }
-else if (is_device_mib($device, 'HH3C-NQA-MIB', FALSE))
+elseif (is_device_mib($device, 'HH3C-NQA-MIB', FALSE))
 {
   // HH3C-NQA-MIB
   echo("HH3C-NQA-MIB ");
@@ -51,6 +51,20 @@ else if (is_device_mib($device, 'HH3C-NQA-MIB', FALSE))
   //  }
   //}
   //unset($sla_history, $last, $index);
+}
+elseif (is_device_mib($device, 'HUAWEI-DISMAN-PING-MIB', FALSE))
+{
+  // HUAWEI-DISMAN-PING-MIB
+  echo("HUAWEI-DISMAN-PING-MIB ");
+  $vendor_mib = 'HUAWEI-DISMAN-PING-MIB';
+  /* Hrm, not sure if we require extended stats there
+  $sla_poll = snmpwalk_cache_multi_oid($device, "hwpingResultsEntry", $sla_poll, $vendor_mib);
+  // HUAWEI Jitter Statistics
+  if (dbExist('slas', '`device_id` = ? AND `rtt_type` = ? AND `deleted` = 0 AND `sla_status` = ?', [$device['device_id'], 'jitter', 'active']))
+  {
+    $sla_poll = snmpwalk_cache_multi_oid($device, "hwPingJitterStatsEntry", $sla_poll, $vendor_mib);
+  }
+  */
 } else {
   // Heh, DISMAN-PING-MIB stores correct timestamp and states in huge history table, here trick for get last one
   // FIXME need found more speedup way! but currently only vendor specific is best!
@@ -72,10 +86,7 @@ else if (is_device_mib($device, 'HH3C-NQA-MIB', FALSE))
   }
   unset($sla_history, $last, $index);
 }
-if (OBS_DEBUG > 1)
-{
-  print_vars($sla_poll);
-}
+print_debug_vars($sla_poll);
 
 // SLA states from MIB definitions
 $sla_states = &$GLOBALS['config']['mibs'][$mib]['sla_states'];
@@ -112,6 +123,7 @@ foreach ($sla_poll as $index => $entry)
       $entry['UnixTime']      = $entry['jnxPingResultsTime'];
       break;
     case 'HH3C-NQA-MIB':
+    case 'HUAWEI-DISMAN-PING-MIB':
       // Note, Stats table is not correct place for values, because in stats used long intervals > 200-300 sec
       //$sla_state['rtt_value']   = $entry['hh3cNqaStatResAverageRtt'];
       //$sla_state['rtt_minimum'] = $entry['hh3cNqaStatResMinRtt'];
@@ -140,6 +152,17 @@ foreach ($sla_poll as $index => $entry)
       //HH3C-NQA-MIB::hh3cNqaResultsRttStatsErrors."cncback"."1" = Gauge32: 0
       //HH3C-NQA-MIB::hh3cNqaResultsRttStatsErrors."cncmaster"."oper" = Gauge32: 0
       //HH3C-NQA-MIB::hh3cNqaResultsRttStatsErrors."imcl2topo"."ping" = Gauge32: 0
+
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttNumDisconnects."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttTimeouts."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttBusies."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttNoConnections."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttDrops."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttSequenceErrors."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsRttStatsErrors."slatest"."besteffort" = Gauge32: 0
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsMaxDelaySD."slatest"."besteffort" = Gauge32: 24 milliseconds
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsMaxDelayDS."slatest"."besteffort" = Gauge32: 24 milliseconds
+      // HUAWEI-DISMAN-PING-MIB::hwpingResultsLostPacketRatio."slatest"."besteffort" = Gauge32: 0 milliseconds
       if ($sla_state['rtt_success'] > 0)
       {
         if ($sla_state['rtt_value'] > 0)

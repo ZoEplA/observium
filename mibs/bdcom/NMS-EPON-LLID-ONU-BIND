@@ -15,7 +15,7 @@
 			FROM RFC1213-MIB
 		    nmsEPONGroup
 			FROM NMS-SMI
-		    TruthValue,RowStatus,MacAddress
+		    TruthValue,RowStatus,MacAddress,DateAndTime
 		    	FROM SNMPv2-TC;
           
                nmsEponLlidOnuBind         OBJECT IDENTIFIER ::= { nmsEPONGroup 11 }
@@ -55,8 +55,13 @@
                        llidOnuBindDistance
                            INTEGER,
                        llidOnuBindRTT
+                           INTEGER,
+                       llidOnuBindLastRegTime
+                      	   DateAndTime,
+                       llidOnuBindLastDeregTime
+                      	   DateAndTime,
+                       llidOnuBindLastDeregReason
                            INTEGER
-                      
                    }
                    
                    
@@ -137,6 +142,46 @@
                    DESCRIPTION
                            "LLID & ONU binding round-trip time."
                    ::= { nmsEponLlidOnuBindEntry 8 } 
+                   
+               llidOnuBindLastRegTime OBJECT-TYPE
+                   SYNTAX  DateAndTime
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding last register time."
+                   ::= { nmsEponLlidOnuBindEntry 9 } 
+                   
+               llidOnuBindLastDeregTime OBJECT-TYPE
+                   SYNTAX  DateAndTime
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding last deregister time."
+                   ::= { nmsEponLlidOnuBindEntry 10 } 
+                   
+               llidOnuBindLastDeregReason OBJECT-TYPE
+                   SYNTAX  INTEGER{
+                                     normal(2),
+                                     mpcp-down(3),
+                                     oam-down(4), 
+                                     firmware-download(5),
+                                     illegal-mac(6), 
+                                     llid-admin-down(7),
+                                     wire-down(8),
+                                     power-off(9), 
+                                     unknow(255)
+                                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "LLID & ONU binding last deregister reason. normal(2), mpcp-down(3), oam-down(4), firmware-download(5) 
+                           , illegal-mac(6) ,llid-admin-down(7) , wire-down(8) , power-off(9) ,unknow(255) "
+                   ::= { nmsEponLlidOnuBindEntry 11 } 
+                   
+                   
+                   
+                   
+                   
 
 
                nmsEponllidCreateTable OBJECT-TYPE

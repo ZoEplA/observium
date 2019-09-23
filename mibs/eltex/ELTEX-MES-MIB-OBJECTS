@@ -2,7 +2,8 @@ ELTEX-MES-MIB-OBJECTS DEFINITIONS ::= BEGIN
 
 IMPORTS
     eltMesIfMIBObjects              FROM ELTEX-MES-IF-MIB
-    MODULE-IDENTITY, OBJECT-TYPE    FROM SNMPv2-SMI
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32                       FROM SNMPv2-SMI
     DisplayString                   FROM SNMPv2-TC
     ifEntry                         FROM IF-MIB;
 
@@ -13,15 +14,6 @@ eltIfExtTable OBJECT-TYPE
     DESCRIPTION
         ""
     ::= { eltMesIfMIBObjects 1 }
-    
-eltIfTypes OBJECT-TYPE
-    SYNTAX      INTEGER { default(1), iana-new(2) }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DEFVAL      { default }
-    DESCRIPTION
-        "If set to 'default', interfaces types in ifTable will be set according to IANAifType-MIB 1996. If set to 'iana-new', interface types will be set according to IANAifType-MIB 2014"
-    ::= { eltMesIfMIBObjects 2 }
 
 eltIfExtEntry OBJECT-TYPE
     SYNTAX      EltIfExtEntry
@@ -33,16 +25,36 @@ eltIfExtEntry OBJECT-TYPE
     ::= { eltIfExtTable 1 }
 
 EltIfExtEntry ::= SEQUENCE {
-    iflongDescr    DisplayString
+    eltIfLongDescr    DisplayString,
+    eltIfAdminMtu     Integer32
 }
 
-iflongDescr   OBJECT-TYPE
-               SYNTAX      DisplayString (SIZE(0..255))
-               MAX-ACCESS  read-write
-               STATUS      current
-               DESCRIPTION
-                       ""
-               ::= { eltIfExtEntry 1 }
+eltIfLongDescr   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..160))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Indicates description for an interface.
+     Difference between ifAlies and LongDescr is
+     in the number of characters used to describe
+     a specific interface"
+    ::= { eltIfExtEntry 1 }
+
+eltIfAdminMtu OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 128..9000)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The MTU configured by the administrator.
+        This object is exactly same as 'ifMtu' in
+        ifTable from IF-MIB for the same ifIndex
+        value, except that it is configurable by the
+        administrator. Zero value means using global
+        configuration for this interface (depends on
+        Jumbo frame enabled). For more description of
+        this object refer to 'ifMtu' in IF-MIB."
+	DEFVAL { 0 }
+    ::= { eltIfExtEntry 2 }
 
 eltIfUpDownTrapEnable OBJECT-TYPE
     SYNTAX         INTEGER { enabled(1), disabled(2) }

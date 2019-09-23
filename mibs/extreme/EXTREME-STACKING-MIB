@@ -1,9 +1,3 @@
---/* 
--- *
-
--- *
--- */
-
 -- ################################################################################
 
 
@@ -18,17 +12,24 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 		NOTIFICATION-TYPE FROM SNMPv2-SMI
 		Unsigned32	FROM SNMPv2-SMI
 		IpAddress         FROM SNMPv2-SMI
-		MacAddress	FROM SNMPv2-TC
+                MacAddress, DateAndTime FROM SNMPv2-TC
 		sysUpTime, sysDescr, ifIndex, DisplayString   FROM RFC1213-MIB
 		TruthValue	FROM SNMPv2-TC
                 extremeAgent    FROM EXTREME-BASE-MIB
 		extremeCurrentTemperature	FROM EXTREME-SYSTEM-MIB;
 
         extremeStackable MODULE-IDENTITY
-                LAST-UPDATED "0409270000Z"
+                LAST-UPDATED "201410131030Z"
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme Stackable MIB objects"
+
+                REVISION "201410131030Z" -- Mon Oct 13 10:30 UTC 2014
+                DESCRIPTION "Added table objects for current image booted and
+                             switch boot time."
+
+                REVISION "200409270915Z" -- Mon Sept 27 09:15 UTC 2004
+                DESCRIPTION "Initial version."
         ::= { extremeAgent 33 }
 
 -- 
@@ -85,7 +86,9 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	     extremeStackMemberMgmtIpAddress	IpAddress,
 	     extremeStackMemberSysLocation      DisplayString,
              extremeStackMemberAutoConfig	TruthValue, 	  
-	     extremeStackMemberStackStatus	INTEGER
+	     extremeStackMemberStackStatus	INTEGER,
+	     extremeStackMemberImageBooted      INTEGER,
+	     extremeStackMemberBootTime         DateAndTime
 	}
 
 	extremeStackMemberSlotId OBJECT-TYPE
@@ -194,7 +197,8 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	extremeStackMemberConfigSelected OBJECT-TYPE
 	     SYNTAX INTEGER {
 		primary   (1),
-		secondary (2)
+		secondary (2),
+		other     (3)
 	     }
 	     MAX-ACCESS read-only
 	     STATUS current
@@ -269,6 +273,22 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	the information as enable, if we mark it as disable, the stack member
 	is removed from the stack and the corresponding row disappears"
 	     	   ::= { extremeStackMemberEntry 18 }
+
+        extremeStackMemberImageBooted OBJECT-TYPE
+             SYNTAX INTEGER { primary(1), secondary(2) }
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The image with which the stack member was last booted, which it is currently running."
+                   ::= { extremeStackMemberEntry 19 }
+
+        extremeStackMemberBootTime OBJECT-TYPE
+             SYNTAX  DateAndTime
+             MAX-ACCESS read-only
+             STATUS      current
+             DESCRIPTION
+                "The date and time when the switch was last booted."
+                   ::= { extremeStackMemberEntry 20 }
 
 --
 --  	Stacking Port Table

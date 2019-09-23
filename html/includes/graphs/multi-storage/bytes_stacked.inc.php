@@ -6,7 +6,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -48,7 +48,7 @@ foreach ($vars['id'] as $storage_id)
 
    $storage = dbFetchRow("SELECT * FROM `storage` WHERE `storage_id` = ?", array($storage_id));
    $device = device_by_id_cache($storage['device_id']);
-   $rrd_filename = get_rrd_path($device, "storage-".$storage['storage_mib']."-".$storage['storage_descr'].".rrd");
+   $rrd_filename = get_rrd_path($device, "storage-".strtolower($storage['storage_mib'])."-".$storage['storage_descr'].".rrd");
 
    if (!$config['graph_colours'][$colours][$iter]) { $iter = 0; }
    $colour=$config['graph_colours'][$colours][$iter];
@@ -69,16 +69,19 @@ foreach ($vars['id'] as $storage_id)
       $iter++;
 
 
-      $ds_used[] = $storage['storage_id']."used,UN,0,".$storage['storage_id']."used,IF";
-      $ds_free[] = $storage['storage_id']."used,UN,0,".$storage['storage_id']."free,IF";
-      $ds_size[] = $storage['storage_id']."used,UN,0,".$storage['storage_id']."size,IF";
+      // Build lists of DSes to aggregate later
+      $ds_used[] = $storage['storage_id']."used";
+      $ds_free[] = $storage['storage_id']."used";
+      $ds_size[] = $storage['storage_id']."used";
 
-   } else { echo($rrd_filename); }
+   } else {
+     //echo($rrd_filename);
+   }
 }
 
-$rrd_options .= " CDEF:agg_used=" . implode(',', $ds_used) . str_repeat(',+', count($ds_used) - 1);
-$rrd_options .= " CDEF:agg_free=" . implode(',', $ds_free) . str_repeat(',+', count($ds_free) - 1);
-$rrd_options .= " CDEF:agg_size=" . implode(',', $ds_size) . str_repeat(',+', count($ds_size) - 1);
+$rrd_options .= " CDEF:agg_used=" . rrd_aggregate_dses($ds_used);
+$rrd_options .= " CDEF:agg_free=" . rrd_aggregate_dses($ds_free);
+$rrd_options .= " CDEF:agg_size=" . rrd_aggregate_dses($ds_size);
 
 $rrd_options .= " CDEF:agg_perc=agg_used,agg_size,/,100,*";
 $rrd_options .= " COMMENT:' '\\n";

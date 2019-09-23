@@ -1,5 +1,36 @@
 WebGraph-Thermo-Hygrometer-US-MIB DEFINITIONS ::= BEGIN
 ----------------------------------------------------------------
+-- Revison: 1.39
+----------------------------------------------------------------
+-- 28.06.2018 	New: 
+--		     syntax error corrected
+----------------------------------------------------------------
+
+-- 12.12.2017 	New: 
+--		     wtWebGraphThermoHygroMQTTLastWillEnable
+--		     wtWebGraphThermoHygroMQTTLastWillTopic
+--		     wtWebGraphThermoHygroMQTTLastWillMsg
+--		     wtWebGraphThermoHygroMQTTLastWillQoS
+--		     wtWebGraphThermoHygroMQTTLastWillRetain
+--		     wtWebGraphThermoHygroMQTTLastWillConnectEnable
+--		     wtWebGraphThermoHygroMQTTLastWillConnectMsg
+----------------------------------------------------------------
+-- Revison: 1.37
+----------------------------------------------------------------
+-- 07.09.2017 	New: wtWebioAnxGraphAlarmManagerPort
+--		     wtWebioAnxGraphAlarmMQTT_QoS
+--		     wtWebioAnxGraphAlarmMQTT_Retain
+----------------------------------------------------------------
+-- Revison: 1.36
+----------------------------------------------------------------
+-- 09.03.2017 	New: wtWebGraphThermoHygroAlarmSensorLostSelection
+--		     		 wtWebGraphThermoHygroAlarmLimitWindow
+----------------------------------------------------------------
+-- Revison: 1.35
+----------------------------------------------------------------
+-- 09.11.2016 	New: wtWebGraphThermoHygroMQTT group
+--		     HTTP Request, MQTT Alarm, REST
+----------------------------------------------------------------
 -- Revison: 1.34
 ----------------------------------------------------------------
 -- 15.07.2015 	Changes for new Navigation (__JB__)
@@ -87,7 +118,7 @@ WebGraph-Thermo-Hygrometer-US-MIB DEFINITIONS ::= BEGIN
 
 --  wtWebGraphThermoHygroBasic Tree
     
-    wtWebGraphThermoHygroNetwork			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 1 }
+    wtWebGraphThermoHygroNetwork		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 1 }
     wtWebGraphThermoHygroHTTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 2 }
     wtWebGraphThermoHygroMail			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 3 }	
     wtWebGraphThermoHygroSNMP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 4 }
@@ -96,6 +127,9 @@ WebGraph-Thermo-Hygrometer-US-MIB DEFINITIONS ::= BEGIN
     wtWebGraphThermoHygroFTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 7 }
     wtWebGraphThermoHygroRSS			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 8 }
     wtWebGraphThermoHygroLanguage		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 9 }
+    wtWebGraphThermoHygroMQTT			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 12 }
+    wtWebGraphThermoHygroREST			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 13 }
+    
     
 --  wtWebGraphThermoHygroGraphics Tree
     
@@ -889,6 +923,13 @@ wtWebGraphThermoHygroSnmpCommunityStringTrap OBJECT-TYPE
         "Community string send within traps."
     ::= { wtWebGraphThermoHygroSNMP 6 }    
             
+wtWebGraphThermoHygroSnmpSystemTrapManagerPort OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Port number of the TCP server which accepts the system trap."
+    ::= { wtWebGraphThermoHygroSNMP 7 }  
     
 -- wtWebGraphThermoHygroUDP Group
 --------------------------------
@@ -1037,7 +1078,7 @@ wtWebGraphThermoHygroFTPEnable OBJECT-TYPE
                 Bit 0  : FTP enable"
     ::= { wtWebGraphThermoHygroFTP 7 }
     
---  wtWebGraphThermoBaroLanguage Group
+--  wtWebGraphThermoHygroLanguage Group
 --------------------------------
 
 wtWebGraphThermoHygroLanguageSelect OBJECT-TYPE
@@ -1054,7 +1095,187 @@ wtWebGraphThermoHygroLanguageSelect OBJECT-TYPE
         	Bit 1  : Englisch
                 Bit 0  : Deutsch"
     ::= { wtWebGraphThermoHygroLanguage 1 }   
+
+--  wtWebGraphThermoHygroMQTT Group
+--------------------------------
+
+wtWebGraphThermoHygroMQTTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 7 schaltet MQTT frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0-6: ungenutzt
+                Bit 7  : MQTT enable"
+    ::= { wtWebGraphThermoHygroMQTT 1 }  
+
+wtWebGraphThermoHygroMQTTBrockerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP-address of the MQTT-Server."
+    ::= { wtWebGraphThermoHygroMQTT 2 }
+
+wtWebGraphThermoHygroMQTTUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login  user name."
+    ::= { wtWebGraphThermoHygroMQTT 3 }
+
+wtWebGraphThermoHygroMQTTPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login password."
+    ::= { wtWebGraphThermoHygroMQTT 4 }
+
+wtWebGraphThermoHygroMQTTLocalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Local port number."
+    ::= { wtWebGraphThermoHygroMQTT 5 }
     
+wtWebGraphThermoHygroMQTTBrokerServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Server port number."
+    ::= { wtWebGraphThermoHygroMQTT 6 }
+    
+wtWebGraphThermoHygroMQTTInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Ping intervall, if no data has to be send: time in seconds."
+    ::= { wtWebGraphThermoHygroMQTT 7 }
+
+wtWebGraphThermoHygroMQTTLastWillEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activate MQTT LastWill message:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : MQTT Last will enable"
+    ::= { wtWebGraphThermoHygroMQTT 8 }  
+
+wtWebGraphThermoHygroMQTTLastWillTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Last Will Topic."
+    ::= { wtWebGraphThermoHygroMQTT 9 }
+	
+wtWebGraphThermoHygroMQTTLastWillMsg OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Last Will message."
+    ::= { wtWebGraphThermoHygroMQTT 10 }
+
+wtWebGraphThermoHygroMQTTLastWillQoS OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded MQTT Publish QoS:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0:	QoS 0
+        Bit 1:	QoS 1
+        Bit 2:  QoS 2
+        Bit 3-7:unused"
+    ::= { wtWebGraphThermoHygroMQTT 11 }
+    
+wtWebGraphThermoHygroMQTTLastWillRetain OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded MQTT Publish Retain properties:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0	: retain enable
+        Bit 1-7	: unused"
+    ::= { wtWebGraphThermoHygroMQTT 12 }  
+	
+wtWebGraphThermoHygroMQTTLastWillConnectEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activate MQTT LastWill Connect message:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : MQTT Last will connect message enable"
+    ::= { wtWebGraphThermoHygroMQTT 13 }
+
+wtWebGraphThermoHygroMQTTLastWillConnectMsg OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Last Will Connect message will be send with the QoS and Retain settings
+		of the LastWill message."
+    ::= { wtWebGraphThermoHygroMQTT 14 }
+	
+	
+--  wtWebGraphThermoHygroREST Group
+--------------------------------
+
+wtWebGraphThermoHygroRESTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates REST :
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : REST enable"
+    ::= { wtWebGraphThermoHygroREST 1 }  
+
+wtWebGraphThermoHygroRESTDigestAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates Digest-Authentification:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : Digest Auth enable"
+    ::= { wtWebGraphThermoHygroREST 2 }  	
+            
 -- wtWebGraphThermoHygroDatalogger Group
 --------------------------------
 
@@ -1231,44 +1452,58 @@ wtWebGraphThermoHygroAlarmEntry OBJECT-TYPE
     ::= { wtWebGraphThermoHygroAlarmTable 1 }
 
 WtWebGraphThermoHygroAlarmEntry ::= SEQUENCE {
-    wtWebGraphThermoHygroAlarmTrigger		OCTET STRING,
-    wtWebGraphThermoHygroAlarmMin		OCTET STRING,
-    wtWebGraphThermoHygroAlarmMax		OCTET STRING,
+    wtWebGraphThermoHygroAlarmTrigger			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMin			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMax			OCTET STRING,
     wtWebGraphThermoHygroAlarmHysteresis		OCTET STRING,
-    wtWebGraphThermoHygroAlarmDelay		OCTET STRING,
-    wtWebGraphThermoHygroAlarmInterval		OCTET STRING,
-    wtWebGraphThermoHygroAlarmEnable		OCTET STRING,
-    wtWebGraphThermoHygroAlarmEMailAddr		OCTET STRING,
-    wtWebGraphThermoHygroAlarmMailSubject	OCTET STRING,
-    wtWebGraphThermoHygroAlarmMailText		OCTET STRING,
-    wtWebGraphThermoHygroAlarmManagerIP		OCTET STRING,
-    wtWebGraphThermoHygroAlarmTrapText		OCTET STRING,
-    wtWebGraphThermoHygroAlarmMailOptions	OCTET STRING,
-    wtWebGraphThermoHygroAlarmTcpIpAddr		OCTET STRING,
-    wtWebGraphThermoHygroAlarmTcpPort		INTEGER,
-    wtWebGraphThermoHygroAlarmTcpText		OCTET STRING,
-    wtWebGraphThermoHygroAlarmClearMailSubject	OCTET STRING,
-    wtWebGraphThermoHygroAlarmClearMailText	OCTET STRING,
-    wtWebGraphThermoHygroAlarmClearTrapText	OCTET STRING,
-    wtWebGraphThermoHygroAlarmClearTcpText	OCTET STRING,
-    wtWebGraphThermoHygroAlarmDeltaTemp		OCTET STRING,
-    wtWebGraphThermoHygroAlarmRHMin		OCTET STRING,
-    wtWebGraphThermoHygroAlarmRHMax		OCTET STRING,
-    wtWebGraphThermoHygroAlarmRHHysteresis	OCTET STRING,
-    wtWebGraphThermoHygroAlarmAHMin		OCTET STRING,
-    wtWebGraphThermoHygroAlarmAHMax		OCTET STRING,    
-    wtWebGraphThermoHygroAlarmSyslogIpAddr	OCTET STRING,
+    wtWebGraphThermoHygroAlarmDelay			OCTET STRING,
+    wtWebGraphThermoHygroAlarmInterval			OCTET STRING,
+    wtWebGraphThermoHygroAlarmEnable			OCTET STRING,
+    wtWebGraphThermoHygroAlarmEMailAddr			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMailSubject		OCTET STRING,
+    wtWebGraphThermoHygroAlarmMailText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmManagerIP			OCTET STRING,
+    wtWebGraphThermoHygroAlarmTrapText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMailOptions		OCTET STRING,
+    wtWebGraphThermoHygroAlarmTcpIpAddr			OCTET STRING,
+    wtWebGraphThermoHygroAlarmTcpPort			INTEGER,
+    wtWebGraphThermoHygroAlarmTcpText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearMailSubject		OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearMailText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearTrapText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearTcpText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmDeltaTemp			OCTET STRING,
+    wtWebGraphThermoHygroAlarmRHMin			OCTET STRING,
+    wtWebGraphThermoHygroAlarmRHMax			OCTET STRING,
+    wtWebGraphThermoHygroAlarmRHHysteresis		OCTET STRING,
+    wtWebGraphThermoHygroAlarmAHMin			OCTET STRING,
+    wtWebGraphThermoHygroAlarmAHMax			OCTET STRING,    
+    wtWebGraphThermoHygroAlarmSyslogIpAddr		OCTET STRING,
     wtWebGraphThermoHygroAlarmSyslogPort		INTEGER,
     wtWebGraphThermoHygroAlarmSyslogText		OCTET STRING,
-    wtWebGraphThermoHygroAlarmSyslogClearText	OCTET STRING,
-    wtWebGraphThermoHygroAlarmFtpDataPort	OCTET STRING,
-    wtWebGraphThermoHygroAlarmFtpFileName	OCTET STRING,
-    wtWebGraphThermoHygroAlarmFtpText		OCTET STRING,
-    wtWebGraphThermoHygroAlarmFtpClearText	OCTET STRING,
-    wtWebGraphThermoHygroAlarmFtpOption		OCTET STRING,
-    wtWebGraphThermoHygroAlarmTimerCron		OCTET STRING,
-	wtWebGraphThermoHygroAlarmName 			OCTET STRING,
-	wtWebGraphThermoHygroAlarmActive 		OCTET STRING   
+    wtWebGraphThermoHygroAlarmSyslogClearText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpDataPort		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpFileName		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpClearText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpOption			OCTET STRING,
+    wtWebGraphThermoHygroAlarmTimerCron			OCTET STRING,
+    wtWebGraphThermoHygroAlarmName 			OCTET STRING,
+    wtWebGraphThermoHygroAlarmActive 			OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqAuthEnable		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqAuthUser		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqAuthPassword	OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqSetUrl		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqClearUrl		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqServerPort		INTEGER,
+    wtWebGraphThermoHygroAlarmMqttTopicPath		OCTET STRING,
+    wtWebGraphThermoHygroAlarmMqttTopicSetTopic		OCTET STRING,
+    wtWebGraphThermoHygroAlarmMqttTopicClear		OCTET STRING,
+    wtWebGraphThermoHygroAlarmSensorLostSelection	OCTET STRING,
+    wtWebGraphThermoHygroAlarmLimitWindow		OCTET STRING,
+    wtWebGraphThermoHygroAlarmSnmpManagerPort		INTEGER,
+    wtWebGraphThermoHygroAlarmMqttQoS			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMqttRetain		OCTET STRING
 }
 
 wtWebGraphThermoHygroAlarmTrigger OBJECT-TYPE
@@ -1511,7 +1746,7 @@ wtWebGraphThermoHygroAlarmAHMax OBJECT-TYPE
     ::= { wtWebGraphThermoHygroAlarmEntry 26 }
 
 wtWebGraphThermoHygroAlarmSyslogIpAddr OBJECT-TYPE
-    SYNTAX IpAddress 
+    SYNTAX OCTET STRING 
     ACCESS read-write
     STATUS mandatory
     DESCRIPTION
@@ -1633,7 +1868,154 @@ wtWebGraphThermoHygroAlarmActive OBJECT-TYPE
         "Alert active
 			1 = ON
 			0 = OFF"
-    ::= { wtWebGraphThermoHygroAlarmEntry 40 } 	
+    ::= { wtWebGraphThermoHygroAlarmEntry 40 }
+    
+wtWebGraphThermoHygroAlarmHttpReqAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 1-7: unused
+        Bit 0  : HHTP Request Authentication enable"
+    ::= { wtWebGraphThermoHygroAlarmEntry 61 }
+
+wtWebGraphThermoHygroAlarmHttpReqAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: User"
+    ::= { wtWebGraphThermoHygroAlarmEntry 62 }
+
+wtWebGraphThermoHygroAlarmHttpReqAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Password"
+    ::= { wtWebGraphThermoHygroAlarmEntry 63 }
+
+wtWebGraphThermoHygroAlarmHttpReqSetUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Set URL"
+    ::= { wtWebGraphThermoHygroAlarmEntry 64 }
+
+wtWebGraphThermoHygroAlarmHttpReqClearUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Clear URL"
+    ::= { wtWebGraphThermoHygroAlarmEntry 65 }
+
+wtWebGraphThermoHygroAlarmHttpReqServerPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Server Port"
+    ::= { wtWebGraphThermoHygroAlarmEntry 66 }
+
+wtWebGraphThermoHygroAlarmMqttTopicPath OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic path"
+    ::= { wtWebGraphThermoHygroAlarmEntry 67 }
+
+wtWebGraphThermoHygroAlarmMqttTopicSetTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic SET message"
+    ::= { wtWebGraphThermoHygroAlarmEntry 68 }
+
+wtWebGraphThermoHygroAlarmMqttTopicClear OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic CLEAR message"
+    ::= { wtWebGraphThermoHygroAlarmEntry 69 }        
+    
+wtWebGraphThermoHygroAlarmSensorLostSelection OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : Sensor 1
+        Bit 0  : Sensor 0"
+    ::= { wtWebGraphThermoHygroAlarmEntry 70 }
+	
+wtWebGraphThermoHygroAlarmLimitWindow OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If window type is INSIDE the alarm is genereted when the temperature
+        is greater minumum value and lower than maximum value. If window type is OUTSIDE
+        the alarm is generated when the measured value is lower than the minimum value
+        or greater than the maximum value.
+		Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : inside window
+        Bit 0  : outside window"
+    ::= { wtWebGraphThermoHygroAlarmEntry 71 }
+    
+wtWebGraphThermoHygroAlarmSnmpManagerPort OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Port number of the SNMP Manager to which the Webio device should send SNMP traps."
+    ::= { wtWebGraphThermoHygroAlarmEntry 76 }     
+    
+wtWebGraphThermoHygroAlarmMqttQoS OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded value:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0:	QoS 0
+        	Bit 1:	QoS 1
+        	Bit 2:  QoS 2
+        	Bit 3-7:unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 77 }
+    
+wtWebGraphThermoHygroAlarmMqttRetain OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded value:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0	: retain enable
+        	Bit 1-7	: unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 78 }        
     
 -- wtWebGraphThermoHygroGraphicsBase Group
 ----------------------------

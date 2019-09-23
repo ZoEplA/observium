@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: Network Quality Analyse MIB. 
 -- Reference:
--- Version:     V2.75
+-- Version:     V2.84
 -- History:
 --              V1.0 liyonggang 2006.6.7,publish 
 --              V1.1         
@@ -42,7 +42,7 @@
 
     
         nqa MODULE-IDENTITY
-          LAST-UPDATED "201509161556Z"
+          LAST-UPDATED "201807301548Z"
          ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -52,7 +52,35 @@
 		   People's Republic of China
 		   Website: http://www.huawei.com
 		   Email: support@huawei.com
-		 "
+		 " 
+        DESCRIPTION 
+               "Add mib node nqaAdminParaRmoteFecType, nqaAdminParaRmoteFecMask, nqaAdminParaRmoteFecIpAddress at 2018-7-30."
+	REVISION "201807301548Z" 
+       DESCRIPTION 
+               "Add mib table nqaJitterLatestStatsTable at 2018-7-28."
+	REVISION "201807281548Z"
+        DESCRIPTION 
+               "Add mib node nqaResultsTestResultChangePackedNotification in nqaNotificationsGroup NOTIFICATIONS at 2017-11-15."
+	REVISION "201711151548Z"		 
+        DESCRIPTION 
+               "Modify description of mib node nqaAdminParaTable, nqaScheduleTable, nqaAdminParaExtTable, nqaUdpServerTable, nqaIcmpServerTable, nqaResultsTable, nqaJitterStatsTable, nqaReflectorTable at 2017-11-10."
+	REVISION "201711101616Z"
+		DESCRIPTION 
+               "Modify mib node nqaAdminParaEthPriorityStatus at 2017-06-19."
+	REVISION "201706191029Z"
+
+		DESCRIPTION 
+               "Add mib node nqaAdminParaEthPriorityStatus at 2017-06-14."
+	REVISION "201706141609Z"
+
+		DESCRIPTION 
+               "Add mib node nqaAdminParaFragment at 2017-03-27."
+	REVISION "201702272132Z"
+	
+        DESCRIPTION 
+               "Add mib node nqaResultsDetail, nqaJitterStatsResultDetail at 2017-02-20."
+	REVISION "201702202132Z"
+
         DESCRIPTION 
                "Add mib node nqaAdminParaPathType at 2015-09-16."
 	REVISION "201509161556Z"
@@ -182,7 +210,9 @@
                 "Modify SYNTAX of hwClockCesAcrDomianInfoDomain on 2014-01-09."  		 
         REVISION "201312301008Z"
             DESCRIPTION 
-                "Modify value of nqaGeneralflowStatsCompletions on 2013-12-16."                
+                "Modify value of nqaGeneralflowStatsCompletions on 2013-12-16."           
+
+     
         ::= { hwDatacomm 111 }  
     
 --
@@ -232,7 +262,7 @@
                 rtptest(36),
                 rtpsnoop(37),
                 generalflow(38),
-								ethernetService(39)
+                ethernetService(39)
                 }  
                 
    EnableValue ::= TEXTUAL-CONVENTION
@@ -470,7 +500,7 @@ NqaDistanceNodeType ::= TEXTUAL-CONVENTION
                 rtptest(36),
                 rtpsnoop(37),
                 generalflow(38),
-								ethernetService(39)
+                ethernetService(39)
                 }
         MAX-ACCESS read-only
             STATUS current
@@ -515,7 +545,7 @@ NqaDistanceNodeType ::= TEXTUAL-CONVENTION
                 rtptest(36),
                 rtpsnoop(37),
                 generalflow(38),
-								ethernetService(39)
+                ethernetService(39)
 The value #0x00 indicates don't suppourt all testtypes."
             ::= { nqaBase 10}  
             nqaSupportServerType OBJECT-TYPE
@@ -770,7 +800,11 @@ MAX-ACCESS read-only
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Set parameter for a test. "
+                "Description: nqaAdminParaTable describes how to configure parameters of a test instance.
+Creation restrictions: None
+Modification restrictions: None
+Deletion restrictions: None
+Access restrictions: None "
             ::= { nqaCtrl 2 }
         
         nqaAdminParaEntry OBJECT-TYPE
@@ -1012,7 +1046,17 @@ nqaAdminParaMTraceResponseAddress
                 nqaAdminParaLspPathType
                     INTEGER,
                 nqaAdminParaPathType
-                    INTEGER                       
+                    INTEGER,
+                nqaAdminParaFragment
+                    TruthValue,
+                nqaAdminParaEthPriorityStatus
+                    EnabledStatus,
+                nqaAdminParaRmoteFecType 
+                    INTEGER,
+                nqaAdminParaRmoteFecMask 
+                    Integer32,
+                nqaAdminParaRmoteFecIpAddress
+                    InetAddress
              }      
 
         nqaAdminParaTargetAddressType OBJECT-TYPE
@@ -1388,6 +1432,8 @@ nqaAdminParaMTraceResponseAddress
              ipv4(1), 
              te(3),
              ipv4vpn(6),
+             srte(8),
+             srbe(9),
              bgp(12),             
              ring(100)         
              }
@@ -2204,13 +2250,72 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
                 "To indicate ping request packet via which path." 
             DEFVAL { main }
             ::= { nqaAdminParaEntry 114 }
+       
+        nqaAdminParaFragment OBJECT-TYPE
+            SYNTAX         TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object enables setting of Fragment (F) flag in 
+                 the IP header for a probe."
+            DEFVAL  { false }
+            ::= { nqaAdminParaEntry 115 }
+		
+		nqaAdminParaEthPriorityStatus OBJECT-TYPE
+			SYNTAX EnabledStatus         
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"Used for enabling or disabling the priority of Ethernet functionality when the test case type is Generalflow.
+			Options:
+				1. enabled(1)  -indicates the priority of Ethernet functionality is enabled.
+				2. disabled(2) -indicates the priority of Ethernet functionality is disabled.
+        Default: disabled(2)."            
+		::= { nqaAdminParaEntry 116 }
+
+        nqaAdminParaRmoteFecType OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                    null(0),             
+                    ldp(1)           
+            }
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION
+                 "Specifies the remote FEC type. The object apples to lspping and 
+                  lsptrace type test instance."
+            DEFVAL { null }
+             ::= { nqaAdminParaEntry 117 }  
+
+        nqaAdminParaRmoteFecMask OBJECT-TYPE
+             SYNTAX   Integer32
+             MAX-ACCESS read-write
+             STATUS current
+             DESCRIPTION
+                 "Specifies the address mask of remote FEC. The object apples to lspping and 
+                  lsptrace type test instance."
+             ::= { nqaAdminParaEntry 118 }  
+
+          nqaAdminParaRmoteFecIpAddress OBJECT-TYPE
+             SYNTAX      InetAddress
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "The IPV4 address of remote FEC. The object apples to lspping and 
+                  lsptrace type test instance."
+             ::= { nqaAdminParaEntry 119 } 
+
 
         nqaAdminParaExtTable OBJECT-TYPE
             SYNTAX SEQUENCE OF NqaAdminParaExtEntry
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Set parameter for a test."
+                "Description: Objects in this table are used in pairs. In each pair, the first object is read-only. After the test instance type is specified, the system automatically fills the character string. Its content is the description of the second object, so that the user can learn the description and value range of the second object. The second object is a configurable NQA parameter. Test instances have different descriptions and values. After the test instance type is specified, the user can obtain the information from the first object. The values of the first 15 pairs of objects in this table are numbers, and those of the last 10 pairs of objects are character strings.
+Creation restrictions: None
+Modification restrictions: None
+Deletion restrictions: None
+Access restrictions: None"
             ::= { nqaCtrl 5 }
         
         nqaAdminParaExtEntry OBJECT-TYPE
@@ -2920,7 +3025,11 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Schedule test ."
+                "Description: nqaScheduleTable describes test instance task scheduling. It implements scheduling of test instances to reduce device burden caused by concurrent tasks. The scheduling content includes the setting of the start time and end time of a single test instance. When several tasks are performed at the same time, the device properly arranges start time and test intervals.
+Creation restrictions: None
+Modification restrictions: The Read-create node can be modified when a test instance is in inactive state.
+Deletion restrictions: None
+Access restrictions: None "
             ::= { nqaCtrl 3 }
         
         nqaScheduleEntry OBJECT-TYPE
@@ -3270,8 +3379,20 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table which contains the status of nqa udp server 
-                configuration information."
+                "Description: This table describes how to configure the NQA UDP service of the server, such as configuring a protocol, IP address, port number, and VRF.
+Creation restrictions
+The entries in this table can be created only when the indexes nqaUdpServerAddress, nqaUdpServerPort, and nqaUdpServerVrfName are specified.
+The nqaUdpServerAddressType index value must be ipv4(1).
+The nqaUdpServerStatus index value must be CreateAndGo (4).
+
+Modification restrictions: The entries in this table cannot be modified.
+
+Deletion restrictions
+The entries in this table can be deleted. Indexes must be specified.
+The nqaUdpServerStatus index value must be Destroy (6).
+
+Access restrictions
+The entries in this table can be accessed only when the nqaUdpServerStatus index value is active(1) or notInService(2)."
             ::= { nqaServer 3 }
         
         nqaUdpServerEntry OBJECT-TYPE
@@ -3355,8 +3476,20 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table which contains the status of nqa ICMP server 
-                configuration information."
+                "Description: This table describes how to configure the NQA ICMP service of the server, such as configuring a server, IP address, and VRF.
+Creation restrictions
+The entries in this table can be created only when the indexes nqaIcmpServerAddress and nqaUdpServerVrfName are specified.
+The nqaIcmpServerAddressType index value must be ipv4(1).
+The nqaIcmpServerStatus index value must be CreateAndGo (4).
+
+Modification restrictions: The entries in this table cannot be modified.
+
+Deletion restrictions
+The entries in this table can be deleted. Indexes must be specified.
+The nqaIcmpServerStatus index value must be 6(Destroy).
+
+Access restrictions
+If the nqaIcmpServerStatus value returned is active(1), the ICMP server is running. If the nqaIcmpServerStatus value returned is notInService(2), the ICMP server has stopped running."
             ::= { nqaServer 4 }
         
         nqaIcmpServerEntry OBJECT-TYPE
@@ -3613,13 +3746,14 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-              "Defines the test Results Extend Table for providing the capability of performing test operations at
-              a remote host.  The results of these operations are stored in the nqaResultsTable . The operation of 
-              this table is same as that of nqaResultsTable.
-              If all of the following conditions are met, the table will display the latest test results:  
-              1) The snmp operation is GET.
-              2) The test type is ICMP, UDP or TCP.
-              3) Both the nqaResultsIndex and nqaResultsHopIndex values are 0."
+              "Description: This table describes result information of a test instance.
+Creation restrictions: No entry can be created in this table.
+Modification restrictions: The entries in this table cannot be modified.
+Deletion restrictions: The entries in this table cannot be deleted.
+Access restrictions: The entries in this table can be accessed only when the following conditions are met.
+A GET operation is performed.
+The test instance type must be ICMP, UDP, or TCP.
+The nqaResultsIndex and nqaResultsHopIndex values must be 0."
             ::= { nqaStats 1 }
         
         nqaResultsEntry OBJECT-TYPE
@@ -3690,7 +3824,9 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
                nqaResultsRingResponseNode
                    Gauge32,
                nqaResultChangeRecord
-                   DisplayString
+                   DisplayString,
+               nqaResultsDetail
+                   Unsigned32
              }
 
         nqaResultsIndex OBJECT-TYPE
@@ -4322,11 +4458,13 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table which contains the status of latest Jitter operation.
-                 If all of the following conditions are met, the table will display the latest test results: 
-                 1) The snmp operation is GET.
-                 2) The test type is JITTER.
-                 3) The nqaJitterStatsIndex value is 0."
+                "Description: nqaJitterStatsTable describes statistics about network status detection using probe packets. The network delay jitter can be calculated after multiple times of statistics collection.
+Creation restrictions: No entry can be created in this table.
+Modification restrictions: The entries in this table cannot be modified.
+Deletion restrictions: The entries in this table cannot be deleted.
+Access restrictions: The entries in this table can be accessed only when the following conditions are met.
+A GET operation is performed.
+The test instance type must be ICMP, UDP, or TCP."
             ::= { nqaStats 3 }
         
         nqaJitterStatsEntry OBJECT-TYPE
@@ -4500,7 +4638,9 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
                 nqaJitterStatsStartTime
                     Unsigned32,
                 nqaJitterStatsEndTime
-                    Unsigned32                                          
+                    Unsigned32,
+                nqaJitterStatsResultDetail
+                    Unsigned32                                                
              }
 
         nqaJitterStatsIndex OBJECT-TYPE
@@ -5188,6 +5328,14 @@ nqaAdminParaLspNextHopAddress OBJECT-TYPE
             DESCRIPTION
                 "This object indicates the time when the Jitter test ended."
             ::= { nqaJitterStatsEntry 80 }
+
+       nqaJitterStatsResultDetail OBJECT-TYPE            
+            SYNTAX Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Indicates detailed result information about the test instance."
+            ::= { nqaJitterStatsEntry 81 }
 
         nqaFTPStatsTable OBJECT-TYPE
             SYNTAX SEQUENCE OF NqaFTPStatsEntry
@@ -8299,8 +8447,142 @@ DESCRIPTION
             DESCRIPTION
                 "The avail value of the test flow."
             ::= { nqaEthernetServiceStatsEntry 32 } 
-			
-			
+            
+         nqaJitterLatestStatsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF NqaJitterLatestStatsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "nqaJitterLatestStatsTable describes statistics about network status detection using probe packets. The network delay jitter can be calculated after multiple times of statistics collection.
+                Creation restrictions: No entry can be created in this table.
+                Modification restrictions: The entries in this table cannot be modified.
+                Deletion restrictions: The entries in this table cannot be deleted.
+                Access restrictions: The entries in this table can be accessed only when the test instance type is jitter."
+            ::= { nqaStats 15 }
+        
+        nqaJitterLatestStatsEntry OBJECT-TYPE
+            SYNTAX NqaJitterLatestStatsEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table which contains the status of latest Jitter operation."
+            INDEX { nqaAdminCtrlOwnerIndex, nqaAdminCtrlTestName}
+            ::= { nqaJitterLatestStatsTable 1 }
+        
+        NqaJitterLatestStatsEntry ::=
+            SEQUENCE { 
+                nqaJitterLatestStatsMaxDelaySD
+                    Unsigned32,
+                nqaJitterLatestStatsMaxDelayDS
+                    Unsigned32, 
+                nqaJitterLatestStatsAvgDelaySD
+                   Unsigned32,
+                nqaJitterLatestStatsAvgDelayDS
+                     Unsigned32,
+                nqaJitterLatestStatsRTTMin
+                     Unsigned32,    
+                nqaJitterLatestStatsRTTMax
+                    Unsigned32,
+                nqaJitterLatestStatsRTTAvg
+                     Unsigned32,
+                nqaJitterLatestStatsPacketLossRatio
+                    Unsigned32,
+                nqaJitterLatestStatsAvgJitter
+                    Unsigned32,
+                nqaJitterLatestStatsAvgJitterSD
+                    Unsigned32,
+                nqaJitterLatestStatsAvgJitterDS
+                    Unsigned32            
+            }
+             
+         nqaJitterLatestStatsMaxDelaySD OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The maximum of all OWD (One Way Delay) from source to destination."
+            ::= { nqaJitterLatestStatsEntry 1 }
+            
+        nqaJitterLatestStatsMaxDelayDS OBJECT-TYPE
+            SYNTAX Unsigned32 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The maximum of all OWD (One Way Delay) from destination to source."
+            ::= { nqaJitterLatestStatsEntry 2 }
+		
+        nqaJitterLatestStatsAvgDelaySD OBJECT-TYPE
+            SYNTAX Unsigned32 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The average of one way time from source to destination."
+            ::= { nqaJitterLatestStatsEntry 3 }
+    
+         nqaJitterLatestStatsAvgDelayDS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The average of one way time from destination to source."
+            ::= { nqaJitterLatestStatsEntry 4 } 
+
+        nqaJitterLatestStatsRTTMin OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimum of RTTs that were successfully measured by tests."
+            ::= { nqaJitterLatestStatsEntry 5 }
+            
+        nqaJitterLatestStatsRTTMax OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum of RTTs that were successfully measured by tests."
+            ::= { nqaJitterLatestStatsEntry 6 }
+
+        nqaJitterLatestStatsRTTAvg OBJECT-TYPE
+           SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The average of RTTs that were successfully measured by tests."
+            ::= { nqaJitterLatestStatsEntry 7 }            
+                           
+        nqaJitterLatestStatsPacketLossRatio OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ratio of the packets lost to all packets sent in the test."
+            ::= { nqaJitterLatestStatsEntry 8 }  
+             
+        nqaJitterLatestStatsAvgJitter OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The average of jitter values that were successfully measured by tests."
+            ::= { nqaJitterLatestStatsEntry 9 }         
+            
+        nqaJitterLatestStatsAvgJitterSD OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The average of jitter values from source to destination that were successfully measured by tests."
+            ::= { nqaJitterLatestStatsEntry 10 }                                            
+
+        nqaJitterLatestStatsAvgJitterDS OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The average of jitter values from destination to source that were successfully measured by tests."
+            ::= { nqaJitterLatestStatsEntry 11 }   
+                 					
         nqaHistory OBJECT IDENTIFIER ::= { nqa 5 }
         
         nqaHistoryTable OBJECT-TYPE
@@ -10204,6 +10486,14 @@ INTEGER
                  "If the test result changes, the system sends packed trap information. No more than two traps will
                   be sent in one second and each trap contains at most ten records."
             ::= { nqaNotifications 29 }
+
+            nqaResultsDetail OBJECT-TYPE            
+            SYNTAX Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Indicates detailed result information about the test instance."
+            ::= { nqaResultsEntry 30 }
                              
         nqaConformance OBJECT IDENTIFIER ::= { nqa 7 }
         
@@ -10236,13 +10526,13 @@ INTEGER
                 nqaAdminParaMeasure, nqaAdminParaEthPriority, nqaAdminParaMinRate, nqaAdminParaMaxRate, nqaAdminParaCevid, nqaAdminParaPevid,nqaAdminParaPrecision,nqaAdminParaSnmpCommunityRead,
                 nqaAdminParaDatasizeList, nqaAdminParaFailRatioPrecision,nqaAdminParaFailRatioValue,nqaAdminGeneralflowTestBehavior,nqaAdminParaFrameRate,nqaAdminGeneralflowDiscardNonTestPriority,
                 nqaAdminParaSourceMacAddress, nqaAdminParaCeEthType, nqaAdminParaPeEthType, nqaAdminParaDirection, nqaAdminParaLspVpnFrrPathType, nqaAdminParaSoftwareBased, nqaAdminParaLspPathType,
-                nqaAdminParaPathType,
+                nqaAdminParaPathType,nqaAdminParaEthPriorityStatus,
                 nqaScheduleStartType, nqaScheduleStartTime, nqaScheduleEndType, nqaScheduleEndTime,nqaScheduleAgeTime,  
                 nqaScheduleNumOfInitiations, nqaAdminParaIcmpJitterMode, nqaAdminParaPathMtuDiscoveryPathMtuMax, nqaAdminParaPathMtuStep, nqaScheduleOperStatus, 
                 nqaScheduleElapsedTime,nqaScheduleLastFinishIndex,nqaScheduleLastCollectIndex,nqaGroupStatusType,nqaGroupPeriod,
                 nqaGroupLeaderOwnerIndex,nqaGroupLeaderTestName,nqaGroupMemberNum,nqaGroupMemberFree,nqaAdminParaHardwareBased,nqaAdminParaPppoeUserName,
                 nqaAdminParaPppoePassword,nqaAdminParaPppoeVlanIf,nqaAdminParaPppoeAuthenticationMode,nqaAdminParaPppoeRedialUpTimes,nqaAdminParaPppoeInterval,nqaAdminParaVsiName,
-                nqaAdminParaVlanId,nqaAdminParaLspTunnelType,nqaAdminParaLspNextHopAddress,nqaAdminParaLspVersion,nqaAdminParaRemoteAddressType,nqaAdminParaRemoteAddress,nqaAdminParaTimeUnit,
+                nqaAdminParaVlanId,nqaAdminParaLspTunnelType,nqaAdminParaLspNextHopAddress,nqaAdminParaLspVersion,nqaAdminParaRemoteAddressType,nqaAdminParaRemoteAddress,nqaAdminParaTimeUnit,nqaAdminParaFragment,nqaAdminParaRmoteFecType,nqaAdminParaRmoteFecMask,nqaAdminParaRmoteFecIpAddress,
                 nqaAdminExtPara1,nqaAdminExtPara2,nqaAdminExtPara3,nqaAdminExtPara4,nqaAdminExtPara5,nqaAdminExtPara6,nqaAdminExtPara7,nqaAdminExtPara8,nqaAdminExtPara9,nqaAdminExtPara10,
                 nqaAdminExtPara11,nqaAdminExtPara12,nqaAdminExtPara13,nqaAdminExtPara14,nqaAdminExtPara15,nqaAdminExtPara16,nqaAdminExtPara17,nqaAdminExtPara18,nqaAdminExtPara19,nqaAdminExtPara20,
                 nqaAdminExtPara21,nqaAdminExtPara22,nqaAdminExtPara23,nqaAdminExtPara24,nqaAdminExtPara25,nqaAdminExtPara26,nqaAdminExtPara27,nqaAdminExtPara28,nqaAdminExtPara29,nqaAdminExtPara30,
@@ -10286,7 +10576,7 @@ INTEGER
                 nqaJitterStatsOperOfIcpif, nqaJitterStatsOperOfMos, nqaJitterStatsMinDelaySD, nqaJitterStatsSum2DelaySDLow,
                 nqaJitterStatsSum2DelaySDHigh, nqaJitterStatsMinDelayDS, nqaJitterStatsSum2DelayDSLow, nqaJitterStatsSum2DelayDSHigh,nqaJitterStatsTimeUnit,nqaJitterStatsAvgDelaySD,nqaJitterStatsAvgDelayDS,
                 nqaJitterStatsPktRewriteNum, nqaJitterStatsPktRewriteRatio, nqaJitterStatsPktDisorderNum, nqaJitterStatsPktDisorderRatio, nqaJitterStatsFragPktDisorderNum, nqaJitterStatsFragPktDisorderRatio, 
-                nqaJitterStatsJitterOverThresholdsSD, nqaJitterStatsJitterOverThresholdsDS, nqaJitterStatsOverallOverThresholds, nqaJitterStatsStartTime, nqaJitterStatsEndTime,
+                nqaJitterStatsJitterOverThresholdsSD, nqaJitterStatsJitterOverThresholdsDS, nqaJitterStatsOverallOverThresholds, nqaJitterStatsStartTime, nqaJitterStatsEndTime, nqaJitterStatsResultDetail,
                 nqaPathJitterStatsRttSum2Low, nqaPathJitterStatsRttSum2High, nqaPathJitterStatsRttMin, nqaPathJitterStatsRttMax, nqaPathJitterStatsMinOfPositivesSD, 
                 nqaPathJitterStatsMaxOfPositivesSD, nqaPathJitterStatsNumOfPositivesSD, nqaPathJitterStatsSumOfPositivesSD, nqaPathJitterStatsSum2OfPositivesSDLow, nqaPathJitterStatsSum2OfPositivesSDHigh, 
                 nqaPathJitterStatsMinOfNegativesSD, nqaPathJitterStatsMaxOfNegativesSD, nqaPathJitterStatsNumOfNegativesSD, nqaPathJitterStatsSumOfNegativesSD, nqaPathJitterStatsSum2OfNegativesSDLow, 
@@ -10312,7 +10602,7 @@ INTEGER
                 nqaMtracertStatsCurProbeCount, nqaMtracertStatsRTDOverThresholds, nqaMtracertStatsTimeouts, nqaMtracertStatsBusies, nqaMtracertStatsSequenceErrors, 
                 nqaMtracertStatsDrops, nqaMtracertStatsProbeResponses, nqaMtracertStatsSentProbes, nqaMtracertStatsLastGoodProbe, nqaMtracertStatsLastGoodPath, 
                 nqaMtracertStatsTestFinished, nqaMtracertStatsCurPathTTL, nqaMtracertStatsMaxPathTTL, nqaMtracertStatsInPkgLossRate, nqaMtracertStatsSGPkgLossRate, 
-                nqaMtracertStatsInPkgRate, nqaMtracertStatsOutPkgRate, nqaMtracertStatsTimeDelay,nqaResultsRttAvg,nqaResultsLostPacketRatio,nqaResultsRingResponseNode,nqaHTTPStatsRttAvg,nqaHTTPStatsLostPacketRatio,nqaFTPStatsRttAvg,nqaFTPStatsLostPacketRatio,
+                nqaMtracertStatsInPkgRate, nqaMtracertStatsOutPkgRate, nqaMtracertStatsTimeDelay,nqaResultsRttAvg,nqaResultsLostPacketRatio,nqaResultsRingResponseNode,nqaResultChangeRecord,nqaResultsDetail, nqaHTTPStatsRttAvg,nqaHTTPStatsLostPacketRatio,nqaFTPStatsRttAvg,nqaFTPStatsLostPacketRatio,
                 nqaPppoeStatsCompletions, nqaPppoeStatsCurrentPhase, nqaPppoeStatsErrorMessage, nqaPppoeDiscoveryTimeout, nqaPppoeLcpTimeout, nqaPppoeAuthorizationTimeout, nqaPppoeNcpTimeout, nqaPppoeConnectionTime, nqaPppoeClientSessionId,
                 nqaPppoeClientIpAddress, nqaPppoeGatewayIpAddress, nqaRtptestStatsCompletions, nqaRtptestStatsIpTargetAddressType, nqaRtptestStatsIpTargetAddress, nqaRtptestStatsSourceAddressType, nqaRtptestStatsIpSourceAddress, nqaRtptestStatsMinRtt,
                 nqaRtptestStatsMaxRtt, nqaRtptestStatsAverageRtt, nqaRtptestStatsProbeResponses, nqaRtptestStatsSentProbes, nqaRtptestStatsMaxJitter, nqaRtptestStatsMinJitter, nqaRtptestStatsAvgJitter,nqaRtptestStatsLostPacketRatio,nqaRtptestStatsSumRtt,nqaRtptestStatsMinDelaySD,nqaRtptestStatsMaxDelaySD,nqaRtptestStatsAvgDelaySD,nqaRtptestStatsMinJitterSD,nqaRtptestStatsMaxJitterSD,nqaRtptestStatsAvgJitterSD,nqaRtptestStatsLossRateSD,nqaRtptestStatsIPDVSD,
@@ -10382,8 +10672,9 @@ INTEGER
                 nqaPppoeStatsTestCompleted,
                 nqaJitterStatsJitterThresholdNotificationSD,
                 nqaJitterStatsJitterThresholdNotificationDS,
-                nqaReflectorStateChangeNotification,
-                nqaResultsTestResultChange                       
+                nqaReflectorStateChangeNotification, 
+                nqaResultsTestResultChange,
+                nqaResultsTestResultChangePackedNotification
               }
             STATUS        current
             DESCRIPTION
@@ -11544,7 +11835,12 @@ By default, the value is disable(2)."
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "A table of NQA reflector definitions."
+                "Description: nqaReflectorTable describes how to configure an NQA reflector.
+Creation restrictions: None
+Modification restrictions: This table is generated after a reflector is created. The entries in this table can be modified when nqaReflectorID is specified.
+The reflector cannot be modified after being created.
+Deletion restrictions: None
+Access restrictions: None"
             ::= { nqaReflector 1 }
         
         nqaReflectorEntry OBJECT-TYPE
@@ -11596,7 +11892,7 @@ By default, the value is disable(2)."
                     Unsigned32,
                 nqaReflectorEndTime
                     Integer32,
-		        nqaReflectorExchangePort
+                nqaReflectorExchangePort
                      INTEGER,
                 nqaReflectorTestFlowId
                     OCTET STRING,
@@ -11713,7 +12009,7 @@ By default, the value is disable(2)."
             {
             active(1),
             notinservice(2),
-	    unknown(0)
+            unknown(0)
             }
             MAX-ACCESS read-only
             STATUS current
@@ -11748,8 +12044,8 @@ By default, the value is disable(2)."
                 "This object indicates the action performed on the non-test frames by the reflector. 
                  0: default value for 2544 reflector.
                  1: sharemode for 2544 reflector.
-		 2: exclusive mode for Y.1564 reflector.
-		 3: test flow mode for Y.1564 reflector."
+                 2: exclusive mode for Y.1564 reflector.
+                 3: test flow mode for Y.1564 reflector."
             DEFVAL { 0 }
             ::= { nqaReflectorEntry 16 }
 

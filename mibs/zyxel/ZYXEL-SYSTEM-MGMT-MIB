@@ -49,6 +49,9 @@ ZYXEL-SYSTEM-MGMT-MIB DEFINITIONS ::= BEGIN
   NOTIFICATION-TYPE
         FROM SNMPv2-SMI
 
+  	EnabledStatus
+		FROM P-BRIDGE-MIB
+		
 	esMgmt			
 		FROM ZYXEL-ES-SMI;
 
@@ -291,9 +294,151 @@ ZYXEL-SYSTEM-MGMT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
                       "Restore system to stacking default settings and reboot."
         ::= { zyxelSysMgmt 12 }
+		
+-- zyxelSysMgmtConfigSaveCustomDefault
+		zySysMgmtConfigSaveCustomDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		nothing(0),
+        		configSaveCustomDefault(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      "Save running-config to custom default. Note: This action can access all configuration includes user account and AA configuration."
+        ::= { zyxelSysMgmt 13 }		
+
+-- zyxelSysMgmtReloadCustomDefault
+		zySysMgmtReloadCustomDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		nothing(0),
+        		reloadCustomDefault(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      "Restore system to custom default settings and reboot."
+        ::= { zyxelSysMgmt 14 }	
+
+-- *******************************************************************
+-- *
+-- * zyxelSysMgmtAutoConfiguration
+-- *
+-- *******************************************************************	
+-- zyxelSysMgmtAutoConfiguration
+		zyxelSysMgmtAutoConfiguration OBJECT IDENTIFIER ::= { zyxelSysMgmt 15 }
+	
+-- zyxelSysMgmtAutoConfigurationSetup
+		zyxelSysMgmtAutoConfigurationSetup OBJECT IDENTIFIER ::= { zyxelSysMgmtAutoConfiguration 1 }
+	
+		zySysMgmtAutoConfigurationState OBJECT-TYPE
+		SYNTAX  EnabledStatus
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Enable(1)/Disable(2) Auto Configuration feature on the switch.
+				
+				Function Description:
+					During startup, the system will automatically try to get the configuration file from remote server-
+				and to load it to runtime memory. 
+				
+				Note: 
+				1. If the state is enabled, it won't take effect immediately until system is rebooted.
+				2. To use this function, please follow the below requirements:
+					For DHCP mode: 
+					  a) The startup config must enable these functions:
+					    - DHCP Client.	
+					    - Auto Configuration.
+					  b) The DHCP and TFTP servers must be running on a remote device while this function is using.
+					    And the TFTP server IP address and configuration file name must be delivered by DHCP server- 
+					    for telling switch device where to get the configuration.
+					For HTTPS mode:
+					  a) The startup config must enable/setup these functions:
+					    - Auto Configuration.
+					    - Specify a HTTPS URL.
+					  b) The HTTPS server must be running on a remote device while this function is using."  
+					
+		::= { zyxelSysMgmtAutoConfigurationSetup 1 }
+
+		zySysMgmtAutoConfigurationMode OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Use which mode to obtain the download information from the remote server.
+					- DHCP(1): DHCP mode.
+					- HTTPS(2): HTTPS mode."
+		::= { zyxelSysMgmtAutoConfigurationSetup 2 }
+
+		zySysMgmtAutoConfigurationVlanId OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Allow user to specify the Vlan ID to decide which DHCP client will process the DHCP Auto Configuration procedure.
+				The switch device that supports multiple DHCP clients can setup this object."
+		::= { zyxelSysMgmtAutoConfigurationSetup 3 }
+
+		zySysMgmtAutoConfigurationUrl OBJECT-TYPE
+		SYNTAX  DisplayString
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Allow user to specify the HTTPS URL for HTTPS Auto Configuration."
+		::= { zyxelSysMgmtAutoConfigurationSetup 4 }
+			
+-- zyxelSysMgmtAutoConfigurationStatus
+		zyxelSysMgmtAutoConfigurationStatus OBJECT IDENTIFIER ::= { zyxelSysMgmtAutoConfiguration 2 }
+		
+		zyxelSysMgmtAutoConfigurationResult OBJECT IDENTIFIER ::= { zyxelSysMgmtAutoConfigurationStatus 1 }
+
+		zySysMgmtAutoConfigurationResultMode OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Indicate which mode is used while Auto Configuration is executing.
+				- DHCP(1): DHCP mode.
+				- HTTPS(2): HTTPS mode.
+				- Otherwise, no any mode is used."
+		::= { zyxelSysMgmtAutoConfigurationResult 1 }		
+
+		zySysMgmtAutoConfigurationResultState OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Indicate Auto Configuration processing state: 
+				 - None(0): Never executed.
+				 - Success(1): Executed Successfully.
+				 - Unsuccess(2): Executed Unsuccessfully."
+		::= { zyxelSysMgmtAutoConfigurationResult 2 }
+
+		zySysMgmtAutoConfigurationResultFilename OBJECT-TYPE
+		SYNTAX  DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Indicate what filename from remote server is used by Auto Configuration.
+				- None: Auto Configuration has never executed.
+				- Otherwise, report the full remote filename path."
+		::= { zyxelSysMgmtAutoConfigurationResult 3 }
         
+-- zyxelSysMgmtCustomDefaultSetup                                                   
+        zyxelSysMgmtCustomDefaultSetup OBJECT IDENTIFIER ::= { zyxelSysMgmt 16 }                      
+
+        zySysMgmtCustomDefaultState OBJECT-TYPE
+        SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+		}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                      	"Enable/Disable Custom Default on the switch."
+        ::= { zyxelSysMgmtCustomDefaultSetup 1 }
+		
 -- zyxelSysMgmtConfigSavePrivilege13      
-        zySysMgmtConfigSavePrivilege13 OBJECT-TYPE
+	    zySysMgmtConfigSavePrivilege13 OBJECT-TYPE
         SYNTAX  INTEGER {
          		config1(1),
          		config2(2)
@@ -345,6 +490,13 @@ ZYXEL-SYSTEM-MGMT-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION
                "The configured image index is defferent from the current booted up image index."
 		::= { zyxelSysMgmtNotifications 3 }
+
+-- zyxelSysMgmtReloadCustomCAFail
+		zySysMgmtReloadCustomCAFail	NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+               "Reload custom HTTPS CA  fail, delete and change to default CA."
+		::= { zyxelSysMgmtNotifications 4 }
 
 END
 

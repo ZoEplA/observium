@@ -2,6 +2,18 @@
 
 Dell-LAN-SYSMNG-MIB DEFINITIONS ::= BEGIN
 
+-- Broadcom FastPath Radius Authentication Client MIB
+-- Copyright 2016 Broadcom.
+-- This SNMP Management Information Specification
+-- embodies Broadcom's confidential and proprietary
+-- intellectual property.  Broadcom retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom 
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
 IMPORTS
     OBJECT-TYPE
         FROM RFC-1212
@@ -16,8 +28,8 @@ IMPORTS
 
 dellLanSystemMng MODULE-IDENTITY
 	LAST-UPDATED "201304120000Z" -- 12 Apr 2013 12:00:00 GMT
-	ORGANIZATION "Dell Inc."
-	CONTACT-INFO "support.dell.com"
+	ORGANIZATION "Dell, Inc."
+	CONTACT-INFO ""
 	DESCRIPTION
 		"This MIB define the common system management functions
 		 applicable to all Dell Networking managed switches

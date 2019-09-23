@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -63,7 +63,7 @@ foreach ($oids as $index => $entry)
 
   if (is_numeric($value) && $entry['sensState'] != 'invalid')
   {
-    discover_sensor($valid['sensor'], $type, $device, $oid, "steSensor.$index", 'ste', $descr, $scale, $value, $options);
+    discover_sensor($type, $device, $oid, "steSensor.$index", 'ste', $descr, $scale, $value, $options);
   }
 
   $oid_name = 'sensState';

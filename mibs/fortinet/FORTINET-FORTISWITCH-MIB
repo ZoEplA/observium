@@ -38,7 +38,27 @@ fnFortiSwitchMib MODULE-IDENTITY
     DESCRIPTION
         "Initial version of FORTINET-FORTISWITCH-MIB."
     ::= { fortinet 106 }
-    
+
+--  
+-- fsCoreMib.fsCommon
+--  
+
+fsCommon OBJECT IDENTIFIER ::= { fnFortiSwitchMib 1 }
+
+--  
+-- fsCoreMib.fsCommon.fsSystem
+--  
+fsSys OBJECT IDENTIFIER ::= { fsCommon 1 }
+
+fsSysSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device serial number. This is the same serial number as given
+        in the ENTITY-MIB tables for the base entity."
+    ::= { fsSys 1 }
+
 --
 -- fortinet.fnFortiSwitchMib.fsModel
 --

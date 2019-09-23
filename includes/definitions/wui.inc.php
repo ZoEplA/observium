@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -34,7 +34,6 @@ define('OBS_CLASS_TABLE_STRIPED_MORE', OBS_CLASS_TABLE . ' table-condensed-more 
 $config['escape_html']['tags']            = array('sup', 'sub');
 // List of allowed (un-escaped) entities in escape_html(): &entity;
 $config['escape_html']['entities']        = array('deg', 'omega');
-
 
 $config['pages']['gridstack']['no_panel'] = TRUE;
 $config['pages']['dashboard']['no_panel'] = TRUE;
@@ -188,6 +187,7 @@ $config['icon']['sensor']            = "sprite-performance";
 $config['icon']['sla']               = "sprite-sla";
 $config['icon']['pseudowire']        = "sprite-cross-connect";
 $config['icon']['virtual-machine']   = "sprite-virtual-machine";
+$config['icon']['antenna']           = "sprite-antenna";
 $config['icon']['p2pradio']          = "sprite-antenna";
 $config['icon']['billing']           = "sprite-accounting";
 $config['icon']['neighbours']        = "sprite-neighbours";
@@ -216,7 +216,21 @@ $config['icon']['velocity']          = "sprite-performance";
 $config['icon']['waterflow']         = "sprite-flowrate";
 $config['icon']['volume']            = "sprite-volume";
 $config['icon']['lflux']             = "sprite-light-bulb";
+$config['icon']['clock']             = "sprite-clock";
 $config['icon']['wavelength']        = "sprite-laser"; // FIXME need other icon
+
+// Status classes
+$config['icon']['battery']           = "sprite-capacity";
+$config['icon']['mains']             = "sprite-network";
+$config['icon']['outlet']            = "sprite-power";
+$config['icon']['linkstate']         = $config['icon']['port'];
+$config['icon']['fan']               = $config['icon']['fanspeed'];
+$config['icon']['blower']            = $config['icon']['airflow'];
+$config['icon']['chassis']           = "sprite-nic";          // FIXME need other icon
+$config['icon']['contact']           = "sprite-connected";    // FIXME need other icon
+$config['icon']['output']            = "sprite-merge";        // FIXME need other icon
+$config['icon']['powersupply']       = "sprite-power";        // FIXME need other icon
+$config['icon']['rectifier']         = "sprite-frequency-2";  // FIXME need other icon
 
 $config['icon']['service']           = "sprite-service";
 $config['icon']['servicegroup']      = $config['icon']['service'];
@@ -235,7 +249,7 @@ $config['icon']['routing']           = "sprite-routing";
 $config['icon']['vrf']               = "sprite-vrf";
 $config['icon']['cef']               = "sprite-cef";
 $config['icon']['ospf']              = "sprite-ospf";
-$config['icon']['eigrp']              = "sprite-ospf";
+$config['icon']['eigrp']             = "sprite-ospf";
 $config['icon']['ipsec_tunnel']      = "sprite-tunnel";
 $config['icon']['vlan']              = "sprite-vlan";
 $config['icon']['switching']         = "sprite-switching";
@@ -252,6 +266,8 @@ $config['icon']['tools']             = "sprite-tools";
 
 $config['icon']['linecard']          = "sprite-nic";
 
+$config['icon']['firewall']          = "sprite-firewall";
+
 $config['icon']['settings']          = "sprite-settings";
 $config['icon']['refresh']           = "sprite-refresh";
 $config['icon']['rebuild']           = $config['icon']['refresh'];
@@ -266,7 +282,7 @@ $config['icon']['bgp']               = "sprite-bgp";
 $config['icon']['bgp-internal']      = "sprite-bgp-internal";
 $config['icon']['bgp-external']      = "sprite-bgp-external";
 $config['icon']['bgp-alert']         = "sprite-bgp-alerts";
-$config['icon']['bgp-afi']            = "sprite-bgp-afi";
+$config['icon']['bgp-afi']           = "sprite-bgp-afi";
 
 $config['icon']['users']             = "sprite-users";
 $config['icon']['user-self']         = "sprite-user-self";
@@ -279,7 +295,7 @@ $config['icon']['lock']              = "sprite-lock";
 $config['icon']['databases']         = "sprite-databases";
 $config['icon']['database']          = "sprite-database";
 
-$config['icon']['mibs']          = "sprite-map-2";
+$config['icon']['mibs']              = "sprite-map-2";
 
 
 // EOF

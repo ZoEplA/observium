@@ -8,7 +8,7 @@
  * @package    observium
  * @subpackage webinterface
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -28,7 +28,8 @@ if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || port_permitted
   $time = time();
   $HC   = ($port['port_64bit'] ? 'HC' : '');
 
-  $data = snmp_get_multi($device, "if${HC}InOctets.".$port['ifIndex']." if${HC}OutOctets.".$port['ifIndex'], "-OQUs", "IF-MIB", mib_dirs());
+  $data = snmp_get_multi_oid($device, "if${HC}InOctets.".$port['ifIndex']." if${HC}OutOctets.".$port['ifIndex'],  array(),"IF-MIB");
+
   printf("%lf|%s|%s\n", $time, $data[$port['ifIndex']]["if${HC}InOctets"], $data[$port['ifIndex']]["if${HC}OutOctets"]);
 } else {
   echo("unauthenticated");

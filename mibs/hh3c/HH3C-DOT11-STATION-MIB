@@ -1,11 +1,11 @@
 -- =============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide 802.11 MAC information such
 --   as station statistic and notification events.
 -- Reference:
--- Version: V2.7
+-- Version: V3.0
 -- History:
 --   V1.0 created by shiyang (Richard)
 --     Initial version 2006-05-10
@@ -87,11 +87,40 @@
 --   V2.6 2014-02-13 modified by xiaomin
 --        Add hh3cDot11StationPowerSaveModeCM, hh3cDot11StationAuthenModeCM,
 --        hh3cDot11StationAKMModeCM, hh3cDot11StationSecurityCiphersCM
---        and hh3cDot11StationSecIEStatusCM to h3cDot11StationAssociateTable
+--        and hh3cDot11StationSecIEStatusCM to hh3cDot11StationAssociateTable
 --   V2.7 2014-05-08 modified by yubo
 --        Add hh3cDot11StaInternetRxFrameBytes,hh3cDot11StaInternetTxFrameBytes,
 --        hh3cDot11StaLocalRxFrameBytes,hh3cDot11StaLocalTxFrameBytes to
 --        hh3cDot11StationStatisTable.
+--   V2.8 2014-11-19 modified by yubo
+--        Add hh3cDot11StationIPv6Address to hh3cDot11StationAssociateTable
+--   V2.9 2015-04-13 modified by limingjin
+--        Add hh3cDot11StaAntennaChgTrap to hh3cDot11StationTraps
+--        Add new node   hh3cDot11StationTrapOldAntennaID to hh3cDot11StationTrapVarObjects
+--        Add new node   hh3cDot11StationTrapNewAntennaID to hh3cDot11StationTrapVarObjects
+--   V3.0 2016-3-11 modified by xiaomin
+--        Add hh3cDot11StationAssociateAPMACAddressCM to hh3cDot11StationAssociateTable
+--        2017-2-24 modified by jiaohaina
+--        Add hh3cDot11StationAuditTrap to hh3cDot11StationTraps
+--        Add new node    hh3cDot11StationTrapAPIPAddress to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapStartTime to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationAuditTrapOpType to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapStaIPAddress to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRadioID to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRadioMode to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapWlanID to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapSSIDName hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRSSI to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRxFrameKbit to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapTxFrameKbit to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects
+--        2017-10-09 modified by jiaohaina
+--        Add hh3cDot11StationDeviceType,hh3cDot11StationTxRateCM,hh3cDot11StationRxRateCM to
+--        hh3cDot11StationAssociateTable
+--        Add hh3cDot11StationBSSID to hh3cDot11StationAssocFailTrap
 -- =============================================================================
 HH3C-DOT11-STATION-MIB DEFINITIONS ::= BEGIN
 
@@ -125,11 +154,11 @@ IMPORTS
     FROM HH3C-DOT11-REF-MIB;
 
 hh3cDot11STATION MODULE-IDENTITY
-    LAST-UPDATED "201009021800Z"        -- Sep 2, 2010 at 18:00 GMT
+    LAST-UPDATED "201710091800Z"        -- Oct 09, 2017 at 18:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip: 100085"
@@ -196,7 +225,35 @@ hh3cDot11STATION MODULE-IDENTITY
         AKM
         The authentication and key management method defined by
         802.11i, and which includes 802.1x and pre-shared key."
-
+  REVISION "201710091800Z"        -- Oct 09, 2017 at 18:00 GMT
+    DESCRIPTION
+         "Modified to add new nodes."
+  REVISION "201702241800Z"        -- Feb 24, 2017 at 18:00 GMT
+    DESCRIPTION
+        "Add hh3cDot11StationAuditTrap to hh3cDot11StationTraps
+         Add new node     hh3cDot11StationTrapAPIPAddress to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapStartTime to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationAuditTrapOpType to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapStaIPAddress to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRadioID to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRadioMode to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapWlanID to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapSSIDName hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRSSI to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRxFrameKbit to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapTxFrameKbit to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects"
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "201504131800Z"        -- Apr 13, 2015 at 18:00 GMT
+    DESCRIPTION
+        "Add hh3cDot11StaAntennaChgTrap to hh3cDot11StationTraps
+         Add new node hh3cDot11StationTrapOldAntennaID to hh3cDot11StationTrapVarObjects
+         Add new node hh3cDot11StationTrapNewAntennaID to hh3cDot11StationTrapVarObjects"
     REVISION "201009021800Z"        -- Sep 2, 2010 at 18:00 GMT
     DESCRIPTION
         "Modify hh3cDot11StationDisconnectTrap."
@@ -318,7 +375,12 @@ Hh3cDot11StationAssociateEntry ::= SEQUENCE
         hh3cDot11StationAuthenModeCM       INTEGER,
         hh3cDot11StationAKMModeCM          INTEGER,
         hh3cDot11StationSecurityCiphersCM  INTEGER,
-        hh3cDot11StationSecIEStatusCM      INTEGER
+        hh3cDot11StationSecIEStatusCM      INTEGER,
+        hh3cDot11StationIPv6Address        OCTET STRING,
+        hh3cDot11StationAssociateAPMACAddressCM   MacAddress,
+        hh3cDot11StationDeviceType         OCTET STRING,
+        hh3cDot11StationTxRateCM           OCTET STRING,
+        hh3cDot11StationRxRateCM           OCTET STRING
     }
 
 hh3cDot11StationMAC OBJECT-TYPE
@@ -518,7 +580,11 @@ hh3cDot11StationRadioMode OBJECT-TYPE
         dot11a(1),
         dot11b(2),
         dot11g(4),
-        dot11n(8)
+        dot11n(8),
+        dot11gn(16),
+        dot11an(32),
+        dot11ac(64),
+        dot11gac(128)
         For a station,it could support only one radio type at
         the same time."
     ::= { hh3cDot11StationAssociateEntry 21 }
@@ -603,7 +669,9 @@ hh3cDot11StationRadioMode2 OBJECT-TYPE
         dot11b(2),
         dot11g(4),
         dot11an(8),
-        dot11gn(16)
+        dot11gn(16),
+        dot11ac(32),
+        dot11gac(64)
         For a station,it could support only one radio type at
         the same time."
     ::= { hh3cDot11StationAssociateEntry 29 }
@@ -751,6 +819,46 @@ hh3cDot11StationSecIEStatusCM OBJECT-TYPE
         wpa2    - only enable wpa2,
         wlanex  - only enable wlanex."
     ::= { hh3cDot11StationAssociateEntry 38 }
+
+hh3cDot11StationIPv6Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IPv6 address of the station."
+    ::= { hh3cDot11StationAssociateEntry 39 }
+
+hh3cDot11StationAssociateAPMACAddressCM OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents MAC address of the AP to be associated."
+    ::= { hh3cDot11StationAssociateEntry 40 }
+
+hh3cDot11StationDeviceType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the device type of stations to be associated."
+    ::= { hh3cDot11StationAssociateEntry 41 }
+
+hh3cDot11StationTxRateCM OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the transmit rate of frames."
+    ::= { hh3cDot11StationAssociateEntry 42 }
+
+hh3cDot11StationRxRateCM OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the receive rate of frames."
+    ::= { hh3cDot11StationAssociateEntry 43 }
 
 -- *****************************************************************************
 -- *  End of hh3cDot11StaAssociateTable Definition
@@ -1278,7 +1386,8 @@ hh3cDot11StationAssocFailTrap NOTIFICATION-TYPE
             hh3cDot11StationAssocFailCause,
             hh3cDot11StationFailCauseDesc,
             hh3cDot11CurrAPID,
-            hh3cDot11StationTrapAPMacAddress
+            hh3cDot11StationTrapAPMacAddress,
+            hh3cDot11StationBSSID
         }
     STATUS      current
     DESCRIPTION
@@ -1368,6 +1477,47 @@ hh3cDot11UserDisconnectTrap NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when user disconnects with AP."
     ::= { hh3cDot11StationTraps 9 }
+
+hh3cDot11StaAntennaChgTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrAPID,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationTrapBSSID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11StationTrapOldAntennaID,
+            hh3cDot11StationTrapNewAntennaID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is to indicate the station has connected to a new antenna."
+    ::= { hh3cDot11StationTraps 10 }
+
+hh3cDot11StationAuditTrap NOTIFICATION-TYPE
+    OBJECTS
+      {
+          hh3cDot11StationAuditTrapOpType,
+          hh3cDot11StationTrapStaMAC,
+          hh3cDot11StationTrapStaIPAddress,
+          hh3cDot11StationTrapAPMacAddress,
+          hh3cDot11StationTrapAPIPAddress,
+          hh3cDot11StationTrapRadioID,
+          hh3cDot11StationTrapRadioMode,
+          hh3cDot11StationTrapWlanID,
+          hh3cDot11StationTrapSSIDName,
+          hh3cDot11StationTrapVlan,
+          hh3cDot11StationTrapChannel,
+          hh3cDot11StationTrapRSSI,
+          hh3cDot11StationTrapStartTime,
+          hh3cDot11StationSessionDuration,
+          hh3cDot11StationTrapRxFrameKbit,
+          hh3cDot11StationTrapTxFrameKbit
+      }
+    STATUS      current
+    DESCRIPTION
+      "This notification is to indicate the station event."
+  ::= { hh3cDot11StationTraps 11 }
 
 -- 802.11 station Notify variable object
 
@@ -1511,6 +1661,132 @@ hh3cDot11StationTrapAPMacAddress OBJECT-TYPE
         "Represents the MAC address of an AP."
     ::= { hh3cDot11StationTrapVarObjects 16 }
 
+hh3cDot11StationTrapOldAntennaID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the ID of the old antenna to which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 17 }
+
+hh3cDot11StationTrapNewAntennaID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the ID of the new antenna to which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 18 }
+
+hh3cDot11StationTrapAPIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of an AP."
+    ::= { hh3cDot11StationTrapVarObjects 19 }
+
+hh3cDot11StationTrapStartTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the device started to connect to a station."
+    ::= { hh3cDot11StationTrapVarObjects 20 }
+
+hh3cDot11StationAuditTrapOpType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the station operation type."
+    ::= { hh3cDot11StationTrapVarObjects 21 }
+
+hh3cDot11StationTrapStaIPAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of the station."
+    ::= { hh3cDot11StationTrapVarObjects 22 }
+
+hh3cDot11StationTrapRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents each radio."
+    ::= { hh3cDot11StationTrapVarObjects 23 }
+
+hh3cDot11StationTrapRadioMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioType2
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio type supported by the station."
+    ::= { hh3cDot11StationTrapVarObjects 24 }
+
+hh3cDot11StationTrapWlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the WLAN ID of the BSS to which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 25 }
+
+hh3cDot11StationTrapSSIDName OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the ESS name."
+    ::= { hh3cDot11StationTrapVarObjects 26 }
+
+hh3cDot11StationTrapVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the VLAN ID with which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 27 }
+
+hh3cDot11StationTrapChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the current radio channel used by the station."
+    ::= { hh3cDot11StationTrapVarObjects 28 }
+
+hh3cDot11StationTrapRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents a device-dependent measure of the RSSI.
+        It is the received signal strength indication.
+        The maximum value is defined by chip set vendors"
+    ::= { hh3cDot11StationTrapVarObjects 29 }
+
+hh3cDot11StationTrapRxFrameKbit OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "kbit"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bits of data frames have been received
+        from the station."
+    ::= { hh3cDot11StationTrapVarObjects 30 }
+
+hh3cDot11StationTrapTxFrameKbit OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "kbit"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bits of data frames have been sent to
+        the station."
+    ::= { hh3cDot11StationTrapVarObjects 31 }
 -- *****************************************************************************
 -- *     End OF NotifyGroup
 -- *****************************************************************************

@@ -1,6 +1,6 @@
 -- ============================================================================
--- Copyright (C) 2005 by  HUAWEI 3COM TECHNOLOGIES.  All rights reserved.
--- Description:  This mib is used for configuration of ATM-DXI.
+-- Copyright (C) 2005 by  H3C TECHNOLOGIES.  All rights reserved.
+-- Description:  This MIB is used for configuration of ATM-DXI.
 --               include :1.ATM-DXI PVC
 --                        2.ATM-DXI MAP
 -- Reference:
@@ -27,12 +27,13 @@ H3C-ATM-DXI-MIB DEFINITIONS ::= BEGIN
       h3cAtmDxi MODULE-IDENTITY
                 LAST-UPDATED "200504141518Z"            -- 14 April, 2005 at 15:18 GMT
                 ORGANIZATION
-                        "Huawei-3Com Technologies Co., Ltd."
+                    "Hangzhou H3C Tech. Co., Ltd."
                 CONTACT-INFO
-                        "Platform Team Huawei 3Com Technologies Co., Ltd.
-                         Hai-Dian District Beijing P.R. China
-                         http://www.huawei-3com.com
-                         Zip:100085"
+                    "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                    Hai-Dian District Beijing P.R. China
+                    http://www.h3c.com
+                    Zip:100085
+                    "
                 DESCRIPTION
                         "This MIB contains objects to manage configuration of ATM-DXI.
                          There are no constraints on this MIB."

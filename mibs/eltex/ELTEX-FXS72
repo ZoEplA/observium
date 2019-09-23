@@ -793,7 +793,7 @@ fxsMonitoring OBJECT IDENTIFIER ::= { fxs72 10 }
 		
 	fxsMonitoringTemp1 OBJECT-TYPE
 		SYNTAX		Integer32
-		UNITS		"ÃÂ°C"
+		UNITS		"°C"
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION
@@ -802,7 +802,7 @@ fxsMonitoring OBJECT IDENTIFIER ::= { fxs72 10 }
 		
 	fxsMonitoringTemp2 OBJECT-TYPE
 		SYNTAX		Integer32
-		UNITS		"ÃÂ°C"
+		UNITS		"°C"
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION
@@ -811,7 +811,7 @@ fxsMonitoring OBJECT IDENTIFIER ::= { fxs72 10 }
 		
 	fxsMonitoringTemp3 OBJECT-TYPE
 		SYNTAX		Integer32
-		UNITS		"ÃÂ°C"
+		UNITS		"°C"
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION
@@ -820,7 +820,7 @@ fxsMonitoring OBJECT IDENTIFIER ::= { fxs72 10 }
 	
 	fxsMonitoringTemp4 OBJECT-TYPE
 		SYNTAX		Integer32
-		UNITS		"ÃÂ°C"
+		UNITS		"°C"
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION

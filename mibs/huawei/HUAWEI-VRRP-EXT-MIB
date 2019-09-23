@@ -1,9 +1,9 @@
 -- ================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
 --
 -- Description:The mib file is for management of VRRP extension
 -- Reference:
--- Version: V2.13
+-- Version: V2.15
 -- History:
 -- 2006.6.20, publish
 -- ================================================================
@@ -33,7 +33,7 @@
                      
                     
     hwVrrpExt MODULE-IDENTITY
-        LAST-UPDATED "201509100000Z"        
+        LAST-UPDATED "201712080000Z"        
         ORGANIZATION
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -47,6 +47,13 @@
         DESCRIPTION
             "It supplies for VRRP tracking function."
 
+       REVISION "201712080000Z"
+            DESCRIPTION 
+               "Change the hwVrrpTrackEfmIfName size."
+
+        REVISION "201708170000Z"
+            DESCRIPTION 
+               "Change the hwVrrpExtStateChangeReasonString Description."
         REVISION "201509100000Z"
             DESCRIPTION 
                "Add the hwVrrpExtTrapExpectStateChange trap and hwVrrpExtTrapExpectStateResume trap."
@@ -139,8 +146,7 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
         MAX-ACCESS   accessible-for-notify
         STATUS       current
         DESCRIPTION
-            "Reasons of VRRP state transition.
-            Used by hwVrrpExtTrapNonMaster, hwVrrpExtTrapMasterDown, hwVrrpExtTrapExpectStateChange, hwVrrpExtTrapExpectStateResume trap and vrrpTrapNewMaster trap."
+            "Reason of VRRP state transition."
         ::= { hwVrrpExtGlobal 7 }
 
 
@@ -635,7 +641,7 @@ But for the VRRP v3 version,this time value is truncated to 40950 milliseconds w
                         ::= { hwVrrpTrackEfmEntry 1 }         
                         
              hwVrrpTrackEfmIfName OBJECT-TYPE
-                        SYNTAX DisplayString (SIZE (1..255))
+                        SYNTAX DisplayString (SIZE (0..255))
                         MAX-ACCESS read-only
                         STATUS current
                         DESCRIPTION

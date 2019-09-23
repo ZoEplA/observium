@@ -5,6 +5,8 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-LOAD-SHARING-MIB.mib $ 
+-- Revision 1.7  2016/08/12 09:05:04  neng 
+-- add ecmp maximum paths configuration. 
 -- Revision 1.6  2013/12/06 07:06:38  ccho 
 -- remove uncessary imports 
 -- Revision 1.5  2013/11/20 06:53:17  ccho 
@@ -80,4 +82,12 @@ ZYXEL-LOAD-SHARING-MIB DEFINITIONS ::= BEGIN
 			"The polling time of unresolved next-hops for equal-cost multipath routes."
         ::= { zyxelLoadSharingSetup 4 }                                              
 
+        zyLoadSharingMaxPaths OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"Set equal-cost multipath maximum paths."
+        ::= { zyxelLoadSharingSetup 5 }
+		
 END

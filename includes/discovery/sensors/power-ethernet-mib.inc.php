@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -27,8 +27,8 @@ foreach ($oids as $index => $entry)
   $oid     = ".1.3.6.1.2.1.105.1.3.1.1.4.$index";
   $value   = $entry['pethMainPseConsumptionPower'];
 
-  $limits = array('limit_high'      => $entry['pethMainPsePower'],
-                  'limit_low'       => 0); // Hardcode 0 as lower limit. Low warning limit will be calculated.
+  $limits = array('limit_high'      => $entry['pethMainPsePower'], );
+                  //'limit_low'       => 0); // Hardcode 0 as lower limit. Low warning limit will be calculated.
 
   // Work around odd devices. 0 as threshold? Hah.
   // Juniper returns 'current usage in %' for this threshold, seriously guys. SNMP is hard.
@@ -64,17 +64,26 @@ foreach ($oids as $index => $entry)
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'power', $device, $oid, "pethMainPseConsumptionPower.$index", 'power-ethernet-mib', $descr, $scale, $value, $limits);
+    $limits['rename_rrd'] = "power-ethernet-mib-pethMainPseConsumptionPower.$index";
+    discover_sensor_ng($device, 'power', $mib, 'pethMainPseConsumptionPower', $oid, $index, 'power-ethernet-mib', $descr, $scale, $value, $limits);
   }
 
+  /* Migrated to definition
   $descr   = "PoE Group $index";
   $oid     = ".1.3.6.1.2.1.105.1.3.1.1.3.$index";
   $value   = $entry['pethMainPseOperStatus'];
 
   if ($value != '')
   {
-    discover_sensor($valid['sensor'], 'state', $device, $oid, "pethMainPseOperStatus.$index", 'power-ethernet-mib-pse-state', $descr, 1, $value);
+    discover_status($device, $oid, "pethMainPseOperStatus.$index", 'power-ethernet-mib-pse-state', $descr,  $value);
   }
+  */
+}
+
+// Set warning if main peth table empty
+if (empty($warning_threshold))
+{
+  $warning_threshold = 0.9;
 }
 
 ////// Per-port Statistics
@@ -168,7 +177,7 @@ if (is_device_mib($device, 'CISCOSB-POE-MIB'))
   // CISCOSB-POE-MIB::rlPethPsePortMaxPowerAllocAllowed.1.57 = INTEGER: 16900
 
   $oids = snmpwalk_cache_oid($device, 'rlPethPsePortEntry', $oids, 'CISCOSB-POE-MIB');
-  if ($GLOBALS['snmp_status'])
+  if (snmp_status())
   {
     $radlan_base = '.1.3.6.1.4.1.9.6.1.101.108';
     $radlan_mib  = 'CISCOSB-POE-MIB';
@@ -178,7 +187,7 @@ if (is_device_mib($device, 'CISCOSB-POE-MIB'))
 if (is_device_mib($device, 'DLINK-3100-POE-MIB'))
 {
   $oids = snmpwalk_cache_oid($device, 'rlPethPsePortEntry', $oids, 'DLINK-3100-POE-MIB');
-  if ($GLOBALS['snmp_status'])
+  if (snmp_status())
   {
     $radlan_base = '.1.3.6.1.4.1.171.10.94.89.89.108';
     $radlan_mib  = 'DLINK-3100-POE-MIB';
@@ -189,16 +198,16 @@ if (is_device_mib($device, 'Dell-POE-MIB'))
 {
   // Dell-POE-MIB is old version of MARVELL-POE-MIB, here used other oids for power limit
   $oids = snmpwalk_cache_oid($device, 'rlPethPsePortEntry', $oids, 'Dell-POE-MIB');
-  if ($GLOBALS['snmp_status'])
+  if (snmp_status())
   {
     $radlan_base = '.1.3.6.1.4.1.89.108';
     $radlan_mib  = 'Dell-POE-MIB';
   }
 }
-else if (is_device_mib($device, 'MARVELL-POE-MIB'))
+elseif (is_device_mib($device, 'MARVELL-POE-MIB'))
 {
   $oids = snmpwalk_cache_oid($device, 'rlPethPsePortEntry', $oids, 'MARVELL-POE-MIB');
-  if ($GLOBALS['snmp_status'])
+  if (snmp_status())
   {
     $radlan_base = '.1.3.6.1.4.1.89.108';
     $radlan_mib  = 'MARVELL-POE-MIB';
@@ -219,13 +228,13 @@ if (is_device_mib($device, 'EdgeSwitch-POWER-ETHERNET-MIB'))
   // agentPethPortReset.1.220 = INTEGER: none(0)
 
   $oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'EdgeSwitch-POWER-ETHERNET-MIB');
-  if ($GLOBALS['snmp_status'])
+  if (snmp_status())
   {
     $fastpath_base = '.1.3.6.1.4.1.4413.1.1.15';
     $fastpath_mib  = 'EdgeSwitch-POWER-ETHERNET-MIB';
   }
 }
-else if (is_device_mib($device, 'BROADCOM-POWER-ETHERNET-MIB'))
+elseif (is_device_mib($device, 'BROADCOM-POWER-ETHERNET-MIB'))
 {
   // agentPethPowerLimit.1.220 = Gauge32: 15200 Milliwatts
   // agentPethOutputPower.1.220 = Gauge32: 0 Milliwatts
@@ -234,40 +243,52 @@ else if (is_device_mib($device, 'BROADCOM-POWER-ETHERNET-MIB'))
   // agentPethTemperature.1.220 = Gauge32: 35 DEGREES
   // agentPethPortReset.1.220 = INTEGER: none(0)
 
-  $oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'BROADCOM-POWER-ETHERNET-MIB');
-  if ($GLOBALS['snmp_status'])
+  $fastpath_oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'BROADCOM-POWER-ETHERNET-MIB');
+  if (snmp_status())
   {
     $fastpath_base = '.1.3.6.1.4.1.4413.1.1.15';
     $fastpath_mib  = 'BROADCOM-POWER-ETHERNET-MIB';
+    $oids          = $fastpath_oids;
   }
 }
 
 if (is_device_mib($device, 'DNOS-POWER-ETHERNET-MIB'))
 {
   // BROADCOM-POWER-ETHERNET-MIB with different base OID
-  $oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'DNOS-POWER-ETHERNET-MIB');
-  if ($GLOBALS['snmp_status'])
+  $fastpath_oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'DNOS-POWER-ETHERNET-MIB');
+  if (snmp_status())
   {
     $fastpath_base = '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.15';
     $fastpath_mib  = 'DNOS-POWER-ETHERNET-MIB';
+    $oids          = $fastpath_oids;
   }
 }
 
 if (is_device_mib($device, 'NETGEAR-POWER-ETHERNET-MIB'))
 {
   // BROADCOM-POWER-ETHERNET-MIB with different base OID
-  $oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'NETGEAR-POWER-ETHERNET-MIB');
-  if ($GLOBALS['snmp_status'])
+  $fastpath_oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'NETGEAR-POWER-ETHERNET-MIB');
+  if (snmp_status())
   {
     $fastpath_base = '.1.3.6.1.4.1.4526.10.15';
     $fastpath_mib  = 'NETGEAR-POWER-ETHERNET-MIB';
+    $oids          = $fastpath_oids;
   }
 }
 
-if (OBS_DEBUG > 1 && count($oids))
+if (is_device_mib($device, 'NG700-POWER-ETHERNET-MIB'))
 {
-  print_vars($oids);
+  // BROADCOM-POWER-ETHERNET-MIB with different base OID
+  $fastpath_oids = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', $oids, 'NG700-POWER-ETHERNET-MIB');
+  if (snmp_status())
+  {
+    $fastpath_base = '.1.3.6.1.4.1.4526.11.15';
+    $fastpath_mib  = 'NG700-POWER-ETHERNET-MIB';
+    $oids          = $fastpath_oids;
+  }
 }
+
+print_debug_vars($oids);
 
 foreach ($oids as $index => $entry)
 {
@@ -318,11 +339,11 @@ foreach ($oids as $index => $entry)
     }
 
     // Skip not powered
-    $deny = $entry['pethPsePortDetectionStatus'] == 'searching' && $entry['hh3cPsePortPeakPower'] == '0' &&
-            $entry['hh3cPsePortAveragePower'] == '0' && $entry['hh3cPsePortCurrentPower'] == '0';
+    $deny = in_array($entry['pethPsePortDetectionStatus'], ['searching', 'disabled']) &&
+            $entry['hh3cPsePortPeakPower'] == '0' && $entry['hh3cPsePortAveragePower'] == '0' && $entry['hh3cPsePortCurrentPower'] == '0';
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'power', 'HH3C-POWER-ETH-EXT-MIB', $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
   }
 
@@ -349,7 +370,7 @@ foreach ($oids as $index => $entry)
     $deny = $entry['etsysPsePortDetectionStatus'] == 'searching' && $entry['etsysPsePortPowerUsage'] == '0';
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'power', 'ENTERASYS-POWER-ETHERNET-EXT-MIB', $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
   }
 
@@ -373,11 +394,12 @@ foreach ($oids as $index => $entry)
     }
 
     // Skip not powered
-    $deny = $entry['pethPsePortDetectionStatus'] == 'searching' && $entry['hpicfPoePethPsePortPower'] == '0' &&
-            $entry['hpicfPoePethPsePortVoltage'] == '0' && $entry['hpicfPoePethPsePortCurrent'] == '0';
+    $deny = in_array($entry['pethPsePortDetectionStatus'], ['searching', 'disabled', 'otherFault']) &&
+            $entry['hpicfPoePethPsePortPower'] == '0' && $entry['hpicfPoePethPsePortVoltage'] == '0' && $entry['hpicfPoePethPsePortCurrent'] == '0';
+
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'power', 'HP-ICF-POE-MIB', $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
 
     $descr    = $entry['ifDescr'] . ' PoE Current' . $group;
@@ -390,7 +412,7 @@ foreach ($oids as $index => $entry)
 
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'current', 'HP-ICF-POE-MIB', $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
 
     $descr    = $entry['ifDescr'] . ' PoE Voltage' . $group;
@@ -403,7 +425,7 @@ foreach ($oids as $index => $entry)
 
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, 0.1, $value, $options);
+      discover_sensor_ng($device, 'voltage', 'HP-ICF-POE-MIB', $oid_name, $oid_num, $index, $type, $descr, 0.1, $value, $options);
     }
   }
 
@@ -427,10 +449,10 @@ foreach ($oids as $index => $entry)
     }
 
     // Skip not powered
-    $deny = $entry['pethPsePortDetectionStatus'] == 'searching' && $entry['extremePethPortMeasuredPower'] == '0';
+    $deny = in_array($entry['pethPsePortDetectionStatus'], ['searching', 'disabled']) && $entry['extremePethPortMeasuredPower'] == '0';
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'power', 'EXTREME-POE-MIB', $oid_name, $oid_num, $index, $type, $descr, 0.001, $value, $options);
     }
   }
 
@@ -460,11 +482,11 @@ foreach ($oids as $index => $entry)
     }
 
     // Skip not powered
-    $deny = $entry['pethPsePortDetectionStatus'] == 'searching' && $entry['rlPethPsePortOutputPower'] == '0' &&
-            $entry['rlPethPsePortOutputVoltage'] == '0' && $entry['rlPethPsePortOutputCurrent'] == '0';
+    $deny = in_array($entry['pethPsePortDetectionStatus'], ['searching', 'disabled']) &&
+            $entry['rlPethPsePortOutputPower'] == '0' && $entry['rlPethPsePortOutputVoltage'] == '0' && $entry['rlPethPsePortOutputCurrent'] == '0';
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'power', $radlan_mib, $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
 
     $descr    = $entry['ifDescr'] . ' PoE Current' . $group;
@@ -477,7 +499,7 @@ foreach ($oids as $index => $entry)
 
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'current', $radlan_mib, $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
 
     $descr    = $entry['ifDescr'] . ' PoE Voltage' . $group;
@@ -490,16 +512,17 @@ foreach ($oids as $index => $entry)
 
     if (!$deny)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'voltage', $radlan_mib, $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
   }
 
-  // BROADCOM-POWER-ETHERNET-MIB / EdgeSwitch-POWER-ETHERNET-MIB / DNOS-POWER-ETHERNET-MIB / NETGEAR-POWER-ETHERNET-MIB
+  // BROADCOM-POWER-ETHERNET-MIB / EdgeSwitch-POWER-ETHERNET-MIB / DNOS-POWER-ETHERNET-MIB /
+  // NETGEAR-POWER-ETHERNET-MIB / NG700-POWER-ETHERNET-MIB
   // These are copied MIBs with a different base OID, so using the same names... calls for annoying constructions!
 
   // Skip not powered (all except temperature)
-  $fastpath_deny = $entry['pethPsePortDetectionStatus'] == 'searching' && $entry['agentPethOutputPower'] === '0' &&
-                   $entry['agentPethOutputCurrent'] === '0' && $entry['agentPethOutputVolts'] === '0';
+  $fastpath_deny = (!isset($entry['pethPsePortDetectionStatus']) || in_array($entry['pethPsePortDetectionStatus'], ['searching', 'disabled'])) &&
+                    $entry['agentPethOutputPower'] === '0' && $entry['agentPethOutputCurrent'] === '0' && $entry['agentPethOutputVolts'] === '0';
 
   if (isset($entry['agentPethOutputPower']))
   {
@@ -511,7 +534,8 @@ foreach ($oids as $index => $entry)
     $scale    = 0.001;
 
     // Limits
-    if (is_device_mib($device, 'NETGEAR-POWER-ETHERNET-MIB') && $entry['agentPethPowerLimit'] < 100)
+    if ((is_device_mib($device, 'NETGEAR-POWER-ETHERNET-MIB') || is_device_mib($device, 'NG700-POWER-ETHERNET-MIB')) &&
+        $entry['agentPethPowerLimit'] < 100)
     {
       // Another Netgear hack, it return strange limit "18"
       $entry['agentPethPowerLimit'] = 0;
@@ -535,7 +559,7 @@ foreach ($oids as $index => $entry)
 
     if (!$fastpath_deny)
     {
-      discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+      discover_sensor_ng($device, 'power', $fastpath_mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
     }
   }
 
@@ -551,7 +575,7 @@ foreach ($oids as $index => $entry)
 
     if (!$fastpath_deny)
     {
-      discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, 0.001, $value, $options);
+      discover_sensor_ng($device, 'current', $fastpath_mib, $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
     }
   }
 
@@ -568,7 +592,7 @@ foreach ($oids as $index => $entry)
 
     if (!$fastpath_deny)
     {
-      discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, 1, $value, $options);
+      discover_sensor_ng($device, 'voltage', $fastpath_mib, $oid_name, $oid_num, $index, NULL, $descr, 1, $value, $options);
     }
   }
 
@@ -583,7 +607,7 @@ foreach ($oids as $index => $entry)
 
     unset($options['limit_high'], $options['limit_high_warn']);
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $index, $type, $descr, 1, $value, $options);
+    discover_sensor_ng($device, 'temperature', $fastpath_mib, $oid_name, $oid_num, $index, NULL, $descr, 1, $value, $options);
   }
 }
 

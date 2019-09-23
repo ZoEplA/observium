@@ -1,7 +1,7 @@
 -- ==================================================================
--- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 by  H3C TECHNOLOGIES. All rights reserved.
 -- 
--- Description: HUAWEI Lan Switch 802.1X MIB
+-- Description: 802.1X MIB
 -- Reference:
 -- Version: V1.3
 -- History:
@@ -36,9 +36,14 @@ HUAWEI-8021PAE-MIB DEFINITIONS ::= BEGIN
 
      hwpaeExtMib MODULE-IDENTITY
             LAST-UPDATED "200106290000Z"
-            ORGANIZATION ""
+            ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-            ""
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
             DESCRIPTION
             "this file extends IEEE8021-PAE-MIB(802.1x)"
             REVISION "200106290000Z"

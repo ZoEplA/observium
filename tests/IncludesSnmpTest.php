@@ -15,28 +15,27 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
   * @dataProvider providerMibDirs
   * @group mib
   */
-  public function testMibDirs($result, $value1, $value2 = '')
+  public function testMibDirs($result, $value)
   {
     global $config;
 
     $config['mib_dir'] = '/opt/observium/mibs';
 
-    $this->assertSame($result, mib_dirs($value1, $value2));
+    $this->assertSame($result, mib_dirs($value));
   }
 
   public function providerMibDirs()
   {
     $results = array(
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', ''),
-      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', 'rfc', 'net-snmp'),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', ['rfc', 'net-snmp']),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco', 'cisco'),
-      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/areca:/opt/observium/mibs/dell', 'areca', 'dell'),
-      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/areca:/opt/observium/mibs/dell', array('areca','dell')),
-      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco:/opt/observium/mibs/dell:/opt/observium/mibs/broadcom:/opt/observium/mibs/netgear', array('cisco','dell'), array('broadcom','netgear')),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/areca:/opt/observium/mibs/dell', ['areca', 'dell']),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco:/opt/observium/mibs/dell:/opt/observium/mibs/broadcom:/opt/observium/mibs/netgear', array('cisco','dell', 'broadcom','netgear')),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/d-link:/opt/observium/mibs/d_link', array('d-link','d_link')),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/dell', array('inv@lid.name','dell')),
-      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/banana', 'banana', '######'),
-      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/banana', 'banana', array('banana')),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/banana', ['banana', '######']),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/banana', ['banana', 'banana']),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs', 'mibs'),
     );
     return $results;
@@ -53,6 +52,13 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
     $config['mib_dir'] = '/opt/observium/mibs';
 
     $this->assertSame($result, snmp_mib2mibdirs($mib));
+
+    // Test with alternative install/mib dirs
+    $config['mib_dir'] = '/appl/observium/mibs';
+    $dirs = str_replace('/opt/observium', '/appl/observium', $result);
+    //var_dump($dirs);
+
+    $this->assertSame($dirs, snmp_mib2mibdirs($mib));
   }
 
   public function providerSnmpMib2MibDir()
@@ -61,12 +67,14 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       // Basic
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', 'HOST-RESOURCES-MIB'),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES'),
+      array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco', 'CISCO-RTTMON-MIB'),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco', 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB'),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp:/opt/observium/mibs/cisco:/opt/observium/mibs/broadcom', 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB:FASTPATH-SWITCHING-MIB'),
       // Unknown
       //array('/opt/observium/mibs', 'HOST-RESOURCES'),
       array('/opt/observium/mibs/rfc:/opt/observium/mibs/net-snmp', 'HOST-RESOURCES'),
     );
+
     return $results;
   }
 
@@ -141,6 +149,7 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       array(     65000,           0, 279172874240000),
       array(   '65000',     '65000', 279172874305000),
       array(       '0',     '65000', 65000),
+      array(4294967295,  4294967295, 18446744073709551615), // Max 32/64bit value
     );
   }
 
@@ -172,6 +181,12 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
       array('"36 C/96 F"', 36),
       array('"8232W"', 8232),
       array('"1628W (+/- 3.0%)"', 1628),
+      // More complex
+      array('CPU Temperature-Ctlr B: 58 C 136.40F',   58),
+      array('Capacitor Cell 1 Voltage-Ctlr B: 2.04V', 2.04),
+      array('Voltage 12V Rail Loc: left-PSU: 12.22V', 12.22),
+      array('Current 12V Rail Loc: right-PSU: 9.53A', 9.53),
+      array('Capacitor Charge-Ctlr B: 100%',          100),
     );
   }
 
@@ -193,6 +208,26 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
     );
   }
   */
+
+  /**
+  * @dataProvider providerSnmpHexString
+  * @group string
+  */
+  public function testSnmpHexString($value, $result)
+  {
+    $this->assertSame($result, snmp_hexstring($value));
+  }
+
+  public function providerSnmpHexString()
+  {
+    return array(
+      array("42 6C 61 63 6B 20 43 61 72 74 72 69 64 67 65 20", "Black Cartridge "),
+      array("42 6C 61 63 6B 20 43 61 72 74 72 69 64 67 65 20 38 31 58 20 48 50 20 43 46 32 38 31 58 00 ", "Black Cartridge 81X HP CF281X"),
+      array("Maintenance Kit HP 110V-F2G76A, 220V-F2G77A.", "Maintenance Kit HP 110V-F2G76A, 220V-F2G77A."),
+      // Multiline string
+      array("67 6F 6F 67 6C 65 2E 73 65 00 6E 61 6D 65 2D 73 65 72 76 65 72 00 31 37 32 2E 31 37 2E 32 30 34 2E 31 30 00", "google.se\nname-server\n172.17.204.10"),
+    );
+  }
 
   /**
   * @dataProvider providerSnmpStringToOid
@@ -267,6 +302,26 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
                   'index'     => '0.3.119.101.115',
             ),
       ),
+      array($flags,
+            'jnxFWCounterDisplayName."__flowspec_default_inet__"."0/0,*,proto=17,port=445".counter = "0/0,*,proto=17,port=445"',
+            array('oid'       => 'jnxFWCounterDisplayName."__flowspec_default_inet__"."0/0,*,proto=17,port=445".counter',
+                  'value'     => '0/0,*,proto=17,port=445',
+                  'oid_name'  => 'jnxFWCounterDisplayName',
+                  'index_parts' => array('__flowspec_default_inet__', '0/0,*,proto=17,port=445', 'counter'),
+                  'index_count' => 3,
+                  'index'     => '__flowspec_default_inet__.0/0,*,proto=17,port=445.counter',
+            ),
+      ),
+      array($flags,
+            'jnxFWCounterDisplayName."__flowspec_default_inet__"."205.213.5.242,*,proto=17,port=123".counter = "205.213.5.242,*,proto=17,port=123"',
+            array('oid'       => 'jnxFWCounterDisplayName."__flowspec_default_inet__"."205.213.5.242,*,proto=17,port=123".counter',
+                  'value'     => '205.213.5.242,*,proto=17,port=123',
+                  'oid_name'  => 'jnxFWCounterDisplayName',
+                  'index_parts' => array('__flowspec_default_inet__', '205.213.5.242,*,proto=17,port=123', 'counter'),
+                  'index_count' => 3,
+                  'index'     => '__flowspec_default_inet__.205.213.5.242,*,proto=17,port=123.counter',
+            ),
+      ),
       array($flags | OBS_SNMP_CONCAT,
             'lldpRemChassisId.0.71.31591 = "08 2E 5F 17 E7 71 "',
             array('oid'       => 'lldpRemChassisId.0.71.31591',
@@ -285,6 +340,46 @@ class IncludesSnmpTest extends \PHPUnit\Framework\TestCase
                   'index_parts' => array('3ffe:100:ff00:0:0:0:0:0', '64', '1'),
                   'index_count' => 3,
                   'index'     => '3ffe:100:ff00:0:0:0:0:0.64.1',
+            ),
+      ),
+      array($flags | OBS_SNMP_TABLE,
+            'ipv6RouteIfIndex[3ffe:100:ff00:0:0:0:0:0][64].1 = 2',
+            array('oid'       => 'ipv6RouteIfIndex[3ffe:100:ff00:0:0:0:0:0][64].1',
+                  'value'     => '2',
+                  'oid_name'  => 'ipv6RouteIfIndex',
+                  'index_parts' => array('3ffe:100:ff00:0:0:0:0:0', '64', '1'),
+                  'index_count' => 3,
+                  'index'     => '3ffe:100:ff00:0:0:0:0:0.64.1',
+            ),
+      ),
+      array($flags | OBS_SNMP_TABLE,
+            'wcAccessPointMac[6:20:c:c8:39:b].96 = 20:c:c8:39:b:60',
+            array('oid'       => 'wcAccessPointMac[6:20:c:c8:39:b].96',
+                  'value'     => '20:c:c8:39:b:60',
+                  'oid_name'  => 'wcAccessPointMac',
+                  'index_parts' => array('6:20:c:c8:39:b', '96'),
+                  'index_count' => 2,
+                  'index'     => '6:20:c:c8:39:b.96',
+            ),
+      ),
+      array($flags | OBS_SNMP_TABLE,
+            'wcAccessPointMac[6:20:c:c8:39:b].96.1 = 20:c:c8:39:b:60',
+            array('oid'       => 'wcAccessPointMac[6:20:c:c8:39:b].96.1',
+                  'value'     => '20:c:c8:39:b:60',
+                  'oid_name'  => 'wcAccessPointMac',
+                  'index_parts' => array('6:20:c:c8:39:b', '96', '1'),
+                  'index_count' => 3,
+                  'index'     => '6:20:c:c8:39:b.96.1',
+            ),
+      ),
+      array($flags | OBS_SNMP_TABLE,
+            'wcAccessPointMac[6:20:c:c8:39:b].96."qkd dj" = 20:c:c8:39:b:60',
+            array('oid'       => 'wcAccessPointMac[6:20:c:c8:39:b].96."qkd dj"',
+                  'value'     => '20:c:c8:39:b:60',
+                  'oid_name'  => 'wcAccessPointMac',
+                  'index_parts' => array('6:20:c:c8:39:b', '96', 'qkd dj'),
+                  'index_count' => 3,
+                  'index'     => '6:20:c:c8:39:b.96.qkd dj',
             ),
       ),
       array($flags | OBS_SNMP_NUMERIC,

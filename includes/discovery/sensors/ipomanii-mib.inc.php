@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -42,7 +42,7 @@ foreach ($oids_in as $index => $entry)
 
   if (is_numeric($value))
   {
-    discover_sensor($valid['sensor'], 'current', $device, $oid, '1.3.1.3.'.$index, 'ipoman', $descr, $scale, $value, $limits);
+    discover_sensor('current', $device, $oid, '1.3.1.3.'.$index, 'ipoman', $descr, $scale, $value, $limits);
   }
 }
 
@@ -55,7 +55,7 @@ foreach ($oids_out as $index => $entry)
 
   if (is_numeric($value))
   {
-    discover_sensor($valid['sensor'], 'current', $device, $oid, '2.3.1.3.'.$index, 'ipoman', $descr, $scale, $value, $limits);
+    discover_sensor('current', $device, $oid, '2.3.1.3.'.$index, 'ipoman', $descr, $scale, $value, $limits);
   }
 }
 
@@ -81,7 +81,7 @@ foreach ($oids as $index => $entry)
 
   if (is_numeric($value))
   {
-    discover_sensor($valid['sensor'], 'frequency', $device, $oid, $index, 'ipoman', $descr, $scale, $value, $limits);
+    discover_sensor('frequency', $device, $oid, $index, 'ipoman', $descr, $scale, $value, $limits);
   }
 }
 
@@ -101,7 +101,7 @@ if ($emd_installed == 'eMD-HT')
   {
     $descr = trim(str_replace('"', '', $descr));
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, 1, 'ipoman', $descr, $scale, $value, $limits);
+    discover_sensor('humidity', $device, $oid, 1, 'ipoman', $descr, $scale, $value, $limits);
   }
 }
 
@@ -117,7 +117,7 @@ if ($emd_installed != 'disabled')
   {
     $descr = trim(str_replace('"', '', $descr));
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 1, 'ipoman', $descr, $scale, $value, $limits);
+    discover_sensor('temperature', $device, $oid, 1, 'ipoman', $descr, $scale, $value, $limits);
   }
 }
 
@@ -137,7 +137,7 @@ $oids_out = snmpwalk_cache_multi_oid($device, 'outletStatusWH', $oids_out, $mib)
 #    $oid   = ".1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.5.$index";
 #    $value = $entry['inletStatusWH'];
 #
-#    discover_sensor($valid['sensor'], 'power', $device, $oid, '1.3.1.3.'.$index, 'ipoman', $descr, $scale, $value);
+#    discover_sensor('power', $device, $oid, '1.3.1.3.'.$index, 'ipoman', $descr, $scale, $value);
 #  }
 
 $scale = 0.1;
@@ -149,7 +149,7 @@ foreach ($oids_out as $index => $entry)
 
   if (is_numeric($value))
   {
-    discover_sensor($valid['sensor'], 'power', $device, $oid, '2.3.1.3.'.$index, 'ipoman', $descr, $scale, $value);
+    discover_sensor('power', $device, $oid, '2.3.1.3.'.$index, 'ipoman', $descr, $scale, $value);
   }
 }
 
@@ -172,7 +172,7 @@ foreach ($oids as $index => $entry)
 
   if (is_numeric($value))
   {
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'ipoman', $descr, $scale, $value, $limits);
+    discover_sensor('voltage', $device, $oid, $index, 'ipoman', $descr, $scale, $value, $limits);
   }
 }
 

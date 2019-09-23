@@ -10,7 +10,7 @@
  * @package    observium
  * @subpackage functions
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -41,22 +41,30 @@ function nicecase($item)
  */
 function trim_quotes($string, $flags = OBS_QUOTES_TRIM)
 {
-  $string = trim($string); // basic trim of string
-  if (strpos($string, '"') !== FALSE && is_flag_set(OBS_QUOTES_TRIM, $flags))
+  $string = trim($string); // basic string clean
+  if (strpos($string, '"') !== FALSE)
   {
-    if (strpos($string, '\"') !== FALSE)
+    if (is_flag_set(OBS_QUOTES_STRIP, $flags))
     {
-      $string = str_replace('\"', '"', $string); // replace escaped quotes
+      // Just remove all (double) quotes from string
+      $string = str_replace(array('\"', '"'), '', $string);
     }
-    $quotes = array('["\']', // remove single quotes
-                    //'\\\"',  // remove escaped quotes
-                    );
-    foreach ($quotes as $quote)
+    else if (is_flag_set(OBS_QUOTES_TRIM, $flags))
     {
-      $pattern = '/^(' . $quote . ')(?<value>.*?)(\1)$/s';
-      while (preg_match($pattern, $string, $matches))
+      if (strpos($string, '\"') !== FALSE)
       {
-        $string = $matches['value'];
+        $string = str_replace('\"', '"', $string); // replace escaped quotes
+      }
+      $quotes = array('["\']', // remove single quotes
+                      //'\\\"',  // remove escaped quotes
+                      );
+      foreach ($quotes as $quote)
+      {
+        $pattern = '/^(' . $quote . ')(?<value>.*?)(\1)$/s';
+        while (preg_match($pattern, $string, $matches))
+        {
+          $string = $matches['value'];
+        }
       }
     }
   }
@@ -121,18 +129,18 @@ function humanize_maintenance(&$maint)
 
   if ($maint['maint_start'] > $GLOBALS['config']['time']['now'])
   {
-    $maint['start_text'] = "+".formatUptime($maint['maint_start'] - $GLOBALS['config']['time']['now']);
+    $maint['start_text'] = "+".format_uptime($maint['maint_start'] - $GLOBALS['config']['time']['now']);
   } else {
-    $maint['start_text'] = "-".formatUptime($GLOBALS['config']['time']['now'] - $maint['maint_start']);
+    $maint['start_text'] = "-".format_uptime($GLOBALS['config']['time']['now'] - $maint['maint_start']);
     $maint['row_class']  = "warning";
     $maint['active_text'] = '<span class="label label-warning pull-right">active</span>';
   }
 
   if ($maint['maint_end'] > $GLOBALS['config']['time']['now'])
   {
-    $maint['end_text'] = "+".formatUptime($maint['maint_end'] - $GLOBALS['config']['time']['now']);
+    $maint['end_text'] = "+".format_uptime($maint['maint_end'] - $GLOBALS['config']['time']['now']);
   } else {
-    $maint['end_text'] = "-".formatUptime($GLOBALS['config']['time']['now'] - $maint['maint_end']);
+    $maint['end_text'] = "-".format_uptime($GLOBALS['config']['time']['now'] - $maint['maint_end']);
     $maint['row_class']  = "disabled";
     $maint['active_text'] = '<span class="label label-disabled pull-right">ended</span>';
   }
@@ -144,7 +152,7 @@ function humanize_maintenance(&$maint)
  *
  *   Process an array containing a row from `alert_checks` and in place to add/modify elements.
  *
- * @param array $alert_check
+ * @param array $check
  */
 // TESTME needs unit testing
 function humanize_alert_check(&$check)
@@ -195,7 +203,7 @@ function humanize_alert_check(&$check)
   *
   *   Process an array containing a row from `alert_entry` and `alert_entry-state` in place to add/modify elements.
   *
-  * @param array $alert_entry
+  * @param array $entry
   */
 // TESTME needs unit testing
 function humanize_alert_entry(&$entry)
@@ -223,10 +231,10 @@ function humanize_alert_entry(&$entry)
   }
 
   // Set the checked/changed/alerted entries to formatted date strings if they exist, else set them to never
-  if (!isset($entry['last_checked']) || $entry['last_checked'] == '0') { $entry['checked'] = "<i>Never</i>"; } else { $entry['checked'] = formatUptime(time()-$entry['last_checked'], 'short-3'); }
-  if (!isset($entry['last_changed']) || $entry['last_changed'] == '0') { $entry['changed'] = "<i>Never</i>"; } else { $entry['changed'] = formatUptime(time()-$entry['last_changed'], 'short-3'); }
-  if (!isset($entry['last_alerted']) || $entry['last_alerted'] == '0') { $entry['alerted'] = "<i>Never</i>"; } else { $entry['alerted'] = formatUptime(time()-$entry['last_alerted'], 'short-3'); }
-  if (!isset($entry['last_recovered']) || $entry['last_recovered'] == '0') { $entry['recovered'] = "<i>Never</i>"; } else { $entry['recovered'] = formatUptime(time()-$entry['last_recovered'], 'short-3'); }
+  if (!isset($entry['last_checked']) || $entry['last_checked'] == '0') { $entry['checked'] = "<i>Never</i>"; } else { $entry['checked'] = format_uptime(time()-$entry['last_checked'], 'short-3'); }
+  if (!isset($entry['last_changed']) || $entry['last_changed'] == '0') { $entry['changed'] = "<i>Never</i>"; } else { $entry['changed'] = format_uptime(time()-$entry['last_changed'], 'short-3'); }
+  if (!isset($entry['last_alerted']) || $entry['last_alerted'] == '0') { $entry['alerted'] = "<i>Never</i>"; } else { $entry['alerted'] = format_uptime(time()-$entry['last_alerted'], 'short-3'); }
+  if (!isset($entry['last_recovered']) || $entry['last_recovered'] == '0') { $entry['recovered'] = "<i>Never</i>"; } else { $entry['recovered'] = format_uptime(time()-$entry['last_recovered'], 'short-3'); }
 
   if (!isset($entry['ignore_until']) || $entry['ignore_until'] == '0') { $entry['ignore_until_text'] = "<i>Disabled</i>"; } else { $entry['ignore_until_text'] = format_timestamp($entry['ignore_until']); }
   if (!isset($entry['ignore_until_ok']) || $entry['ignore_until_ok'] == '0') { $entry['ignore_until_ok_text'] = "<i>Disabled</i>"; } else { $entry['ignore_until_ok_text'] = '<span class="purple">Yes</span>'; }
@@ -430,11 +438,17 @@ function process_port_label(&$this_port, $device)
       $this_port['port_label'] = $this_port['ifName'];
     }
   }
-  else if (isset($config['os'][$device['os']]['ifalias']))
+  elseif (isset($config['os'][$device['os']]['ifalias']))
   {
     $this_port['port_label'] = $this_port['ifAlias'];
   } else {
-    $this_port['port_label'] = $this_port['ifDescr'];
+    if ($this_port['ifDescr'] === '' && $this_port['ifName'] !== '')
+    {
+      // Some new NX-OS have empty ifDescr
+      $this_port['port_label'] = $this_port['ifName'];
+    } else {
+      $this_port['port_label'] = $this_port['ifDescr'];
+    }
     if (isset($config['os'][$device['os']]['ifindex']))
     {
       $this_port['port_label'] .= ' ' . $this_port['ifIndex'];
@@ -447,21 +461,31 @@ function process_port_label(&$this_port, $device)
   {
     $this_port['port_label'] = preg_replace('/\ {2,}/', ' ', $this_port['port_label']); // clear 2 and more spaces
 
-    $oid_base = $oid.'_base';
-    $oid_num  = $oid.'_num';
+    $oid_base  = $oid.'_base';
+    $oid_num   = $oid.'_num';
+    $oid_short = $oid.'_short';
     foreach ($config['os'][$device['os']][$oid] as $pattern)
     {
       if (preg_match($pattern, $this_port[$oid], $matches))
       {
-        print_debug("Port '$oid' rewritten: '" . $this_port[$oid] . "' -> '" . $matches[1] . "'");
-        $this_port[$oid] = $matches[1];
+        //print_debug_vars($matches);
+        if (isset($matches[$oid]))
+        {
+          // if exist 'port_label' match reference
+          $this_port[$oid] = $matches[$oid];
+        } else {
+          // or just first reference
+          $this_port[$oid] = $matches[1];
+        }
+        print_debug("Port '$oid' rewritten: '" . $this_port[$oid] . "' -> '" . $this_port[$oid] . "'");
+
         if (isset($matches[$oid_base]))
         {
           $this_port[$oid_base] = $matches[$oid_base];
         }
         if (isset($matches[$oid_num]))
         {
-          if ($matches[$oid_num] === '')
+          if ($device['os'] == 'cisco-altiga' && $matches[$oid_num] === '') // This derp only for altiga (I hope so)
           {
             // See cisco-altiga os definition
             // If port_label_num match set, but it empty, use ifIndex as num
@@ -470,6 +494,12 @@ function process_port_label(&$this_port, $device)
           } else {
             $this_port[$oid_num] = $matches[$oid_num];
           }
+        }
+
+        // Additionally possible to parse port_label_short
+        if (isset($matches[$oid_short]))
+        {
+          $this_port[$oid_short] = $matches[$oid_short];
         }
 
         // Additionally possible to parse ifAlias from ifDescr (ie timos)
@@ -485,119 +515,132 @@ function process_port_label(&$this_port, $device)
     $this_port['port_label'] = rewrite_ifname($this_port['port_label'], FALSE);
   }
 
-  // Extract bracket part from port label and remove it
-  $label_bracket = '';
-  if (preg_match('/\s*(\([^\)]+\))$/', $this_port['port_label'], $matches))
+  if (!isset($this_port['port_label_base'])) // skip when already set by previous processing, ie os definitions
   {
-    // GigaVUE-212 Port  8/48 (Network Port)
-    // rtif(172.20.30.46/28)
-    $label_bracket = $matches[0]; // fallback
-    list($this_port['port_label']) = explode($matches[0], $this_port['port_label'], 2);
-  }
-  else if (preg_match('!^10*(?:/10*)*\s*[MGT]Bit\s+(.*)!i', $this_port['port_label'], $matches))
-  {
-    // remove 10/100 Mbit part from beginning, this broke detect label_base/label_num (see hirschmann-switch os)
-    // 10/100 MBit Ethernet Switch Interface 6
-    // 1 MBit Ethernet Switch Interface 6
-    $label_bracket = $this_port['port_label']; // fallback
-    $this_port['port_label'] = $matches[1];
-  }
-  else if (preg_match('/^(.+)\s*:\s+(.+)/', $this_port['port_label'], $matches))
-  {
-    // Another case with colon
-    // gigabitEthernet 1/0/24 : copper
-    // port 3: Gigabit Fiber
-    $label_bracket = $this_port['port_label']; // fallback
-    $this_port['port_label'] = $matches[1];
-  }
+    // Extract bracket part from port label and remove it
+    $label_bracket = '';
+    if (preg_match('/\s*(\([^\)]+\))$/', $this_port['port_label'], $matches))
+    {
+      // GigaVUE-212 Port  8/48 (Network Port)
+      // rtif(172.20.30.46/28)
+      print_debug('Port label ('.$this_port['port_label'].') matched #1'); // Just for find issues
+      $label_bracket = $this_port['port_label']; // fallback
+      list($this_port['port_label']) = explode($matches[0], $this_port['port_label'], 2);
+    }
+    else if (preg_match('!^10*(?:/10*)*\s*[MGT]Bit\s+(.*)!i', $this_port['port_label'], $matches))
+    {
+      // remove 10/100 Mbit part from beginning, this broke detect label_base/label_num (see hirschmann-switch os)
+      // 10/100 MBit Ethernet Switch Interface 6
+      // 1 MBit Ethernet Switch Interface 6
+      print_debug('Port label ('.$this_port['port_label'].') matched #2'); // Just for find issues
+      $label_bracket = $this_port['port_label']; // fallback
+      $this_port['port_label'] = $matches[1];
+    }
+    else if (preg_match('/^(.+)\s*:\s+(.+)/', $this_port['port_label'], $matches))
+    {
+      // Another case with colon
+      // gigabitEthernet 1/0/24 : copper
+      // port 3: Gigabit Fiber
+      print_debug('Port label ('.$this_port['port_label'].') matched #3'); // Just for find issues
+      $label_bracket = $this_port['port_label']; // fallback
+      $this_port['port_label'] = $matches[1];
+    }
 
-  // Detect port_label_base and port_label_num
-  if (isset($this_port['port_label_base'])) {} // already set by previous processing, ie os definitions
-  //else if (preg_match('/\d+(?:(?:[\/:](?:[a-z])?[\d\.:]+)+[a-z\d\.\:]*(?:[\-\_][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
-  else if (preg_match('/\d+((?<periodic>(?:[\/:][a-z]*\d+(?:\.\d+)?)+)(?<last>[\-\_\.][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
-  {
-    // Multipart numeric
-    /*
-    1/1/1
-    e1-0/0/1.0
-    e1-0/2/0:13.0
-    dwdm0/1/0/6
-    DTI1/1/0
-    Cable8/1/4-upstream2
-    Cable8/1/4
-    16GigabitEthernet1/2/1
-    cau4-0/2/0
-    dot11radio0/0
-    Dialer0/0.1
-    Downstream 0/2/0
-    ControlEthernet0/RSP0/CPU0/S0/10
-    1000BaseTX Port 8/48 Name
-    Backplane-GigabitEthernet0/3
-    Ethernet1/10
-    FC port 0/19
-    GigabitEthernet0/0/0/1
-    GigabitEthernet0/1.ServiceInstance.206
-    Integrated-Cable7/0/0:0
-    Logical Upstream Channel 1/0.0/0
-    Slot0/1
-    sonet_12/1
-    GigaVUE-212 Port  8/48 (Network Port)
-    Stacking Port 1/StackA
-    gigabitEthernet 1/0/24 : copper
-    1:38
-    1/4/x24, mx480-xe-0-0-0
-    1/4/x24
-    */
-    $this_port['port_label_num'] = $matches[0];
-    list($this_port['port_label_base']) = explode($matches[0], $this_port['port_label'], 2);
-    $this_port['port_label'] = $this_port['port_label_base'] . $this_port['port_label_num']; // Remove additional part (after port number)
-  }
-  else if (preg_match('/(?<port_label_num>(?:\d+[a-z])?\d[\d\.\:]*(?:[\-\_]\w+)?)(?: [a-z()\[\] ]+)?$/i', $this_port['port_label'], $matches))
-  {
-    // Simple numeric
-    /*
-    GigaVUE-212 Port  1 (Network Port)
-    MMC-A s3 SW Port
-    Atm0_Physical_Interface
-    wan1_phys
-    fwbr101i0
-    Nortel Ethernet Switch 325-24G Module - Port 1
-    lo0.32768
-    vlan.818
-    jsrv.1
-    Bundle-Ether1.1701
-    Ethernet1
-    ethernet_13
-    eth0
-    eth0.101
-    BVI900
-    A/1
-    e1
-    CATV-MAC 1
-    16
-    */
-    $this_port['port_label_num'] = $matches['port_label_num'];
-    $this_port['port_label_base'] = substr($this_port['port_label'], 0, 0 - strlen($matches[0]));
-    $this_port['port_label'] = $this_port['port_label_base'] . $this_port['port_label_num']; // Remove additional part (after port number)
-  } else {
-    // All other (non-numeric)
-    /*
-    UniPing Server Solution v3/SMS Enet Port
-    MMC-A s2 SW Port
-    Control Plane
-    */
-    $this_port['port_label_base'] = $this_port['port_label'];
-  }
+    // Detect port_label_base and port_label_num
+    //if (preg_match('/\d+(?:(?:[\/:](?:[a-z])?[\d\.:]+)+[a-z\d\.\:]*(?:[\-\_][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
+    if (preg_match('/\d+((?<periodic>(?:[\/:][a-z]*\d+(?:\.\d+)?)+)(?<last>[\-\_\.][\w\.\:]+)*|\/\w+$)/i', $this_port['port_label'], $matches))
+    {
+      // Multipart numeric
+      /*
+      1/1/1
+      e1-0/0/1.0
+      e1-0/2/0:13.0
+      dwdm0/1/0/6
+      DTI1/1/0
+      Cable8/1/4-upstream2
+      Cable8/1/4
+      16GigabitEthernet1/2/1
+      cau4-0/2/0
+      dot11radio0/0
+      Dialer0/0.1
+      Downstream 0/2/0
+      ControlEthernet0/RSP0/CPU0/S0/10
+      1000BaseTX Port 8/48 Name
+      Backplane-GigabitEthernet0/3
+      Ethernet1/10
+      FC port 0/19
+      GigabitEthernet0/0/0/1
+      GigabitEthernet0/1.ServiceInstance.206
+      Integrated-Cable7/0/0:0
+      Logical Upstream Channel 1/0.0/0
+      Slot0/1
+      sonet_12/1
+      GigaVUE-212 Port  8/48 (Network Port)
+      Stacking Port 1/StackA
+      gigabitEthernet 1/0/24 : copper
+      1:38
+      1/4/x24, mx480-xe-0-0-0
+      1/4/x24
+      */
+      $this_port['port_label_num'] = $matches[0];
+      list($this_port['port_label_base']) = explode($matches[0], $this_port['port_label'], 2);
+      $this_port['port_label'] = $this_port['port_label_base'] . $this_port['port_label_num']; // Remove additional part (after port number)
+    }
+    else if (preg_match('/(?<port_label_num>(?:\d+[a-z])?\d[\d\.\:]*(?:[\-\_]\w+)?)(?: [a-z()\[\] ]+)?$/i', $this_port['port_label'], $matches))
+    {
+      // Simple numeric
+      /*
+      GigaVUE-212 Port  1 (Network Port)
+      MMC-A s3 SW Port
+      Atm0_Physical_Interface
+      wan1_phys
+      fwbr101i0
+      Nortel Ethernet Switch 325-24G Module - Port 1
+      lo0.32768
+      vlan.818
+      jsrv.1
+      Bundle-Ether1.1701
+      Ethernet1
+      ethernet_13
+      eth0
+      eth0.101
+      BVI900
+      A/1
+      e1
+      CATV-MAC 1
+      16
+      */
+      $this_port['port_label_num'] = $matches['port_label_num'];
+      $this_port['port_label_base'] = substr($this_port['port_label'], 0, 0 - strlen($matches[0]));
+      $this_port['port_label'] = $this_port['port_label_base'] . $this_port['port_label_num']; // Remove additional part (after port number)
+    } else {
+      // All other (non-numeric)
+      /*
+      UniPing Server Solution v3/SMS Enet Port
+      MMC-A s2 SW Port
+      Control Plane
+      */
+      $this_port['port_label_base'] = $this_port['port_label'];
+    }
 
-  // When not empty label brackets and empty numeric part, re-add brackets to label
-  if (!empty($label_bracket) && $this_port['port_label_num'] == '')
-  {
-    // rtif(172.20.30.46/28)
-    $this_port['port_label'] .= $label_bracket;
+    // When not empty label brackets and empty numeric part, re-add brackets to label
+    if (!empty($label_bracket) && $this_port['port_label_num'] == '')
+    {
+      // rtif(172.20.30.46/28)
+      $this_port['port_label'] = $label_bracket;
+      $this_port['port_label_base'] = $this_port['port_label'];
+      $this_port['port_label_num'] = '';
+    }
   }
 
   // Make short version (do not escape)
-  $this_port['port_label_short'] = short_ifname($this_port['port_label'], FALSE);
+  if (isset($this_port['port_label_short']))
+  {
+    // Short already parsed from definitions (not sure if need additional shorting)
+    $this_port['port_label_short'] = short_ifname($this_port['port_label_short'], NULL, FALSE);
+  } else {
+    $this_port['port_label_short'] = short_ifname($this_port['port_label'], NULL, FALSE);
+  }
 
   // Set entity variables for use by code which uses entities
   // Base label part: TenGigabitEthernet3/3 -> TenGigabitEthernet, GigabitEthernet4/8.722 -> GigabitEthernet, Vlan2603 -> Vlan
@@ -929,170 +972,6 @@ $rewrite_breeze_type = array(
   'su-12-l'  => 'SU-12-L',  // subscriber unit supporting 12 Mbps
   'au'       => 'AU',       // security access unit
   'su'       => 'SU',       // security subscriber unit
-);
-
-$rewrite_extreme_hardware = array (
-  'ags100-24t' => 'AGS 100-24t',
-  'ags150-24p' => 'AGS 150-24p',
-  'alpine3802' => 'Alpine 3802',
-  'alpine3804' => 'Alpine 3804',
-  'alpine3808' => 'Alpine 3808',
-  'altitude300' => 'Altitude 300',
-  'altitude350' => 'Altitude 350',
-  'altitude3510' => 'Altitude 3510',
-  'altitude3550' => 'Altitude 3550',
-  'altitude360' => 'Altitude 360',
-  'altitude450' => 'Altitude 450',
-  'altitude4610' => 'Altitude 4610',
-  'altitude4620' => 'Altitude 4620',
-  'altitude4700' => 'Altitude 4700',
-  'bd10808' => 'Black Diamond 10808',
-  'bd12802' => 'Black Diamond 12802',
-  'bd12804' => 'Black Diamond 12804',
-  'bd20804' => 'Black Diamond 20804',
-  'bd20808' => 'Black Diamond 20808',
-  'bd8806' => 'Black Diamond 8806',
-  'bd8810' => 'Black Diamond 8810',
-  'bdx8' => 'Black Diamond X8',
-  'blackDiamond6800' => 'Black Diamond 6800',
-  'blackDiamond6804' => 'Black Diamond 6804',
-  'blackDiamond6808' => 'Black Diamond 6808',
-  'blackDiamond6816' => 'Black Diamond 6816',
-  'e4g-200' => 'E4G-200',
-  'e4g-400' => 'E4G-400',
-  'enetSwitch24Port' => 'EnetSwitch 24Port',
-  'nwi-e450a' => 'NWI-e450a',
-  'sentriantAG200' => 'Sentriant AG200',
-  'sentriantAGSW' => 'Sentriant AGSW',
-  'sentriantCE150' => 'Sentriant CE150',
-  'sentriantNG300' => 'Sentriant NG300',
-  'sentriantPS200v1' => 'Sentriant PS200v1',
-  'summit1' => 'Summit 1',
-  'summit1iSX' => 'Summit 1iSX',
-  'summit1iTX' => 'Summit 1iTX',
-  'summit2' => 'Summit 2',
-  'summit200-24' => 'Summit 200-24',
-  'summit200-24fx' => 'Summit 200-24fx',
-  'summit200-48' => 'Summit 200-48',
-  'summit24' => 'Summit 24',
-  'summit24e2SX' => 'Summit 24e2SX',
-  'summit24e2TX' => 'Summit 24e2TX',
-  'summit24e3' => 'Summit 24e3',
-  'summit3' => 'Summit 3',
-  'summit300-24' => 'Summit 300-24',
-  'summit300-48' => 'Summit 300-48',
-  'summit4' => 'Summit 4',
-  'summit400-24p' => 'Summit 400-24p',
-  'summit400-24t' => 'Summit 400-24t',
-  'summit400-48t' => 'Summit 400-48t',
-  'summit48' => 'Summit 48',
-  'summit48i' => 'Summit 48i',
-  'summit48si' => 'Summit 48si',
-  'summit4fx' => 'Summit 4fx',
-  'summit5i' => 'Summit 5i',
-  'summit5iLX' => 'Summit 5iLX',
-  'summit5iTX' => 'Summit 5iTX',
-  'summit7iSX' => 'Summit 7iSX',
-  'summit7iTX' => 'Summit 7iTX',
-  'summitPx1' => 'Summit Px1',
-  'summitStack' => 'Summit Stack',
-  'summitVer2Stack' => 'Summit Stack V2',
-  'summitWM100' => 'Summit WM100',
-  'summitWM1000' => 'Summit WM1000',
-  'summitWM100Lite' => 'Summit WM100Lite',
-  'summitWM20' => 'Summit WM20',
-  'summitWM200' => 'Summit WM200',
-  'summitWM2000' => 'Summit WM2000',
-  'summitWM3400' => 'Summit WM3400',
-  'summitWM3600' => 'Summit WM3600',
-  'summitWM3700' => 'Summit WM3700',
-  'summitX150-24p' => 'Summit X150-24p',
-  'summitX150-24t' => 'Summit X150-24t',
-  'summitX150-24tDC' => 'Summit X150-24tDC',
-  'summitX150-24x' => 'Summit X150-24x',
-  'summitX150-24xDC' => 'Summit X150-24xDC',
-  'summitX150-48p' => 'Summit X150-48p',
-  'summitX150-48t' => 'Summit X150-48t',
-  'summitX150-48tDC' => 'Summit X150-48tDC',
-  'summitX250-24p' => 'Summit X250-24p',
-  'summitX250-24t' => 'Summit X250-24t',
-  'summitX250-24tDC' => 'Summit X250-24tDC',
-  'summitX250-24x' => 'Summit X250-24x',
-  'summitX250-24xDC' => 'Summit X250-24xDC',
-  'summitX250-48p' => 'Summit X250-48p',
-  'summitX250-48t' => 'Summit X250-48t',
-  'summitX250-48tDC' => 'Summit X250-48tDC',
-  'summitX350-24t' => 'Summit X350-24t',
-  'summitX350-48t' => 'Summit X350-48t',
-  'summitX440-24p' => 'Summit X440-24p',
-  'summitX440-24p-10G' => 'Summit X440-24p-10G',
-  'summitX440-24t' => 'Summit X440-24t',
-  'summitX440-24t-10G' => 'Summit X440-24t-10G',
-  'summitX440-24tdc' => 'Summit X440-24tdc',
-  'summitX440-24x' => 'Summit X440-24x',
-  'summitX440-24x-10g' => 'Summit X440-24x-10g',
-  'summitX440-48p' => 'Summit X440-48p',
-  'summitX440-48p-10G' => 'Summit X440-48p-10G',
-  'summitX440-48t' => 'Summit X440-48t',
-  'summitX440-48t-10G' => 'Summit X440-48t-10G',
-  'summitX440-48tdc' => 'Summit X440-48tdc',
-  'summitX440-8p' => 'Summit X440-8p',
-  'summitX440-8t' => 'Summit X440-8t',
-  'summitX440-L2-24t' => 'Summit X440-L2-24t',
-  'summitX440-L2-48t' => 'Summit X440-L2-48t',
-  'summitX450-24t' => 'Summit X450-24t',
-  'summitX450-24x' => 'Summit X450-24x',
-  'summitX450a-24t ' => 'Summit X450a-24t ',
-  'summitX450a-24tDC' => 'Summit X450a-24tDC',
-  'summitX450a-24x' => 'Summit X450a-24x',
-  'summitX450a-24xDC' => 'Summit X450a-24xDC',
-  'summitX450a-48t' => 'Summit X450a-48t',
-  'summitX450a-48tDC' => 'Summit X450a-48tDC',
-  'summitX450e-24p ' => 'Summit X450e-24p ',
-  'summitX450e-24t' => 'Summit X450e-24t',
-  'summitX450e-48p' => 'Summit X450e-48p',
-  'summitX450e-48t' => 'Summit X450e-48t',
-  'summitX460-24p' => 'Summit X460-24p',
-  'summitX460-24t' => 'Summit X460-24t',
-  'summitX460-24x' => 'Summit X460-24x',
-  'summitX460-48p' => 'Summit X460-48p',
-  'summitX460-48t' => 'Summit X460-48t',
-  'summitX460-48x' => 'Summit X460-48x',
-  'summitX480-24x' => 'Summit X480-24x',
-  'summitX480-24x-10G4X' => 'Summit X480-24x-10G4X',
-  'summitX480-24x-40G4X' => 'Summit X480-24x-40G4X',
-  'summitX480-24x-SS' => 'Summit X480-24x-SS',
-  'summitX480-24x-SS128' => 'Summit X480-24x-SS128',
-  'summitX480-24x-SSV80' => 'Summit X480-24x-SSV80',
-  'summitX480-48t' => 'Summit X480-48t',
-  'summitX480-48t-10G4X' => 'Summit X480-48t-10G4X',
-  'summitX480-48t-40G4X' => 'Summit X480-48t-40G4X',
-  'summitX480-48t-SS' => 'Summit X480-48t-SS',
-  'summitX480-48t-SS128' => 'Summit X480-48t-SS128',
-  'summitX480-48t-SSV80' => 'Summit X480-48t-SSV80',
-  'summitX480-48x' => 'Summit X480-48x',
-  'summitX480-48x-10G4X' => 'Summit X480-48x-10G4X',
-  'summitX480-48x-40G4X' => 'Summit X480-48x-40G4X',
-  'summitX480-48x-SS' => 'Summit X480-48x-SS',
-  'summitX480-48x-SS128' => 'Summit X480-48x-SS128',
-  'summitX480-48x-SSV80' => 'Summit X480-48x-SSV80',
-  'summitX650-24t' => 'Summit X650-24t',
-  'summitX650-24t-10G8X' => 'Summit X650-24t-10G8X',
-  'summitX650-24t-40G4X' => 'Summit X650-24t-40G4X',
-  'summitX650-24t-SS' => 'Summit X650-24t-SS',
-  'summitX650-24t-SS256' => 'Summit X650-24t-SS256',
-  'summitX650-24t-SS512' => 'Summit X650-24t-SS512',
-  'summitX650-24t-SSns' => 'Summit X650-24t-SSns',
-  'summitX650-24x' => 'Summit X650-24x',
-  'summitX650-24x-10G8X' => 'Summit X650-24x-10G8X',
-  'summitX650-24x-40G4X' => 'Summit X650-24x-40G4X',
-  'summitX650-24x-SS' => 'Summit X650-24x-SS',
-  'summitX650-24x-SS256' => 'Summit X650-24x-SS256',
-  'summitX650-24x-SS512' => 'Summit X650-24x-SS512',
-  'summitX650-24x-SSns' => 'Summit X650-24x-SSns',
-  'summitX670-48x' => 'Summit X670-48x',
-  'summitX670v-48t' => 'Summit X670v-48t',
-  'summitX670v-48x' => 'Summit X670v-48x',
 );
 
 $rewrite_cpqida_hardware = array(
@@ -1545,6 +1424,8 @@ $rewrite_ifname = array(
   'gig' => 'Gig',
   'fast' => 'Fast',
   'ten' => 'Ten',
+  'forty' => 'Forty',
+  'hundred' => 'Hundred',
   'bvi' => 'BVI',
   'vlan' => 'Vlan',
   'ether' => 'Ether',
@@ -1568,6 +1449,7 @@ $rewrite_ifname_regexp = array(
 $rewrite_shortif = array(
   'bundle-ether' => 'BE',         // IOS XR
   'controlethernet' => 'CE',      // IOS XR
+  'hundredgigabitethernet' => 'Hu',
   'fortygigabitethernet' => 'Fo',
   'tengigabitethernet' => 'Te',
   'tengige' => 'Te',
@@ -1577,7 +1459,9 @@ $rewrite_shortif = array(
   'fast ethernet' => 'Fa',
   'managementethernet' => 'Mgmt', // DNOS
   'ethernet' => 'Et',
+  'twentyfivegige' => 'Twe',
   'fortygige' => 'Fo',
+  'hundredgige' => 'Hu',
   'management' => 'Mgmt',
   'serial' => 'Se',
   'pos' => 'Pos',
@@ -1598,6 +1482,7 @@ $rewrite_shortif_regexp = array(
   '/^10\w+ (Port)/i' => '\1',      // 1000BaseTX Port 8/48 -> Port 8/48
   '/^(?:GigaVUE)\S* (Port)/i' => '\1', // GigaVUE-212 Port 8/48
   '/.*(Upstream|Downstream)(\s*)[^\d]*(\d.*)/' => '\1\2\3', // Logical Upstream Channel 1/0.0/0, Video Downstream 0/0/38, Downstream RF Port 4/7
+  '/^mgmteth(\d.*)/i' => 'Mgmt\1', // IOS XR
 );
 
 $rewrite_adslLineType = array(
@@ -1655,11 +1540,29 @@ function rewrite_definition_type($device, $sysObjectID_new = NULL)
 // TESTME needs unit testing
 function rewrite_extreme_hardware($hardware)
 {
-  global $rewrite_extreme_hardware;
 
-  $hardware = $rewrite_extreme_hardware[$hardware];
+  $hardware = str_replace('EXTREME-BASE-MIB::', '', $hardware);
 
-  return ($hardware);
+  // Common replaces
+  $from = array();
+  $to   = array();
+  $from[] = '/^summit/';       $to[] = 'Summit ';               // summitX440G2-48t-10G4-DC
+  $from[] = '/^x/';            $to[] = 'Summit X';              // x690-48x-4q-2c
+  $from[] = '/^isw/';          $to[] = 'Industrial Switch isw'; // isw-8GP-G4
+  $from[] = '/^one/';          $to[] = 'One';                   // oneC-A-600
+  $from[] = '/^aviatCtr/';     $to[] = 'CTR';                   // aviatCtr-8440
+  $from[] = '/^e4g/';          $to[] = 'E4G';                   // e4g-200-12x
+  $from[] = '/^bdx8/';         $to[] = 'BlackDiamond X';        // bdx8
+  $from[] = '/^bd/';           $to[] = 'BlackDiamond ';         // bd20804
+  $from[] = '/^blackDiamond/'; $to[] = 'BlackDiamond ';         // blackDiamond6816
+  $from[] = '/^ags/';          $to[] = 'AGS';                   // ags150-24p
+  $from[] = '/^altitude/';     $to[] = 'Altitude ';             // altitude4700
+  $from[] = '/^sentriant/';    $to[] = 'Sentriant ';            // sentriantPS200v1
+  $from[] = '/^nwi/';          $to[] = 'NWI';                   // nwi-e450a
+  $from[] = '/^enetSwitch/';   $to[] = 'EnetSwitch ';           // enetSwitch24Port
+  $hardware = preg_replace($from, $to, $hardware);
+
+  return $hardware;
 }
 
 // DOCME needs phpdoc block
@@ -1728,14 +1631,19 @@ function rewrite_unix_hardware($descr, $hw = NULL)
 
   if     (preg_match('/i[3456]86/i',    $descr)) { $hardware .= ' x86 [32bit]'; }
   elseif (preg_match('/x86_64|amd64/i', $descr)) { $hardware .= ' x86 [64bit]'; }
+  elseif (stristr($descr, 'ia64'))    { $hardware .= ' IA [64bit]'; }
   elseif (stristr($descr, 'ppc'))     { $hardware .= ' PPC [32bit]'; }
   elseif (stristr($descr, 'sparc32')) { $hardware .= ' SPARC [32bit]'; }
-  elseif (stristr($descr, 'sparc64')) { $hardware .= ' SPARC [32bit]'; }
+  elseif (stristr($descr, 'sparc64')) { $hardware .= ' SPARC [64bit]'; }
   elseif (stristr($descr, 'mips64'))  { $hardware .= ' MIPS [64bit]'; }
   elseif (stristr($descr, 'mips'))    { $hardware .= ' MIPS [32bit]'; }
-  elseif (stristr($descr, 'armv5'))   { $hardware .= ' ARMv5'; }
-  elseif (stristr($descr, 'armv6'))   { $hardware .= ' ARMv6'; }
-  elseif (stristr($descr, 'armv7'))   { $hardware .= ' ARMv7'; }
+  elseif (preg_match('/armv(\d+)/i', $descr, $matches))
+  {
+    $hardware .= ' ARMv' . $matches[1];
+  }
+  //elseif (stristr($descr, 'armv5'))   { $hardware .= ' ARMv5'; }
+  //elseif (stristr($descr, 'armv6'))   { $hardware .= ' ARMv6'; }
+  //elseif (stristr($descr, 'armv7'))   { $hardware .= ' ARMv7'; }
   elseif (stristr($descr, 'armv'))    { $hardware .= ' ARM'; }
 
   return ($hardware);
@@ -1873,11 +1781,11 @@ function short_ifname($if, $len = NULL, $escape = TRUE)
 function rewrite_entity_name($string)
 {
   $string = str_replace("Distributed Forwarding Card", "DFC", $string);
-  $string = preg_replace("/7600 Series SPA Interface Processor-/", "7600 SIP-", $string);
+  $string = str_replace("7600 Series SPA Interface Processor-", "7600 SIP-", $string);
   $string = preg_replace("/Rev\.\ [0-9\.]+\ /", "", $string);
-  $string = preg_replace("/12000 Series Performance Route Processor/", "12000 PRP", $string);
+  $string = str_replace("12000 Series Performance Route Processor", "12000 PRP", $string);
   $string = preg_replace("/^12000/", "", $string);
-  $string = preg_replace("/Gigabit Ethernet/", "GigE", $string);
+  $string = str_replace("Gigabit Ethernet", "GigE", $string);
   $string = preg_replace("/^ASR1000\ /", "", $string);
   //$string = str_replace("Routing Processor", "RP", $string);
   //$string = str_replace("Route Processor", "RP", $string);
@@ -1888,6 +1796,8 @@ function rewrite_entity_name($string)
   $string = str_replace(array('fan-tray'), 'Fan Tray', $string);
   $string = str_replace(array('Temp: ', 'CPU of ', 'CPU ', '(TM)', '(R)', '(r)'), '', $string);
   $string = str_replace('GenuineIntel Intel', 'Intel', $string);
+  $string = str_replace(array(' Inc.', ' Computer Corporation', ' Corporation'), '', $string);
+  $string = str_replace('IBM IBM', 'IBM', $string);
   $string = preg_replace("/(HP \w+) Switch/", "$1", $string);
   $string = preg_replace("/power[ -]supply( \d+)?(?: (?:module|sensor))?/i", "Power Supply$1", $string);
   $string = preg_replace("/([Vv]oltage|[Tt]ransceiver|[Pp]ower|[Cc]urrent|[Tt]emperature|[Ff]an|input|fail)\ [Ss]ensor/", "$1", $string);
@@ -1959,6 +1869,92 @@ function rewrite_location($location)
   return $location;
 }
 
+/**
+ * This function cleanup vendor/manufacturer name and
+ * unification multiple same names to single common vendor name.
+ */
+function rewrite_vendor($string)
+{
+  global $config;
+
+  $clean_name = $string;
+
+  // By first, clean all additional abbreviations in vendor name
+  $clean_array = array(
+    '/(?:\s+|,\s*)(?:inc|corp|comm|co|elec|tech|llc)(?![a-z])/i' => '', // abbreviations
+    '/(?:\s+|,\s*)(?:Systems|Computer|Corporation|Company|Communications|Networks|Electronics)(?![a-z])/i' => '',
+  );
+  foreach ($clean_array as $pattern => $replace)
+  {
+    if (preg_match_all($pattern, $string, $matches))
+    {
+      foreach($matches[0] as $match)
+      {
+        $clean_name = str_replace($match, $replace, $clean_name);
+      }
+    }
+  }
+  $clean_name = trim($clean_name, " \t\n\r\0\x0B.,;'\"()"); // Clean punctuations after rewrites
+
+  // Remove string duplicates
+  $clean_name_array = array_unique(explode(' ', $clean_name));
+  $clean_name = implode(' ', $clean_name_array);
+
+  // Now try to find exist vendor definition
+  $clean_key = safename(strtolower($clean_name));
+  if (isset($config['vendors'][$clean_key]))
+  {
+    // Founded definition by original string
+    return $config['vendors'][$clean_key]['name'];
+  }
+  $key  = safename(strtolower($string));
+  if (isset($config['vendors'][$key]))
+  {
+    // Founded definition by clean string
+    return $config['vendors'][$key]['name'];
+  }
+
+  // Now try to find definition by full search in definitions
+  foreach ($config['vendors'] as $vendor_key => $entry)
+  {
+    if (strlen($entry['name']) <= 3)
+    {
+      // In case, when vendor name too short, that seems as abbr, ie GE
+      if (strcasecmp($clean_name, $entry['name']) == 0 || // Cleaned string
+          strcasecmp($string, $entry['name']) == 0)       // Original string
+      {
+        // Founded in definitions
+        return $entry['name'];
+      }
+      $search_array = array();
+    } else {
+      $search_array = array($entry['name']);
+    }
+
+    if (isset($entry['full_name'])) { $search_array[] = $entry['full_name']; } // Full name of vendor
+    if (isset($entry['alternatives'])) { $search_array = array_merge($search_array, $entry['alternatives']); } // Alternative (possible) names of vendor
+
+    if (str_istarts($clean_name, $search_array) || // Cleaned string
+        str_istarts($string, $search_array))       // Original string
+    {
+      // Founded in definitions
+      return $entry['name'];
+    }
+  }
+
+  if (strlen($clean_name) < 5 ||
+      preg_match('/^([A-Z0-9][a-z]+[\ \-]?[A-Z]+[a-z]*|[A-Z0-9]+[\ \-][A-Za-z]+|[A-Z]{2,}[a-z]+)/', $clean_name))
+  {
+    // This is MultiCase name or small name, keeps as is
+    //echo("\n"); print_error($clean_name . ': MULTICASE ');
+    return $clean_name;
+  } else {
+    // Last, just return cleaned name
+    //echo("\n"); print_error($clean_name . ': UCWORDS');
+    return ucwords(strtolower($clean_name));
+  }
+}
+
 // Underlying rewrite functions
 
 /**
@@ -1992,8 +1988,6 @@ function array_str_replace($array, $string, $case_sensitive = FALSE)
 
   foreach ($array as $key => $entry)
   {
-    if ($search === '') { continue; }
-
     $search[] = $key;
     $replace[] = $entry;
   }
@@ -2036,292 +2030,70 @@ function array_preg_replace($array, $string)
  */
 function array_tag_replace($array, $string, $tag_scope = '%')
 {
-  if (empty($tag_scope))
+  // If passed array, do tag replace recursive (for values only)
+  if (is_array($string))
   {
-    // Default key scopes string %
-    $tag_scope = '%';
-  }
-  $pattern = '/'.$tag_scope.'(?<tag>\w+)'.$tag_scope.'/';
-  //var_dump($pattern);
-
-  if (preg_match_all($pattern, $string, $matches)) // Search all tags
-  {
-    //var_dump($matches['tag']);
-    $search = array();
-    $replace = array();
-    foreach (array_unique($matches['tag']) as $tag) // Unique tags
+    foreach ($string as $key => $value)
     {
-      $search[] = $tag_scope . $tag . $tag_scope;
-      $replace[] = $array[$tag];
+      $string[$key] = array_tag_replace($array, $value, $tag_scope);
     }
-    $string = str_replace($search, $replace, $string);
+    return $string;
   }
+
+  $new_array = array();
+
+  // Generate new array of tags including delimiter
+  foreach($array as $key => $value)
+  {
+    $new_array[$tag_scope.$key.$tag_scope] = $value;
+  }
+
+  // Replace tags
+  $string = array_str_replace($new_array, $string, TRUE);
+  //$string = strtr($string, $new_array); // never use this slowest function in the world
+
+  // Remove unused tags
+  if ($tag_scope !== '/')
+  {
+    $pattern_clean = '/'.$tag_scope.'\S+?'.$tag_scope.'/';
+  } else {
+    $pattern_clean = '%/\S+?/%';
+  }
+  $string = preg_replace($pattern_clean, '', $string);
 
   return $string;
 }
-
-// FIXME move somewhere else? definitions?
-$countries = array(
-  'AF' => 'Afghanistan',
-  'AX' => 'Åland Islands',
-  'AL' => 'Albania',
-  'DZ' => 'Algeria',
-  'AS' => 'American Samoa',
-  'AD' => 'Andorra',
-  'AO' => 'Angola',
-  'AI' => 'Anguilla',
-  'AQ' => 'Antarctica',
-  'AG' => 'Antigua and Barbuda',
-  'AR' => 'Argentina',
-  'AM' => 'Armenia',
-  'AW' => 'Aruba',
-  'AU' => 'Australia',
-  'AT' => 'Austria',
-  'AZ' => 'Azerbaijan',
-  'BS' => 'Bahamas',
-  'BH' => 'Bahrain',
-  'BD' => 'Bangladesh',
-  'BB' => 'Barbados',
-  'BY' => 'Belarus',
-  'BE' => 'Belgium',
-  'BZ' => 'Belize',
-  'BJ' => 'Benin',
-  'BM' => 'Bermuda',
-  'BT' => 'Bhutan',
-  'BO' => 'Bolivia, Plurinational State of',
-  'BA' => 'Bosnia and Herzegovina',
-  'BW' => 'Botswana',
-  'BV' => 'Bouvet Island',
-  'BR' => 'Brazil',
-  'IO' => 'British Indian Ocean Territory',
-  'BN' => 'Brunei Darussalam',
-  'BG' => 'Bulgaria',
-  'BF' => 'Burkina Faso',
-  'BI' => 'Burundi',
-  'KH' => 'Cambodia',
-  'CM' => 'Cameroon',
-  'CA' => 'Canada',
-  'CV' => 'Cape Verde',
-  'KY' => 'Cayman Islands',
-  'CF' => 'Central African Republic',
-  'TD' => 'Chad',
-  'CL' => 'Chile',
-  'CN' => 'China',
-  'CX' => 'Christmas Island',
-  'CC' => 'Cocos (Keeling) Islands',
-  'CO' => 'Colombia',
-  'KM' => 'Comoros',
-  'CG' => 'Congo',
-  'CD' => 'Congo, the Democratic Republic of the',
-  'CK' => 'Cook Islands',
-  'CR' => 'Costa Rica',
-  'CI' => "Côte d'Ivoire",
-  'HR' => 'Croatia',
-  'CU' => 'Cuba',
-  'CY' => 'Cyprus',
-  'CZ' => 'Czech Republic',
-  'DK' => 'Denmark',
-  'DJ' => 'Djibouti',
-  'DM' => 'Dominica',
-  'DO' => 'Dominican Republic',
-  'EC' => 'Ecuador',
-  'EG' => 'Egypt',
-  'SV' => 'El Salvador',
-  'GQ' => 'Equatorial Guinea',
-  'ER' => 'Eritrea',
-  'EE' => 'Estonia',
-  'ET' => 'Ethiopia',
-  'FK' => 'Falkland Islands (Malvinas)',
-  'FO' => 'Faroe Islands',
-  'FJ' => 'Fiji',
-  'FI' => 'Finland',
-  'FR' => 'France',
-  'GF' => 'French Guiana',
-  'PF' => 'French Polynesia',
-  'TF' => 'French Southern Territories',
-  'GA' => 'Gabon',
-  'GM' => 'Gambia',
-  'GE' => 'Georgia',
-  'DE' => 'Germany',
-  'GH' => 'Ghana',
-  'GI' => 'Gibraltar',
-  'GR' => 'Greece',
-  'GL' => 'Greenland',
-  'GD' => 'Grenada',
-  'GP' => 'Guadeloupe',
-  'GU' => 'Guam',
-  'GT' => 'Guatemala',
-  'GG' => 'Guernsey',
-  'GN' => 'Guinea',
-  'GW' => 'Guinea-Bissau',
-  'GY' => 'Guyana',
-  'HT' => 'Haiti',
-  'HM' => 'Heard Island and McDonald Islands',
-  'VA' => 'Holy See (Vatican City State)',
-  'HN' => 'Honduras',
-  'HK' => 'Hong Kong',
-  'HU' => 'Hungary',
-  'IS' => 'Iceland',
-  'IN' => 'India',
-  'ID' => 'Indonesia',
-  'IR' => 'Iran, Islamic Republic of',
-  'IQ' => 'Iraq',
-  'IE' => 'Ireland',
-  'IM' => 'Isle of Man',
-  'IL' => 'Israel',
-  'IT' => 'Italy',
-  'JM' => 'Jamaica',
-  'JP' => 'Japan',
-  'JE' => 'Jersey',
-  'JO' => 'Jordan',
-  'KZ' => 'Kazakhstan',
-  'KE' => 'Kenya',
-  'KI' => 'Kiribati',
-  'KP' => "Korea, Democratic People's Republic of",
-  'KR' => 'Korea, Republic of',
-  'KW' => 'Kuwait',
-  'KG' => 'Kyrgyzstan',
-  'LA' => "Lao People's Democratic Republic",
-  'LV' => 'Latvia',
-  'LB' => 'Lebanon',
-  'LS' => 'Lesotho',
-  'LR' => 'Liberia',
-  'LY' => 'Libyan Arab Jamahiriya',
-  'LI' => 'Liechtenstein',
-  'LT' => 'Lithuania',
-  'LU' => 'Luxembourg',
-  'MO' => 'Macao',
-  'MK' => 'Macedonia, the former Yugoslav Republic of',
-  'MG' => 'Madagascar',
-  'MW' => 'Malawi',
-  'MY' => 'Malaysia',
-  'MV' => 'Maldives',
-  'ML' => 'Mali',
-  'MT' => 'Malta',
-  'MH' => 'Marshall Islands',
-  'MQ' => 'Martinique',
-  'MR' => 'Mauritania',
-  'MU' => 'Mauritius',
-  'YT' => 'Mayotte',
-  'MX' => 'Mexico',
-  'FM' => 'Micronesia, Federated States of',
-  'MD' => 'Moldova, Republic of',
-  'MC' => 'Monaco',
-  'MN' => 'Mongolia',
-  'ME' => 'Montenegro',
-  'MS' => 'Montserrat',
-  'MA' => 'Morocco',
-  'MZ' => 'Mozambique',
-  'MM' => 'Myanmar',
-  'NA' => 'Namibia',
-  'NR' => 'Nauru',
-  'NP' => 'Nepal',
-  'NL' => 'Netherlands',
-  'AN' => 'Netherlands Antilles',
-  'NC' => 'New Caledonia',
-  'NZ' => 'New Zealand',
-  'NI' => 'Nicaragua',
-  'NE' => 'Niger',
-  'NG' => 'Nigeria',
-  'NU' => 'Niue',
-  'NF' => 'Norfolk Island',
-  'MP' => 'Northern Mariana Islands',
-  'NO' => 'Norway',
-  'OM' => 'Oman',
-  'PK' => 'Pakistan',
-  'PW' => 'Palau',
-  'PS' => 'Palestinian Territory, Occupied',
-  'PA' => 'Panama',
-  'PG' => 'Papua New Guinea',
-  'PY' => 'Paraguay',
-  'PE' => 'Peru',
-  'PH' => 'Philippines',
-  'PN' => 'Pitcairn',
-  'PL' => 'Poland',
-  'PT' => 'Portugal',
-  'PR' => 'Puerto Rico',
-  'QA' => 'Qatar',
-  'RE' => 'Réunion',
-  'RO' => 'Romania',
-  'RU' => 'Russian Federation',
-  'RW' => 'Rwanda',
-  'BL' => 'Saint Barthélemy',
-  'SH' => 'Saint Helena',
-  'KN' => 'Saint Kitts and Nevis',
-  'LC' => 'Saint Lucia',
-  'MF' => 'Saint Martin (French part)',
-  'PM' => 'Saint Pierre and Miquelon',
-  'VC' => 'Saint Vincent and the Grenadines',
-  'WS' => 'Samoa',
-  'SM' => 'San Marino',
-  'ST' => 'Sao Tome and Principe',
-  'SA' => 'Saudi Arabia',
-  'SN' => 'Senegal',
-  'RS' => 'Serbia',
-  'SC' => 'Seychelles',
-  'SL' => 'Sierra Leone',
-  'SG' => 'Singapore',
-  'SK' => 'Slovakia',
-  'SI' => 'Slovenia',
-  'SB' => 'Solomon Islands',
-  'SO' => 'Somalia',
-  'ZA' => 'South Africa',
-  'GS' => 'South Georgia and the South Sandwich Islands',
-  'ES' => 'Spain',
-  'LK' => 'Sri Lanka',
-  'SD' => 'Sudan',
-  'SR' => 'Suriname',
-  'SJ' => 'Svalbard and Jan Mayen',
-  'SZ' => 'Swaziland',
-  'SE' => 'Sweden',
-  'CH' => 'Switzerland',
-  'SY' => 'Syrian Arab Republic',
-  'TW' => 'Taiwan, Province of China',
-  'TJ' => 'Tajikistan',
-  'TZ' => 'Tanzania, United Republic of',
-  'TH' => 'Thailand',
-  'TL' => 'Timor-Leste',
-  'TG' => 'Togo',
-  'TK' => 'Tokelau',
-  'TO' => 'Tonga',
-  'TT' => 'Trinidad and Tobago',
-  'TN' => 'Tunisia',
-  'TR' => 'Turkey',
-  'TM' => 'Turkmenistan',
-  'TC' => 'Turks and Caicos Islands',
-  'TV' => 'Tuvalu',
-  'UG' => 'Uganda',
-  'UA' => 'Ukraine',
-  'AE' => 'United Arab Emirates',
-  'GB' => 'United Kingdom',
-  'US' => 'United States',
-  'UM' => 'United States Minor Outlying Islands',
-  'UY' => 'Uruguay',
-  'UZ' => 'Uzbekistan',
-  'VU' => 'Vanuatu',
-  'VE' => 'Venezuela, Bolivarian Republic of',
-  'VN' => 'Viet Nam',
-  'VG' => 'Virgin Islands, British',
-  'VI' => 'Virgin Islands, U.S.',
-  'WF' => 'Wallis and Futuna',
-  'EH' => 'Western Sahara',
-  'YE' => 'Yemen',
-  'ZM' => 'Zambia',
-  'ZW' => 'Zimbabwe'
-);
 
 // DOCME needs phpdoc block
 // TESTME needs unit testing
 function country_from_code($code)
 {
-  global $countries;
+  global $config;
 
+  $countries = $config['rewrites']['countries'];
   $code = strtoupper(trim($code));
-  if (array_key_exists($code, $countries))
+  switch (strlen($code))
   {
-    return $countries[$code];
+    case 0:
+    case 1:
+      return "Unknown";
+    case 2: // ISO 2
+    case 3: // ISO 3
+      // Return country by code
+      if (array_key_exists($code, $countries))
+      {
+        return $countries[$code];
+      }
+      return "Unknown";
+    default:
+      // Try to search by country name
+      $names = array_unique(array_values($countries));
+      foreach ($names as $country)
+      {
+        if (str_istarts($country, $code) || str_istarts($code, $country)) { return $country; }
+      }
+      return "Unknown";
   }
-  return "Unknown";
 }
 
 // EOF

@@ -82,8 +82,14 @@
                        FiberProtectGroup
                            INTEGER,
                        splittingRatio
-                           INTEGER
-                          
+                           INTEGER,
+                       activeOnuNum 
+                           INTEGER,
+                       inactiveOnuNum 
+                           INTEGER,
+                       llidIfindexString
+                           OCTET STRING
+                         
                    }
 
           -- The following section describes the components of the
@@ -285,9 +291,32 @@
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
-                           "Fiber splits ratio, for each OLT PON port, which means the number of ONU uplinked."
+                           "Fiber splits ratio, for each OLT PON port, which means the max number of ONU."
                    ::= { nmsEponOltPonEntry 20 } 
 
+               activeOnuNum  OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Currnet active ONU number."
+                   ::= { nmsEponOltPonEntry 21 } 
+
+               inactiveOnuNum  OBJECT-TYPE
+                   SYNTAX  INTEGER 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Currnet inactive ONU number."
+                   ::= { nmsEponOltPonEntry 22 } 
+
+               llidIfindexString  OBJECT-TYPE
+                   SYNTAX  OCTET STRING 
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Llid ports ifindex string. Seperated with comma."
+                   ::= { nmsEponOltPonEntry 23 } 
 
 
 
@@ -625,6 +654,19 @@
     		DESCRIPTION
         	"The agent generates this trap when olt optical module  works in abnormal status or return to normal ."
     		::= { ponSfpParameterAlarmsNotifications 2 }
+
+-- PON port migration
+
+               ponPortMigration       OBJECT IDENTIFIER ::= { nmsEponOltPon 4 }
+              
+               ponPortMigLlidSet  OBJECT-TYPE
+                   SYNTAX  OCTET STRING 
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Llid ports ifindex string. Seperated with semicolon. For example, if we migrate the PON port configuration from port EPON3/1(llid:25) to 
+                             port EPON3/2(llid:26), this value should be set to '25;26'."
+                   ::= { ponPortMigration 1 } 
 
               
 

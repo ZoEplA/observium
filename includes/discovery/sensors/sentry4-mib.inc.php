@@ -50,7 +50,7 @@ foreach ($sentry4_LineConfigEntry as $tower => $cords)
                                 'limit_high_warn' => $line_event_entry['st4LineCurrentHighAlarm']);
                 $value  = $line_monitor_entry['st4LineCurrent'];
 
-                discover_sensor($valid['sensor'], 'current', $device, $oid, "st4LineCurrent.$index", 'sentry4', $descr, $scale, $value, $limits);
+                discover_sensor('current', $device, $oid, "st4LineCurrent.$index", 'sentry4', $descr, $scale, $value, $limits);
             } else {
                 /// FIXME. States for $entry['infeedLoadStatus']
             }
@@ -61,7 +61,7 @@ foreach ($sentry4_LineConfigEntry as $tower => $cords)
             {
                 $value = $phase_monitor_entry['st4PhaseVoltage'];
 
-                discover_sensor($valid['sensor'], 'voltage', $device, $oid, "st4PhaseVoltage.$index", 'sentry4', $descr, $scale_voltage, $value);
+                discover_sensor('voltage', $device, $oid, "st4PhaseVoltage.$index", 'sentry4', $descr, $scale_voltage, $value);
             }
 
             //infeedPower
@@ -70,7 +70,7 @@ foreach ($sentry4_LineConfigEntry as $tower => $cords)
             {
               $value = $phase_monitor_entry['st4PhaseApparentPower'];
 
-              discover_sensor($valid['sensor'], 'power', $device, $oid, "st4PhaseApparentPower.$index", 'sentry4', $descr, 1, $value);
+              discover_sensor('power', $device, $oid, "st4PhaseApparentPower.$index", 'sentry4', $descr, 1, $value);
             }
         }
 
@@ -90,7 +90,7 @@ foreach ($sentry4_LineConfigEntry as $tower => $cords)
                                  'limit_high_warn'  => $ou_event_entry['st4OutletCurrentHighAlarm']);
                  $value  = $ou_monitor_entry['st4OutletCurrent'];
 
-                 discover_sensor($valid['sensor'], 'current', $device, $oid, "st4OutletCurrent.$index", 'sentry4', $descr, $scale, $value, $limits);
+                 discover_sensor('current', $device, $oid, "st4OutletCurrent.$index", 'sentry4', $descr, $scale, $value, $limits);
              } else {
                 /// FIXME. States for $ou_entry['outletLoadStatus'], $ou_entry['outletStatus']
              }
@@ -136,7 +136,7 @@ foreach ($sentry4_TempSensorEntry as $index => $entry)
         var_dump($limits);
     }
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, "st4TempSensorValue.$index", 'sentry4', $descr, $scale_temp, $value, $limits);
+    discover_sensor('temperature', $device, $oid, "st4TempSensorValue.$index", 'sentry4', $descr, $scale_temp, $value, $limits);
   }
 }
 
@@ -169,7 +169,7 @@ foreach ($sentry4_HumidSensorEntry as $index => $entry)
       var_dump($limits);
     }
 
-    discover_sensor($valid['sensor'], 'humidity', $device, $oid, "st4HumidSensorValue.$index", 'sentry4', $descr, 1, $value, $limits);
+    discover_sensor('humidity', $device, $oid, "st4HumidSensorValue.$index", 'sentry4', $descr, 1, $value, $limits);
   }
 }
 

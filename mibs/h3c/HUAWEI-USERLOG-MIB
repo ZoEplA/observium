@@ -1,7 +1,7 @@
 -- =================================================================
--- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2003 by  H3C TECHNOLOGIES. All rights reserved
 --
--- Description:This mib file is used for management of huawei userlog
+-- Description:This MIB file is used for management of userlog
 --             information.
 -- Reference:
 -- Version: V1.1
@@ -29,15 +29,13 @@ HUAWEI-USERLOG-MIB DEFINITIONS ::= BEGIN
     hwUserLogMIB MODULE-IDENTITY
             LAST-UPDATED "200304100000Z"          -- April 10, 2003 at 00:00 GMT
             ORGANIZATION
-                    "Huawei Technologies co.,Ltd."
+                "Hangzhou H3C Tech. Co., Ltd."
             CONTACT-INFO
-                    " R&D BeiJing, Huawei Technologies co.,Ltd.
-                    Huawei Bld.,NO.3 Xinxi Rd.,
-                    Shang-Di Information Industry Base,
-                    Hai-Dian District Beijing P.R. China
-                    Zip:100085
-                    Http://www.huawei.com
-                    E-mail:support@huawei.com "
+                "Platform Team Hangzhou H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
             DESCRIPTION
                     "The HUAWEI-USERLOG-MIB contains objects to
                     Manage configuration and Monitor running state
@@ -754,7 +752,7 @@ HUAWEI-USERLOG-MIB DEFINITIONS ::= BEGIN
             STATUS current
             DESCRIPTION
                     "The compliance statement for entities which implement the
-                    Huawei Userlog mib."
+                    Userlog mib."
             MODULE -- this module
                     MANDATORY-GROUPS { hwUserlogMandatoryGroup }
             ::= { hwUserlogCompliances 1 }

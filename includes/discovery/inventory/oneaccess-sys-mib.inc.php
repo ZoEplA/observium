@@ -7,16 +7,13 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-if (!isset($cache_discovery['oneaccess-sys-mib']))
-{
-  $cache_discovery['oneaccess-sys-mib'] = snmpwalk_cache_oid($device, 'oacExpIMSysHwComponentsTable', array(), 'ONEACCESS-SYS-MIB');
-}
+$oids = snmpwalk_cache_oid($device, 'oacExpIMSysHwComponentsTable', array(), 'ONEACCESS-SYS-MIB');
 
-foreach ($cache_discovery['oneaccess-sys-mib'] as $index => $entry)
+foreach ($oids as $index => $entry)
 {
   //print_r($entry);
   $index = (int)$entry['oacExpIMSysHwcIndex'] + 1;
@@ -33,7 +30,7 @@ foreach ($cache_discovery['oneaccess-sys-mib'] as $index => $entry)
     'entPhysicalParentRelPos' => ($entry['oacExpIMSysHwcIndex'] == 0 ? -1 : (int)$entry['oacExpIMSysHwcIndex']),
   );
 
-  discover_inventory($valid['inventory'], $device, $index, $inventory[$index], 'oneaccess-sys-mib');
+  discover_inventory($device, $index, $inventory[$index], $mib);
 }
 
 // EOF

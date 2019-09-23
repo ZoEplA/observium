@@ -1,5 +1,7 @@
 <?php
 
+//define('OBS_DEBUG', 1);
+
 $base_dir = realpath(dirname(__FILE__) . '/..');
 $config['install_dir'] = $base_dir;
 
@@ -31,6 +33,7 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
         array('<test@example.com> ',  array('test@example.com' => NULL)),
         array(' <test@example.com> ', array('test@example.com' => NULL)),
 
+        array('Test Title <test@example>',          array('test@example' => 'Test Title')), // Non fqdn
         array('Test Title <test@example.com>',      array('test@example.com' => 'Test Title')),
         array('Test Title<test@example.com>',       array('test@example.com' => 'Test Title')),
         array('"Test Title" <test@example.com>',    array('test@example.com' => 'Test Title')),
@@ -366,6 +369,8 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array('C1 9C 5A 26',  '193.156.90.38'),
       array('4a7d343d',     '74.125.52.61'),
       array('207d343d',     '32.125.52.61'),
+      // cisco IPv4
+      array('54 2E 68 02 FF FF FF FF ', '84.46.104.2'),
       // IPv4 (converted to snmp string)
       array('J}4=',         '74.125.52.61'),
       array('J}4:',         '74.125.52.58'),
@@ -376,6 +381,8 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array(' ^KL=',        '94.75.76.61'),
       array('  KL=',        '32.75.76.61'),
       array('    ',         '32.32.32.32'),
+      // hex string
+      array('31 38 35 2E 31 39 2E 31 30 30 2E 31 32 ', '185.19.100.12'),
       // IPv6
       array('20 01 07 F8 00 12 00 01 00 00 00 00 00 05 02 72',  '2001:07f8:0012:0001:0000:0000:0005:0272'),
       array('20:01:07:F8:00:12:00:01:00:00:00:00:00:05:02:72',  '2001:07f8:0012:0001:0000:0000:0005:0272'),
@@ -565,7 +572,7 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
   */
   public function testStateStringToNumeric($type, $value, $result)
   {
-    $this->assertSame($result, state_string_to_numeric($type, $value));
+    $this->assertSame($result, state_string_to_numeric($type, $value)); // old without mib
   }
 
   public function providerStateStringToNumeric()
@@ -580,6 +587,7 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array('cisco-envmon-state',         'warning', 2),
       array('cisco-envmon-state',         'war ning', FALSE),
       array('powernet-sync-state',        'inSync', 1),
+      array('power-ethernet-mib-pse-state', 'off', 2),
       // Numeric value
       array('cisco-envmon-state',         '2', 2),
       array('cisco-envmon-state',          2, 2),
@@ -595,7 +603,7 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
   */
   public function testGetStateArray($type, $value, $poller, $result)
   {
-    $this->assertSame($result, get_state_array($type, $value, NULL, $poller));
+    $this->assertSame($result, get_state_array($type, $value, '', NULL, $poller)); // old without know mib
   }
 
   public function providerGetStateArray()
@@ -610,14 +618,15 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array('cisco-envmon-state',         'warning',        'snmp', array('value' => 2, 'name' => 'warning', 'event' => 'warning', 'mib' => 'CISCO-ENVMON-MIB')),
       array('cisco-envmon-state',         'war ning',       'snmp', array('value' => FALSE)),
       array('powernet-sync-state',        'inSync',         'snmp', array('value' => 1, 'name' => 'inSync', 'event' => 'ok', 'mib' => 'PowerNet-MIB')),
+      array('power-ethernet-mib-pse-state', 'off',          'snmp', array('value' => 2, 'name' => 'off', 'event' => 'ignore', 'mib' => 'POWER-ETHERNET-MIB')),
       // Numeric value
       array('cisco-envmon-state',         '2',              'snmp', array('value' => 2, 'name' => 'warning', 'event' => 'warning', 'mib' => 'CISCO-ENVMON-MIB')),
       array('cisco-envmon-state',          2,               'snmp', array('value' => 2, 'name' => 'warning', 'event' => 'warning', 'mib' => 'CISCO-ENVMON-MIB')),
       array('cisco-envmon-state',         '2.34',           'snmp', array('value' => FALSE)),
       array('cisco-envmon-state',          10,              'snmp', array('value' => FALSE)),
       // agent, ipmi
-      array('unix-agent-state',           'warn',          'agent', array('value' => 2, 'name' => 'warn', 'event' => 'warning', 'mib' => 'agent')),
-      array('unix-agent-state',           0,               'agent', array('value' => 0, 'name' => 'fail', 'event' => 'alert',   'mib' => 'agent')),
+      array('unix-agent-state',           'warn',          'agent', array('value' => 2, 'name' => 'warn', 'event' => 'warning', 'mib' => '')),
+      array('unix-agent-state',           0,               'agent', array('value' => 0, 'name' => 'fail', 'event' => 'alert',   'mib' => '')),
     );
     return $results;
   }
@@ -626,18 +635,24 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
   * @dataProvider providerGetStateArray2
   * @group states
   */
-  public function testGetStateArray2($type, $value, $event_value, $result)
+  public function testGetStateArray2($type, $value, $event_value, $mib, $result)
   {
-    $this->assertSame($result, get_state_array($type, $value, $event_value));
+    $this->assertSame($result, get_state_array($type, $value, $mib, $event_value)); // old without know mib
   }
 
   public function providerGetStateArray2()
   {
+    $mib = 'PowerNet-MIB';
     $results = array(
-      array('emsInputContactStatusInputContactState', 'contactClosedEMS', 'normallyClosedEMS', array('value' => 1, 'name' => 'contactClosedEMS', 'event' => 'ok',    'mib' => 'PowerNet-MIB')),
-      array('emsInputContactStatusInputContactState', 'contactClosedEMS',   'normallyOpenEMS', array('value' => 1, 'name' => 'contactClosedEMS', 'event' => 'alert', 'mib' => 'PowerNet-MIB')),
-      array('emsInputContactStatusInputContactState',   'contactOpenEMS', 'normallyClosedEMS', array('value' => 2, 'name' => 'contactOpenEMS',   'event' => 'alert', 'mib' => 'PowerNet-MIB')),
-      array('emsInputContactStatusInputContactState',   'contactOpenEMS',   'normallyOpenEMS', array('value' => 2, 'name' => 'contactOpenEMS',   'event' => 'ok',    'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState', 'contactClosedEMS', 'normallyClosedEMS',   '', array('value' => 1, 'name' => 'contactClosedEMS', 'event' => 'ok',    'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState', 'contactClosedEMS',   'normallyOpenEMS',   '', array('value' => 1, 'name' => 'contactClosedEMS', 'event' => 'alert', 'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState',   'contactOpenEMS', 'normallyClosedEMS',   '', array('value' => 2, 'name' => 'contactOpenEMS',   'event' => 'alert', 'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState',   'contactOpenEMS',   'normallyOpenEMS',   '', array('value' => 2, 'name' => 'contactOpenEMS',   'event' => 'ok',    'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState', 'contactClosedEMS', 'normallyClosedEMS', $mib, array('value' => 1, 'name' => 'contactClosedEMS', 'event' => 'ok',    'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState', 'contactClosedEMS',   'normallyOpenEMS', $mib, array('value' => 1, 'name' => 'contactClosedEMS', 'event' => 'alert', 'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState',   'contactOpenEMS', 'normallyClosedEMS', $mib, array('value' => 2, 'name' => 'contactOpenEMS',   'event' => 'alert', 'mib' => 'PowerNet-MIB')),
+      array('emsInputContactStatusInputContactState',   'contactOpenEMS',   'normallyOpenEMS', $mib, array('value' => 2, 'name' => 'contactOpenEMS',   'event' => 'ok',    'mib' => 'PowerNet-MIB')),
+
     );
     return $results;
   }
@@ -679,20 +694,32 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
   /**
   * @dataProvider providerArrayMergeIndexed
   */
-  public function testArrayMergeIndexed($result, $array1, $array2, $array3 = NULL)
+  public function testArrayMergeIndexed($result, $array1, $array2)
   {
 
-    if ($array3 == NULL)
-    {
-      $this->assertSame($result, array_merge_indexed($array1, $array2));
-    } else {
-      $this->assertSame($result, array_merge_indexed($array1, $array2, $array3));
-    }
+    $this->assertSame($result, array_merge_indexed($array1, $array2));
+    //if ($array3 == NULL)
+    //{
+    //  $this->assertSame($result, array_merge_indexed($array1, $array2));
+    //} else {
+    //  $this->assertSame($result, array_merge_indexed($array1, $array2, $array3));
+    //}
   }
 
   public function providerArrayMergeIndexed()
   {
     $results = array(
+      array( // Simple 2 array test with NULL
+             array( // Result
+                    1 => array('Test2' => 'Foo', 'Test3' => 'Bar'),
+                    2 => array('Test2' => 'Qux'),
+             ),
+             NULL,
+             array( // Array 2
+                    1 => array('Test2' => 'Foo', 'Test3' => 'Bar'),
+                    2 => array('Test2' => 'Qux'),
+             ),
+      ),
       array( // Simple 2 array test
         array( // Result
           1 => array('Test1' => 'Moo', 'Test2' => 'Foo', 'Test3' => 'Bar'),
@@ -709,7 +736,7 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       ),
       array( // Simple 3 array test
         array( // Result
-          1 => array('Test1' => 'Moo', 'Test2' => 'Foo', 'Test3' => 'Bar'),
+          1 => array('Test1' => 'Moo', 'Test2' => 'Foo'), //, 'Test3' => 'Bar'),
           2 => array('Test1' => 'Baz', 'Test4' => 'Bam', 'Test2' => 'Qux'),
         ),
         array( // Array 1
@@ -720,10 +747,10 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
           1 => array('Test2' => 'Foo'),
           2 => array('Test2' => 'Qux'),
         ),
-        array( // Array 3
-          1 => array('Test3' => 'Bar'),
-          2 => array('Test2' => 'Qux'),
-        ),
+        //array( // Array 3
+        //  1 => array('Test3' => 'Bar'),
+        //  2 => array('Test2' => 'Qux'),
+        //),
       array( // Partial overwrite by array 2
         array( // Result
           1 => array('Test1' => 'Moo', 'Test2' => 'Foo', 'Test3' => 'Bar'),
@@ -989,6 +1016,13 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
       array('oooOOObservium', 'oooOOObserviumo', array(
                                                    array('action' => 'rtrim', 'characters' => 'o')
                                                  )),
+      // MAP
+      array('oooOOObserviumo', 'oooOOObservium', array(
+                                                   array('action' => 'map', 'map' => ['oooOOObservium' => 'oooOOObserviumo'])
+      )),
+      array('oooOOO', 'oooOOO', array(
+        array('action' => 'map', 'map' => ['oooOOObservium' => 'oooOOObserviumo'])
+      )),
       // Timeticks
       array(15462419, '178:23:06:59.03', array(
                                                    array('action' => 'timeticks')
@@ -1040,6 +1074,80 @@ class IncludesFunctionsTest extends \PHPUnit\Framework\TestCase
     return $results;
   }
 
+  /**
+  * @dataProvider providerStringSimilar
+  * @group string
+  */
+  public function testStringSimilar($result, $string1, $string2)
+  {
+    $this->assertSame($result, str_similar($string1, $string2));
+    $this->assertSame($result, str_similar($string2, $string1));
+  }
+
+  public function providerStringSimilar()
+  {
+    return array(
+      array('Intel Xeon E5430 @ 2.66GH', '0/0/0 Intel Xeon E5430 @ 2.66GH', '0/1/0 Intel Xeon E5430 @ 2.66GH'),
+      array('Intel Xeon E5430 @',        '0/0/0 Intel Xeon E5430 @ 2.66GH', '0/1/0 Intel Xeon E5430 @ 2.66G'),
+      array('Network Processor',         'Network Processor CPU8', 'Network Processor CPU31'),
+      array('',                          'Network Processor CPU8', 'Supervisor Card CPU'),
+    );
+  }
+
+  /**
+  * @dataProvider providerFindSimilar
+  * @group string
+  */
+  public function testFindSimilar($result, $result_flip, $array)
+  {
+    shuffle($array); // Randomize array for more natural test
+
+    $this->assertSame($result,      find_similar($array));
+    $this->assertSame($result_flip, find_similar($array, TRUE));
+  }
+
+  public function providerFindSimilar()
+  {
+    $array1 = ['0/0/0 Intel Xeon E5430 @ 2.66GHz', '0/1/0 Intel Xeon E5430 @ 2.66GHz', '0/10/0 Intel Xeon E5430 @ 2.66GHz',
+               'Supervisor Card CPU',
+               'Network Processor CPU8', 'Network Processor CPU31'];
+    $array2 = ['0/0/0 Intel Xeon E5430 @ 2.66GH', '0/1/0 Intel Xeon E5430 @ 2.66GH', '0/10/0 Intel Xeon E5430 @ 2.66G'];
+    $array3 = ['Slot 1 BR-MLX-10Gx8-X [1]', 'Slot 2 BR-MLX-10Gx8-X [1]',
+               'Slot 4 BR-MLX-1GFx24-X [1]',
+               'Slot 5 BR-MLX-MR2-X [1]', 'Slot 6 BR-MLX-MR2-X [1]'];
+
+    return array(
+      array(['Intel Xeon E5430 @ 2.66GHz' => ['0/0/0 Intel Xeon E5430 @ 2.66GHz', '0/1/0 Intel Xeon E5430 @ 2.66GHz', '0/10/0 Intel Xeon E5430 @ 2.66GHz'],
+             'Network Processor'          => ['Network Processor CPU8', 'Network Processor CPU31'],
+             'Supervisor Card CPU'        => ['Supervisor Card CPU']
+            ],
+            ['0/0/0 Intel Xeon E5430 @ 2.66GHz' => 'Intel Xeon E5430 @ 2.66GHz',
+             '0/1/0 Intel Xeon E5430 @ 2.66GHz' => 'Intel Xeon E5430 @ 2.66GHz',
+             '0/10/0 Intel Xeon E5430 @ 2.66GHz' => 'Intel Xeon E5430 @ 2.66GHz',
+             'Network Processor CPU8' => 'Network Processor',
+             'Network Processor CPU31' => 'Network Processor',
+             'Supervisor Card CPU' => 'Supervisor Card CPU'
+            ],
+            $array1),
+      array(['Intel Xeon E5430 @ 2.66GH' => ['0/0/0 Intel Xeon E5430 @ 2.66GH', '0/1/0 Intel Xeon E5430 @ 2.66GH', '0/10/0 Intel Xeon E5430 @ 2.66G']],
+            ['0/0/0 Intel Xeon E5430 @ 2.66GH' => 'Intel Xeon E5430 @ 2.66GH',
+             '0/1/0 Intel Xeon E5430 @ 2.66GH' => 'Intel Xeon E5430 @ 2.66GH',
+             '0/10/0 Intel Xeon E5430 @ 2.66G' => 'Intel Xeon E5430 @ 2.66GH'
+            ],
+            $array2),
+      array(['Slot BR-MLX-10Gx8-X [1]'    => ['Slot 1 BR-MLX-10Gx8-X [1]', 'Slot 2 BR-MLX-10Gx8-X [1]'],
+             'Slot 4 BR-MLX-1GFx24-X [1]' => ['Slot 4 BR-MLX-1GFx24-X [1]'],
+             'Slot BR-MLX-MR2-X [1]'      => ['Slot 5 BR-MLX-MR2-X [1]', 'Slot 6 BR-MLX-MR2-X [1]']
+            ],
+            ['Slot 1 BR-MLX-10Gx8-X [1]'  => 'Slot BR-MLX-10Gx8-X [1]',
+             'Slot 2 BR-MLX-10Gx8-X [1]'  => 'Slot BR-MLX-10Gx8-X [1]',
+             'Slot 4 BR-MLX-1GFx24-X [1]' => 'Slot 4 BR-MLX-1GFx24-X [1]',
+             'Slot 5 BR-MLX-MR2-X [1]'    => 'Slot BR-MLX-MR2-X [1]',
+             'Slot 6 BR-MLX-MR2-X [1]'    => 'Slot BR-MLX-MR2-X [1]'
+            ],
+            $array3),
+    );
+  }
   /**
   * @dataProvider providerIsPingable
   * @group network

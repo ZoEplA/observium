@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -49,8 +49,9 @@ if (count($oids))
     // 740 - 440 === -1 * (-740 + 440)
     $options['sensor_addition'] = $entry['snAgentPoeUnitPowerCapacityTotal'] * $negative;
 
+
     // Warning, negative scale here!
-    discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $negative * $scale, $value, $options);
+    discover_sensor_ng($device, 'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, $negative * $scale, $value, $options);
   }
 } else {
   // All other
@@ -80,8 +81,7 @@ if (count($oids))
     $options['sensor_addition'] = $entry['snAgentPoeGblPowerCapacityTotal'] * $negative;
 
     // Warning, negative scale here!
-    discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $negative * $scale, $value, $options);
-
+    discover_sensor_ng($device, 'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, $negative * $scale, $value, $options);
   }
 }
 
@@ -154,8 +154,7 @@ foreach ($oids as $index => $entry)
   } else {
     unset($options['limit_high']);
   }
-
-  discover_sensor($valid['sensor'], 'power', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor_ng($device, 'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, $scale, $value, $options);
 }
 
 // EOF

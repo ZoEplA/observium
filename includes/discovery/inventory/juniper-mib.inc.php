@@ -7,15 +7,15 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$jnxBoxDescr = snmp_get($device, 'jnxBoxDescr.0', '-OQv', 'JUNIPER-MIB');
+$jnxBoxDescr = snmp_get_oid($device, 'jnxBoxDescr.0', 'JUNIPER-MIB');
 
 if ($jnxBoxDescr)
 {
-  $jnxBoxSerialNo = snmp_get($device, 'jnxBoxSerialNo.0', '-OQv', 'JUNIPER-MIB');
+  $jnxBoxSerialNo = snmp_get_oid($device, 'jnxBoxSerialNo.0', 'JUNIPER-MIB');
 
   // Insert chassis as index 1, everything hangs off of this.
   $system_index = 1;
@@ -30,7 +30,7 @@ if ($jnxBoxDescr)
     'entPhysicalMfgName'      => 'Juniper'
   );
 
-  discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], 'juniper-mib');
+  discover_inventory($device, $system_index, $inventory[$system_index], $mib);
 
   // Now fetch data for the rest of the hardware in the chassis
   $data = snmpwalk_cache_oid($device, 'jnxContentsTable', array(), 'JUNIPER-MIB');
@@ -75,7 +75,7 @@ if ($jnxBoxDescr)
         'entPhysicalMfgName'      => 'Juniper'
       );
 
-      discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], 'juniper-mib');
+      discover_inventory($device, $system_index, $inventory[$system_index], $mib);
     }
   }
 }

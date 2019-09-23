@@ -753,7 +753,7 @@ rldot1dStpPortAutoEdgePort OBJECT-TYPE
          the forwarding state."
     REFERENCE
         "IEEE 802.1D-2004: Section 17.13.3"
-    DEFVAL { false }
+    DEFVAL { true }
     ::= { rldot1dStpPortEntry 10 }
 
 rldot1dStpPortLoopback OBJECT-TYPE

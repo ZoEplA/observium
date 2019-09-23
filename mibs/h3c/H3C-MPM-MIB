@@ -1,5 +1,5 @@
 -- ==================================================================
--- Copyright (C) 2002 by HUAWEI-3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2002 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description: LAN Switch Multicast Port Management MIB
 -- Reference:
@@ -39,12 +39,14 @@ IMPORTS
 
     h3cMpm MODULE-IDENTITY
         LAST-UPDATED "200503220000Z"
-        ORGANIZATION "Huawei 3Com Technologies Co., Ltd."
+        ORGANIZATION
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Huawei 3Com Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
-            Zip:100085"
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             "The MPM (Multicast Port Management) MIB."
         REVISION "200503220000Z"

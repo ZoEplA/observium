@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -202,6 +202,11 @@ $rrd_options .= ' --font-render-mode normal';
 if ($step != TRUE)
 {
    $rrd_options .= ' -E';
+}
+
+if ($kibi == TRUE)
+{
+   $rrd_options .= ' -b 1024';
 }
 
 // EOF

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -24,7 +24,7 @@ if ($GLOBALS['snmp_status'] === FALSE)
   $pws = snmpwalk_cache_threepart_oid($device, 'jnxVpnPwTunnelName',          $pws, 'JUNIPER-VPN-MIB', NULL, $flags); // pwDescr
   $pws = snmpwalk_cache_threepart_oid($device, 'jnxVpnPwTunnelType',          $pws, 'JUNIPER-VPN-MIB', NULL, $flags); // pwPsnType
   $pws = snmpwalk_cache_threepart_oid($device, 'jnxVpnRemotePeIdAddrType',    $pws, 'JUNIPER-VPN-MIB', NULL, $flags); // pwPeerAddrType
-  $pws = snmpwalk_cache_threepart_oid($device, 'jnxVpnRemotePeIdAddress',     $pws, 'JUNIPER-VPN-MIB', NULL, $flags); // pwPeerAddr
+  $pws = snmpwalk_cache_threepart_oid($device, 'jnxVpnRemotePeIdAddress',     $pws, 'JUNIPER-VPN-MIB', NULL, OBS_SNMP_ALL_HEX ^ OBS_QUOTES_STRIP); // pwPeerAddr
   //$pws = snmpwalk_cache_oid($device, 'pwLocalIfMtu',     $pws, 'JUNIPER-VPN-MIB');
   //$pws = snmpwalk_cache_oid($device, 'pwRemoteIfMtu',    $pws, 'JUNIPER-VPN-MIB');
   $pws = snmpwalk_cache_threepart_oid($device, 'jnxVpnPwRemoteSiteId',        $pws, 'JUNIPER-VPN-MIB', NULL, $flags); // pwMplsPeerLdpID

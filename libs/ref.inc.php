@@ -1605,7 +1605,7 @@ class ref
 
             break;
 
-          // mysql connection (mysql extension is deprecated from php 5.4/5.5)
+          /* mysql connection (mysql extension is deprecated from php 5.4/5.5)
           case 'mysql link':
           case 'mysql link persistent':
             $dbs = array();
@@ -1637,6 +1637,7 @@ class ref
             }
 
             break;
+          */
 
           // stream resource (fopen, fsockopen, popen, opendir etc)
           case 'stream':

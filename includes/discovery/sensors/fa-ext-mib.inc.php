@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -64,7 +64,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'temperature', $device, $oid_num, $entry['connUnitPortIndex'], $type, $descr, 1, $value, $options);
+  discover_sensor_ng($device,'temperature', $mib, $oid_name, $oid_num, $entry['connUnitPortIndex'], NULL, $descr, 1, $value, $options);
 
   $descr    = $name . ' Voltage';
   $oid_name = 'swSfpVoltage';
@@ -72,7 +72,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $entry['connUnitPortIndex'], $type, $descr, 0.001, $value, $options);
+  discover_sensor_ng($device,'voltage', $mib, $oid_name, $oid_num, $entry['connUnitPortIndex'], NULL, $descr, 0.001, $value, $options);
 
   $descr    = $name . ' Bias Current';
   $oid_name = 'swSfpCurrent';
@@ -80,7 +80,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'current', $device, $oid_num, $entry['connUnitPortIndex'], $type, $descr, 0.001, $value, $options);
+  discover_sensor_ng($device,'current', $mib, $oid_name, $oid_num, $entry['connUnitPortIndex'], NULL, $descr, 0.001, $value, $options);
 
   $descr    = $name . ' Receive Power';
   $oid_name = 'swSfpRxPower';
@@ -88,7 +88,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = str_replace('-inf', '-40', $entry[$oid_name]);
 
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $entry['connUnitPortIndex'], $type, $descr, 1, $value, $options);
+  discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $entry['connUnitPortIndex'], NULL, $descr, 1, $value, $options);
 
   $descr    = $name . ' Transmit Power';
   $oid_name = 'swSfpTxPower';
@@ -96,7 +96,7 @@ foreach ($oids as $index => $entry)
   $type     = $mib . '-' . $oid_name;
   $value    = $entry[$oid_name];
 
-  discover_sensor($valid['sensor'], 'dbm', $device, $oid_num, $entry['connUnitPortIndex'], $type, $descr, 1, $value, $options);
+  discover_sensor_ng($device,'dbm', $mib, $oid_name, $oid_num, $entry['connUnitPortIndex'], NULL, $descr, 1, $value, $options);
 
 }
 

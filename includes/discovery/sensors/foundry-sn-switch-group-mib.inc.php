@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -37,7 +37,8 @@ foreach ($oids as $index => $entry)
     }
     $descr  .= " DOM TX Bias Current";
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'brocade-dom', $descr, $scale, $value, $options);
+    $options['rename_rrd'] = "brocade-dom-$index";
+    discover_sensor_ng($device, 'current', $mib, 'snIfOpticalMonitoringTxBiasCurrent', $oid, $index, NULL, $descr, $scale, $value, $options);
   }
 }
 
@@ -63,7 +64,8 @@ foreach ($oids as $index => $entry)
     }
     $descr  .= " DOM TX Power";
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'brocade-dom-tx', $descr, 1, $value, $options);
+    $options['rename_rrd'] = "brocade-dom-tx-$index";
+    discover_sensor_ng($device,'dbm', $mib, 'snIfOpticalMonitoringTxPower', $oid, $index, NULL, $descr, 1, $value, $options);
   }
 }
 
@@ -89,7 +91,8 @@ foreach ($oids as $index => $entry)
     }
     $descr  .= " DOM RX Power";
 
-    discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'brocade-dom-rx', $descr, 1, $value, $options);
+    $options['rename_rrd'] = "brocade-dom-rx-$index";
+    discover_sensor_ng($device,'dbm', $mib, 'snIfOpticalMonitoringRxPower', $oid, $index, NULL, $descr, 1, $value, $options);
   }
 }
 
@@ -115,8 +118,86 @@ foreach ($oids as $index => $entry)
     }
     $descr  .= " DOM Temperature";
 
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'brocade-dom', $descr, 1, $value, $options);
+    $options['rename_rrd'] = "brocade-dom-$index";
+    discover_sensor_ng($device, 'temperature', $mib, 'snIfOpticalMonitoringTemperature', $oid, $index, NULL, $descr, 1, $value, $options);
   }
 }
+
+/*
+FOUNDRY-SN-SWITCH-GROUP-MIB::snIfOpticalLaneMonitoringTemperature.201334784.1 = STRING: "57 C Normal"
+FOUNDRY-SN-SWITCH-GROUP-MIB::snIfOpticalLaneMonitoringTxPower.201334784.1 = STRING: "566.4 uWatts Normal"
+FOUNDRY-SN-SWITCH-GROUP-MIB::snIfOpticalLaneMonitoringRxPower.201334784.1 = STRING: "451.1 uWatts Normal"
+FOUNDRY-SN-SWITCH-GROUP-MIB::snIfOpticalLaneMonitoringTxBiasCurrent.201334784.1 = STRING: "6.184 mAmps Normal"
+*/
+
+$oids = snmpwalk_cache_twopart_oid($device, "snIfOpticalLaneMonitoringTable", array(), "FOUNDRY-SN-SWITCH-GROUP-MIB");
+
+//print_r($oids);
+
+foreach ($oids as $ifIndex => $lanes)
+{
+
+  $options = array();
+  $port = get_port_by_index_cache($device['device_id'], $ifIndex);
+
+  if (is_array($port))
+  {
+    $port_descr = ($port["ifDescr"] ? $port["ifDescr"] : $port["ifName"]);
+    $options['measured_class'] = 'port';
+    $options['measured_entity'] = $port['port_id'];
+  } else
+  {
+    $port_descr = snmp_get($device, "ifDescr.$index", "-Oqv", "IF-MIB");
+  }
+
+  foreach($lanes as $lane => $entry)
+  {
+
+    $lane_descr = "$port_descr Lane $lane";
+    $index = "$ifIndex.$lane";
+
+    if ($entry['snIfOpticalLaneMonitoringTemperature'] != "NA")
+    {
+      $value = $entry['snIfOpticalLaneMonitoringTemperature'];
+      $oid_name = 'snIfOpticalLaneMonitoringTemperature';
+      $oid_num = '.1.3.6.1.4.1.1991.1.1.3.3.10.1.2.'.$index;
+      discover_sensor_ng($device, 'temperature', $mib, $oid_name, $oid_num, $index, NULL, $lane_descr, 1, $value, $options);
+    }
+
+    if ($entry['snIfOpticalLaneMonitoringTxPower'] != "NA")
+    {
+      $value = $entry['snIfOpticalLaneMonitoringTxPower'];
+      $oid_name = 'snIfOpticalLaneMonitoringTxPower';
+      $oid_num = '.1.3.6.1.4.1.1991.1.1.3.3.10.1.3.'.$index;
+      $descr = "$lane_descr TX Power";
+
+      //discover_sensor_ng($device, 'dbm', $mib, $oid_name, $oid_num, $index, NULL, $descr, 0.000001, $value, $options);
+      discover_sensor_ng($device, 'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, 0.000001, $value, $options);
+    }
+
+    if ($entry['snIfOpticalLaneMonitoringRxPower'] != "NA")
+    {
+      $value = $entry['snIfOpticalLaneMonitoringRxPower'];
+      $oid_name = 'snIfOpticalLaneMonitoringRxPower';
+      $oid_num = '.1.3.6.1.4.1.1991.1.1.3.3.10.1.4.'.$index;
+      $descr = "$lane_descr RX Power";
+
+      //discover_sensor_ng($device, 'dbm', $mib, $oid_name, $oid_num, $index, NULL, $descr, 0.000001, $value, $options);
+      discover_sensor_ng($device, 'power', $mib, $oid_name, $oid_num, $index, NULL, $descr, 0.000001, $value, $options);
+    }
+
+    if ($entry['snIfOpticalLaneMonitoringTxBiasCurrent'] != "NA")
+    {
+      $value = $entry['snIfOpticalLaneMonitoringTxBiasCurrent'];
+      $oid_name = 'snIfOpticalLaneMonitoringTxBiasCurrent';
+      $oid_num = '.1.3.6.1.4.1.1991.1.1.3.3.10.1.5.'.$index;
+      $descr = "$lane_descr TX Bias Current";
+
+      discover_sensor_ng($device, 'current', $mib, $oid_name, $oid_num, $index, NULL, $descr, 0.001, $value, $options);
+    }
+
+  }
+}
+
 
 // EOF

@@ -6,17 +6,15 @@
  *
  * @package        observium
  * @subpackage     discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
-$mib = 'RAISECOM-POWERMONITOR-MIB';
-$cache = array();
-$cache = snmpwalk_cache_oid($device, 'raisecomPowerSerialNumber', $cache, $mib);
-$cache = snmpwalk_cache_oid($device, 'raisecomPowerType', $cache, $mib);
+$oids = snmpwalk_cache_oid($device, 'raisecomPowerSerialNumber', NULL, $mib);
+$oids = snmpwalk_cache_oid($device, 'raisecomPowerType', $oids, $mib);
 
 $system_index = 201;
-foreach ($cache as $id => $entry)
+foreach ($oids as $id => $entry)
 {
   $psu_type = strtoupper($entry['raisecomPowerType']);
   if ($psu_type == 'AC' || $psu_type == 'DC')
@@ -32,11 +30,11 @@ foreach ($cache as $id => $entry)
       'entPhysicalParentRelPos' => -1,
       'entPhysicalMfgName'      => 'Raisecom'
     );
-    discover_inventory($valid['inventory'], $device, $system_index, $inventory[$system_index], $mib);
+    discover_inventory($device, $system_index, $inventory[$system_index], $mib);
   }
   $system_index++;
 }
 
-unset($mib, $cache, $system_index, $id, $entry, $psu_type);
+unset($mib, $system_index, $id, $entry, $psu_type);
 
 // EOF

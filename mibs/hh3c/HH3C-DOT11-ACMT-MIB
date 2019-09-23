@@ -1,11 +1,11 @@
 -- =============================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide wireless switch object and CAPWAP
 --   tunnel information.
 -- Reference:
--- Version: V2.4
+-- Version: V2.5
 -- History:
 --   V1.0 created by shiyang (Richard)
 --     Initial version 2006-05-10
@@ -114,6 +114,21 @@
 --        Add hh3cDot11ACPortalStatisticCMEntry, hh3cDot11PortalStatisticSSIDCM,
 --        hh3cACPortalStatAuthReqCM and
 --        hh3cACPortalStatAuthRespCM to hh3cDot11ACPortalStatisticCMTable
+--   v2.5 2016-03-11 modified by yubo 04460
+--        Add new node   hh3cDot11MaxNewConnCntPerSecCM to hh3cDot11ACObject
+--        Add new node   hh3cDot11IFNumberCM to hh3cDot11ACObject
+--        Add new node   hh3cDot11ACStaUserAuthRespCntCM to hh3cDot11ACStaUserSecAuthStatis
+--        2016-06-15 modified by zhouwenshuai kf6157
+--        Add new table   hh3cDot11LocalACModelTable
+--        Add Hh3cDot11LocalACModelEntry, hh3cDot11LocalACModelAlias
+--        hh3cDot11LocalACModelName,
+--        hh3cDot11LocalACManufacturer, hh3cDot11LocalACCPUType
+--        hh3cDot11LocalACCPUClockSpeed, hh3cDot11LocalACMemoryType
+--        hh3cDot11LocalACMemorySize, hh3cDot11LocalACFlashType
+--        hh3cDot11LocalACFlashSize, hh3cDot11LocalACMemSize
+--        hh3cDot11LocalACFlashSizeInBytes to hh3cDot11LocalACModelTable
+--        2016-09-05 modified by yangxiaobin ykf4651
+--        Add new node   hh3cDot11APLicenseWeight to hh3cDot11ACObject
 -- =============================================================================
 HH3C-DOT11-ACMT-MIB DEFINITIONS ::= BEGIN
 
@@ -125,7 +140,9 @@ IMPORTS
         Counter32,
         IpAddress,
         Counter64,
-        TimeTicks
+        TimeTicks,
+        Unsigned32,
+        Gauge32
     FROM SNMPv2-SMI
         IANAifType
     FROM IANAifType-MIB
@@ -138,11 +155,11 @@ IMPORTS
     FROM SNMPv2-TC;
 
 hh3cDot11ACMT MODULE-IDENTITY
-    LAST-UPDATED "201008041800Z"        -- Aug 04, 2009 at 18:00 GMT
+    LAST-UPDATED "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Technologies Co., Ltd."
+        "New H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+        "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip: 100085"
@@ -188,7 +205,9 @@ hh3cDot11ACMT MODULE-IDENTITY
         The IEEE 802.11 BSS of an AP comprises of the
         stations directly associating with the AP. It will
         be identified by BSSID."
-
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Add new nodes."
     REVISION "201008041800Z"        -- Aug 04, 2010 at 18:00 GMT
     DESCRIPTION
         "Add new nodes."
@@ -285,6 +304,33 @@ hh3cDot11RunAPNumThreshold OBJECT-TYPE
         threshold, a notification will be sent."
     DEFVAL      { 100 }
     ::= { hh3cDot11ACObject 4 }
+
+hh3cDot11MaxNewConnCntPerSecCM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum count of station connected to AC per second."
+    DEFVAL      { 300 }
+    ::= { hh3cDot11ACObject 5 }
+
+hh3cDot11IFNumberCM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "All intface in AC except console."
+    DEFVAL      { 24 }
+    ::= { hh3cDot11ACObject 6 }
+
+hh3cDot11APLicenseWeight OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the license weight of AP connection for one AC."
+    ::= { hh3cDot11ACObject 7 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11ACObject element Definition
 -- *****************************************************************************
@@ -744,6 +790,14 @@ hh3cDot11ACStaUserAllAuthCntCM OBJECT-TYPE
         "Represents the total number of users authenticated with this AC."
     ::= { hh3cDot11ACStaUserSecAuthStatis 6 }
 
+hh3cDot11ACStaUserAuthRespCntCM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of user authenticate response with this AC."
+    ::= { hh3cDot11ACStaUserSecAuthStatis 7 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11StaUserSecAuthStatis element Definition
 -- *****************************************************************************
@@ -996,6 +1050,144 @@ hh3cDot11ACPortalStatAuthRespCM OBJECT-TYPE
 
 -- *****************************************************************************
 -- *  End of hh3cDot11ACPortalStatisticCMTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11LocalACModelTable Definition
+-- *****************************************************************************
+hh3cDot11LocalACModelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11LocalACModelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the capability information for a specific
+        kind of local AC."
+    ::= { hh3cDot11ACObjectGroup 8 }
+
+hh3cDot11LocalACModelEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LocalACModelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains capability information for a specific kind
+        of local AC."
+    INDEX
+        {
+            hh3cDot11LocalACModelAlias
+        }
+    ::= { hh3cDot11LocalACModelTable 1 }
+
+Hh3cDot11LocalACModelEntry ::= SEQUENCE
+    {
+        hh3cDot11LocalACModelAlias         OCTET STRING,
+        hh3cDot11LocalACModelName          OCTET STRING,
+        hh3cDot11LocalACManufacturer       OCTET STRING,
+        hh3cDot11LocalACCPUType            OCTET STRING,
+        hh3cDot11LocalACCPUClockSpeed      Unsigned32,
+        hh3cDot11LocalACMemoryType         OCTET STRING,
+        hh3cDot11LocalACMemorySize         Unsigned32,
+        hh3cDot11LocalACFlashType          OCTET STRING,
+        hh3cDot11LocalACFlashSize          Unsigned32,
+        hh3cDot11LocalACMemSize            Counter64,
+        hh3cDot11LocalACFlashSizeInBytes   Counter64
+    }
+
+hh3cDot11LocalACModelAlias OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents alias of local AC model name."
+    ::= { hh3cDot11LocalACModelEntry 1 }
+
+hh3cDot11LocalACModelName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents local AC model name."
+    ::= { hh3cDot11LocalACModelEntry 2 }
+
+hh3cDot11LocalACManufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "'SMI Network Management Private Enterprise Codes'
+        assigned by the IANA, which means the vendor of local AC."
+    ::= { hh3cDot11LocalACModelEntry 3 }
+
+hh3cDot11LocalACCPUType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the CPU type of local AC."
+    ::= { hh3cDot11LocalACModelEntry 4 }
+
+hh3cDot11LocalACCPUClockSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Hz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the clock speed of CPU."
+    ::= { hh3cDot11LocalACModelEntry 5 }
+
+hh3cDot11LocalACMemoryType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the memory card type of local AC."
+    ::= { hh3cDot11LocalACModelEntry 6 }
+
+hh3cDot11LocalACMemorySize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kbytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of local AC memory card."
+    ::= { hh3cDot11LocalACModelEntry 7 }
+
+hh3cDot11LocalACFlashType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the flash card type of local AC."
+    ::= { hh3cDot11LocalACModelEntry 8 }
+
+hh3cDot11LocalACFlashSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kbytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of local AC flash card."
+    ::= { hh3cDot11LocalACModelEntry 9 }
+
+hh3cDot11LocalACMemSize OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of local AC memory card."
+    ::= { hh3cDot11LocalACModelEntry 10 }
+
+hh3cDot11LocalACFlashSizeInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the size of local AC flash card in bytes."
+    ::= { hh3cDot11LocalACModelEntry 11 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LocalACModelTable Definition
 -- *****************************************************************************
 
 -- *****************************************************************************

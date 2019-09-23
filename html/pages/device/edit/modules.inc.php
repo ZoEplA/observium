@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage webui
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -15,7 +15,7 @@ include($config['install_dir'] . '/includes/polling/functions.inc.php');
 include($config['install_dir'] . '/includes/discovery/functions.inc.php');
 
 $ports_ignored_count = intval(get_entity_attrib('device', $device, 'ports_ignored_count')); // Cache last ports ignored count
-$ports_total_count   = $ports_ignored_coun + dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `deleted` = 0', array($device['device_id']));
+$ports_total_count   = $ports_ignored_count + dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `deleted` = ?', array($device['device_id'], 0));
 
 if ($vars['submit'])
 {
@@ -71,6 +71,7 @@ if ($vars['submit'])
   }
 }
 
+//r($device_state);
 ?>
 
 <div class="row"> <!-- begin row -->
@@ -107,7 +108,7 @@ foreach (array_merge(array('os' => 1, 'system' => 1), $config['poller_modules'])
   {
     $module_time = '--';
   }
-  else if ($device_state['poller_mod_perf'][$module] < 0.01)
+  elseif ($device_state['poller_mod_perf'][$module] < 0.01)
   {
     $module_time = $device_state['poller_mod_perf'][$module] . 's';
   } else {
@@ -210,11 +211,11 @@ foreach (array_keys($config) as $module)
   {
     $module_time = ''; // nothing to show for this pseudo-module
   }
-  else if (!isset($device_state['poller_ports_perf'][$module_name]))
+  elseif (!isset($device_state['poller_ports_perf'][$module_name]))
   {
     $module_time = '--';
   }
-  else if ($device_state['poller_ports_perf'][$module_name] < 0.01)
+  elseif ($device_state['poller_ports_perf'][$module_name] < 0.01)
   {
     $module_time = $device_state['poller_ports_perf'][$module_name] . 's';
   }
@@ -247,18 +248,18 @@ foreach (array_keys($config) as $module)
     $toggle = "Excluded"; $btn_class = ''; $btn_icon = 'icon-lock';
     $disabled = TRUE;
   }
-  else if (discovery_module_excluded($device, $module)) // What? This is ports options..
-  {
-    $attrib_status = '<span class="label label-disabled">excluded</span>';
-    $toggle = "Excluded"; $btn_class = ''; $btn_icon = 'icon-lock';
-    $disabled = TRUE;
-  }
-  else if (($attrib_set && $attribs[$module]) || (!$attrib_set && $module_status))
+  // elseif (discovery_module_excluded($device, $module)) // What? This is ports options..
+  // {
+  //   $attrib_status = '<span class="label label-disabled">excluded</span>';
+  //   $toggle = "Excluded"; $btn_class = ''; $btn_icon = 'icon-lock';
+  //   $disabled = TRUE;
+  // }
+  elseif (($attrib_set && $attribs[$module]) || (!$attrib_set && $module_status))
   {
     $attrib_status = '<span class="label label-success">enabled</span>';
     $toggle = "Disable"; $btn_class = "btn-danger"; $btn_icon = 'icon-remove';
   }
-  else if ($module == 'enable_ports_separate_walk' && !$attrib_set)
+  elseif ($module == 'enable_ports_separate_walk' && !$attrib_set)
   {
     if ($config['os'][$device['os']]['ports_separate_walk'] && $ports_total_count > 10)
     {
@@ -266,8 +267,7 @@ foreach (array_keys($config) as $module)
       $toggle = "Disable"; $btn_class = "btn-danger"; $btn_icon = 'icon-remove';
       $value  = 'Disable';
     }
-    /// FIXME. Warning, currently not recommended, use at own risk, enabled only if ports polling time more than 20 sec or ports count more than 10
-    else if (intval($device['state']['poller_mod_perf']['ports']) < 20 && $ports_total_count <= 10)
+    elseif (intval($device['state']['poller_mod_perf']['ports']) < 20 && $ports_total_count <= 10)
     {
       $attrib_status = '<span class="label label-default">excluded</span>';
       $toggle = "Excluded"; $btn_class = ''; $btn_icon = 'icon-lock';
@@ -313,6 +313,7 @@ foreach (array_keys($config) as $module)
   <thead>
     <tr>
       <th>Module</th>
+      <th style="width: 60px;">Last</th>
       <th style="width: 60px;">Global</th>
       <th style="width: 60px;">Device</th>
       <th style="width: 80px;"></th>
@@ -325,7 +326,30 @@ foreach ($config['discovery_modules'] as $module => $module_status)
 {
   $attrib_set = isset($attribs['discover_'.$module]);
 
-  echo('<tr><td><strong>'.$module.'</strong></td><td>');
+  // Last module discovery time and row class
+  $module_row_class = '';
+  if (!isset($device_state['discovery_mod_perf'][$module]))
+  {
+    $module_time = '--';
+  }
+  elseif ($device_state['discovery_mod_perf'][$module] < 0.01)
+  {
+    $module_time = $device_state['discovery_mod_perf'][$module] . 's';
+  } else {
+    $module_time = format_value($device_state['discovery_mod_perf'][$module]) . 's';
+
+    if ($device_state['discovery_mod_perf'][$module] > 10)
+    {
+      $module_row_class = 'error';
+    }
+    elseif ($device_state['discovery_mod_perf'][$module] > 3)
+    {
+      $module_row_class = 'warning';
+    }
+  }
+
+  echo('<tr class="'.$module_row_class.'"><td><strong>'.$module.'</strong></td>');
+  echo('<td>'.$module_time.'</td><td>');
   echo(($module_status ? '<span class="label label-success">enabled</span>' : '<span class="label label-important">disabled</span>'));
   echo('</td><td>');
 

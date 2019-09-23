@@ -10,7 +10,7 @@ IMPORTS
     RowStatus, StorageType                  FROM SNMPv2-TC
     OBJECT-GROUP                            FROM SNMPv2-CONF                    
     OBJECT-TYPE, 
-    DisplayString, MacAddress               FROM SNMPv2-TC;
+    DisplayString, MacAddress, PhysAddress  FROM SNMPv2-TC;
 
 
 
@@ -301,7 +301,7 @@ wcAccessPointTable OBJECT-TYPE
     ::= {  wcAccessPoint 1 }
 
 WcAccessPointEntry ::= SEQUENCE {
-        wcAccessPointMac             MacAddress,
+        wcAccessPointMac             PhysAddress,
         wcAccessPointIp              IpAddress,
         wcAccessPointSubnetMask      IpAddress,   
         wcAccessPointDefaultGateway  IpAddress,
@@ -334,7 +334,7 @@ wcAccessPointEntry OBJECT-TYPE
     ::= {wcAccessPointTable 1 }
 
 wcAccessPointMac OBJECT-TYPE
-    SYNTAX      MacAddress
+    SYNTAX      PhysAddress
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

@@ -121,6 +121,27 @@ class IncludesSnmpTest2 extends \PHPUnit\Framework\TestCase
     $this->assertSame($result, $test);
   }
 
+  /**
+   * @dataProvider providerSnmpGetOid
+   * @group snmpget
+   */
+  public function testSnmpGetNextOid($community, $flags, $oid, $mib, $result)
+  {
+    global $snmpsimd_ip, $snmpsimd_port;
+
+    $device = build_initial_device_array($snmpsimd_ip, $community, 'v2c', $snmpsimd_port, 'udp');
+    $device['snmp_timeout'] = 2;
+    $device['snmp_retries'] = 1;
+    //var_dump($device);
+    list($oid, $index) = explode('.', $oid, 2); // Split oid and index parts
+    if ($index === '0') // Fot test purpose use only Oids with first index is 0
+    {
+      $test = snmp_getnext_oid($device, $oid, $mib, NULL, $flags);
+      //var_dump($test);
+      $this->assertSame($result, $test);
+    }
+  }
+
   public function providerSnmpGetOid()
   {
     $community_ftos     = 'ftos-9.10';
@@ -285,7 +306,7 @@ DI-1705 (RISC)
 
   /**
   * @dataProvider providerSnmpWalkMultiPartOid
-  * @group snmpwalk
+  * @group snmpwalk_new
   */
   public function testSnmpWalkMultiPartOid($community, $flags, $oids, $mib, $result_file)
   {
@@ -304,6 +325,7 @@ DI-1705 (RISC)
     //var_dump($test);
     // Fetch array from JSON file
     $result = json_decode(file_get_contents(dirname(__FILE__) . '/data/snmp/' . $result_file), TRUE);
+    //$result = array();
     $this->assertSame($result, $test);
   }
 
@@ -311,22 +333,10 @@ DI-1705 (RISC)
   {
     $community_ftos     = 'ftos-9.10';
     $community_ubuntu   = 'ubuntu-16.04';
+    $community_lldp     = 'lldp1';
+    $community_prnt     = 'prnt';
 
     return array(
-      /*
-      array( $community_ftos,                OBS_QUOTES_TRIM,   'sysUpTime.0 sysObjectID.0', 'SNMPv2-MIB',
-            array(0 => array('sysUpTime' => '459:18:26:40.96', 'sysObjectID' => 'enterprises.6027.1.3.14'))
-      ),
-      array( $community_ftos,                OBS_QUOTES_TRIM,   array('sysUpTime.0', 'sysObjectID.0'), 'SNMPv2-MIB',
-            array(0 => array('sysUpTime' => '459:18:26:40.96', 'sysObjectID' => 'enterprises.6027.1.3.14'))
-      ),
-      array( $community_ftos,              OBS_SNMP_ALL_ENUM,   'bgpLocalAs.0 bgpPeerState.64.72.74.193', 'BGP4-MIB',
-            array(0 => array('bgpLocalAs' => '20282'), '64.72.74.193' => array('bgpPeerState' => '1'))
-      ),
-      array( $community_ftos,     OBS_SNMP_ALL_NUMERIC_INDEX,   'sysUpTime.0 sysObjectID.0', 'SNMPv2-MIB',
-            array(0 => array('sysUpTime' => '459:18:26:40.96', 'sysObjectID' => 'enterprises.6027.1.3.14'))
-      ),
-      */
 
       array( $community_ftos,                OBS_QUOTES_TRIM,   array('bgpPeerState', 'bgpPeerAdminStatus', 'wrongOid'), 'BGP4-MIB',
             'snmp_walk_multipart_oid-1.json' // Link to result json
@@ -337,6 +347,66 @@ DI-1705 (RISC)
 
       array( $community_ubuntu,              OBS_QUOTES_TRIM,   array('nsExtendNumEntries', 'nsExtendOutputFull', 'nsExtendOutLine'), 'NET-SNMP-EXTEND-MIB',
             'snmp_walk_multipart_oid-3.json' // Link to result json
+      ),
+
+      array( $community_lldp,         OBS_SNMP_ALL_MULTILINE,   array('lldpRemChassisIdSubtype', 'lldpRemChassisId', 'lldpRemPortIdSubtype', 'lldpRemPortId', 'lldpRemPortDesc', 'lldpRemSysName', 'lldpRemSysDesc'), 'LLDP-MIB',
+             'snmp_walk_multipart_lldp-1.json' // Link to result json
+      ),
+      array( $community_lldp,                   OBS_SNMP_ALL,   array('lldpRemChassisIdSubtype', 'lldpRemChassisId', 'lldpRemPortIdSubtype', 'lldpRemPortId', 'lldpRemPortDesc', 'lldpRemSysName'), 'LLDP-MIB',
+             'snmp_walk_multipart_lldp-2.json' // Link to result json
+      ),
+
+      array( $community_prnt,                   OBS_SNMP_ALL,   array('prtMarkerSuppliesDescription', 'prtMarkerSuppliesType', 'prtMarkerSuppliesLevel'), 'Printer-MIB',
+             'snmp_walk_multipart_prnt-1.json' // Link to result json
+      ),
+      array( $community_prnt,         OBS_SNMP_ALL_MULTILINE,   array('prtMarkerSuppliesDescription', 'prtMarkerSuppliesType', 'prtMarkerSuppliesLevel'), 'Printer-MIB',
+             'snmp_walk_multipart_prnt-2.json' // Link to result json
+      ),
+      array( $community_prnt,             OBS_SNMP_ALL_ASCII,   array('prtMarkerSuppliesDescription', 'prtMarkerSuppliesType', 'prtMarkerSuppliesLevel'), 'Printer-MIB',
+             'snmp_walk_multipart_prnt-3.json' // Link to result json
+      ),
+
+    );
+  }
+
+  /**
+  * @dataProvider providerSnmpWalkThreepartOid
+  * @group snmpwalk
+  */
+  public function testSnmpWalkThreepartOid($community, $flags, $oid, $mib, $result_file)
+  {
+    global $snmpsimd_ip, $snmpsimd_port;
+
+    $device = build_initial_device_array($snmpsimd_ip, $community, 'v2c', $snmpsimd_port, 'udp');
+    $device['snmp_timeout'] = 2;
+    $device['snmp_retries'] = 1;
+    //var_dump($device);
+    $test = snmpwalk_cache_threepart_oid($device, $oid, array(), $mib, NULL, $flags);
+    //echo PHP_EOL . json_encode($test, JSON_PRETTY_PRINT) . PHP_EOL;
+    //var_dump($test);
+    // Fetch array from JSON file
+    $result = json_decode(file_get_contents(dirname(__FILE__) . '/data/snmp/' . $result_file), TRUE);
+    $this->assertSame($result, $test);
+  }
+
+  public function providerSnmpWalkThreepartOid()
+  {
+    $community_lldp1    = 'lldp1';
+    $community_lldp2    = 'lldp2';
+
+    return array(
+      array( $community_lldp1,                   OBS_SNMP_ALL,   'lldpRemSysDesc',         'LLDP-MIB',
+             'snmp_walk_lldp-1.json' // Link to result json
+      ),
+      array( $community_lldp1, OBS_SNMP_ALL | OBS_SNMP_CONCAT,   'lldpRemSysDesc',         'LLDP-MIB',
+             'snmp_walk_lldp-2.json' // Link to result json
+      ),
+
+      array( $community_lldp2,                   OBS_SNMP_ALL,   'lldpRemSysDesc',         'LLDP-MIB',
+             'snmp_walk_lldp-3.json' // Link to result json
+      ),
+      array( $community_lldp2, OBS_SNMP_ALL | OBS_SNMP_CONCAT,   'lldpRemSysDesc',         'LLDP-MIB',
+             'snmp_walk_lldp-3.json' // Link to result json
       ),
     );
   }

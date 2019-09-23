@@ -1,5 +1,5 @@
 -- ==================================================================
--- Copyright (C) 2005 by HUAWEI-3COM TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2005 by H3C TECHNOLOGIES. All rights reserved.
 --
 -- Description:  HGMP Information MIB for LAN Switch
 -- Reference:
@@ -46,12 +46,13 @@ HUAWEI-HGMP-MIB  DEFINITIONS ::= BEGIN
     hwCluster MODULE-IDENTITY
         LAST-UPDATED "200512061452Z"
         ORGANIZATION
-            "Huawei 3Com Technologies Co., Ltd."
+            "Hangzhou H3C Tech. Co., Ltd."
         CONTACT-INFO
-            "Platform Team Huawei 3Com Technologies Co., Ltd.
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
-            Zip:100085"
+            http://www.h3c.com
+            Zip:100085
+            "
         DESCRIPTION
             "This MIB contains objects to manage the hgmp operations,
             which are used on lanswitch products."

@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -54,7 +54,7 @@ foreach ($oids as $index => $entry)
   $options = array('limit_high'      => $limit_high,
                    'limit_high_warn' => $limit_high_warn);
 
-  discover_sensor($valid['sensor'], 'current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('current', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $descr    = "Rectifier $index Input Voltage (" . $entry['rectifierType'] . ")";
   $oid_name = 'rectifierInputVoltageValue';
@@ -63,7 +63,7 @@ foreach ($oids as $index => $entry)
   $value    = $entry[$oid_name];
   $scale    = 1;
 
-  discover_sensor($valid['sensor'], 'voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor('voltage', $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 
   $descr    = "Rectifier $index Status (" . $entry['rectifierType'] . ")";
   $oid_name = 'rectifierStatus';

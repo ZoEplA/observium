@@ -1,5 +1,17 @@
 Dell-LAN-TRAP-MIB DEFINITIONS ::= BEGIN
 
+-- Broadcom FastPath Radius Authentication Client MIB
+-- Copyright 2016 Broadcom.
+-- This SNMP Management Information Specification
+-- embodies Broadcom's confidential and proprietary
+-- intellectual property.  Broadcom retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom 
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
 IMPORTS
     OBJECT-TYPE, NOTIFICATION-TYPE
         FROM SNMPv2-SMI 
@@ -11,9 +23,8 @@ IMPORTS
 -- Dell alarms specific global parameters are defined in this group. 
 dellAlarmGroup MODULE-IDENTITY
         LAST-UPDATED "200504260000Z" -- 26 Apr 2005 12:00:00 GMT
-        ORGANIZATION "Dell."
-        CONTACT-INFO
-          " "
+        ORGANIZATION "Dell, Inc."
+        CONTACT-INFO ""
         DESCRIPTION
           " "
 

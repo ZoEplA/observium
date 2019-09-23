@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -70,7 +70,7 @@ foreach ($data as $index => $entry)
   $options['warn_high']  = $entry['cyanXcvrTxBiasHiWarnThres']  * 0.001;
   $options['warn_low']   = $entry['cyanXcvrTxBiasHiWarnThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'current', $device, ".1.3.6.1.4.1.28533.5.30.140.1.1.1.43." . $index, $index, 'cyanXcvrTxBiasCurrent', $descr. " TX Bias", 0.001, $entry['cyanXcvrTxBiasCurrent'], $options);
+  discover_sensor('current', $device, ".1.3.6.1.4.1.28533.5.30.140.1.1.1.43." . $index, $index, 'cyanXcvrTxBiasCurrent', $descr. " TX Bias", 0.001, $entry['cyanXcvrTxBiasCurrent'], $options);
 
   $options = array();
   if (isset($entry['measured_entity'])) { $options['measured_entity'] = $entry['measured_entity']; $options['measured_class'] = 'port'; }
@@ -79,7 +79,7 @@ foreach ($data as $index => $entry)
   $options['warn_high']  = $entry['cyanXcvrTempHiWarnThres']  * 0.001;
   $options['warn_low']   = $entry['cyanXcvrTempHiWarnThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'temperature', $device, ".1.3.6.1.4.1.28533.5.30.140.1.1.1.42." . $index, $index, 'cyanXcvrTemperature', $descr, 0.001, $entry['cyanXcvrTemperature'], $options);
+  discover_sensor('temperature', $device, ".1.3.6.1.4.1.28533.5.30.140.1.1.1.42." . $index, $index, 'cyanXcvrTemperature', $descr, 0.001, $entry['cyanXcvrTemperature'], $options);
 
   $options = array();
   if (isset($entry['measured_entity'])) { $options['measured_entity'] = $entry['measured_entity']; $options['measured_class'] = 'port'; }
@@ -88,7 +88,7 @@ foreach ($data as $index => $entry)
   $options['warn_high']  = $entry['cyanXcvrVccVoltHiWarnThres']  * 0.001;
   $options['warn_low']   = $entry['cyanXcvrVccVoltHiWarnThres']  * 0.001;
 
-  discover_sensor($valid['sensor'], 'voltage', $device, ".1.3.6.1.4.1.28533.5.30.140.1.1.1.56." . $index, $index, 'cyanXcvrVccVoltage', $descr . " Vcc", 0.001, $entry['cyanXcvrVccVoltage'], $options);
+  discover_sensor('voltage', $device, ".1.3.6.1.4.1.28533.5.30.140.1.1.1.56." . $index, $index, 'cyanXcvrVccVoltage', $descr . " Vcc", 0.001, $entry['cyanXcvrVccVoltage'], $options);
 
 }
 

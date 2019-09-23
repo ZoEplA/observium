@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -33,7 +33,7 @@ if (is_file($rrd_filename))
   $rrd_list[2]['ds']       = "pagewritessec";
 
 } else {
-  echo("file missing: $file");
+  echo("file missing: $rrd_filename");
 }
 
 include($config['html_dir']."/includes/graphs/generic_multi_line.inc.php");

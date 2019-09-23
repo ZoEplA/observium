@@ -8,7 +8,7 @@
  *
  * @package    observium
  * @subpackage scripts
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -16,41 +16,74 @@ chdir(dirname($argv[0]).'/..');
 $scriptname = basename($argv[0]);
 
 $options = getopt("d");
-if (isset($options['d'])) { array_shift($argv); } // for compatability
+if (isset($options['d'])) { array_shift($argv); } // for compatibility
 
 include_once("includes/sql-config.inc.php");
 
 //$config['rancid_version'] = '3.7.1';
 
-if (isset($config['rancid_version']) && str_starts($config['rancid_version'], '3'))
+// Detect configured version
+if (isset($config['rancid_version']))
 {
-  // Rancid version configured and more than 2
-  $rancid_version = ltrim($config['rancid_version'], 'vV');
+  // Rancid version set manually
+  $rancid_config_version = ltrim($config['rancid_version'], 'vV');
+  list($rancid_config_base) = explode('.', $rancid_config_version);
+  // $rancid_message = "Used RANCID version configured manually in \$config['rancid_version']: $rancid_version";
+  // // v3 delimiter
+  // $rancid_version_base = '3';
+  // $delimiter = ';';
+} else {
+  // Dummy version for compare
+  $rancid_config_version = 0;
+  $rancid_config_base = 0;
+}
+
+// Detect locally installed version
+if ($rancid_cmd = external_exec('which rancid-run'))
+{
+  list(, $rancid_cmd_version) = explode(' ', external_exec($rancid_cmd . ' -V'));
+  list($rancid_cmd_base) = explode('.', $rancid_cmd_version);
+} else {
+  // Dummy version for compare
+  $rancid_cmd_version = 0;
+  $rancid_cmd_version = 0;
+}
+
+if ($rancid_config_base > 0 && $rancid_cmd_base > 0 && $rancid_config_base != $rancid_cmd_base)
+{
+  // If configured version base different from detected, than prefer configured (ie, for force v2 delimiter
+  $rancid_version_base = $rancid_config_base;
+  $rancid_version = $rancid_config_version;
   $rancid_message = "Used RANCID version configured manually in \$config['rancid_version']: $rancid_version";
-  // v3 delimiter
-  $rancid_version_base = '3';
+}
+elseif (version_compare($rancid_cmd_version, $rancid_config_version, '>'))
+{
+  // RANCID locally detected, use maximum version
+  $rancid_version_base = $rancid_cmd_version;
+  $rancid_version = $rancid_cmd_version;
+  $rancid_message = "Used RANCID version detected on system: $rancid_version";
+}
+elseif (version_compare($rancid_config_version, '0', '>'))
+{
+  // RANCID not detected, but version configured
+  $rancid_version_base = $rancid_config_base;
+  $rancid_version = $rancid_config_version;
+  $rancid_message = "Used RANCID version configured manually in \$config['rancid_version']: $rancid_version";
+} else {
+  // Last compat version
+  $rancid_version_base = '2';
+  $rancid_version = '2';
+  $rancid_message = "Used default RANCID version: $rancid_version";
+}
+
+// Set delimiter
+if ($rancid_version_base < 3)
+{
+  $delimiter = ':';
+} else {
   $delimiter = ';';
 }
-else if ($rancid_cmd = external_exec('which rancid-run'))
-{
-  // Try detect rancid version on local system
-  list(, $rancid_version) = explode(' ', external_exec($rancid_cmd . ' -V'));
-  $rancid_message = "Used RANCID version detected on system: $rancid_version";
-  list($rancid_version_base) = explode('.', $rancid_version);
-  if ($rancid_version_base < 3)
-  {
-    $delimiter = ':';
-  } else {
-    $delimiter = ';';
-  }
-} else {
-  // Old version
-  $rancid_version = ltrim($config['rancid_version'], 'vV');
-  $rancid_message = "Used default RANCID version: $rancid_version. For version 3.x, install rancid locally or use \$config['rancid_version'].";
-  // v2 delimiter
-  $rancid_version_base = '2';
-  $delimiter = ':';
-}
+
 print_debug($rancid_message);
 
 ?>

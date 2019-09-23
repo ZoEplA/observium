@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -56,8 +56,6 @@ if (is_numeric($vars['id']) && ($auth || port_permitted($vars['id'])))
 
   $port   = get_port_by_id($vars['id']);
   $device = device_by_id_cache($port['device_id']);
-  $title  = generate_device_link($device);
-  $title .= " :: Port  <b>".generate_port_link($port) ."</b>";
 
   $title_array   = array();
   $title_array[] = array('text' => $device['hostname'], 'url' => generate_url(array('page' => 'device', 'device' => $device['device_id'])));

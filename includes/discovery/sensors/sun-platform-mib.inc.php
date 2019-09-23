@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -78,7 +78,7 @@ $SunPlatBaseUnits = array(
   /*
   newtons(18),
   */
-  'cfm'     => array('type' => 'airflow'),
+  'cfm'     => array('type' => 'airflow'), //, 'unit' => 'CFM'),
   'rpm'     => array('type' => 'fanspeed'),
   'hertz'   => array('type' => 'frequency'),
   /*
@@ -224,7 +224,7 @@ foreach ($oids as $index => $entry)
     }
   }
 
-  discover_sensor($valid['sensor'], $unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
+  discover_sensor($unit['type'], $device, $oid_num, $index, $type, $descr, $scale, $value, $options);
 }
 
 // EOF

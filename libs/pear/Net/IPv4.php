@@ -136,7 +136,7 @@ class Net_IPv4
      */
     public static function check_ip($ip)
     {
-        return $this->validateIP($ip);
+        return Net_IPv4::validateIP($ip);
     }
 
     // }}}

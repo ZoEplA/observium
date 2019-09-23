@@ -70,6 +70,18 @@ bcsiModules OBJECT-IDENTITY
     DESCRIPTION   
         "The root OID sub-tree for all the Brocade management MIBs."
     ::= { bcsiReg 1 }
+
+-- reserved for: brocadeTrapsMIB MODULE-IDENTITY  	::= { bcsiModules 1 }
+-- bcsiModuleTC MODULE-IDENTITY  					::= { bcsiModules 2 }
+-- swMibModule MODULE-IDENTITY 						::= { bcsiModules 3 }
+-- maps MODULE-IDENTITY 							::= { bcsiModules 4 }
+-- brocadeContextMappingMIB  MODULE-IDENTITY 		::= { bcsiModules 7 }
+-- brocadeOpticalMonitoringMIB  MODULE-IDENTITY 	::= { bcsiModules 8 }
+-- brocadeUdldMIB  MODULE-IDENTITY                  ::= { bcsiModules 9 }
+-- brocadeMplsMIB  MODULE-IDENTITY     				::= { bcsiModules 10 }
+-- brocadeInterfaceStatsMIB MODULE-IDENTITY         ::= { bcsiModules 11 }
+-- brocadeModuleCpuUtilMIB MODULE-IDENTITY          ::= { bcsiModules 12 }
+-- brocadeModuleMemUtilMIB MODULE-IDENTITY          ::= { bcsiModules 13 } 
     
 brocadeAgentCapability OBJECT-IDENTITY
 	STATUS	current

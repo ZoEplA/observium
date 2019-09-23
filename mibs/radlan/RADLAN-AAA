@@ -1443,7 +1443,8 @@ rlRadiusServerUsage OBJECT-TYPE
       userAuthentication(1),
       portAuthentication(2),
       all(3),
-      wirelessAuthentication (4)
+      wirelessAuthentication (4),
+      igmp-auth(5)
     }
     MAX-ACCESS read-write
     STATUS current
@@ -1638,7 +1639,8 @@ rlRadiusServerInetUsage OBJECT-TYPE
       userAuthentication(1),
       portAuthentication(2),
       all(3),
-      wirelessAuthentication (4)
+      wirelessAuthentication (4),
+      igmpAuthorization (5)
     }
     MAX-ACCESS read-write
     STATUS current

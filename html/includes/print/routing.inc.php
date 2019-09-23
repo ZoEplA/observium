@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -36,113 +36,115 @@ function print_bgp_peer_table($vars)
     {
         // There have been no entries returned. Print the warning.
         print_warning('<h4>No BGP peers found!</h4>');
+        return;
     }
-    else
+
+    // Entries have been returned. Print the table.
+    $list = array('device' => FALSE);
+    if ($vars['page'] != 'device')
     {
-        // Entries have been returned. Print the table.
-        $list = array('device' => FALSE);
-        if ($vars['page'] != 'device')
+        $list['device'] = TRUE;
+    }
+
+    switch ($vars['graph'])
+    {
+        case 'prefixes_ipv4unicast':
+        case 'prefixes_ipv4multicast':
+        case 'prefixes_ipv4vpn':
+        case 'prefixes_ipv6unicast':
+        case 'prefixes_ipv6multicast':
+        case 'macaccounting_bits':
+        case 'macaccounting_pkts':
+        case 'updates':
+            $table_class   = 'table-striped-two';
+            $list['graph'] = TRUE;
+            break;
+        default:
+            $table_class   = 'table-striped';
+            $list['graph'] = FALSE;
+    }
+
+    $string = generate_box_open();
+
+    $string .= '<table class="table  ' . $table_class . ' table-hover table-condensed ">' . PHP_EOL;
+
+    $cols = array(
+        array(NULL, 'class="state-marker"'),
+        array(NULL, 'style="width: 1px;"'),
+        'device'  => array('Local address', 'style="width: 150px;"'),
+        array(NULL, 'style="width: 20px;"'),
+        'peer_ip' => array('Peer address', 'style="width: 150px;"'),
+        'type'    => array('Type', 'style="width: 50px;"'),
+        array('Family', 'style="width: 50px;"'),
+        'peer_as' => 'Remote AS',
+        'state'   => 'State',
+        'Uptime / Updates',
+    );
+    //if (!$list['device']) { unset($cols['device']); }
+    $string .= get_table_header($cols, $vars);
+
+    $string .= '  <tbody>' . PHP_EOL;
+
+    foreach ($entries['entries'] as $peer)
+    {
+        $local_dev  = device_by_id_cache($peer['device_id']);
+        $local_as   = ($list['device'] ? ' (AS' . $peer['human_local_as'] . ')' : '');
+        $local_name = generate_device_link($local_dev, short_hostname($local_dev['hostname'], 18), array('tab' => 'routing', 'proto' => 'bgp'));
+        $local_ip   = generate_device_link($local_dev, $peer['human_localip'] . $local_as, array('tab' => 'routing', 'proto' => 'bgp'));
+        $peer_as    = 'AS' . $peer['human_remote_as'];
+        if ($peer['peer_device_id'])
         {
-            $list['device'] = TRUE;
+            $peer_dev  = device_by_id_cache($peer['peer_device_id']);
+            $peer_name = generate_device_link($peer_dev, short_hostname($peer_dev['hostname'], 18), array('tab' => 'routing', 'proto' => 'bgp'));
         }
-
-        switch ($vars['graph'])
+        else
         {
-            case 'prefixes_ipv4unicast':
-            case 'prefixes_ipv4multicast':
-            case 'prefixes_ipv4vpn':
-            case 'prefixes_ipv6unicast':
-            case 'prefixes_ipv6multicast':
-            case 'macaccounting_bits':
-            case 'macaccounting_pkts':
-            case 'updates':
-                $table_class   = 'table-striped-two';
-                $list['graph'] = TRUE;
-                break;
-            default:
-                $table_class   = 'table-striped';
-                $list['graph'] = FALSE;
+            $peer_name = $peer['reverse_dns'];
         }
+        $peer_ip        = generate_entity_link("bgp_peer", $peer, $peer['human_remoteip']);
+        $peer_afis      = &$entries['afisafi'][$peer['device_id']][$peer['bgpPeer_id']];
+        $peer_afis_html = array();
 
-        $string = generate_box_open();
-
-        $string .= '<table class="table  ' . $table_class . ' table-hover table-condensed ">' . PHP_EOL;
-
-        $cols = array(
-            array(NULL, 'class="state-marker"'),
-            array(NULL, 'style="width: 1px;"'),
-            'device'  => array('Local address', 'style="width: 150px;"'),
-            array(NULL, 'style="width: 20px;"'),
-            'peer_ip' => array('Peer address', 'style="width: 150px;"'),
-            'type'    => array('Type', 'style="width: 50px;"'),
-            array('Family', 'style="width: 50px;"'),
-            'peer_as' => 'Remote AS',
-            'state'   => 'State',
-            'Uptime / Updates',
-        );
-        //if (!$list['device']) { unset($cols['device']); }
-        $string .= get_table_header($cols, $vars);
-
-        $string .= '  <tbody>' . PHP_EOL;
-
-        foreach ($entries['entries'] as $peer)
+        // Generate AFI/SAFI labels
+        foreach ($peer_afis as $peer_afi)
         {
-            $local_dev  = device_by_id_cache($peer['device_id']);
-            $local_as   = ($list['device'] ? ' (AS' . $peer['human_local_as'] . ')' : '');
-            $local_name = generate_device_link($local_dev, short_hostname($local_dev['hostname'], 18), array('tab' => 'routing', 'proto' => 'bgp'));
-            $local_ip   = generate_device_link($local_dev, $peer['human_localip'] . $local_as, array('tab' => 'routing', 'proto' => 'bgp'));
-            $peer_as    = 'AS' . $peer['human_remote_as'];
-            if ($peer['peer_device_id'])
+//            $peer_afi_html = '<span class="label-group">';
+            if (isset($GLOBALS['config']['routing_afis_name'][$peer_afi['afi']]))
             {
-                $peer_dev  = device_by_id_cache($peer['peer_device_id']);
-                $peer_name = generate_device_link($peer_dev, short_hostname($peer_dev['hostname'], 18), array('tab' => 'routing', 'proto' => 'bgp'));
-            }
-            else
-            {
-                $peer_name = $peer['reverse_dns'];
-            }
-            $peer_ip        = generate_entity_link("bgp_peer", $peer, $peer['human_remoteip']);
-            $peer_afis      = &$entries['afisafi'][$peer['device_id']][$peer['bgpPeer_id']];
-            $peer_afis_html = array();
-
-            foreach ($peer_afis AS $peer_afi)
-            {
-                $peer_afi_html = '<span class="label-group">';
-                switch ($peer_afi['afi'])
-                {
-                    case 'ipv4':
-                    case 'ipv4z':
-                        $afi_class = 'success';
-                        break;
-                    case 'ipv6':
-                    case 'ipv6z':
-                        $afi_class = 'primary';
-                        break;
-                    default:
-                        $afi_class = 'default';
-                }
-
-                switch ($peer_afi['safi'])
-                {
-                    case 'unicast':
-                        $safi_class = 'delayed';
-                        break;
-                    case 'multicast':
-                        $safi_class = 'warning';
-                        break;
-                    case 'vpn':
-                        $safi_class = 'suppressed';
-                        break;
-                    default:
-                        $safi_class = 'default';
-                }
-
-                $peer_afi_html    .= '<span class="label label-' . $afi_class . '">' . $peer_afi['afi'] . '</span>';
-                $peer_afi_html    .= '<span class="label label-' . $safi_class . '">' . $peer_afi['safi'] . '</span>';
-                $peer_afi_html    .= '</span>';
-                $peer_afis_html[] = $peer_afi_html;
+                $afi_num   = $GLOBALS['config']['routing_afis_name'][$peer_afi['afi']];
+                $afi_class = $GLOBALS['config']['routing_afis'][$afi_num]['class'];
+            } else {
+                $afi_class = 'default';
             }
 
+            if (isset($GLOBALS['config']['routing_safis_name'][$peer_afi['safi']]))
+            {
+                // Named SAFI
+                $safi_num   = $GLOBALS['config']['routing_safis_name'][$peer_afi['safi']];
+                $safi_class = $GLOBALS['config']['routing_safis'][$safi_num]['class'];
+            }
+            else if (isset($GLOBALS['config']['routing_safis'][$peer_afi['safi']]))
+            {
+                // Numeric SAFI
+                $safi_num   = $peer_afi['safi'];
+                $peer_afi['safi'] = $GLOBALS['config']['routing_safis'][$safi_num]['name'];
+                $safi_class = $GLOBALS['config']['routing_safis'][$safi_num]['class'];
+            } else {
+                $safi_class = 'default';
+            }
+
+//            $peer_afi_html    .= '<span class="label label-' . $afi_class . '">' . $peer_afi['afi'] . '</span>';
+//            $peer_afi_html    .= '<span class="label label-' . $safi_class . '">' . $peer_afi['safi'] . '</span>';
+//            $peer_afi_html    .= '</span>';
+
+            $peer_afi_items = [
+              ['event' => $afi_class,  'text' => $peer_afi['afi']],
+              ['event' => $safi_class, 'text' => $peer_afi['safi']],
+            ];
+            $peer_afi_html = get_label_group($peer_afi_items);
+            //r($peer_afi_html);
+            $peer_afis_html[] = $peer_afi_html;
+        }
 
             $string .= '  <tr class="' . $peer['html_row_class'] . '">' . PHP_EOL;
             $string .= '     <td class="state-marker"></td>' . PHP_EOL;
@@ -154,85 +156,85 @@ function print_bgp_peer_table($vars)
             $string .= '     <td>' . implode('<br />', $peer_afis_html) . '</td>' . PHP_EOL;
             $string .= '     <td><strong>' . $peer_as . '</strong><br />' . $peer['astext'] . '</td>' . PHP_EOL;
             $string .= '     <td><strong><span class=" label label-' . $peer['admin_class'] . '">' . $peer['bgpPeerAdminStatus'] . '</span><br /><span class="label label-' . $peer['state_class'] . '">' . $peer['bgpPeerState'] . '</span></strong></td>' . PHP_EOL;
-            $string .= '     <td style="white-space: nowrap">' . formatUptime($peer['bgpPeerFsmEstablishedTime']) . '<br />
+            $string .= '     <td style="white-space: nowrap">' . format_uptime($peer['bgpPeerFsmEstablishedTime']) . '<br />
                 Updates: <i class="icon-circle-arrow-down text-success"></i> ' . format_si($peer['bgpPeerInUpdates']) . ' <i class="icon-circle-arrow-up text-primary"></i> ' . format_si($peer['bgpPeerOutUpdates']) . '</td>' . PHP_EOL;
             $string .= '  </tr>' . PHP_EOL;
 
-            // Graphs
-            $peer_graph = FALSE;
-            switch ($vars['graph'])
-            {
-                case 'prefixes_ipv4unicast':
-                case 'prefixes_ipv4multicast':
-                case 'prefixes_ipv4vpn':
-                case 'prefixes_ipv6unicast':
-                case 'prefixes_ipv6multicast':
-                    $afisafi = preg_replace('/prefixes_(ipv[46])(\w+)/', '$1.$2', $vars['graph']); // prefixes_ipv6unicast ->> ipv6.unicast
-                    if (isset($peer_afis[$afisafi]) && $peer['bgpPeer_id'])
-                    {
-                        $graph_array['type'] = 'bgp_' . $vars['graph'];
-                        $graph_array['id']   = $peer['bgpPeer_id'];
-                        $peer_graph          = TRUE;
-                    }
-                    break;
-                case 'updates':
-                    if ($peer['bgpPeer_id'])
-                    {
-                        $graph_array['type'] = 'bgp_updates';
-                        $graph_array['id']   = $peer['bgpPeer_id'];
-                        $peer_graph          = TRUE;
-                    }
-                    break;
-                case 'macaccounting_bits':
-                case 'macaccounting_pkts':
-                    //FIXME. I really still not know it works or not? -- mike
-                    // This part copy-pasted from old code as is
-                    $acc      = dbFetchRow("SELECT * FROM `mac_accounting` AS M
-                            LEFT JOIN `ip_mac` AS I ON M.mac = I.mac_address
-                            LEFT JOIN `ports` AS P ON P.port_id = M.port_id
-                            LEFT JOIN `devices` AS D ON D.device_id = P.device_id
-                            WHERE I.ip_address = ?", array($peer['bgpPeerRemoteAddr']));
-                    $database = get_rrd_path($device, "cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
-                    if (is_array($acc) && is_file($database))
-                    {
-                        $peer_graph          = TRUE;
-                        $graph_array['id']   = $acc['ma_id'];
-                        $graph_array['type'] = $vars['graph'];
-                    }
-                    break;
-            }
-
-            if ($peer_graph)
-            {
-                $graph_array['to'] = $config['time']['now'];
-                $string            .= '  <tr class="' . $peer['html_row_class'] . '">' . PHP_EOL;
-                $string            .= '    <td class="state-marker"></td><td colspan="10" style="white-space: nowrap">' . PHP_EOL;
-
-                $string .= generate_graph_row($graph_array);
-
-                $string .= '    </td>' . PHP_EOL . '  </tr>' . PHP_EOL;
-            }
-            elseif ($list['graph'])
-            {
-                // Empty row for correct view class table-striped-two
-                $string .= '  <tr class="' . $peer['html_row_class'] . '"><td class="state-marker"></td><td colspan="10"></td></tr>' . PHP_EOL;
-            }
-        }
-
-        $string .= '  </tbody>' . PHP_EOL;
-        $string .= '</table>';
-
-        $string .= generate_box_close();
-
-        // Print pagination header
-        if ($entries['pagination_html'])
+        // Graphs
+        $peer_graph = FALSE;
+        switch ($vars['graph'])
         {
-            $string = $entries['pagination_html'] . $string . $entries['pagination_html'];
+            case 'prefixes_ipv4unicast':
+            case 'prefixes_ipv4multicast':
+            case 'prefixes_ipv4vpn':
+            case 'prefixes_ipv6unicast':
+            case 'prefixes_ipv6multicast':
+                $afisafi = preg_replace('/prefixes_(ipv[46])(\w+)/', '$1.$2', $vars['graph']); // prefixes_ipv6unicast ->> ipv6.unicast
+                if (isset($peer_afis[$afisafi]) && $peer['bgpPeer_id'])
+                {
+                    $graph_array['type'] = 'bgp_' . $vars['graph'];
+                    $graph_array['id']   = $peer['bgpPeer_id'];
+                    $peer_graph          = TRUE;
+                }
+                break;
+            case 'updates':
+                if ($peer['bgpPeer_id'])
+                {
+                    $graph_array['type'] = 'bgp_updates';
+                    $graph_array['id']   = $peer['bgpPeer_id'];
+                    $peer_graph          = TRUE;
+                }
+                break;
+            case 'macaccounting_bits':
+            case 'macaccounting_pkts':
+                //FIXME. I really still not know it works or not? -- mike
+                // This part copy-pasted from old code as is
+                $acc      = dbFetchRow("SELECT * FROM `mac_accounting` AS M
+                        LEFT JOIN `ip_mac` AS I ON M.mac = I.mac_address
+                        LEFT JOIN `ports` AS P ON P.port_id = M.port_id
+                        LEFT JOIN `devices` AS D ON D.device_id = P.device_id
+                        WHERE I.ip_address = ?", array($peer['bgpPeerRemoteAddr']));
+                $database = get_rrd_path($device, "cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
+                if (is_array($acc) && is_file($database))
+                {
+                    $peer_graph          = TRUE;
+                    $graph_array['id']   = $acc['ma_id'];
+                    $graph_array['type'] = $vars['graph'];
+                }
+                break;
         }
 
-        // Print
-        echo $string;
+        if ($peer_graph)
+        {
+            $graph_array['to'] = $config['time']['now'];
+            $string            .= '  <tr class="' . $peer['html_row_class'] . '">' . PHP_EOL;
+            $string            .= '    <td class="state-marker"></td><td colspan="10" style="white-space: nowrap">' . PHP_EOL;
+
+            $string .= generate_graph_row($graph_array);
+
+            $string .= '    </td>' . PHP_EOL . '  </tr>' . PHP_EOL;
+        }
+        elseif ($list['graph'])
+        {
+            // Empty row for correct view class table-striped-two
+            $string .= '  <tr class="' . $peer['html_row_class'] . '"><td class="state-marker"></td><td colspan="10"></td></tr>' . PHP_EOL;
+        }
     }
+
+    $string .= '  </tbody>' . PHP_EOL;
+    $string .= '</table>';
+
+    $string .= generate_box_close();
+
+    // Print pagination header
+    if ($entries['pagination_html'])
+    {
+        $string = $entries['pagination_html'] . $string . $entries['pagination_html'];
+    }
+
+    // Print
+    echo $string;
+
 }
 
 /**

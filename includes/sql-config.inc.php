@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage config
  * @author     Tom Laermans <sid3windr@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -85,8 +85,9 @@ else if (!get_db_version() && !(isset($options['u']) || isset($options['V'])))
   // Maybe better in another place, but at least here it runs always; keep track of what svn revision we last saw, and eventlog the upgrade versions.
   // We have versions here from the includes above, and we just connected to the DB.
   $rev_old = @get_obs_attrib('current_rev');
-  if ($rev_old < OBSERVIUM_REV || !is_numeric($rev_old))
+  if (($rev_old < OBSERVIUM_REV || !is_numeric($rev_old)) && OBSERVIUM_VERSION_LONG != '0.SVN.ERROR')
   {
+    // Ignore changes to not correctly detected version (0.SVN.ERROR)
     // Version update detected, log it
     $version_old = @get_obs_attrib('current_version');
     log_event("Observium updated: $version_old -> " . OBSERVIUM_VERSION_LONG, NULL, NULL, NULL, 5);
@@ -238,10 +239,12 @@ if (isset($config['auth']['remote_user']) && $config['auth']['remote_user'] && !
 }
 
 // Database currently stores v6 networks non-compressed, check for any compressed subnet and expand them
-foreach ($config['ignore_common_subnet'] as $index => $content)
+foreach ($config['ignore_common_subnet'] as $i => $content)
 {
-  if (strstr($content,':') !== FALSE) { $config['ignore_common_subnet'][$index] = Net_IPv6::uncompress($content); }
+  if (strstr($content,':') !== FALSE) { $config['ignore_common_subnet'][$i] = Net_IPv6::uncompress($content); }
 }
+
+unset($i); unset($content);
 
 if (isset($config['rrdgraph_def_text']))
 {
@@ -253,6 +256,34 @@ if (isset($config['rrdgraph_def_text']))
 if ($config['cache']['enable'] && version_compare(PHP_VERSION, '5.5.0', '<'))
 {
   $config['cache']['enable'] = FALSE;
+}
+
+// Generate poller id if we're a partitioned poller and we don't yet have one.
+/*
+if (isset($config['poller_id']))
+{
+  // Use already configured poller_id
+}
+else
+*/
+if (isset($config['poller_name']))
+{
+  $poller_id = dbFetchCell("SELECT `poller_id` FROM `pollers` WHERE `poller_name` = ?", array($GLOBALS['config']['poller_name']));
+
+  if (is_numeric($poller_id))
+  {
+    $config['poller_id'] = $poller_id;
+  } else {
+    // This poller not exist, create it
+    // I not sure that this should be in global sql-config include @mike
+    $config['poller_id'] = dbInsert('pollers', array('poller_name' => $config['poller_name']));
+  }
+  unset($poller_id);
+
+} else {
+  // Default poller
+  $config['poller_id'] = 0;
+
 }
 
 // EOF

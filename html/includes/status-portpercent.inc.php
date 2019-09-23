@@ -2,8 +2,8 @@
 
 $graph_data = array();
 
-$classes = array('primary', 'success', 'danger');
-$colours = array('0a5f7f', '4d9221', 'd9534f');
+$classes = array('primary', 'success', 'danger', 'warning', 'info');
+$colours = array('0a5f7f', '4d9221', 'd9534f', 'F0AD4E', '4BB1CF');
 
 $i=0;
 
@@ -15,6 +15,8 @@ foreach ($config['frontpage']['portpercent'] as $type => $data) {
 
         $totalInOctets = 0;
         $totalOutOctets = 0;
+
+        if(!isset($colours[$i])) { $i = 0; }
 
         //fetch ports in group using existing observium functioon
         foreach (get_group_entities($data['group']) as $port) {
@@ -69,7 +71,10 @@ foreach ($totals_array as $type => $dir)
   $percentOut = $dir["out"] / $totalOut * 100;
   $percent = ($dir["in"]+$dir["out"]) / ($totalIn+$totalOut) * 100;
 
-  $color = $config['graph_colours']['mixed'][$i];
+  if(!isset($colours[$i])) { $i = 0; }
+
+
+   $color = $config['graph_colours']['mixed'][$i];
   $class = $classes[$i];
 
   $bars_in  .= '  <div class="progress-bar progress-bar-'.$class.'" style="width: '.$percentIn.'%"><span class="sr-only">'.round($percentIn).'%'.'</span></div>';
@@ -114,26 +119,37 @@ echo generate_box_open($box_args);
         $graph_array = array('type'   => 'multi-port_groups_bits',
                              'width'  => 1239,
                              'height' => 89,
-                             'legend' => no,
+                             'legend' => 'no',
                              'from'   => $config['time']['twoday'],
                              'to'     => $config['time']['now'],
                              'perc_agg' => TRUE,
-                             'data'   => var_encode(json_encode($graph_data)),
+                             'data'   => var_encode($graph_data),
 //                             'width'  => '305'
                          );
 
         echo '<tr><td colspan=3>';
 
+        // Calculate height of the table
+        $table_height = (count($config['frontpage']['portpercent']) * 27);
+        if($table_height < 81) { $table_height = 81; }
+
+        // Calculate height available for graph
+        if(isset($width))
+        {
+          $graph_array['height'] = $height - (82 + 9 + $table_height);
+        } else {
+          $graph_array['height'] = 100;
+        }
+
+
         switch($options['graph_format'])
         {
           case 'single':
-            $graph_array['height'] = 100;
             $graph_array['width']  = 1148;
             $graph_array['draw_all'] = 'yes';
 
             if(isset($width)) {
               $graph_array['width'] = ($width - 10 - 76);
-              $graph_array['height'] = $height - 174;
               if ($graph_array['width'] > 350) { $graph_array['width'] -= 6; }
             }
 
@@ -143,15 +159,11 @@ echo generate_box_open($box_args);
             // FIXME - This logic should probably be functionalised, and the cuttoff to switch font should be a variable.
 
           case 'multi':
-            $graph_array['height'] = 100;
             $graph_array['draw_all'] = 'yes';
             unset($graph_array['width']);
             if(isset($width)) {
               $graph_array['width'] = round(($width - 19) / 4);
-
               if($graph_array['width'] > 350) { $graph_array['width'] -= 82; } else { $graph_array['width'] -= 76; }
-
-              $graph_array['height'] = $height - 174;
             }
             print_graph_row($graph_array);
             break;
@@ -161,9 +173,8 @@ echo generate_box_open($box_args);
             $graph_array['graph_only'] = 'yes';
             if(isset($width)) {
                 $graph_array['width'] = ($width - 19) / 4;
-              $graph_array['height'] = $height - 135;
             }
-
+            $graph_array['height'] += 39;
             print_graph_row($graph_array);
             break;
 
@@ -171,11 +182,11 @@ echo generate_box_open($box_args);
           default:
               $graph_array['graph_only'] = 'yes';
           if(isset($width)) {
-
             $graph_array['width'] = ($width - 10);
-            $graph_array['height'] = $height - 135;
           }
-            echo(generate_graph_tag($graph_array));
+        $graph_array['height'] += 39;
+
+        echo(generate_graph_tag($graph_array));
            break;
         }
 
@@ -183,11 +194,13 @@ echo generate_box_open($box_args);
 
       }
 
+if(!isset($options['legend_width'])) { $options['legend_width'] = "220"; }
+
     ?>
 
-<table class="table table-condensed">
+<table class="table table-condensed" style="background-color: #ffffff00;">
 <tr>
-  <td rowspan="3" width="220"><?php echo $legend; ?></td>
+  <td rowspan="3" width="<?php echo $options['legend_width']; ?>"><?php echo $legend; ?></td>
   <th width="40"><span class="label label-success"><i class="icon-circle-arrow-down"></i> In</span></th>
   <td>
   <div class="progress" style="margin-bottom: 0;">

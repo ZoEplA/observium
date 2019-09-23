@@ -6,7 +6,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -38,6 +38,10 @@ function build_mempool_query($vars)
       case "device":
       case "device_id":
         $sql .= generate_query_values($value, 'mempools.device_id');
+        break;
+      case "descr":
+      case "mempool_descr";
+        $sql .= generate_query_values($value, 'mempool_descr', '%LIKE%');
         break;
     }
   }
@@ -244,5 +248,110 @@ function generate_mempool_row($mempool, $vars)
   } # endif graphs
 
   return $row;
-
 }
+
+function print_mempool_form($vars, $single_device = FALSE)
+{
+  //global $config;
+
+  $form = array('type'  => 'rows',
+                'space' => '10px',
+                'submit_by_key' => TRUE,
+                'url'   => generate_url($vars));
+
+  $form_items = array();
+
+  if ($single_device)
+  {
+    // Single device, just hidden field
+    $form['row'][0]['device_id'] = array(
+      'type'        => 'hidden',
+      'name'        => 'Device',
+      'value'       => $vars['device_id'],
+      'grid'        => 2,
+      'width'       => '100%');
+  } else {
+    $form_items['devices'] = generate_form_values('device', dbFetchColumn('SELECT DISTINCT `device_id` FROM `mempools`'));
+
+    $form['row'][0]['device_id'] = array(
+      'type'        => 'multiselect',
+      'name'        => 'Device',
+      'value'       => $vars['device_id'],
+      'grid'        => 2,
+      'width'       => '100%', //'180px',
+      'values'      => $form_items['devices']);
+  }
+
+  //$sensor_permitted = generate_query_permitted(array('device', 'sensor'));
+  $form['row'][0]['mempool_descr'] = array(
+    'type'        => 'text',
+    'placeholder' => 'Mempool',
+    'width'       => '100%', //'180px',
+    'grid'        => 6,
+    'value'       => $vars['mempool_descr']);
+
+  // Groups
+  foreach (get_type_groups('storage') as $entry)
+  {
+    $form_items['group'][$entry['group_id']] = $entry['group_name'];
+  }
+  $form['row'][0]['group']    = array(
+    'community'   => FALSE,
+    'type'        => 'multiselect',
+    'name'        => 'Select Groups',
+    'width'       => '100%', //'180px',
+    'grid'        => 2,
+    'value'       => $vars['group'],
+    'values'      => $form_items['group']);
+
+  $form['row'][0]['search']   = array(
+    'type'        => 'submit',
+    'grid'        => 2,
+    //'name'        => 'Search',
+    //'icon'        => 'icon-search',
+    'right'       => TRUE,
+  );
+
+  // Show search form
+  echo '<div class="hidden-xl">';
+  print_form($form);
+  echo '</div>';
+
+  // Custom panel form
+  $panel_form = array('type'  => 'rows',
+                      'title' => 'Search Mempools',
+                      'space' => '10px',
+                      //'brand' => NULL,
+                      //'class' => '',
+                      'submit_by_key' => TRUE,
+                      'url'   => generate_url($vars));
+
+  // Clean grids
+  foreach (array_keys($form['row'][0]) as $param)
+  {
+    unset($form['row'][0][$param]['grid']);
+  }
+  foreach (array_keys($form['row'][1]) as $param)
+  {
+    unset($form['row'][1][$param]['grid']);
+  }
+  // Copy forms
+  $panel_form['row'][0]['device_id']      = $form['row'][0]['device_id'];
+  $panel_form['row'][0]['group']          = $form['row'][0]['group'];
+
+  //$panel_form['row'][1]['supply_colour']  = $form['row'][0]['supply_colour'];
+  //$panel_form['row'][1]['supply_type']    = $form['row'][0]['supply_type'];
+
+  //$panel_form['row'][2]['measured_state'] = $form['row'][0]['measured_state'];
+  //$panel_form['row'][2]['group']          = $form['row'][1]['group'];
+
+  $panel_form['row'][3]['mempool_descr']  = $form['row'][0]['mempool_descr'];
+
+  //$panel_form['row'][5]['sort'] = $form['row'][0]['sort'];
+  $panel_form['row'][5]['search'] = $form['row'][0]['search'];
+
+  // Register custom panel
+  register_html_panel(generate_form($panel_form));
+}
+
+// EOF

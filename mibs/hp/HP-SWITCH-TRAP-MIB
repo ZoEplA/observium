@@ -1,8 +1,24 @@
-HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
+-- ***********************************************************************
+-- Module:    hpSwitchTrap.mib
+-- 
+-- Copyright (C) 2016-2017 Hewlett Packard Enterprise Development LP
+-- All Rights Reserved.
+--  
+-- The contents of this software are proprietary and confidential to
+-- the Hewlett Packard Enterprise Development LP. No part of this
+-- program may be photocopied, reproduced, or translated into another
+-- programming language without prior written consent of the
+-- Hewlett Packard Enterprise Development LP.
+--
+-- Purpose: This file contains MIB definition of HP-SWITCH-TRAP-MIB 
+--
+-- ***********************************************************************
+
+HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN 
 
     IMPORTS
+
 	TRAP-TYPE                      FROM RFC-1215
-      
 
 	hpSwitch1600,   hpSwitchJ9079A, hpSwitchJ9080A, hpSwitchJ9028A,
 	hpSwitchJ9028B, hpSwitchJ9029A, hpSwitchJ9449A, hpSwitchJ9450A,
@@ -26,11 +42,23 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
         hpSwitchJ9729A, hpStack2920,    hpSwitchJ4905A, hpSwitchJ4906A, 
         hpSwitchJ8692A, hpSwitchJ8693A, hpSwitchJ9310A, hpSwitchJ9311A, 
         hpSwitchJ9470A, hpSwitchJ9471A, hpSwitchJ9472A, hpSwitchJ9473A, 
-        hpSwitchJ9573,  hpSwitchJ9574,  hpSwitchJ9575,   hpSwitchJ9576, 
-        hpSwitchJ9584,  hpSwitchJ9585,  hpSwitchJ9586,   hpSwitchJ9587, 
+        hpSwitchJ9573,  hpSwitchJ9574,  hpSwitchJ9575,  hpSwitchJ9576, 
+        hpSwitchJ9584,  hpSwitchJ9585,  hpSwitchJ9586,  hpSwitchJ9587, 
         hpSwitchJ9588,                  hpStack,       hpStackVSF5400R,
+                           arubaSwitchJL354A, arubaSwitchJL355A,
+        arubaSwitchJL356A, arubaSwitchJL357A,
+        arubaStack2930,    arubaStack2930M,   arubaSwitchJL319A,
+        arubaSwitchJL321A, arubaSwitchJL320A, arubaSwitchJL322A,
+        arubaSwitchJL323A, arubaSwitchJL258A,
+        arubaSwitchJL253A, arubaSwitchJL254A, arubaSwitchJL255A,
+        arubaSwitchJL256A, arubaSwitchJL259A, arubaSwitchJL260A,
+        arubaSwitchJL261A, arubaSwitchJL262A, arubaSwitchJL558A, 
+        arubaSwitchJL557A, arubaSwitchJL692A,
+        arubaSwitchJL263A, arubaSwitchJL264A, 
+        arubaSwitchJL559A, arubaSwitchJL324A,
+        arubaSwitchR0M67A, arubaSwitchR0M68A,
         arubaStack3810, arubaJL071A,    arubaJL072A,       arubaJL073A,
-        arubaJL074A,    arubaJL075A,                       arubaJL076A,       
+        arubaJL074A,    arubaJL075A,    arubaJL076A,       arubaJL077A,
         hpSwitch4000,   hpSwitchJ4865A, hpSwitchJ4887A, hpSwitchJ4819A,
         hpSwitchJ4850A,                                 hpSwitchJ8697A,
         hpSwitchJ8698A, hpSwitchJ9850A, hpSwitchJ9851A, hpSwitchJ4902A, 
@@ -64,63 +92,49 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION   "An SNMP trap that is generated for an RMON event on a J4120A 1600M Switch."
         ::= 2
 
-
 -- -------------
 -- 1700 SWITCHES
 -- -------------
-
-
    hpSwitchJ9079Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9079A
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9079A 1700-8 Switch."
         ::= 2
-
 
    hpSwitchJ9080Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9080A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9080A 1700-24 Switch."
         ::= 2
 
-
 -- -------------
 -- 1800 SWITCHES
 -- -------------
-
-
    hpSwitchJ9028Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9028A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9028A 1800-24G Switch."
         ::= 2
-
 
    hpSwitchJ9028Btrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9028B 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9028B 1800-24G Switch."
         ::= 2
 
-
    hpSwitchJ9029Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9029A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9029A 1800-24G Switch."
         ::= 2
 
-
 -- -------------
 -- 1810 SWITCHES
 -- -------------
-
-
    hpSwitchJ9449Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9449A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9449A 1810-8G Switch."
         ::= 2
 
-
    hpSwitchJ9450Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9450A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9450A 1810-24G Switch."
         ::= 2
-
 
    hpSwitchJ9660Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9660A 
@@ -145,36 +159,28 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9802A 1810-8G v2 Switch."
         ::= 2
 
-
    hpSwitchJ9803Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9803A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9803A 1810-24G v2 Switch."
         ::= 2
-
 
    hpSwitchJ9833Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9833A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9833A PS1810-8G Switch."
         ::= 2
 
-
    hpSwitchJ9834Atrap  TRAP-TYPE
         ENTERPRISE     hpSwitchJ9834A 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9834A PS1810-24G Switch."
         ::= 2
 
-
-
 -- -------------
 -- 2400 SWITCHES
 -- -------------
-
-
    hpSwitch2400trap    TRAP-TYPE
          ENTERPRISE    hpSwitch2400 
         DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J4122A 2400M Switch."
         ::= 2
-
 
    hpSwitch2424trap    TRAP-TYPE
         ENTERPRISE     hpSwitch2424 
@@ -372,6 +378,32 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
           DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J9856A 2530-24G-2SFP+ Switch."
           ::= 2
 
+
+
+-- -------------
+-- 2540 SWITCHES
+-- -------------
+
+
+   arubaSwitchJL354Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL354A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL354A Aruba 2930F-24G-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL355Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL355A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL355A Aruba 2930F-48G-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL356Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL356A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL356A Aruba 2930F-24G-PoE+-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL357Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL357A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL357A Aruba 2930F-48G-PoE+-4SFP+ Switch."
+          ::= 2
 
 
 -- -------------
@@ -644,8 +676,136 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
           ENTERPRISE     hpStack2920
           DESCRIPTION    "An SNMP trap that is generated for an RMON event on a stack of 2920 Switches."
           ::= 2	
-	
 
+
+-- -------------
+-- 2930 SWITCHES
+-- -------------
+
+   arubaStack2930Mtrap   TRAP-TYPE
+          ENTERPRISE     arubaStack2930M
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a BPS stack of 2930M switches."
+          ::= 2
+
+   arubaStack2930trap    TRAP-TYPE
+          ENTERPRISE     arubaStack2930
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a stack of 2930 Switches."
+          ::= 2
+
+   arubaSwitchJL319Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL319A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL319A Aruba 2930M-24G Switch."
+          ::= 2
+
+   arubaSwitchJL321Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL321A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL321A Aruba 2930M-48G Switch."
+          ::= 2
+
+   arubaSwitchJL320Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL320A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL320A Aruba 2930M-24G-PoE+ Switch."
+          ::= 2
+
+   arubaSwitchJL322Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL322A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL322A Aruba 2930M-48G-PoE+ Switch."
+          ::= 2
+
+   arubaSwitchJL324Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL324A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL324A Aruba 2930M-24SR-PoE+ Switch."
+          ::= 2
+
+   arubaSwitchJL323Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL323A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL323A Aruba 2930M-40G-8SR-PoE+ Switch."
+          ::= 2
+
+   arubaSwitchR0M67Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchR0M67A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a R0M67A Aruba 2930M-40G-8SR-PoE-Class6 Switch."
+          ::= 2
+
+   arubaSwitchR0M68Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchR0M68A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a R0M68A Aruba 2930M-24SR-PoE-Class6 Switch."
+          ::= 2
+
+   arubaSwitchJL258Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL258A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL258A Aruba 2930F-8G-PoE+-2SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL253Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL253A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL253A Aruba 2930F-24G-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL254Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL254A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL254A Aruba 2930F-48G-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL255Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL255A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL255A Aruba 2930F-24G-PoE+-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL256Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL256A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL256A Aruba 2930F-48G-PoE+-4SFP+ Switch."
+          ::= 2
+
+   arubaSwitchJL259Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL259A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL259A Aruba 2930F-24G-4SFP Switch."
+          ::= 2
+
+   arubaSwitchJL260Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL260A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL260A Aruba 2930F-48G-4SFP Switch."
+          ::= 2
+
+   arubaSwitchJL261Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL261A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL261A Aruba 2930F-24G-PoE+-4SFP Switch."
+          ::= 2
+
+   arubaSwitchJL262Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL262A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL262A Aruba 2930F-48G-PoE+-4SFP Switch."
+          ::= 2
+
+   arubaSwitchJL558Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL558A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL558A Aruba 2930F 48G 740W PoE+ 4SPF+ Switch."
+          ::= 2
+
+   arubaSwitchJL557Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL557A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL557A Aruba 2930F 48G 740W PoE+ 4SPF Switch."
+          ::= 2
+
+   arubaSwitchJL692Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL692A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL692A Aruba 2930F-8G-PoE+-2SFP+-TAA Switch."
+          ::= 2
+
+   arubaSwitchJL263Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL263A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL263A Aruba 2930F-24G-PoE+-4SFP+-TAA Switch."
+          ::= 2
+
+   arubaSwitchJL264Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL264A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL264A Aruba 2930F-48G-PoE+-4SFP+-TAA Switch."
+          ::= 2
+
+   arubaSwitchJL559Atrap TRAP-TYPE
+          ENTERPRISE     arubaSwitchJL559A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL559A Aruba 2930F 48G 740W PoE+ 4SPF+ TAA Switch."
+          ::= 2
 
 -- -------------
 -- 3400 SWITCHES
@@ -828,6 +988,12 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
           DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL076A Aruba 3810M 40G 8 HPE Smart Rate PoE+ 1-slot Switch."
           ::= 2
 
+   arubaJL077Atrap       TRAP-TYPE
+          ENTERPRISE     arubaJL077A
+          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a JL077A Aruba 3810M 16 HPE Smart Rate PoE+ 2-slot Switch."
+          ::= 2
+
+
 -- -------------
 -- 4000 SWITCHES
 -- -------------
@@ -857,6 +1023,40 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
 
 
 
+-- -------------
+-- 4200 SWITCHES
+-- -------------
+
+
+--   hpSwitchJ8770Atrap    TRAP-TYPE
+--          ENTERPRISE     hpSwitchJ8770A
+--          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J8770A 4204VL Switch."
+--          ::= 2
+
+
+--   hpSwitchJ8771Atrap    TRAP-TYPE
+--          ENTERPRISE     hpSwitchJ8771A
+--          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J8771A 4202VL-48G Switch."
+--          ::= 2
+
+
+--   hpSwitchJ8772Atrap    TRAP-TYPE
+--          ENTERPRISE     hpSwitchJ8772A
+--          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J8772A 4202VL-72 Switch."
+--          ::= 2
+
+
+--   hpSwitchJ8772Btrap    TRAP-TYPE
+--          ENTERPRISE     hpSwitchJ8772B
+--          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J8772B 4202VL-72 Switch."
+--          ::= 2
+
+
+--   hpSwitchJ8773Atrap    TRAP-TYPE
+--          ENTERPRISE     hpSwitchJ8773A
+--          DESCRIPTION    "An SNMP trap that is generated for an RMON event on a J8773A 4208VL Switch."
+--
+--          ::= 2
 
 
 
@@ -1170,6 +1370,7 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
 
    eswitch2trap          TRAP-TYPE
         ENTERPRISE       eswitch2
+
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2980A AdvanceStack LAN Switch-16."
         ::= 2
 
@@ -1187,7 +1388,7 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
         ENTERPRISE       netSwitch200
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3125A AdvanceStack Switch 200."
         ::= 2
-   
+
 
 -- AdvanceStack Routers 200, 400, 600	
 
@@ -1219,49 +1420,50 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
    icfRouterLRtrap       TRAP-TYPE
         ENTERPRISE       icfRouterLR
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a 27287A AdvanceStack Router 470."
-        ::= 2
+        ::= 2 
 
 
    icfRouterBRtrap       TRAP-TYPE
         ENTERPRISE       icfRouterBR
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a 27290A AdvanceStack Router 480."
-        ::= 2
+        ::= 2 
 
 
    icfRouterPRtrap       TRAP-TYPE
         ENTERPRISE       icfRouterPR
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2540A AdvanceStack Router PR."
-        ::= 2
+        ::=  2
+
+
 
 
    icfRouter650trap      TRAP-TYPE
         ENTERPRISE       icfRouter650
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2430A AdvanceStack Router 650."
-        ::= 2
+        ::=  2  
 
 
    icfRouter230trap      TRAP-TYPE
         ENTERPRISE       icfRouter230
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2540B AdvanceStack Router 230."
-        ::= 2
+        ::=  2
 
 
    icfRouter250trap      TRAP-TYPE
         ENTERPRISE       icfRouter250
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a 27289B AdvanceStack Router 250."
-        ::= 2
-
+        ::=  2
 
    icfRouter255trap      TRAP-TYPE
         ENTERPRISE       icfRouter255
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2543A AdvanceStack Router 255."
-        ::= 2
+        ::=  2
 
 
    icfRouter210trap      TRAP-TYPE
         ENTERPRISE       icfRouter210
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2628A AdvanceStack Router 150."
-        ::= 2
+        ::=  2 
 
 
 -- Managable hubs
@@ -1270,91 +1472,96 @@ HP-SWITCH-TRAP-MIB DEFINITIONS ::= BEGIN
    fiberOptictrap        TRAP-TYPE
         ENTERPRISE       fiberOptic
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a 28682A Fiber-Optic Hub Plus."
-        ::= 2
+        ::=  2 
 
 
    advStack12trap        TRAP-TYPE
         ENTERPRISE       advStack12
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2600A AdvanceStack 10Base-T Hub-12."
-        ::= 2
+        ::=  2 
 
 
    advStack24trap        TRAP-TYPE
         ENTERPRISE       advStack24
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2601A or J2601B AdvanceStack 10Base-T Hub-24."
-        ::= 2
+        ::=  2  
 
 
    advStack48trap        TRAP-TYPE
         ENTERPRISE       advStack48
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2602A or J2602B AdvanceStack 10Base-T Hub-48."
-        ::= 2
+        ::=  2 
+
+
 
 
    advStackU8trap        TRAP-TYPE
         ENTERPRISE       advStackU8
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2610A AdvanceStack 10Base-T Hub-8U."
-        ::= 2
+        ::=  2  
 
 
    advStackU16trap       TRAP-TYPE
         ENTERPRISE       advStackU16
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J2611A AdvanceStack 10Base-T Hub-16U."
-        ::= 2
+        ::=  2 
 
 
    hpAdvStkEnetSH12Rtrap TRAP-TYPE
         ENTERPRISE       hpAdvStkEnetSH12R
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3200A AdvanceStack 10BT Switching Hub-12R."
-        ::= 2
+        ::=  2  
 
 
    hpAdvStkEnetSH24Rtrap TRAP-TYPE
         ENTERPRISE       hpAdvStkEnetSH24R
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3202A AdvanceStack 10BT Switching Hub-24R."
-        ::= 2
+        ::=  2  
 
 
    hpAdvStkEnetSH24Ttrap TRAP-TYPE
         ENTERPRISE       hpAdvStkEnetSH24T
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3204A AdvanceStack 10BT Switching Hub-24T."
-        ::= 2
+        ::=  2 
 
 
    hpAdvStk100Tx12TMtrap TRAP-TYPE
         ENTERPRISE       hpAdvStk100Tx12TM
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3233A AdvanceStack 100B-TX Hub-12TM."
-        ::= 2
+        ::=  2  
+
+
 
 
    hp10BaseTHub12Mtrap   TRAP-TYPE
         ENTERPRISE       hp10BaseTHub12M
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3301A 10Base-T Hub-12M."
-        ::= 2
+        ::=  2
 
 
    hp10BaseTHub24Mtrap   TRAP-TYPE
         ENTERPRISE       hp10BaseTHub24M
+
         DESCRIPTION      "An SNMP trap that is generated for an RMON event on a J3303A 10Base-T Hub-24M."
-        ::= 2
+        ::=  2 
 
 
    hpProCurve10T100THub12Mtrap   TRAP-TYPE
         ENTERPRISE               hpProCurve10T100THub12M
+
         DESCRIPTION              "An SNMP trap that is generated for an RMON event on a J3288A 100Base-T Hub 12M."
-        ::= 2
+        ::=  2
 
 
    hpProCurve10T100THub24Mtrap   TRAP-TYPE
         ENTERPRISE               hpProCurve10T100THub24M
         DESCRIPTION              "An SNMP trap that is generated for an RMON event on a J3289A 100Base-T Hub 24M."
-        ::= 2
+        ::=  2
 
 
    hpAdvStkEnetSHStacktrap   TRAP-TYPE
         ENTERPRISE           hpAdvStkEnetSHStack
         DESCRIPTION          "An SNMP trap that is generated for an RMON event on stack of AdvanceStack 10Base-T Switching Hubs."
-        ::= 2
-
+        ::=  2  
 
 END

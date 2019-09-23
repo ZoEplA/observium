@@ -5,6 +5,8 @@
 -- It contains ZyXEL products OIDs, and common managed objects.
 
 -- $Log: ZYXEL-SYSTEM-MIB.mib $ 
+-- Revision 1.9  2016/04/20 04:11:52  Lun 
+-- change zyDateTimeServerIpAddress syntax to OCTET STRING. 
 -- Revision 1.8  2013/12/06 07:09:02  ccho 
 -- remove uncessary imports 
 -- Revision 1.7  2013/11/20 06:55:30  ccho 
@@ -32,14 +34,20 @@ ZYXEL-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	MODULE-IDENTITY
 		FROM SNMPv2-SMI
 
-	DisplayString                                          
-	  	FROM SNMPv2-TC                             
+	RowStatus, MacAddress, DisplayString
+		FROM SNMPv2-TC			-- RFC2579                        
 	
 	EnabledStatus
 		FROM  P-BRIDGE-MIB
  	
     IpAddress
         FROM SNMPv2-SMI
+
+    InetAddressType
+    	FROM INET-ADDRESS-MIB
+   
+   	InetAddress
+   		FROM INET-ADDRESS-MIB
 
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
@@ -48,7 +56,7 @@ ZYXEL-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		FROM ZYXEL-ES-SMI;
 
 	zyxelSystem MODULE-IDENTITY
-		LAST-UPDATED	"201207010000Z"    
+		LAST-UPDATED	"201801100000Z"
 		ORGANIZATION "Enterprise Solution ZyXEL"     
 		CONTACT-INFO
 			""	   
@@ -80,15 +88,6 @@ ZYXEL-SYSTEM-MIB DEFINITIONS ::= BEGIN
                     "The time service protocol that your timeserver uses."
         ::= { zyxelDateTimeSetup 1 }
         
--- zyxelDateTimeServerIpAddress
-        zyDateTimeServerIpAddress OBJECT-TYPE
-        SYNTAX  IpAddress
-        MAX-ACCESS  read-write
-        STATUS  current
-        DESCRIPTION
-                    "IP address of time server."
-        ::= { zyxelDateTimeSetup 2 }
-
 -- zyxelDateTimeZone
         zyDateTimeZone OBJECT-TYPE
         SYNTAX  INTEGER
@@ -282,6 +281,22 @@ ZYXEL-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						"End time of Daylight Saving Time service."
         ::= { zyxelDateTimeDaylightSavingTimeSetup 9 }
 
+	zyDateTimeServerInetAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "The type of Internet address of this date time server."
+        ::= { zyxelDateTimeSetup 11 }
+	
+	zyDateTimeServerInetAddress OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "The Internet address of this date time server."
+        ::= { zyxelDateTimeSetup 12 }
+
 -- *******************************************************************
 -- *
 -- * zyxelSysInfo
@@ -390,6 +405,24 @@ ZYXEL-SYSTEM-MIB DEFINITIONS ::= BEGIN
                     "Current system boot up image. You can change the boot up image of next rebooting by setting sysMgmtBootupImage."
         ::= { zyxelSysInfo 11 }	
 		
+-- zySysServiceStatus
+        zySysServiceStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                    "This field displays the service that available on the device."
+        ::= { zyxelSysInfo 12 }
+
+--zySysRegisterMacAddress
+        zySysRegisterMacAddress OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                    "The MAC address which this system register at MYZYXEL.COM."
+        ::= { zyxelSysInfo 13 }
+
 -- *******************************************************************
 -- *
 -- * zyxelDateTimeTrapNotifications

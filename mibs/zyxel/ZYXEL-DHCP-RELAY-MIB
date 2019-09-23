@@ -61,6 +61,10 @@ ZYXEL-DHCP-RELAY-MIB DEFINITIONS ::= BEGIN
     zyxelDhcpRelayGlobalRelay 	OBJECT IDENTIFIER ::= { zyxelDhcpRelaySetup 1 }
 	zyxelDhcpRelayVlanRelay 	OBJECT IDENTIFIER ::= { zyxelDhcpRelaySetup 2 }
   
+	zyxelDhcpRelayStatus 	OBJECT IDENTIFIER ::= { zyxelDhcpRelay 2 }		
+
+  	zyxelDhcpRelayVlanRelayInfo 	OBJECT IDENTIFIER ::= { zyxelDhcpRelayStatus 1 }	
+  
  -- 1.zyxelDhcpRelayGlobalRelay
  
         zyDhcpRelayGlobalRelayState OBJECT-TYPE
@@ -304,5 +308,71 @@ ZYXEL-DHCP-RELAY-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
         "DHCP option 82 profile in specified VLAN and port."
         ::= { zyxelDhcpRelayVlanRelayOption82VlanPortEntry 1 }		
+ 
+-- 		zyxelDhcpRelayVlanRelaySourceAddressTable           
+        zyxelDhcpRelayVlanRelaySourceAddressTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelDhcpRelayVlanRelaySourceAddressEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains DHCP VLAN relay source ip address configuration. "
+        ::= { zyxelDhcpRelayVlanRelay 7 }  	
+
+
+		zyxelDhcpRelayVlanRelaySourceAddressEntry OBJECT-TYPE
+        SYNTAX	ZyxelDhcpRelayVlanRelaySourceAddressEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains DHCP relay  source ip address configuration.  "
+        INDEX          	{ zyDhcpRelayVlanRelayRemoteServerServeVid }
+        ::= { zyxelDhcpRelayVlanRelaySourceAddressTable 1 }
+
+        ZyxelDhcpRelayVlanRelaySourceAddressEntry ::=
+           SEQUENCE {
+			zyDhcpRelayVlanRelaySourceAddress    IpAddress
+           }
+
+        zyDhcpRelayVlanRelaySourceAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "IP address of DHCP relay source Ip address"
+        ::= { zyxelDhcpRelayVlanRelaySourceAddressEntry 1 }   	
+ 
+
+-- 2.zyxelDhcpRelayVlanRelayInfo         
+        zyxelDhcpRelayVlanRelaySourceAddressInfoTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelDhcpRelayVlanRelaySourceAddressInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains Current DHCP VLAN relay source ip address. "
+        ::= { zyxelDhcpRelayVlanRelayInfo 1 }  	
+
+
+		zyxelDhcpRelayVlanRelaySourceAddressInfoEntry OBJECT-TYPE
+        SYNTAX	ZyxelDhcpRelayVlanRelaySourceAddressInfoEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains Current DHCP relay  source ip address .  "
+        INDEX          	{ zyDhcpRelayVlanRelayRemoteServerServeVid }
+        ::= { zyxelDhcpRelayVlanRelaySourceAddressInfoTable 1 }
+
+        ZyxelDhcpRelayVlanRelaySourceAddressInfoEntry ::=
+           SEQUENCE {
+			zyDhcpRelayVlanRelayCurrentSourceAddress    IpAddress
+           }
+
+        zyDhcpRelayVlanRelayCurrentSourceAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "DHCP relay Current source Ip address."
+        ::= { zyxelDhcpRelayVlanRelaySourceAddressInfoEntry 1 }   
+		
  
 END

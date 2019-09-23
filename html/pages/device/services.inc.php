@@ -7,7 +7,7 @@
  * @package    observium
  * @subpackage webui
  * @author     Adam Armstrong <adama@observium.org>
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -35,7 +35,8 @@ unset($sep);
 
 print_optionbar_end();
 
-if (dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE device_id = ?", array($device['device_id'])) > '0')
+//if (dbFetchCell("SELECT COUNT(service_id) FROM `services` WHERE device_id = ?", array($device['device_id'])) > '0')
+if (dbExist('services', '`device_id` = ?', array($device['device_id'])))
 {
   echo("<div style='margin: 5px;'><table cellpadding=7 border=0 cellspacing=0 width=100%>");
   $i = "1";

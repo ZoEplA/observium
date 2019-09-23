@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -21,7 +21,7 @@ if (!isset($config['os'][$device['os']]))
 // Cache hardware/version/serial info from ENTITY-MIB (if possible use inventory module data)
 if (is_device_mib($device, 'ENTITY-MIB') &&
     (in_array($device['os_group'], array('unix', 'cisco')) ||
-     in_array($device['os'], array('acme', 'nos', 'ibmnos', 'acsw', 'fabos', 'wlc', 'h3c', 'hh3c', 'hpuww', 'lenovo-cnos'))))
+     in_array($device['os'], array('acme', 'nos', 'slx', 'ibmnos', 'acsw', 'fabos', 'wlc', 'h3c', 'hh3c', 'hpuww', 'lenovo-cnos'))))
 {
   // Get entPhysical tables for some OS and OS groups
   if ($config['discovery_modules']['inventory'])
@@ -36,7 +36,7 @@ if (is_device_mib($device, 'ENTITY-MIB') &&
       case ($device['os'] == 'qnap'):
         $oids = 'entPhysicalDescr.1 entPhysicalName.1 entPhysicalSerialNum.1 entPhysicalFirmwareRev.1';
         break;
-      case ($device['os'] == 'ibmnos'):
+      case (in_array($device['os'], ['ibmnos', 'slx'])):
         $oids = 'entPhysicalName.1 entPhysicalSerialNum.1 entPhysicalSoftwareRev.1';
         break;
       case ($device['os'] == 'wlc'):
@@ -54,11 +54,9 @@ if (is_device_mib($device, 'ENTITY-MIB') &&
 
   if (!empty($entPhysical['entPhysicalDescr']))
   {
-    // FIXME this should be in definitions
-    $entPhysical['entPhysicalDescr'] = str_replace(array(' Inc.', ' Computer Corporation', ' Corporation'), '', $entPhysical['entPhysicalDescr']);
-    $entPhysical['entPhysicalDescr'] = str_replace('IBM IBM', 'IBM', $entPhysical['entPhysicalDescr']);
+    $entPhysical['entPhysicalDescr'] = rewrite_entity_name($entPhysical['entPhysicalDescr']);
 
-    if (strpos($entPhysical['entPhysicalSerialNum'], '..') !== FALSE)
+    if (str_contains($entPhysical['entPhysicalSerialNum'], ['..', '***']))
     {
       $entPhysical['entPhysicalSerialNum'] = '';
     }
@@ -68,7 +66,7 @@ if (is_device_mib($device, 'ENTITY-MIB') &&
 }
 
 // List of variables/params parsed from sysDescr or snmp for each os
-$os_metatypes = array('serial', 'version', 'hardware', 'features', 'asset_tag', 'ra_url_http');
+$os_metatypes = array('serial', 'version', 'hardware', 'vendor', 'features', 'asset_tag', 'ra_url_http', 'kernel', 'arch');
 $os_values    = array();
 
 // Find OS-specific SNMP data via OID regex: serial number, version number, hardware description, features, asset tag
@@ -78,7 +76,8 @@ foreach ($config['os'][$device['os']]['sysDescr_regex'] as $pattern)
   {
     foreach ($os_metatypes as $metatype)
     {
-      if (isset($matches[$metatype]) && $matches[$metatype] != '')
+      if (!isset($os_values[$metatype]) &&
+          isset($matches[$metatype]) && $matches[$metatype] != '')
       {
         $os_values[$metatype] = $matches[$metatype];
 
@@ -95,11 +94,11 @@ foreach ($config['os'][$device['os']]['sysDescr_regex'] as $pattern)
         }
 
         $$metatype = $os_values[$metatype]; // Set metatype variable
-        print_debug("Added OS param from sysDescr parse: '$metatype' = '" . $os_values[$metatype] . "'");
+        print_debug("Added OS param from sysDescr pattern: '$metatype' = '" . $os_values[$metatype] . "' (".$pattern.")");
       }
     }
 
-    break; // Do not match other sysDescr regex, use correct patterns order instead!
+    //break; // Do not match other sysDescr regex, use correct patterns order instead!
   }
 }
 
@@ -108,7 +107,7 @@ foreach ($os_metatypes as $metatype)
 {
   if (!isset($os_values[$metatype])) // Skip search if already set by sysDescr regex
   {
-    foreach (get_device_mibs($device, TRUE) as $mib) // Check every MIB supported by the device, in order
+    foreach (get_device_mibs_permitted($device) as $mib) // Check every MIB supported by the device, in order
     {
       if (isset($config['mibs'][$mib][$metatype]))
       {
@@ -116,9 +115,14 @@ foreach ($os_metatypes as $metatype)
         {
           if (isset($entry['oid_num'])) // Use numeric OID if set, otherwise fetch text based string
           {
-            $value = trim(snmp_hexstring(snmp_get($device, $entry['oid_num'], '-Oqv')));
+            $value = trim(snmp_hexstring(snmp_get_oid($device, $entry['oid_num'])));
+          }
+          elseif (isset($entry['oid_next']))
+          {
+            // If Oid passed without index part use snmpgetnext (see FCMGMT-MIB definitions)
+            $value = trim(snmp_hexstring(snmp_getnext_oid($device, $entry['oid_next'], $mib)));
           } else {
-            $value = trim(snmp_hexstring(snmp_get($device, $entry['oid'], '-Oqv', $mib)));
+            $value = trim(snmp_hexstring(snmp_get_oid($device, $entry['oid'], $mib)));
           }
 
           if ($GLOBALS['snmp_status'] && $value != '')
@@ -127,7 +131,7 @@ foreach ($os_metatypes as $metatype)
             $os_values[$metatype] = string_transform($value, $entry['transformations']);
 
             $$metatype = $os_values[$metatype]; // Set metatype variable
-            print_debug("Added OS param from SNMP definition walk: '$metatype' = '$value'");
+            print_debug("Added OS param from SNMP definition walk: '$metatype' = '".$os_values[$metatype]."'");
 
             // Exit both foreach loops and move on to the next field.
             break 2;
@@ -146,7 +150,7 @@ if (is_file($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc
   // OS Specific
   include($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php");
 }
-else if ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/os/".$device['os_group'].".inc.php"))
+elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/os/".$device['os_group'].".inc.php"))
 {
   // OS Group-specific code as fallback, if OS-specific code does not exist
   print_cli_data("OS Poller", 'Group', 2);
@@ -161,11 +165,37 @@ foreach ($os_values as $metatype => $value)
 {
   if (!isset($$metatype) || $$metatype == '' || str_istarts($$metatype, 'generic'))
   {
-    print_debug("Redded OS param from sysDescr parse or SNMP definition walk: '$metatype' = '$value'");
+    print_debug("Re-added OS param from sysDescr parse or SNMP definition walk: '$metatype' = '$value'");
     $$metatype = $value;
   }
 }
 
+// Set hardware by model definition if it's exist
+if (empty($hardware) && isset($config['os'][$device['os']]['model']))
+{
+  $hardware = rewrite_definition_hardware($device, $poll_device['sysObjectID']);
+}
+
+// Unified vendor name
+if ($vendor)
+{
+  // Vendor fetched from sysDescr, Oid or os poller
+  $vendor = rewrite_vendor($vendor);
+}
+elseif (isset($config['os'][$device['os']]['vendor']))
+{
+  // Use os defined vendor name
+  $vendor = rewrite_vendor($config['os'][$device['os']]['vendor']);
+}
+
+// If vendor and hardware not empty, remove excessive vendor part from beginning of hardware
+// I.e.: "Xerox Phaser 8560" -> "Phaser 8560"
+if ($vendor && $hardware && preg_match('/^'.preg_quote($vendor, '/').'/i', $hardware))
+{
+  $hardware = preg_replace('/^'.preg_quote($vendor, '/').'\s*/i', '', $hardware);
+}
+
+print_cli_data("Vendor",   ($vendor ?: "%b<empty>%n"));
 print_cli_data("Hardware", ($hardware ?: "%b<empty>%n"));
 print_cli_data("Version",  ($version ?: "%b<empty>%n"));
 print_cli_data("Features", ($features ?: "%b<empty>%n"));
@@ -198,7 +228,7 @@ foreach ($os_additional_info as $header => $entries)
 }
 
 // Fields notified in event log
-$update_fields = array('version', 'features', 'hardware', 'serial', 'kernel', 'distro', 'distro_ver', 'arch', 'asset_tag');
+$update_fields = array('version', 'features', 'hardware', 'vendor', 'serial', 'kernel', 'distro', 'distro_ver', 'arch', 'asset_tag');
 
 // Log changed variables
 foreach ($update_fields as $field)

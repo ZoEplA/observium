@@ -1,12 +1,16 @@
 -- =================================================================
--- Copyright (C) 2006 by HUAWEI 3COM TECHNOLOGIES.  All rights reserved.
+-- Copyright (c) 2004-2013 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Mirror group MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --   2006-01-10 created by xialei
 --     Initial version V1.0
+-- V1.1 2012/04/28 modified by mouxuanli
+--  Modify the description of the object h3cMGStatus.
+--  Modify the description of the object h3cMGMirrorDirection.
+--  Add h3cMGEgressIfTable, h3cMGMirrorVlanTable and h3cMGMirrorCpuTable.
 -- =================================================================
 -- =================================================================
 --
@@ -21,17 +25,17 @@ IMPORTS
         FROM HUAWEI-3COM-OID-MIB
     RowStatus
         FROM SNMPv2-TC
-    Integer32, OBJECT-TYPE, MODULE-IDENTITY
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
         FROM SNMPv2-SMI;
 
     h3cMirrGroup MODULE-IDENTITY
         LAST-UPDATED "200601131403Z"
         ORGANIZATION
-            "Huawei 3Com Technologies Co., Ltd."
-            CONTACT-INFO
-            "Platform Team Huawei 3Com Technologies Co., Ltd.
+            "Hangzhou H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team Hangzhou H3C Tech. Co., Ltd.
             Hai-Dian District Beijing P.R. China
-            http://www.huawei-3com.com
+            http://www.h3c.com
             Zip:100085
             "
         DESCRIPTION
@@ -75,12 +79,12 @@ IMPORTS
         }
 
     h3cMGID OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Integer32 (0..2147483647)
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
             "An index that uniquely identifies an entry in the mirror group table."
-        ::= { h3cMGEntry 1 }
+        ::={ h3cMGEntry 1 }
 
     h3cMGType OBJECT-TYPE
         SYNTAX      INTEGER
@@ -93,7 +97,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "GroupType."
-        ::= { h3cMGEntry 2 }
+        ::={ h3cMGEntry 2 }
 
     h3cMGStatus OBJECT-TYPE
         SYNTAX      INTEGER
@@ -104,22 +108,32 @@ IMPORTS
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "The status of a mirror group.  A mirror group will be inactive
+            "The status of a mirror group.  A mirror group is inactive
             when it was created.
 
             The status of a mirror group can be changed automatically from inactive
-            to active when appropriate conditions were met, also, it can be changed
+            to active when appropriate conditions were met.  Also, it can be changed
             automatically from active to inactive when these conditions disappeared.
 
             Followings are conditions for a mirror group to become active:
               group type          conditions
               ============================================================================
-              local               mirroring-port, monitor-port
-              remoteSource        mirroring-port, remote-probe vlan, reflector-port(may not
-                                  be supported by some products)
-              remoteDestination   monitor-port, remote-probe vlan
-              "
-        ::= { h3cMGEntry 3 }
+              local               any source (mirroring-port, mirroring-VLAN, or mirroring-CPU),
+                                  monitor-port
+              remoteSource        If one of the three conditions is satisfied,
+                                  remoteSource group would be active.
+                                  1) any source (mirroring-port, mirroring-VLAN, or mirroring-CPU),
+                                     remote-probe VLAN,
+                                     configurable reflector-port (which is not supported on some devices)
+                                  2) any source (mirroring-port, mirroring-VLAN, or mirroring-CPU),
+                                     remote-probe VLAN,
+                                     egress-port (which is not supported on some devices)
+                                  3) any source (mirroring-port, mirroring-VLAN, or mirroring-CPU),
+                                     remote-probe VLAN,
+                                     fixed reflector-port(which is not supported on some devices)
+              remoteDestination   monitor-port, remote-probe VLAN
+            "
+        ::={ h3cMGEntry 3 }
 
     h3cMGRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
@@ -127,7 +141,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "RowStatus"
-        ::= { h3cMGEntry 4 }
+        ::={ h3cMGEntry 4 }
 
     h3cMGMirrorIfObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 2  }
 
@@ -168,7 +182,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "IfIndex of mirror group mirroring-port."
-        ::= { h3cMGMirrorIfEntry 1 }
+        ::={ h3cMGMirrorIfEntry 1 }
 
     h3cMGMirrorDirection OBJECT-TYPE
         SYNTAX      INTEGER
@@ -180,18 +194,8 @@ IMPORTS
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
-            "Mirror direction of mirroring-port.  Once mirror direction
-             was configured for a mirroring-port, it can not be changed
-             unless the mirroring-port was removed from mirror group.
-
-             If a mirror port is configured with two mirror directions
-             'outbound' and 'inbound', though it is functionally equal
-             to 'both', it will be handled as two table items.  If a
-             mirror port is configured with mirror direction 'outbound'
-             or 'inbound', or both of them, it will not be allowed to
-             configure 'both', more details please refer to mirror group
-             manual."
-        ::= { h3cMGMirrorIfEntry 2 }
+            "Mirror direction of mirroring-port."
+        ::={ h3cMGMirrorIfEntry 2 }
 
     h3cMGMirrorRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
@@ -199,7 +203,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "RowStatus"
-        ::= { h3cMGMirrorIfEntry 3 }
+        ::={ h3cMGMirrorIfEntry 3 }
 
     h3cMGMonitorIfObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 3  }
 
@@ -238,7 +242,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "IfIndex of mirror group monitor-port."
-        ::= { h3cMGMonitorIfEntry 1 }
+        ::={ h3cMGMonitorIfEntry 1 }
 
     h3cMGMonitorRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
@@ -246,7 +250,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "RowStatus"
-        ::= { h3cMGMonitorIfEntry 2 }
+        ::={ h3cMGMonitorIfEntry 2 }
 
     h3cMGReflectorIfObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 4  }
 
@@ -285,7 +289,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "IfIndex of mirror group reflector-port."
-        ::= { h3cMGReflectorIfEntry 1 }
+        ::={ h3cMGReflectorIfEntry 1 }
 
     h3cMGReflectorRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
@@ -293,7 +297,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "RowStatus"
-        ::= { h3cMGReflectorIfEntry 2 }
+        ::={ h3cMGReflectorIfEntry 2 }
 
     h3cMGRprobeVlanObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 5  }
 
@@ -333,7 +337,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "An index that uniquely identifies an entry in the remote-probe vlan table."
-        ::= { h3cMGRprobeVlanEntry 1 }
+        ::={ h3cMGRprobeVlanEntry 1 }
 
     h3cMGRprobeVlanRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
@@ -341,6 +345,189 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "RowStatus"
-        ::= { h3cMGRprobeVlanEntry 2 }
+        ::={ h3cMGRprobeVlanEntry 2 }
+
+    h3cMGEgressIfObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 6  }
+
+    h3cMGEgressIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cMGEgressIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of mirror group egress-port entries."
+        ::= { h3cMGEgressIfObjects 1 }
+
+    h3cMGEgressIfEntry OBJECT-TYPE
+        SYNTAX      H3cMGEgressIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of parameters that describe an egress-port to be added to
+            a mirror group."
+        INDEX
+        {
+            h3cMGID,
+            h3cMGEgressIfIndex
+        }
+        ::= { h3cMGEgressIfTable 1 }
+
+    H3cMGEgressIfEntry ::=
+        SEQUENCE
+        {
+            h3cMGEgressIfIndex      Integer32,
+            h3cMGEgressRowStatus    RowStatus
+        }
+
+    h3cMGEgressIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "IfIndex of mirror group egress-port."
+        ::={ h3cMGEgressIfEntry 1 }
+
+    h3cMGEgressRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RowStatus"
+        ::={ h3cMGEgressIfEntry 2 }
+
+    h3cMGMirrorVlanObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 7  }
+
+    h3cMGMirrorVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cMGMirrorVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of mirror group mirroring-VLAN entries."
+        ::= { h3cMGMirrorVlanObjects 1 }
+
+    h3cMGMirrorVlanEntry OBJECT-TYPE
+        SYNTAX      H3cMGMirrorVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of parameters that describe a mirroring-VLAN to be added to
+            a mirror group."
+        INDEX
+        {
+            h3cMGID,
+            h3cMGMirrorVlanID
+        }
+        ::= { h3cMGMirrorVlanTable 1 }
+
+    H3cMGMirrorVlanEntry ::=
+        SEQUENCE
+        {
+            h3cMGMirrorVlanID           Integer32,
+            h3cMGMirrorVlanDirection    INTEGER,
+            h3cMGMirrorVlanRowStatus    RowStatus
+        }
+
+    h3cMGMirrorVlanID OBJECT-TYPE
+        SYNTAX      Integer32(1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Mirror group mirroring-VLAN ID."
+        ::={ h3cMGMirrorVlanEntry 1 }
+
+    h3cMGMirrorVlanDirection OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        inbound(1),
+                        outbound(2),
+                        both(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror direction of mirroring-VLAN."
+        ::={ h3cMGMirrorVlanEntry 2 }
+
+    h3cMGMirrorVlanRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RowStatus"
+        ::={ h3cMGMirrorVlanEntry 3 }
+
+    h3cMGMirrorCpuObjects OBJECT IDENTIFIER ::= {  h3cMGInfoObjects 8  }
+
+    h3cMGMirrorCpuTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF H3cMGMirrorCpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of mirror group mirroring-CPU entries."
+        ::= { h3cMGMirrorCpuObjects 1 }
+
+    h3cMGMirrorCpuEntry OBJECT-TYPE
+        SYNTAX      H3cMGMirrorCpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of parameters that describe a mirroring-CPU to be added to
+            a mirror group."
+        INDEX
+        {
+            h3cMGID,
+            h3cMGMirrorCpuChassis,
+            h3cMGMirrorCpuSlot
+        }
+        ::= { h3cMGMirrorCpuTable 1 }
+
+    H3cMGMirrorCpuEntry ::=
+        SEQUENCE
+        {
+            h3cMGMirrorCpuChassis      Unsigned32,
+            h3cMGMirrorCpuSlot         Unsigned32,
+            h3cMGMirrorCpuDirection    INTEGER,
+            h3cMGMirrorCpuRowStatus    RowStatus
+        }
+
+    h3cMGMirrorCpuChassis OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Chassis ID of mirroring-CPU.  On a centralized device,
+             centralized IRF device, or distributed device in standalone mode,
+             the value for this node is always zero."
+        ::={ h3cMGMirrorCpuEntry 1 }
+
+    h3cMGMirrorCpuSlot OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Slot ID of mirroring-CPU.  On a centralized device, the value for
+             this node is always zero."
+        ::={ h3cMGMirrorCpuEntry 2 }
+
+    h3cMGMirrorCpuDirection OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        inbound(1),
+                        outbound(2),
+                        both(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror direction of mirroring-CPU."
+        ::={ h3cMGMirrorCpuEntry 3 }
+
+    h3cMGMirrorCpuRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "RowStatus"
+        ::={ h3cMGMirrorCpuEntry 4 }
+
 
 END

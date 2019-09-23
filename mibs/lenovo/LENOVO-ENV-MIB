@@ -2,7 +2,7 @@ LENOVO-ENV-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32
-	    FROM SNMPv2-SMI
+ 	    FROM SNMPv2-SMI
     TEXTUAL-CONVENTION	
 	    FROM SNMPv2-TC
     SnmpAdminString                      
@@ -27,7 +27,7 @@ lenovoEnvMIB MODULE-IDENTITY
     DESCRIPTION " 
         Defines environmental notifications
                 "
-	REVISION       "201609230000Z"    -- 09/23/2016 13:37GMT
+	REVISION       "201609230000Z"    -- 09/23/2016 00:00GMT
     DESCRIPTION    "Initial version."
 
     ::= { network-mibs 11 }
@@ -353,24 +353,24 @@ lenovoEnvMibTempSensorTemperature OBJECT-TYPE
 lenovoEnvMibTempSensorThresholds OBJECT IDENTIFIER ::= { lenovoEnvMibObjects 4 }	
 	
 lenovoEnvMIBTempSensorWarning OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-only
+	SYNTAX 		Integer32
+	MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION       
         "System temperature sensor warning threshold value"
     ::= { lenovoEnvMibTempSensorThresholds 1 }
 
 lenovoEnvMIBTempSensorShutdown OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-only
+	SYNTAX 		Integer32
+	MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION       
         "System temperature sensor shutdown/failure threshold value"
     ::= { lenovoEnvMibTempSensorThresholds 2 }
 
 lenovoEnvMIBTempSensorSetPoint OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-only
+	SYNTAX 		Integer32
+	MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION       
         "System temperature sensor set point threshold value"

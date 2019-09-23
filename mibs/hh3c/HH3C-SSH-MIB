@@ -1,15 +1,25 @@
 -- =========================================================================
--- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Secure Shell(SSH) MIB
 -- Reference: draft-ylonen-ssh-protocol-00.txt
--- Version: V1.2
+-- Version: V1.4
 -- History:
 --  V1.0 2007-11-19 created by ZhangJun 03132
 --       Initial version.
---  V1.1 2013-12-21 add enum value scp(5) in hh3cSSHUserServiceType by DaiRuiqiang 04358.
---  V1.2 2014-01-17 add enum value scp(4) in hh3cSSHSessionServiceType by DaiRuiqiang 04358.
---       2014-02-20 add hh3cSCPServerEnable and hh3cSTelnetServerEnable by DaiRuiqiang 04358.
+--  V1.1 2013-12-21 Added enum value scp(5) to hh3cSSHUserServiceType by DaiRuiqiang 04358.
+--  V1.2 2014-01-17 Added enum value scp(4) to hh3cSSHSessionServiceType by DaiRuiqiang 04358.
+--       2014-02-20 Added hh3cSCPServerEnable and hh3cSTelnetServerEnable by DaiRuiqiang 04358.
+--  V1.3 2014-10-25 Added enum value netconf(6) to hh3cSSHUserServiceType,
+--                  added enum value netconf(5) to hh3cSSHSessionServiceType by DaiRuiqiang 04358.
+--  V1.4 2016-04-26 Added hh3cSSHUserPublicKeyName2 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName3 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName4 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName5 to Hh3cSSHUserConfigEntry,
+--                  added hh3cSSHUserPublicKeyName6 to Hh3cSSHUserConfigEntry by DaiRuiqiang 04358.
+--                  Added enum values aes128CTR(5), aes192CTR(6), aes256CTR(7), aes128GCM(8),
+--                  aes256GCM(9), and aes256CBC(10) to hh3cSSHSessionEncry by DaiRuiqiang 04358.
+--       2018-02-06 Added enum value keyboard-interactive(6) in hh3cSSHUserAuthType by DaiRuiqiang 04358
 -- =========================================================================
 HH3C-SSH-MIB DEFINITIONS ::= BEGIN
 
@@ -24,25 +34,37 @@ IMPORTS
     FROM SNMPv2-TC;
 
 hh3cSSH MODULE-IDENTITY
-    LAST-UPDATED "201402200000Z"
+    LAST-UPDATED "201802060000Z"
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team New H3C Tech. Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085"
     DESCRIPTION
         "This MIB is used to configure SSH server."
+    REVISION "201802060000Z"
+    DESCRIPTION
+        "Added enum value keyboardInteractive(6) to hh3cSSHUserAuthType."
+    REVISION "201604260000Z"
+    DESCRIPTION
+        "Added enum values aes128CTR(5), aes192CTR(6), aes256CTR(7), aes128GCM(8),
+         aes256GCM(9), and aes256CBC(10) to hh3cSSHSessionEncry.
+         Added hh3cSSHUserPublicKeyName2, and hh3cSSHUserPublicKeyName3, hh3cSSHUserPublicKeyName4,
+         hh3cSSHUserPublicKeyName5, and hh3cSSHUserPublicKeyName6 to Hh3cSSHUserConfigEntry."
+    REVISION "201410250000Z"
+    DESCRIPTION
+        "Added enum value netconf(6) to hh3cSSHUserServiceType, add enum value netconf(5) to hh3cSSHSessionServiceType."
     REVISION "201402200000Z"
     DESCRIPTION
-        "Add hh3cSCPServerEnable and hh3cSTelnetServerEnable."
+        "Added hh3cSCPServerEnable and hh3cSTelnetServerEnable."
     REVISION "201401170000Z"
     DESCRIPTION
-        "Add enum value scp(4) in hh3cSSHSessionServiceType."
+        "Added enum value scp(4) to hh3cSSHSessionServiceType."
     REVISION "201312210000Z"
     DESCRIPTION
-        "Add enum value scp(5) in hh3cSSHUserServiceType."
+        "Added enum value scp(5) to hh3cSSHUserServiceType."
     REVISION "200711190000Z"
     DESCRIPTION
         "The initial version."
@@ -201,7 +223,12 @@ Hh3cSSHUserConfigEntry ::= SEQUENCE
         hh3cSSHUserAuthType         INTEGER,
         hh3cSSHUserPublicKeyName    DisplayString,
         hh3cSSHUserWorkDirectory    DisplayString,
-        hh3cSSHUserRowStatus        RowStatus
+        hh3cSSHUserRowStatus        RowStatus,
+        hh3cSSHUserPublicKeyName2    DisplayString,
+        hh3cSSHUserPublicKeyName3    DisplayString,
+        hh3cSSHUserPublicKeyName4    DisplayString,
+        hh3cSSHUserPublicKeyName5    DisplayString,
+        hh3cSSHUserPublicKeyName6    DisplayString
     }
 
 hh3cSSHUserName OBJECT-TYPE
@@ -219,7 +246,8 @@ hh3cSSHUserServiceType OBJECT-TYPE
             all(2),
             stelnet(3),
             sftp(4),
-            scp(5)
+            scp(5),
+            netconf(6)
         }
     MAX-ACCESS  read-create
     STATUS      current
@@ -235,7 +263,8 @@ hh3cSSHUserAuthType OBJECT-TYPE
             password(2),
             publicKey(3),
             any(4),
-            publicKeyPassword(5)
+            publicKeyPassword(5),
+            keyboardInteractive(6)
         }
     MAX-ACCESS  read-create
     STATUS      current
@@ -249,7 +278,11 @@ hh3cSSHUserPublicKeyName OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The public key which is used for authentication."
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
     DEFVAL      { "" }
     ::= { hh3cSSHUserConfigEntry 4 }
 
@@ -261,7 +294,6 @@ hh3cSSHUserWorkDirectory OBJECT-TYPE
         "The SFTP user's work directory associates with an existing user."
     DEFVAL      { "" }
     ::= { hh3cSSHUserConfigEntry 5 }
-
 
 hh3cSSHUserRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -282,6 +314,71 @@ hh3cSSHUserRowStatus OBJECT-TYPE
         are appropriately configured, the value of the corresponding
         instance of the hh3cSSHUserRowStatus column is 'notReady'."
     ::= { hh3cSSHUserConfigEntry 6 }
+
+hh3cSSHUserPublicKeyName2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 7 }
+
+hh3cSSHUserPublicKeyName3 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 8 }
+
+hh3cSSHUserPublicKeyName4 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 9 }
+
+hh3cSSHUserPublicKeyName5 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 10 }
+
+hh3cSSHUserPublicKeyName6 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The public key which is used for authentication.
+        A maximum of 6 public keys can be assigned to one user.
+        If multiple public keys are assigned, the user
+        can log in to the SSH server from different devices at the
+        same time by using different public keys."
+    DEFVAL      { "" }
+    ::= { hh3cSSHUserConfigEntry 11 }
 
 -- Define a group which consists of all objects used for sessions.
 hh3cSSHSessionInfoTable OBJECT-TYPE
@@ -363,7 +460,8 @@ hh3cSSHSessionServiceType OBJECT-TYPE
             invalid(1),
             stelnet(2),
             sftp(3),
-            scp(4)
+            scp(4),
+            netconf(5)
         }
     MAX-ACCESS  read-only
     STATUS      current
@@ -377,7 +475,13 @@ hh3cSSHSessionEncry OBJECT-TYPE
             invalid(1),
             aes128CBC(2),
             desCBC(3),
-            des3CBC(4)
+            des3CBC(4),
+            aes128CTR(5),
+            aes192CTR(6),
+            aes256CTR(7),
+            aes128GCM(8),
+            aes256GCM(9),
+            aes256CBC(10)
         }
     MAX-ACCESS  read-only
     STATUS      current

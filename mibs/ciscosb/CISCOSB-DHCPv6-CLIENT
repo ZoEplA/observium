@@ -596,10 +596,10 @@ rlDhcpv6ClientIAEntry OBJECT-TYPE
     ::= { rlDhcpv6ClientIATable 1 }
 
 RlDhcpv6ClientIAEntry ::= SEQUENCE {
-    rlDhcpv6ClientIAIfIndex           InterfaceIndex,
-    rlDhcpv6ClientIANAID              INTEGER,
-    rlDhcpv6ClientIATAID              INTEGER,
-    rlDhcpv6ClientIAT1                INTEGER,
+    rlDhcpv6ClientIAIfIndex    InterfaceIndex,
+	rlDhcpv6ClientIANAID       INTEGER,
+	rlDhcpv6ClientIATAID       INTEGER,
+	rlDhcpv6ClientIAT1         INTEGER,
     rlDhcpv6ClientIAT2                INTEGER,
     rlDhcpv6ClientIAT1RemainLifetime  Unsigned32
 }

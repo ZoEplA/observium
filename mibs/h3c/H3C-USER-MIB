@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2012 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2016 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
--- Reference:H3C enterprise mib
--- Version: V2.5
+-- Reference:
+-- Version: V2.8
 -- History:
 --  V1.0 Initial version 2004-07-13
 --  V1.1 2004-10-12 updated by gaolong
@@ -28,24 +28,32 @@
 --  V2.5 2012-02-28 updated by y02965
 --       Add h3cUserRoleTable
 --       Add h3cPPPService, h3cHttpService and h3cHttpsService under h3cUserAttributeTable
+--  V2.6 2012-05-28 updated by y06401
+--       Modify description of h3cAuthMode.
+--       2012-10-11 updated by l04367
+--       Add h3cUserIfIndex
+--       Modify h3cUserRole
+--  V2.7 2013-04-25 updated by q04356
+--       Modified the description of h3cIdleCut
+--  V2.8 2016-11-19 updated by y06401
+--       Modified the description of h3cUserGroup
+--       Modified the SYNTAX of h3cUserGroupName
 -- =================================================================
 H3C-USER-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     h3cCommon
         FROM HUAWEI-3COM-OID-MIB
-    OBJECT-GROUP, MODULE-COMPLIANCE
-        FROM SNMPv2-CONF
-    RowStatus, MacAddress, TEXTUAL-CONVENTION, DateAndTime
+    RowStatus, MacAddress, TEXTUAL-CONVENTION, DateAndTime, DisplayString
         FROM SNMPv2-TC
-    IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
         FROM SNMPv2-SMI;
 
 h3cUser MODULE-IDENTITY
-    LAST-UPDATED "200304100000Z"            -- April 10, 2003 at 00:00 GMT
+    LAST-UPDATED "201611190000Z"            -- November 19, 2016 at 00:00 GMT
     ORGANIZATION
-        "Hangzhou H3C Tech. Co., Ltd."
+        "Hangzhou H3C Technologies Co., Ltd."
     CONTACT-INFO
-        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
         Hai-Dian District Beijing P.R. China
         http://www.h3c.com
         Zip:100085
@@ -56,21 +64,16 @@ h3cUser MODULE-IDENTITY
         Manage configuration and Monitor running state
         for userlog feature.
         "
+    REVISION "201611190000Z"        -- November 19, 2016 at 00:00 GMT
+    DESCRIPTION
+        "Modified description of h3cUserGroup.
+        Modified SYNTAX of h3cUserGroupName"
     ::= { h3cCommon 12 }
 
 
 --
 -- type definitions
 --
-
--- DisplayString
-DisplayString     ::=
-        OCTET STRING
--- This data type is used to model textual information taken
--- from the NVT ASCII character set.  By convention, objects
--- with this syntax are declared as having
---
-        (SIZE (0..255))
 
 -- ServiceType
 ServiceType ::=  TEXTUAL-CONVENTION
@@ -130,7 +133,7 @@ H3cUserInfoEntry ::= SEQUENCE
 
 
 h3cUserName OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      DisplayString(SIZE(1..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -140,7 +143,7 @@ h3cUserName OBJECT-TYPE
     ::= { h3cUserInfoEntry 1 }
 
 h3cUserPassword OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      DisplayString(SIZE(0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -157,8 +160,10 @@ h3cAuthMode OBJECT-TYPE
     DESCRIPTION
         "
         The encrypting type of password:
-        0 : password simple, means password is clean text.
-        7 : password cipher, means password is encrypted text.
+        0 : password simple, means password is entered in clean text and saved in cipher text.
+        1 : password hash simple, means password is entered in clean text and saved in hash value.
+        7 : password cipher, means password is entered and saved in cipher text.
+        8 : password hash cipher, means password is entered and saved in hash value.
         default is 0.
         "
     ::= { h3cUserInfoEntry 3 }
@@ -199,7 +204,7 @@ h3cUserInfoRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        The status of this conceptual row. Now only support CreateAndGo and
+        The status of this conceptual row.  Now only support CreateAndGo and
         Destroy and Active.
         "
     ::= { h3cUserInfoEntry 6 }
@@ -214,7 +219,6 @@ h3cUserIndex OBJECT-TYPE
         The index of local user
         "
     ::= { h3cUserInfoEntry 7 }
-
 
 -- h3cUserAttributeTable========================================================
 h3cUserAttributeTable OBJECT-TYPE
@@ -265,7 +269,8 @@ H3cUserAttributeEntry ::= SEQUENCE
         h3cPortalService       ServiceType,
         h3cPPPService          ServiceType,
         h3cHttpService         ServiceType,
-        h3cHttpsService        ServiceType
+        h3cHttpsService        ServiceType,
+        h3cUserIfIndex         Integer32
     }
 
 
@@ -286,7 +291,7 @@ h3cIdleCut OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "
-        Valid idle time out(second): 60..7200,
+        Valid idle time out(second),
         default is 0, means disable idle time out.
         "
     ::= { h3cUserAttributeEntry 2 }
@@ -498,7 +503,7 @@ h3cExpirationDate OBJECT-TYPE
     ::= { h3cUserAttributeEntry 16 }
 
 h3cUserGroup      OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      DisplayString(SIZE(0..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -506,7 +511,6 @@ h3cUserGroup      OBJECT-TYPE
         The user group that user belongs to.
         Any user must belong to a user group.
         The default group is the 'system' group.
-        The maximum length of the group name is 80.
         "
     ::= { h3cUserAttributeEntry 17 }
 
@@ -594,6 +598,17 @@ h3cHttpsService OBJECT-TYPE
         "
     ::= { h3cUserAttributeEntry 21 }
 
+h3cUserIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's interface index.  A value of 0 means that the interface
+        index has not been assigned or the interface assigned not exist.
+        The default value is 0.
+        "
+    ::= { h3cUserAttributeEntry 22 }
 
 -- h3cUserMaxNum================================================================
 h3cUserMaxNum OBJECT-TYPE
@@ -626,8 +641,8 @@ h3cUserIndexIndicator OBJECT-TYPE
         "
         This object contains an appropriate value to
         be used for h3cUserIndex when creating entries in the
-        h3cUserInfoTable. The value 0 indicates that no unassigned
-        entries are available. To obtain the
+        h3cUserInfoTable.  The value 0 indicates that no unassigned
+        entries are available.  To obtain the
         h3cUserIndex value for a new
         entry, the manager issues a management
         protocol retrieval operation to obtain the
@@ -674,7 +689,7 @@ H3cUserRoleEntry ::= SEQUENCE
     }
 
 h3cUserRole      OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(1..64))
+    SYNTAX      DisplayString(SIZE(1..63))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -683,7 +698,7 @@ h3cUserRole      OBJECT-TYPE
         The user must be authorized one role at least.
         The default user role for a local user created by a network-admin user
         is network-operator, and the default user role for a local user created
-        by a vd-admin or level-15 user is vd-operator.
+        by an mdc-admin or level-15 user is mdc-operator.
         "
     ::= { h3cUserRoleEntry 1 }
 
@@ -739,7 +754,7 @@ H3cUserGroupInfoEntry ::= SEQUENCE
     }
 
 h3cUserGroupName OBJECT-TYPE
-    SYNTAX      DisplayString(SIZE(1..80))
+    SYNTAX      DisplayString(SIZE(1..255))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION

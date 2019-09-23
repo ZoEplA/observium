@@ -15,15 +15,19 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
             FROM IF-MIB;
 
     hpicfTransceiverMIB MODULE-IDENTITY
-         LAST-UPDATED "201502170000Z" -- Feb 17, 2015
+         LAST-UPDATED "201602230000Z" -- Feb 23, 2016
          ORGANIZATION "HP Networking"
          CONTACT-INFO "Hewlett Packard Company
                        8000 Foothills Blvd.
                        Roseville, CA 95747"
-         DESCRIPTION  "Add objects for reporting transceiver channel
-                       information."
-         REVISION     "201502170000Z" -- Feb 17, 2015
          DESCRIPTION  "This MIB module describes HP transceiver
+                       information."
+         REVISION     "201602230000Z" -- Feb 23, 2016
+         DESCRIPTION  "Add object for transceiver nagware suppress."
+         REVISION     "201602010000Z" -- Feb 1, 2016
+         DESCRIPTION  "Add object for transceiver lock feature."
+         REVISION     "201502170000Z" -- Feb 17, 2015
+         DESCRIPTION  "Add objects for reporting transceiver channel
                        information."
 	 REVISION     "201202220000Z" -- Feb 22, 2012
          DESCRIPTION  "Deprecated hpicfXcvrInfoGroup1 and hpicfXcvrCompliance1, 
@@ -1704,7 +1708,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
            "A collection of objects that provides transceiver
             channel information."
           ::= { hpicfXcvrGroups 4 }
- 
+
    hpicfXcvrCompliances OBJECT IDENTIFIER ::=
         { hpicfXcvrConformance 2 }
 

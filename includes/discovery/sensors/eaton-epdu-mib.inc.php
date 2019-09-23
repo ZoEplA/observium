@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage discovery
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -31,7 +31,7 @@ foreach ($inputs AS $unit_id => $unit_data)
 
    if (isset($input_data['inputFrequency']))
    {
-      discover_sensor($valid['sensor'], 'frequency', $device, ".1.3.6.1.4.1.534.6.6.7.3.1.1.3.".$input_oid, "inputFrequency.$input_oid", 'eaton-epdu-mib', "Unit $unit_id Input $input_id Frequency", "0.1", $input_data['inputFrequency']);
+      discover_sensor('frequency', $device, ".1.3.6.1.4.1.534.6.6.7.3.1.1.3.".$input_oid, "inputFrequency.$input_oid", 'eaton-epdu-mib', "Unit $unit_id Input $input_id Frequency", "0.1", $input_data['inputFrequency']);
    }
 
    if (isset($input_data['inputFrequencyStatus']))
@@ -44,7 +44,7 @@ foreach ($inputs AS $unit_id => $unit_data)
      $descr  = "Unit $unit_id Input $input_id";
      $oid    = ".1.3.6.1.4.1.534.6.6.7.3.5.1.3.".$input_oid;
      $value  = $input_data['inputTotalVA'];
-     discover_sensor($valid['sensor'], 'apower', $device, $oid, "inputTotalVA.$input_oid", 'eaton-epdu-mib', $descr, 1, $value);
+     discover_sensor('apower', $device, $oid, "inputTotalVA.$input_oid", 'eaton-epdu-mib', $descr, 1, $value);
    }
 
    if (isset($input_data['inputTotalWatts']) && is_numeric($input_data['inputTotalWatts']))
@@ -52,7 +52,7 @@ foreach ($inputs AS $unit_id => $unit_data)
      $descr  = "Unit $unit_id Input $input_id";
      $oid    = ".1.3.6.1.4.1.534.6.6.7.3.5.1.4.".$input_oid;
      $value  = $input_data['inputTotalWatts'];
-     discover_sensor($valid['sensor'], 'power', $device, $oid, "inputTotalWatts.$input_oid", 'eaton-epdu-mib', $descr, 1, $value);
+     discover_sensor('power', $device, $oid, "inputTotalWatts.$input_oid", 'eaton-epdu-mib', $descr, 1, $value);
    }
 
    if (isset($input_data['inputTotalPowerFactor']) && is_numeric($input_data['inputTotalPowerFactor']))
@@ -60,7 +60,7 @@ foreach ($inputs AS $unit_id => $unit_data)
      $descr  = "Unit $unit_id Input $input_id";
      $oid    = ".1.3.6.1.4.1.534.6.6.7.3.5.1.7.".$input_oid;
      $value  = $input_data['inputTotalPowerFactor'];
-     discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, "inputTotalPowerFactor.$input_oid", 'eaton-epdu-mib', $descr, 0.001, $value);
+     discover_sensor('powerfactor', $device, $oid, "inputTotalPowerFactor.$input_oid", 'eaton-epdu-mib', $descr, 0.001, $value);
    }
 
    if (isset($input_data['inputTotalVAR']) && is_numeric($input_data['inputTotalVAR']))
@@ -68,7 +68,7 @@ foreach ($inputs AS $unit_id => $unit_data)
      $descr  = "Unit $unit_id Input $input_id";
      $oid    = ".1.3.6.1.4.1.534.6.6.7.3.5.1.8.".$input_oid;
      $value  = $input_data['inputTotalVAR'];
-     discover_sensor($valid['sensor'], 'rpower', $device, $oid, "inputTotalVAR.$input_oid", 'eaton-epdu-mib', $descr, 1, $value);
+     discover_sensor('rpower', $device, $oid, "inputTotalVAR.$input_oid", 'eaton-epdu-mib', $descr, 1, $value);
    }
 
    if (is_array($inputs_o[$unit_id][$input_id])) {
@@ -90,7 +90,7 @@ foreach ($inputs AS $unit_id => $unit_data)
           $limits = array('limit_low' => $entry['inputVoltageThLowerCritical']*0.001, 'limit_low_warn' => $entry['inputVoltageThLowerWarning']*0.001,
                           'limit_high' => $entry['inputVoltageThUpperCritical']*0.001, 'limit_high_warn' => $entry['inputVoltageThUpperWarning']*0.001);
 
-          discover_sensor($valid['sensor'], 'voltage', $device, $oid, "inputVoltage.$entry_oid", 'eaton-epdu-mib', $descr, 0.001, $value, $limits);
+          discover_sensor('voltage', $device, $oid, "inputVoltage.$entry_oid", 'eaton-epdu-mib', $descr, 0.001, $value, $limits);
           discover_status($device, $status_oid, "inputVoltageThStatus.".$entry_oid, 'inputVoltageThStatus', $status_descr, $status_value, array('entPhysicalClass' => 'input'));
         }
 
@@ -106,7 +106,7 @@ foreach ($inputs AS $unit_id => $unit_data)
           $limits = array('limit_low' => $entry['inputCurrentThLowerCritical']*0.001, 'limit_low_warn' => $entry['inputCurrentThLowerWarning']*0.001,
                           'limit_high' => $entry['inputCurrentThUpperCritical']*0.001, 'limit_high_warn' => $entry['inputCurrentThUpperWarning']*0.001);
 
-          discover_sensor($valid['sensor'], 'current', $device, $oid, "inputCurrent.$entry_oid", 'eaton-epdu-mib', $descr, 0.001, $value, $limits);
+          discover_sensor('current', $device, $oid, "inputCurrent.$entry_oid", 'eaton-epdu-mib', $descr, 0.001, $value, $limits);
           discover_status($device, $status_oid, "inputCurrentThStatus.".$entry_oid, 'inputCurrentThStatus', $status_descr, $status_value, array('entPhysicalClass' => 'input'));
 
         }
@@ -116,7 +116,7 @@ foreach ($inputs AS $unit_id => $unit_data)
           $descr  = "Unit $unit_id Input $input_id ".$entry['inputPowerMeasType'];
           $oid    = ".1.3.6.1.4.1.534.6.6.7.3.4.1.3.".$entry_oid;
           $value  = $entry['inputVA'];
-          discover_sensor($valid['sensor'], 'apower', $device, $oid, "inputVA.$entry_oid", 'eaton-epdu-mib', $descr, 1, $value);
+          discover_sensor('apower', $device, $oid, "inputVA.$entry_oid", 'eaton-epdu-mib', $descr, 1, $value);
         }
 
         if (isset($entry['inputWatts']) && is_numeric($entry['inputWatts']))
@@ -124,7 +124,7 @@ foreach ($inputs AS $unit_id => $unit_data)
           $descr  = "Unit $unit_id Input $input_id ".$entry['inputPowerMeasType'];
           $oid    = ".1.3.6.1.4.1.534.6.6.7.3.4.1.4.".$entry_oid;
           $value  = $entry['inputWatts'];
-          discover_sensor($valid['sensor'], 'power', $device, $oid, "inputWatts.$entry_oid", 'eaton-epdu-mib', $descr, 1, $value);
+          discover_sensor('power', $device, $oid, "inputWatts.$entry_oid", 'eaton-epdu-mib', $descr, 1, $value);
         }
 
         if (isset($entry['inputPowerFactor']) && is_numeric($entry['inputPowerFactor']))
@@ -132,7 +132,7 @@ foreach ($inputs AS $unit_id => $unit_data)
           $descr  = "Unit $unit_id Input $input_id ".$entry['inputPowerMeasType'];
           $oid    = ".1.3.6.1.4.1.534.6.6.7.3.4.1.7.".$entry_oid;
           $value  = $entry['inputPowerFactor'];
-          discover_sensor($valid['sensor'], 'powerfactor', $device, $oid, "inputPowerFactor.$entry_oid", 'eaton-epdu-mib', $descr, 0.001, $value);
+          discover_sensor('powerfactor', $device, $oid, "inputPowerFactor.$entry_oid", 'eaton-epdu-mib', $descr, 0.001, $value);
         }
 
         if (isset($entry['inputVAR']) && is_numeric($entry['inputVAR']))
@@ -140,7 +140,7 @@ foreach ($inputs AS $unit_id => $unit_data)
           $descr  = "Unit $unit_id Input $input_id ".$entry['inputPowerMeasType'];
           $oid    = ".1.3.6.1.4.1.534.6.6.7.3.4.1.8.".$entry_oid;
           $value  = $entry['inputVAR'];
-          discover_sensor($valid['sensor'], 'rpower', $device, $oid, "inputVAR.$entry_oid", 'eaton-epdu-mib', $descr, 1, $value);
+          discover_sensor('rpower', $device, $oid, "inputVAR.$entry_oid", 'eaton-epdu-mib', $descr, 1, $value);
         }
 
       }
@@ -179,9 +179,9 @@ foreach ($outlets AS $unit_id => $unit_data)
     $limits = array('limit_low' => $entry['outletCurrentThLowerCritical']*0.001, 'limit_low_warn' => $entry['outletCurrentThLowerWarning']*0.001,
                     'limit_high' => $entry['outletCurrentThUpperCritical']*0.001, 'limit_high_warn' => $entry['outletCurrentThUpperWarning']*0.001);
 
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, "outletCurrent.$outlet_index", 'eaton-epdu-mib', $outlet_descr, 0.001, $current_value, $limits);
-    discover_sensor($valid['sensor'], 'load', $device, $percent_oid, "outletCurrentPercentLoad.$outlet_index", 'eaton-epdu-mib', $outlet_descr, 1, $percent_value);
-    discover_sensor($valid['sensor'], 'crestfactor', $device, $crest_oid, "outletCurrentCrestFactor.$outlet_index", 'eaton-epdu-mib', $outlet_descr, 1, $crest_value);
+    discover_sensor('current', $device, $current_oid, "outletCurrent.$outlet_index", 'eaton-epdu-mib', $outlet_descr, 0.001, $current_value, $limits);
+    discover_sensor('load', $device, $percent_oid, "outletCurrentPercentLoad.$outlet_index", 'eaton-epdu-mib', $outlet_descr, 1, $percent_value);
+    discover_sensor('crestfactor', $device, $crest_oid, "outletCurrentCrestFactor.$outlet_index", 'eaton-epdu-mib', $outlet_descr, 1, $crest_value);
   }
 }
 

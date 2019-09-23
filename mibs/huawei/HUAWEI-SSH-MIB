@@ -1,10 +1,10 @@
 
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This mib which contains objects manages the 
 --              SSH server and SSH client configuration. 
 -- Reference:  
--- Version: V2.16
+-- Version: V2.23
 -- ==================================================================
 -- ==================================================================
 -- 
@@ -16,16 +16,16 @@
         IMPORTS
             hwDatacomm          
                 FROM HUAWEI-MIB         
-            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
+               OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
                 FROM SNMPv2-CONF            
-            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE          
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE          
                 FROM SNMPv2-SMI         
             RowStatus, DisplayString            
                 FROM SNMPv2-TC;
     
         -- 1.3.6.1.4.1.2011.5.25.118
             hwSSH MODULE-IDENTITY 
-            LAST-UPDATED "201701240000Z"        
+            LAST-UPDATED "201806070000Z"         
             ORGANIZATION "Huawei Technologies Co.,Ltd."
             CONTACT-INFO                                        
                          "Huawei Industrial Base                
@@ -39,7 +39,43 @@
                 "This mib which contains objects manages the 
                 SSH server and SSH client configuration. 
                 "   
---  Revision history
+--  Revision history    
+            REVISION    "201806070000Z"
+            DESCRIPTION "V2.23, modify hwSNetConfMaxUserNum range 0..20 "
+
+            REVISION    "201711220000Z"
+            DESCRIPTION "V2.22, delete index of hwRSAPublicKeyTable;" 
+
+            REVISION    "201711100000Z"
+            DESCRIPTION "V2.21, modify  hwSSHServerInfoTable    OID:1.3.6.1.4.1.2011.5.25.118.2.2;" 
+
+             REVISION    "201708230000Z"
+             DESCRIPTION "V2.20, delete index of hwSSHServerSessionTable." 
+
+            REVISION    "201708170000Z"
+            DESCRIPTION "V2.19, 
+                          1.modify hwStelnetServerEnable               OID:1.3.6.1.4.1.2011.5.25.118.1.1;
+                          2.modify hwSftpServerEnable                    OID:1.3.6.1.4.1.2011.5.25.118.1.2;
+                          3.modify hwSNetConfServerEnable         OID:1.3.6.1.4.1.2011.5.25.118.1.15;
+                          4.modify hwStelnetIPv4ServerEnable       OID:1.3.6.1.4.1.2011.5.25.118.1.21;
+                          5.modify hwStelnetIPv6ServerEnable       OID:1.3.6.1.4.1.2011.5.25.118.1.22;
+                          6.modify hwSftpIPv4ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.23;
+                          7.modify hwSftpIPv6ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.24;
+                          8.modify hwSCPIPv4ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.25;
+                          9.modify hwSCPIPv6ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.26;
+                          10.modify hwSNetConfIPv4ServerEnable         OID:1.3.6.1.4.1.2011.5.25.118.1.27;
+                          11.modify hwSNetConfIPv6ServerEnable         OID:1.3.6.1.4.1.2011.5.25.118.1.28;
+                          12.modify hwSSHFirstTimeAuthEnable            OID:1.3.6.1.4.1.2011.5.25.118.2.1;
+                          13.modify hwSSHUserName                              OID:1.3.6.1.4.1.2011.5.25.118.1.11.1.2;"
+
+             REVISION    "201705170000Z"
+             DESCRIPTION "V2.18, Modify the type of mib-node according to the field type in DOM" 
+
+             REVISION    "201703140000Z"
+             DESCRIPTION "V2.17, 
+                         1.Add hwSNetConfIPv4ServerEnable          OID:1.3.6.1.4.1.2011.5.25.118.1.27;
+                         2.Add hwSNetConfIPv6ServerEnable          OID:1.3.6.1.4.1.2011.5.25.118.1.28;" 
+
              REVISION    "201701240000Z"
              DESCRIPTION "V2.16, 
                            1.Add hwSSHIPv4ServerPort                OID:1.3.6.1.4.1.2011.5.25.118.1.19;
@@ -133,8 +169,9 @@
                 "
                 The object specifies whether the SSH stelnet server is enable.
                 Options:
-                1. enable(1) -The SSH stelnet server is enable.
-                2. disable(2)-The SSH stelnet server is disable.
+               1. enable(1) -The SSH stelnet server is enable.
+               2. disable(2)-The SSH stelnet server is disable.
+               The default value is disable.
                 "
             ::= { hwSSHServer 1 }
 
@@ -150,10 +187,11 @@
             STATUS current
             DESCRIPTION
                 "
-                The object specifies whether the sftp server is enable.
+                The object specifies whether the sftp server is enable. 
                 Options:
-                1.enable(1) -the sftp server is enable
+                1.enable(1) -the sftp server is enable.
                 2.disable(2)-the sftp server is disable.
+                The default value is disable.
                 "
             -- DEFVAL { 2 }
             ::= { hwSSHServer 2 }
@@ -283,7 +321,6 @@
             DESCRIPTION
                 "
                 This table is used for querying and setting the information about SSH user.
-                The index of this table is hwSSHUserIndex. 
                 "
             ::= { hwSSHServer 11 }
 
@@ -342,7 +379,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The object specifies the name of a SSH user. The maximum length of the node is 85."
+                "The object specifies the name of a SSH user. The maximum length of the node is 255."
             ::= { hwSSHUserEntry 2 }
 
         
@@ -502,7 +539,6 @@
                 "
                 The object shows current session information of the SSH server which includes username,
                 version information, retry times of online users currently.
-                The index of this table is hwSSHSessionIndex.
                 "
             ::= { hwSSHServer 12 }
 
@@ -799,7 +835,6 @@
             DESCRIPTION
                 "
                 A table of configuration about RSA Public Key.
-                The index of this table is hwRSAPublicKeyName.  
                 hwRSAPublicKeyName is the name of RSA Public Key.              
                 "
             ::= { hwSSHServer 13 }
@@ -889,7 +924,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.118.1.14
         hwSNetConfMaxUserNum OBJECT-TYPE
-            SYNTAX Integer32 (0..15)
+            SYNTAX Integer32 (0..20)
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -909,7 +944,7 @@
             STATUS current
             DESCRIPTION
                 "The object specifies whether the SSH SNetConf Server is enable.
-                The default is 2."
+                The default is disable(2)."
             ::= { hwSSHServer 15 }
 
         
@@ -955,7 +990,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.118.1.19
         hwSSHIPv4ServerPort OBJECT-TYPE
-            SYNTAX Integer32 (22 | 1025..65535)
+            SYNTAX Unsigned32 (22 | 1025..65535)
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -966,7 +1001,7 @@
             
         -- 1.3.6.1.4.1.2011.5.25.118.1.20
         hwSSHIPv6ServerPort OBJECT-TYPE
-            SYNTAX Integer32 (22 | 1025..65535)
+            SYNTAX Unsigned32 (22 | 1025..65535)
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -990,6 +1025,7 @@
                 Options:
                 1. enable(1) -The SSH stelnet IPv4 server is enable.
                 2. disable(2)-The SSH stelnet IPv4 server is disable.
+                The default value is disable.
                 "
             ::= { hwSSHServer 21 }
             
@@ -1009,6 +1045,7 @@
                 Options:
                 1. enable(1) -The stelnet IPv6 server is enable.
                 2. disable(2)-The stelnet IPv6 server is disable.
+                The default value is disable.
                 "
             ::= { hwSSHServer 22 }
 
@@ -1028,6 +1065,7 @@
                 Options:
                 1.enable(1) -The sftp IPv4 server is enable
                 2.disable(2)-The sftp IPv4 server is disable.
+                The default value is disable.
                 "
             ::= { hwSSHServer 23 }
             
@@ -1045,8 +1083,9 @@
                 "
                 The object specifies whether the sftp IPv6 server is enable.
                 Options:
-                1.enable(1) -the sftp IPv6 server is enable
+                1.enable(1) -the sftp IPv6 server is enable.
                 2.disable(2)-the sftp IPv6 server is disable.
+                The default value is disable.
                 "
             ::= { hwSSHServer 24 }
             
@@ -1061,8 +1100,8 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The object specifies whether the SCP IPv4 Server is enable.
-                The default is 2."
+                "The object specifies whether the SCP IPv4 Server is enable. 
+                The default value is disable."
             ::= { hwSSHServer 25 }
             
             
@@ -1077,8 +1116,48 @@
             STATUS current
             DESCRIPTION
                 "The object specifies whether the SCP IPv6 Server is enable.
-                The default is 2."
+                The default value is disable."
             ::= { hwSSHServer 26 }
+
+
+         -- 1.3.6.1.4.1.2011.5.25.118.1.27
+         hwSNetConfIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH SNetConf IPv4 server is enable.
+                Options:
+                1.enable(1) -the SSH SNetConf IPv4 server is enable.
+                2.disable(2)-the SSH SNetConf IPv4 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 27 }
+
+        
+         -- 1.3.6.1.4.1.2011.5.25.118.1.28
+         hwSNetConfIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH SNetConf IPv6 server is enable.
+                Options:
+                1. enable(1) -The SSH SNetConf IPv6 server is enable.
+                2. disable(2)-The SSH SNetConf IPv6 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 28 }
 
         
         -- 1.3.6.1.4.1.2011.5.25.118.2
@@ -1095,11 +1174,12 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The object specifies whether the SSH client 
+                "The object specifies whether the SSH client
                 supports first-time-authentication.
                 Options:
                 1.enable(1) -indicates the SSH client supports first-time-authentication.
                 2.disable(2)-indicates the SSH client does not support first-time-authentication.
+                The default value is disable.
                 "
             ::= { hwSSHClient 1 }
 
@@ -1111,9 +1191,8 @@
             STATUS current
             DESCRIPTION
                 "
-                A table of configuration about the relation
-                between the SSH server and the rsa peerkey.
-                The index of this table is hwSSHServerIndex.
+                This table describes SSH server information on the SSH client, 
+                including the table index, server name, RSA public key, and server status.
                 "
             ::= { hwSSHClient 2 }
 

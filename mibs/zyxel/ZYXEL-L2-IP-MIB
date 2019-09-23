@@ -37,6 +37,9 @@ ZYXEL-L2-IP-MIB DEFINITIONS ::= BEGIN
 	IpAddress
 		FROM SNMPv2-SMI
 
+ 	DisplayString
+	  	FROM SNMPv2-TC
+	  	
 	esMgmt			
 		FROM ZYXEL-ES-SMI;
 
@@ -121,6 +124,24 @@ ZYXEL-L2-IP-MIB DEFINITIONS ::= BEGIN
 		"IP address of the default outgoing gateway."
         ::= { zyxelLayer2IpInbandDefaultSetup 5 }	
 
+        zyLayer2IpInbandDefaultDhcpOption60State OBJECT-TYPE
+        SYNTAX  EnabledStatus 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+		"Enable(1)/Disable(2) DHCP option 60 vendor class-id."
+        ::= { zyxelLayer2IpInbandDefaultSetup 6 }	
+
+        zyLayer2IpInbandDefaultDhcpOption60ClassId OBJECT-TYPE
+        SYNTAX  DisplayString 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+		"Set/Get the vendor class identifier (DHCPv4 option 60) to be sent with the DHCP packet.
+		 Min length of string is 1 byte.
+		 Max length of string is 32 bytes."
+        ::= { zyxelLayer2IpInbandDefaultSetup 7 }
+        
         zyLayer2IpInbandMaxNumberOfInterfaces OBJECT-TYPE
         SYNTAX  INTEGER
         MAX-ACCESS  read-only

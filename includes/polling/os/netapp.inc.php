@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -59,7 +59,7 @@ $rrd_create = '  \
      DS:tape_rd:COUNTER:600:0:10000000000 \
      DS:tape_wr:COUNTER:600:0:10000000000 ';
 
-$snmpdata = snmp_get_multi($device, 'iscsi64Ops.0 fcp64Ops.0 misc64NfsOps.0 misc64CifsOps.0 misc64HttpOps.0 misc64NetRcvdBytes.0 misc64NetSentBytes.0 misc64DiskReadBytes.0 misc64DiskWriteBytes.0 misc64TapeReadBytes.0 misc64TapeWriteBytes.0', '-OQUs', $mib);
+$snmpdata = snmp_get_multi_oid($device, 'iscsi64Ops.0 fcp64Ops.0 misc64NfsOps.0 misc64CifsOps.0 misc64HttpOps.0 misc64NetRcvdBytes.0 misc64NetSentBytes.0 misc64DiskReadBytes.0 misc64DiskWriteBytes.0 misc64TapeReadBytes.0 misc64TapeWriteBytes.0', array(), $mib);
 
 rrdtool_create($device, $rrd_filename, $rrd_create);
 rrdtool_update($device, $rrd_filename, array($snmpdata[0]['iscsi64Ops'], $snmpdata[0]['fcp64Ops'], $snmpdata[0]['misc64NfsOps'], $snmpdata[0]['misc64CifsOps'], $snmpdata[0]['misc64HttpOps'], $snmpdata[0]['misc64NetRcvdBytes'], $snmpdata[0]['misc64NetSentBytes'], $snmpdata[0]['misc64DiskReadBytes'], $snmpdata[0]['misc64DiskWriteBytes'], $snmpdata[0]['misc64TapeReadBytes'], $snmpdata[0]['misc64TapeWriteBytes']));
@@ -106,7 +106,7 @@ if(is_file($host_rrd . '/netapp_cp.rrd'))
     DS:cp_deferred:COUNTER:600:0:10000000000 \
     DS:low_datavecs:COUNTER:600:0:10000000000 ';
 
-  $snmpdata = snmp_get_multi($device, 'cpTime.0 cpFromTimerOps.0 cpFromSnapshotOps.0 cpFromLowWaterOps.0 cpFromHighWaterOps.0 cpFromLogFullOps.0 cpFromCpOps.0 cpFromFlushOps.0 cpFromSyncOps.0 cpFromLowVbufOps.0 cpFromCpDeferredOps.0 cpFromLowDatavecsOps.0', '-OQUs', $mib);
+  $snmpdata = snmp_get_multi_oid($device, 'cpTime.0 cpFromTimerOps.0 cpFromSnapshotOps.0 cpFromLowWaterOps.0 cpFromHighWaterOps.0 cpFromLogFullOps.0 cpFromCpOps.0 cpFromFlushOps.0 cpFromSyncOps.0 cpFromLowVbufOps.0 cpFromCpDeferredOps.0 cpFromLowDatavecsOps.0', array(), $mib);
 
   rrdtool_create($device, $rrd_filename, $rrd_create);
   rrdtool_update($device, $rrd_filename, array($snmpdata[0]['cpTime'], $snmpdata[0]['cpFromTimerOps'], $snmpdata[0]['cpFromSnapshotOps'], $snmpdata[0]['cpFromLowWaterOps'], $snmpdata[0]['cpFromHighWaterOps'], $snmpdata[0]['cpFromLogFullOps'], $snmpdata[0]['cpFromCpOps'], $snmpdata[0]['cpFromFlushOps'], $snmpdata[0]['cpFromSyncOps'], $snmpdata[0]['cpFromLowVbufOps'], $snmpdata[0]['cpFromCpDeferredOps'], $snmpdata[0]['cpFromLowDatavecsOps']));

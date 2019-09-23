@@ -5,7 +5,7 @@
  *
  * @package    observium
  * @subpackage poller
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -22,6 +22,7 @@ $netstats_poll['ip']['oids']   = array('ipForwDatagrams', 'ipInDelivers', 'ipInR
 // ICMP
 $netstats_poll['icmp']['mib']    = 'IP-MIB';
 $netstats_poll['icmp']['graphs'] = array('netstat_icmp', 'netstat_icmp_info');
+$netstats_poll['icmp']['oids_t'] = array('icmpInMsgs', 'icmpOutMsgs');
 $netstats_poll['icmp']['oids']   = array('icmpInMsgs', 'icmpOutMsgs', 'icmpInErrors', 'icmpOutErrors', 'icmpInEchos', 'icmpOutEchos',
                                          'icmpInEchoReps', 'icmpOutEchoReps', 'icmpInDestUnreachs', 'icmpOutDestUnreachs', 'icmpInParmProbs',
                                          'icmpInTimeExcds', 'icmpInSrcQuenchs', 'icmpInRedirects', 'icmpInTimestamps', 'icmpInTimestampReps',
@@ -43,6 +44,7 @@ $netstats_poll['udp']['oids']   = array('udpInDatagrams', 'udpOutDatagrams', 'ud
 // SNMP
 $netstats_poll['snmp']['mib']    = 'SNMPv2-MIB';
 $netstats_poll['snmp']['graphs'] = array('netstat_snmp_stats', 'netstat_snmp_packets');
+$netstats_poll['snmp']['oids_t'] = array('snmpInPkts', 'snmpOutPkts');
 $netstats_poll['snmp']['oids']   = array('snmpInPkts', 'snmpOutPkts', 'snmpInBadVersions', 'snmpInBadCommunityNames', 'snmpInBadCommunityUses',
                                          'snmpInASNParseErrs', 'snmpInTooBigs', 'snmpInNoSuchNames', 'snmpInBadValues', 'snmpInReadOnlys',
                                          'snmpInGenErrs', 'snmpInTotalReqVars', 'snmpInTotalSetVars', 'snmpInGetRequests', 'snmpInGetNexts',

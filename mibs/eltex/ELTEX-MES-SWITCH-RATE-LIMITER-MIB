@@ -1,8 +1,8 @@
 ELTEX-MES-SWITCH-RATE-LIMITER-MIB DEFINITIONS ::= BEGIN
 
 -- Title:      ELTEX MES Switch Rate Limiter Private
--- Version:    2.0
--- Date:       27 May 2016
+-- Version:    2.1
+-- Date:       10 Jul 2017
 
 IMPORTS
     MODULE-IDENTITY,
@@ -16,6 +16,9 @@ IMPORTS
 
 eltMesSwitchRateLimiterObjects OBJECT IDENTIFIER
     ::= { eltMesSwitchRateLimiterMIB 1 }
+
+eltMesCpuRateLimiterNotifications OBJECT IDENTIFIER 
+	::= { eltMesSwitchRateLimiterObjects 0 }    
 
 eltMesSwitchRateLimiterConfig OBJECT IDENTIFIER
     ::= { eltMesSwitchRateLimiterObjects 1 }
@@ -110,8 +113,9 @@ eltCpuRateLimiterEntry OBJECT-TYPE
     ::= { eltCpuRateLimiterTable 1 }
 
 EltCpuRateLimiterEntry ::= SEQUENCE {
-        eltCpuRateLimiterIndex       EltCpuRateLimiterTrafficType,
-        eltCpuRateLimiterValue       Integer32
+        eltCpuRateLimiterIndex          	EltCpuRateLimiterTrafficType,
+        eltCpuRateLimiterValue       		Integer32,
+        eltCpuRateDefaultLimiterValue       Integer32
 }
 
 eltCpuRateLimiterIndex OBJECT-TYPE
@@ -127,6 +131,13 @@ eltCpuRateLimiterValue OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "Value of rate-limiter"
     ::= { eltCpuRateLimiterEntry 2 }
+    
+eltCpuRateDefaultLimiterValue OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Default value of rate-limiter"
+    ::= { eltCpuRateLimiterEntry 3 }    
 
 -------------------------------
 -- CPU Rate Statistics Table --
@@ -174,5 +185,18 @@ eltCpuRateStatisticsCounter OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "Total counter of packets."
     ::= { eltCpuRateStatisticsEntry 3 }
+    
+    
+--
+-- Notifications
+--
+
+eltCpuRateLimiterTrap NOTIFICATION-TYPE
+    OBJECTS   {eltCpuRateLimiterIndex, eltCpuRateLimiterValue}
+    STATUS    current
+    DESCRIPTION
+        "A eltCpuRateLimiterTrap is generated when
+         exceeded threshold value of CPU input rate."
+    ::= { eltMesCpuRateLimiterNotifications 1 }
 
 END

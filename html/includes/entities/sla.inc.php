@@ -7,7 +7,7 @@
  *
  * @package        observium
  * @subpackage     web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -316,7 +316,7 @@ function generate_sla_row($sla, $vars)
   $out .= '<td>'. $sla['sla_owner'] .'</td>';
   $out .= '<td>'. $sla['rtt_label'] .'</td>';
   $out .= '<td>' . generate_entity_link('sla', $sla, $mini_graph, NULL, FALSE) . '</td>';
-  $out .= '<td style="white-space: nowrap">' . generate_tooltip_link(NULL, formatUptime(($config['time']['now'] - $sla['rtt_last_change']), 'short-2') . ' ago', format_unixtime($sla['rtt_last_change'])) . '</td>';
+  $out .= '<td style="white-space: nowrap">' . generate_tooltip_link(NULL, format_uptime(($config['time']['now'] - $sla['rtt_last_change']), 'short-2') . ' ago', format_unixtime($sla['rtt_last_change'])) . '</td>';
   $out .= '<td style="text-align: right;"><strong>' . generate_tooltip_link('', $sla['rtt_event'], $sla['event_descr'], $sla['event_class']) . '</strong></td>';
   $out .= '<td style="text-align: right;"><strong>' . generate_tooltip_link('', $sla['rtt_sense'], $sla['event_descr'], $sla['event_class']) . '</strong></td>';
   $out .= '<td><span class="' . $sla['sla_class'] . '">' . $sla['human_value'] . $sla['human_unit'] . '</span></td>';

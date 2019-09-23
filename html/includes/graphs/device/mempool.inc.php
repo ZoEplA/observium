@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage graphs
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -35,9 +35,13 @@ foreach (dbFetchRows("SELECT * FROM `mempools` where `device_id` = ?", array($de
   $colour=$config['graph_colours'][$colours][$iter];
 
   $descr = rrdtool_escape(rewrite_hrDevice($mempool['mempool_descr']), $descr_len);
-  if (isset($mempool['mempool_type'])) { $mempool['mempool_mib'] = $mempool['mempool_type']; }
 
-  $rrd_filename = get_rrd_path($device, "mempool-".strtolower($mempool['mempool_mib'])."-".$mempool['mempool_index'].".rrd");
+  if (isset($mempool['mempool_table']))
+  {
+    $rrd_filename = get_rrd_path($device, "mempool-".strtolower($mempool['mempool_mib'])."-".$mempool['mempool_table']."-".$mempool['mempool_index'].".rrd");
+  } else {
+    $rrd_filename = get_rrd_path($device, "mempool-".strtolower($mempool['mempool_mib'])."-".$mempool['mempool_index'].".rrd");
+  }
 
   if (is_file($rrd_filename))
   {

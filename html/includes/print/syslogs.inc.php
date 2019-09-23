@@ -7,7 +7,7 @@
  *
  * @package    observium
  * @subpackage web
- * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2018 Observium Limited
+ * @copyright  (C) 2006-2013 Adam Armstrong, (C) 2013-2019 Observium Limited
  *
  */
 
@@ -39,6 +39,8 @@ function print_syslogs($vars)
 
   $priorities = $GLOBALS['config']['syslog']['priorities'];
 
+  $device_single = FALSE; // Show syslog entries for single device or multiple (use approximate counts for multiple)
+
   $param = array();
   $where = ' WHERE 1 ';
   foreach ($vars as $var => $value)
@@ -50,6 +52,7 @@ function print_syslogs($vars)
       {
         case 'device':
         case 'device_id':
+          $device_single = is_numeric($value);
           $where .= generate_query_values($value, 'device_id');
           break;
         case 'priority':
@@ -83,12 +86,19 @@ function print_syslogs($vars)
     }
   }
 
-  // Show events only for permitted devices
+  // Show entries only for permitted devices
   $query_permitted = generate_query_permitted();
+  /*
+  // Convert NOT IN to IN for correctly use indexes
+  $devices_permitted = dbFetchColumn('SELECT DISTINCT `device_id` FROM `syslog` WHERE 1 '.$query_permitted, NULL, TRUE);
+  $query_permitted = generate_query_values($devices_permitted, 'device_id');
+  //r($devices_permitted);
+  */
 
   $query = 'FROM `syslog` ';
   $query .= $where . $query_permitted;
   $query_count = 'SELECT COUNT(*) ' . $query;
+  $query_count_approx = 'EXPLAIN SELECT * ' . $query; // Fast approximate count
 
   $query = 'SELECT * ' . $query;
   $query .= ' ORDER BY `seq` DESC ';
@@ -97,8 +107,23 @@ function print_syslogs($vars)
   // Query syslog messages
   $entries = dbFetchRows($query, $param);
   // Query syslog count
-  if ($pagination && !$short) { $count = dbFetchCell($query_count, $param); }
-  else { $count = count($entries); }
+  if ($pagination && !$short)
+  {
+    dbQuery('SET SESSION MAX_EXECUTION_TIME=300;'); // Set 0.3 sec maximum query execution time
+    // Exactly count, but it's very SLOW on huge tables
+    $count = dbFetchCell($query_count, $param);
+    dbQuery('SET SESSION MAX_EXECUTION_TIME=0;'); // Reset maximum query execution time
+    //r($count);
+    if (!is_numeric($count))
+    {
+      // Approximate count correctly around 100-80%
+      dbQuery('ANALYZE TABLE `syslog`;'); // Update INFORMATION_SCHEMA for more correctly count
+      $tmp = dbFetchRow($query_count_approx, $param);
+      $count = $tmp['rows'];
+    }
+  } else {
+    $count = count($entries);
+  }
 
   if (!$count)
   {
@@ -144,7 +169,7 @@ See <a href="'.OBSERVIUM_URL.'/wiki/Category:Documentation" target="_blank">docu
       {
         $string .= '    <td class="syslog text-nowrap">';
         $timediff = $GLOBALS['config']['time']['now'] - strtotime($entry['timestamp']);
-        $string .= generate_tooltip_link('', formatUptime($timediff, "short-3"), format_timestamp($entry['timestamp']), NULL) . '</td>' . PHP_EOL;
+        $string .= generate_tooltip_link('', format_uptime($timediff, "short-3"), format_timestamp($entry['timestamp']), NULL) . '</td>' . PHP_EOL;
       } else {
         $string .= '    <td style="width: 130px">';
         $string .= format_timestamp($entry['timestamp']) . '</td>' . PHP_EOL;

@@ -307,26 +307,6 @@ HP-ICF-SVCS-APP-MIB DEFINITIONS ::= BEGIN
     ::= { hpicfSvcsV1AppEntry 9 }
 
 -- ****************************************************************************
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- Conformance Groups
 -- ****************************************************************************
     hpicfSvcsAppCompliances   OBJECT IDENTIFIER ::= { hpicfSvcsAppConformance 1 }
@@ -406,21 +386,6 @@ HP-ICF-SVCS-APP-MIB DEFINITIONS ::= BEGIN
             OBJECT    hpicfSvcsV1AppRowStatus 
             MIN-ACCESS read-only
             DESCRIPTION "Write access is not required."
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         ::= { hpicfSvcsAppCompliances 1 }
 

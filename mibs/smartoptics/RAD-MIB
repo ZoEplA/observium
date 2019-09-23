@@ -22,13 +22,13 @@ RAD-MIB
 
 IMPORTS
       TimeTicks, enterprises, IpAddress, OBJECT-TYPE, Integer32, Counter32,
-      Gauge32, OBJECT-IDENTITY, NOTIFICATION-TYPE, Unsigned32,Counter64		            FROM SNMPv2-SMI
-      RowStatus, TimeStamp, DisplayString, TruthValue,TEXTUAL-CONVENTION,RowPointer     FROM SNMPv2-TC
-	  PerfCurrentCount, PerfIntervalCount, PerfTotalCount								FROM PerfHist-TC-MIB
-      ifAlias, ifIndex                                     						    	FROM IF-MIB
-      SnmpAdminString																	FROM SNMP-FRAMEWORK-MIB 
-      IANAifType																		FROM IANAifType-MIB
-	  InetAddressType,InetAddress														FROM INET-ADDRESS-MIB;
+      Gauge32, OBJECT-IDENTITY, NOTIFICATION-TYPE, Unsigned32,Counter64			FROM SNMPv2-SMI
+      RowStatus, TimeStamp, DisplayString, TruthValue,TEXTUAL-CONVENTION,RowPointer	FROM SNMPv2-TC
+      PerfCurrentCount, PerfIntervalCount, PerfTotalCount				FROM PerfHist-TC-MIB
+      ifAlias, ifIndex									FROM IF-MIB
+      SnmpAdminString									FROM SNMP-FRAMEWORK-MIB 
+      IANAifType									FROM IANAifType-MIB
+      InetAddressType,InetAddress							FROM INET-ADDRESS-MIB;
 --      
 -- Some MIB compilers need those two lines:
 -- enterprises OBJECT IDENTIFIER ::=
