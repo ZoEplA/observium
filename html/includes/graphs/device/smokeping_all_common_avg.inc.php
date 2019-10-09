@@ -105,6 +105,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
 
   
   
+  if ($direction == "incoming") {
   ksort($lc);                               # matt.ayre: begin section for new CDEF/AREA/STACK for line and background colour
   $last = -1;
   foreach ($lc as $loss => $lc_loss) {
@@ -120,7 +121,8 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
       // line and legend (@median)
       $rrd_options .= " CDEF:me$lvar=loss$i,$last,GT,loss$i,$loss,LE,*,1,UNKN,IF,median$i,*";
       $rrd_options .= " CDEF:meL$lvar=me$lvar,$swidth,-";
-      $rrd_options .= " CDEF:meH$lvar=me$lvar,$i,*,$swidth,2,*,+";
+      // $rrd_options .= " CDEF:meH$lvar=me$lvar,$i,*,$swidth,2,*,+";
+      $rrd_options .= " CDEF:meH$lvar=me$lvar,0,*,$swidth,2,*,+";
       $rrd_options_lc .= " AREA:meL$lvar";
       $rrd_options_lc .= " STACK:meH$lvar$lc_loss[1]:$lc_loss[0]";
   
@@ -129,6 +131,7 @@ foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filena
       $rrd_options_bg .= " AREA:lossbg$lvar$lc_loss[1]$bg_trans";
   
       $last = $loss;
+  }
   }
 
   $i++;
@@ -145,7 +148,8 @@ $rrd_options .= " CDEF:dmlow_all=dm_all,sd_all,2,/,-";
 
 $rrd_options .= " AREA:dmlow_all";
 $rrd_options .= " AREA:sd_all#AAAAAA::STACK";
-$rrd_options .= " LINE1:dm_all#CC0000:'$descr'";
+//$rrd_options .= " LINE1:dm_all#CC0000:'$descr'";
+$rrd_options .= " LINE1:dm_all#000000:'$descr'";
 
 $rrd_options .= " VDEF:avmed=dm_all,AVERAGE";
 $rrd_options .= " VDEF:avsd=sd_all,AVERAGE";
@@ -156,15 +160,16 @@ $rrd_options .= " GPRINT:avmed:'%5.1lf%ss'";
 $rrd_options .= " GPRINT:ploss_all:AVERAGE:'%5.3lf%%'";
 $rrd_options .= " GPRINT:avsd:'%5.1lf%Ss'";
 $rrd_options .= " GPRINT:avmsr:'%5.1lf%s\\l'";
-
+if ($direction == "incoming") {
 $rrd_options .= " COMMENT:' \l'";                   # matt.ayre: legend loss thresholds
 $rrd_options .= " COMMENT:'loss color\:'";
-
+}
 $rrd_options .= $rrd_options_lc;
 $rrd_options .= $rrd_options_bg;
-
+if ($direction == "incoming") {
 $rrd_options .= " COMMENT:'\l'";                    # matt.ayre: annotation showing smokeping parameters
 $rrd_options .= " COMMENT:'probes\:\t$pings ICMP Echo Pings ($description) every ${interval}s\l'";
+}
  
 
 
