@@ -67,6 +67,25 @@ function print_status_old($options)
       $string .= '    <td style="white-space: nowrap">' . deviceUptime($device, 'short') . '</td>' . PHP_EOL;
       $string .= '  </tr>' . PHP_EOL;
     }
+
+    $query = 'SELECT * FROM `devices` AS D';
+    $query .= ' WHERE D.`status` = 1' . $query_device_permitted;
+    $query .= ' ORDER BY D.`hostname` ASC';
+    $entries = dbFetchRows($query);
+    foreach ($entries as $device)
+    {
+      $since = get_entity_attrib('device', $device, 'host_id_changed');
+      if ($since) {
+        $string .= '  <tr>' . PHP_EOL;
+        $string .= '    <td class="entity">' . generate_device_link($device, short_hostname($device['hostname'])) . '</td>' . PHP_EOL;
+        // $string .= '    <td><span class="badge badge-inverse">Device</span></td>' . PHP_EOL;
+        $string .= '    <td><span class="label label-important">Host identification changed</span></td>' . PHP_EOL;
+        $string .= '    <td class="entity"><i class="'.$config['icon']['devices'].'"></i> ' . generate_device_link($device, short_hostname($device['hostname'])) . '</td>' . PHP_EOL;
+        // $string .= '    <td style="white-space: nowrap">' . escape_html(truncate($device['location'], 30)) . '</td>' . PHP_EOL;
+        $string .= '    <td style="white-space: nowrap">' . format_unixtime($since) . '</td>' . PHP_EOL;
+        $string .= '  </tr>' . PHP_EOL;
+      }
+    }
   }
 
   // Uptime
@@ -412,6 +431,24 @@ function get_status_array($options)
                        'device_link' => generate_device_link($device, short_hostname($device['hostname'])),
                        'time' => deviceUptime($device, 'short-3'),
                        'icon_tag' => '<i class="' . $config['entities']['device']['icon'] . '"></i>');
+    }
+
+    $query = 'SELECT * FROM `devices` AS D ';
+    $query .= 'WHERE D.`status` = 1' . $query_device_permitted;
+    $query .= 'ORDER BY D.`hostname` ASC';
+    $entries = dbFetchRows($query);
+    foreach ($entries as $device)
+    {
+      $since = get_entity_attrib('device', $device, 'host_id_changed');
+      if ($since)
+      {
+          $boxes[] = array('sev' => 10,
+                       'class' => 'Device',
+                       'event' => 'Changed',
+                       'device_link' => generate_device_link($device, short_hostname($device['hostname'])),
+                       'time' => format_unixtime($since),
+                       'icon_tag' => '<i class="' . $config['entities']['device']['icon'] . '"></i>');
+      }
     }
   }
 
