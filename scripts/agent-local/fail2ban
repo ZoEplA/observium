@@ -1,0 +1,12 @@
+#!/bin/sh
+
+f2bclient=`which fail2ban-client`
+
+if [ $? -eq 0 ]; then
+  echo "<<<app-fail2ban>>>"
+
+  $f2bclient status sshd | grep 'Currently banned' | cut -f2
+  $f2bclient status dropbear | grep 'Currently banned' | cut -f2
+  $f2bclient status nginx-http-auth | grep 'Currently banned' | cut -f2
+fi
+

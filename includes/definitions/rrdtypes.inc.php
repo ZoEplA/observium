@@ -119,4 +119,42 @@ $config['rrd_types']['smart'] = array(
   ),
 );
 
+$config['rrd_types']['rrdcached'] = array(
+  'file'  => 'app-rrdcached-%index%.rrd',
+  'ds'    => array(
+    'QueueLength'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'UpdatesReceived'  => array('type' => 'COUNTER', 'min' => 0, 'max' => 125000000000),
+    'FlushesReceived'  => array('type' => 'COUNTER', 'min' => 0, 'max' => 125000000000),
+    'UpdatesWritten'  => array('type' => 'COUNTER', 'min' => 0, 'max' => 125000000000),
+    'DataSetsWritten'  => array('type' => 'COUNTER', 'min' => 0, 'max' => 125000000000),
+    'TreeNodesNumber'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'TreeDepth'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'JournalBytes'  => array('type' => 'COUNTER', 'min' => 0, 'max' => 125000000000),
+    'JournalRotate'  => array('type' => 'COUNTER', 'min' => 0, 'max' => 125000000000),
+  ),
+);
+
+$config['rrd_types']['phpfpm'] = array(
+  'file'  => 'app-phpfpm-%index%.rrd',
+  'ds'    => array(
+    'lq'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'mlq' => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'ip'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'ap'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'tp'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'map' => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'mcr' => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'sr'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+  ),
+);
+
+$config['rrd_types']['fail2ban'] = array(
+  'file'  => 'app-fail2ban-%index%.rrd',
+  'ds'    => array(
+    'sshd'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'dropbear'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+    'nginx'  => array('type' => 'GAUGE', 'min' => 0, 'max' => 125000000000),
+  ),
+);
+
 // EOF

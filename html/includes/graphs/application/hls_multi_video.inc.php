@@ -79,7 +79,7 @@ if ($width > "500")
   $descr_len += round(($width - 215) / 9.5);
 }
 
-$unit_text = "bps";
+$unit_text = "Bits/s";
 
 if (!$noheader)
 {
